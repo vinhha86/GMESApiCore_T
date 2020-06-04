@@ -26,6 +26,8 @@ import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProductBinding;
 import vn.gpay.gsmart.core.pcontractproductdocument.IPContractProducDocumentService;
 import vn.gpay.gsmart.core.pcontractproductdocument.PContractProductDocument;
+import vn.gpay.gsmart.core.pcontractproductpairing.IPContractProductPairingService;
+import vn.gpay.gsmart.core.pcontractproductpairing.PContractProductPairing;
 import vn.gpay.gsmart.core.pcontratproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontratproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.product.IProductService;
@@ -46,9 +48,10 @@ public class PContractProductAPI {
 	@Autowired IPContractProductSKUService pskuservice;
 	@Autowired IPContractProducDocumentService docService;
 	@Autowired ISKU_AttributeValue_Service skuavService;
+	@Autowired IPContractProductPairingService pppairService;
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public ResponseEntity<ResponseBase> Create(HttpServletRequest request,
+ 	public ResponseEntity<ResponseBase> Create(HttpServletRequest request,
 			@RequestBody PContractProduct_create_request entity) {
 		ResponseBase response = new ResponseBase();
 		try {
@@ -320,7 +323,65 @@ public class PContractProductAPI {
 		}
 	}
 	
-	
+	@RequestMapping(value = "/gettreeproduct", method = RequestMethod.POST)
+	public ResponseEntity<PContractProduct_gettreeproduct_response> GetTreeProductByPContract(HttpServletRequest request,
+			@RequestBody PContractProduct_getbycontract_request entity) {
+		PContractProduct_gettreeproduct_response response = new PContractProduct_gettreeproduct_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			long pcontractid_link = entity.pcontractid_link;
+			List<PContractProduct> lst = pcpservice.get_by_product_and_pcontract(orgrootid_link, 0, pcontractid_link);
+			List<PContractProductBinding> data = new ArrayList<PContractProductBinding>();
+			String FolderPath = "upload/product";
+			
+			for (PContractProduct pContractProduct : lst) {
+				PContractProductBinding binding = new PContractProductBinding();
+				binding.setId(pContractProduct.getId());
+				binding.setOrgrootid_link(orgrootid_link);
+				binding.setPcontractid_link(pContractProduct.getPcontractid_link());
+				binding.setProductid_link(pContractProduct.getProductid_link());
+				binding.setProductCode(pContractProduct.getProductCode());
+				binding.setProductName(pContractProduct.getProductName());
+				binding.setPquantity(pContractProduct.getPquantity());
+				binding.setProduction_date(pContractProduct.getProduction_date());
+				binding.setDelivery_date(pContractProduct.getDelivery_date());
+				binding.setUnitprice(pContractProduct.getUnitprice());
+				binding.setProducttypeid_link(pContractProduct.getProducttypeid_link());
+				
+				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+				
+				binding.setImgproduct(getimg(pContractProduct.getImgurl1(),uploadRootPath));
+				
+				data.add(binding);
+			}
+			
+			//Lay nhung bo san pham
+			List<PContractProductPairing> listpair = pppairService.getall_bypcontract(orgrootid_link, pcontractid_link);
+			for(PContractProductPairing pair : listpair) {
+				PContractProductBinding binding = new PContractProductBinding();
+				binding.setId(pair.getProductpairid_link());
+				binding.setOrgrootid_link(orgrootid_link);
+				binding.setPcontractid_link(pcontractid_link);
+				binding.setProductid_link(pair.getProductpairid_link());
+				binding.setProductCode(pair.getproductpairCode());
+				binding.setProductName(pair.getproductpairName());
+				binding.setProducttypeid_link(5);
+				
+				data.add(binding);
+			}
+			
+			response.children = pservice.createTree(data, pcontractid_link);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<PContractProduct_gettreeproduct_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<PContractProduct_gettreeproduct_response>(response, HttpStatus.OK);
+		}
+	}
 	
 	private byte[] getimg(String filename, String uploadRootPath) {
 		String filePath = uploadRootPath+"\\"+ filename;

@@ -30,14 +30,12 @@ public interface IPContractProductPairingRepository extends JpaRepository<PContr
 			@Param ("pcontractid_link")final  Long pcontractid_link,
 			@Param ("productpairid_link")final  Long productpairid_link,
 			@Param ("orgrootid_link")final  Long orgrootid_link);
-//	
-//	@Query(value = "select d.productid_link from PContractProductPairing c "
-//			+ "inner join ProductPairing d on c.productpairid_link = d.productpairid_link "
-//			+ "where c.pcontractid_link = :pcontractid_link "
-//			+ "and c.orgrootid_link = :orgrootid_link "
-//			+ "and (0= :productpairid_link or c.productpairid_link = :productpairid_link)")
-//	public List<Long> getall_productid_pair_bypcontract(
-//			@Param ("pcontractid_link")final  Long pcontractid_link,
-//			@Param ("orgrootid_link")final  Long orgrootid_link,
-//			@Param ("productpairid_link")final  Long productpairid_link);
+
+	@Query(value = "select c from PContractProductPairing c "
+			+ "inner join ProductPairing d on c.productpairid_link = d.productpairid_link "
+			+ "where c.pcontractid_link = :pcontractid_link "
+			+ "and d.productid_link = :productid_link")
+	public List<PContractProductPairing> get_pairing_bypcontract_and_product(
+			@Param ("pcontractid_link")final  Long pcontractid_link,
+			@Param ("productid_link")final  Long productid_link);
 }

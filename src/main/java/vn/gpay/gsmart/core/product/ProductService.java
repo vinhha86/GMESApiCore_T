@@ -1,27 +1,17 @@
 package vn.gpay.gsmart.core.product;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.FlushModeType;
-import javax.persistence.LockModeType;
-import javax.persistence.Query;
-import javax.persistence.StoredProcedureQuery;
-import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaBuilder.In;
-import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.Metamodel;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,7 +21,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import com.github.wenhao.jpa.PredicateBuilder;
 import com.github.wenhao.jpa.Sorts;
 import com.github.wenhao.jpa.Specifications;
 
@@ -39,7 +28,10 @@ import vn.gpay.gsmart.core.api.product.Product_getall_request;
 import vn.gpay.gsmart.core.attribute.Attribute;
 import vn.gpay.gsmart.core.base.AbstractService;
 import vn.gpay.gsmart.core.pcontractproduct.IPContractProductService;
+import vn.gpay.gsmart.core.pcontractproduct.PContractProductBinding;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBomRepository;
+import vn.gpay.gsmart.core.pcontractproductpairing.IPContractProductPairingRepository;
+import vn.gpay.gsmart.core.pcontractproductpairing.PContractProductPairing;
 import vn.gpay.gsmart.core.productattributevalue.IProductAttributeRepository;
 import vn.gpay.gsmart.core.productattributevalue.ProductAttributeValue;
 
@@ -53,6 +45,7 @@ public class ProductService extends AbstractService<Product> implements IProduct
 	@Autowired IProductAttributeRepository productAttr;
 	@Autowired IPContractProductService serviceContractProduct;
 	@Autowired EntityManager em;
+	@Autowired IPContractProductPairingRepository pcontractpairingRepo;
 	@Override
 	protected JpaRepository<Product, Long> getRepository() {
 		// TODO Auto-generated method stub
@@ -350,5 +343,61 @@ List<Long> lstbom = ppbom_repo.getall_materialid_in_pcontract_productBOM(product
 	@Override
 	public List<ProductType> getall_ProductTypes(Integer producttypeid_min, Integer producttypeid_max){
 		return repo_productype.getall_ProductTypes(producttypeid_min, producttypeid_max);
+	}
+
+	@Override
+	public List<ProductTree> createTree(List<PContractProductBinding> nodes, Long pcontractid_link) {
+		// TODO Auto-generated method stub
+		Map<Long, ProductTree> mapTmp = new HashMap<>();
+        
+        //Save all nodes to a map
+        for (PContractProductBinding current : nodes) {
+        	ProductTree product = new ProductTree();
+        	product.setId(current.getProductid_link());
+        	product.setText(current.getProductName());
+        	product.setCode(current.getProductCode());
+        	product.setImgproduct(current.getImgproduct());
+            mapTmp.put(current.getProductid_link(), product);
+        }
+ 
+        //loop and assign parent/child relationships
+        for (PContractProductBinding current : nodes) {
+        	Long parentId = null;
+        	if(current.getProducttypeid_link() != 5) {
+        		List<PContractProductPairing> pairing = pcontractpairingRepo.get_pairing_bypcontract_and_product
+        				(pcontractid_link, current.getProductid_link());
+        		if(pairing.size()> 0)
+        			parentId = pairing.get(0).getProductpairid_link();
+        	}
+             
+            if (parentId != null ) {
+            	ProductTree parent = mapTmp.get(parentId);
+                if (parent != null) {
+                	ProductTree current_n = new ProductTree();
+                	current_n.setId(current.getProductid_link());
+                	current_n.setText(current.getProductName());
+                	current_n.setCode(current.getProductCode());
+                	current_n.setImgproduct(current.getImgproduct());
+                	current_n.setParent_id(parentId);
+                	
+                    parent.getChildren().add(current_n);
+                    mapTmp.put(parentId, parent);
+                    mapTmp.put(current_n.getId(), current_n);
+                    mapTmp.remove(current_n.getId());
+                }
+            }
+ 
+        }
+        
+    
+        //get the root
+        List<ProductTree> root = new ArrayList<ProductTree>();
+        for (ProductTree node : mapTmp.values()) {
+            if(node.getParent_id()==null) {
+                root.add(node);
+            }
+        }
+ 
+        return root;
 	}
 }

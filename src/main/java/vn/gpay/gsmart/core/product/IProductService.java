@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import vn.gpay.gsmart.core.api.product.Product_getall_request;
 import vn.gpay.gsmart.core.attribute.Attribute;
 import vn.gpay.gsmart.core.base.Operations;
+import vn.gpay.gsmart.core.pcontractproduct.PContractProductBinding;
 
 
 public interface IProductService extends Operations<Product> {
@@ -22,4 +23,5 @@ public interface IProductService extends Operations<Product> {
 	Page<Product> getall_packingtrim(Long orgrootid_link, Product_getall_request request);
 	List<ProductType> getall_ProductTypes(Integer producttypeid_min, Integer producttypeid_max);
 	List<Product> filter(Long orgrootid_link,int product_type, String code, String partnercode, List<Attribute> attributes, Long productid_link, Long orgcustomerid_link);
+	public List<ProductTree> createTree(final List<PContractProductBinding> nodes, Long pcontractid_link);
 }
