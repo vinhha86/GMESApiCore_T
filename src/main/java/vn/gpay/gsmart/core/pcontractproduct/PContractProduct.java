@@ -44,6 +44,13 @@ public class PContractProduct implements Serializable {/**
     private Product product;
 	
 	@Transient
+	public int getProducttypeid_link() {
+		if(product!=null) {
+			return product.getProducttypeid_link();
+		}
+		return 0;
+	}
+	@Transient
 	public String getProductName() {
 		if(product!=null) {
 			return product.getName();

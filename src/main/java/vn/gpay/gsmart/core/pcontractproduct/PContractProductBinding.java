@@ -15,7 +15,14 @@ public class PContractProductBinding {
 	private Date production_date;
 	private Date delivery_date;
 	private Float unitprice;
+	private Integer producttypeid_link;
 	
+	public Integer getProducttypeid_link() {
+		return producttypeid_link;
+	}
+	public void setProducttypeid_link(Integer producttypeid_link) {
+		this.producttypeid_link = producttypeid_link;
+	}
 	public Long getId() {
 		return id;
 	}
