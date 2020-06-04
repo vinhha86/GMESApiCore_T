@@ -1,0 +1,33 @@
+package vn.gpay.gsmart.core.porder;
+
+import java.util.List;
+
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+
+@Repository
+@Transactional
+public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpecificationExecutor<POrder> {
+	@Query("SELECT c FROM POrder c where c.pcontractid_link = :pcontractid_link")
+	public List<POrder> getByContract(@Param ("pcontractid_link")final Long pcontractid_link);
+	
+	@Query("SELECT c FROM POrder c where c.pcontractid_link = :pcontractid_link and c.productid_link = :productid_link")
+	public List<POrder> getByContractAndProduct(@Param ("pcontractid_link")final Long pcontractid_link, @Param ("productid_link")final Long productid_link);
+
+	@Query("SELECT c FROM POrder c where c.status = :status")
+	public List<POrder> getByStatus(@Param ("status")final Integer status);
+	
+	@Query("SELECT c FROM POrder c where c.salarymonth is null")
+	public List<POrder> getAll_SalaryUngranted(@Nullable Specification<POrder> spec, Sort sort);
+	
+	@Query(value = "select MAX(a.priority) from POrder a where a.status = 2")
+	public Integer getMaxPriority();
+}

@@ -1,0 +1,147 @@
+package vn.gpay.gsmart.core.porder_grant;
+import java.io.Serializable;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+//import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+//import javax.persistence.JoinColumn;
+//import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+//import javax.persistence.Transient;
+
+@Table(name="porder_grant")
+@Entity
+public class POrderGrant implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	protected Long id;
+	
+	@Column(name ="orgrootid_link")
+    private Long orgrootid_link;
+	
+	@Column(name ="porderid_link")
+    private Long porderid_link;
+	
+	@Column(name ="ordercode", length=10)
+    private String ordercode;	
+
+	@Column(name ="granttoorgid_link")
+    private Long granttoorgid_link;
+	
+	@Column(name ="grantdate")
+    private Date grantdate;
+
+	@Column(name ="grantamount")
+    private Integer grantamount;	
+	
+	@Column(name ="amountcutsum")
+    private Integer amountcutsum;	
+	
+	@Column(name ="status")
+    private Integer status;	
+	
+	@Column(name ="usercreatedid_link")
+    private Long usercreatedid_link;	
+	
+	@Column(name ="timecreated")
+    private Date timecreated;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Long getOrgrootid_link() {
+		return orgrootid_link;
+	}
+
+	public void setOrgrootid_link(Long orgrootid_link) {
+		this.orgrootid_link = orgrootid_link;
+	}
+
+	public Long getPorderid_link() {
+		return porderid_link;
+	}
+
+	public void setPorderid_link(Long porderid_link) {
+		this.porderid_link = porderid_link;
+	}
+
+	public Long getGranttoorgid_link() {
+		return granttoorgid_link;
+	}
+
+	public void setGranttoorgid_link(Long granttoorgid_link) {
+		this.granttoorgid_link = granttoorgid_link;
+	}
+
+	public Date getGrantdate() {
+		return grantdate;
+	}
+
+	public void setGrantdate(Date grantdate) {
+		this.grantdate = grantdate;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
+	public Long getUsercreatedid_link() {
+		return usercreatedid_link;
+	}
+
+	public void setUsercreatedid_link(Long usercreatedid_link) {
+		this.usercreatedid_link = usercreatedid_link;
+	}
+
+	public Date getTimecreated() {
+		return timecreated;
+	}
+
+	public void setTimecreated(Date timecreated) {
+		this.timecreated = timecreated;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public Integer getGrantamount() {
+		return grantamount;
+	}
+
+	public void setGrantamount(Integer grantamount) {
+		this.grantamount = grantamount;
+	}
+
+	public Integer getAmountcutsum() {
+		return amountcutsum;
+	}
+
+	public void setAmountcutsum(Integer amountcutsum) {
+		this.amountcutsum = amountcutsum;
+	}
+
+	public String getOrdercode() {
+		return ordercode;
+	}
+
+	public void setOrdercode(String ordercode) {
+		this.ordercode = ordercode;
+	}
+
+}

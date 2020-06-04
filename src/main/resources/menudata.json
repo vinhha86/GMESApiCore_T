@@ -1,0 +1,101 @@
+{
+"children":[
+    {
+    "id": "dashboard",
+    "text": "Dashboard",
+    "rowCls": "nav-tree-badge nav-tree-badge-new",
+    "iconCls": "desktop",
+    "routeId": "dashboard",
+    "children":[],
+    "leaf": true,
+    "selectable":true,
+    "action": null,
+    "viewType": "admindashboard",
+    "type": null,
+    "index": 1
+    },
+    {
+    "id": "email",
+    "text": "Email",
+    "rowCls": "nav-tree-badge nav-tree-badge-hot",
+    "iconCls": "send",
+    "routeId": null,
+    "children":[],
+    "leaf": true,
+    "selectable":true,
+    "action": ["create","view"],
+    "viewType": "email",
+    "type": null,
+    "index": 2
+    },
+    {
+    "id": "news",
+    "text": "News",
+    "rowCls": null,
+    "iconCls": "inbox",
+    "routeId": null,
+    "children":[],
+    "leaf": true,
+    "selectable":true,
+    "action": null,
+    "viewType": "news",
+    "type": null,
+    "index": 3
+    },
+    {
+    "id": "report",
+    "text": "Reports",
+    "rowCls": null,
+    "iconCls": "leanpub",
+    "routeId": null,
+    "leaf": false,
+    "selectable":true,
+    "action": null,
+    "viewType": null,
+    "type": null,
+    "index": 4,   
+    "children":[
+        {
+        "id": "rchart",
+        "text": "Charts",
+        "rowCls": null,
+        "iconCls": "pie-chart",
+        "routeId": null,
+        "children":[],
+        "leaf": true,
+        "selectable":true,
+        "action": null,
+        "viewType": "charts",
+        "type": null,
+        "index": 5
+        },
+        {
+        "id": "rkpi",
+        "text": "KPI",
+        "rowCls": null,
+        "iconCls": "pie-chart",
+        "routeId": null,
+        "children":[],
+        "leaf": true,
+        "selectable":true,
+        "action": null,
+        "viewType": "kpi",
+        "type": null,
+        "index": 6            
+        },
+        {
+        "id": "rquart",
+        "text": "Quarterly",
+        "rowCls": null,
+        "iconCls": "microchip",
+        "routeId": null,
+        "children":[],
+        "leaf": true,
+        "selectable":true,
+        "action": null,
+        "viewType": "quarterly",
+        "type": null,
+        "index": 7       
+        }      
+    ]}
+]}

@@ -1,0 +1,17 @@
+package vn.gpay.gsmart.core.workingprocess;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+//import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+@Repository
+@Transactional
+public interface IWorkingProcess_Repository extends JpaRepository<WorkingProcess, Long>{
+	@Query(value = "Select a from WorkingProcess a where a.process_type=1")
+	public List<WorkingProcess>findAll_SubProcess();
+	@Query(value = "Select a from WorkingProcess a where a.process_type=0")
+	public List<WorkingProcess>findAll_MainProcess();	
+}
