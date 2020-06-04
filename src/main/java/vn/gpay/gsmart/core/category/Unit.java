@@ -26,6 +26,9 @@ public class Unit implements Serializable {
 	
 	@Column(name ="name",length =100)
     private String name;
+	
+	@Column(name ="name_en",length =100)
+    private String name_en;
 
 	public Long getId() {
 		return id;
@@ -58,7 +61,14 @@ public class Unit implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	public String getName_en() {
+		return name_en;
+	}
+
+	public void setName_en(String name_en) {
+		this.name_en = name_en;
+	}
 	
-	//@Column(name ="name_en",length=100)
-    //private String name_en;
+	
 }
