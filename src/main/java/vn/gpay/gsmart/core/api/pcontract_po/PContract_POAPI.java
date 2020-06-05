@@ -91,7 +91,6 @@ public class PContract_POAPI {
 			
 			List<PContract_PO> pcontract = pcontract_POService.getPOByContract(orgrootid_link, entity.pcontractid_link);
 			response.data = pcontract;
-			response.totalCount = pcontract.size();
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
