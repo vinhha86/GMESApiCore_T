@@ -16,6 +16,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.fob_price.FOBPrice;
 import vn.gpay.gsmart.core.security.GpayUser;
 
 @Table(name="pcontract_price")
@@ -33,20 +34,42 @@ public class PContract_Price implements Serializable {/**
 	private Long pcontractid_link;
 	private Long pcontract_poid_link;
 	private Long productid_link;
-	private Float price;
-	private Float cost;
+	private Float price; //giá chào
+	private Float cost; // giá vốn
 	private Boolean isfob;
 	private Long currencyid_link;
 	private Float exchangerate;
 	private Long usercreatedid_link;
 	private Date datecreated;
 	private Integer status;
+	private Long fobpriceid_link;
 	
 	
+	public Long getFobpriceid_link() {
+		return fobpriceid_link;
+	}
+
+	public void setFobpriceid_link(Long fobpriceid_link) {
+		this.fobpriceid_link = fobpriceid_link;
+	}
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="usercreatedid_link",insertable=false,updatable =false)
     private GpayUser usercreated;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="fobpriceid_link",insertable=false,updatable =false)
+    private FOBPrice fobprice;
+	
+	@Transient
+	public String getFobprice_name() {
+		if(fobprice != null) {
+			return fobprice.getName();
+		}
+		return "";
+	}
 	
 	@Transient
 	public String getUsercreatedName() {
@@ -159,14 +182,6 @@ public class PContract_Price implements Serializable {/**
 
 	public void setIsfob(Boolean isfob) {
 		this.isfob = isfob;
-	}
-
-	public GpayUser getUsercreated() {
-		return usercreated;
-	}
-
-	public void setUsercreated(GpayUser usercreated) {
-		this.usercreated = usercreated;
 	}
 
 }

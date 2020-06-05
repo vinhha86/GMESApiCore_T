@@ -400,4 +400,10 @@ List<Long> lstbom = ppbom_repo.getall_materialid_in_pcontract_productBOM(product
  
         return root;
 	}
+
+	@Override
+	public List<Product> getby_pairid(long productpairid_link) {
+		// TODO Auto-generated method stub
+		return repo.getby_pairid(productpairid_link);
+	}
 }
