@@ -33,10 +33,9 @@ public class PContract_Price implements Serializable {/**
 	private Long pcontractid_link;
 	private Long pcontract_poid_link;
 	private Long productid_link;
-	private Float totalprice;
-	private Date pricedate;
-	private Date activedate;
-	private Date deactivedate;
+	private Float price;
+	private Float cost;
+	private Boolean isfob;
 	private Long currencyid_link;
 	private Float exchangerate;
 	private Long usercreatedid_link;
@@ -97,37 +96,6 @@ public class PContract_Price implements Serializable {/**
 		this.productid_link = productid_link;
 	}
 
-	public Float getTotalprice() {
-		return totalprice;
-	}
-
-	public void setTotalprice(Float totalprice) {
-		this.totalprice = totalprice;
-	}
-
-	public Date getPricedate() {
-		return pricedate;
-	}
-
-	public void setPricedate(Date pricedate) {
-		this.pricedate = pricedate;
-	}
-
-	public Date getActivedate() {
-		return activedate;
-	}
-
-	public void setActivedate(Date activedate) {
-		this.activedate = activedate;
-	}
-
-	public Date getDeactivedate() {
-		return deactivedate;
-	}
-
-	public void setDeactivedate(Date deactivedate) {
-		this.deactivedate = deactivedate;
-	}
 
 	public Long getCurrencyid_link() {
 		return currencyid_link;
@@ -167,6 +135,38 @@ public class PContract_Price implements Serializable {/**
 
 	public void setStatus(Integer status) {
 		this.status = status;
+	}
+
+	public Float getPrice() {
+		return price;
+	}
+
+	public void setPrice(Float price) {
+		this.price = price;
+	}
+
+	public Float getCost() {
+		return cost;
+	}
+
+	public void setCost(Float cost) {
+		this.cost = cost;
+	}
+
+	public Boolean getIsfob() {
+		return isfob;
+	}
+
+	public void setIsfob(Boolean isfob) {
+		this.isfob = isfob;
+	}
+
+	public GpayUser getUsercreated() {
+		return usercreated;
+	}
+
+	public void setUsercreated(GpayUser usercreated) {
+		this.usercreated = usercreated;
 	}
 
 }
