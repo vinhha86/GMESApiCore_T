@@ -1,7 +1,9 @@
 package vn.gpay.gsmart.core.pcontract_po;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -16,6 +19,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 import vn.gpay.gsmart.core.security.GpayUser;
 
 @Table(name="pcontract_po")
@@ -70,6 +74,15 @@ public class PContract_PO implements Serializable {/**
 	public void setProductiondays(Integer productiondays) {
 		this.productiondays = productiondays;
 	}
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
+    private List<PContract_Price> listprice = new ArrayList<PContract_Price>();
+
+	public List<PContract_Price> getListprice() {
+		return listprice;
+	}
 
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -82,6 +95,40 @@ public class PContract_PO implements Serializable {/**
 			return usercreated.getFullName();
 		}
 		return "";
+	}
+	
+	@Transient
+	public float getFob_price() {
+		float fob = (float)0;
+		
+		for(PContract_Price price : listprice) {
+			if(price.getIsfob()) {
+				fob += price.getPrice();
+			}
+		}
+		return fob;
+	}
+	
+	@Transient
+	public float getCmpt_price() {
+		float cmpt = (float)0;
+		
+		for(PContract_Price price : listprice) {
+			if(!price.getIsfob()) {
+				cmpt += price.getPrice();
+			}
+		}
+		return cmpt;
+	}
+	
+	@Transient
+	public float getTotal_price() {
+		float total = (float)0;
+		
+		for(PContract_Price price : listprice) {
+			total += price.getPrice();
+		}
+		return total;
 	}
 
 	public Long getId() {

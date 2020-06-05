@@ -27,7 +27,7 @@ public class PContract_Price implements Serializable {/**
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pcontract_generator")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pcontract_price_generator")
 	@SequenceGenerator(name="pcontract_price_generator", sequenceName = "pcontract_price_id_seq", allocationSize=1)
 	private Long id;
 	private Long orgrootid_link;
