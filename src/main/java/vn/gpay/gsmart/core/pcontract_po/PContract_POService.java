@@ -1,5 +1,7 @@
 package vn.gpay.gsmart.core.pcontract_po;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,6 +18,10 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		// TODO Auto-generated method stub
 		return repo;
 	}
-
+	@Override
+	public List<PContract_PO> getPriceByContract(Long orgrootid_link,
+			Long pcontractid_link,Long productid_link){
+		return repo.getPriceByContract(orgrootid_link, pcontractid_link, productid_link);
+	}
 
 }
