@@ -60,7 +60,17 @@ public class PContract_PO implements Serializable {/**
 	private Date datecreated;
 	private Integer status;
 	private String factories;
+	private Integer productiondays;
 	
+	
+	public Integer getProductiondays() {
+		return productiondays;
+	}
+
+	public void setProductiondays(Integer productiondays) {
+		this.productiondays = productiondays;
+	}
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="usercreatedid_link",insertable=false,updatable =false)

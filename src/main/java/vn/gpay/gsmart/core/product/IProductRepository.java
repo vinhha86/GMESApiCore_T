@@ -47,5 +47,11 @@ public interface IProductRepository extends JpaRepository<Product, Long>, JpaSpe
 
 	@Query(value = "select c from Product c where c.producttypeid_link >19 and c.producttypeid_link<50 and c.status = 1")
 	public List<Product> getall_materials(@Nullable Specification<Product> spec);
+	
+	@Query(value = "select c from Product c "
+			+ "inner join ProductPairing d on c.id = d.productid_link "
+			+ "where d.productpairid_link = :productid_link")
+	public List<Product> getby_pairid(
+			@Param ("productid_link")final  Long productid_link);
 
 }

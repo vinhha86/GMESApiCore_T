@@ -8,5 +8,4 @@ import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 
 public class PContract_getbycontractproduct_response extends ResponseBase{
 	public List<PContract_PO> data;
-	public long totalCount;
 }

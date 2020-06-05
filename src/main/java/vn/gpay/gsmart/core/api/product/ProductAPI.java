@@ -939,4 +939,26 @@ public class ProductAPI {
 				return new ResponseEntity<Product_type_response>(response, HttpStatus.BAD_REQUEST);
 			}
 		}
+		
+		@RequestMapping(value = "/get_by_pairid", method = RequestMethod.POST)
+		public ResponseEntity<getlistproduct_bypairingid_response> getbypairid(
+				@RequestBody getlistproduct_bypairingid_request entity, HttpServletRequest request) {
+			getlistproduct_bypairingid_response response = new getlistproduct_bypairingid_response();
+			try {
+				Product product = productService.findOne(entity.product_pairid_link);
+				response.data = new ArrayList<Product>();
+				response.data.add(product);
+				
+				List<Product> list = productService.getby_pairid(entity.product_pairid_link);
+				response.data.addAll(list);
+				
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<getlistproduct_bypairingid_response>(response, HttpStatus.OK);
+			} catch (Exception e) {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage(e.getMessage());
+				return new ResponseEntity<getlistproduct_bypairingid_response>(response, HttpStatus.BAD_REQUEST);
+			}
+		}
 }
