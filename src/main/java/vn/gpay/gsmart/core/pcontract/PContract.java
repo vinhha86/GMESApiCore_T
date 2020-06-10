@@ -34,7 +34,7 @@ public class PContract implements Serializable {/**
 	private Long id;
 	private Long orgrootid_link;
 	private Long orgcustomerid_link;
-	private Long orgvenderid_link;
+	private Long orgvendorid_link;
 	private Long orgbuyerid_link;
 	private String cust_contractcode;
 	private String contractcode;
@@ -47,6 +47,12 @@ public class PContract implements Serializable {/**
 	private Date datecreated;
 	private Integer status;
 	private Float complete_rate;
+	private Integer lengthunitid_link;
+	private Integer widthunitid_link;
+	private Integer contracttypeid_link;
+	private Long orgmerchandiseid_link;
+	private Long merchandiserid_link;
+	private Long orgshowid_link;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -124,12 +130,12 @@ public class PContract implements Serializable {/**
 		this.orgcustomerid_link = orgcustomerid_link;
 	}
 
-	public Long getOrgvenderid_link() {
-		return orgvenderid_link;
+	public Long getOrgvendorid_link() {
+		return orgvendorid_link;
 	}
 
-	public void setOrgvenderid_link(Long orgvenderid_link) {
-		this.orgvenderid_link = orgvenderid_link;
+	public void setOrgvendorid_link(Long orgvendorid_link) {
+		this.orgvendorid_link = orgvendorid_link;
 	}
 
 	public Long getOrgbuyerid_link() {
@@ -261,4 +267,53 @@ public class PContract implements Serializable {/**
 	public void setComplete_rate(Float complete_rate) {
 		this.complete_rate = complete_rate;
 	}
+
+	public Integer getLengthunitid_link() {
+		return lengthunitid_link;
+	}
+
+	public void setLengthunitid_link(Integer lengthunitid_link) {
+		this.lengthunitid_link = lengthunitid_link;
+	}
+
+	public Integer getWidthunitid_link() {
+		return widthunitid_link;
+	}
+
+	public void setWidthunitid_link(Integer widthunitid_link) {
+		this.widthunitid_link = widthunitid_link;
+	}
+
+	public Integer getContracttypeid_link() {
+		return contracttypeid_link;
+	}
+
+	public void setContracttypeid_link(Integer contracttypeid_link) {
+		this.contracttypeid_link = contracttypeid_link;
+	}
+
+	public Long getOrgmerchandiseid_link() {
+		return orgmerchandiseid_link;
+	}
+
+	public void setOrgmerchandiseid_link(Long orgmerchandiseid_link) {
+		this.orgmerchandiseid_link = orgmerchandiseid_link;
+	}
+
+	public Long getMerchandiserid_link() {
+		return merchandiserid_link;
+	}
+
+	public void setMerchandiserid_link(Long merchandiserid_link) {
+		this.merchandiserid_link = merchandiserid_link;
+	}
+
+	public Long getOrgshowid_link() {
+		return orgshowid_link;
+	}
+
+	public void setOrgshowid_link(Long orgshowid_link) {
+		this.orgshowid_link = orgshowid_link;
+	}
+	
 }
