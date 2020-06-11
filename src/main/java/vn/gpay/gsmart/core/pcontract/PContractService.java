@@ -28,7 +28,7 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 	public Page<PContract> getall_by_orgrootid_paging(Long orgrootid_link, PContract_getbypaging_request request) {
 		// TODO Auto-generated method stub
 		Specification<PContract> specification = Specifications.<PContract>and()
-	            .eq(request.orgcustomerid_link > 0, "orgcustomerid_link", request.orgcustomerid_link)
+	            .eq(request.orgbuyerid_link > 0, "orgbuyerid_link", request.orgbuyerid_link)
 	            .eq(request.branchid_link> 0 ,"branchid_link", request.branchid_link)
 	            .eq(request.seasonid_link > 0, "seasonid_link", request.seasonid_link)
 	            .eq("status", 1)
