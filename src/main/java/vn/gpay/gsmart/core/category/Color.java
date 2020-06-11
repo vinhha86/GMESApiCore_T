@@ -9,7 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 
-@Table(name="Color")
+@Table(name="color")
 @Entity
 public class Color implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -18,8 +18,8 @@ public class Color implements Serializable {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	protected Long id;
 	
-	@Column(name ="orgid_link")
-    private Long orgid_link;
+	@Column(name ="orgrootid_link")
+    private Long orgrootid_link;
 	
 	@Column(name ="code",length=50)
     private String code;
@@ -32,7 +32,7 @@ public class Color implements Serializable {
 	
 	@Column(name ="rgbvalue",length =100)
     private String rgbvalue;
-
+	
 	public Long getId() {
 		return id;
 	}
@@ -41,12 +41,12 @@ public class Color implements Serializable {
 		this.id = id;
 	}
 
-	public Long getOrgid_link() {
-		return orgid_link;
+	public Long getOrgrootid_link() {
+		return orgrootid_link;
 	}
 
-	public void setOrgid_link(Long orgid_link) {
-		this.orgid_link = orgid_link;
+	public void setOrgrootid_link(Long orgrootid_link) {
+		this.orgrootid_link = orgrootid_link;
 	}
 
 	public String getCode() {
