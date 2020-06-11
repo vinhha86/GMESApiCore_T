@@ -1,7 +1,9 @@
 package vn.gpay.gsmart.core.org;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import com.github.wenhao.jpa.Sorts;
 import com.github.wenhao.jpa.Specifications;
 
 import vn.gpay.gsmart.core.base.AbstractService;
+import vn.gpay.gsmart.core.menu.MenuTree;
 
 @Service
 public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
@@ -126,4 +129,96 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 			}
 		}
 	}
+
+	@Override
+	public List<OrgTree> createTree(final List<Org> nodes) {
+		
+		Map<Long, OrgTree> mapTmp = new HashMap<>();
+		
+		// Save all nodes (Org) to a map with Ids as keys, Org objs as values
+		for(Org current : nodes) {
+			if(current.getParentid_link()==null) {
+				current.setParentid_link(-1L);
+			}
+			OrgTree menu = new OrgTree();
+			menu.setId(current.getId());
+			menu.setCode(current.getCode());
+			menu.setOrgtypeid_link(current.getOrgtypeid_link());
+			menu.setName(current.getName());
+			menu.setCountryid_link(current.getCountryid_link());
+			menu.setCity(current.getCity());
+			menu.setAddress(current.getAddress());
+			menu.setGpslat(current.getGpslat());
+			menu.setGpslong(current.getGpslong());
+			menu.setMainbizid_link(current.getMainbizid_link());
+			menu.setTimezone(current.getTimezone());
+			menu.setContactperson(current.getContactperson());
+			menu.setEmail(current.getEmail());
+			menu.setLangid_link(current.getLangid_link());
+			menu.setStatus(current.getStatus());
+			menu.setParentid_link(current.getParentid_link());
+			menu.setPhone(current.getPhone());
+			menu.setOrgrootid_link(current.getOrgrootid_link());
+			menu.setColorid_link(current.getColorid_link());
+			menu.setLinecost(current.getLinecost());
+			menu.setExpanded(true);
+			menu.setChecked(current.checked);
+			mapTmp.put(current.getId(), menu);
+			
+		}
+		
+		//loop and assign parent/child relationships
+		for(Org current : nodes) {
+			if(current.getParentid_link()==null){
+				current.setParentid_link(-1L);
+			}
+			Long parentId = current.getParentid_link();
+			
+			// if == -1 >> no parent
+			if(parentId != -1) {
+				OrgTree parent = mapTmp.get(parentId);
+				if(parent != null) {
+					OrgTree current_n = new OrgTree();
+					current_n.setId(current.getId());
+					current_n.setCode(current.getCode());
+					current_n.setOrgtypeid_link(current.getOrgtypeid_link());
+					current_n.setName(current.getName());
+					current_n.setCountryid_link(current.getCountryid_link());
+					current_n.setCity(current.getCity());
+					current_n.setAddress(current.getAddress());
+					current_n.setGpslat(current.getGpslat());
+					current_n.setGpslong(current.getGpslong());
+					current_n.setMainbizid_link(current.getMainbizid_link());
+					current_n.setTimezone(current.getTimezone());
+					current_n.setContactperson(current.getContactperson());
+					current_n.setEmail(current.getEmail());
+					current_n.setLangid_link(current.getLangid_link());
+					current_n.setStatus(current.getStatus());
+					current_n.setParentid_link(current.getParentid_link());
+					current_n.setPhone(current.getPhone());
+					current_n.setOrgrootid_link(current.getOrgrootid_link());
+					current_n.setColorid_link(current.getColorid_link());
+					current_n.setLinecost(current.getLinecost());
+					current_n.setChecked(current.checked);
+					parent.addChild(current_n);
+					parent.setExpanded(false);
+					mapTmp.put(parentId, parent);
+					mapTmp.put(current_n.getId(), current_n);
+				}
+			}
+			
+		}
+		
+		// get the root
+		List<OrgTree> root = new ArrayList<OrgTree>();
+		
+		for(OrgTree node : mapTmp.values()) {
+			if(node.getParentid_link() == -1) {
+				root.add(node);
+			}
+		}
+		return root;
+	}
+	
+	
 }

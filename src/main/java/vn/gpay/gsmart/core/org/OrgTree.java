@@ -1,93 +1,88 @@
 package vn.gpay.gsmart.core.org;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+public class OrgTree implements Serializable {
 
+	private long id;
+	
+	private String code;
+	
+	private Integer orgtypeid_link;
+	
+	private String name;
+	
+	private Integer countryid_link;
+	
+	private String city;
+	
+	private String address;
+	
+	private Double gpslat;
+	
+	private Double gpslong;
+	
+	private Integer mainbizid_link;
+	
+	private Integer timezone;
+	
+	private String contactperson;
+	
+	private String email;
+	
+	private Integer langid_link;
+	
+	private Integer status;
+	
+	private Long parentid_link;
+	
+	private String phone;
+	
+	private Long orgrootid_link;
+	
+	private Long colorid_link;
+	
+	private Long linecost;
+	
+	private boolean checked;
+    
+    private boolean expanded;
+	
+	private OrgTree parent;
+	
+	private List<OrgTree> children = new ArrayList<OrgTree>();
+	
+	/////
+	
+	public void addChild(OrgTree child) {
+        if (!this.children.contains(child) && child != null)
+            this.children.add(child);
+    }
+    
+    public boolean getLeaf() {
+    	if(this.children.size()>0) {
+    		return false;
+    	}else {
+    		return true;
+    	}
+    }
+    public boolean getSelectable() {
+    	if(this.children.size()>0) {
+    		return false;
+    	}else {
+    		return true;
+    	}
+    }
+	
+	///// Getters, setters
 
-@Table(name="org")
-@Entity
-public class Org implements Serializable {
-	private static final long serialVersionUID = 1L;
-	
-	@Id
-//	@GeneratedValue(strategy=GenerationType.AUTO)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "org_generator")
-	@SequenceGenerator(name="org_generator", sequenceName = "org_id_seq", allocationSize=1)
-	protected Long id;
-	
-	@Column(name ="code",length =100)
-    private String code;
-	
-	@Column(name ="orgtypeid_link")
-    private Integer orgtypeid_link;
-	
-	@Column(name = "name",length=200)
-    private String name;
-	
-	@Column(name = "countryid_link",nullable = false)
-    private Integer countryid_link;
-	
-	@Column(name = "city",length=100)
-    private String city;
-	
-	@Column(name = "address",length=200)
-    private String address;
-	
-	@Column(name ="gpslat",nullable = false)
-    private Double gpslat;
-	
-	@Column(name ="gpslong",nullable = false)
-    private Double gpslong;
-	
-	@Column(name ="mainbizid_link")
-    private Integer mainbizid_link;
-	
-	@Column(name ="timezone",nullable = false)
-    private Integer timezone;
-	
-	@Column(name = "contactperson",length=100)
-    private String contactperson;
-	
-	@Column(name = "email",length=100)
-    private String email;
-	
-	@Column(name ="langid_link",nullable = false)
-    private Integer langid_link;
-	
-	@Column(name ="status")
-    private Integer status;
-	
-	@Column(name ="parentid_link",nullable = false)
-    private Long parentid_link;
-	
-	@Column(name = "phone",length=100)
-    private String phone;
-	
-	@Column(name ="orgrootid_link",nullable = false)
-    private Long orgrootid_link;
-	
-	@Column(name ="colorid_link")
-    private Long colorid_link;
-	
-	@Column(name ="linecost")
-    private Long linecost;
-	
-	@Transient
-	public boolean checked;
-
-	public Long getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -226,7 +221,7 @@ public class Org implements Serializable {
 	public void setOrgrootid_link(Long orgrootid_link) {
 		this.orgrootid_link = orgrootid_link;
 	}
-	
+
 	public Long getColorid_link() {
 		return colorid_link;
 	}
@@ -250,4 +245,32 @@ public class Org implements Serializable {
 	public void setChecked(boolean checked) {
 		this.checked = checked;
 	}
+
+	public boolean isExpanded() {
+		return expanded;
+	}
+
+	public void setExpanded(boolean expanded) {
+		this.expanded = expanded;
+	}
+
+	public OrgTree getParent() {
+		return parent;
+	}
+
+	public void setParent(OrgTree parent) {
+		this.parent = parent;
+	}
+
+	public List<OrgTree> getChildren() {
+		return children;
+	}
+
+	public void setChildren(List<OrgTree> children) {
+		this.children = children;
+	}
+	
+	
+	
+	
 }

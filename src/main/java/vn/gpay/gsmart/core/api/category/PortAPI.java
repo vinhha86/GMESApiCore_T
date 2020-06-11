@@ -25,7 +25,7 @@ public class PortAPI {
 	@Autowired IPortService portService;
 	
 	@RequestMapping(value = "/getPortAll",method = RequestMethod.POST)
-	public ResponseEntity<?> GetSkuByCode(HttpServletRequest request ) {
+	public ResponseEntity<?> GetPortAll(HttpServletRequest request ) {
 		PortResponse response = new PortResponse();
 		try {
 			response.data = portService.findAll();
