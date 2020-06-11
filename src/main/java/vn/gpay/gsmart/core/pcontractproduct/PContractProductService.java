@@ -27,7 +27,7 @@ public class PContractProductService extends AbstractService<PContractProduct> i
 		return repo.get_by_product_and_pcontract(orgrootid_link, productid_link, pcontractid_link);
 	}
 	@Override
-	public List<Long> get_by_orgcustomer(Long orgrootid_link,Long orgcustomerid_link){
-		return repo.get_by_orgcustomer(orgrootid_link, orgcustomerid_link);
+	public List<Long> get_by_orgcustomer(Long orgrootid_link,Long orgbuyerid_link){
+		return repo.get_by_orgcustomer(orgrootid_link, orgbuyerid_link);
 	}
 }

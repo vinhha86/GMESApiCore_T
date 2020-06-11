@@ -33,7 +33,7 @@ public class PContract implements Serializable {/**
 	@SequenceGenerator(name="pcontract_generator", sequenceName = "pcontract_id_seq", allocationSize=1)
 	private Long id;
 	private Long orgrootid_link;
-	private Long orgcustomerid_link;
+	private Long orgpayerid_link;
 	private Long orgvendorid_link;
 	private Long orgbuyerid_link;
 	private String cust_contractcode;
@@ -48,7 +48,7 @@ public class PContract implements Serializable {/**
 	private Integer status;
 	private Float complete_rate;
 	private Integer lengthunitid_link;
-	private Integer widthunitid_link;
+	private Integer weightunitid_link;
 	private Integer contracttypeid_link;
 	private Long orgmerchandiseid_link;
 	private Long merchandiserid_link;
@@ -67,18 +67,6 @@ public class PContract implements Serializable {/**
 		return "";
 	}
 	
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne
-    @JoinColumn(name="orgcustomerid_link",insertable=false,updatable =false)
-    private Org customer;
-	
-	@Transient
-	public String getOrgcustomerName() {
-		if(customer != null) {
-			return customer.getName();
-		}
-		return "";
-	}
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -122,12 +110,12 @@ public class PContract implements Serializable {/**
 		this.orgrootid_link = orgrootid_link;
 	}
 
-	public Long getOrgcustomerid_link() {
-		return orgcustomerid_link;
+	public Long getOrgpayerid_link() {
+		return orgpayerid_link;
 	}
 
-	public void setOrgcustomerid_link(Long orgcustomerid_link) {
-		this.orgcustomerid_link = orgcustomerid_link;
+	public void setOrgpayerid_link(Long orgpayerid_link) {
+		this.orgpayerid_link = orgpayerid_link;
 	}
 
 	public Long getOrgvendorid_link() {
@@ -236,14 +224,6 @@ public class PContract implements Serializable {/**
 		this.usercreated = usercreated;
 	}
 
-	public Org getCustomer() {
-		return customer;
-	}
-
-	public void setCustomer(Org customer) {
-		this.customer = customer;
-	}
-
 	public Branch getBranch() {
 		return branch;
 	}
@@ -276,12 +256,12 @@ public class PContract implements Serializable {/**
 		this.lengthunitid_link = lengthunitid_link;
 	}
 
-	public Integer getWidthunitid_link() {
-		return widthunitid_link;
+	public Integer getWeightunitid_link() {
+		return weightunitid_link;
 	}
 
-	public void setWidthunitid_link(Integer widthunitid_link) {
-		this.widthunitid_link = widthunitid_link;
+	public void setWeightunitid_link(Integer weightunitid_link) {
+		this.weightunitid_link = weightunitid_link;
 	}
 
 	public Integer getContracttypeid_link() {
