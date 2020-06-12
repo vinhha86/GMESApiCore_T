@@ -21,6 +21,9 @@ public class Unit implements Serializable {
 	@Column(name ="orgid_link")
     private Long orgid_link;
 	
+	@Column(name ="orgrootid_link")
+    private Long orgrootid_link;
+	
 	@Column(name ="code",length=50)
     private String code;
 	
@@ -29,6 +32,10 @@ public class Unit implements Serializable {
 	
 	@Column(name ="name_en",length =100)
     private String name_en;
+	
+	@Column(name ="unittype")
+    private Integer unittype;
+	
 
 	public Long getId() {
 		return id;
@@ -69,6 +76,23 @@ public class Unit implements Serializable {
 	public void setName_en(String name_en) {
 		this.name_en = name_en;
 	}
+
+	public Long getOrgrootid_link() {
+		return orgrootid_link;
+	}
+
+	public void setOrgrootid_link(Long orgrootid_link) {
+		this.orgrootid_link = orgrootid_link;
+	}
+
+	public Integer getUnittype() {
+		return unittype;
+	}
+
+	public void setUnittype(Integer unittype) {
+		this.unittype = unittype;
+	}
+	
 	
 	
 }
