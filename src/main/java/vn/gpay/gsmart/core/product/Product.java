@@ -49,6 +49,12 @@ public class Product implements Serializable {/**
 	
 	private Long designerid_link;
 	
+	private String buyercode;
+	private String buyername;
+	private String vendorcode;
+	private String vendorname;
+	
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="designerid_link",insertable=false,updatable =false)
@@ -340,6 +346,38 @@ public class Product implements Serializable {/**
 
 	public void setPartnercode(String partnercode) {
 		this.partnercode = partnercode;
+	}
+
+	public String getBuyercode() {
+		return buyercode;
+	}
+
+	public String getBuyername() {
+		return buyername;
+	}
+
+	public String getVendorcode() {
+		return vendorcode;
+	}
+
+	public String getVendorname() {
+		return vendorname;
+	}
+
+	public void setBuyercode(String buyercode) {
+		this.buyercode = buyercode;
+	}
+
+	public void setBuyername(String buyername) {
+		this.buyername = buyername;
+	}
+
+	public void setVendorcode(String vendorcode) {
+		this.vendorcode = vendorcode;
+	}
+
+	public void setVendorname(String vendorname) {
+		this.vendorname = vendorname;
 	}
 	
 }
