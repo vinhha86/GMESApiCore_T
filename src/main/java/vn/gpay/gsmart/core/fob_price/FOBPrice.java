@@ -2,6 +2,7 @@ package vn.gpay.gsmart.core.fob_price;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,7 +22,9 @@ public class FOBPrice implements Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "fob_price_generator")
 	@SequenceGenerator(name="fob_price_generator", sequenceName = "fob_price_id_seq", allocationSize=1)
 	protected Long id;
+	@Column(name ="name",length =100)
 	private String name;
+	@Column(name ="orgrootid_link")
 	private Long orgrootid_link;
 	 
 	public Long getOrgrootid_link() {

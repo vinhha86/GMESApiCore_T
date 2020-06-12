@@ -26,6 +26,9 @@ public class Port implements Serializable {
 	
 	@Column(name ="name_en",length=100)
     private String name_en;
+	
+	@Column(name ="orgid_link")
+    private Long orgid_link;
 
 	public Long getId() {
 		return id;
@@ -58,4 +61,14 @@ public class Port implements Serializable {
 	public void setName_en(String name_en) {
 		this.name_en = name_en;
 	}
+
+	public Long getOrgid_link() {
+		return orgid_link;
+	}
+
+	public void setOrgid_link(Long orgid_link) {
+		this.orgid_link = orgid_link;
+	}
+	
+	
 }
