@@ -42,6 +42,9 @@ import vn.gpay.gsmart.core.productattributevalue.ProductAttributeValueBinding;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 import vn.gpay.gsmart.core.sku.ISKU_Service;
+import vn.gpay.gsmart.core.sku.SKU;
+import vn.gpay.gsmart.core.sku.SKU_Attribute_Value;
+import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.ProductType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
@@ -655,13 +658,61 @@ public class ProductAPI {
 						user.getRootorgid_link());
 				for (Attribute attribute : lstAttr) {
 					ProductAttributeValue pav = new ProductAttributeValue();
+					long value = 0;
+					
+					if(attribute.getId() == AtributeFixValues.ATTR_COLOR) {
+						value = AtributeFixValues.value_color_all;
+					}
+					else if(attribute.getId() == AtributeFixValues.ATTR_SIZE) {
+						value = AtributeFixValues.value_size_all;
+					} else if(attribute.getId() == AtributeFixValues.ATTR_SIZEWIDTH) {
+						value = AtributeFixValues.value_sizewidth_all;
+					}
+					
 					pav.setId((long) 0);
 					pav.setProductid_link(product.getId());
 					pav.setAttributeid_link(attribute.getId());
-					pav.setAttributevalueid_link((long) 0);
+					pav.setAttributevalueid_link(value);
 					pav.setOrgrootid_link(user.getRootorgid_link());
 					pavService.save(pav);
 				}
+				
+				//Sinh SKU cho mau all va co all
+				long skuid_link = 0;
+				
+				SKU sku = new SKU();
+				sku.setId(skuid_link);
+				sku.setCode(genCodeSKU(product));
+				sku.setName(product.getName());
+				sku.setProductid_link(product.getId());
+				sku.setOrgrootid_link(user.getRootorgid_link());
+				sku.setSkutypeid_link(product.getProducttypeid_link());
+
+				sku = skuService.save(sku);
+				skuid_link = sku.getId();
+				
+				// Them vao bang sku_attribute_value
+				SKU_Attribute_Value savMau = new SKU_Attribute_Value();
+				savMau.setId((long) 0);
+				savMau.setAttributevalueid_link(AtributeFixValues.value_color_all);
+				savMau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
+				savMau.setOrgrootid_link(user.getRootorgid_link());
+				savMau.setSkuid_link(skuid_link);
+				savMau.setUsercreateid_link(user.getId());
+				savMau.setTimecreate(new Date());
+
+				skuattService.save(savMau);
+
+				SKU_Attribute_Value savCo = new SKU_Attribute_Value();
+				savCo.setId((long) 0);
+				savCo.setAttributevalueid_link(AtributeFixValues.value_size_all);
+				savCo.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
+				savCo.setOrgrootid_link(user.getRootorgid_link());
+				savCo.setSkuid_link(skuid_link);
+				savCo.setUsercreateid_link(user.getId());
+				savCo.setTimecreate(new Date());
+
+				skuattService.save(savCo);
 
 				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -674,6 +725,17 @@ public class ProductAPI {
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<Product_create_response>(response, HttpStatus.OK);
 		}
+	}
+	
+	private String genCodeSKU(Product product) {
+		List<SKU> lstSKU = skuService.getlist_byProduct(product.getId());
+		if (lstSKU.size() == 0) {
+			return product.getCode() + "_" + "1";
+		}
+		String old_code = lstSKU.get(0).getCode();
+		String[] obj = old_code.split("_");
+		int a = Integer.parseInt(obj[1]);
+		return product.getCode() + "_" + (a + 1);
 	}
 	
 	@RequestMapping(value = "/update_productpair", method = RequestMethod.POST)

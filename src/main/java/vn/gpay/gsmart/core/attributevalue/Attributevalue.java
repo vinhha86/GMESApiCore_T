@@ -44,8 +44,7 @@ public class Attributevalue implements Serializable {/**
 	@Column(name = "timecreate")
 	private Date timecreate;
 	
-	private Boolean isdefault;
-	
+	private Boolean isdefault;	
 	
 
 	public Long getId() {
