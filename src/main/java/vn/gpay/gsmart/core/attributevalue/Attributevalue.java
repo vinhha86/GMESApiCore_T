@@ -43,6 +43,10 @@ public class Attributevalue implements Serializable {/**
 	
 	@Column(name = "timecreate")
 	private Date timecreate;
+	
+	private Boolean isdefault;
+	
+	
 
 	public Long getId() {
 		return id;
@@ -106,6 +110,14 @@ public class Attributevalue implements Serializable {/**
 
 	public void setTimecreate(Date timecreate) {
 		this.timecreate = timecreate;
+	}
+
+	public Boolean getIsdefault() {
+		return isdefault;
+	}
+
+	public void setIsdefault(Boolean isdefault) {
+		this.isdefault = isdefault;
 	}
 	
 }
