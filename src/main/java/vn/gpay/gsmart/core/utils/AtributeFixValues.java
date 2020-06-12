@@ -8,4 +8,8 @@ public class AtributeFixValues {
     public static long ATTR_FABRIC    	= 37; //thành phần vải
     
     public static int orgtype_factory = 13;
+    
+    public static long value_color_all = 148;
+    public static long value_size_all = 152;
+    public static long value_sizewidth_all = 155;
 }
