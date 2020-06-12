@@ -73,6 +73,7 @@ public class AttributeValueAPI {
 			if(attvalue.getId()==null || attvalue.getId()==0) {
 				attvalue.setOrgrootid_link(user.getRootorgid_link());
 				attvalue.setUsercreateid_link(user.getId());
+				attvalue.setIsdefault(false);
 				attvalue.setTimecreate(new Date());
 			}else {
 				Attributevalue value_old =  attValueService.findOne(attvalue.getId());
