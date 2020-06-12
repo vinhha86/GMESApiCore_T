@@ -30,7 +30,7 @@ public class PContract_PO implements Serializable {/**
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pcontract_generator")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pcontract_po_generator")
 	@SequenceGenerator(name="pcontract_po_generator", sequenceName = "pcontract_po_id_seq", allocationSize=1)
 	private Long id;
 	private Long orgrootid_link;
@@ -57,6 +57,7 @@ public class PContract_PO implements Serializable {/**
 	private Date productiondate;
 	private String packingnotice;
 	private Long qcorgid_link;
+	private String qcorgname;
 	private Integer etm_from;
 	private Integer etm_to;
 	private Integer etm_avr;
@@ -385,6 +386,14 @@ public class PContract_PO implements Serializable {/**
 
 	public void setFactories(String factories) {
 		this.factories = factories;
+	}
+
+	public String getQcorgname() {
+		return qcorgname;
+	}
+
+	public void setQcorgname(String qcorgname) {
+		this.qcorgname = qcorgname;
 	}
 	
 }
