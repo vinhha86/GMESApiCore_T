@@ -33,7 +33,7 @@ public class OrgMenuAPI {
 	public ResponseEntity<?> OrgMenuTree(HttpServletRequest request ) {
 		try {
 			OrgMenuTreeResponse response = new OrgMenuTreeResponse();
-			List<Org> menu = orgService.findAll();
+			List<Org> menu = orgService.findOrgByTypeForMenuOrg();
 			List<OrgTree> children = orgService.createTree(menu);
 			response.children=children;
 			return new ResponseEntity<OrgMenuTreeResponse>(response,HttpStatus.OK);

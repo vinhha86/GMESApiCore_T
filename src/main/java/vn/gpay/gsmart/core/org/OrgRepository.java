@@ -35,4 +35,9 @@ public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecification
 			+ "and orgtypeid_link = :orgtypeid_link and c.status = 1")
 	public List<Org> findAllOrgbyType(@Param ("orgrootid")final long orgrootid,
 			@Param ("orgtypeid_link")final Integer orgtypeid_link);
+	
+	@Query(value = "select c from Org c where c.orgtypeid_link in(1,2,3,4,5,6,7,8,9) and c.status=1")
+	public List<Org> findOrgByTypeForMenuOrg();
+	
+	
 }
