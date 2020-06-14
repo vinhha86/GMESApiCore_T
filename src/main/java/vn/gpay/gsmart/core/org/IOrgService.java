@@ -20,5 +20,7 @@ public interface IOrgService extends Operations<Org>{
 	
 	public List<Org> findOrgAllByRoot(long orgrootid, long orgid, List<String> list_typeid, boolean isincludeorg);
 	
-	public List<OrgTree> createTree( List<Org> nodes); 
+	public List<OrgTree> createTree( List<Org> nodes);
+	
+	public List<Org> findOrgByTypeForMenuOrg();
 }

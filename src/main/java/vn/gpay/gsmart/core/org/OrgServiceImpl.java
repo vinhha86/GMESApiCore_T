@@ -215,9 +215,15 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 		for(OrgTree node : mapTmp.values()) {
 			if(node.getParentid_link() == -1) {
 				root.add(node);
+				node.setExpanded(true);
 			}
 		}
 		return root;
+	}
+
+	@Override
+	public List<Org> findOrgByTypeForMenuOrg() {
+		return repositoty.findOrgByTypeForMenuOrg();
 	}
 	
 	
