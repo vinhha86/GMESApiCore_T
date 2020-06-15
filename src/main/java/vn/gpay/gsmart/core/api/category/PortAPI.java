@@ -59,9 +59,7 @@ public class PortAPI {
 	public ResponseEntity<ResponseBase> CreatePort(@RequestBody Port_create_request entity, HttpServletRequest request ) {//@RequestParam("type") 
 		ResponseBase response = new ResponseBase();
 		try {
-			
 			Port port = entity.data;
-			
 			portService.save(port);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

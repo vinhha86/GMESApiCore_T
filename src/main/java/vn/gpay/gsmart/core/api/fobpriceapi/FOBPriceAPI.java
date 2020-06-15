@@ -61,4 +61,19 @@ public class FOBPriceAPI {
 		    return new ResponseEntity<FOBPrice_getall_response>(HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/delete",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> Delete(@RequestBody FOBPrice_delete_request entity, HttpServletRequest request ) {//@RequestParam("type") 
+		ResponseBase response = new ResponseBase();
+		try {
+			fobService.deleteById(entity.id);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_SERVER_ERROR);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}
+	}
 }

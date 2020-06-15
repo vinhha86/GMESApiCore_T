@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import vn.gpay.gsmart.core.api.menu.MenuTreeResponse;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.base.ResponseError;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.org.OrgTree;
 import vn.gpay.gsmart.core.security.GpayAuthentication;
+import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -33,8 +33,7 @@ public class OrgMenuAPI {
 	public ResponseEntity<?> OrgMenuTree(HttpServletRequest request ) {
 		try {
 			OrgMenuTreeResponse response = new OrgMenuTreeResponse();
-//			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
-			List<Org> menu = orgService.findAll();
+			List<Org> menu = orgService.findOrgByTypeForMenuOrg();
 			List<OrgTree> children = orgService.createTree(menu);
 			response.children=children;
 			return new ResponseEntity<OrgMenuTreeResponse>(response,HttpStatus.OK);
@@ -50,9 +49,7 @@ public class OrgMenuAPI {
 	public ResponseEntity<?> OrgAll(HttpServletRequest request ) {
 		try {
 			OrgResponse response = new OrgResponse();
-//			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
 			List<Org> menu = orgService.findAll();
-//			List<OrgTree> children = orgService.createTree(menu);
 			response.data=menu;
 			return new ResponseEntity<OrgResponse>(response,HttpStatus.OK);
 		}catch (RuntimeException e) {
@@ -67,9 +64,14 @@ public class OrgMenuAPI {
 	public ResponseEntity<ResponseBase> CreateOrg(@RequestBody Org_create_Request entity, HttpServletRequest request ) {//@RequestParam("type") 
 		ResponseBase response = new ResponseBase();
 		try {
-			
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Org org = entity.data;
-			
+			if(org.getId()==null || org.getId()==0) {
+				org.setOrgrootid_link(user.getRootorgid_link());
+			}else {
+				Org _org =  orgService.findOne(org.getId());
+				org.setOrgrootid_link(_org.getOrgrootid_link());
+			}
 			orgService.save(org);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
