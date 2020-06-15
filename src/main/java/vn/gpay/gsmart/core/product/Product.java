@@ -3,6 +3,7 @@ package vn.gpay.gsmart.core.product;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ import org.hibernate.annotations.NotFoundAction;
 import vn.gpay.gsmart.core.category.Unit;
 import vn.gpay.gsmart.core.productattributevalue.ProductAttributeValue;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.utils.AtributeFixValues;
 
 @Table(name="product")
 @Entity
@@ -103,7 +105,7 @@ public class Product implements Serializable {/**
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
     @JoinColumn(name="productid_link",insertable=false,updatable =false)
-    private Set<ProductAttributeValue> listPAvalue;
+    private Set<ProductAttributeValue> listPAvalue = new HashSet<ProductAttributeValue>();
 		
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -151,7 +153,7 @@ public class Product implements Serializable {/**
     public String getTenMauNPL() {
     	String name ="";
     	for (ProductAttributeValue pav : listPAvalue) {
-			if(pav.getAttributeid_link() == 35) {
+			if(pav.getAttributeid_link() == AtributeFixValues.ATTR_COLOR) {
 				if(pav.getAttributevalueid_link() != 0) {
 					String attName = pav.getAttributeValueName();
 					if(name == "") {

@@ -156,6 +156,7 @@ public class ProductService extends AbstractService<Product> implements IProduct
 		if (null!=partnercode && partnercode.length()>0){
 			predicates_Products.add(cb.like(rootProduct.get("partnercode"), "%"+partnercode+"%"));
 		}	
+		predicates_Products.add(cb.equal(rootProduct.get("status"), 1));
 
 		Predicate p = cb.and(predicates_Products.toArray(new Predicate[0]));	
 		cq_product.where(p);

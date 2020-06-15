@@ -17,9 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.pcontract.IPContractService;
-import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.pcontractattributevalue.IPContractProductAtrributeValueService;
-import vn.gpay.gsmart.core.pcontractattributevalue.PContractAttributeValue;
 import vn.gpay.gsmart.core.pcontractattributevalue.PContractAttributeValueBinding;
 import vn.gpay.gsmart.core.pcontractproductcolor.IPContractProductColorService;
 import vn.gpay.gsmart.core.pcontractproductcolor.PContractProductColor;
@@ -29,7 +27,6 @@ import vn.gpay.gsmart.core.product.IProductService;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.productattributevalue.IProductAttributeService;
 import vn.gpay.gsmart.core.productattributevalue.ProductAttributeValue;
-import vn.gpay.gsmart.core.productattributevalue.ProductAttributeValueBinding;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 import vn.gpay.gsmart.core.sku.ISKU_Service;

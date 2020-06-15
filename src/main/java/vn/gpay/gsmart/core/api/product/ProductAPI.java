@@ -632,11 +632,22 @@ public class ProductAPI {
 					.getPrincipal();
 			Product product = entity.data;
 			long orgrootid_link = user.getRootorgid_link();
+			boolean isNew = false;
 			
 			if (product.getId() == null || product.getId() == 0) {
+				isNew = true;
 				product.setOrgrootid_link(user.getRootorgid_link());
 				product.setUsercreateid_link(user.getId());
 				product.setTimecreate(new Date());
+				
+				if(product.getVendorcode() == "" || product.getVendorcode() == null) {
+					product.setVendorcode(product.getBuyercode());
+				}
+				
+				if(product.getVendorname() == "" || product.getVendorname() == null) {
+					product.setVendorname(product.getBuyername());
+				}
+				
 			} else {
 				Product product_old = productService.findOne(product.getId());
 				product.setOrgrootid_link(product_old.getOrgrootid_link());
@@ -652,73 +663,77 @@ public class ProductAPI {
 				response.setMessage("Mã đã tồn tại trong hệ thống!");
 			} else {
 				product = productService.save(product);
+				
+				if(isNew) {
+					// sau khi lưu sản phẩm xong thì tự động insert các thuộc tính của sản phẩm vào
+					List<Attribute> lstAttr = attrService.getList_attribute_forproduct(product.getProducttypeid_link(),
+							user.getRootorgid_link());
+					for (Attribute attribute : lstAttr) {
+						ProductAttributeValue pav = new ProductAttributeValue();
+						long value = 0;
+						
+						if(attribute.getId() == AtributeFixValues.ATTR_COLOR) {
+							value = AtributeFixValues.value_color_all;
+						}
+						else if(attribute.getId() == AtributeFixValues.ATTR_SIZE) {
+							value = AtributeFixValues.value_size_all;
+						} else if(attribute.getId() == AtributeFixValues.ATTR_SIZEWIDTH) {
+							value = AtributeFixValues.value_sizewidth_all;
+						}
+						
+						pav.setId((long) 0);
+						pav.setProductid_link(product.getId());
+						pav.setAttributeid_link(attribute.getId());
+						pav.setAttributevalueid_link(value);
+						pav.setOrgrootid_link(user.getRootorgid_link());
+						pavService.save(pav);
+					}
+					
+					//Sinh SKU cho mau all va co all
+					long skuid_link = 0;
+					
+					SKU sku = new SKU();
+					sku.setId(skuid_link);
+					sku.setCode(genCodeSKU(product));
+					sku.setName(product.getName());
+					sku.setProductid_link(product.getId());
+					sku.setOrgrootid_link(user.getRootorgid_link());
+					sku.setSkutypeid_link(product.getProducttypeid_link());
 
-				// sau khi lưu sản phẩm xong thì tự động insert các thuộc tính của sản phẩm vào
-				List<Attribute> lstAttr = attrService.getList_attribute_forproduct(product.getProducttypeid_link(),
-						user.getRootorgid_link());
-				for (Attribute attribute : lstAttr) {
-					ProductAttributeValue pav = new ProductAttributeValue();
-					long value = 0;
+					sku = skuService.save(sku);
+					skuid_link = sku.getId();
 					
-					if(attribute.getId() == AtributeFixValues.ATTR_COLOR) {
-						value = AtributeFixValues.value_color_all;
-					}
-					else if(attribute.getId() == AtributeFixValues.ATTR_SIZE) {
-						value = AtributeFixValues.value_size_all;
-					} else if(attribute.getId() == AtributeFixValues.ATTR_SIZEWIDTH) {
-						value = AtributeFixValues.value_sizewidth_all;
-					}
-					
-					pav.setId((long) 0);
-					pav.setProductid_link(product.getId());
-					pav.setAttributeid_link(attribute.getId());
-					pav.setAttributevalueid_link(value);
-					pav.setOrgrootid_link(user.getRootorgid_link());
-					pavService.save(pav);
+					// Them vao bang sku_attribute_value
+					SKU_Attribute_Value savMau = new SKU_Attribute_Value();
+					savMau.setId((long) 0);
+					savMau.setAttributevalueid_link(AtributeFixValues.value_color_all);
+					savMau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
+					savMau.setOrgrootid_link(user.getRootorgid_link());
+					savMau.setSkuid_link(skuid_link);
+					savMau.setUsercreateid_link(user.getId());
+					savMau.setTimecreate(new Date());
+
+					skuattService.save(savMau);
+
+					SKU_Attribute_Value savCo = new SKU_Attribute_Value();
+					savCo.setId((long) 0);
+					savCo.setAttributevalueid_link(AtributeFixValues.value_size_all);
+					savCo.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
+					savCo.setOrgrootid_link(user.getRootorgid_link());
+					savCo.setSkuid_link(skuid_link);
+					savCo.setUsercreateid_link(user.getId());
+					savCo.setTimecreate(new Date());
+
+					skuattService.save(savCo);
 				}
 				
-				//Sinh SKU cho mau all va co all
-				long skuid_link = 0;
-				
-				SKU sku = new SKU();
-				sku.setId(skuid_link);
-				sku.setCode(genCodeSKU(product));
-				sku.setName(product.getName());
-				sku.setProductid_link(product.getId());
-				sku.setOrgrootid_link(user.getRootorgid_link());
-				sku.setSkutypeid_link(product.getProducttypeid_link());
-
-				sku = skuService.save(sku);
-				skuid_link = sku.getId();
-				
-				// Them vao bang sku_attribute_value
-				SKU_Attribute_Value savMau = new SKU_Attribute_Value();
-				savMau.setId((long) 0);
-				savMau.setAttributevalueid_link(AtributeFixValues.value_color_all);
-				savMau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
-				savMau.setOrgrootid_link(user.getRootorgid_link());
-				savMau.setSkuid_link(skuid_link);
-				savMau.setUsercreateid_link(user.getId());
-				savMau.setTimecreate(new Date());
-
-				skuattService.save(savMau);
-
-				SKU_Attribute_Value savCo = new SKU_Attribute_Value();
-				savCo.setId((long) 0);
-				savCo.setAttributevalueid_link(AtributeFixValues.value_size_all);
-				savCo.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
-				savCo.setOrgrootid_link(user.getRootorgid_link());
-				savCo.setSkuid_link(skuid_link);
-				savCo.setUsercreateid_link(user.getId());
-				savCo.setTimecreate(new Date());
-
-				skuattService.save(savCo);
 
 				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			}
 
 			response.id = product.getId();
+			response.product = product;
 			return new ResponseEntity<Product_create_response>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
