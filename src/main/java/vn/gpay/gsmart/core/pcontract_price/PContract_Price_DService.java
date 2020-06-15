@@ -9,17 +9,17 @@ import org.springframework.stereotype.Service;
 import vn.gpay.gsmart.core.base.AbstractService;
 
 @Service
-public class PContract_Price_Service extends AbstractService<PContract_Price_D> implements IPContract_Price_Service {
-	@Autowired IPContract_Price_Repository repo;
+public class PContract_Price_DService extends AbstractService<PContract_Price_D> implements IPContract_Price_DService {
+	@Autowired IPContract_Price_DRepository repo;
 	@Override
 	protected JpaRepository<PContract_Price_D, Long> getRepository() {
 		// TODO Auto-generated method stub
 		return repo;
 	}
 	@Override
-	public List<PContract_Price> getPrice_ByPO(long pcontract_poid_link) {
+	public List<PContract_Price_D> getPrice_D_ByPO(long pcontract_poid_link) {
 		// TODO Auto-generated method stub
-		return repo.getPrice_ByPO(pcontract_poid_link);
+		return repo.getPrice_D_ByPO(pcontract_poid_link);
 	}
 
 }

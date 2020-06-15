@@ -1,23 +1,22 @@
 package vn.gpay.gsmart.core.pcontract_price;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import vn.gpay.gsmart.core.fob_price.FOBPrice;
-import vn.gpay.gsmart.core.security.GpayUser;
 
 @Table(name="pcontract_price")
 @Entity
@@ -34,154 +33,96 @@ public class PContract_Price implements Serializable {/**
 	private Long pcontractid_link;
 	private Long pcontract_poid_link;
 	private Long productid_link;
-	private Float price; //giá chào
-	private Float cost; // giá vốn
-	private Boolean isfob;
-	private Long currencyid_link;
-	private Float exchangerate;
-	private Long usercreatedid_link;
-	private Date datecreated;
-	private Integer status;
-	private Long fobpriceid_link;
-	
-	
-	public Long getFobpriceid_link() {
-		return fobpriceid_link;
-	}
-
-	public void setFobpriceid_link(Long fobpriceid_link) {
-		this.fobpriceid_link = fobpriceid_link;
-	}
-
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne
-    @JoinColumn(name="usercreatedid_link",insertable=false,updatable =false)
-    private GpayUser usercreated;
+	private Long sizesetid_link;
+	private Float price_cmp;
+	private Float price_fob;
+	private Float price_sewingtarget;
+	private Float price_sewingcost;
+	private Float totalprice;
+	private Float salaryfund;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne
-    @JoinColumn(name="fobpriceid_link",insertable=false,updatable =false)
-    private FOBPrice fobprice;
+	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
+	@JoinColumn( name="pcontractpriceid_link", referencedColumnName="id")
+	private List<PContract_Price_D>  po_price_d  = new ArrayList<>();
 	
-	@Transient
-	public String getFobprice_name() {
-		if(fobprice != null) {
-			return fobprice.getName();
-		}
-		return "";
-	}
-	
-	@Transient
-	public String getUsercreatedName() {
-		if(usercreated != null) {
-			return usercreated.getFullName();
-		}
-		return "";
-	}
-
 	public Long getId() {
 		return id;
 	}
-
 	public void setId(Long id) {
 		this.id = id;
 	}
-
 	public Long getOrgrootid_link() {
 		return orgrootid_link;
 	}
-
 	public void setOrgrootid_link(Long orgrootid_link) {
 		this.orgrootid_link = orgrootid_link;
 	}
-
 	public Long getPcontractid_link() {
 		return pcontractid_link;
 	}
-
 	public void setPcontractid_link(Long pcontractid_link) {
 		this.pcontractid_link = pcontractid_link;
 	}
-
 	public Long getPcontract_poid_link() {
 		return pcontract_poid_link;
 	}
-
 	public void setPcontract_poid_link(Long pcontract_poid_link) {
 		this.pcontract_poid_link = pcontract_poid_link;
 	}
-
 	public Long getProductid_link() {
 		return productid_link;
 	}
-
 	public void setProductid_link(Long productid_link) {
 		this.productid_link = productid_link;
 	}
-
-
-	public Long getCurrencyid_link() {
-		return currencyid_link;
+	public Long getSizesetid_link() {
+		return sizesetid_link;
 	}
-
-	public void setCurrencyid_link(Long currencyid_link) {
-		this.currencyid_link = currencyid_link;
+	public void setSizesetid_link(Long sizesetid_link) {
+		this.sizesetid_link = sizesetid_link;
 	}
-
-	public Float getExchangerate() {
-		return exchangerate;
+	public Float getPrice_cmp() {
+		return price_cmp;
 	}
-
-	public void setExchangerate(Float exchangerate) {
-		this.exchangerate = exchangerate;
+	public void setPrice_cmp(Float price_cmp) {
+		this.price_cmp = price_cmp;
 	}
-
-	public Long getUsercreatedid_link() {
-		return usercreatedid_link;
+	public Float getPrice_fob() {
+		return price_fob;
 	}
-
-	public void setUsercreatedid_link(Long usercreatedid_link) {
-		this.usercreatedid_link = usercreatedid_link;
+	public void setPrice_fob(Float price_fob) {
+		this.price_fob = price_fob;
 	}
-
-	public Date getDatecreated() {
-		return datecreated;
+	public Float getPrice_sewingtarget() {
+		return price_sewingtarget;
 	}
-
-	public void setDatecreated(Date datecreated) {
-		this.datecreated = datecreated;
+	public void setPrice_sewingtarget(Float price_sewingtarget) {
+		this.price_sewingtarget = price_sewingtarget;
 	}
-
-	public Integer getStatus() {
-		return status;
+	public Float getPrice_sewingcost() {
+		return price_sewingcost;
 	}
-
-	public void setStatus(Integer status) {
-		this.status = status;
+	public void setPrice_sewingcost(Float price_sewingcost) {
+		this.price_sewingcost = price_sewingcost;
 	}
-
-	public Float getPrice() {
-		return price;
+	public Float getTotalprice() {
+		return totalprice;
 	}
-
-	public void setPrice(Float price) {
-		this.price = price;
+	public void setTotalprice(Float totalprice) {
+		this.totalprice = totalprice;
 	}
-
-	public Float getCost() {
-		return cost;
+	public Float getSalaryfund() {
+		return salaryfund;
 	}
-
-	public void setCost(Float cost) {
-		this.cost = cost;
+	public void setSalaryfund(Float salaryfund) {
+		this.salaryfund = salaryfund;
 	}
-
-	public Boolean getIsfob() {
-		return isfob;
+	public List<PContract_Price_D> getPo_price_d() {
+		return po_price_d;
 	}
-
-	public void setIsfob(Boolean isfob) {
-		this.isfob = isfob;
+	public void setPo_price_d(List<PContract_Price_D> po_price_d) {
+		this.po_price_d = po_price_d;
 	}
-
+	
 }

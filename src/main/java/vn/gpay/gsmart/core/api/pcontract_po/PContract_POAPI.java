@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
+import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_DService;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Service;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
+import vn.gpay.gsmart.core.pcontract_price.PContract_Price_D;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -28,6 +30,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 public class PContract_POAPI {
 	@Autowired IPContract_POService pcontract_POService;
 	@Autowired IPContract_Price_Service pcontractpriceService;
+	@Autowired IPContract_Price_DService pcontractpriceDService;
 	
 	@RequestMapping(value = "/create",method = RequestMethod.POST)
 	public ResponseEntity<PContract_pocreate_response> PContractCreate(@RequestBody PContract_pocreate_request entity,HttpServletRequest request ) {
@@ -45,35 +48,13 @@ public class PContract_POAPI {
 				pcontract_po.setDatecreated(new Date());
 				pcontract_po.setPcontractid_link(pcontractid_link);
 			}
-			else {
-				PContract_PO pcontract_po_old = pcontract_POService.findOne(pcontract_po.getId());
-				pcontract_po.setOrgrootid_link(pcontract_po_old.getOrgrootid_link());
-				pcontract_po.setUsercreatedid_link(pcontract_po_old.getUsercreatedid_link());
-				pcontract_po.setDatecreated(pcontract_po_old.getDatecreated());
-			}
+//			else {
+//				PContract_PO pcontract_po_old = pcontract_POService.findOne(pcontract_po.getId());
+//				pcontract_po.setOrgrootid_link(pcontract_po_old.getOrgrootid_link());
+//				pcontract_po.setUsercreatedid_link(pcontract_po_old.getUsercreatedid_link());
+//				pcontract_po.setDatecreated(pcontract_po_old.getDatecreated());
+//			}
 			pcontract_po = pcontract_POService.save(pcontract_po);
-			
-			long pcontract_poid_link = pcontract_po.getId();
-			//Cập nhật lại giá
-			
-			//Xóa list cũ
-			List<PContract_Price> list_price = pcontractpriceService.getby_pcontractpo_id_link(pcontract_poid_link);
-			for(PContract_Price price : list_price) {
-				pcontractpriceService.delete(price);
-			}
-			
-			//them list moi
-			List<PContract_Price> list_price_new  = entity.list_price;
-			for(PContract_Price price : list_price_new) {
-				price.setId(null);
-				price.setPcontract_poid_link(pcontract_poid_link);
-				price.setPcontractid_link(pcontractid_link);
-				price.setOrgrootid_link(orgrootid_link);
-				price.setUsercreatedid_link(usercreatedid_link);
-				price.setStatus(0);
-				
-				pcontractpriceService.save(price);
-			}
 			
 			response.id = pcontract_po.getId();
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

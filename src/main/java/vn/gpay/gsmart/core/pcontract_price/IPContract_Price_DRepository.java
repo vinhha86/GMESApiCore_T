@@ -11,9 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
-public interface IPContract_Price_Repository extends JpaRepository<PContract_Price_D, Long>, JpaSpecificationExecutor<PContract_Price_D> {
-	@Query(value = "select c from PContract_Price c "
+public interface IPContract_Price_DRepository extends JpaRepository<PContract_Price_D, Long>, JpaSpecificationExecutor<PContract_Price_D> {
+	@Query(value = "select c from PContract_Price_D c "
 			+ "where pcontract_poid_link = :pcontract_poid_link")
-	public List<PContract_Price> getPrice_ByPO(
+	public List<PContract_Price_D> getPrice_D_ByPO(
 			@Param ("pcontract_poid_link")final  Long pcontract_poid_link);
 }

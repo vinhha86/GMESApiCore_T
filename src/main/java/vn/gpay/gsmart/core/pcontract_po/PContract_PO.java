@@ -45,7 +45,7 @@ public class PContract_PO implements Serializable {/**
 	private Date matdate;
 	private Float actual_quantity;
 	private Date actual_shipdate;
-	private Float price_cmpt;
+	private Float price_cmp;
 	private Float price_fob;
 	private Float price_sweingtarget;
 	private Float price_sweingfact;
@@ -79,10 +79,10 @@ public class PContract_PO implements Serializable {/**
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
     @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
-    private List<PContract_Price> listprice = new ArrayList<PContract_Price>();
+    private List<PContract_Price> po_price = new ArrayList<PContract_Price>();
 
-	public List<PContract_Price> getListprice() {
-		return listprice;
+	public List<PContract_Price> getPoprice() {
+		return po_price;
 	}
 
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -98,40 +98,6 @@ public class PContract_PO implements Serializable {/**
 		return "";
 	}
 	
-	@Transient
-	public float getFob_price() {
-		float fob = (float)0;
-		
-		for(PContract_Price price : listprice) {
-			if(price.getIsfob()) {
-				fob += price.getPrice();
-			}
-		}
-		return fob;
-	}
-	
-	@Transient
-	public float getCmpt_price() {
-		float cmpt = (float)0;
-		
-		for(PContract_Price price : listprice) {
-			if(!price.getIsfob()) {
-				cmpt += price.getPrice();
-			}
-		}
-		return cmpt;
-	}
-	
-	@Transient
-	public float getTotal_price() {
-		float total = (float)0;
-		
-		for(PContract_Price price : listprice) {
-			total += price.getPrice();
-		}
-		return total;
-	}
-
 	public Long getId() {
 		return id;
 	}
@@ -236,12 +202,12 @@ public class PContract_PO implements Serializable {/**
 		this.actual_shipdate = actual_shipdate;
 	}
 
-	public Float getPrice_cmpt() {
-		return price_cmpt;
+	public Float getPrice_cmp() {
+		return price_cmp;
 	}
 
-	public void setPrice_cmpt(Float price_cmpt) {
-		this.price_cmpt = price_cmpt;
+	public void setPrice_cmp(Float price_cmp) {
+		this.price_cmp = price_cmp;
 	}
 
 	public Float getPrice_fob() {
