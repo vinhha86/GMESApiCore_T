@@ -94,24 +94,31 @@ public class ProductAttributeValueAPI {
 
 			for (ProductAttributeValue pavMau : lstmau) {
 				for (ProductAttributeValue pavCo : lstco) {
+					Long skuid_link = (long) 0;
 					// Lấy danh sách SKU theo màu cua product
 					lstSKUMau = savService.getlist_byProduct_and_value(entity.productid_link,
 							pavMau.getAttributevalueid_link());
 					// Lấy danh sách SKU theo cỡ cua product
 					lstSKUCo = savService.getlist_byProduct_and_value(entity.productid_link,
 							pavCo.getAttributevalueid_link());
-					Long skuid_link = (long) 0;
+					if(lstSKUMau.size() ==0 || lstSKUCo.size() ==0)
+						skuid_link = (long)-1;
 					// Lấy SKU của màu và cỡ
 					for (SKU_Attribute_Value savMau : lstSKUMau) {
 						for (SKU_Attribute_Value savCo : lstSKUCo) {
-							long skuMau = savMau.getSkuid_link();
-							long skuCo = savCo.getSkuid_link();
-							if (skuMau == skuCo) {
-								skuid_link = savMau.getSkuid_link();
-								break;
+							if(savMau.getIsdefaultvalue() || savCo.getIsdefaultvalue()) {
+								skuid_link = (long)-1;
 							}
+							else {
+								long skuMau = savMau.getSkuid_link();
+								long skuCo = savCo.getSkuid_link();
+								if (skuMau == skuCo) {
+									skuid_link = savMau.getSkuid_link();
+									break;
+								}
+							}							
 						}
-						if (skuid_link > 0)
+						if (skuid_link != 0)
 							break;
 					}
 
@@ -279,25 +286,33 @@ public class ProductAttributeValueAPI {
 			}
 
 			for (ProductAttributeValue pavMau : lstmau) {
-				for (ProductAttributeValue pavCo : lstco) {
+				for (ProductAttributeValue pavCo : lstco) {	
+					Long skuid_link = (long) 0;
+					
 					// Lấy danh sách SKU theo màu cua product
 					lstSKUMau = savService.getlist_byProduct_and_value(entity.productid_link,
 							pavMau.getAttributevalueid_link());
 					// Lấy danh sách SKU theo cỡ cua product
 					lstSKUCo = savService.getlist_byProduct_and_value(entity.productid_link,
 							pavCo.getAttributevalueid_link());
-					Long skuid_link = (long) 0;
+					if(lstSKUMau.size() ==0 || lstSKUCo.size() ==0)
+						skuid_link = (long)-1;
 					// Lấy SKU của màu và cỡ
 					for (SKU_Attribute_Value savMau : lstSKUMau) {
 						for (SKU_Attribute_Value savCo : lstSKUCo) {
-							long skuMau = savMau.getSkuid_link();
-							long skuCo = savCo.getSkuid_link();
-							if (skuMau == skuCo) {
-								skuid_link = savMau.getSkuid_link();
-								break;
+							if(savMau.getIsdefaultvalue() || savCo.getIsdefaultvalue()) {
+								skuid_link = (long)-1;
 							}
+							else {
+								long skuMau = savMau.getSkuid_link();
+								long skuCo = savCo.getSkuid_link();
+								if (skuMau == skuCo) {
+									skuid_link = savMau.getSkuid_link();
+									break;
+								}
+							}							
 						}
-						if (skuid_link > 0)
+						if (skuid_link != 0)
 							break;
 					}
 

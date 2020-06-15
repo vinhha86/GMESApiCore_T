@@ -84,6 +84,13 @@ public class SKU_Attribute_Value implements Serializable {
 		}
 		return "";
 	}
+	
+	@Transient
+	public Boolean getIsdefaultvalue() {
+		if(attributevalue != null)
+			return attributevalue.getIsdefault();
+		return true;
+	}
 
 	public Long getId() {
 		return id;
