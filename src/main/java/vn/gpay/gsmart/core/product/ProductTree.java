@@ -11,18 +11,15 @@ public class ProductTree implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	private Long id;
+	private Long productid_link;
 	
 	private String text;
 	private Long parent_id;
 	private String code;
 	private byte[] imgproduct;
-	private String iconCls;
 	
 	public String getIconCls() {
 		return "no-icon";
-	}
-	public void setIconCls(String iconCls) {
-		this.iconCls = iconCls;
 	}
 	public byte[] getImgproduct() {
 		return imgproduct;
@@ -61,5 +58,11 @@ public class ProductTree implements Serializable{
 	}
 	public void setChildren(List<ProductTree> children) {
 		this.children = children;
+	}
+	public Long getProductid_link() {
+		return productid_link;
+	}
+	public void setProductid_link(Long productid_link) {
+		this.productid_link = productid_link;
 	}
 }
