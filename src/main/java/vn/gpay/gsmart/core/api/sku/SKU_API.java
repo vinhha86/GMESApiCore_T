@@ -44,28 +44,39 @@ public class SKU_API {
 	}
 	
 	@RequestMapping(value = "/createcode",method = RequestMethod.POST)
-	public ResponseEntity<ResponseBase> update_SKU(HttpServletRequest request, @RequestBody SKU_Createcode_Request entity ) {
-		ResponseBase response = new ResponseBase();
+	public ResponseEntity<SKU_createcode_response> update_SKU(HttpServletRequest request, @RequestBody SKU_Createcode_Request entity ) {
+		SKU_createcode_response response = new SKU_createcode_response();
 		
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			SKU sku = entity.data;
-			if(sku.getId()==null || sku.getId()==0) {
-				sku.setOrgrootid_link(user.getRootorgid_link());
-			}else {
-				SKU sku_old =  skuService.findOne(sku.getId());
-				sku.setOrgrootid_link(sku_old.getOrgrootid_link());
+			long orgrootid_link = user.getRootorgid_link();
+			
+			SKU sku_check = skuService.getSKU_byCode(entity.data.getCode(), orgrootid_link);
+			
+			if(sku_check != null) {
+				response.mesErr = "Sku đã trùng trong hệ thống";
+			}
+			else {
+				SKU sku = entity.data;
+				if(sku.getId()==null || sku.getId()==0) {
+					sku.setOrgrootid_link(user.getRootorgid_link());
+				}else {
+					SKU sku_old =  skuService.findOne(sku.getId());
+					sku.setOrgrootid_link(sku_old.getOrgrootid_link());
+				}
+				
+				skuService.save(sku);
+				response.mesErr = "";
 			}
 			
-			skuService.save(sku);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+			return new ResponseEntity<SKU_createcode_response>(response,HttpStatus.OK);
 		}catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-		    return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+		    return new ResponseEntity<SKU_createcode_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
 	

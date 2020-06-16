@@ -1022,14 +1022,50 @@ public class ProductAPI {
 				@RequestBody getlistproduct_bypairingid_request entity, HttpServletRequest request) {
 			getlistproduct_bypairingid_response response = new getlistproduct_bypairingid_response();
 			try {
-				response.data = new ArrayList<Product>();
+				response.data = new ArrayList<ProductBinding>();
 				Product product = productService.findOne(entity.product_pairid_link);
 				if(!entity.ishidden_pair || product.getProducttypeid_link() !=5) {
-					response.data.add(product);
+					ProductBinding pb = new ProductBinding();
+					pb.setId(product.getId());
+					pb.setCode(product.getCode());
+					pb.setName(product.getName());
+					pb.setProduct_type(product.getProducttypeid_link());
+					pb.setProduct_typeName(product.getProducttype_name());
+					pb.setCoKho(product.getCoKho());
+					pb.setThanhPhanVai(product.getThanhPhanVai());
+					pb.setTenMauNPL(product.getTenMauNPL());
+					
+					String FolderPath = commonService.getFolderPath(product.getProducttypeid_link());
+					String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+					
+					pb.setUrlimage(getimg(product.getImgurl1(),uploadRootPath));
+					
+					response.data.add(pb);
 				}				
 				
 				List<Product> list = productService.getby_pairid(entity.product_pairid_link);
-				response.data.addAll(list);
+				
+				List<ProductBinding> lstdata = new ArrayList<ProductBinding>();
+				
+				for (Product _product : list) {
+					ProductBinding pb = new ProductBinding();
+					pb.setId(_product.getId());
+					pb.setCode(_product.getCode());
+					pb.setName(_product.getName());
+					pb.setProduct_type(_product.getProducttypeid_link());
+					pb.setProduct_typeName(_product.getProducttype_name());
+					pb.setCoKho(_product.getCoKho());
+					pb.setThanhPhanVai(_product.getThanhPhanVai());
+					pb.setTenMauNPL(_product.getTenMauNPL());
+					
+					String FolderPath = commonService.getFolderPath(_product.getProducttypeid_link());
+					String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+					
+					pb.setUrlimage(getimg(_product.getImgurl1(),uploadRootPath));
+					lstdata.add(pb);
+				}
+				
+				response.data = lstdata;
 				
 				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

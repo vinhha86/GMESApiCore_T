@@ -53,10 +53,7 @@ public class PContractProductPairingAPI {
 			long pcontractid_link = entity.pcontractid_link;
 			
 			List<PContractProduct> listproduct = ppservice.get_by_product_and_pcontract(orgrootid_link, (long)0, pcontractid_link);
-			List<Long> listpair = prodctpairservice.getproductid_pairing_bycontract(orgrootid_link, pcontractid_link);
-			
-			listproduct.removeIf(c-> listpair.contains(c.getProductid_link()));
-			
+						
 			List<PContractProductBinding> data = new ArrayList<PContractProductBinding>();
 			String FolderPath = "upload/product";
 			
@@ -185,50 +182,70 @@ public class PContractProductPairingAPI {
 	}
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public ResponseEntity<ResponseBase> Create(HttpServletRequest request,
+	public ResponseEntity<PContractProductPair_create_response> Create(HttpServletRequest request,
 			@RequestBody PContractProductPair_create_request entity) {
-		ResponseBase response = new ResponseBase();
+		PContractProductPair_create_response response = new PContractProductPair_create_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
 					.getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
 			long pcontractid_link = entity.pcontractid_link;
 			long productpairid_link = entity.productpairid_link;
-
-			Product product = new Product();
-			if(productpairid_link == 0) {
-				//Sinh sản phẩm bộ
-				product.setId(productpairid_link);				
-				product.setProducttypeid_link(5);
-				product.setOrgrootid_link(orgrootid_link);
-				product.setStatus(1);
-				product.setUsercreateid_link(user.getId());
-				product.setTimecreate(new Date());
+			
+			//Kiểm tra xem bộ đã tồn tại hay chưa
+			List<ProductPairing> list_pair = prodctpairservice.getproduct_pairing_bycontract(orgrootid_link, pcontractid_link);
+			
+			if(list_pair.size() == entity.listpair.size()) {
+				for(ProductPairing productpair : entity.listpair) {
+					list_pair.removeIf(c-> c.getProductid_link() == productpair.getProductid_link() && c.getAmount() == productpair.getAmount());
+				}
+				
+				if(list_pair.size() == 0) {
+					response.mesErr = "Bộ đã tồn tại trong hệ thống!";
+				}
 			}
 			else {
-				product = productService.findOne(productpairid_link);
+				response.mesErr = "";
 			}
 			
-			product.setName(getNameproductPair(entity.listpair));
-			
-			product = productService.save(product);
-			
-			//Update vào bảng ProductPairing
-			for (ProductPairing productPairing : entity.listpair) {
-				productPairing.setProductpairid_link(product.getId());
-				productPairing.setOrgrootid_link(orgrootid_link);
-				prodctpairservice.save(productPairing);
+			if(response.mesErr == "") {
+				Product product = new Product();
+				if(productpairid_link == 0) {
+					//Sinh sản phẩm bộ
+					product.setId(productpairid_link);				
+					product.setProducttypeid_link(5);
+					product.setOrgrootid_link(orgrootid_link);
+					product.setStatus(1);
+					product.setUsercreateid_link(user.getId());
+					product.setTimecreate(new Date());
+				}
+				else {
+					product = productService.findOne(productpairid_link);
+				}
+				
+				product.setName(getNameproductPair(entity.listpair));
+				
+				product = productService.save(product);
+				
+				//Update vào bảng ProductPairing
+				for (ProductPairing productPairing : entity.listpair) {
+					productPairing.setProductpairid_link(product.getId());
+					productPairing.setOrgrootid_link(orgrootid_link);
+					prodctpairservice.save(productPairing);
+				}
+				
+				//Cập nhật lại vào bảng PContract_Product_Pair
+				if(productpairid_link == 0) {
+					PContractProductPairing ppPair = new PContractProductPairing();
+					ppPair.setId((long)0);
+					ppPair.setOrgrootid_link(orgrootid_link);
+					ppPair.setPcontractid_link(pcontractid_link);
+					ppPair.setProductpairid_link(product.getId());
+					ppPairingservice.save(ppPair);
+				}
 			}
+
 			
-			//Cập nhật lại vào bảng PContract_Product_Pair
-			if(productpairid_link == 0) {
-				PContractProductPairing ppPair = new PContractProductPairing();
-				ppPair.setId((long)0);
-				ppPair.setOrgrootid_link(orgrootid_link);
-				ppPair.setPcontractid_link(pcontractid_link);
-				ppPair.setProductpairid_link(product.getId());
-				ppPairingservice.save(ppPair);
-			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -236,7 +253,7 @@ public class PContractProductPairingAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		}
-		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		return new ResponseEntity<PContractProductPair_create_response>(response, HttpStatus.OK);
 	}
 	
 	public String getNameproductPair(List<ProductPairing> lst) {
