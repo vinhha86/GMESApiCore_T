@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.1.4.RELEASE</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>vn.gpay.gsmart</groupId>
 	<artifactId>GSMART_API_CORE</artifactId>
@@ -19,6 +20,11 @@
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.15</version>
+		</dependency>
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger-ui</artifactId>
@@ -39,10 +45,10 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-starter-web</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework.security.oauth</groupId>
 			<artifactId>spring-security-oauth2</artifactId>
@@ -59,25 +65,25 @@
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>com.github.wenhao</groupId>
-		    <artifactId>jpa-spec</artifactId>
-		    <version>3.2.4</version>
+			<groupId>com.github.wenhao</groupId>
+			<artifactId>jpa-spec</artifactId>
+			<version>3.2.4</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-starter-tomcat</artifactId>
-		    <scope>provided</scope>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-devtools</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
@@ -85,10 +91,10 @@
 			<version>0.7.0</version>
 		</dependency>
 		<dependency>
-	    <groupId>org.springframework.security.oauth.boot</groupId>
-	    <artifactId>spring-security-oauth2-autoconfigure</artifactId>
-	    <version>2.0.1.RELEASE</version>
-	</dependency>
+			<groupId>org.springframework.security.oauth.boot</groupId>
+			<artifactId>spring-security-oauth2-autoconfigure</artifactId>
+			<version>2.0.1.RELEASE</version>
+		</dependency>
 	</dependencies>
 
 	<build>
