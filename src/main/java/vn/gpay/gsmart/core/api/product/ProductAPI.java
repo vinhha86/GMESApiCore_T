@@ -553,8 +553,6 @@ public class ProductAPI {
 	}
 	
 	private byte[] getimg(String filename, String uploadRootPath) {
-		logger.info("uploadRootPath: "+ uploadRootPath);
-		logger.info("filename: "+ filename);
 		String filePath = uploadRootPath+"\\"+ filename;
 		Path path = Paths.get(filePath);
 		byte[] data;
@@ -1045,7 +1043,6 @@ public class ProductAPI {
 				
 				List<Product> list = productService.getby_pairid(entity.product_pairid_link);
 				
-				List<ProductBinding> lstdata = new ArrayList<ProductBinding>();
 				
 				for (Product _product : list) {
 					ProductBinding pb = new ProductBinding();
@@ -1062,10 +1059,10 @@ public class ProductAPI {
 					String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
 					
 					pb.setUrlimage(getimg(_product.getImgurl1(),uploadRootPath));
-					lstdata.add(pb);
+					
+					response.data.add(pb);
 				}
 				
-				response.data = lstdata;
 				
 				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
