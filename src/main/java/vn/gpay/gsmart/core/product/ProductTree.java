@@ -19,7 +19,7 @@ public class ProductTree implements Serializable{
 	private byte[] imgproduct;
 	
 	public String getIconCls() {
-		return "no-icon";
+		return "x-tree-node-icon";
 	}
 	public byte[] getImgproduct() {
 		return imgproduct;
