@@ -10,6 +10,7 @@ import vn.gpay.gsmart.core.base.AbstractService;
 
 @Service
 public class FOBPrice_Service extends AbstractService<FOBPrice> implements IFOBService {
+	
 	@Autowired FOBPrice_repository repo;
 	
 	@Override
