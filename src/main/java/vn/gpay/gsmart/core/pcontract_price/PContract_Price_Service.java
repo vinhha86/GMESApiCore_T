@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service;
 import vn.gpay.gsmart.core.base.AbstractService;
 
 @Service
-public class PContract_Price_Service extends AbstractService<PContract_Price_D> implements IPContract_Price_Service {
+public class PContract_Price_Service extends AbstractService<PContract_Price> implements IPContract_Price_Service {
 	@Autowired IPContract_Price_Repository repo;
 	@Override
-	protected JpaRepository<PContract_Price_D, Long> getRepository() {
+	protected JpaRepository<PContract_Price, Long> getRepository() {
 		// TODO Auto-generated method stub
 		return repo;
 	}

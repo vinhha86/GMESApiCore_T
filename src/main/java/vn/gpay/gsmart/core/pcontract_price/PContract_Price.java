@@ -10,12 +10,17 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.sizeset.SizeSet;
 
 
 @Table(name="pcontract_price")
@@ -42,10 +47,29 @@ public class PContract_Price implements Serializable {/**
 	private Float salaryfund;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="sizesetid_link",insertable=false,updatable =false)
+    private SizeSet sizeset;
+	@Transient
+	public String getSizesetname() {
+		if(sizeset != null) {
+			return sizeset.getName();
+		}
+		return "";
+	}	
+	
+	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
 	@JoinColumn( name="pcontractpriceid_link", referencedColumnName="id")
-	private List<PContract_Price_D>  po_price_d  = new ArrayList<>();
+	private List<PContract_Price_D>  pcontract_price_d  = new ArrayList<>();
 	
+	
+	public List<PContract_Price_D> getPcontract_price_d() {
+		return pcontract_price_d;
+	}
+	public void setPcontract_price_d(List<PContract_Price_D> pcontract_price_d) {
+		this.pcontract_price_d = pcontract_price_d;
+	}
 	public Long getId() {
 		return id;
 	}
@@ -117,12 +141,6 @@ public class PContract_Price implements Serializable {/**
 	}
 	public void setSalaryfund(Float salaryfund) {
 		this.salaryfund = salaryfund;
-	}
-	public List<PContract_Price_D> getPo_price_d() {
-		return po_price_d;
-	}
-	public void setPo_price_d(List<PContract_Price_D> po_price_d) {
-		this.po_price_d = po_price_d;
 	}
 	
 }

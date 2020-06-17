@@ -79,10 +79,15 @@ public class PContract_PO implements Serializable {/**
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
     @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
-    private List<PContract_Price> po_price = new ArrayList<PContract_Price>();
+    private List<PContract_Price> pcontract_price = new ArrayList<PContract_Price>();
 
-	public List<PContract_Price> getPoprice() {
-		return po_price;
+    
+	public List<PContract_Price> getPcontract_price() {
+		return pcontract_price;
+	}
+
+	public void setPcontract_price(List<PContract_Price> pcontract_price) {
+		this.pcontract_price = pcontract_price;
 	}
 
 	@NotFound(action = NotFoundAction.IGNORE)

@@ -56,6 +56,28 @@ public class PContract_POAPI {
 //			}
 			pcontract_po = pcontract_POService.save(pcontract_po);
 			
+			long pcontract_poid_link = pcontract_po.getId();
+			//Cập nhật lại giá
+
+			//Xóa list cũ
+			List<PContract_Price> list_price = pcontractpriceService.getPrice_ByPO(pcontract_poid_link);
+			for(PContract_Price price : list_price) {
+				pcontractpriceService.delete(price);
+			}
+			List<PContract_Price_D> list_price_d = pcontractpriceDService.getPrice_D_ByPO(pcontract_poid_link);
+			for(PContract_Price_D price_d : list_price_d) {
+				pcontractpriceDService.delete(price_d);
+			}
+
+			//them list moi
+			List<PContract_Price> list_price_new  = entity.data.getPcontract_price();
+			for(PContract_Price price : list_price_new) {
+				price.setId(null);
+				price.setPcontract_poid_link(pcontract_poid_link);
+				price.setPcontractid_link(pcontractid_link);
+				price.setOrgrootid_link(orgrootid_link);
+				pcontractpriceService.save(price);
+			}			
 			response.id = pcontract_po.getId();
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));	
