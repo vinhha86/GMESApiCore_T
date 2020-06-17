@@ -12,5 +12,5 @@ public interface ISKU_Service extends Operations<SKU> {
 
 	List<SKU> getSKU_ByType(String code, Integer producttypeid_link);
 
-	SKU getSKU_byCode(String code);
+	SKU getSKU_byCode(String code, long orgrootid_link);
 }

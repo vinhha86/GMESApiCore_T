@@ -34,10 +34,11 @@ public class EncodeApi {
 		try {
 			
 			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
+			long orgrootid_link = user.getRootorgid_link();
 			if(entity.data.size()>0) {
 				SKU sku =new SKU();
 				try {
-					sku = skuService.getSKU_byCode(entity.data.get(0).getSku());
+					sku = skuService.getSKU_byCode(entity.data.get(0).getSku(), orgrootid_link);
 				}catch(Exception e) {
 					sku=null;
 				}

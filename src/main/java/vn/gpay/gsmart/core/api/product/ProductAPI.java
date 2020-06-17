@@ -632,11 +632,22 @@ public class ProductAPI {
 					.getPrincipal();
 			Product product = entity.data;
 			long orgrootid_link = user.getRootorgid_link();
+			boolean isNew = false;
 			
 			if (product.getId() == null || product.getId() == 0) {
+				isNew = true;
 				product.setOrgrootid_link(user.getRootorgid_link());
 				product.setUsercreateid_link(user.getId());
 				product.setTimecreate(new Date());
+				
+				if(product.getVendorcode() == "" || product.getVendorcode() == null) {
+					product.setVendorcode(product.getBuyercode());
+				}
+				
+				if(product.getVendorname() == "" || product.getVendorname() == null) {
+					product.setVendorname(product.getBuyername());
+				}
+				
 			} else {
 				Product product_old = productService.findOne(product.getId());
 				product.setOrgrootid_link(product_old.getOrgrootid_link());
@@ -652,73 +663,77 @@ public class ProductAPI {
 				response.setMessage("Mã đã tồn tại trong hệ thống!");
 			} else {
 				product = productService.save(product);
+				
+				if(isNew) {
+					// sau khi lưu sản phẩm xong thì tự động insert các thuộc tính của sản phẩm vào
+					List<Attribute> lstAttr = attrService.getList_attribute_forproduct(product.getProducttypeid_link(),
+							user.getRootorgid_link());
+					for (Attribute attribute : lstAttr) {
+						ProductAttributeValue pav = new ProductAttributeValue();
+						long value = 0;
+						
+						if(attribute.getId() == AtributeFixValues.ATTR_COLOR) {
+							value = AtributeFixValues.value_color_all;
+						}
+						else if(attribute.getId() == AtributeFixValues.ATTR_SIZE) {
+							value = AtributeFixValues.value_size_all;
+						} else if(attribute.getId() == AtributeFixValues.ATTR_SIZEWIDTH) {
+							value = AtributeFixValues.value_sizewidth_all;
+						}
+						
+						pav.setId((long) 0);
+						pav.setProductid_link(product.getId());
+						pav.setAttributeid_link(attribute.getId());
+						pav.setAttributevalueid_link(value);
+						pav.setOrgrootid_link(user.getRootorgid_link());
+						pavService.save(pav);
+					}
+					
+					//Sinh SKU cho mau all va co all
+					long skuid_link = 0;
+					
+					SKU sku = new SKU();
+					sku.setId(skuid_link);
+					sku.setCode(genCodeSKU(product));
+					sku.setName(product.getName());
+					sku.setProductid_link(product.getId());
+					sku.setOrgrootid_link(user.getRootorgid_link());
+					sku.setSkutypeid_link(product.getProducttypeid_link());
 
-				// sau khi lưu sản phẩm xong thì tự động insert các thuộc tính của sản phẩm vào
-				List<Attribute> lstAttr = attrService.getList_attribute_forproduct(product.getProducttypeid_link(),
-						user.getRootorgid_link());
-				for (Attribute attribute : lstAttr) {
-					ProductAttributeValue pav = new ProductAttributeValue();
-					long value = 0;
+					sku = skuService.save(sku);
+					skuid_link = sku.getId();
 					
-					if(attribute.getId() == AtributeFixValues.ATTR_COLOR) {
-						value = AtributeFixValues.value_color_all;
-					}
-					else if(attribute.getId() == AtributeFixValues.ATTR_SIZE) {
-						value = AtributeFixValues.value_size_all;
-					} else if(attribute.getId() == AtributeFixValues.ATTR_SIZEWIDTH) {
-						value = AtributeFixValues.value_sizewidth_all;
-					}
-					
-					pav.setId((long) 0);
-					pav.setProductid_link(product.getId());
-					pav.setAttributeid_link(attribute.getId());
-					pav.setAttributevalueid_link(value);
-					pav.setOrgrootid_link(user.getRootorgid_link());
-					pavService.save(pav);
+					// Them vao bang sku_attribute_value
+					SKU_Attribute_Value savMau = new SKU_Attribute_Value();
+					savMau.setId((long) 0);
+					savMau.setAttributevalueid_link(AtributeFixValues.value_color_all);
+					savMau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
+					savMau.setOrgrootid_link(user.getRootorgid_link());
+					savMau.setSkuid_link(skuid_link);
+					savMau.setUsercreateid_link(user.getId());
+					savMau.setTimecreate(new Date());
+
+					skuattService.save(savMau);
+
+					SKU_Attribute_Value savCo = new SKU_Attribute_Value();
+					savCo.setId((long) 0);
+					savCo.setAttributevalueid_link(AtributeFixValues.value_size_all);
+					savCo.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
+					savCo.setOrgrootid_link(user.getRootorgid_link());
+					savCo.setSkuid_link(skuid_link);
+					savCo.setUsercreateid_link(user.getId());
+					savCo.setTimecreate(new Date());
+
+					skuattService.save(savCo);
 				}
 				
-				//Sinh SKU cho mau all va co all
-				long skuid_link = 0;
-				
-				SKU sku = new SKU();
-				sku.setId(skuid_link);
-				sku.setCode(genCodeSKU(product));
-				sku.setName(product.getName());
-				sku.setProductid_link(product.getId());
-				sku.setOrgrootid_link(user.getRootorgid_link());
-				sku.setSkutypeid_link(product.getProducttypeid_link());
-
-				sku = skuService.save(sku);
-				skuid_link = sku.getId();
-				
-				// Them vao bang sku_attribute_value
-				SKU_Attribute_Value savMau = new SKU_Attribute_Value();
-				savMau.setId((long) 0);
-				savMau.setAttributevalueid_link(AtributeFixValues.value_color_all);
-				savMau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
-				savMau.setOrgrootid_link(user.getRootorgid_link());
-				savMau.setSkuid_link(skuid_link);
-				savMau.setUsercreateid_link(user.getId());
-				savMau.setTimecreate(new Date());
-
-				skuattService.save(savMau);
-
-				SKU_Attribute_Value savCo = new SKU_Attribute_Value();
-				savCo.setId((long) 0);
-				savCo.setAttributevalueid_link(AtributeFixValues.value_size_all);
-				savCo.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
-				savCo.setOrgrootid_link(user.getRootorgid_link());
-				savCo.setSkuid_link(skuid_link);
-				savCo.setUsercreateid_link(user.getId());
-				savCo.setTimecreate(new Date());
-
-				skuattService.save(savCo);
 
 				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			}
 
 			response.id = product.getId();
+			response.product = product;
 			return new ResponseEntity<Product_create_response>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
@@ -1007,14 +1022,50 @@ public class ProductAPI {
 				@RequestBody getlistproduct_bypairingid_request entity, HttpServletRequest request) {
 			getlistproduct_bypairingid_response response = new getlistproduct_bypairingid_response();
 			try {
-				response.data = new ArrayList<Product>();
+				response.data = new ArrayList<ProductBinding>();
 				Product product = productService.findOne(entity.product_pairid_link);
 				if(!entity.ishidden_pair || product.getProducttypeid_link() !=5) {
-					response.data.add(product);
+					ProductBinding pb = new ProductBinding();
+					pb.setId(product.getId());
+					pb.setCode(product.getCode());
+					pb.setName(product.getName());
+					pb.setProduct_type(product.getProducttypeid_link());
+					pb.setProduct_typeName(product.getProducttype_name());
+					pb.setCoKho(product.getCoKho());
+					pb.setThanhPhanVai(product.getThanhPhanVai());
+					pb.setTenMauNPL(product.getTenMauNPL());
+					
+					String FolderPath = commonService.getFolderPath(product.getProducttypeid_link());
+					String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+					
+					pb.setUrlimage(getimg(product.getImgurl1(),uploadRootPath));
+					
+					response.data.add(pb);
 				}				
 				
 				List<Product> list = productService.getby_pairid(entity.product_pairid_link);
-				response.data.addAll(list);
+				
+				List<ProductBinding> lstdata = new ArrayList<ProductBinding>();
+				
+				for (Product _product : list) {
+					ProductBinding pb = new ProductBinding();
+					pb.setId(_product.getId());
+					pb.setCode(_product.getCode());
+					pb.setName(_product.getName());
+					pb.setProduct_type(_product.getProducttypeid_link());
+					pb.setProduct_typeName(_product.getProducttype_name());
+					pb.setCoKho(_product.getCoKho());
+					pb.setThanhPhanVai(_product.getThanhPhanVai());
+					pb.setTenMauNPL(_product.getTenMauNPL());
+					
+					String FolderPath = commonService.getFolderPath(_product.getProducttypeid_link());
+					String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+					
+					pb.setUrlimage(getimg(_product.getImgurl1(),uploadRootPath));
+					lstdata.add(pb);
+				}
+				
+				response.data = lstdata;
 				
 				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

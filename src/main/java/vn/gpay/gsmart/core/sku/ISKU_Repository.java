@@ -16,8 +16,10 @@ public interface ISKU_Repository extends JpaRepository<SKU, Long>, JpaSpecificat
 	@Query(value = "select c from SKU c where c.productid_link = :productid_link  order by c.id DESC")
 	public List<SKU> getlist_byproduct(@Param ("productid_link")final  Long productid_link);
 	
-	@Query(value = "select c from SKU c where UPPER(c.code) = UPPER(:code)")
-	public List<SKU> getSKU_byCode(@Param ("code")final  String code);
+	@Query(value = "select c from SKU c where UPPER(c.code) = UPPER(:code) and orgrootid_link = :orgrootid_link")
+	public List<SKU> getSKU_byCode(
+			@Param ("code")final  String code,
+			@Param ("orgrootid_link")final  long orgrootid_link);
 	
 	@Query(value = "select a from SKU a inner join Product b on a.productid_link = b.id and b.producttypeid_link >19 and b.producttypeid_link <30")
 	public List<SKU>getSKU_MainMaterial(Specification<SKU> specification);

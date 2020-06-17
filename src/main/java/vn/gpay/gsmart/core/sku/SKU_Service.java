@@ -6,7 +6,6 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import com.github.wenhao.jpa.Specifications;
@@ -31,8 +30,8 @@ public class SKU_Service extends AbstractService<SKU> implements ISKU_Service {
 	}
 
 	@Override
-	public SKU getSKU_byCode(String code){
-		List<SKU> lsSku = repo.getSKU_byCode(code);
+	public SKU getSKU_byCode(String code, long orgrootid_link){
+		List<SKU> lsSku = repo.getSKU_byCode(code, orgrootid_link);
 		if (lsSku.size() > 0)
 			return lsSku.get(0);
 		else

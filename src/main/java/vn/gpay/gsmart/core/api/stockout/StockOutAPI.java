@@ -292,6 +292,7 @@ public class StockOutAPI {
 	@RequestMapping(value = "/createstockoutforcheck",method = RequestMethod.POST)
 	public ResponseEntity<StockoutCreateResponse> createStockoutForCheck(@RequestBody StockoutCreateRequest entity, HttpServletRequest request) {
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		long orgrootid_link = user.getRootorgid_link();
 		String requestAddr = request.getRemoteAddr();
 		ActionLogs actionLogs = new ActionLogs();
 		actionLogs.setOrgrootid_link(user.getRootorgid_link());
@@ -304,7 +305,7 @@ public class StockOutAPI {
 		StockoutCreateResponse response = new StockoutCreateResponse();
 		try {
 			//1. Check if the skucode exists
-			SKU theSku = skuService.getSKU_byCode(entity.data.getP_skucode());
+			SKU theSku = skuService.getSKU_byCode(entity.data.getP_skucode(), orgrootid_link);
 			if (null != theSku){
 				//1. Check for ordercode available on Stockout table, if have return error
 				//List<Stockout> stockoutChecklist = stockoutRepository.getBySkucode(StockoutTypes.STOCKOUT_TYPE_FORCHECK, entity.data.getP_skucode());
