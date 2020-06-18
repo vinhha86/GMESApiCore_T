@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.org;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -78,7 +79,7 @@ public class Org implements Serializable {
     private Long colorid_link;
 	
 	@Column(name ="linecost")
-    private Long linecost;
+    private BigDecimal linecost;
 	
 	@Transient
 	public boolean checked;
@@ -235,11 +236,11 @@ public class Org implements Serializable {
 		this.colorid_link = colorid_link;
 	}
 
-	public Long getLinecost() {
+	public BigDecimal getLinecost() {
 		return linecost;
 	}
 
-	public void setLinecost(Long linecost) {
+	public void setLinecost(BigDecimal linecost) {
 		this.linecost = linecost;
 	}
 
