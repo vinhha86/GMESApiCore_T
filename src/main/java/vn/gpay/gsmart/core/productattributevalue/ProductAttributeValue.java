@@ -62,6 +62,14 @@ public class ProductAttributeValue implements Serializable {
     private Attributevalue attributevalue;
 	
 	@Transient
+	public Boolean getIsdefaultvalue() {
+		if(attributevalue!=null) {
+			return attributevalue.getIsdefault();
+		}
+		return true;
+	}
+	
+	@Transient
 	public String getAttributeValueName() {
 		if(attributevalue!=null) {
 			if(attributevalue.getAttributeid_link() == attributeid_link)

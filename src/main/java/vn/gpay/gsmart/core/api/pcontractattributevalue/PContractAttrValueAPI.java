@@ -53,9 +53,6 @@ public class PContractAttrValueAPI {
 	public ResponseEntity<PContractProduct_getbyproduct_response> Attribute_GetbyProduct(HttpServletRequest request, @RequestBody PContractProductAttValue_getbyproduct_request entity ) {
 		PContractProduct_getbyproduct_response response = new PContractProduct_getbyproduct_response();
 		try {
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			long orgrootid_link = user.getRootorgid_link();
-			long pcontractid_link = entity.pcontractid_link;
 			long productid_link = entity.productid_link;
 			
 //			List<PContractAttributeValue> lstpav = ppavservice.getattribute_by_product_and_pcontract(orgrootid_link, pcontractid_link, productid_link);
@@ -113,13 +110,11 @@ public class PContractAttrValueAPI {
 	public ResponseEntity<PContractAttributeValue_getbyproduct_response> Attributevalue_GetbyProduct(HttpServletRequest request, @RequestBody PContractAttributeValue_getvalue_byprouct_request entity ) {
 		PContractAttributeValue_getbyproduct_response response = new PContractAttributeValue_getbyproduct_response();
 		try {
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			long orgrootid_link = user.getRootorgid_link();
 			long pcontractid_link = entity.pcontractid_link;
 			long productid_link = entity.productid_link;
 			long attributeid_link = entity.attributeid_link;
 			
-			response.data = ppavservice.getvalue_by_product_and_pcontract_and_attribute(orgrootid_link, pcontractid_link, productid_link, attributeid_link);
+			response.data = ppavservice.getvalue_by_product_and_pcontract_and_attribute(pcontractid_link, productid_link, attributeid_link);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -222,7 +217,6 @@ public class PContractAttrValueAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
 					.getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
-			long pcontractid_link = entity.pcontractid_link;
 			long productid_link = entity.productid_link;
 			long attributeid_link = entity.attributeid_link;
 			
@@ -256,7 +250,6 @@ public class PContractAttrValueAPI {
 				pavService.save(pav);
 			}
 			
-			Long ID_Mau = AtributeFixValues.ATTR_COLOR, ID_Co = AtributeFixValues.ATTR_SIZE;
 			
 			Product product = productService.findOne(entity.productid_link);
 

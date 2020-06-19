@@ -94,72 +94,70 @@ public class ProductAttributeValueAPI {
 
 			for (ProductAttributeValue pavMau : lstmau) {
 				for (ProductAttributeValue pavCo : lstco) {
-					Long skuid_link = (long) 0;
+					long skuid_link = 0;
 					// Lấy danh sách SKU theo màu cua product
 					lstSKUMau = savService.getlist_byProduct_and_value(entity.productid_link,
 							pavMau.getAttributevalueid_link());
 					// Lấy danh sách SKU theo cỡ cua product
 					lstSKUCo = savService.getlist_byProduct_and_value(entity.productid_link,
 							pavCo.getAttributevalueid_link());
-					if(lstSKUMau.size() ==0 || lstSKUCo.size() ==0)
-						skuid_link = (long)-1;
 					// Lấy SKU của màu và cỡ
 					for (SKU_Attribute_Value savMau : lstSKUMau) {
 						for (SKU_Attribute_Value savCo : lstSKUCo) {
-							if(savMau.getIsdefaultvalue() || savCo.getIsdefaultvalue()) {
-								skuid_link = (long)-1;
-							}
-							else {
-								long skuMau = savMau.getSkuid_link();
-								long skuCo = savCo.getSkuid_link();
-								if (skuMau == skuCo) {
-									skuid_link = savMau.getSkuid_link();
-									break;
-								}
-							}							
+							long skuMau = savMau.getSkuid_link();
+							long skuCo = savCo.getSkuid_link();
+							if (skuMau == skuCo) {
+								skuid_link = savMau.getSkuid_link();
+								break;
+							}						
 						}
 						if (skuid_link != 0)
 							break;
 					}
 
-					// Nếu không có skuid và thuộc tính đều có giá trị thì phải thêm vào bảng sku
-					// trước
+					// Nếu không có skuid và thuộc tính đều có giá trị thì phải thêm vào bảng sku  trước
+					
 					if (skuid_link == 0) {
-						if (pavMau.getAttributevalueid_link() != 0 && pavCo.getAttributevalueid_link() != 0) {
-							SKU sku = new SKU();
-							sku.setId(skuid_link);
-							sku.setCode(genCodeSKU(product));
-							sku.setName(product.getName());
-							sku.setProductid_link(product.getId());
-							sku.setOrgrootid_link(user.getRootorgid_link());
-							sku.setSkutypeid_link(product.getProducttypeid_link());
+						Attributevalue valuemau = avService.findOne(pavMau.getAttributevalueid_link());
+						Attributevalue valueco = avService.findOne(pavCo.getAttributevalueid_link());
+						
+						if(!valuemau.getIsdefault() && !valueco.getIsdefault()) {
+							if (pavMau.getAttributevalueid_link() != 0 && pavCo.getAttributevalueid_link() != 0) {
+								SKU sku = new SKU();
+								sku.setId(skuid_link);
+								sku.setCode(genCodeSKU(product));
+								sku.setName(product.getName());
+								sku.setProductid_link(product.getId());
+								sku.setOrgrootid_link(user.getRootorgid_link());
+								sku.setSkutypeid_link(product.getProducttypeid_link());
 
-							sku = skuService.save(sku);
-							skuid_link = sku.getId();
+								sku = skuService.save(sku);
+								skuid_link = sku.getId();
 
-							// Them vao bang sku_attribute_value
-							SKU_Attribute_Value savMau = new SKU_Attribute_Value();
-							savMau.setId((long) 0);
-							savMau.setAttributevalueid_link(pavMau.getAttributevalueid_link());
-							savMau.setAttributeid_link(pavMau.getAttributeid_link());
-							savMau.setOrgrootid_link(user.getRootorgid_link());
-							savMau.setSkuid_link(skuid_link);
-							savMau.setUsercreateid_link(user.getId());
-							savMau.setTimecreate(new Date());
+								// Them vao bang sku_attribute_value
+								SKU_Attribute_Value savMau = new SKU_Attribute_Value();
+								savMau.setId((long) 0);
+								savMau.setAttributevalueid_link(pavMau.getAttributevalueid_link());
+								savMau.setAttributeid_link(pavMau.getAttributeid_link());
+								savMau.setOrgrootid_link(user.getRootorgid_link());
+								savMau.setSkuid_link(skuid_link);
+								savMau.setUsercreateid_link(user.getId());
+								savMau.setTimecreate(new Date());
 
-							savService.save(savMau);
+								savService.save(savMau);
 
-							SKU_Attribute_Value savCo = new SKU_Attribute_Value();
-							savCo.setId((long) 0);
-							savCo.setAttributevalueid_link(pavCo.getAttributevalueid_link());
-							savCo.setAttributeid_link(pavCo.getAttributeid_link());
-							savCo.setOrgrootid_link(user.getRootorgid_link());
-							savCo.setSkuid_link(skuid_link);
-							savCo.setUsercreateid_link(user.getId());
-							savCo.setTimecreate(new Date());
+								SKU_Attribute_Value savCo = new SKU_Attribute_Value();
+								savCo.setId((long) 0);
+								savCo.setAttributevalueid_link(pavCo.getAttributevalueid_link());
+								savCo.setAttributeid_link(pavCo.getAttributeid_link());
+								savCo.setOrgrootid_link(user.getRootorgid_link());
+								savCo.setSkuid_link(skuid_link);
+								savCo.setUsercreateid_link(user.getId());
+								savCo.setTimecreate(new Date());
 
-							savService.save(savCo);
-						}
+								savService.save(savCo);
+							}
+						}						
 					}
 
 				}
