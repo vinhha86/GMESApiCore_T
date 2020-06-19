@@ -42,7 +42,6 @@ public interface IPContractProductAtrributeValueRepository extends JpaRepository
 			+ "and ((c.attributevalueid_link > 0 and (:attributeid_link = 30 or :attributeid_link = 4)) or "
 			+ "(:attributeid_link != 30 and :attributeid_link != 4))")
 	public List<PContractAttributeValue> getlistvalue_by_product_and_pcontract_and_attribute(
-			@Param ("orgrootid_link")final  Long orgrootid_link,
 			@Param ("productid_link")final Long productid_link,
 			@Param ("pcontractid_link")final Long pcontractid_link,
 			@Param ("attributeid_link")final Long attributeid_link);
@@ -57,5 +56,7 @@ public interface IPContractProductAtrributeValueRepository extends JpaRepository
 			@Param ("pcontractid_link")final Long pcontractid_link,
 			@Param ("attributeid_link")final Long attributeid_link,
 			@Param ("attributevalueid_link")final Long attributevalueid_link);
+	
+	
 	
 }
