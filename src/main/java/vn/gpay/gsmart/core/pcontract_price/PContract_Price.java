@@ -41,6 +41,7 @@ public class PContract_Price implements Serializable {/**
 	private Long sizesetid_link;
 	private Float price_cmp;
 	private Float price_fob;
+	private Float sewfobratio;
 	private Float price_sewingtarget;
 	private Float price_sewingcost;
 	private Float totalprice;
@@ -141,6 +142,12 @@ public class PContract_Price implements Serializable {/**
 	}
 	public void setSalaryfund(Float salaryfund) {
 		this.salaryfund = salaryfund;
+	}
+	public Float getSewfobratio() {
+		return sewfobratio;
+	}
+	public void setSewfobratio(Float sewfobratio) {
+		this.sewfobratio = sewfobratio;
 	}
 	
 }
