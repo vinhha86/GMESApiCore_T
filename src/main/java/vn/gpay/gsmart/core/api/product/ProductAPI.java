@@ -67,7 +67,6 @@ public class ProductAPI {
 	IProductBomService productbomservice;
 	@Autowired
 	Common commonService;
-	private static final Logger logger = LogManager.getLogger(ProductAPI.class);
 
 	@RequestMapping(value = "/filter", method = RequestMethod.POST)
 	public ResponseEntity<Product_filter_response> Product_Filter(HttpServletRequest request,

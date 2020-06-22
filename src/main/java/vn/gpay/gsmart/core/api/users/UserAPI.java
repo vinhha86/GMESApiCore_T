@@ -131,6 +131,23 @@ public class UserAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/getbyorg",method = RequestMethod.POST)
+	public ResponseEntity<UserResponse> GetByOrg( @RequestBody user_getbyorg_request entity,HttpServletRequest request ) {
+		UserResponse response = new UserResponse();
+		try {
+			long orgid_link = entity.orgid_link;
+			
+			response.data=userDetailsService.getUserList(orgid_link,"", 1);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<UserResponse>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<UserResponse>(response,HttpStatus.OK);
+		}
+	}
+	
 	@RequestMapping(value = "/user_delete",method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> Delete( @RequestBody UserByIdRequest entity,HttpServletRequest request ) {
 		ResponseBase response = new ResponseBase();

@@ -383,6 +383,78 @@ public class PContractProductAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/getpair_and_single", method = RequestMethod.POST)
+	public ResponseEntity<PcontractProduct_getpair_andsingle_response> getPair_and_single(HttpServletRequest request,
+			@RequestBody PContractProduct_getpair_andsingle_request entity) {
+		PcontractProduct_getpair_andsingle_response response = new PcontractProduct_getpair_andsingle_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			long pcontractid_link = entity.pcontractid_link;
+			List<PContractProduct> lst = pcpservice.get_by_product_and_pcontract(orgrootid_link, 0, pcontractid_link);
+			List<PContractProductBinding> data = new ArrayList<PContractProductBinding>();
+			String FolderPath = "upload/product";
+			
+			//Lay nhung bo san pham
+			List<PContractProductPairing> listpair = pppairService.getall_bypcontract(orgrootid_link, pcontractid_link);
+			for(PContractProductPairing pair : listpair) {
+				PContractProductBinding binding = new PContractProductBinding();
+				binding.setId(pair.getProductpairid_link());
+				binding.setOrgrootid_link(orgrootid_link);
+				binding.setPcontractid_link(pcontractid_link);
+				binding.setProductid_link(pair.getProductpairid_link());
+				binding.setProductCode(pair.getproductpairCode());
+				binding.setProductName(pair.getproductpairName());
+				binding.setProducttypeid_link(5);
+				
+				data.add(binding);
+				
+				List<Product> listproduct = pservice.getby_pairid(pair.getProductpairid_link());
+				for(Product product : listproduct) {
+					lst.removeIf(c->c.getProductid_link() == product.getId());
+				}
+			}
+			
+			
+			
+			for (PContractProduct pContractProduct : lst) {
+				PContractProductBinding binding = new PContractProductBinding();
+				binding.setId(pContractProduct.getId());
+				binding.setOrgrootid_link(orgrootid_link);
+				binding.setPcontractid_link(pContractProduct.getPcontractid_link());
+				binding.setProductid_link(pContractProduct.getProductid_link());
+				binding.setProductCode(pContractProduct.getProductCode());
+				binding.setProductName(pContractProduct.getProductName());
+				binding.setPquantity(pContractProduct.getPquantity());
+				binding.setProduction_date(pContractProduct.getProduction_date());
+				binding.setDelivery_date(pContractProduct.getDelivery_date());
+				binding.setUnitprice(pContractProduct.getUnitprice());
+				binding.setProducttypeid_link(pContractProduct.getProducttypeid_link());
+				
+				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+				
+				binding.setImgproduct(getimg(pContractProduct.getImgurl1(),uploadRootPath));
+				
+				data.add(binding);
+			}
+			
+			
+			
+			response.data = data;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<PcontractProduct_getpair_andsingle_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<PcontractProduct_getpair_andsingle_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	
+	
 	private byte[] getimg(String filename, String uploadRootPath) {
 		String filePath = uploadRootPath+"\\"+ filename;
 		Path path = Paths.get(filePath);

@@ -23,6 +23,7 @@ import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.category.Unit;
 import vn.gpay.gsmart.core.productattributevalue.ProductAttributeValue;
+import vn.gpay.gsmart.core.productpairing.ProductPairing;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
 
@@ -55,37 +56,6 @@ public class Product implements Serializable {/**
 	private String buyername;
 	private String vendorcode;
 	private String vendorname;
-	
-	
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne
-    @JoinColumn(name="designerid_link",insertable=false,updatable =false)
-    private GpayUser designerName;
-	
-	@Transient
-	public String getDesignerName() {
-		if(designerName!=null) {
-			return designerName.getFullName();
-		}
-		return "";
-	}
-	
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne
-    @JoinColumn(name="unitid_link",insertable=false,updatable =false)
-    private Unit unit;
-	
-	@Transient
-	public String getUnitName() {
-		if(unit != null)
-			return unit.getName();
-		return "";
-	}
-	
-	//Tạm thời đóng lại khi có bảng may mẫu sẽ mở ra để hiển thị
-//	@Setter(AccessLevel.NONE)
-//	private String samplemakerid_link;
-	
 	private Integer status;
 	
 	private Long usercreateid_link;
@@ -102,6 +72,22 @@ public class Product implements Serializable {/**
 	
 	private String imgurl5;
 	
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="designerid_link",insertable=false,updatable =false)
+    private GpayUser designerName;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+    @JoinColumn(name="productid_link",insertable=false,updatable =false)
+    private List<ProductPairing> listpair = new ArrayList<ProductPairing>();	
+
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="unitid_link",insertable=false,updatable =false)
+    private Unit unit;
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
     @JoinColumn(name="productid_link",insertable=false,updatable =false)
@@ -113,30 +99,28 @@ public class Product implements Serializable {/**
     private ProductType producttype;
 	
 	@Transient
+	public String getDesignerName() {
+		if(designerName!=null) {
+			return designerName.getFullName();
+		}
+		return "";
+	}
+	
+	
+	@Transient
+	public String getUnitName() {
+		if(unit != null)
+			return unit.getName();
+		return "";
+	}
+	
+	@Transient
 	public String getProducttype_name() {
 		if(producttype != null) {
 			return producttype.getName();
 		}
 		return null;
 	}	
-//	@Transient
-//	public String getProduct_typeName() {
-//		String name = "";
-//		switch (product_type) {
-//		case 2:
-//			name = "Nguyên liệu";
-//			break;
-//		case 3:
-//			name = "Phụ liệu may";
-//			break;
-//		case 4:
-//			name = "Phụ liệu hoàn thiện";
-//			break;
-//		default:
-//			break;
-//		}
-//		return name;
-//	}
 	
 	@Transient
 	public List<Long> getProductAttribute() {

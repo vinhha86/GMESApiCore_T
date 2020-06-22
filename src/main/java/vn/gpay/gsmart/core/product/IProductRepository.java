@@ -53,5 +53,6 @@ public interface IProductRepository extends JpaRepository<Product, Long>, JpaSpe
 			+ "where d.productpairid_link = :productid_link")
 	public List<Product> getby_pairid(
 			@Param ("productid_link")final  Long productid_link);
+	
 
 }

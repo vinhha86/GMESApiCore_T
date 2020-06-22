@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.gpay.gsmart.core.api.pcontract_po.pcontractsku_getby_po_product_request;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.pcontractattributevalue.IPContractProductAtrributeValueService;
 import vn.gpay.gsmart.core.pcontractattributevalue.PContractAttributeValue;
@@ -43,6 +44,27 @@ public class PContractskuAPI {
 			long productid_link = entity.productid_link;
 			
 			response.data = pskuservice.getlistsku_byproduct_and_pcontract(orgrootid_link, productid_link, pcontractid_link);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		}
+		catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		
+		return new ResponseEntity<PContractSKU_getbyproduct_response>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/getby_po_product",method = RequestMethod.POST)
+	public ResponseEntity<PContractSKU_getbyproduct_response> SKU_GetbyProduct_and_PO
+	(HttpServletRequest request, @RequestBody pcontractsku_getby_po_product_request entity ) {
+		PContractSKU_getbyproduct_response response = new PContractSKU_getbyproduct_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long pcontract_poid_link = entity.pcontract_poid_link;
+			long productid_link = entity.productid_link;
+			
+			response.data = pskuservice.getbypo_and_product(pcontract_poid_link ,productid_link);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 		}

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import vn.gpay.gsmart.core.api.porder.POrderAPI;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
@@ -136,6 +135,27 @@ public class PContract_POAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/accept",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> Accept(@RequestBody PContractPO_accept_request entity,
+			HttpServletRequest request ) {
+		ResponseBase response = new ResponseBase();
+		try {
+			PContract_PO po = pcontract_POService.findOne(entity.pcontract_poid_link);
+			po.setOrgmerchandiseid_link(entity.orgid_link);
+			po.setMerchandiserid_link(entity.userid_link);
+			
+			pcontract_POService.save(po);			
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
 	

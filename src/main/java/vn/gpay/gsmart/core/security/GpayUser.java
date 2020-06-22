@@ -97,7 +97,11 @@ public class GpayUser implements UserDetails {
 	}
 	@Transient
 	public String getFullName() {
-		return getFullname();
+		String name = firstname;
+		if(middlename != null)
+			name += " "+ middlename;
+		name += " " + lastname;
+		return name;
 	}
 	
 	public String getTel_mobile() {

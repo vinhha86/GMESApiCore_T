@@ -45,7 +45,7 @@ public class GpayUserImpl  extends AbstractService<GpayUser> implements IGpayUse
 	            .eq(orgid_link!=0,"orgid_link", orgid_link)
 	            .predicate(Specifications.or()
 	            		.like("useremail","%"+textsearch+"%")
-	            		.like("firtname","%"+textsearch+"%")
+	            		.like("firstname","%"+textsearch+"%")
 	            		.like("lastname","%"+textsearch+"%")
 	            		.build())
 	            .build();

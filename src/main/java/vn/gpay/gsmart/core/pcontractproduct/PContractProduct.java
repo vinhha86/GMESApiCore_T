@@ -1,7 +1,9 @@
 package vn.gpay.gsmart.core.pcontractproduct;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,7 +18,9 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.pcontractproductpairing.PContractProductPairing;
 import vn.gpay.gsmart.core.product.Product;
+import vn.gpay.gsmart.core.productpairing.ProductPairing;
 
 @Table(name="pcontract_products")
 @Entity

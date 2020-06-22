@@ -66,6 +66,8 @@ public class PContract_PO implements Serializable {/**
 	private Integer status;
 	private String factories;
 	private Integer productiondays;
+	private Long orgmerchandiseid_link;
+	private Long merchandiserid_link;
 	
 	
 	public Integer getProductiondays() {
@@ -365,6 +367,22 @@ public class PContract_PO implements Serializable {/**
 
 	public void setQcorgname(String qcorgname) {
 		this.qcorgname = qcorgname;
+	}
+
+	public Long getOrgmerchandiseid_link() {
+		return orgmerchandiseid_link;
+	}
+
+	public Long getMerchandiserid_link() {
+		return merchandiserid_link;
+	}
+
+	public void setOrgmerchandiseid_link(Long orgmerchandiseid_link) {
+		this.orgmerchandiseid_link = orgmerchandiseid_link;
+	}
+
+	public void setMerchandiserid_link(Long merchandiserid_link) {
+		this.merchandiserid_link = merchandiserid_link;
 	}
 	
 }
