@@ -553,7 +553,7 @@ public class ProductAPI {
 	}
 	
 	private byte[] getimg(String filename, String uploadRootPath) {
-		String filePath = uploadRootPath+"\\"+ filename;
+		String filePath = uploadRootPath+"/"+ filename;
 		Path path = Paths.get(filePath);
 		byte[] data;
 		try {
@@ -791,7 +791,7 @@ public class ProductAPI {
 			Product product = productService.findOne(entity.id);
 			String filename = product.getCode()+"_"+entity.img+"."+entity.ext;
 			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-			String filePath = uploadRootPath+"\\"+ filename;
+			String filePath = uploadRootPath+"/"+ filename;
 			Path path = Paths.get(filePath);
 			byte[] data = Files.readAllBytes(path);
 			response.data = data;
@@ -817,7 +817,7 @@ public class ProductAPI {
 			Product product = productService.findOne(entity.id);
 			String filename = product.getCode()+"_"+entity.img+"."+entity.ext;
 			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-			String filePath = uploadRootPath+"\\"+ filename;
+			String filePath = uploadRootPath+"/"+ filename;
 			Path path = Paths.get(filePath);
 			byte[] data = Files.readAllBytes(path);
 			response.data = data;
@@ -852,7 +852,7 @@ public class ProductAPI {
 
 			String name = file.getOriginalFilename();		
 			if (name != null && name.length() > 0) {
-				String[] str = name.toString().split("\\.");
+				String[] str = name.toString().split("/.");
 				String extend = str[str.length -1];	
 				name = product.getCode()+"_"+img+"."+extend;
 				File serverFile = new File(uploadRootDir.getAbsolutePath() + File.separator + name);

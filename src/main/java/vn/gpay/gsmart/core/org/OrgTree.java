@@ -7,7 +7,7 @@ import java.util.List;
 
 public class OrgTree implements Serializable {
 
-	private long id;
+	private Long id;
 	
 	private String code;
 	
@@ -79,11 +79,11 @@ public class OrgTree implements Serializable {
 	
 	///// Getters, setters
 
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
