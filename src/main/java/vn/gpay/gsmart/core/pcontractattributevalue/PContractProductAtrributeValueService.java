@@ -23,10 +23,9 @@ public class PContractProductAtrributeValueService extends AbstractService<PCont
 		return repo.getattribute_by_product_and_pcontract(orgrootid_link, productid_link, pcontractid_link);
 	}
 	@Override
-	public List<PContractAttributeValue> getvalue_by_product_and_pcontract_and_attribute(long orgrootid_link,
-			long pcontractid_link, long productid_link, long attributeid_link) {
+	public List<PContractAttributeValue> getvalue_by_product_and_pcontract_and_attribute(long pcontractid_link, long productid_link, long attributeid_link) {
 		// TODO Auto-generated method stub
-		return repo.getlistvalue_by_product_and_pcontract_and_attribute(orgrootid_link, productid_link, pcontractid_link, attributeid_link);
+		return repo.getlistvalue_by_product_and_pcontract_and_attribute(productid_link, pcontractid_link, attributeid_link);
 	}
 	@Override
 	public List<Long> getvalueid_by_product_and_pcontract_and_attribute(long orgrootid_link, long pcontractid_link,

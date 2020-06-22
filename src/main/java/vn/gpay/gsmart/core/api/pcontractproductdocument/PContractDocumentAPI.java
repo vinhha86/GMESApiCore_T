@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -143,7 +144,37 @@ public class PContractDocumentAPI {
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<Product_viewimg_response>(response, HttpStatus.OK);
 		}
-		
+	}
+	
+	@RequestMapping(value = "/download_test", method = RequestMethod.POST)
+	public @ResponseBody byte[] DownloadTest(HttpServletRequest request,
+			@RequestBody PContractDocument_download_request entity)
+	{
+
+		Product_viewimg_response response = new Product_viewimg_response();
+		try {
+			Product product = productService.findOne(entity.productid_link);
+			PContract pcontract = pcontractService.findOne(entity.pcontractid_link);
+			
+			String FolderPath = String.format("upload/pcontract/%s/%s", pcontract.getContractcode(), product.getCode());
+			
+			// Thư mục gốc upload file.			
+			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+			
+			String filePath = uploadRootPath+"\\"+ entity.filename;
+			Path path = Paths.get(filePath);
+			byte[] data = Files.readAllBytes(path);
+			response.data = data;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			
+			return data;
+		}
+		catch(Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return null;
+		}
 	}
 	
 	@RequestMapping(value ="/update", method = RequestMethod.POST)

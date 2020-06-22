@@ -21,7 +21,8 @@ public interface IProductAttributeRepository extends JpaRepository<ProductAttrib
 	@Query(value = "select c from ProductAttributeValue c "
 			+ "where c.attributeid_link = :attributeid_link"
 			+ " and productid_link = :productid_link")
-	public List<ProductAttributeValue> getlistvalue_byattribute(@Param ("attributeid_link")final  Long attributeid_link,
+	public List<ProductAttributeValue> getlistvalue_byattribute(
+			@Param ("attributeid_link")final  Long attributeid_link,
 			@Param ("productid_link")final  Long productid_link);
 	
 	@Query(value = "select c from ProductAttributeValue c "
