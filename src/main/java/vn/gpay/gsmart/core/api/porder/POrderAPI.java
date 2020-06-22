@@ -103,6 +103,24 @@ public class POrderAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/get_product_sku", method = RequestMethod.POST)
+	public ResponseEntity<POrder_getbyproduct_response> get_Product_SKU(HttpServletRequest request,
+			@RequestBody POrder_getbyid_request entity) {
+		POrder_getbyproduct_response response = new POrder_getbyproduct_response();
+		try {
+			Long porderid_link = entity.porderid_link;
+			
+			response.data = porderskuService.getby_porder(porderid_link);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<POrder_getbyproduct_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<POrder_getbyproduct_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@RequestMapping(value = "/get_bycontract", method = RequestMethod.POST)
 	public ResponseEntity<POrder_getbycontract_response> GetByContract(HttpServletRequest request,
 			@RequestBody POrder_getbycontract_request entity) {
