@@ -118,8 +118,10 @@ public class ProductAttributeValueAPI {
 					// Nếu không có skuid và thuộc tính đều có giá trị thì phải thêm vào bảng sku  trước
 					
 					if (skuid_link == 0) {
-						Attributevalue valuemau = avService.findOne(pavMau.getAttributevalueid_link());
-						Attributevalue valueco = avService.findOne(pavCo.getAttributevalueid_link());
+						long attrMau = pavMau.getAttributevalueid_link();
+						long attCo = pavCo.getAttributevalueid_link();
+						Attributevalue valuemau = avService.findOne(attrMau);
+						Attributevalue valueco = avService.findOne(attCo);
 						
 						if(!valuemau.getIsdefault() && !valueco.getIsdefault()) {
 							if (pavMau.getAttributevalueid_link() != 0 && pavCo.getAttributevalueid_link() != 0) {

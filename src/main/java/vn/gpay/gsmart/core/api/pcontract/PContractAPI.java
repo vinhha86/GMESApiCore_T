@@ -47,6 +47,9 @@ public class PContractAPI {
 				pcontract.setUsercreatedid_link(pc_old.getUsercreatedid_link());
 				pcontract.setDatecreated(pc_old.getDatecreated());
 			}
+			
+			
+			
 			String contractcode = pcontract.getContractcode();
 			long pcontractid_link = pcontract.getId();
 			

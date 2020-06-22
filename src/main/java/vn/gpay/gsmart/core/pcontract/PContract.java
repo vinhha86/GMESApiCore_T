@@ -17,7 +17,6 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.branch.Branch;
-import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.season.Season;
 import vn.gpay.gsmart.core.security.GpayUser;
 
@@ -53,6 +52,7 @@ public class PContract implements Serializable {/**
 	private Long orgmerchandiseid_link;
 	private Long merchandiserid_link;
 	private Long orgshowid_link;
+	private Long marketypeid_link;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -86,6 +86,13 @@ public class PContract implements Serializable {/**
     @JoinColumn(name="seasonid_link",insertable=false,updatable =false)
     private Season season;
 	
+	@Transient
+	public int getPayer() {
+		if(orgpayerid_link == orgvendorid_link )
+			return 1;
+		else
+			return 2;
+	}
 	@Transient
 	public String getSeasonName() {
 		if(season != null) {
@@ -216,24 +223,12 @@ public class PContract implements Serializable {/**
 		this.status = status;
 	}
 
-	public GpayUser getUsercreated() {
-		return usercreated;
-	}
-
 	public void setUsercreated(GpayUser usercreated) {
 		this.usercreated = usercreated;
 	}
 
-	public Branch getBranch() {
-		return branch;
-	}
-
 	public void setBranch(Branch branch) {
 		this.branch = branch;
-	}
-
-	public Season getSeason() {
-		return season;
 	}
 
 	public void setSeason(Season season) {
@@ -294,6 +289,14 @@ public class PContract implements Serializable {/**
 
 	public void setOrgshowid_link(Long orgshowid_link) {
 		this.orgshowid_link = orgshowid_link;
+	}
+
+	public Long getMarketypeid_link() {
+		return marketypeid_link;
+	}
+
+	public void setMarketypeid_link(Long marketypeid_link) {
+		this.marketypeid_link = marketypeid_link;
 	}
 	
 }
