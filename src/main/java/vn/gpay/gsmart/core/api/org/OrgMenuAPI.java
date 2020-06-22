@@ -35,6 +35,7 @@ public class OrgMenuAPI {
 			OrgMenuTreeResponse response = new OrgMenuTreeResponse();
 			List<Org> menu = orgService.findOrgByTypeForMenuOrg();
 			List<OrgTree> children = orgService.createTree(menu);
+//			System.out.println(menu.size());
 			response.children=children;
 			return new ResponseEntity<OrgMenuTreeResponse>(response,HttpStatus.OK);
 		}catch (RuntimeException e) {
@@ -49,7 +50,7 @@ public class OrgMenuAPI {
 	public ResponseEntity<?> OrgAll(HttpServletRequest request ) {
 		try {
 			OrgResponse response = new OrgResponse();
-			List<Org> menu = orgService.findAll();
+			List<Org> menu = orgService.findOrgByTypeForMenuOrg();
 			response.data=menu;
 			return new ResponseEntity<OrgResponse>(response,HttpStatus.OK);
 		}catch (RuntimeException e) {

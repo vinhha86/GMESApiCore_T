@@ -132,8 +132,8 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 
 	@Override
 	public List<OrgTree> createTree(final List<Org> nodes) {
-		
 		Map<Long, OrgTree> mapTmp = new HashMap<>();
+		Long index = 0L;
 		
 		// Save all nodes (Org) to a map with Ids as keys, Org objs as values
 		for(Org current : nodes) {
@@ -164,6 +164,7 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 			menu.setExpanded(true);
 			menu.setChecked(current.checked);
 			mapTmp.put(current.getId(), menu);
+			
 			
 		}
 		
