@@ -25,6 +25,7 @@ import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.porder_bom_sku.POrderBOMSKU;
 import vn.gpay.gsmart.core.porder_product.POrder_Product;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
+import vn.gpay.gsmart.core.sizeset.SizeSet;
 
 @Table(name="porders")
 @Entity
@@ -45,6 +46,8 @@ public class POrder implements Serializable {
 	private String ordercode;
 	private Date orderdate;
 	private Long pcontractid_link;
+	private Long pcontract_poid_link;
+	private Long sizesetid_link;
 	private Long productid_link;
 	private Integer totalorder;
 	private Integer totalcut;
@@ -81,6 +84,27 @@ public class POrder implements Serializable {
 	public String getGranttoorgname() {
 		if(org != null) {
 			return org.getName();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getGranttoorgcode() {
+		if(org != null) {
+			return org.getCode();
+		}
+		return "";
+	}
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="sizesetid_link",insertable=false,updatable =false)
+    private SizeSet sizeset;
+	
+	@Transient
+	public String getSizesetname() {
+		if(sizeset != null) {
+			return sizeset.getName();
 		}
 		return "";
 	}
@@ -317,6 +341,18 @@ public class POrder implements Serializable {
 	}
 	public void setStockout_date(Date stockout_date) {
 		this.stockout_date = stockout_date;
+	}
+	public Long getPcontract_poid_link() {
+		return pcontract_poid_link;
+	}
+	public void setPcontract_poid_link(Long pcontract_poid_link) {
+		this.pcontract_poid_link = pcontract_poid_link;
+	}
+	public Long getSizesetid_link() {
+		return sizesetid_link;
+	}
+	public void setSizesetid_link(Long sizesetid_link) {
+		this.sizesetid_link = sizesetid_link;
 	}
 	
 }

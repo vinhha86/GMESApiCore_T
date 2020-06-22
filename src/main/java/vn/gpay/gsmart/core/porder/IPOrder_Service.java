@@ -15,5 +15,7 @@ public interface IPOrder_Service extends Operations<POrder> {
 			Integer salaryyear, Integer salarymonth, Date processingdate_from, Date processingdate_to);
 	
 	List<POrder> get_by_org(long orgid_link);
+	List<POrder> getByContractAndPO(Long pcontractid_link, Long pcontract_poid_link);
+	Long savePOrder(POrder porder, String po_code);
 
 }

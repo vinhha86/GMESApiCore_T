@@ -21,27 +21,20 @@ import vn.gpay.gsmart.core.actionlog.ActionLogs;
 import vn.gpay.gsmart.core.actionlog.IActionLogs_Service;
 import vn.gpay.gsmart.core.api.stockout.StockoutDFilterResponse;
 import vn.gpay.gsmart.core.base.ResponseBase;
-import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOMSKUService;
-import vn.gpay.gsmart.core.pcontractbomsku.PContractBOMSKU;
+import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontratproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontratproductsku.PContractProductSKU;
-import vn.gpay.gsmart.core.porder.IPOrder_AutoID_Service;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder.POrderFilter;
-import vn.gpay.gsmart.core.porder_bom_sku.IPOrderBOMSKU_Service;
-import vn.gpay.gsmart.core.porder_bom_sku.POrderBOMSKU;
-import vn.gpay.gsmart.core.porder_product.IPOrder_Product_Service;
-import vn.gpay.gsmart.core.porder_product.POrder_Product;
+
 import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.security.GpayUser;
-import vn.gpay.gsmart.core.sku.ISKU_Service;
-import vn.gpay.gsmart.core.sku.SKU;
-import vn.gpay.gsmart.core.stockout.StockOut;
-import vn.gpay.gsmart.core.utils.Common;
+
 import vn.gpay.gsmart.core.utils.NetworkUtils;
 import vn.gpay.gsmart.core.utils.POrderStatus;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
@@ -50,119 +43,45 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 @RequestMapping("/api/v1/porder")
 public class POrderAPI {
 	@Autowired private IPOrder_Service porderService;
-	@Autowired private IPOrder_AutoID_Service porder_AutoID_Service;
+	@Autowired IPContract_POService pcontract_POService;
 	@Autowired private IPOrder_Product_SKU_Service porderskuService;
-	@Autowired private IPOrder_Product_Service porderproductService;
 	@Autowired private IPContractProductSKUService pskuservice;
     @Autowired private IActionLogs_Service actionLogsRepository;
-    @Autowired private IPContractBOMSKUService pcontractBOMSKUService;
-    @Autowired private IPOrderBOMSKU_Service porderBOMSKUService;
-    @Autowired private ISKU_Service skuService;
     @Autowired private IPOrderProcessing_Service porderprocessingService;
-    @Autowired private Common commonService;
     ObjectMapper mapper = new ObjectMapper();
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public ResponseEntity<ResponseBase> Create(HttpServletRequest request,
+	public ResponseEntity<POrder_Create_response> Create(HttpServletRequest request,
 			@RequestBody POrder_Create_request entity) {
-		ResponseBase response = new ResponseBase();
+		POrder_Create_response response = new POrder_Create_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			Long productid_link = entity.productid_link;
 			Long orgrootid_link = user.getRootorgid_link();
-			Long pcontractid_link = entity.pcontractid_link;
-			Integer pquantitytotal = 0;
+		
+			POrder porder = entity.data;
 			
-			POrder porder = new POrder();
+			//Lay thong tin PO
+			PContract_PO thePO = pcontract_POService.findOne(porder.getPcontract_poid_link());
+			String po_code = thePO.getPo_vendor().length() > 0?thePO.getPo_vendor():thePO.getPo_buyer();
 			
-			if (entity.id == null || entity.id == 0) {
-				porder.setId((long)0);
-				porder.setProductid_link(productid_link);
+			if (porder.getId() == null || porder.getId() == 0) {
 				porder.setOrgrootid_link(orgrootid_link);
 				porder.setOrderdate(new Date());
-				porder.setPcontractid_link(entity.pcontractid_link);
-				porder.setOrdercode(porder_AutoID_Service.getLastID());
-				porder.setGranttoorgid_link(entity.granttoorg_link);
 				porder.setUsercreatedid_link(user.getId());
-				porder.setStatus(POrderStatus.PORDER_STATUS_FREE);
+				porder.setStatus(POrderStatus.PORDER_STATUS_UNCONFIRM);
 				porder.setTimecreated(new Date());
 			} 
-			else {
-				porder = porderService.findOne(entity.id);
-			}
 			
-			porder = porderService.save(porder);
-			
-			List<PContractProductSKU> listsku = entity.sku;
-			
-			for (PContractProductSKU sku : listsku) {
-				SKU orginSKU =skuService.findOne(sku.getSkuid_link());
-				if (null != orginSKU){
-					POrder_Product_SKU pordersku = new POrder_Product_SKU();
-					pordersku.setId(null);
-					pordersku.setOrgrootid_link(orgrootid_link);
-					pordersku.setPorderid_link(porder.getId());
-					pordersku.setPquantity_porder(sku.getPquantity_porder());
-					pordersku.setPquantity_sample(sku.getPquantity_sample());
-					pordersku.setPquantity_total(sku.getPquantity_total());
-					pordersku.setProductid_link(productid_link);
-					pordersku.setSkuid_link(sku.getSkuid_link());
-					
-					porderskuService.save(pordersku);
-					
-					pquantitytotal += sku.getPquantity_total();
-					
-					//Update so da phan lenh cua PContract
-					updateContractSKU(porder.getId(),pordersku.getSkuid_link());
-					
-					//Lấy BOM của sản phẩm (SKU) từ Contract
-//					List<PContractBOMSKU> lsSKUBOM = pcontractBOMSKUService.getMaterials_BySKUId(sku.getSkuid_link());
-					List<PContractBOMSKU> lsSKUBOM = commonService.getBOMSKU_PContract_Product(pcontractid_link, productid_link, listsku);
-					for(PContractBOMSKU contractBOM: lsSKUBOM){
-						POrderBOMSKU porderBOM = new POrderBOMSKU();
-						porderBOM.setOrgrootid_link(orgrootid_link);
-						porderBOM.setPcontractid_link(contractBOM.getPcontractid_link());
-						porderBOM.setPorderid_link(porder.getId());
-						porderBOM.setProductid_link(contractBOM.getProductid_link());
-						porderBOM.setSkuid_link(contractBOM.getSkuid_link());
-						porderBOM.setMaterialid_link(contractBOM.getMaterialid_link());
-						porderBOM.setAmount(contractBOM.getAmount());
-						porderBOM.setLost_ratio(contractBOM.getLost_ratio());
-						porderBOM.setCreateduserid_link(user.getId());
-						porderBOM.setCreateddate(new Date());
-						
-						porderBOM.setProductcolor_name(orginSKU.getMauSanPham());
-						porderBOMSKUService.save(porderBOM);
-					}
-					
-					//Lay BOM tu pcontract_bom_color
-//					List<PCon>
-//					List<PContractBOMColor> list_bom_color = bomcolorService.getall_material_in_productBOMColor(pcontractid_link, productid_link, colorid_link, 0);
-				}
-			}
-			
-			POrder_Product porderproduct = new POrder_Product();
-			porderproduct.setId(null);
-			porderproduct.setOrgrootid_link(orgrootid_link);
-			porderproduct.setPorderid_link(porder.getId());
-			porderproduct.setPquantity(pquantitytotal);
-			porderproduct.setProductid_link(productid_link);
-			
-			porderproductService.save(porderproduct);
-			
-			
-			//Lưu tổng số lượng sản phẩm theo lệnh
-			porder.setTotalorder(pquantitytotal);
-			porderService.save(porder);
+			response.id = porderService.savePOrder(porder, po_code);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+			return new ResponseEntity<POrder_Create_response>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+			return new ResponseEntity<POrder_Create_response>(response, HttpStatus.OK);
 		}
 	}
 	
@@ -191,6 +110,25 @@ public class POrderAPI {
 		try {
 			if (null != entity.productid_link)
 				response.data = porderService.getByContractAndProduct(entity.pcontractid_link, entity.productid_link);
+			else
+				response.data = porderService.getByContract(entity.pcontractid_link);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<POrder_getbycontract_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<POrder_getbycontract_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/get_bypo", method = RequestMethod.POST)
+	public ResponseEntity<POrder_getbycontract_response> GetByPO(HttpServletRequest request,
+			@RequestBody POrder_getbypo_request entity) {
+		POrder_getbycontract_response response = new POrder_getbycontract_response();
+		try {
+			if (null != entity.pcontract_poid_link)
+				response.data = porderService.getByContractAndPO(entity.pcontractid_link, entity.pcontract_poid_link);
 			else
 				response.data = porderService.getByContract(entity.pcontractid_link);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -399,11 +337,11 @@ public class POrderAPI {
 	//Lấy danh sách và tình trạng chuẩn bị NPL của 1 lệnh
 	@RequestMapping(value = "/getbalance",method = RequestMethod.POST)
 	public ResponseEntity<StockoutDFilterResponse> getBalance(@RequestBody POrderGetBalanceRequest entity, HttpServletRequest request) {
-		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		StockoutDFilterResponse response = new StockoutDFilterResponse();
 		try {
 		//Lay danh sach lenh cho vao chuyen de tao Stockout list
-			StockOut theWaitingOrder = new StockOut();
+//			StockOut theWaitingOrder = new StockOut();
 //			theWaitingOrder.setPordercode(entity.ordercode);
 //			
 //			//Lay danh sach NPL cua lenh tu IVY ERP

@@ -19,7 +19,6 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sizeset.SizeSet;
 
 
@@ -46,6 +45,7 @@ public class PContract_Price implements Serializable {/**
 	private Float price_sewingcost;
 	private Float totalprice;
 	private Float salaryfund;
+	private Float quantity;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -148,6 +148,12 @@ public class PContract_Price implements Serializable {/**
 	}
 	public void setSewfobratio(Float sewfobratio) {
 		this.sewfobratio = sewfobratio;
+	}
+	public Float getQuantity() {
+		return quantity;
+	}
+	public void setQuantity(Float quantity) {
+		this.quantity = quantity;
 	}
 	
 }

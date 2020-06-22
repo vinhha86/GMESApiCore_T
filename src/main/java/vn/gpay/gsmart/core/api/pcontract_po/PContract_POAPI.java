@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.gpay.gsmart.core.api.porder.POrderAPI;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
@@ -21,7 +22,11 @@ import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_DService;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Service;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price_D;
+import vn.gpay.gsmart.core.porder.IPOrder_Service;
+import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.utils.POStatus;
+import vn.gpay.gsmart.core.utils.POrderStatus;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 
@@ -31,6 +36,7 @@ public class PContract_POAPI {
 	@Autowired IPContract_POService pcontract_POService;
 	@Autowired IPContract_Price_Service pcontractpriceService;
 	@Autowired IPContract_Price_DService pcontractpriceDService;
+	@Autowired IPOrder_Service porderService;
 	
 	@RequestMapping(value = "/create",method = RequestMethod.POST)
 	public ResponseEntity<PContract_pocreate_response> PContractCreate(@RequestBody PContract_pocreate_request entity,HttpServletRequest request ) {
@@ -47,6 +53,7 @@ public class PContract_POAPI {
 				pcontract_po.setUsercreatedid_link(usercreatedid_link);
 				pcontract_po.setDatecreated(new Date());
 				pcontract_po.setPcontractid_link(pcontractid_link);
+				pcontract_po.setStatus(POStatus.PO_STATUS_UNCONFIRM);
 			}
 //			else {
 //				PContract_PO pcontract_po_old = pcontract_POService.findOne(pcontract_po.getId());
@@ -77,7 +84,28 @@ public class PContract_POAPI {
 				price.setPcontractid_link(pcontractid_link);
 				price.setOrgrootid_link(orgrootid_link);
 				pcontractpriceService.save(price);
-			}			
+			}
+			
+			//Update POrders
+			List<POrder> lst_porders = entity.po_orders;
+			String po_code = pcontract_po.getPo_vendor().length() > 0?pcontract_po.getPo_vendor():pcontract_po.getPo_buyer();
+			for(POrder porder : lst_porders) {
+				if (null == porder.getId() || 0 == porder.getId()){
+					//Them moi POrder
+					porder.setPcontractid_link(pcontractid_link);
+					porder.setPcontract_poid_link(pcontract_poid_link);
+					porder.setOrgrootid_link(orgrootid_link);
+					porder.setProductid_link(pcontract_po.getProductid_link());
+					porder.setOrderdate(new Date());
+					porder.setUsercreatedid_link(user.getId());
+					porder.setStatus(pcontract_po.getStatus() == POStatus.PO_STATUS_UNCONFIRM?POrderStatus.PORDER_STATUS_UNCONFIRM:POrderStatus.PORDER_STATUS_FREE);
+					porder.setTimecreated(new Date());
+				} 
+				//Save to DB
+				porderService.savePOrder(porder, po_code);
+			}
+			
+			//Response to Client
 			response.id = pcontract_po.getId();
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));	

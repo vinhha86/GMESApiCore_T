@@ -1,8 +1,8 @@
 package vn.gpay.gsmart.core.utils;
 
 public class POrderStatus {
-
-	public static int PORDER_STATUS_FREE       = 0; //Chưa phân chuyền
+	public static int PORDER_STATUS_UNCONFIRM  = -1; //Chưa chốt
+	public static int PORDER_STATUS_FREE       = 0; //Đã chốt, chưa phân chuyền
     public static int PORDER_STATUS_GRANTED    = 1; //Đã phân chuyền, chưa yêu cầu sx
     public static int PORDER_STATUS_READY      = 2; //Yêu cầu sx đề kho và cắt chuẩn bị
     public static int PORDER_STATUS_SUBPROCESS = 3; //Đang thực hiện công đoạn phụ (may trc 1 số bước khó) trước khi vào chuyền

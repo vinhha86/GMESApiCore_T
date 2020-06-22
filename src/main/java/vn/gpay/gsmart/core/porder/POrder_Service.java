@@ -19,6 +19,7 @@ import vn.gpay.gsmart.core.utils.DateFormat;
 @Service
 public class POrder_Service extends AbstractService<POrder> implements IPOrder_Service {
 	@Autowired IPOrder_Repository repo;
+	@Autowired IPOrder_AutoID_Service porder_AutoID_Service;
 	@Override
 	protected JpaRepository<POrder, Long> getRepository() {
 		// TODO Auto-generated method stub
@@ -31,8 +32,27 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 	}
 	
 	@Override
+	public Long savePOrder(POrder porder, String po_code){
+		try {
+			if (porder.getId() == null || porder.getId() == 0) {
+				porder.setOrdercode(porder_AutoID_Service.getLastID(po_code));
+			} 
+			porder = this.save(porder);
+			return porder.getId();
+		} catch (Exception e){
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	@Override
 	public List<POrder> getByContractAndProduct(Long pcontractid_link, Long productid_link){
 		return repo.getByContractAndProduct(pcontractid_link,productid_link);
+	}
+	
+	@Override
+	public List<POrder> getByContractAndPO(Long pcontractid_link, Long pcontract_poid_link){
+		return repo.getByContractAndPO(pcontractid_link,pcontract_poid_link);
 	}
 	
 	@Override
