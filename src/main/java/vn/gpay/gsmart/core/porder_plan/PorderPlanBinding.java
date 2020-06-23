@@ -16,6 +16,7 @@ public class PorderPlanBinding {
 	private Integer totalorder;
 	private Boolean expanded;
 	private Boolean leaf;
+	private String iconCls;
 	private Integer plan_type;
 	private Float totalpackage;
 	private Float totalyds;
@@ -23,7 +24,6 @@ public class PorderPlanBinding {
 	private Integer status;
 	private Long pcontractid_link;
 	private Long productid_link;
-	private String iconCls;
 	private String pcontract_number;
 	
 	public String getPcontract_number() {

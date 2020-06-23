@@ -23,4 +23,6 @@ public interface IOrgService extends Operations<Org>{
 	public List<OrgTree> createTree( List<Org> nodes);
 	
 	public List<Org> findOrgByTypeForMenuOrg();
+	
+	public List<Org> getorgChildrenbyOrg(long orgid_link, List<String> list_typeid);
 }
