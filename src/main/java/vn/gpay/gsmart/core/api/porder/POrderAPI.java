@@ -21,6 +21,8 @@ import vn.gpay.gsmart.core.actionlog.ActionLogs;
 import vn.gpay.gsmart.core.actionlog.IActionLogs_Service;
 import vn.gpay.gsmart.core.api.stockout.StockoutDFilterResponse;
 import vn.gpay.gsmart.core.base.ResponseBase;
+import vn.gpay.gsmart.core.org.IOrgService;
+import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontratproductsku.IPContractProductSKUService;
@@ -49,6 +51,7 @@ public class POrderAPI {
 	@Autowired private IPContractProductSKUService pskuservice;
     @Autowired private IActionLogs_Service actionLogsRepository;
     @Autowired private IPOrderProcessing_Service porderprocessingService;
+    @Autowired private IOrgService orgService;
     ObjectMapper mapper = new ObjectMapper();
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
@@ -90,20 +93,26 @@ public class POrderAPI {
 	}
 	
 	@RequestMapping(value = "/get_free_bygolivedate", method = RequestMethod.POST)
-	public ResponseEntity<POrder_getbyproduct_response> get_free_bygolivedate(HttpServletRequest request,
-			@RequestBody POrder_getbyproduct_request entity) {
-		POrder_getbyproduct_response response = new POrder_getbyproduct_response();
+	public ResponseEntity<POrderResponse> get_free_bygolivedate(HttpServletRequest request,
+			@RequestBody POrder_getbygolivedate_request entity) {
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Long orgid_link = user.getOrgid_link();
+		POrderResponse response = new POrderResponse();
 		try {
-			Long productid_link = entity.productid_link;
 			
-			response.data = porderskuService.getby_productid_link(productid_link);
+			List<POrder> lsPOrder = porderService.get_free_bygolivedate(entity.golivedate_from, entity.golivedate_to, orgid_link);
+			List<Org> lsOrgChild = orgService.getChild(orgid_link);
+			for(Org theOrg:lsOrgChild){
+				lsPOrder.addAll(porderService.get_free_bygolivedate(entity.golivedate_from, entity.golivedate_to, theOrg.getId()));
+			}
+			response.data = lsPOrder;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<POrder_getbyproduct_response>(response, HttpStatus.OK);
+			return new ResponseEntity<POrderResponse>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			return new ResponseEntity<POrder_getbyproduct_response>(response, HttpStatus.OK);
+			return new ResponseEntity<POrderResponse>(response, HttpStatus.OK);
 		}
 	}
 		

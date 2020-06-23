@@ -22,9 +22,11 @@ import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract.PContract;
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.porder_bom_sku.POrderBOMSKU;
 import vn.gpay.gsmart.core.porder_product.POrder_Product;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
+import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.sizeset.SizeSet;
 
 @Table(name="porders")
@@ -96,6 +98,7 @@ public class POrder implements Serializable {
 		return "";
 	}
 	
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="sizesetid_link",insertable=false,updatable =false)
@@ -121,6 +124,33 @@ public class POrder implements Serializable {
 		}
 		return "";
 	}
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
+    private PContract_PO pcontract_po;
+	
+	@Transient
+	public String getPo_vendor() {
+		if(pcontract_po != null) {
+			return pcontract_po.getPo_vendor();
+		}
+		return "";
+	}
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="productid_link",insertable=false,updatable =false)
+    private Product product;
+	
+	@Transient
+	public String getBuyercode() {
+		if(product != null) {
+			return product.getBuyercode();
+		}
+		return "";
+	}
+	
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
