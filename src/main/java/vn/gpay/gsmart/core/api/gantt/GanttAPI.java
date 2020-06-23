@@ -20,6 +20,8 @@ import vn.gpay.gsmart.core.org.OrgServiceImpl;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO_Gantt;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder.POrder_Service;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant_Service;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -28,6 +30,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 public class GanttAPI {
 	@Autowired OrgServiceImpl orgService;
 	@Autowired POrder_Service porderService;
+	@Autowired POrderGrant_Service granttService;
 	
 	@RequestMapping(value = "/getporder_po_gantt",method = RequestMethod.POST)
 	public ResponseEntity<gantt_getbydate_porder_po_response> GetAll(HttpServletRequest request,
@@ -61,6 +64,7 @@ public class GanttAPI {
 				PContract_PO_Gantt gantt_org = new PContract_PO_Gantt();
 				gantt_org.setExpanded(false);
 				gantt_org.setId(id);
+				gantt_org.setCode(org_factory.getCode());
 				gantt_org.setId_origin(org_factory.getId());
 				gantt_org.setLeaf(false);
 				gantt_org.setName(org_factory.getName());
@@ -83,7 +87,14 @@ public class GanttAPI {
 					gant_orggrantt.setName(org_grantt.getName());
 					gant_orggrantt.setRollup(false);
 					gant_orggrantt.setIconCls("x-fa fa-home");
+					gant_orggrantt.setCode(org_grantt.getCode());
 					
+					//Lay nhung lenh cua cac to 
+					List<POrderGrant> list_porder = granttService.get_granted_bygolivedate(startdate, todate, gant_orggrantt.getId());
+					
+					for(POrderGrant porder_grant : list_porder) {
+						
+					}
 					gantt_org.getChildren().add(gant_orggrantt);
 				}
 				
