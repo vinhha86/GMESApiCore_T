@@ -148,11 +148,12 @@ public class PContractskuAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long pcontractid_link = entity.pcontractid_link;
 			long productid_link = entity.productid_link;
+			long pcontract_poid_link = entity.pcontract_poid_link;
 			long orgrootid_link = user.getRootorgid_link();
 			
 			 for(Long skuid_link : entity.listskuid_link) {
 				 //Kiem tra sku da co trong don hang chua? chua co thi moi insert vao
-				 List<PContractProductSKU> list = pskuservice.getlistsku_bysku_and_pcontract(skuid_link, pcontractid_link);
+				 List<PContractProductSKU> list = pskuservice.getlistsku_bysku_and_product_PO(skuid_link, pcontract_poid_link, productid_link);
 				 if(list.size() == 0) {
 					 PContractProductSKU psku = new PContractProductSKU();
 					 psku.setId(null);
@@ -164,6 +165,7 @@ public class PContractskuAPI {
 					 psku.setPquantity_total(0);
 					 psku.setProductid_link(productid_link);
 					 psku.setSkuid_link(skuid_link);
+					 psku.setPcontract_poid_link(pcontract_poid_link);
 					 
 					 pskuservice.save(psku);
 				 }
