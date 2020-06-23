@@ -9,7 +9,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class PContract_PO_Gantt {
 	private long id;
 	private long id_origin;
+	private String code;
 	
+	public String getCode() {
+		return code;
+	}
+	public void setCode(String code) {
+		this.code = code;
+	}
 	@JsonProperty("Name")
 	private String Name;
 	
