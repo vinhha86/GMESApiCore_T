@@ -136,4 +136,21 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 		List<POrder> a = repo.findAll(specification,sort);
 		return a;
 	}
+	
+	@Override
+	//Danh sach cac lenh duoc phan cho Phan xuong nhung chua duoc phan chuyen
+	public List<POrder> get_free_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link){
+		Specification<POrder> specification = Specifications.<POrder>and()
+				.le("status", 1)
+	            .eq("granttoorgid_link", granttoorgid_link)
+	            .ge(Objects.nonNull(golivedate_from),"golivedate",DateFormat.atStartOfDay(golivedate_from))
+                .le(Objects.nonNull(golivedate_to),"golivedate",DateFormat.atEndOfDay(golivedate_to))
+	            .build();
+//		Sort sort = Sorts.builder()
+//		        .desc("ordercode")
+//		        .build();
+//		List<POrder> a = repo.findAll(specification,sort);
+		List<POrder> a = repo.findAll(specification);
+		return a;
+	}
 }
