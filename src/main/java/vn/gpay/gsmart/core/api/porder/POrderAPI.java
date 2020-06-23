@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.api.porder;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.concurrent.ListenableFutureCallbackRegistry;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -101,7 +103,10 @@ public class POrderAPI {
 		try {
 			
 			List<POrder> lsPOrder = porderService.get_free_bygolivedate(entity.golivedate_from, entity.golivedate_to, orgid_link);
-			List<Org> lsOrgChild = orgService.getChild(orgid_link);
+			List<String> orgTypes = new ArrayList<String>();
+			orgTypes.add("13");
+			orgTypes.add("14");
+			List<Org> lsOrgChild = orgService.getorgChildrenbyOrg(orgid_link,orgTypes);
 			for(Org theOrg:lsOrgChild){
 				lsPOrder.addAll(porderService.get_free_bygolivedate(entity.golivedate_from, entity.golivedate_to, theOrg.getId()));
 			}

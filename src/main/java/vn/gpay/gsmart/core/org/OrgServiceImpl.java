@@ -244,12 +244,4 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 		
 		return list;
 	}
-	
-	@Override
-	public List<Org> getChild(Long parentid_link) {
-		Specification<Org> specification = Specifications.<Org>and()
-	            .eq( "parentid_link", parentid_link)
-	            .build();
-	    return repositoty.findAll(specification);
-	}
 }
