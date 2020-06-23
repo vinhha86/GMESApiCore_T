@@ -24,7 +24,7 @@ public class OrgTypeAPI {
 	public ResponseEntity<?> getAllOrgType(HttpServletRequest request ) {
 		try {
 			OrgTypeResponse response = new OrgTypeResponse();
-			List<OrgType> all = orgTypeService.findAll();
+			List<OrgType> all = orgTypeService.findOrgTypeForMenuOrg();
 			response.data=all;
 			return new ResponseEntity<OrgTypeResponse>(response,HttpStatus.OK);
 		}catch (RuntimeException e) {
