@@ -87,33 +87,35 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 	public List<Org> findOrgAllByRoot(long orgrootid, long orgid, List<String> list_typeid, boolean isincludeorg) {
 		// TODO Auto-generated method stub
 		List<Org> list  = new ArrayList<Org>();
+		if(orgrootid == orgid)
+			list_typeid.add("1");
+		
 		Specification<Org> specification = Specifications.<Org>and()
 	            .eq("orgrootid_link", orgrootid)
 	            .ne(!isincludeorg, "id", orgid)
-	            .in(list_typeid.size() > 0 && orgid != orgrootid,"orgtypeid_link", list_typeid.toArray())
+	            .in(list_typeid.size() > 0,"orgtypeid_link", list_typeid.toArray())
 	            .build();
 		Sort sort = Sorts.builder()
 		        .desc("id")
 		        .build();
 		list =  repositoty.findAll(specification,sort);
 		if(isincludeorg)
-		list = getOrgChildrenbyId(orgid, list);
+			list = getOrgChildrenbyId(orgid, list);
 		return list;
 	}
 	
 	private List<Org> getOrgChildrenbyId(long orgid, List<Org> listAll){
 		List<Org> list = new ArrayList<>();
 		
-		if(list.size() == 0) {
-			for(Org org : listAll) {
-				if(org.getId() == orgid) {
-					list.add(org);
-					listAll.remove(org);
-					break;
-				}
+		for(Org org : listAll) {
+			if(org.getId() == orgid) {
+				list.add(org);
+				listAll.remove(org);
+				break;
 			}
 		}
-		else { 
+		
+		if(list.size() > 0) { 
 			for(Org org : listAll) {
 				check(list, org);
 			}
@@ -225,6 +227,22 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 	@Override
 	public List<Org> findOrgByTypeForMenuOrg() {
 		return repositoty.findOrgByTypeForMenuOrg();
+	}
+
+	@Override
+	public List<Org> getorgChildrenbyOrg(long orgid_link, List<String> list_typeid) {
+		// TODO Auto-generated method stub
+		Specification<Org> specification = Specifications.<Org>and()
+	            .eq("parentid_link", orgid_link)
+	            .in(list_typeid.size() > 0,"orgtypeid_link", list_typeid.toArray())
+	            .build();
+		Sort sort = Sorts.builder()
+		        .desc("id")
+		        .build();
+		List<Org> list =  repositoty.findAll(specification,sort);
+		
+		
+		return list;
 	}
 	
 	@Override
