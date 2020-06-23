@@ -93,6 +93,18 @@ public class GanttAPI {
 					List<POrderGrant> list_porder = granttService.get_granted_bygolivedate(startdate, todate, gant_orggrantt.getId());
 					
 					for(POrderGrant porder_grant : list_porder) {
+						PContract_PO_Gantt gant_porder = new PContract_PO_Gantt();
+						id++;
+						
+						gant_porder.setExpanded(false);
+						gant_porder.setId(id);
+						gant_porder.setId_origin(org_grantt.getId());
+						gant_porder.setLeaf(false);
+						gant_porder.setName(porder_grant.getOrdercode());
+						gant_porder.setRollup(false);
+						gant_porder.setIconCls("x-fa fa-industry");
+						
+						
 						
 					}
 					gantt_org.getChildren().add(gant_orggrantt);
@@ -119,7 +131,7 @@ public class GanttAPI {
 					gantt_porderfree.setExpanded(false);
 					gantt_porderfree.setId(id);
 					gantt_porderfree.setId_origin(porder_free.getId());
-					gantt_porderfree.setLeaf(false);
+					gantt_porderfree.setLeaf(true);
 					gantt_porderfree.setName(porder_free.getOrdercode());
 					gantt_porderfree.setRollup(false);
 					gantt_porderfree.setIconCls("x-fa fa-industry");
