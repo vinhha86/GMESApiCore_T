@@ -10,6 +10,9 @@ public class PContract_PO_Gantt {
 	private long id;
 	private long id_origin;
 	private String code;
+	private long orgtypeid_link ;
+	private long parentid_origin;
+	private Integer totalpackage;
 	
 	public String getCode() {
 		return code;
@@ -39,10 +42,10 @@ public class PContract_PO_Gantt {
 	private boolean Rollup;
 	private List<PContract_PO_Gantt> children = new ArrayList<PContract_PO_Gantt>();
 	
-	public String getCls() {
+	public String getClss() {
 		return Cls;
 	}
-	public void setCls(String cls) {
+	public void setClss(String cls) {
 		Cls = cls;
 	}
 	
@@ -111,6 +114,24 @@ public class PContract_PO_Gantt {
 	}
 	public void setStartDate(Date startDate) {
 		StartDate = startDate;
+	}
+	public long getOrgtypeid_link() {
+		return orgtypeid_link;
+	}
+	public long getParentid_origin() {
+		return parentid_origin;
+	}
+	public void setOrgtypeid_link(long orgtypeid_link) {
+		this.orgtypeid_link = orgtypeid_link;
+	}
+	public void setParentid_origin(long parentid_origin) {
+		this.parentid_origin = parentid_origin;
+	}
+	public Integer getTotalpackage() {
+		return totalpackage;
+	}
+	public void setTotalpackage(Integer totalpackage) {
+		this.totalpackage = totalpackage;
 	}
 	
 	

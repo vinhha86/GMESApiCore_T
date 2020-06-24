@@ -65,6 +65,21 @@ public class POrderGrant implements Serializable {
     @JoinColumn(name="porderid_link",insertable=false,updatable =false)
     private POrder porder;
 	
+	@Transient
+	public String getCls() {
+		if(porder!=null) {
+			return porder.getCls();
+		}
+		return "";
+	}
+	
+	@Transient
+	public int getTotalpackage() {
+		if(porder != null) {
+			return porder.getTotalorder();
+		}
+		return 0;
+	}
 	
 	@Transient
 	public Date getOrderdate() {

@@ -71,6 +71,8 @@ public class GanttAPI {
 				gantt_org.setParentId(null);
 				gantt_org.setRollup(false);
 				gantt_org.setIconCls("x-fa fa-home");
+				gantt_org.setOrgtypeid_link(org_factory.getOrgtypeid_link());
+				gantt_org.setParentid_origin(0);
 				
 				//lay cac to cua nha may
 				List<Org> listorg_grantt = orgService.getorgChildrenbyOrg(orgid, list);
@@ -85,14 +87,42 @@ public class GanttAPI {
 					gant_orggrantt.setId_origin(org_grantt.getId());
 					gant_orggrantt.setLeaf(false);
 					gant_orggrantt.setName(org_grantt.getName());
-					gant_orggrantt.setRollup(false);
+					gant_orggrantt.setRollup(true);
 					gant_orggrantt.setIconCls("x-fa fa-home");
 					gant_orggrantt.setCode(org_grantt.getCode());
+					gant_orggrantt.setOrgtypeid_link(org_grantt.getOrgtypeid_link());
+					gant_orggrantt.setParentid_origin(org_factory.getId());
+					
 					
 					//Lay nhung lenh cua cac to 
-					List<POrderGrant> list_porder = granttService.get_granted_bygolivedate(startdate, todate, gant_orggrantt.getId());
+					List<POrderGrant> list_porder = granttService.get_granted_bygolivedate(startdate, todate, org_grantt.getId());
 					
 					for(POrderGrant porder_grant : list_porder) {
+						
+						if(startdate_grantt==null) {
+							startdate_grantt = porder_grant.getProductiondate();
+						} else {
+							startdate_grantt = startdate_grantt.compareTo(porder_grant.getProductiondate()) > 0 ? porder_grant.getProductiondate() : startdate_grantt;
+						}
+						
+						if(enddate_grantt==null) {
+							enddate_grantt = porder_grant.getGolivedate();
+						} else {
+							enddate_grantt = enddate_grantt.compareTo(porder_grant.getGolivedate()) < 0 ? porder_grant.getGolivedate() : enddate_grantt;
+						}
+						
+						if(startdate_org==null) {
+							startdate_org = porder_grant.getProductiondate();
+						} else {
+							startdate_org = startdate_org.compareTo(porder_grant.getProductiondate()) > 0 ? porder_grant.getProductiondate() : startdate_org;
+						}
+						
+						if(enddate_org==null) {
+							enddate_org = porder_grant.getGolivedate();
+						} else {
+							enddate_org = enddate_org.compareTo(porder_grant.getGolivedate()) < 0 ? porder_grant.getGolivedate() : enddate_org;
+						}
+						
 						PContract_PO_Gantt gant_porder = new PContract_PO_Gantt();
 						id++;
 						
@@ -101,17 +131,39 @@ public class GanttAPI {
 						gant_porder.setId_origin(org_grantt.getId());
 						gant_porder.setLeaf(false);
 						gant_porder.setName(porder_grant.getOrdercode());
-						gant_porder.setRollup(false);
+						gant_porder.setRollup(true);
 						gant_porder.setIconCls("x-fa fa-industry");
+						gant_porder.setClss(porder_grant.getCls());
+						gant_porder.setStartDate(porder_grant.getProductiondate());
+						gant_porder.setEndDate(porder_grant.getGolivedate());
 						
+						//Tao ke hoach cua lenh
+						PContract_PO_Gantt gant_porderKH = new PContract_PO_Gantt();
+						id++;
 						
+						gant_porderKH.setExpanded(false);
+						gant_porderKH.setId(id);
+						gant_porderKH.setId_origin(org_grantt.getId());
+						gant_porderKH.setLeaf(true);
+						gant_porderKH.setName("Kế hoạch");
+						gant_porderKH.setRollup(false);
+						gant_porderKH.setIconCls("x-fa fa-calendar-edit");
+						gant_porderKH.setStartDate(porder_grant.getProductiondate());
+						gant_porderKH.setEndDate(porder_grant.getGolivedate());
+						gant_porderKH.setTotalpackage(porder_grant.getTotalpackage());
 						
+						gant_porder.getChildren().add(gant_porderKH);						
+						
+						gant_orggrantt.getChildren().add(gant_porder);
 					}
+					gant_orggrantt.setStartDate(startdate_grantt);
+					gant_orggrantt.setEndDate(enddate_grantt);
 					gantt_org.getChildren().add(gant_orggrantt);
 				}
 				
 				//Them lenh free vao moi nha may
 				PContract_PO_Gantt gant_folderfree = new PContract_PO_Gantt();
+				Date start_gant_folderfree = null, end_gant_folderfree = null;
 				
 				id++;
 				gant_folderfree.setExpanded(false);
@@ -121,10 +173,40 @@ public class GanttAPI {
 				gant_folderfree.setName("Lệnh chưa phân");
 				gant_folderfree.setRollup(false);
 				gant_folderfree.setIconCls("x-fa fa-industry");
+				gant_folderfree.setParentid_origin(org_factory.getId());
 				
 				//Lay nhung lenh chua phan chuyen cua moi nha may
 				List<POrder> listporder_free = porderService.get_free_bygolivedate(startdate, todate, org_factory.getId());
 				for(POrder porder_free : listporder_free) {
+					
+					if(start_gant_folderfree==null) {
+						start_gant_folderfree = porder_free.getProductiondate();
+					}
+					else {
+						start_gant_folderfree = start_gant_folderfree.compareTo(porder_free.getProductiondate()) > 0 ? porder_free.getProductiondate() : start_gant_folderfree;
+					}
+					
+					if(end_gant_folderfree==null) {
+						end_gant_folderfree = porder_free.getGolivedate();
+					}
+					else {
+						end_gant_folderfree = end_gant_folderfree.compareTo(porder_free.getGolivedate()) < 0 ? porder_free.getGolivedate() : end_gant_folderfree;
+					}
+					
+					if(startdate_org==null) {
+						startdate_org = porder_free.getProductiondate();
+					}
+					else {
+						startdate_org = startdate_org.compareTo(porder_free.getProductiondate()) > 0 ? porder_free.getProductiondate() : startdate_org;
+					}
+					
+					if(enddate_org==null) {
+						enddate_org = porder_free.getGolivedate();
+					}
+					else {
+						enddate_org = enddate_org.compareTo(porder_free.getGolivedate()) < 0 ? porder_free.getGolivedate() : enddate_org;
+					}
+					
 					PContract_PO_Gantt gantt_porderfree = new PContract_PO_Gantt();
 					
 					id++;
@@ -137,12 +219,19 @@ public class GanttAPI {
 					gantt_porderfree.setIconCls("x-fa fa-industry");
 					gantt_porderfree.setStartDate(porder_free.getProductiondate());
 					gantt_porderfree.setEndDate(porder_free.getGolivedate());
+					gantt_porderfree.setParentid_origin(0);
+					gantt_porderfree.setTotalpackage(porder_free.getTotalorder());
+									
 					
 					gant_folderfree.getChildren().add(gantt_porderfree);
 				}
 				
+				gant_folderfree.setStartDate(start_gant_folderfree);
+				gant_folderfree.setEndDate(end_gant_folderfree);
 				gantt_org.getChildren().add(gant_folderfree);
 				
+				gantt_org.setStartDate(startdate_org);
+				gantt_org.setEndDate(enddate_org);
 				list_gantt.add(gantt_org);
 			}
 			

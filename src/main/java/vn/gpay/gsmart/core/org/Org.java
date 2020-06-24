@@ -8,9 +8,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.category.Color;
 
 
 @Table(name="org")
@@ -81,8 +88,21 @@ public class Org implements Serializable {
 	@Column(name ="linecost")
     private BigDecimal linecost;
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="colorid_link",insertable=false,updatable =false)
+    private Color color;
+	
 	@Transient
 	public boolean checked;
+	
+	@Transient
+	public String getCls() {
+		if(color!=null) {
+			return color.getCode();
+		}
+		return "";
+	}
 
 	public Long getId() {
 		return id;

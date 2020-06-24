@@ -17,6 +17,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.branch.Branch;
+import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.season.Season;
 import vn.gpay.gsmart.core.security.GpayUser;
 
@@ -73,6 +74,11 @@ public class PContract implements Serializable {/**
     @JoinColumn(name="branchid_link",insertable=false,updatable =false)
     private Branch branch;
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="orgshowid_link",insertable=false,updatable =false)
+    private Org orgshow;
+	
 	@Transient
 	public String getBranchName() {
 		if(branch != null) {
@@ -87,12 +93,29 @@ public class PContract implements Serializable {/**
     private Season season;
 	
 	@Transient
+	public String getcls() {
+		if(orgshow!=null )
+			return orgshow.getCls();
+		else
+			return "";
+	}
+	
+	@Transient
 	public int getPayer() {
 		if(orgpayerid_link == orgvendorid_link )
 			return 1;
 		else
 			return 2;
 	}
+	
+	@Transient
+	public int getOrgshow() {
+		if(orgpayerid_link == orgvendorid_link )
+			return 1;
+		else
+			return 2;
+	}
+	
 	@Transient
 	public String getSeasonName() {
 		if(season != null) {
