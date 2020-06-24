@@ -93,6 +93,10 @@ public class PContract_POAPI {
 					//Them moi POrder
 					porder.setPcontractid_link(pcontractid_link);
 					porder.setPcontract_poid_link(pcontract_poid_link);
+					
+					porder.setGolivedate(pcontract_po.getShipdate());
+					porder.setProductiondate(pcontract_po.getProductiondate());
+					
 					porder.setOrgrootid_link(orgrootid_link);
 					porder.setProductid_link(pcontract_po.getProductid_link());
 					porder.setOrderdate(new Date());
