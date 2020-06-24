@@ -170,7 +170,7 @@ public class GanttAPI {
 				gant_folderfree.setId(id);
 				gant_folderfree.setId_origin(0);
 				gant_folderfree.setLeaf(false);
-				gant_folderfree.setName("Lệnh chưa phân");
+				gant_folderfree.setName("Chưa phân chuyền");
 				gant_folderfree.setRollup(false);
 				gant_folderfree.setIconCls("x-fa fa-industry");
 				gant_folderfree.setParentid_origin(org_factory.getId());
