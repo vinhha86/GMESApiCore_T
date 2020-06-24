@@ -16,7 +16,6 @@ import com.github.wenhao.jpa.Sorts;
 import com.github.wenhao.jpa.Specifications;
 
 import vn.gpay.gsmart.core.base.AbstractService;
-import vn.gpay.gsmart.core.menu.MenuTree;
 
 @Service
 public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{

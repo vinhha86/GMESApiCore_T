@@ -12,6 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 public interface ISizeSetRepository extends JpaRepository<SizeSet, Long>, JpaSpecificationExecutor<SizeSet> {
-	@Query(value = "select c from SizeSet c where c.orgrootid_link = :orgrootid_link ")
+	@Query(value = "select c from SizeSet c where c.orgrootid_link = :orgrootid_link order by c.id asc")
 	public List<SizeSet> getall_byorgrootid(@Param ("orgrootid_link")final  Long orgrootid_link);
 }

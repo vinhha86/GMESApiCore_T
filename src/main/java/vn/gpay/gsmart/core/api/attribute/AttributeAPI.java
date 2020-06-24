@@ -22,6 +22,8 @@ import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.productattributevalue.IProductAttributeService;
 import vn.gpay.gsmart.core.productattributevalue.ProductAttributeValue;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.sizesetattributevalue.ISizeSetAttributeService;
+import vn.gpay.gsmart.core.sizesetattributevalue.SizeSetAttributeValue;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 
@@ -31,6 +33,7 @@ public class AttributeAPI {
 	@Autowired IAttributeService attService;
 	@Autowired IAttributeValueService attvalueService;
 	@Autowired IProductAttributeService pavService;
+	@Autowired ISizeSetAttributeService sizesetService;
 	
 	@RequestMapping(value = "/getall",method = RequestMethod.POST)
 	public ResponseEntity<Attribute_getall_response> Attribute_GetAll(HttpServletRequest request ) {
@@ -143,6 +146,35 @@ public class AttributeAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_EXCEPTION));
 		    return new ResponseEntity<ResponseBase>(HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/notinsizeset",method = RequestMethod.POST)
+	public ResponseEntity<Attribute_getall_response> Attribute_NotinSizeset(HttpServletRequest request, @RequestBody Attribute_Delete_Request entity ) {
+		Attribute_getall_response response = new Attribute_getall_response();
+		List<SizeSetAttributeValue> listSizesetAttrValue = sizesetService.getall_bySizeSetId(entity.id);
+		
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			response.data = attService.getList_byorgid_link(user.getOrgid_link());
+			for(int i =0; i< response.data.size(); i++) {
+				Attribute attribute = response.data.get(i);
+				for (SizeSetAttributeValue sizesetAttrValue : listSizesetAttrValue) {
+					if(sizesetAttrValue.getAttributeid_link() == attribute.getId()) {
+						response.data.remove(attribute);
+						i--;
+						break;
+					}
+				}
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<Attribute_getall_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_EXCEPTION));
+		    return new ResponseEntity<Attribute_getall_response>(HttpStatus.OK);
 		}
 	}
 }
