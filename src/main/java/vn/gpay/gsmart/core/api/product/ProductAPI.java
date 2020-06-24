@@ -851,7 +851,7 @@ public class ProductAPI {
 
 			String name = file.getOriginalFilename();		
 			if (name != null && name.length() > 0) {
-				String[] str = name.toString().split("/.");
+				String[] str = name.split("\\.");
 				String extend = str[str.length -1];	
 				name = product.getCode()+"_"+img+"."+extend;
 				File serverFile = new File(uploadRootDir.getAbsolutePath() + File.separator + name);
