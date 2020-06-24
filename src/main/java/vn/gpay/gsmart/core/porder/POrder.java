@@ -125,6 +125,18 @@ public class POrder implements Serializable {
 	}
 	
 	@Transient
+	public String getMaHang() {
+		String name = "";
+		int total = totalorder == null ? 0 : totalorder;
+		
+		if(product != null && pcontract_po!=null) {
+			name += product.getBuyercode()+"/"+pcontract_po.getPo_vendor()+"/"+total;
+		}
+		
+		return name;
+	}
+	
+	@Transient
 	public String getContractcode() {
 		if(pcontract != null) {
 			return pcontract.getContractcode();

@@ -13,7 +13,14 @@ public class PContract_PO_Gantt {
 	private long orgtypeid_link ;
 	private long parentid_origin;
 	private Integer totalpackage;
+	private String mahang;
 	
+	public String getMahang() {
+		return mahang;
+	}
+	public void setMahang(String mahang) {
+		this.mahang = mahang;
+	}
 	public String getCode() {
 		return code;
 	}
