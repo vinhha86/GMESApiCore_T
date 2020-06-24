@@ -131,13 +131,62 @@ public class POrder implements Serializable {
     private PContract_PO pcontract_po;
 	
 	@Transient
+	public String getPo_buyer() {
+		if(pcontract_po != null) {
+			return pcontract_po.getPo_buyer();
+		}
+		return "";
+	}
+	
+	@Transient
 	public String getPo_vendor() {
 		if(pcontract_po != null) {
 			return pcontract_po.getPo_vendor();
 		}
 		return "";
 	}
-	
+	@Transient
+	public Float getPo_quantity() {
+		if(pcontract_po != null) {
+			return pcontract_po.getPo_quantity();
+		}
+		return null;
+	}
+	@Transient
+	public Date getShipdate() {
+		if(pcontract_po != null) {
+			return pcontract_po.getShipdate();
+		}
+		return null;
+	}
+	@Transient
+	public Date getMatdate() {
+		if(pcontract_po != null) {
+			return pcontract_po.getMatdate();
+		}
+		return null;
+	}
+	@Transient
+	public Date getPO_Productiondate() {
+		if(pcontract_po != null) {
+			return pcontract_po.getProductiondate();
+		}
+		return null;
+	}
+	@Transient
+	public String getQcorgname() {
+		if(pcontract_po != null) {
+			return pcontract_po.getQcorgname();
+		}
+		return "";
+	}
+	@Transient
+	public String getPackingnotice() {
+		if(pcontract_po != null) {
+			return pcontract_po.getPackingnotice();
+		}
+		return "";
+	}
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="productid_link",insertable=false,updatable =false)

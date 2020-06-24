@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.concurrent.ListenableFutureCallbackRegistry;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -56,6 +55,22 @@ public class POrderAPI {
     @Autowired private IOrgService orgService;
     ObjectMapper mapper = new ObjectMapper();
 	
+	@RequestMapping(value = "/getone",method = RequestMethod.POST)
+	public ResponseEntity<POrderGetByIDResponse> POrderGetOne(@RequestBody POrder_getbyid_request entity,HttpServletRequest request ) {
+		POrderGetByIDResponse response = new POrderGetByIDResponse();
+		try {
+			
+			response.data = porderService.findOne(entity.porderid_link); 
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<POrderGetByIDResponse>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<POrderGetByIDResponse>(response, HttpStatus.OK);
+		}
+	}    
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ResponseEntity<POrder_Create_response> Create(HttpServletRequest request,
 			@RequestBody POrder_Create_request entity) {
