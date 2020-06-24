@@ -75,6 +75,12 @@ public class POrderGrant implements Serializable {
     private POrder porder;
 	
 	@Transient
+	public String getMaHang() {
+		if(porder!=null)
+			return porder.getMaHang();
+		return "";
+	}
+	@Transient
 	public String getCls() {
 		if(porder!=null) {
 			return porder.getCls();

@@ -136,6 +136,7 @@ public class GanttAPI {
 						gant_porder.setClss(porder_grant.getCls());
 						gant_porder.setStartDate(porder_grant.getProductiondate());
 						gant_porder.setEndDate(porder_grant.getGolivedate());
+						gant_porder.setMahang(porder_grant.getMaHang());
 						
 						//Tao ke hoach cua lenh
 						PContract_PO_Gantt gant_porderKH = new PContract_PO_Gantt();
@@ -151,6 +152,7 @@ public class GanttAPI {
 						gant_porderKH.setStartDate(porder_grant.getProductiondate());
 						gant_porderKH.setEndDate(porder_grant.getGolivedate());
 						gant_porderKH.setTotalpackage(porder_grant.getTotalpackage());
+						gant_porderKH.setMahang(porder_grant.getMaHang());
 						
 						gant_porder.getChildren().add(gant_porderKH);						
 						
