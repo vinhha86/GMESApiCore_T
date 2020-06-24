@@ -1,7 +1,10 @@
 package vn.gpay.gsmart.core.porder_grant;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 //import javax.persistence.FetchType;
@@ -10,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 //import javax.persistence.JoinColumn;
 //import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -60,6 +64,11 @@ public class POrderGrant implements Serializable {
 	@Column(name ="timecreated")
     private Date timecreated;
 
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
+	@JoinColumn( name="pordergrantid_link", referencedColumnName="id")
+	private List<POrderGrant_SKU>  porder_grant_sku  = new ArrayList<>();
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="porderid_link",insertable=false,updatable =false)
