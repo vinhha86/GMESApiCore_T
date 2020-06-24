@@ -38,8 +38,9 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 	@Override
 	//Danh sach cac lenh duoc phan cho Phan xuong va da phan chuyen
 	public List<POrderGrant> get_granted_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link){
+		
 		Specification<POrderGrant> specification = Specifications.<POrderGrant>and()
-				.ge("porder.status", 1)
+				.ge("porder.status", 2)
 	            .eq("granttoorgid_link", granttoorgid_link)
 	            .ge(Objects.nonNull(golivedate_from),"porder.golivedate",DateFormat.atStartOfDay(golivedate_from))
                 .le(Objects.nonNull(golivedate_to),"porder.golivedate",DateFormat.atEndOfDay(golivedate_to))

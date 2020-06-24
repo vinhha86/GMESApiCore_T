@@ -117,6 +117,13 @@ public class POrder implements Serializable {
     @JoinColumn(name="pcontractid_link",insertable=false,updatable =false)
     private PContract pcontract;
 	
+	@Transient 
+	public String getCls() {
+		if(pcontract!=null)
+			return pcontract.getcls();
+		return "";
+	}
+	
 	@Transient
 	public String getContractcode() {
 		if(pcontract != null) {
