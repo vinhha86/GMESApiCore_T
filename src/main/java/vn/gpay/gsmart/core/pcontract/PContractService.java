@@ -29,11 +29,9 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 		// TODO Auto-generated method stub
 		Specification<PContract> specification = Specifications.<PContract>and()
 	            .eq(request.orgbuyerid_link > 0, "orgbuyerid_link", request.orgbuyerid_link)
-	            .eq(request.branchid_link> 0 ,"branchid_link", request.branchid_link)
-	            .eq(request.seasonid_link > 0, "seasonid_link", request.seasonid_link)
+	            .eq(request.orgvendorid_link > 0, "orgvendorid_link", request.orgvendorid_link)
 	            .eq("status", 1)
 	            .eq("orgrootid_link", orgrootid_link)
-	            .like("cust_contractcode","%"+request.cust_contractcode+"%")
         		.like("contractcode","%"+request.contractcode+"%")
 	            .build();
 		

@@ -77,7 +77,31 @@ public class PContract implements Serializable {/**
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="orgshowid_link",insertable=false,updatable =false)
-    private Org orgshow;
+    private Org orgShow;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="orgbuyerid_link",insertable=false,updatable =false)
+    private Org buyer;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="orgvendorid_link",insertable=false,updatable =false)
+    private Org vendor;
+	
+	@Transient
+	public String getBuyername() {
+		if(buyer!=null)
+			return buyer.getName();
+		return "";
+	}
+	
+	@Transient
+	public String getVendorname() {
+		if(vendor!=null)
+			return vendor.getName();
+		return "";
+	}
 	
 	@Transient
 	public String getBranchName() {
@@ -94,8 +118,8 @@ public class PContract implements Serializable {/**
 	
 	@Transient
 	public String getcls() {
-		if(orgshow!=null )
-			return orgshow.getCls();
+		if(orgShow!=null )
+			return orgShow.getCls();
 		else
 			return "";
 	}
