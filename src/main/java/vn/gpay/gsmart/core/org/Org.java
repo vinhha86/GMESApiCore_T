@@ -103,6 +103,14 @@ public class Org implements Serializable {
 		}
 		return "";
 	}
+	
+	@Transient
+	public String getClsName() {
+		if(color!=null) {
+			return color.getName();
+		}
+		return "";
+	}
 
 	public Long getId() {
 		return id;
