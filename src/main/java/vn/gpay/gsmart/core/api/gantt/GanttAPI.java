@@ -70,7 +70,7 @@ public class GanttAPI {
 				gantt_org.setName(org_factory.getName());
 				gantt_org.setParentId(null);
 				gantt_org.setRollup(false);
-				gantt_org.setIconCls("x-fa fa-home");
+				gantt_org.setIconCls("x-fa fa-industry");
 				gantt_org.setOrgtypeid_link(org_factory.getOrgtypeid_link());
 				gantt_org.setParentid_origin(0);
 				
@@ -88,7 +88,7 @@ public class GanttAPI {
 					gant_orggrantt.setLeaf(false);
 					gant_orggrantt.setName(org_grantt.getName());
 					gant_orggrantt.setRollup(true);
-					gant_orggrantt.setIconCls("x-fa fa-home");
+					gant_orggrantt.setIconCls("x-fa fa-sliders");
 					gant_orggrantt.setCode(org_grantt.getCode());
 					gant_orggrantt.setOrgtypeid_link(org_grantt.getOrgtypeid_link());
 					gant_orggrantt.setParentid_origin(org_factory.getId());
@@ -132,7 +132,7 @@ public class GanttAPI {
 						gant_porder.setLeaf(false);
 						gant_porder.setName(porder_grant.getOrdercode());
 						gant_porder.setRollup(true);
-						gant_porder.setIconCls("x-fa fa-industry");
+						gant_porder.setIconCls("x-fa fa-hand-o-right");
 						gant_porder.setClss(porder_grant.getCls());
 						gant_porder.setStartDate(porder_grant.getProductiondate());
 						gant_porder.setEndDate(porder_grant.getGolivedate());
@@ -174,7 +174,7 @@ public class GanttAPI {
 				gant_folderfree.setLeaf(false);
 				gant_folderfree.setName("Chưa phân chuyền");
 				gant_folderfree.setRollup(false);
-				gant_folderfree.setIconCls("x-fa fa-industry");
+				gant_folderfree.setIconCls("x-fa fa-file-o");
 				gant_folderfree.setParentid_origin(org_factory.getId());
 				
 				//Lay nhung lenh chua phan chuyen cua moi nha may
