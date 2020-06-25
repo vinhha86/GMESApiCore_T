@@ -290,8 +290,23 @@ public class OrgAPI {
 			for (String string : listtype) {
 				list.add(string);
 			}
-			List<Org> listreturn = orgService.findOrgAllByRoot(user.getRootorgid_link(), user.getOrgId(), list, true);
-//			List<Org> listreturn = getOrgChildrenbyId(user.getOrgId(), listorg);
+			
+			//Lay org la con 	
+			List<Org> listreturn = new ArrayList<Org>();
+			
+			List<Org> listorg = orgService.getorgChildrenbyOrg(user.getOrgId(), list);
+			
+			listreturn.addAll(listorg);
+			
+			//Lay org chau
+			
+			for(Org org : listorg) {
+				List<Org> list_chil = orgService.getorgChildrenbyOrg(org.getId(), list);
+				listreturn.addAll(list_chil);
+			}
+			
+			Org org = orgService.findOne(user.getOrgId());
+			listreturn.add(org);
 			
 			response.data = listreturn;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
