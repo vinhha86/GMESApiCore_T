@@ -304,6 +304,8 @@ public class PContractProductAPI {
 				binding.setProduction_date(pContractProduct.getProduction_date());
 				binding.setDelivery_date(pContractProduct.getDelivery_date());
 				binding.setUnitprice(pContractProduct.getUnitprice());
+				binding.setProductVendorCode(pContractProduct.getProductVendorCode());
+				binding.setProductBuyerCode(pContractProduct.getProductBuyerCode());
 				
 				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
 				

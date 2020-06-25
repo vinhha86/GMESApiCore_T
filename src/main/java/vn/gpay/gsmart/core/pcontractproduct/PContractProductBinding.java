@@ -16,6 +16,8 @@ public class PContractProductBinding {
 	private Date delivery_date;
 	private Float unitprice;
 	private Integer producttypeid_link;
+	private String productBuyerCode;
+	private String productVendorCode;
 	
 	public Integer getProducttypeid_link() {
 		return producttypeid_link;
@@ -94,5 +96,17 @@ public class PContractProductBinding {
 	}
 	public void setUnitprice(Float unitprice) {
 		this.unitprice = unitprice;
+	}
+	public String getProductBuyerCode() {
+		return productBuyerCode;
+	}
+	public String getProductVendorCode() {
+		return productVendorCode;
+	}
+	public void setProductBuyerCode(String productBuyerCode) {
+		this.productBuyerCode = productBuyerCode;
+	}
+	public void setProductVendorCode(String productVendorCode) {
+		this.productVendorCode = productVendorCode;
 	}
 }
