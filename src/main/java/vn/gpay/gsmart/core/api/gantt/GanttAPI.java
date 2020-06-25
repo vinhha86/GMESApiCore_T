@@ -47,9 +47,14 @@ public class GanttAPI {
 			for (String string : listtype) {
 				list.add(string);
 			}
+			Org orgroot = orgService.findOne(orgid_link);
 			
 			//Lay danh sach nhung don vi duoc phep xem cua user dang dang nhap
-			List<Org> listorg = orgService.getorgChildrenbyOrg(orgid_link, list);
+			List<Org> listorg = new ArrayList<Org>();
+			if(orgroot.getOrgtypeid_link() ==1 )
+				listorg = orgService.getorgChildrenbyOrg(orgid_link, list);
+			else 
+				listorg.add(orgroot);
 			
 			List<PContract_PO_Gantt> list_gantt = new ArrayList<PContract_PO_Gantt>();
 			//tao id tu tang 
@@ -128,7 +133,7 @@ public class GanttAPI {
 						
 						gant_porder.setExpanded(false);
 						gant_porder.setId(id);
-						gant_porder.setId_origin(org_grantt.getId());
+						gant_porder.setId_origin(porder_grant.getPorderid_link());
 						gant_porder.setLeaf(false);
 						gant_porder.setName(porder_grant.getOrdercode());
 						gant_porder.setRollup(true);
