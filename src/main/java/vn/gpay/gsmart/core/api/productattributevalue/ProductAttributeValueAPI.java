@@ -1,4 +1,4 @@
-package vn.gpay.gsmart.core.api.productattributevalue;
+	package vn.gpay.gsmart.core.api.productattributevalue;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -217,6 +217,7 @@ public class ProductAttributeValueAPI {
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
@@ -420,7 +421,7 @@ public class ProductAttributeValueAPI {
 		}
 		String old_code = lstSKU.get(0).getCode();
 		String[] obj = old_code.split("_");
-		int a = Integer.parseInt(obj[1]);
+		int a = Integer.parseInt(obj[obj.length-1]);
 		return product.getCode() + "_" + (a + 1);
 	}
 
