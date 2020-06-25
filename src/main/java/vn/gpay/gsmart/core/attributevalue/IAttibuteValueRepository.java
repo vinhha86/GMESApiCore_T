@@ -12,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 public interface IAttibuteValueRepository extends JpaRepository<Attributevalue, Long>, JpaSpecificationExecutor<Attributevalue> {
-	@Query(value = "select c from Attributevalue c where c.attributeid_link =:attributeid_link")
+	@Query(value = "select c from Attributevalue c "
+			+ "where c.attributeid_link =:attributeid_link "
+			+ "order by isdefault desc, value")
 	public List<Attributevalue> getlist_ByidAttribute(@Param ("attributeid_link")final long attributeid_link);
 	
 }

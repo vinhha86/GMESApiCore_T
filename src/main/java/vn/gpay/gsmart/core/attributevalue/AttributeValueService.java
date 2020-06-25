@@ -43,6 +43,7 @@ public class AttributeValueService extends AbstractService<Attributevalue> imple
 				.eq("attributeid_link", attributeid_link)
 	            .build();
 		Sort sort = Sorts.builder()
+				.asc("isdefault")
 		        .asc("value")
 		        .build();
 		
