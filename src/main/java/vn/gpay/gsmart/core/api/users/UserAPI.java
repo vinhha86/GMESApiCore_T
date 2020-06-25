@@ -36,6 +36,7 @@ import vn.gpay.gsmart.core.security.GpayAuthentication;
 import vn.gpay.gsmart.core.security.GpayRole;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.security.IGpayUserService;
+import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 
@@ -319,6 +320,56 @@ public class UserAPI {
 		}catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
+		    return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/user_create_fromauthen",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> Create_FromAuthen( @RequestBody user_create_user_fromauthen_request entity,HttpServletRequest request ) {
+		ResponseBase response = new ResponseBase();
+		try {
+			GpayUser user = new GpayUser();			
+			
+			if(!entity.enable) {
+				user.setOrgid_link((long)0);
+				user.setId((long)entity.id);
+				user.setFirstname(entity.firstname);
+				user.setMiddlename(entity.middlename);
+				user.setLastname(entity.lastname);
+				user.setFullname(entity.fullname);
+				user.setEmail(entity.email);
+				user.setUsername(entity.username);
+				user.setRootorgid_link((long)entity.orgrootid);
+				user.setStatus(1);		
+				user.setEnabled(true);
+				user.setUserrole("ROLE_USER");
+				user.setOrg_type(1);
+
+				user = userDetailsService.save(user);
+			}
+			
+			
+			if(entity.isrootadmin) {
+				AppRole_User role = new AppRole_User();
+				role.setId(null);
+				role.setRole_id(AtributeFixValues.role_id_admin);
+				role.setUser_id((long)entity.id);
+				roleuserService.save(role);
+			}
+			else {
+				//Xoa quyen cua user
+				List<AppRole_User> listrole = roleuserService.getby_user_and_role((long)entity.id, (long)0);
+				for(AppRole_User role : listrole) {
+					roleuserService.delete(role);
+				}
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_EXCEPTION));
 		    return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
 		}
 	}

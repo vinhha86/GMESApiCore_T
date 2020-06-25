@@ -58,7 +58,7 @@ public class AttributeAPI {
 		
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			response.data = attService.getList_byorgid_link(user.getOrgid_link());
+			response.data = attService.getList_byorgid_link(user.getRootorgid_link());
 			for(int i =0; i< response.data.size(); i++) {
 				Attribute attribute = response.data.get(i);
 				for (ProductAttributeValue productAttributeValue : lstpav) {

@@ -99,6 +99,7 @@ public class Common {
 		
 		return listbomsku;
 	}
+
 	
 	public String getFolderPath(int producttypeid_link) {
 		String Path = "upload/";
