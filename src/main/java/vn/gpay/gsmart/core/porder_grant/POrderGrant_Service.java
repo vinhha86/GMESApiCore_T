@@ -29,6 +29,15 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 	}
 	
 	@Override
+	public POrderGrant getByOrderIDAndOrg(Long granttoorgid_link, Long porderid_link){
+		List<POrderGrant> a= repo.getByOrderIDAndOrg(granttoorgid_link, porderid_link);
+		if (a.size() > 0)
+			return a.get(0);
+		else
+			return null;
+	}
+	
+	@Override
 	public void deleteByOrderId(Long porderid_link){
 		for(POrderGrant pordergrant: repo.getByOrderId(porderid_link)){
 			repo.delete(pordergrant);

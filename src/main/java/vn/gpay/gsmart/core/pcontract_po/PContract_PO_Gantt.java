@@ -12,6 +12,7 @@ public class PContract_PO_Gantt {
 	private String code;
 	private long orgtypeid_link ;
 	private long parentid_origin;
+	private String parentname;
 	private Integer totalpackage;
 	private String mahang;
 	
@@ -139,6 +140,12 @@ public class PContract_PO_Gantt {
 	}
 	public void setTotalpackage(Integer totalpackage) {
 		this.totalpackage = totalpackage;
+	}
+	public String getParentname() {
+		return parentname;
+	}
+	public void setParentname(String parentname) {
+		this.parentname = parentname;
 	}
 	
 	

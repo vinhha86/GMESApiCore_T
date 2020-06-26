@@ -13,8 +13,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -746,7 +744,7 @@ public class ProductAPI {
 		}
 		String old_code = lstSKU.get(0).getCode();
 		String[] obj = old_code.split("_");
-		int a = Integer.parseInt(obj[1]);
+		int a = Integer.parseInt(obj[obj.length-1]);
 		return product.getCode() + "_" + (a + 1);
 	}
 	

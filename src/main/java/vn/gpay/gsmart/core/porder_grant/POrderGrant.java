@@ -23,6 +23,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.porder.POrder;
 
 @Table(name="porder_grant")
@@ -118,6 +119,18 @@ public class POrderGrant implements Serializable {
 		return null;
 	}
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="granttoorgid_link",insertable=false,updatable =false)
+    private Org org;
+	
+	@Transient
+	public String getGranttoorgname() {
+		if(org != null) {
+			return org.getName();
+		}
+		return "";
+	}
 	
 	public Long getId() {
 		return id;
@@ -209,6 +222,12 @@ public class POrderGrant implements Serializable {
 
 	public void setOrdercode(String ordercode) {
 		this.ordercode = ordercode;
+	}
+	public List<POrderGrant_SKU> getPorder_grant_sku() {
+		return porder_grant_sku;
+	}
+	public void setPorder_grant_sku(List<POrderGrant_SKU> porder_grant_sku) {
+		this.porder_grant_sku = porder_grant_sku;
 	}
 
 }

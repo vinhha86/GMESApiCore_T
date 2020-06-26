@@ -201,19 +201,30 @@ public class PContract_POAPI {
 	}
 	
 	@RequestMapping(value = "/delete",method = RequestMethod.POST)
-	public ResponseEntity<ResponseBase> PContractDelete(@RequestBody PContract_podelete_request entity
+	public ResponseEntity<ResponseBase> PContract_PODelete(@RequestBody PContract_podelete_request entity
 			,HttpServletRequest request ) {
 		ResponseBase response = new ResponseBase();
 		try {
 			
-			pcontract_POService.deleteById(entity.id); 
+			PContract_PO thePO = pcontract_POService.findOne(entity.id);
+			if (null != thePO){
+				for(PContract_Price thePrice: thePO.getPcontract_price()){
+					for (PContract_Price_D thePrice_D: thePrice.getPcontract_price_d()){
+						pcontractpriceDService.delete(thePrice_D);
+					}
+					pcontractpriceService.delete(thePrice);
+				}
+				pcontract_POService.delete(thePO);
+			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 		}catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 		}
-	    return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+	    
 	}
 }

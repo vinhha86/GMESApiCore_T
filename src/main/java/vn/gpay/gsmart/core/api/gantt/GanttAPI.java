@@ -79,7 +79,7 @@ public class GanttAPI {
 				gantt_org.setOrgtypeid_link(org_factory.getOrgtypeid_link());
 				gantt_org.setParentid_origin(0);
 				
-				//lay cac to cua nha may
+				//lay danh sach to chuyen
 				List<Org> listorg_grantt = orgService.getorgChildrenbyOrg(orgid, list);
 				for(Org org_grantt : listorg_grantt) {
 					Date startdate_grantt = null, enddate_grantt = null;
@@ -142,7 +142,8 @@ public class GanttAPI {
 						gant_porder.setStartDate(porder_grant.getProductiondate());
 						gant_porder.setEndDate(porder_grant.getGolivedate());
 						gant_porder.setMahang(porder_grant.getMaHang());
-						
+						gant_porder.setParentid_origin(gant_orggrantt.getId_origin());
+						gant_porder.setParentname(gant_orggrantt.getName());
 						//Tao ke hoach cua lenh
 						PContract_PO_Gantt gant_porderKH = new PContract_PO_Gantt();
 						id++;
@@ -158,6 +159,7 @@ public class GanttAPI {
 						gant_porderKH.setEndDate(porder_grant.getGolivedate());
 						gant_porderKH.setTotalpackage(porder_grant.getTotalpackage());
 						gant_porderKH.setMahang(porder_grant.getMaHang());
+						gant_porderKH.setParentid_origin(gant_porder.getId_origin());
 						
 						gant_porder.getChildren().add(gant_porderKH);						
 						

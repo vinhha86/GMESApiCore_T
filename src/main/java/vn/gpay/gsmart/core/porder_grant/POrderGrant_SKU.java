@@ -1,18 +1,20 @@
 package vn.gpay.gsmart.core.porder_grant;
 import java.io.Serializable;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import vn.gpay.gsmart.core.sku.SKU;
 
@@ -23,19 +25,18 @@ public class POrderGrant_SKU implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "porder_grant_sku_generator")
+	@SequenceGenerator(name="porder_grant_sku_generator", sequenceName = "porder_grant_sku_id_seq", allocationSize=1)
 	protected Long id;
-	
-	@Column(name ="orgrootid_link")
     private Long orgrootid_link;
-	
-	@Column(name ="pordergrantid_link")
+    
+    @JsonProperty("pordergrantid_link")
     private Long pordergrantid_link;
-	
-	@Column(name ="skuid_link")
+    
+    @JsonProperty("skuid_link")
     private Long skuid_link;
-	
-	@Column(name ="grantamount")
+    
+    @JsonProperty("grantamount")
     private Integer grantamount;
 
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -43,6 +44,21 @@ public class POrderGrant_SKU implements Serializable {
     @JoinColumn(name="skuid_link",insertable=false,updatable =false)
     private SKU sku;
 	
+	@Transient
+	@JsonProperty("skucode")
+	public String getSkucode() {
+		if(sku!=null) {
+			return sku.getCode();
+		}
+		return "";
+	}
+	@Transient
+	public String getSkuname() {
+		if(sku!=null) {
+			return sku.getName();
+		}
+		return "";
+	}
 	@Transient
 	public String getMauSanPham() {
 		if(sku!=null) {
