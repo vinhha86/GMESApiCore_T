@@ -54,7 +54,7 @@ public class UnitAPI {
 	
 	@RequestMapping(value = "/createUnit",method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> CreateUnit(@RequestBody Unit_create_request entity, HttpServletRequest request ) {//@RequestParam("type") 
-		ResponseBase response = new ResponseBase();
+		Unit_create_response response = new Unit_create_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Unit unit = entity.data;
@@ -64,8 +64,10 @@ public class UnitAPI {
 				Unit _unit =  unitservice.findOne(unit.getId());
 				unit.setOrgrootid_link(_unit.getOrgrootid_link());
 			}
-			unitservice.save(unit);
+			unit = unitservice.save(unit);
 			
+			response.id = unit.getId();
+			response.unit = unit;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);

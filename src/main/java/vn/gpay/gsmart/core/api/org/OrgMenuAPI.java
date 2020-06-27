@@ -63,7 +63,7 @@ public class OrgMenuAPI {
 	
 	@RequestMapping(value = "/createOrg",method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> CreateOrg(@RequestBody Org_create_Request entity, HttpServletRequest request ) {//@RequestParam("type") 
-		ResponseBase response = new ResponseBase();
+		Org_create_Response response = new Org_create_Response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Org org = entity.data;
@@ -73,7 +73,9 @@ public class OrgMenuAPI {
 				Org _org =  orgService.findOne(org.getId());
 				org.setOrgrootid_link(_org.getOrgrootid_link());
 			}
-			orgService.save(org);
+			org = orgService.save(org);
+			response.id = org.getId();
+			response.org = org;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
