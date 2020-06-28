@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.gpay.gsmart.core.api.attributevalue.AttributeValue_getlist_byId_Request;
+import vn.gpay.gsmart.core.api.attributevalue.AttributeValue_getlist_byId_Response;
 import vn.gpay.gsmart.core.attributevalue.Attributevalue;
 import vn.gpay.gsmart.core.attributevalue.IAttributeValueService;
 import vn.gpay.gsmart.core.base.ResponseBase;
@@ -145,6 +147,37 @@ public class SizeSetAttributeValueAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<ResponseBase>(HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/getbyidattributeforsizeset",method = RequestMethod.POST)
+	public ResponseEntity<AttributeValue_getlist_byId_Response> AttributeValue_Get_ById_ForSizeset(@RequestBody AttributeValue_getlist_byId_Request entity,HttpServletRequest request ) {
+		AttributeValue_getlist_byId_Response response = new AttributeValue_getlist_byId_Response();
+		try {
+			//GPayUserDetail user = (GPayUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			List<Attributevalue> listAttr = avService.getlist_byidAttribute(entity.id);
+			List<SizeSetAttributeValue> listOther = sizesetAttrService.getallother_bySizeSetId(entity.sizesetid_link);
+			List<Attributevalue> listToRmove = new ArrayList<Attributevalue>();
+			for(Attributevalue attrValue : listAttr) {
+				for(SizeSetAttributeValue sizesetAttrValue : listOther) {
+					if(attrValue.getId() == sizesetAttrValue.getAttributevalueid_link()) {
+						listToRmove.add(attrValue);
+						break;
+					}
+				}
+			}
+			for(Attributevalue attrValue : listToRmove) {
+				listAttr.remove(attrValue);
+			}
+			response.data = listAttr;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<AttributeValue_getlist_byId_Response>(response,HttpStatus.OK);
+		}
+		catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<AttributeValue_getlist_byId_Response>(response,HttpStatus.OK);
 		}
 	}
 	
