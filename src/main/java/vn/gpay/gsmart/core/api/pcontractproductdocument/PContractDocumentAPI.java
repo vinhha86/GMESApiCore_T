@@ -131,7 +131,7 @@ public class PContractDocumentAPI {
 			// Thư mục gốc upload file.			
 			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
 			
-			String filePath = uploadRootPath+"\\"+ entity.filename;
+			String filePath = uploadRootPath+"/"+ entity.filename;
 			Path path = Paths.get(filePath);
 			byte[] data = Files.readAllBytes(path);
 			response.data = data;
