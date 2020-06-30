@@ -37,5 +37,9 @@ public class SizeSetAttributeService extends AbstractService<SizeSetAttributeVal
 		// TODO Auto-generated method stub
 		return repo;
 	}
-
+	@Override
+	public List<SizeSetAttributeValue> getallother_bySizeSetId(Long sizesetid_link){
+		return repo.getallother_bySizeSetId(sizesetid_link);
+		
+	}
 }

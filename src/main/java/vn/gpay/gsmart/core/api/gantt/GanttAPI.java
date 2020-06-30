@@ -226,8 +226,8 @@ public class GanttAPI {
 					gantt_porderfree.setName(porder_free.getOrdercode());
 					gantt_porderfree.setRollup(false);
 					gantt_porderfree.setIconCls("x-fa fa-industry");
-					gantt_porderfree.setStartDate(porder_free.getProductiondate());
-					gantt_porderfree.setEndDate(porder_free.getGolivedate());
+//					gantt_porderfree.setStartDate(porder_free.getProductiondate());
+//					gantt_porderfree.setEndDate(porder_free.getGolivedate());
 					gantt_porderfree.setParentid_origin(0);
 					gantt_porderfree.setTotalpackage(porder_free.getTotalorder());
 									
@@ -235,12 +235,12 @@ public class GanttAPI {
 					gant_folderfree.getChildren().add(gantt_porderfree);
 				}
 				
-				gant_folderfree.setStartDate(start_gant_folderfree);
-				gant_folderfree.setEndDate(end_gant_folderfree);
+//				gant_folderfree.setStartDate(start_gant_folderfree);
+//				gant_folderfree.setEndDate(end_gant_folderfree);
 				gantt_org.getChildren().add(gant_folderfree);
 				
-				gantt_org.setStartDate(startdate_org);
-				gantt_org.setEndDate(enddate_org);
+//				gantt_org.setStartDate(startdate_org);
+//				gantt_org.setEndDate(enddate_org);
 				list_gantt.add(gantt_org);
 			}
 			

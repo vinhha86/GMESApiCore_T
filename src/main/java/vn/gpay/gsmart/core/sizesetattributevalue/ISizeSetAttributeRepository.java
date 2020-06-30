@@ -37,4 +37,7 @@ public interface ISizeSetAttributeRepository extends JpaRepository<SizeSetAttrib
 	@Query(value = "select distinct sizesetid_link from SizeSetAttributeValue")
 	public List<Long> getId_Distinct(@Nullable Specification<SizeSetAttributeValue> spec);
 	
+	@Query(value = "select c from SizeSetAttributeValue c where c.sizesetid_link <> :sizesetid_link")
+	public List<SizeSetAttributeValue> getallother_bySizeSetId(@Param ("sizesetid_link")final  Long sizesetid_link);
+	
 }

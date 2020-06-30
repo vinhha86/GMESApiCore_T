@@ -124,7 +124,6 @@ public class SizeSetAPI {
 			sizeset = sizesetservice.save(sizeset);
 			
 			response.id = sizeset.getId();
-			response.sizeset = sizeset;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<SizeSet_create_response>(response, HttpStatus.OK);

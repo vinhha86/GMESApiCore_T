@@ -2,13 +2,22 @@ package vn.gpay.gsmart.core.sizeset;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.sizesetattributevalue.SizeSetAttributeValue;
 
 @Table(name="sizeset")
 @Entity
@@ -26,6 +35,27 @@ public class SizeSet implements Serializable {/**
 	private String comment;
 	private Long usercreatedid_link;
 	private Date timecreate;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+    @JoinColumn(name="sizesetid_link",insertable=false,updatable =false)
+    private List<SizeSetAttributeValue> list;
+	
+	@Transient
+	public String getAttrValues() {
+		String values = "";
+		if(list.size()!=0) {
+			for(SizeSetAttributeValue sizeSetAttributeValue : list) {
+				if(values.equals("")) {
+					values+=sizeSetAttributeValue.getAttributeValueName();
+				}else {
+					values+=", " + sizeSetAttributeValue.getAttributeValueName();
+				}
+			}
+		}
+		return values;
+	}
+
 	public Long getId() {
 		return id;
 	}
