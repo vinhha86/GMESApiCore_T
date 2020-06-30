@@ -90,12 +90,13 @@ public class POrder_GrantAPI {
 
 			//them list moi
 			for(POrderGrant_SKU theGrantSKU: porder_grant.getPorder_grant_sku()){
-				theGrantSKU.setId(null);
-				theGrantSKU.setOrgrootid_link(orgrootid_link);
-				theGrantSKU.setPordergrantid_link(porder_grant.getId());
-				theGrantSKU.setSkuid_link(theGrantSKU.getSkuid_link());
-				theGrantSKU.setGrantamount(theGrantSKU.getGrantamount());
-				porderGrant_SKUService.save(theGrantSKU);
+				POrderGrant_SKU newGrantSKU = new POrderGrant_SKU();
+				newGrantSKU.setId(null);
+				newGrantSKU.setOrgrootid_link(orgrootid_link);
+				newGrantSKU.setPordergrantid_link(porder_grant.getId());
+				newGrantSKU.setSkuid_link(theGrantSKU.getSkuid_link());
+				newGrantSKU.setGrantamount(theGrantSKU.getGrantamount());
+				porderGrant_SKUService.save(newGrantSKU);
 			}
 			//Create line on Porder Procesing
 			if (porder_grant.getId() != null || porder_grant.getId() != 0){

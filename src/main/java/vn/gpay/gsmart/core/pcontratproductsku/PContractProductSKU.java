@@ -32,10 +32,11 @@ public class PContractProductSKU implements Serializable {/**
 	private Long pcontractid_link;
 	private Long productid_link;
 	private Long skuid_link;
-	private Integer pquantity_sample;
-	private Integer pquantity_porder;
-	private Integer pquantity_total;
-	private Integer pquantity_granted;
+	private Integer pquantity_sample;//SL mau
+	private Integer pquantity_porder;//SL don
+	private Integer pquantity_total;//SL tong sx
+	private Integer pquantity_granted;//SL da phan chuyen
+	private Integer pquantity_production;//SL yeu cau sx
 	private Long pcontract_poid_link;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -181,6 +182,14 @@ public class PContractProductSKU implements Serializable {/**
 
 	public void setPcontract_poid_link(Long pcontract_poid_link) {
 		this.pcontract_poid_link = pcontract_poid_link;
+	}
+
+	public Integer getPquantity_production() {
+		return pquantity_production;
+	}
+
+	public void setPquantity_production(Integer pquantity_production) {
+		this.pquantity_production = pquantity_production;
 	}
 	
 }
