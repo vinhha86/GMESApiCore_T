@@ -1,0 +1,73 @@
+package vn.gpay.gsmart.core.Schedule;
+
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class Schedule_porder {
+	@JsonProperty("ResourceId")
+	private long ResourceId;
+	
+	@JsonProperty("ResourceId")
+	private String Name;
+	
+	@JsonProperty("StartDate")
+	private Date StartDate;
+	
+	@JsonProperty("EndDate")
+	private Date EndDate;
+	
+	private String mahang;
+	
+	@JsonProperty("Cls")
+	private String Cls;
+	
+	private long id_origin;
+	
+	
+	
+	public long getResourceId() {
+		return ResourceId;
+	}
+	public String getName() {
+		return Name;
+	}
+	public Date getStartDate() {
+		return StartDate;
+	}
+	public Date getEndDate() {
+		return EndDate;
+	}
+	public void setResourceId(long resourceId) {
+		ResourceId = resourceId;
+	}
+	public void setName(String name) {
+		Name = name;
+	}
+	public void setStartDate(Date startDate) {
+		StartDate = startDate;
+	}
+	public void setEndDate(Date endDate) {
+		EndDate = endDate;
+	}
+	public String getMahang() {
+		return mahang;
+	}
+	public String getCls() {
+		return Cls;
+	}
+	public void setMahang(String mahang) {
+		this.mahang = mahang;
+	}
+	public void setCls(String cls) {
+		Cls = cls;
+	}
+	public long getId_origin() {
+		return id_origin;
+	}
+	public void setId_origin(long id_origin) {
+		this.id_origin = id_origin;
+	}
+	
+	
+}
