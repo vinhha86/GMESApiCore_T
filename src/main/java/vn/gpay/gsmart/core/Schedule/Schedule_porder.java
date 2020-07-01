@@ -8,7 +8,7 @@ public class Schedule_porder {
 	@JsonProperty("ResourceId")
 	private long ResourceId;
 	
-	@JsonProperty("ResourceId")
+	@JsonProperty("Name")
 	private String Name;
 	
 	@JsonProperty("StartDate")

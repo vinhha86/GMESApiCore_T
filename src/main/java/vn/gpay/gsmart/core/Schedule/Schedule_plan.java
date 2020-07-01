@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.Schedule;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -7,6 +8,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Schedule_plan {
 	@JsonProperty("Id")
 	private long Id;
+	
+	private long id_origin;
+	private String code;
+	private long parentid_origin;
+	private long orgtypeid_link;
 
 	@JsonProperty("Name")
 	private String Name;
@@ -16,7 +22,7 @@ public class Schedule_plan {
 	
 	private Boolean expanded;
 	private Boolean leaf;
-	private List<Schedule_plan> children;
+	private List<Schedule_plan> children = new ArrayList<Schedule_plan>();
 	
 	public long getId() {
 		return Id;
@@ -53,6 +59,30 @@ public class Schedule_plan {
 	}
 	public void setChildren(List<Schedule_plan> children) {
 		this.children = children;
+	}
+	public long getId_origin() {
+		return id_origin;
+	}
+	public void setId_origin(long id_origin) {
+		this.id_origin = id_origin;
+	}
+	public String getCode() {
+		return code;
+	}
+	public long getParentid_origin() {
+		return parentid_origin;
+	}
+	public long getOrgtypeid_link() {
+		return orgtypeid_link;
+	}
+	public void setCode(String code) {
+		this.code = code;
+	}
+	public void setParentid_origin(long parentid_origin) {
+		this.parentid_origin = parentid_origin;
+	}
+	public void setOrgtypeid_link(long orgtypeid_link) {
+		this.orgtypeid_link = orgtypeid_link;
 	}
 	
 	
