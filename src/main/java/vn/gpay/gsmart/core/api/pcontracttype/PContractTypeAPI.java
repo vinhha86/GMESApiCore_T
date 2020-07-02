@@ -41,7 +41,7 @@ public class PContractTypeAPI {
 		}catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-		    return new ResponseEntity<ResponseBase>(HttpStatus.OK);
+		    return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
 		}
 	}
 	
@@ -58,7 +58,7 @@ public class PContractTypeAPI {
 		}catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-		    return new ResponseEntity<PContractType_getall_response>(HttpStatus.OK);
+		    return new ResponseEntity<PContractType_getall_response>(response,HttpStatus.OK);
 		}
 	}
 	

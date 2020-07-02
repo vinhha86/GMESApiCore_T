@@ -60,7 +60,7 @@ public class SizeSetAttributeValueAPI {
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			return new ResponseEntity<ResponseBase>(HttpStatus.OK);
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
 		}
 	}
 	
@@ -87,7 +87,7 @@ public class SizeSetAttributeValueAPI {
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			return new ResponseEntity<SizeSetAttributeValue_getbyid_Response>(HttpStatus.OK);
+			return new ResponseEntity<SizeSetAttributeValue_getbyid_Response>(response,HttpStatus.OK);
 		}
 	}
 	
@@ -146,7 +146,7 @@ public class SizeSetAttributeValueAPI {
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			return new ResponseEntity<ResponseBase>(HttpStatus.OK);
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
 		}
 	}
 	
