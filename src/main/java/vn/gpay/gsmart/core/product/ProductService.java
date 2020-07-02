@@ -161,7 +161,7 @@ public class ProductService extends AbstractService<Product> implements IProduct
 		}
 
 		if (null != code && code.length() > 0) {
-			predicates_Products.add(cb.like(rootProduct.get("code"), "%" + code + "%"));
+			predicates_Products.add(cb.like(rootProduct.get("buyercode"), "%" + code + "%"));
 		}
 		if (null != partnercode && partnercode.length() > 0) {
 			predicates_Products.add(cb.like(rootProduct.get("partnercode"), "%" + partnercode + "%"));
