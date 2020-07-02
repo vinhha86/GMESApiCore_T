@@ -46,6 +46,7 @@ public class PContract_Price implements Serializable {/**
 	private Float totalprice;
 	private Float salaryfund;
 	private Float quantity;
+	private Float price_vendortarget;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -155,5 +156,11 @@ public class PContract_Price implements Serializable {/**
 	public void setQuantity(Float quantity) {
 		this.quantity = quantity;
 	}
-	
+	public Float getPrice_vendortarget() {
+		return price_vendortarget;
+	}
+	public void setPrice_vendortarget(Float price_vendortarget) {
+		this.price_vendortarget = price_vendortarget;
+	}
+
 }

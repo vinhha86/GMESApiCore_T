@@ -70,6 +70,7 @@ public class PContract_PO implements Serializable {/**
 	private Long merchandiserid_link;
 	private Long parentpoid_link;
 	private Boolean is_tbd;
+	private Float sewtarget_percent;
 	
 	public Integer getProductiondays() {
 		return productiondays;
@@ -414,6 +415,14 @@ public class PContract_PO implements Serializable {/**
 
 	public void setIs_tbd(Boolean is_tbd) {
 		this.is_tbd = is_tbd;
+	}
+
+	public Float getSewtarget_percent() {
+		return sewtarget_percent;
+	}
+
+	public void setSewtarget_percent(Float sewtarget_percent) {
+		this.sewtarget_percent = sewtarget_percent;
 	}
 	
 }
