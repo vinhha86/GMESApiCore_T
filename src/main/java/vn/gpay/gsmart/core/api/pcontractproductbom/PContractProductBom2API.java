@@ -20,9 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.pcontractattributevalue.IPContractProductAtrributeValueService;
 import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBom2ColorService;
+import vn.gpay.gsmart.core.pcontractbomcolor.PContractBOMColor;
 import vn.gpay.gsmart.core.pcontractbomcolor.PContractBom2Color;
 import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOM2SKUService;
 import vn.gpay.gsmart.core.pcontractbomsku.PContractBOM2SKU;
+import vn.gpay.gsmart.core.pcontractbomsku.PContractBOMSKU;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
 import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom;
 import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom2;
@@ -40,6 +42,47 @@ public class PContractProductBom2API {
 	@Autowired IPContractBOM2SKUService ppbom2skuservice;
 	@Autowired IPContractProductAtrributeValueService ppatt_service;
 	@Autowired IPContractProductSKUService ppskuService;
+	
+	@RequestMapping(value = "/create_pcontract_productbom", method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> CreateProductBom(HttpServletRequest request,
+			@RequestBody PContractProductBom_create_request entity) {
+		ResponseBase response = new ResponseBase();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+			long productid_link = entity.productid_link;
+			long pcontractid_link = entity.pcontractid_link;
+			
+			for (Long materialid_link : entity.listnpl) {
+				//them vao bang product_bom
+				List<PContractProductBom2> listBom = ppbom2service.getby_pcontract_product_material(productid_link, pcontractid_link, materialid_link);
+				if(listBom.size() == 0) {
+					
+					PContractProductBom2 productbom2 = new PContractProductBom2(); 
+					productbom2.setProductid_link(productid_link);
+					productbom2.setMaterialid_link(materialid_link);
+					productbom2.setAmount((float)0);
+					productbom2.setLost_ratio((float)0);
+					productbom2.setDescription("");
+					productbom2.setCreateduserid_link(user.getId());
+					productbom2.setCreateddate(new Date());
+					productbom2.setOrgrootid_link(user.getRootorgid_link());
+					productbom2.setPcontractid_link(pcontractid_link);
+					
+					ppbom2service.save(productbom2);
+				}
+				
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 	
 	@RequestMapping(value = "/update_pcontract_productbom", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UpdateProductBom(HttpServletRequest request,
@@ -236,6 +279,43 @@ public class PContractProductBom2API {
 		return new ResponseEntity<PContractProductBOM2_getbyproduct_response>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/deletematerial", method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> DeleteMaterial(HttpServletRequest request,
+			@RequestBody PContractProductBom_delete_material_request entity) {
+		ResponseBase response = new ResponseBase();
+		try {
+			long pcontractid_link = entity.pcontractid_link;
+			long productid_link = entity.productid_link;
+			long materialid_link = entity.materialid_link;
+			
+			
+			//xoa trong bang pcontract_product_bom2
+			List<PContractProductBom2> list_bom2 = ppbom2service.getby_pcontract_product_material(productid_link, pcontractid_link, materialid_link);
+			for(PContractProductBom2 bom : list_bom2) {
+				ppbom2service.delete(bom);
+			}
+			
+			//Xoa trong bang pcontract_product_color_bom2
+			List<PContractBom2Color> list_bom_color2 = ppbomcolor2service.getcolor_bymaterial_in_productBOMColor(pcontractid_link, productid_link, materialid_link);
+			for(PContractBom2Color color : list_bom_color2) {
+				ppbomcolor2service.delete(color);
+			}
+			
+			//Xoa trong bang pcontract_sku_bom2
+			List<PContractBOM2SKU> list_bom_sku2 = ppbom2skuservice.getcolor_bymaterial_in_productBOMSKU(pcontractid_link, productid_link, materialid_link);
+			for(PContractBOM2SKU sku : list_bom_sku2) {
+				ppbom2skuservice.delete(sku);
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/getlist_pcontract_productbomcolor", method = RequestMethod.POST)
 	public ResponseEntity<PContractProductBOM_getbomcolor_response> GetListProductBomColor(HttpServletRequest request,
 			@RequestBody PContractProductBOM_getbomcolor_request entity) {
@@ -284,6 +364,8 @@ public class PContractProductBom2API {
 				map.put("materialid_link", pContractProductBom.getMaterialid_link().toString());
 				
 				map.put("materialName", pContractProductBom.getMaterialName().toString());
+				
+				map.put("materialCode", pContractProductBom.getMaterialCode().toString());
 				
 				map.put("orgrootid_link", pContractProductBom.getOrgrootid_link().toString());
 				

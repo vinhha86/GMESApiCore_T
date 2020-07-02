@@ -414,7 +414,7 @@ public class PContractProductAPI {
 				
 				List<Product> listproduct = pservice.getby_pairid(pair.getProductpairid_link());
 				for(Product product : listproduct) {
-					lst.removeIf(c->c.getProductid_link() == product.getId());
+					lst.removeIf(c->c.getProductid_link().equals(product.getId()));
 				}
 			}
 			

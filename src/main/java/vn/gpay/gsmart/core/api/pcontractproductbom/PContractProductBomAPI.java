@@ -76,18 +76,18 @@ public class PContractProductBomAPI {
 					
 					ppbomservice.save(productbom);
 					
-					PContractProductBom2 productbom2 = new PContractProductBom2(); 
-					productbom2.setProductid_link(productid_link);
-					productbom2.setMaterialid_link(materialid_link);
-					productbom2.setAmount((float)0);
-					productbom2.setLost_ratio((float)0);
-					productbom2.setDescription("");
-					productbom2.setCreateduserid_link(user.getId());
-					productbom2.setCreateddate(new Date());
-					productbom2.setOrgrootid_link(user.getRootorgid_link());
-					productbom2.setPcontractid_link(pcontractid_link);
-					
-					ppbom2service.save(productbom2);
+//					PContractProductBom2 productbom2 = new PContractProductBom2(); 
+//					productbom2.setProductid_link(productid_link);
+//					productbom2.setMaterialid_link(materialid_link);
+//					productbom2.setAmount((float)0);
+//					productbom2.setLost_ratio((float)0);
+//					productbom2.setDescription("");
+//					productbom2.setCreateduserid_link(user.getId());
+//					productbom2.setCreateddate(new Date());
+//					productbom2.setOrgrootid_link(user.getRootorgid_link());
+//					productbom2.setPcontractid_link(pcontractid_link);
+//					
+//					ppbom2service.save(productbom2);
 				}
 				
 			}
@@ -346,6 +346,8 @@ public class PContractProductBomAPI {
 				
 				map.put("materialName", pContractProductBom.getMaterialName().toString());
 				
+				map.put("materialCode", pContractProductBom.getMaterialCode().toString());
+				
 				map.put("orgrootid_link", pContractProductBom.getOrgrootid_link().toString());
 				
 				map.put("pcontractid_link", pContractProductBom.getPcontractid_link().toString());
@@ -401,34 +403,16 @@ public class PContractProductBomAPI {
 				ppbomservice.delete(bom);
 			}
 			
-			//xoa trong bang pcontract_product_bom2
-			List<PContractProductBom2> list_bom2 = ppbom2service.getby_pcontract_product_material(productid_link, pcontractid_link, materialid_link);
-			for(PContractProductBom2 bom : list_bom2) {
-				ppbom2service.delete(bom);
-			}
-			
 			//Xoa trong bang pcontract_product_color_bom
 			List<PContractBOMColor> list_bom_color = ppbomcolorservice.getcolor_bymaterial_in_productBOMColor(pcontractid_link, productid_link, materialid_link);
 			for(PContractBOMColor color : list_bom_color) {
 				ppbomcolorservice.delete(color);
 			}
 			
-			//Xoa trong bang pcontract_product_color_bom2
-			List<PContractBom2Color> list_bom_color2 = ppbom2colorservice.getcolor_bymaterial_in_productBOMColor(pcontractid_link, productid_link, materialid_link);
-			for(PContractBom2Color color : list_bom_color2) {
-				ppbom2colorservice.delete(color);
-			}
-			
 			//Xoa trong bang pcontract_sku_bom
 			List<PContractBOMSKU> list_bom_sku = ppbomskuservice.getcolor_bymaterial_in_productBOMSKU(pcontractid_link, productid_link, materialid_link);
 			for(PContractBOMSKU sku : list_bom_sku) {
 				ppbomskuservice.delete(sku);
-			}
-			
-			//Xoa trong bang pcontract_sku_bom2
-			List<PContractBOM2SKU> list_bom_sku2 = ppbom2skuservice.getcolor_bymaterial_in_productBOMSKU(pcontractid_link, productid_link, materialid_link);
-			for(PContractBOM2SKU sku : list_bom_sku2) {
-				ppbom2skuservice.delete(sku);
 			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
