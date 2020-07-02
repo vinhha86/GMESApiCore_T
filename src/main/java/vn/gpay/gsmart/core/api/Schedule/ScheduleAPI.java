@@ -42,18 +42,16 @@ public class ScheduleAPI {
 	
 	@RequestMapping(value = "/getplan",method = RequestMethod.POST)
 	public ResponseEntity<get_schedule_porder_response> GetAll(HttpServletRequest request,
-			@RequestParam String listid) throws ParseException{
+			@RequestParam String listid, @RequestParam String startDate , @RequestParam String endDate) throws ParseException{
 		get_schedule_porder_response response = new get_schedule_porder_response();
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		long orgrootid_link = user.getRootorgid_link();
 		int year = Calendar.getInstance().get(Calendar.YEAR);
 		long orgid_link = user.getOrgid_link();
-		
-		String sDate1="01/06/2020";  
-	    Date startdate = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);  
+		 
+	    Date startdate = new SimpleDateFormat("yyyy-MM-dd").parse(startDate.substring(0,10));  
 	    
-	    String stodate="01/12/2020";  
-	    Date toDate = new SimpleDateFormat("dd/MM/yyyy").parse(stodate);  
+	    Date toDate = new SimpleDateFormat("yyyy-MM-dd").parse(endDate.substring(0,10));  
 		
 		String[] listtype = listid.split(",");
 		List<String> list = new ArrayList<String>();

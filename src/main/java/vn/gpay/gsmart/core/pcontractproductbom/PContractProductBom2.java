@@ -57,6 +57,14 @@ public class PContractProductBom2 implements Serializable{/**
 	}
 	
 	@Transient
+	public String getMaterialCode() {
+		if(sku !=null) {
+			return sku.getCode();
+		}
+		return "";
+	}
+	
+	@Transient
 	public String getTenMauNPL() {
 		if(sku !=null) {
 			return sku.getMauSanPham();
