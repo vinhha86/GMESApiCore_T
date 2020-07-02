@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 public interface IPContract_PORepository extends JpaRepository<PContract_PO, Long>, JpaSpecificationExecutor<PContract_PO> {
 	@Query(value = "select c from PContract_PO c "
 			+ "where c.orgrootid_link = :orgrootid_link "
+			+ "and c.parentpoid_link = null "
 			+ "and c.pcontractid_link = :pcontractid_link "
 			+ "and (c.productid_link = :productid_link or 0 = :productid_link) ")
 	public List<PContract_PO> getPOByContractProduct(@Param ("orgrootid_link")final  Long orgrootid_link,

@@ -122,6 +122,28 @@ public class PContract_POAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/update",method = RequestMethod.POST)
+	public ResponseEntity<PContract_pocreate_response> PContractCreate(@RequestBody PContract_poupdate_request entity,HttpServletRequest request ) {
+		PContract_pocreate_response response = new PContract_pocreate_response();
+		try {
+
+			PContract_PO pcontract_po = entity.data;
+			pcontract_po = pcontract_POService.save(pcontract_po);
+
+			//Response to Client
+			response.id = pcontract_po.getId();
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));	
+			
+			return new ResponseEntity<PContract_pocreate_response>(response, HttpStatus.OK);
+			
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<PContract_pocreate_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@RequestMapping(value = "/getbycontractproduct",method = RequestMethod.POST)
 	public ResponseEntity<PContract_getbycontractproduct_response> getPOByContractProduct(@RequestBody PContract_getbycontractproduct_request entity,HttpServletRequest request ) {
 		PContract_getbycontractproduct_response response = new PContract_getbycontractproduct_response();

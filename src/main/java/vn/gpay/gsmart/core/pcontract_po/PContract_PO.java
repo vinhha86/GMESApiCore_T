@@ -68,7 +68,8 @@ public class PContract_PO implements Serializable {/**
 	private Integer productiondays;
 	private Long orgmerchandiseid_link;
 	private Long merchandiserid_link;
-	
+	private Long parentpoid_link;
+	private Boolean is_tbd;
 	
 	public Integer getProductiondays() {
 		return productiondays;
@@ -90,6 +91,20 @@ public class PContract_PO implements Serializable {/**
 
 	public void setPcontract_price(List<PContract_Price> pcontract_price) {
 		this.pcontract_price = pcontract_price;
+	}
+
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+    @JoinColumn(name="parentpoid_link",insertable=false,updatable =false)
+    private List<PContract_PO> sub_po = new ArrayList<PContract_PO>();
+    
+    
+	public List<PContract_PO> getSub_po() {
+		return sub_po;
+	}
+
+	public void setSub_po(List<PContract_PO> sub_po) {
+		this.sub_po = sub_po;
 	}
 
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -383,6 +398,22 @@ public class PContract_PO implements Serializable {/**
 
 	public void setMerchandiserid_link(Long merchandiserid_link) {
 		this.merchandiserid_link = merchandiserid_link;
+	}
+
+	public Long getParentpoid_link() {
+		return parentpoid_link;
+	}
+
+	public void setParentpoid_link(Long parentpoid_link) {
+		this.parentpoid_link = parentpoid_link;
+	}
+
+	public Boolean getIs_tbd() {
+		return is_tbd;
+	}
+
+	public void setIs_tbd(Boolean is_tbd) {
+		this.is_tbd = is_tbd;
 	}
 	
 }
