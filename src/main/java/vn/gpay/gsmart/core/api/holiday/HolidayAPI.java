@@ -3,6 +3,7 @@ package vn.gpay.gsmart.core.api.holiday;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -52,7 +53,11 @@ public class HolidayAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
+			int thisYear = Calendar.getInstance().get(Calendar.YEAR);
+			
 			List<Integer> years = holidayService.getAllYears();
+			if(!years.contains(thisYear))years.add(thisYear);
+			
 			Collections.sort(years, Collections.reverseOrder());
 			years.add(0, null);
 			
