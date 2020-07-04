@@ -30,6 +30,7 @@ import vn.gpay.gsmart.core.porder.POrder_Service;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant_Service;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -39,15 +40,20 @@ public class ScheduleAPI {
 	@Autowired OrgServiceImpl orgService;
 	@Autowired POrder_Service porderService;
 	@Autowired POrderGrant_Service granttService;
+	@Autowired Common commonService;
 	
 	@RequestMapping(value = "/getplan",method = RequestMethod.POST)
 	public ResponseEntity<get_schedule_porder_response> GetAll(HttpServletRequest request,
-			@RequestParam String listid, @RequestParam String startDate , @RequestParam String endDate) throws ParseException{
+			@RequestParam String listid, @RequestParam String startDate , @RequestParam String endDate,
+			@RequestParam String PO_code, @RequestParam String Buyer, @RequestParam String Vendor, 
+			 @RequestParam Boolean isReqPorder, @RequestParam Boolean isAllgrant) throws ParseException{
 		get_schedule_porder_response response = new get_schedule_porder_response();
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		long orgrootid_link = user.getRootorgid_link();
 		int year = Calendar.getInstance().get(Calendar.YEAR);
 		long orgid_link = user.getOrgid_link();
+		long orgbuyerid_link = Buyer == "" ? (long)0 : Long.parseLong(Buyer);
+		long orgvendorid_link = Vendor == "" ? (long)0 : Long.parseLong(Vendor);
 		 
 	    Date startdate = new SimpleDateFormat("yyyy-MM-dd").parse(startDate.substring(0,10));  
 	    
@@ -115,23 +121,41 @@ public class ScheduleAPI {
 					sch_org_grant.setOrgtypeid_link(org_grant.getOrgtypeid_link());
 					sch_org_grant.setParentid_origin(org_grant.getParentid_link());
 					
-					sch_org.getChildren().add(sch_org_grant);
 					id++;
 					
 					//Lấy các lệnh của các tổ
 					
-					List<POrderGrant> list_porder = granttService.get_granted_bygolivedate(startdate, toDate, org_grant.getId());
+					List<POrderGrant> list_porder = granttService.get_granted_bygolivedate(startdate, toDate, org_grant.getId(),
+							PO_code, orgbuyerid_link, orgvendorid_link, isReqPorder);
 					for(POrderGrant pordergrant : list_porder) {
+						Date start = pordergrant.getProductiondate_plan();
+						Date end = pordergrant.getEndDatePlan();
+						int duration = commonService.getDuration(start, end, orgrootid_link, year);
+						int productivity = pordergrant.getTotalpackage() / duration; 
+						
 						Schedule_porder sch_porder = new Schedule_porder();
 						sch_porder.setCls(pordergrant.getCls());
-						sch_porder.setEndDate(pordergrant.getGolivedate());
+						sch_porder.setEndDate(end);
 						sch_porder.setId_origin(pordergrant.getId());
 						sch_porder.setMahang(pordergrant.getMaHang());
 						sch_porder.setName(pordergrant.getMaHang());
 						sch_porder.setResourceId(sch_org_grant.getId());
-						sch_porder.setStartDate(pordergrant.getProductiondate());
+						sch_porder.setStartDate(start);
+						sch_porder.setDuration(duration);
+						sch_porder.setProductivity(productivity);
+						sch_porder.setVendorname(pordergrant.getVendorname());
+						sch_porder.setBuyername(pordergrant.getBuyername());
 						
 						response.events.rows.add(sch_porder);
+					}
+					
+					if(isAllgrant) {
+						sch_org.getChildren().add(sch_org_grant);
+					}
+					else {
+						if(list_porder.size() > 0) {
+							sch_org.getChildren().add(sch_org_grant);
+						}
 					}
 				}
 				
@@ -161,8 +185,15 @@ public class ScheduleAPI {
 					porder_free.getChildren().add(sch_porderfree);
 					id++;
 				}
+				if(isAllgrant) {
+					sch_org.getChildren().add(porder_free);
+				}
+				else {
+					if(listporder_free.size() > 0) {
+						sch_org.getChildren().add(porder_free);
+					}
+				}
 				
-				sch_org.getChildren().add(porder_free);
 				list_sch_plan.add(sch_org);
 			}
 			

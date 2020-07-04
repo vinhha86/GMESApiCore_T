@@ -46,18 +46,28 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 	
 	@Override
 	//Danh sach cac lenh duoc phan cho Phan xuong va da phan chuyen
-	public List<POrderGrant> get_granted_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link){
+	public List<POrderGrant> get_granted_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link, 
+			String POBuyer, Long orgbuyerid_link , Long orgvendorid_link, Boolean isReqPorder){
 //		if(granttoorgid_link == 3 || granttoorgid_link ==5) {
 //			long i = 0;
 //		}
-		Specification<POrderGrant> specification = Specifications.<POrderGrant>and()
-				.ge("porder.status", 1)
-	            .eq("granttoorgid_link", granttoorgid_link)
-	            .ge(Objects.nonNull(golivedate_from),"porder.golivedate",DateFormat.atStartOfDay(golivedate_from))
-                .le(Objects.nonNull(golivedate_to),"porder.golivedate",DateFormat.atEndOfDay(golivedate_to))
-	            .build();
-
-		List<POrderGrant> a = repo.findAll(specification);
+//		Specification<POrderGrant> specification = Specifications.<POrderGrant>and()
+//				.ge("porder.status", 1)
+//	            .eq("granttoorgid_link", granttoorgid_link)
+//	            .ge(Objects.nonNull(golivedate_from),"porder.finishdate_plan",DateFormat.atStartOfDay(golivedate_from))
+//                .le(Objects.nonNull(golivedate_to),"porder.finishdate_plan",DateFormat.atEndOfDay(golivedate_to))
+//                .like(POBuyer != "" && POBuyer != null, "porder.po_buyer", "%"+POBuyer+"%")
+////                .eq(orgbuyerid_link != 0, "porder.pcontract.orgbuyerid_link", orgbuyerid_link)
+////                .eq(orgvendorid_link != 0, "porder.pcontract.orgvendorid_link", orgvendorid_link)
+//                .build();
+		
+		int status = isReqPorder == true ? -1 : 1;
+		POBuyer = "%"+POBuyer+"%";
+		orgvendorid_link = orgvendorid_link == 0 ? null : orgvendorid_link;
+		orgbuyerid_link = orgbuyerid_link == 0 ? null : orgbuyerid_link;
+		
+		List<POrderGrant> a = repo.get_granted_bygolivedate(status, granttoorgid_link, golivedate_from,
+				golivedate_to, POBuyer, orgbuyerid_link, orgvendorid_link);
 		return a;
 	}
 }

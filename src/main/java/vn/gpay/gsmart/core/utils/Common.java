@@ -7,12 +7,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import vn.gpay.gsmart.core.holiday.Holiday;
+import vn.gpay.gsmart.core.holiday.IHolidayService;
 import vn.gpay.gsmart.core.pcontractattributevalue.IPContractProductAtrributeValueService;
 import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBOMColorService;
 import vn.gpay.gsmart.core.pcontractbomcolor.PContractBOMColor;
@@ -35,6 +39,7 @@ public class Common {
 	@Autowired IPContractProductAtrributeValueService ppavService;
 	@Autowired IPContractProductSKUService ppskuService;
 	@Autowired IPContractProductBomService ppbomService;
+	@Autowired IHolidayService holidayService;
 	
 	@Autowired IStockingUniqueService stockService;
 	
@@ -156,5 +161,39 @@ public class Common {
 	        is.close();
 	        os.close();
 	    }
+	}
+
+	public int getDuration(Date startdate, Date enddate, long orgrootid_link, int year) {
+		int duration = 0;		
+		
+		Calendar start = Calendar.getInstance();
+		Calendar end = Calendar.getInstance();
+		
+		start.setTime(startdate);
+		end.setTime(enddate);
+		
+		List<Holiday> list_holiday = holidayService.getby_year(orgrootid_link, year);
+		
+		while(start.before(end) || start.compareTo(end) == 0) {
+			if(start.DAY_OF_WEEK != Calendar.SUNDAY) {
+				boolean check = false;
+				for(Holiday holiday : list_holiday) {
+					Calendar day = Calendar.getInstance();
+					day.setTime(holiday.getDay());
+					if(start.compareTo(day) == 0) {
+						check = true;
+						break;
+					}
+				}
+				
+				if(!check) {
+					duration++;
+				}
+			}
+			
+			start.add(Calendar.DATE , 1);
+		}
+		
+		return duration;
 	}
 }

@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.porder_grant;
 //import java.util.List;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,5 +23,25 @@ public interface IPOrderGrant_Repository extends JpaRepository<POrderGrant, Long
 
 	@Query(value = "select a from POrderGrant a where a.porderid_link = :porderid_link")
 	public List<POrderGrant>getByOrderId(@Param ("porderid_link")final Long porderid_link);
+	
+	@Query(value = "select a from POrderGrant a "
+			+ "inner join POrder b on a.porderid_link = b.id "
+			+ "inner join PContract_PO c on b.pcontract_poid_link = c.id "
+			+ "inner join PContract d on b.pcontractid_link = d.id "
+			+ "where a.granttoorgid_link = :granttoorgid_link "
+			+ "and b.status >= :status "
+			+ "and b.finishdate_plan >= :golivedate_from "
+			+ "and b.finishdate_plan <= :golivedate_to "
+			+ "and c.po_buyer like :POBuyer "
+			+ "and (:orgbuyerid_link is null or d.orgbuyerid_link = :orgbuyerid_link) "
+			+ "and (:orgvendorid_link is null or d.orgvendorid_link = :orgvendorid_link)")
+	public List<POrderGrant>get_granted_bygolivedate(
+			@Param ("status")final int status,
+			@Param ("granttoorgid_link")final long granttoorgid_link,
+			@Param ("golivedate_from")final Date golivedate_from,
+			@Param ("golivedate_to")final Date golivedate_to,
+			@Param ("POBuyer")final String POBuyer,
+			@Param ("orgbuyerid_link")final Long orgbuyerid_link,
+			@Param ("orgvendorid_link")final Long orgvendorid_link);
 	
 }

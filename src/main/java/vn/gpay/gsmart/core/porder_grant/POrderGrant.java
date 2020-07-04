@@ -74,6 +74,27 @@ public class POrderGrant implements Serializable {
 	@ManyToOne
     @JoinColumn(name="porderid_link",insertable=false,updatable =false)
     private POrder porder;
+
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="granttoorgid_link",insertable=false,updatable =false)
+    private Org org;
+	
+	@Transient
+	public String getBuyername() {
+		if(porder!=null) {
+			return porder.getBuyername();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getVendorname() {
+		if(porder!=null) {
+			return porder.getVendorname();
+		}
+		return "";
+	}
 	
 	@Transient
 	public String getMaHang() {
@@ -111,6 +132,22 @@ public class POrderGrant implements Serializable {
 		}
 		return null;
 	}
+	
+	@Transient
+	public Date getProductiondate_plan() {
+		if(porder != null) {
+			return porder.getProductiondate_plan();
+		}
+		return null;
+	}
+	
+	@Transient
+	public Date getEndDatePlan() {
+		if(porder != null) {
+			return porder.getFinishdate_plan();
+		}
+		return null;
+	}
 	@Transient
 	public Date getGolivedate() {
 		if(porder != null) {
@@ -118,11 +155,6 @@ public class POrderGrant implements Serializable {
 		}
 		return null;
 	}
-	
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne
-    @JoinColumn(name="granttoorgid_link",insertable=false,updatable =false)
-    private Org org;
 	
 	@Transient
 	public String getGranttoorgname() {

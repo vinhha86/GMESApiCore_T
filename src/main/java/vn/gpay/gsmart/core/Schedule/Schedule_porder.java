@@ -19,12 +19,16 @@ public class Schedule_porder {
 	
 	private String mahang;
 	
+	private String vendorname;
+	private String buyername;
+	
 	@JsonProperty("Cls")
 	private String Cls;
 	
 	private long id_origin;
 	
-	
+	private int duration;
+	private int productivity;
 	
 	public long getResourceId() {
 		return ResourceId;
@@ -67,6 +71,30 @@ public class Schedule_porder {
 	}
 	public void setId_origin(long id_origin) {
 		this.id_origin = id_origin;
+	}
+	public int getDuration() {
+		return duration;
+	}
+	public void setDuration(int duration) {
+		this.duration = duration;
+	}
+	public int getProductivity() {
+		return productivity;
+	}
+	public void setProductivity(int productivity) {
+		this.productivity = productivity;
+	}
+	public String getVendorname() {
+		return vendorname;
+	}
+	public String getBuyername() {
+		return buyername;
+	}
+	public void setVendorname(String vendorname) {
+		this.vendorname = vendorname;
+	}
+	public void setBuyername(String buyername) {
+		this.buyername = buyername;
 	}
 	
 	

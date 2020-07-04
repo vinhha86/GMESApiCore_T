@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.porder;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -76,11 +77,37 @@ public class POrder implements Serializable {
 	private Date packing_date;
 	private Date qc_date;
 	private Date stockout_date;
+	private Long porderreqid_link;
+	private Date productiondate_plan;
+	private Date productiondate_fact;
+	private Date finishdate_plan;
+	private Date finishdate_fact;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="granttoorgid_link",insertable=false,updatable =false)
     private Org org;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="sizesetid_link",insertable=false,updatable =false)
+    private SizeSet sizeset;
+
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="pcontractid_link",insertable=false,updatable =false)
+    private PContract pcontract;
+
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
+    private PContract_PO pcontract_po;
+
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="productid_link",insertable=false,updatable =false)
+    private Product product;
+	
 	
 	@Transient
 	public String getGranttoorgname() {
@@ -97,13 +124,7 @@ public class POrder implements Serializable {
 		}
 		return "";
 	}
-	
-	
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne
-    @JoinColumn(name="sizesetid_link",insertable=false,updatable =false)
-    private SizeSet sizeset;
-	
+		
 	@Transient
 	public String getSizesetname() {
 		if(sizeset != null) {
@@ -111,11 +132,6 @@ public class POrder implements Serializable {
 		}
 		return "";
 	}
-	
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne
-    @JoinColumn(name="pcontractid_link",insertable=false,updatable =false)
-    private PContract pcontract;
 	
 	@Transient 
 	public String getCls() {
@@ -128,9 +144,14 @@ public class POrder implements Serializable {
 	public String getMaHang() {
 		String name = "";
 		int total = totalorder == null ? 0 : totalorder;
+		String ST = product.getBuyercode() == null ? "" : product.getBuyercode();
+		String PO = pcontract_po.getPo_buyer() == null ? "" : pcontract_po.getPo_vendor();
+		
+		DecimalFormat decimalFormat = new DecimalFormat("#,###");
+		decimalFormat.setGroupingSize(3);
 		
 		if(product != null && pcontract_po!=null) {
-			name += product.getBuyercode()+"/"+pcontract_po.getPo_vendor()+"/"+total;
+			name += "(ST: "+ST+")-(PO: "+PO+")-(SL: "+decimalFormat.format(total)+")";
 		}
 		
 		return name;
@@ -143,11 +164,6 @@ public class POrder implements Serializable {
 		}
 		return "";
 	}
-	
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne
-    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
-    private PContract_PO pcontract_po;
 	
 	@Transient
 	public String getPo_buyer() {
@@ -206,15 +222,27 @@ public class POrder implements Serializable {
 		}
 		return "";
 	}
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne
-    @JoinColumn(name="productid_link",insertable=false,updatable =false)
-    private Product product;
 	
 	@Transient
 	public String getBuyercode() {
 		if(product != null) {
 			return product.getBuyercode();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getBuyername() {
+		if(product != null) {
+			return product.getBuyername();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getVendorname() {
+		if(product != null) {
+			return product.getVendorname();
 		}
 		return "";
 	}
@@ -451,6 +479,46 @@ public class POrder implements Serializable {
 	}
 	public void setSizesetid_link(Long sizesetid_link) {
 		this.sizesetid_link = sizesetid_link;
+	}
+
+	public Long getPorderreqid_link() {
+		return porderreqid_link;
+	}
+
+	public Date getProductiondate_plan() {
+		return productiondate_plan;
+	}
+
+	public Date getProductiondate_fact() {
+		return productiondate_fact;
+	}
+
+	public Date getFinishdate_plan() {
+		return finishdate_plan;
+	}
+
+	public Date getFinishdate_fact() {
+		return finishdate_fact;
+	}
+
+	public void setPorderreqid_link(Long porderreqid_link) {
+		this.porderreqid_link = porderreqid_link;
+	}
+
+	public void setProductiondate_plan(Date productiondate_plan) {
+		this.productiondate_plan = productiondate_plan;
+	}
+
+	public void setProductiondate_fact(Date productiondate_fact) {
+		this.productiondate_fact = productiondate_fact;
+	}
+
+	public void setFinishdate_plan(Date finishdate_plan) {
+		this.finishdate_plan = finishdate_plan;
+	}
+
+	public void setFinishdate_fact(Date finishdate_fact) {
+		this.finishdate_fact = finishdate_fact;
 	}
 	
 }

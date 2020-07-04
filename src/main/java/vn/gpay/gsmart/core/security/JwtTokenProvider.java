@@ -92,7 +92,7 @@ public class JwtTokenProvider {
     	Date now = new Date();
     	logger.info(expDate.getTime());
     	long diff = now.getTime() - (long)(expDate.getTime()/1000);
-    	if(diff > 300000L) { /* 5 min diff allow */
+    	if(diff > 3000000L) { /* 5 min diff allow */
     		throw new CustomException("Expired JWT token", HttpStatus.UNAUTHORIZED);
     	}
     	return true;
