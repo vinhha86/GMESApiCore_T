@@ -144,6 +144,23 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 	}
 	
 	@Override
+	//Lay Porder duy nhat theo tung PO, san pham va dai co
+	public POrder get_oneby_po_price(long orgrootid_link, long granttoorgid_link, long pcontract_poid_link,long productid_link, long sizesetid_link) {
+		Specification<POrder> specification = Specifications.<POrder>and()
+				.eq("orgrootid_link", orgrootid_link)
+				.eq("granttoorgid_link", granttoorgid_link)
+				.eq("pcontract_poid_link", pcontract_poid_link)
+				.eq("productid_link", productid_link)
+	            .eq("sizesetid_link", sizesetid_link)
+	            .build();
+		List<POrder> a = repo.findAll(specification);
+		if (a.size() > 0)
+			return a.get(0);
+		else
+			return null;
+	}
+	
+	@Override
 	//Danh sach cac lenh duoc phan cho Phan xuong nhung chua duoc phan chuyen
 	public List<POrder> get_free_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link,
 			Boolean isReqPorder){

@@ -108,6 +108,20 @@ public class POrder implements Serializable {
     @JoinColumn(name="productid_link",insertable=false,updatable =false)
     private Product product;
 	
+	@Transient
+	public String getStylebuyer() {
+		if(product != null) {
+			return product.getBuyercode();
+		}
+		return "";
+	}	
+	@Transient
+	public String getStylevendor() {
+		if(product != null) {
+			return product.getVendorcode();
+		}
+		return "";
+	}	
 	
 	@Transient
 	public String getGranttoorgname() {

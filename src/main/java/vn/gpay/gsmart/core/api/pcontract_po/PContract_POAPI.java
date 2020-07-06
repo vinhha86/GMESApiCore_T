@@ -123,6 +123,7 @@ public class PContract_POAPI {
 					porder_req.setPcontract_poid_link(pcontract_poid_link);
 					
 					porder_req.setTotalorder(porder.getTotalorder());
+					porder_req.setGranttoorgid_link(porder.getGranttoorgid_link());
 					
 					porder_req.setOrgrootid_link(orgrootid_link);
 					porder_req.setProductid_link(pcontract_po.getProductid_link());
@@ -133,7 +134,12 @@ public class PContract_POAPI {
 					
 					//Save to DB
 					porder_req_Service.savePOrder_Req(porder_req);
-				} 
+				} else {
+					POrder_Req porder_req = porder_req_Service.findOne(porder.getId());
+					porder_req.setTotalorder(porder.getTotalorder());
+					//Save to DB
+					porder_req_Service.savePOrder_Req(porder_req);
+				}
 			}
 			
 			//Response to Client

@@ -19,6 +19,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.sizeset.SizeSet;
 
 
@@ -45,7 +46,7 @@ public class PContract_Price implements Serializable {/**
 	private Float price_sewingcost;
 	private Float totalprice;
 	private Float salaryfund;
-	private Float quantity;
+	private Integer quantity;
 	private Float price_vendortarget;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -59,6 +60,18 @@ public class PContract_Price implements Serializable {/**
 		}
 		return "";
 	}	
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="productid_link",insertable=false,updatable =false)
+    private Product product;
+	@Transient
+	public Integer getProducttypeid_link() {
+		if(product != null) {
+			return product.getProducttypeid_link();
+		}
+		return null;
+	}
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
@@ -150,10 +163,10 @@ public class PContract_Price implements Serializable {/**
 	public void setSewfobratio(Float sewfobratio) {
 		this.sewfobratio = sewfobratio;
 	}
-	public Float getQuantity() {
+	public Integer getQuantity() {
 		return quantity;
 	}
-	public void setQuantity(Float quantity) {
+	public void setQuantity(Integer quantity) {
 		this.quantity = quantity;
 	}
 	public Float getPrice_vendortarget() {

@@ -2,6 +2,7 @@ package vn.gpay.gsmart.core.utils;
 
 public class ProductType {
 
+	public static int SKU_TYPE_PRODUCT_PAIR    		= 5;
 	public static int SKU_TYPE_PRODUCT_MIN    		= 10;
 	public static int SKU_TYPE_PRODUCT_MAX    		= 19;
     public static int SKU_TYPE_COMPLETEPRODUCT    	= 10; //Thành phẩm
