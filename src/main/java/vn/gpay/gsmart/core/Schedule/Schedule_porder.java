@@ -21,7 +21,14 @@ public class Schedule_porder {
 	
 	private String vendorname;
 	private String buyername;
-	
+	private String pordercode;
+		
+	public String getPordercode() {
+		return pordercode;
+	}
+	public void setPordercode(String pordercode) {
+		this.pordercode = pordercode;
+	}
 	@JsonProperty("Cls")
 	private String Cls;
 	

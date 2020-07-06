@@ -158,6 +158,16 @@ public class SizeSetAttributeValueAPI {
 			List<Attributevalue> listAttr = avService.getlist_byidAttribute(entity.id);
 			List<SizeSetAttributeValue> listOther = sizesetAttrService.getallother_bySizeSetId(entity.sizesetid_link);
 			List<Attributevalue> listToRmove = new ArrayList<Attributevalue>();
+			Attributevalue valAll = new Attributevalue();
+			
+			
+			for(Attributevalue attrValue : listAttr) {
+				if(attrValue.getValue().equals("ALL")) {
+					valAll = attrValue;
+				}
+			}
+			listAttr.remove(valAll);
+			
 			for(Attributevalue attrValue : listAttr) {
 				for(SizeSetAttributeValue sizesetAttrValue : listOther) {
 					if(attrValue.getId() == sizesetAttrValue.getAttributevalueid_link()) {
@@ -169,6 +179,7 @@ public class SizeSetAttributeValueAPI {
 			for(Attributevalue attrValue : listToRmove) {
 				listAttr.remove(attrValue);
 			}
+
 			response.data = listAttr;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

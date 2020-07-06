@@ -126,7 +126,7 @@ public class ScheduleAPI {
 					//Lấy các lệnh của các tổ
 					
 					List<POrderGrant> list_porder = granttService.get_granted_bygolivedate(startdate, toDate, org_grant.getId(),
-							PO_code, orgbuyerid_link, orgvendorid_link, isReqPorder);
+							PO_code, orgbuyerid_link, orgvendorid_link);
 					for(POrderGrant pordergrant : list_porder) {
 						Date start = pordergrant.getProductiondate_plan();
 						Date end = pordergrant.getEndDatePlan();
@@ -145,6 +145,7 @@ public class ScheduleAPI {
 						sch_porder.setProductivity(productivity);
 						sch_porder.setVendorname(pordergrant.getVendorname());
 						sch_porder.setBuyername(pordergrant.getBuyername());
+						sch_porder.setPordercode(pordergrant.getpordercode());
 						
 						response.events.rows.add(sch_porder);
 					}
@@ -170,7 +171,7 @@ public class ScheduleAPI {
 				porder_free.setParentid_origin(org_factory.getId());
 				id++;
 				
-				List<POrder> listporder_free = porderService.get_free_bygolivedate(startdate, toDate, org_factory.getId());
+				List<POrder> listporder_free = porderService.get_free_bygolivedate(startdate, toDate, org_factory.getId(), isReqPorder);
 				for(POrder porderfree : listporder_free) {
 					Schedule_plan sch_porderfree = new Schedule_plan();
 					
@@ -181,8 +182,24 @@ public class ScheduleAPI {
 					sch_porderfree.setName(porderfree.getOrdercode());
 					sch_porderfree.setIconCls("x-fa fa-industry");
 					sch_porderfree.setParentid_origin(org_factory.getId());
-					
+										
 					porder_free.getChildren().add(sch_porderfree);
+					
+					Schedule_porder sch_porder = new Schedule_porder();
+					sch_porder.setCls(porderfree.getCls());
+					sch_porder.setEndDate(porderfree.getProductiondate_plan());
+					sch_porder.setId_origin(porderfree.getId());
+					sch_porder.setMahang(porderfree.getMaHang());
+					sch_porder.setName(porderfree.getMaHang());
+					sch_porder.setResourceId(id);
+					sch_porder.setStartDate(porderfree.getFinishdate_plan());
+					sch_porder.setDuration(0);
+					sch_porder.setProductivity(0);
+					sch_porder.setVendorname(porderfree.getVendorname());
+					sch_porder.setBuyername(porderfree.getBuyername());
+					sch_porder.setPordercode(porderfree.getOrdercode());
+					
+					response.events.rows.add(sch_porder);
 					id++;
 				}
 				if(isAllgrant) {

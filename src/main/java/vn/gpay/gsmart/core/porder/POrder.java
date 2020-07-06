@@ -136,7 +136,10 @@ public class POrder implements Serializable {
 	@Transient 
 	public String getCls() {
 		if(pcontract!=null)
-			return pcontract.getcls();
+			if(status > -1)
+				return pcontract.getcls();
+			else
+				return "gray";
 		return "";
 	}
 	

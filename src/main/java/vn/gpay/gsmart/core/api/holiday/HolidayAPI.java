@@ -153,4 +153,34 @@ public class HolidayAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/save", method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> Save(@RequestBody Holiday_save_request entity,
+			HttpServletRequest request) {
+		ResponseBase response = new ResponseBase();
+		
+		try {
+			Holiday holiday = new Holiday();
+			
+			Long time = entity.time;
+			Date date=new Date(time);
+			LocalDate localdate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+			
+			holiday.setId(entity.data.getId());
+			holiday.setYear(localdate.getYear());
+			holiday.setDay(Date.from(localdate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+			holiday.setComment(entity.data.getComment());
+			holiday.setOrgrootid_link(entity.data.getOrgrootid_link());
+			
+			holidayService.save(holiday);
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		}
+	}
+	
 }

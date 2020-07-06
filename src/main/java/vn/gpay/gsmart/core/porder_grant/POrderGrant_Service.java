@@ -47,7 +47,7 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 	@Override
 	//Danh sach cac lenh duoc phan cho Phan xuong va da phan chuyen
 	public List<POrderGrant> get_granted_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link, 
-			String POBuyer, Long orgbuyerid_link , Long orgvendorid_link, Boolean isReqPorder){
+			String POBuyer, Long orgbuyerid_link , Long orgvendorid_link){
 //		if(granttoorgid_link == 3 || granttoorgid_link ==5) {
 //			long i = 0;
 //		}
@@ -61,7 +61,7 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 ////                .eq(orgvendorid_link != 0, "porder.pcontract.orgvendorid_link", orgvendorid_link)
 //                .build();
 		
-		int status = isReqPorder == true ? -1 : 1;
+		int status = 1;
 		POBuyer = "%"+POBuyer+"%";
 		orgvendorid_link = orgvendorid_link == 0 ? null : orgvendorid_link;
 		orgbuyerid_link = orgbuyerid_link == 0 ? null : orgbuyerid_link;
