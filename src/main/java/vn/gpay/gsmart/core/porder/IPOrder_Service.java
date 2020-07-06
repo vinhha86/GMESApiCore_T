@@ -18,5 +18,6 @@ public interface IPOrder_Service extends Operations<POrder> {
 	List<POrder> getByContractAndPO(Long pcontractid_link, Long pcontract_poid_link);
 	Long savePOrder(POrder porder, String po_code);
 	List<POrder> get_free_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link,Boolean isReqPorder);
+	List<POrder> getByPOrder_Req(Long pcontract_poid_link, Long porderreqid_link);
 
 }
