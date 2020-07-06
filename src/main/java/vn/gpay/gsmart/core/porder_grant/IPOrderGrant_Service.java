@@ -11,7 +11,7 @@ public interface IPOrderGrant_Service extends Operations<POrderGrant>{
 	void deleteByOrderId(Long porderid_link);
 
 	List<POrderGrant> get_granted_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link, 
-			String POBuyer, Long orgbuyerid_link , Long orgvendorid_link, Boolean isReqPorder);
+			String POBuyer, Long orgbuyerid_link , Long orgvendorid_link);
 
 	POrderGrant getByOrderIDAndOrg(Long granttoorgid_link, Long porderid_link);
 

@@ -29,7 +29,7 @@ public interface IPOrderGrant_Repository extends JpaRepository<POrderGrant, Long
 			+ "inner join PContract_PO c on b.pcontract_poid_link = c.id "
 			+ "inner join PContract d on b.pcontractid_link = d.id "
 			+ "where a.granttoorgid_link = :granttoorgid_link "
-			+ "and b.status >= :status "
+			+ "and b.status = :status "
 			+ "and b.finishdate_plan >= :golivedate_from "
 			+ "and b.finishdate_plan <= :golivedate_to "
 			+ "and c.po_buyer like :POBuyer "
