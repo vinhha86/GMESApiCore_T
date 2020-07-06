@@ -23,9 +23,11 @@ import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price_D;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
+import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.POStatus;
-import vn.gpay.gsmart.core.utils.POrderStatus;
+import vn.gpay.gsmart.core.utils.POrderReqStatus;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 
@@ -36,6 +38,7 @@ public class PContract_POAPI {
 	@Autowired IPContract_Price_Service pcontractpriceService;
 	@Autowired IPContract_Price_DService pcontractpriceDService;
 	@Autowired IPOrder_Service porderService;
+	@Autowired private IPOrder_Req_Service porder_req_Service;
 	
 	@RequestMapping(value = "/create",method = RequestMethod.POST)
 	public ResponseEntity<PContract_pocreate_response> PContractCreate(@RequestBody PContract_pocreate_request entity,HttpServletRequest request ) {
@@ -86,26 +89,51 @@ public class PContract_POAPI {
 			}
 			
 			//Update POrders
+//			List<POrder> lst_porders = entity.po_orders;
+//			String po_code = pcontract_po.getPo_vendor().length() > 0?pcontract_po.getPo_vendor():pcontract_po.getPo_buyer();
+//			for(POrder porder : lst_porders) {
+//				if (null == porder.getId() || 0 == porder.getId()){
+//					//Them moi POrder
+//					porder.setPcontractid_link(pcontractid_link);
+//					porder.setPcontract_poid_link(pcontract_poid_link);
+//					
+//					porder.setGolivedate(pcontract_po.getShipdate());
+//					porder.setProductiondate(pcontract_po.getProductiondate());
+//					
+//					porder.setOrgrootid_link(orgrootid_link);
+//					porder.setProductid_link(pcontract_po.getProductid_link());
+//					porder.setOrderdate(new Date());
+//					porder.setUsercreatedid_link(user.getId());
+//					porder.setStatus(pcontract_po.getStatus() == POStatus.PO_STATUS_UNCONFIRM?POrderStatus.PORDER_STATUS_UNCONFIRM:POrderStatus.PORDER_STATUS_FREE);
+//					porder.setTimecreated(new Date());
+//				} 
+//				//Save to DB
+//				porderService.savePOrder(porder, po_code);
+//			}
+			
+			//Update POrder_Req
 			List<POrder> lst_porders = entity.po_orders;
-			String po_code = pcontract_po.getPo_vendor().length() > 0?pcontract_po.getPo_vendor():pcontract_po.getPo_buyer();
+//			String po_code = pcontract_po.getPo_vendor().length() > 0?pcontract_po.getPo_vendor():pcontract_po.getPo_buyer();
 			for(POrder porder : lst_porders) {
 				if (null == porder.getId() || 0 == porder.getId()){
 					//Them moi POrder
-					porder.setPcontractid_link(pcontractid_link);
-					porder.setPcontract_poid_link(pcontract_poid_link);
+					POrder_Req porder_req = new POrder_Req();
 					
-					porder.setGolivedate(pcontract_po.getShipdate());
-					porder.setProductiondate(pcontract_po.getProductiondate());
+					porder_req.setPcontractid_link(pcontractid_link);
+					porder_req.setPcontract_poid_link(pcontract_poid_link);
 					
-					porder.setOrgrootid_link(orgrootid_link);
-					porder.setProductid_link(pcontract_po.getProductid_link());
-					porder.setOrderdate(new Date());
-					porder.setUsercreatedid_link(user.getId());
-					porder.setStatus(pcontract_po.getStatus() == POStatus.PO_STATUS_UNCONFIRM?POrderStatus.PORDER_STATUS_UNCONFIRM:POrderStatus.PORDER_STATUS_FREE);
-					porder.setTimecreated(new Date());
+					porder_req.setTotalorder(porder.getTotalorder());
+					
+					porder_req.setOrgrootid_link(orgrootid_link);
+					porder_req.setProductid_link(pcontract_po.getProductid_link());
+					porder_req.setOrderdate(new Date());
+					porder_req.setUsercreatedid_link(user.getId());
+					porder_req.setStatus(POrderReqStatus.STATUS_FREE);
+					porder_req.setTimecreated(new Date());
+					
+					//Save to DB
+					porder_req_Service.savePOrder_Req(porder_req);
 				} 
-				//Save to DB
-				porderService.savePOrder(porder, po_code);
 			}
 			
 			//Response to Client

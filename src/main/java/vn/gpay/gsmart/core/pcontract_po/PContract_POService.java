@@ -25,6 +25,12 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	}
 
 	@Override
+	public List<PContract_PO> getPO_LeafOnly(Long orgrootid_link,
+			Long pcontractid_link,Long productid_link){
+		return repo.getPOByContractProduct(orgrootid_link, pcontractid_link, productid_link);
+	}
+	
+	@Override
 	public List<PContract_PO> getPOByContract(Long orgrootid_link,
 			Long pcontractid_link){
 		return repo.getPOByContract(orgrootid_link, pcontractid_link);

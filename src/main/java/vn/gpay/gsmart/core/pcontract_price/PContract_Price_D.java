@@ -45,7 +45,9 @@ public class PContract_Price_D implements Serializable {/**
 	private Long fobpriceid_link;
 	private Long sizesetid_link;
 	private Long pcontractpriceid_link;
-	
+	private Float quota;
+	private Float unitprice;
+	private Long unitid_link;
 	
 	public Long getFobpriceid_link() {
 		return fobpriceid_link;
@@ -200,6 +202,30 @@ public class PContract_Price_D implements Serializable {/**
 
 	public void setPcontractpriceid_link(Long pcontractpriceid_link) {
 		this.pcontractpriceid_link = pcontractpriceid_link;
+	}
+
+	public Float getQuota() {
+		return quota;
+	}
+
+	public void setQuota(Float quota) {
+		this.quota = quota;
+	}
+
+	public Float getUnitprice() {
+		return unitprice;
+	}
+
+	public void setUnitprice(Float unitprice) {
+		this.unitprice = unitprice;
+	}
+
+	public Long getUnitid_link() {
+		return unitid_link;
+	}
+
+	public void setUnitid_link(Long unitid_link) {
+		this.unitid_link = unitid_link;
 	}
 
 }

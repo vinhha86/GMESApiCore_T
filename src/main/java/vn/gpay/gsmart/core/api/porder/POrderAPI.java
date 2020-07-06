@@ -210,6 +210,23 @@ public class POrderAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/get_byporder_req", method = RequestMethod.POST)
+	public ResponseEntity<POrder_getbycontract_response> GetByPOrder_Req(HttpServletRequest request,
+			@RequestBody POrder_getbyporder_req_request entity) {
+		POrder_getbycontract_response response = new POrder_getbycontract_response();
+		try {
+			response.data = porderService.getByPOrder_Req(entity.pcontract_poid_link, entity.porderreqid_link);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<POrder_getbycontract_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<POrder_getbycontract_response>(response, HttpStatus.OK);
+		}
+	}	
+	
 	@RequestMapping(value = "/getfilter",method = RequestMethod.POST)
 	public ResponseEntity<POrderFilterResponse> getFilter(@RequestBody POrderFilterRequest entity, HttpServletRequest request) {
 		POrderFilterResponse response = new POrderFilterResponse();

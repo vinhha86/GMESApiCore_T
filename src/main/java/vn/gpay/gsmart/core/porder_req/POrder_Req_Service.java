@@ -1,4 +1,4 @@
-package vn.gpay.gsmart.core.porder;
+package vn.gpay.gsmart.core.porder_req;
 
 import java.util.Date;
 import java.util.List;
@@ -17,28 +17,23 @@ import vn.gpay.gsmart.core.base.AbstractService;
 import vn.gpay.gsmart.core.utils.DateFormat;
 
 @Service
-public class POrder_Service extends AbstractService<POrder> implements IPOrder_Service {
-	@Autowired IPOrder_Repository repo;
-	@Autowired IPOrder_AutoID_Service porder_AutoID_Service;
-	@Override
-	protected JpaRepository<POrder, Long> getRepository() {
+public class POrder_Req_Service extends AbstractService<POrder_Req> implements IPOrder_Req_Service {
+	@Autowired IPOrder_Req_Repository repo;
+	protected JpaRepository<POrder_Req, Long> getRepository() {
 		// TODO Auto-generated method stub
 		return repo;
 	}
 	
 	@Override
-	public List<POrder> getByContract(Long pcontractid_link){
+	public List<POrder_Req> getByContract(Long pcontractid_link){
 		return repo.getByContract(pcontractid_link);
 	}
 	
 	@Override
-	public Long savePOrder(POrder porder, String po_code){
+	public Long savePOrder_Req(POrder_Req porder_req){
 		try {
-			if (porder.getId() == null || porder.getId() == 0) {
-				porder.setOrdercode(porder_AutoID_Service.getLastID(po_code));
-			} 
-			porder = this.save(porder);
-			return porder.getId();
+			porder_req = this.save(porder_req);
+			return porder_req.getId();
 		} catch (Exception e){
 			e.printStackTrace();
 			return null;
@@ -46,33 +41,27 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 	}
 	
 	@Override
-	public List<POrder> getByContractAndProduct(Long pcontractid_link, Long productid_link){
+	public List<POrder_Req> getByContractAndProduct(Long pcontractid_link, Long productid_link){
 		return repo.getByContractAndProduct(pcontractid_link,productid_link);
 	}
 	
 	@Override
-	public List<POrder> getByContractAndPO(Long pcontractid_link, Long pcontract_poid_link){
+	public List<POrder_Req> getByContractAndPO(Long pcontractid_link, Long pcontract_poid_link){
 		return repo.getByContractAndPO(pcontractid_link,pcontract_poid_link);
 	}
 	
 	@Override
-	public List<POrder> getByPOrder_Req(Long pcontract_poid_link, Long porderreqid_link){
-		return repo.getByPOrder_Req(pcontract_poid_link,porderreqid_link);
-	}
-	
-	
+	public List<POrder_Req> getByPO(Long pcontract_poid_link){
+		return repo.getByPO(pcontract_poid_link);
+	} 
 	@Override
-	public List<POrder> getByStatus(Integer status){
+	public List<POrder_Req> getByStatus(Integer status){
 		return repo.getByStatus(status);
 	}
 	
+
 	@Override
-	public Integer getMaxPriority(){
-		return repo.getMaxPriority();
-	}
-	
-	@Override
-	public List<POrder> getFilter(
+	public List<POrder_Req> getFilter(
 			String ordercode,
 			Integer status,
 			Long granttoorgid_link,
@@ -85,7 +74,7 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 			) {
 		try {
 			if (null != salarymonth){
-				Specification<POrder> specification = Specifications.<POrder>and()
+				Specification<POrder_Req> specification = Specifications.<POrder_Req>and()
 						.eq(null!=status && status !=-1, "status", status)
 			            .eq(null!=granttoorgid_link && granttoorgid_link != -1, "granttoorgid_link", granttoorgid_link)
 			            .like(null!=ordercode && ordercode !="", "ordercode", "%"+ordercode+"%")
@@ -100,10 +89,10 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 				Sort sort = Sorts.builder()
 				        .desc("ordercode")
 				        .build();
-				List<POrder> a = repo.findAll(specification,sort);
+				List<POrder_Req> a = repo.findAll(specification,sort);
 				return a;
 			} else {
-				Specification<POrder> specification = Specifications.<POrder>and()
+				Specification<POrder_Req> specification = Specifications.<POrder_Req>and()
 						.eq(null!=status && status !=-1, "status", status)
 			            .eq(null!=granttoorgid_link && granttoorgid_link != -1, "granttoorgid_link", granttoorgid_link)
 			            .like(null!=ordercode && ordercode !="", "ordercode", "%"+ordercode+"%")
@@ -119,7 +108,7 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 				Sort sort = Sorts.builder()
 				        .desc("ordercode")
 				        .build();
-				List<POrder> a = repo.findAll(specification,sort);
+				List<POrder_Req> a = repo.findAll(specification,sort);
 				return a;
 			}
 		} catch(Exception ex){
@@ -129,9 +118,9 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 	}
 
 	@Override
-	public List<POrder> get_by_org(long orgid_link) {
+	public List<POrder_Req> get_by_org(long orgid_link) {
 		// TODO Auto-generated method stub
-		Specification<POrder> specification = Specifications.<POrder>and()
+		Specification<POrder_Req> specification = Specifications.<POrder_Req>and()
 				.ne("status", -1)
 				.le("status", 5)
 	            .eq("granttoorgid_link", orgid_link)
@@ -139,14 +128,14 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 		Sort sort = Sorts.builder()
 		        .desc("ordercode")
 		        .build();
-		List<POrder> a = repo.findAll(specification,sort);
+		List<POrder_Req> a = repo.findAll(specification,sort);
 		return a;
 	}
 	
 	@Override
 	//Danh sach cac lenh duoc phan cho Phan xuong nhung chua duoc phan chuyen
-	public List<POrder> get_free_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link){
-		Specification<POrder> specification = Specifications.<POrder>and()
+	public List<POrder_Req> get_free_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link){
+		Specification<POrder_Req> specification = Specifications.<POrder_Req>and()
 				.le("status", 0)
 	            .eq("granttoorgid_link", granttoorgid_link)
 	            .ge(Objects.nonNull(golivedate_from),"golivedate",DateFormat.atStartOfDay(golivedate_from))
@@ -156,7 +145,7 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 //		        .desc("ordercode")
 //		        .build();
 //		List<POrder> a = repo.findAll(specification,sort);
-		List<POrder> a = repo.findAll(specification);
+		List<POrder_Req> a = repo.findAll(specification);
 		return a;
 	}
 }
