@@ -187,12 +187,12 @@ public class ScheduleAPI {
 					
 					Schedule_porder sch_porder = new Schedule_porder();
 					sch_porder.setCls(porderfree.getCls());
-					sch_porder.setEndDate(porderfree.getProductiondate_plan());
+					sch_porder.setEndDate(porderfree.getFinishdate_plan());
 					sch_porder.setId_origin(porderfree.getId());
 					sch_porder.setMahang(porderfree.getMaHang());
 					sch_porder.setName(porderfree.getMaHang());
 					sch_porder.setResourceId(id);
-					sch_porder.setStartDate(porderfree.getFinishdate_plan());
+					sch_porder.setStartDate(porderfree.getProductiondate_plan());
 					sch_porder.setDuration(0);
 					sch_porder.setProductivity(0);
 					sch_porder.setVendorname(porderfree.getVendorname());
