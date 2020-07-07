@@ -197,10 +197,12 @@ public class Common {
 		return duration;
 	}
 	
-	public Date addDate(Date date , int d) {
+	public Date getEndOfDate(Date date) {
 		Calendar start = Calendar.getInstance();
 		start.setTime(date);
-		start.add(Calendar.DAY_OF_WEEK, d);
-		return start.getTime();
+		start.add(Calendar.DAY_OF_WEEK, 1);
+		start.add(Calendar.MINUTE, -1);
+		Date date_ret = start.getTime();
+		return date_ret;
 	}
 }

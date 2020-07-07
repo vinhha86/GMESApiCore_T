@@ -16,9 +16,9 @@ public class GsmartCoreApplication {
 		SpringApplication.run(GsmartCoreApplication.class, args);
 	}
 	
-//	@PostConstruct
-//    public void init(){
-//      // Setting Spring Boot SetTimeZone
-//      TimeZone.setDefault(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
-//    }
+	@PostConstruct
+    public void init(){
+      // Setting Spring Boot SetTimeZone
+      TimeZone.setDefault(TimeZone.getTimeZone("GMT+0700"));
+    }
 }

@@ -131,14 +131,14 @@ public class ScheduleAPI {
 							PO_code, orgbuyerid_link, orgvendorid_link);
 					for(POrderGrant pordergrant : list_porder) {
 						Date start = pordergrant.getProductiondate_plan();
-						Date end = pordergrant.getEndDatePlan();
+						Date end = commonService.getEndOfDate(pordergrant.getEndDatePlan());
 						int duration = commonService.getDuration(start, end, orgrootid_link, year);
 						int productivity = pordergrant.getTotalpackage() / duration; 
 						
 						Schedule_porder sch_porder = new Schedule_porder();
 						sch_porder.setCls(pordergrant.getCls());
 						sch_porder.setEndDate(end);
-						sch_porder.setId_origin(pordergrant.getId());
+						sch_porder.setId_origin(pordergrant.getPorderid_link());
 						sch_porder.setMahang(pordergrant.getMaHang());
 						sch_porder.setName(pordergrant.getMaHang());
 						sch_porder.setResourceId(sch_org_grant.getId());
@@ -159,14 +159,14 @@ public class ScheduleAPI {
 					
 					for(POrderGrant pordergrant : list_porder_test) {
 						Date start = pordergrant.getProductiondate_plan();
-						Date end = pordergrant.getEndDatePlan();
+						Date end = commonService.getEndOfDate(pordergrant.getEndDatePlan());
 						int duration = commonService.getDuration(start, end, orgrootid_link, year);
 						int productivity = pordergrant.getTotalpackage() / duration; 
 						
 						Schedule_porder sch_porder = new Schedule_porder();
 						sch_porder.setCls(pordergrant.getCls());
 						sch_porder.setEndDate(end);
-						sch_porder.setId_origin(pordergrant.getId());
+						sch_porder.setId_origin(pordergrant.getPorderid_link());
 						sch_porder.setMahang(pordergrant.getMaHang());
 						sch_porder.setName(pordergrant.getMaHang());
 						sch_porder.setResourceId(sch_org_grant.getId());
@@ -177,6 +177,7 @@ public class ScheduleAPI {
 						sch_porder.setVendorname(pordergrant.getVendorname());
 						sch_porder.setBuyername(pordergrant.getBuyername());
 						sch_porder.setPordercode(pordergrant.getpordercode());
+						sch_porder.setParentid_origin(orgid);
 						
 						response.events.rows.add(sch_porder);
 					}
@@ -220,7 +221,7 @@ public class ScheduleAPI {
 					Date _end = porderfree.getFinishdate_plan();
 					
 					sch_porder.setCls(porderfree.getCls());
-					sch_porder.setEndDate(commonService.addDate(_end, 1));
+					sch_porder.setEndDate(commonService.getEndOfDate(_end));
 					sch_porder.setId_origin(porderfree.getId());
 					sch_porder.setMahang(porderfree.getMaHang());
 					sch_porder.setName(porderfree.getMaHang());
@@ -279,7 +280,12 @@ public class ScheduleAPI {
 			event.setDuration(duration);
 			event.setProductivity(productivity);
 			
-			
+			//update vao lenh
+			long porderid_link = entity.data.getId_origin();
+			POrder porder = porderService.findOne(porderid_link);
+			porder.setProductiondate_plan(entity.data.getStartDate());
+			porder.setFinishdate_plan(entity.data.getEndDate());
+			porderService.save(porder);
 			
 			response.data = event;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

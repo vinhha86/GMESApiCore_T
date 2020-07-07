@@ -23,7 +23,14 @@ public class Schedule_porder {
 	private String buyername;
 	private String pordercode;
 	private Integer totalpackage;
+	private Long parentid_origin;
 		
+	public Long getParentid_origin() {
+		return parentid_origin;
+	}
+	public void setParentid_origin(Long parentid_origin) {
+		this.parentid_origin = parentid_origin;
+	}
 	public String getPordercode() {
 		return pordercode;
 	}
