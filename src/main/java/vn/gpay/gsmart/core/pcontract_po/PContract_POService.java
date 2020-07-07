@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.pcontract_po;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +26,28 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	}
 
 	@Override
+	//Chi lay cac PO o muc la
 	public List<PContract_PO> getPO_LeafOnly(Long orgrootid_link,
 			Long pcontractid_link,Long productid_link){
-		return repo.getPOByContractProduct(orgrootid_link, pcontractid_link, productid_link);
+		try{
+			List<PContract_PO> a = repo.getPOByContractProduct(orgrootid_link, pcontractid_link, productid_link);
+//			List<PContract_PO> parentPO = new ArrayList<PContract_PO>();
+			List<PContract_PO> returnPO = new ArrayList<PContract_PO>();
+			for(PContract_PO thePO: a){
+				if (thePO.getSub_po().size() > 0){
+					for(PContract_PO subPO: thePO.getSub_po()){
+						returnPO.add(subPO);
+					}
+//					parentPO.add(thePO);
+				} else
+					returnPO.add(thePO);
+			}
+//			a.removeAll(parentPO);
+			return returnPO;
+		} catch(Exception ex){
+			ex.printStackTrace();
+			return null;
+		}
 	}
 	
 	@Override

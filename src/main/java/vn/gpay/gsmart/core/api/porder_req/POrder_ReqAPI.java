@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.api.porder_req;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -121,7 +122,14 @@ public class POrder_ReqAPI {
 			PContract_PO thePO = pcontract_POService.findOne(porder_req.getPcontract_poid_link());
 			if (thePO.getStatus() == POStatus.PO_STATUS_CONFIRMED){
 				String po_code = thePO.getPo_vendor().length() > 0?thePO.getPo_vendor():thePO.getPo_buyer();
-				for (PContract_Price thePrice: thePO.getPcontract_price()){
+				List<PContract_Price> thePriceList;
+				if (null == thePO.getParentpoid_link()){
+					thePriceList = thePO.getPcontract_price();
+				} else {
+					PContract_PO thePO_parent = pcontract_POService.findOne(thePO.getParentpoid_link());
+					thePriceList = thePO_parent.getPcontract_price();
+				}
+				for (PContract_Price thePrice: thePriceList){
 					if (thePrice.getProducttypeid_link() != ProductType.SKU_TYPE_PRODUCT_PAIR){
 						
 						POrder thePOrder = porderService.get_oneby_po_price(orgrootid_link, porder_req.getGranttoorgid_link(), thePO.getId(), thePrice.getProductid_link(), thePrice.getSizesetid_link());

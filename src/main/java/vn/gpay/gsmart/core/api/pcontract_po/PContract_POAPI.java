@@ -157,13 +157,46 @@ public class PContract_POAPI {
 	}
 	
 	@RequestMapping(value = "/update",method = RequestMethod.POST)
-	public ResponseEntity<PContract_pocreate_response> PContractCreate(@RequestBody PContract_poupdate_request entity,HttpServletRequest request ) {
+	public ResponseEntity<PContract_pocreate_response> PContractUpdate(@RequestBody PContract_pocreate_request entity,HttpServletRequest request ) {
 		PContract_pocreate_response response = new PContract_pocreate_response();
 		try {
-
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			long usercreatedid_link = user.getId();
+			
 			PContract_PO pcontract_po = entity.data;
 			pcontract_po = pcontract_POService.save(pcontract_po);
-
+			
+			//Update POrder_Req
+			List<POrder> lst_porders = entity.po_orders;
+//			String po_code = pcontract_po.getPo_vendor().length() > 0?pcontract_po.getPo_vendor():pcontract_po.getPo_buyer();
+			for(POrder porder : lst_porders) {
+				if (null == porder.getId() || 0 == porder.getId()){
+					//Them moi POrder
+					POrder_Req porder_req = new POrder_Req();
+					
+					porder_req.setPcontractid_link(pcontract_po.getPcontractid_link());
+					porder_req.setPcontract_poid_link(pcontract_po.getId());
+					
+					porder_req.setTotalorder(porder.getTotalorder());
+					porder_req.setGranttoorgid_link(porder.getGranttoorgid_link());
+					
+					porder_req.setOrgrootid_link(orgrootid_link);
+					porder_req.setProductid_link(pcontract_po.getProductid_link());
+					porder_req.setOrderdate(new Date());
+					porder_req.setUsercreatedid_link(usercreatedid_link);
+					porder_req.setStatus(POrderReqStatus.STATUS_FREE);
+					porder_req.setTimecreated(new Date());
+					
+					//Save to DB
+					porder_req_Service.savePOrder_Req(porder_req);
+				} else {
+					POrder_Req porder_req = porder_req_Service.findOne(porder.getId());
+					porder_req.setTotalorder(porder.getTotalorder());
+					//Save to DB
+					porder_req_Service.savePOrder_Req(porder_req);
+				}
+			}
 			//Response to Client
 			response.id = pcontract_po.getId();
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -186,6 +219,26 @@ public class PContract_POAPI {
 			long orgrootid_link = user.getRootorgid_link();
 			
 			List<PContract_PO> pcontract = pcontract_POService.getPOByContractProduct(orgrootid_link, entity.pcontractid_link, entity.productid_link);
+			response.data = pcontract;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<PContract_getbycontractproduct_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/getleafonly",method = RequestMethod.POST)
+	public ResponseEntity<PContract_getbycontractproduct_response> getPOLeafOnly(@RequestBody PContract_getbycontractproduct_request entity,HttpServletRequest request ) {
+		PContract_getbycontractproduct_response response = new PContract_getbycontractproduct_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			
+			List<PContract_PO> pcontract = pcontract_POService.getPO_LeafOnly(orgrootid_link, entity.pcontractid_link, entity.productid_link);
 			response.data = pcontract;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
