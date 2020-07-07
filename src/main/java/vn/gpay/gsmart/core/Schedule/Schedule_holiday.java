@@ -14,6 +14,9 @@ public class Schedule_holiday {
 	
 	private String comment;
 	
+	@JsonProperty("Cls")
+	private String Cls;
+	
 	public Date getStartDate() {
 		return StartDate;
 	}
@@ -31,6 +34,12 @@ public class Schedule_holiday {
 	}
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+	public String getCls() {
+		return Cls;
+	}
+	public void setCls(String cls) {
+		Cls = cls;
 	}
 	
 }
