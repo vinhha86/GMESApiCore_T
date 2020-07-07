@@ -22,16 +22,14 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.gpay.gsmart.core.Schedule.Schedule_holiday;
 import vn.gpay.gsmart.core.Schedule.Schedule_plan;
 import vn.gpay.gsmart.core.Schedule.Schedule_porder;
-import vn.gpay.gsmart.core.api.product.Product_filter_request;
-import vn.gpay.gsmart.core.api.product.Product_filter_response;
 import vn.gpay.gsmart.core.holiday.Holiday;
 import vn.gpay.gsmart.core.holiday.IHolidayService;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.org.OrgServiceImpl;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder.POrder_Service;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
-import vn.gpay.gsmart.core.porder_grant.POrderGrant_Service;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
@@ -42,7 +40,7 @@ public class ScheduleAPI {
 	@Autowired IHolidayService holidayService;
 	@Autowired OrgServiceImpl orgService;
 	@Autowired POrder_Service porderService;
-	@Autowired POrderGrant_Service granttService;
+	@Autowired IPOrderGrant_Service granttService;
 	@Autowired Common commonService;
 	
 	@RequestMapping(value = "/getplan",method = RequestMethod.POST)
@@ -155,6 +153,34 @@ public class ScheduleAPI {
 						response.events.rows.add(sch_porder);
 					}
 					
+					//Lay cac lenh dang thu
+					List<POrderGrant> list_porder_test = granttService.get_porder_test(startdate, toDate, 
+							org_grant.getId(), PO_code, orgbuyerid_link, orgvendorid_link);
+					
+					for(POrderGrant pordergrant : list_porder_test) {
+						Date start = pordergrant.getProductiondate_plan();
+						Date end = pordergrant.getEndDatePlan();
+						int duration = commonService.getDuration(start, end, orgrootid_link, year);
+						int productivity = pordergrant.getTotalpackage() / duration; 
+						
+						Schedule_porder sch_porder = new Schedule_porder();
+						sch_porder.setCls(pordergrant.getCls());
+						sch_porder.setEndDate(end);
+						sch_porder.setId_origin(pordergrant.getId());
+						sch_porder.setMahang(pordergrant.getMaHang());
+						sch_porder.setName(pordergrant.getMaHang());
+						sch_porder.setResourceId(sch_org_grant.getId());
+						sch_porder.setStartDate(start);
+						sch_porder.setDuration(duration);
+						sch_porder.setTotalpackage(pordergrant.getTotalpackage());
+						sch_porder.setProductivity(productivity);
+						sch_porder.setVendorname(pordergrant.getVendorname());
+						sch_porder.setBuyername(pordergrant.getBuyername());
+						sch_porder.setPordercode(pordergrant.getpordercode());
+						
+						response.events.rows.add(sch_porder);
+					}
+					
 					if(isAllgrant) {
 						sch_org.getChildren().add(sch_org_grant);
 					}
@@ -176,7 +202,7 @@ public class ScheduleAPI {
 				porder_free.setParentid_origin(org_factory.getId());
 				id++;
 				
-				List<POrder> listporder_free = porderService.get_free_bygolivedate(startdate, toDate, org_factory.getId(), isReqPorder);
+				List<POrder> listporder_free = porderService.get_free_bygolivedate(startdate, toDate, org_factory.getId());
 				for(POrder porderfree : listporder_free) {
 					Schedule_plan sch_porderfree = new Schedule_plan();
 					
@@ -191,8 +217,10 @@ public class ScheduleAPI {
 					porder_free.getChildren().add(sch_porderfree);
 					
 					Schedule_porder sch_porder = new Schedule_porder();
+					Date _end = porderfree.getFinishdate_plan();
+					
 					sch_porder.setCls(porderfree.getCls());
-					sch_porder.setEndDate(porderfree.getFinishdate_plan());
+					sch_porder.setEndDate(commonService.addDate(_end, 1));
 					sch_porder.setId_origin(porderfree.getId());
 					sch_porder.setMahang(porderfree.getMaHang());
 					sch_porder.setName(porderfree.getMaHang());
@@ -250,6 +278,8 @@ public class ScheduleAPI {
 			int productivity = event.getTotalpackage() / duration; 
 			event.setDuration(duration);
 			event.setProductivity(productivity);
+			
+			
 			
 			response.data = event;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
