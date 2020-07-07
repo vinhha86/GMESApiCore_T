@@ -174,8 +174,8 @@ public class Common {
 		
 		List<Holiday> list_holiday = holidayService.getby_year(orgrootid_link, year);
 		
-		while(start.before(end) || start.compareTo(end) == 0) {
-			if(start.DAY_OF_WEEK != Calendar.SUNDAY) {
+		while(start.before(end)) {
+			if(start.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
 				boolean check = false;
 				for(Holiday holiday : list_holiday) {
 					Calendar day = Calendar.getInstance();
@@ -191,9 +191,16 @@ public class Common {
 				}
 			}
 			
-			start.add(Calendar.DATE , 1);
+			start.add(Calendar.DAY_OF_WEEK , 1);
 		}
 		
 		return duration;
+	}
+	
+	public Date addDate(Date date , int d) {
+		Calendar start = Calendar.getInstance();
+		start.setTime(date);
+		start.add(Calendar.DAY_OF_WEEK, d);
+		return start.getTime();
 	}
 }

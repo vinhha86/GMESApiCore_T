@@ -22,6 +22,7 @@ public class Schedule_porder {
 	private String vendorname;
 	private String buyername;
 	private String pordercode;
+	private Integer totalpackage;
 		
 	public String getPordercode() {
 		return pordercode;
@@ -102,6 +103,12 @@ public class Schedule_porder {
 	}
 	public void setBuyername(String buyername) {
 		this.buyername = buyername;
+	}
+	public Integer getTotalpackage() {
+		return totalpackage;
+	}
+	public void setTotalpackage(Integer totalpackage) {
+		this.totalpackage = totalpackage;
 	}
 	
 	

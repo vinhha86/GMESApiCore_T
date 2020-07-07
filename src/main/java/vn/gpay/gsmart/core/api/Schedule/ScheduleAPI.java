@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,8 +28,8 @@ import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.org.OrgServiceImpl;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder.POrder_Service;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
-import vn.gpay.gsmart.core.porder_grant.POrderGrant_Service;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
@@ -39,7 +40,7 @@ public class ScheduleAPI {
 	@Autowired IHolidayService holidayService;
 	@Autowired OrgServiceImpl orgService;
 	@Autowired POrder_Service porderService;
-	@Autowired POrderGrant_Service granttService;
+	@Autowired IPOrderGrant_Service granttService;
 	@Autowired Common commonService;
 	
 	@RequestMapping(value = "/getplan",method = RequestMethod.POST)
@@ -73,6 +74,7 @@ public class ScheduleAPI {
 				sch_holiday.setComment(holiday.getComment());
 				sch_holiday.setStartDate(holiday.getDay());
 				sch_holiday.setEndDate(holiday.getDay());
+				sch_holiday.setCls("holiday");
 				
 				response.zones.rows.add(sch_holiday);
 			}
@@ -142,6 +144,35 @@ public class ScheduleAPI {
 						sch_porder.setResourceId(sch_org_grant.getId());
 						sch_porder.setStartDate(start);
 						sch_porder.setDuration(duration);
+						sch_porder.setTotalpackage(pordergrant.getTotalpackage());
+						sch_porder.setProductivity(productivity);
+						sch_porder.setVendorname(pordergrant.getVendorname());
+						sch_porder.setBuyername(pordergrant.getBuyername());
+						sch_porder.setPordercode(pordergrant.getpordercode());
+						
+						response.events.rows.add(sch_porder);
+					}
+					
+					//Lay cac lenh dang thu
+					List<POrderGrant> list_porder_test = granttService.get_porder_test(startdate, toDate, 
+							org_grant.getId(), PO_code, orgbuyerid_link, orgvendorid_link);
+					
+					for(POrderGrant pordergrant : list_porder_test) {
+						Date start = pordergrant.getProductiondate_plan();
+						Date end = pordergrant.getEndDatePlan();
+						int duration = commonService.getDuration(start, end, orgrootid_link, year);
+						int productivity = pordergrant.getTotalpackage() / duration; 
+						
+						Schedule_porder sch_porder = new Schedule_porder();
+						sch_porder.setCls(pordergrant.getCls());
+						sch_porder.setEndDate(end);
+						sch_porder.setId_origin(pordergrant.getId());
+						sch_porder.setMahang(pordergrant.getMaHang());
+						sch_porder.setName(pordergrant.getMaHang());
+						sch_porder.setResourceId(sch_org_grant.getId());
+						sch_porder.setStartDate(start);
+						sch_porder.setDuration(duration);
+						sch_porder.setTotalpackage(pordergrant.getTotalpackage());
 						sch_porder.setProductivity(productivity);
 						sch_porder.setVendorname(pordergrant.getVendorname());
 						sch_porder.setBuyername(pordergrant.getBuyername());
@@ -171,7 +202,7 @@ public class ScheduleAPI {
 				porder_free.setParentid_origin(org_factory.getId());
 				id++;
 				
-				List<POrder> listporder_free = porderService.get_free_bygolivedate(startdate, toDate, org_factory.getId(), isReqPorder);
+				List<POrder> listporder_free = porderService.get_free_bygolivedate(startdate, toDate, org_factory.getId());
 				for(POrder porderfree : listporder_free) {
 					Schedule_plan sch_porderfree = new Schedule_plan();
 					
@@ -186,14 +217,17 @@ public class ScheduleAPI {
 					porder_free.getChildren().add(sch_porderfree);
 					
 					Schedule_porder sch_porder = new Schedule_porder();
+					Date _end = porderfree.getFinishdate_plan();
+					
 					sch_porder.setCls(porderfree.getCls());
-					sch_porder.setEndDate(porderfree.getFinishdate_plan());
+					sch_porder.setEndDate(commonService.addDate(_end, 1));
 					sch_porder.setId_origin(porderfree.getId());
 					sch_porder.setMahang(porderfree.getMaHang());
 					sch_porder.setName(porderfree.getMaHang());
 					sch_porder.setResourceId(id);
 					sch_porder.setStartDate(porderfree.getProductiondate_plan());
 					sch_porder.setDuration(0);
+					sch_porder.setTotalpackage(porderfree.getTotalorder());
 					sch_porder.setProductivity(0);
 					sch_porder.setVendorname(porderfree.getVendorname());
 					sch_porder.setBuyername(porderfree.getBuyername());
@@ -227,4 +261,34 @@ public class ScheduleAPI {
 		
 		return new ResponseEntity<get_schedule_porder_response>(response,HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/update",method = RequestMethod.POST)
+	public ResponseEntity<update_schedule_response> Product_Filter(HttpServletRequest request,
+			@RequestBody update_schedule_request entity) {
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		update_schedule_response response = new update_schedule_response();
+		try {
+			Schedule_porder event = entity.data;
+			Date start = event.getStartDate();
+			Date end = event.getEndDate();
+			long orgrootid_link = user.getRootorgid_link();
+			int year = Calendar.getInstance().get(Calendar.YEAR);
+			
+			int duration = commonService.getDuration(start, end, orgrootid_link, year);
+			int productivity = event.getTotalpackage() / duration; 
+			event.setDuration(duration);
+			event.setProductivity(productivity);
+			
+			
+			
+			response.data = event;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<update_schedule_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<update_schedule_response>(response, HttpStatus.OK);
+		}
+	} 
 }

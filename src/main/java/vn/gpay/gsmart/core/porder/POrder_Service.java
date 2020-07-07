@@ -162,9 +162,8 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 	
 	@Override
 	//Danh sach cac lenh duoc phan cho Phan xuong nhung chua duoc phan chuyen
-	public List<POrder> get_free_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link,
-			Boolean isReqPorder){
-		int status = isReqPorder == true ? -1: 0;
+	public List<POrder> get_free_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link){
+		int status = 0;
 		Specification<POrder> specification = Specifications.<POrder>and()
 				.le("status", 0)
 				.ge("status", status)
