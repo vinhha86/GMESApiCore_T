@@ -22,13 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.gpay.gsmart.core.Schedule.Schedule_holiday;
 import vn.gpay.gsmart.core.Schedule.Schedule_plan;
 import vn.gpay.gsmart.core.Schedule.Schedule_porder;
-import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.holiday.Holiday;
 import vn.gpay.gsmart.core.holiday.IHolidayService;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.org.OrgServiceImpl;
+import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
-import vn.gpay.gsmart.core.porder.POrder_Service;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -40,7 +39,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 public class ScheduleAPI {
 	@Autowired IHolidayService holidayService;
 	@Autowired OrgServiceImpl orgService;
-	@Autowired POrder_Service porderService;
+	@Autowired IPOrder_Service porderService;
 	@Autowired IPOrderGrant_Service granttService;
 	@Autowired Common commonService;
 	
@@ -207,7 +206,8 @@ public class ScheduleAPI {
 				porder_free.setParentid_origin(org_factory.getId());
 				id++;
 				
-				List<POrder> listporder_free = porderService.get_free_bygolivedate(startdate, toDate, org_factory.getId());
+				List<POrder> listporder_free = porderService.get_free_bygolivedate(startdate, toDate, org_factory.getId(),
+						PO_code, orgbuyerid_link, orgvendorid_link);
 				for(POrder porderfree : listporder_free) {
 					Schedule_plan sch_porderfree = new Schedule_plan();
 					
