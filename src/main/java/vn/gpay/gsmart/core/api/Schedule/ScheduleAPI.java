@@ -433,4 +433,27 @@ public class ScheduleAPI {
 			return new ResponseEntity<update_duration_porder_response>(response, HttpStatus.OK);
 		}
 	} 
+	
+	@RequestMapping(value = "/get_duration",method = RequestMethod.POST)
+	public ResponseEntity<getduration_response> GetDuration(HttpServletRequest request,
+			@RequestBody getduration_request entity) {
+		getduration_response response = new getduration_response();
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		long orgrootid_link = user.getRootorgid_link();
+		int year = Calendar.getInstance().get(Calendar.YEAR);
+		
+		try {
+			int duration = commonService.getDuration(entity.StartDate, entity.EndDate, orgrootid_link, year);
+			
+			response.duration = duration;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getduration_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<getduration_response>(response, HttpStatus.OK);
+		}
+	} 
 }
