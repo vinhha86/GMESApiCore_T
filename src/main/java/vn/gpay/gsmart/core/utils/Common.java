@@ -197,6 +197,41 @@ public class Common {
 		return duration;
 	}
 	
+	public boolean check_dayoff(Calendar _date, long orgrootid_link ,int year) {
+		if(_date.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
+			return true;
+		else {
+			List<Holiday> list_holiday = holidayService.getby_year(orgrootid_link, year);
+			for(Holiday holiday : list_holiday) {
+				if(_date.getTime().compareTo(holiday.getDay()) == 0) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	public Date Date_Add(Date date, int amount) {
+		Calendar _date = Calendar.getInstance();
+		_date.setTime(date);
+		_date.add(Calendar.DATE, amount);
+		return _date.getTime();
+	}
+	public Date Date_Add_with_holiday(Date date, int amount, long orgrootid_link, int year) {
+		int count = 0;
+		
+		Calendar _date = Calendar.getInstance();
+		_date.setTime(date);
+		
+		while(count<amount) {
+			_date.add(Calendar.DATE, 1);
+			if(!check_dayoff(_date, orgrootid_link, year)) {
+				count++;
+			}
+		}
+		
+		return _date.getTime();
+	}
+	
 	public Date getEndOfDate(Date date) {
 		Calendar start = Calendar.getInstance();
 		start.setTime(date);

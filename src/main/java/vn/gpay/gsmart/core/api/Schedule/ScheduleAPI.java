@@ -74,7 +74,7 @@ public class ScheduleAPI {
 				Schedule_holiday sch_holiday = new Schedule_holiday();
 				sch_holiday.setComment(holiday.getComment());
 				sch_holiday.setStartDate(holiday.getDay());
-				sch_holiday.setEndDate(holiday.getDay());
+				sch_holiday.setEndDate(commonService.Date_Add(holiday.getDay(), 1));
 				sch_holiday.setCls("holiday");
 				
 				response.zones.rows.add(sch_holiday);
@@ -340,6 +340,90 @@ public class ScheduleAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/update_date",method = RequestMethod.POST)
+	public ResponseEntity<update_duration_porder_response> UpdateStartDate(HttpServletRequest request,
+			@RequestBody update_duration_porder_request entity) {
+		update_duration_porder_response response = new update_duration_porder_response();
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		long orgrootid_link = user.getRootorgid_link();
+		int year = Calendar.getInstance().get(Calendar.YEAR);
+		
+		try {
+			int duration = commonService.getDuration(entity.data.getStartDate(), entity.data.getEndDate(), orgrootid_link, year);
+			int productivity = entity.data.getTotalpackage() / duration;
+			
+			Schedule_porder sch = entity.data;
+			sch.setDuration(duration);
+			sch.setProductivity(productivity);
+			
+			response.data = sch;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<update_duration_porder_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<update_duration_porder_response>(response, HttpStatus.OK);
+		}
+	} 
+	
+	@RequestMapping(value = "/update_duration",method = RequestMethod.POST)
+	public ResponseEntity<update_duration_porder_response> UpdatDuration(HttpServletRequest request,
+			@RequestBody update_duration_porder_request entity) {
+		update_duration_porder_response response = new update_duration_porder_response();
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		long orgrootid_link = user.getRootorgid_link();
+		int year = Calendar.getInstance().get(Calendar.YEAR);
+		
+		try {
+			Date end = commonService.Date_Add_with_holiday(entity.data.getStartDate(), entity.data.getDuration(), orgrootid_link, year);
+			int productivity = entity.data.getTotalpackage() / entity.data.getDuration();
+			
+			Schedule_porder sch = entity.data;
+			sch.setEndDate(end);
+			sch.setProductivity(productivity);
+			
+			response.data = sch;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<update_duration_porder_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<update_duration_porder_response>(response, HttpStatus.OK);
+		}
+	} 
+	
+	@RequestMapping(value = "/update_productivity",method = RequestMethod.POST)
+	public ResponseEntity<update_duration_porder_response> UpdatProductivity(HttpServletRequest request,
+			@RequestBody update_duration_porder_request entity) {
+		update_duration_porder_response response = new update_duration_porder_response();
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		long orgrootid_link = user.getRootorgid_link();
+		int year = Calendar.getInstance().get(Calendar.YEAR);
+		
+		try {
+			int duration = entity.data.getTotalpackage() / entity.data.getProductivity();			
+			Date end = commonService.Date_Add_with_holiday(entity.data.getStartDate(), duration, orgrootid_link, year);
+			
+			Schedule_porder sch = entity.data;
+			sch.setEndDate(end);
+			sch.setDuration(duration);
+			
+			response.data = sch;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<update_duration_porder_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<update_duration_porder_response>(response, HttpStatus.OK);
 		}
 	} 
 }

@@ -1,10 +1,7 @@
 package vn.gpay.gsmart.core.api.Schedule;
 
-import java.util.Date;
+import vn.gpay.gsmart.core.Schedule.Schedule_porder;
 
 public class update_duration_porder_request {
-	public Date startDate;
-	public Date endDate;
-	public int duration;
-	public int productivity;
+	public Schedule_porder data;
 }
