@@ -305,12 +305,13 @@ public class ScheduleAPI {
 	} 
 	
 	@RequestMapping(value = "/update_porder",method = RequestMethod.POST)
-	public ResponseEntity<ResponseBase> UpdatePorder(HttpServletRequest request,
+	public ResponseEntity<update_porder_response> UpdatePorder(HttpServletRequest request,
 			@RequestBody update_porder_request entity) {
-		ResponseBase response = new ResponseBase();
+		update_porder_response response = new update_porder_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
+			int year = Calendar.getInstance().get(Calendar.YEAR);
 			//update vao lenh
 			long porderid_link = entity.porderid_link;
 			POrder porder = porderService.findOne(porderid_link);
@@ -327,19 +328,23 @@ public class ScheduleAPI {
 				grant.setPorderid_link(porderid_link);
 				grant.setTimecreated(new Date());
 				grant.setUsercreatedid_link(user.getId());
+				grant.setGrantdate(porder.getOrderdate());
+				grant.setGrantamount(porder.getTotalorder());
 				granttService.save(grant);
 				
 				porder.setStatus(1);
 			}
 			porderService.save(porder);
 			
+			response.duration = commonService.getDuration(entity.StartDate, entity.EndDate, orgrootid_link, year);
+			response.productivity = porder.getTotalorder() / response.duration;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+			return new ResponseEntity<update_porder_response>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+			return new ResponseEntity<update_porder_response>(response, HttpStatus.OK);
 		}
 	}
 	

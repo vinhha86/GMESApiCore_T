@@ -250,16 +250,16 @@ public class POrder implements Serializable {
 	
 	@Transient
 	public String getBuyername() {
-		if(product != null) {
-			return product.getBuyername();
+		if(pcontract != null) {
+			return pcontract.getBuyername();
 		}
 		return "";
 	}
 	
 	@Transient
 	public String getVendorname() {
-		if(pcontract_po != null) {
-			return pcontract_po.getPo_vendor();
+		if(pcontract != null) {
+			return pcontract.getVendorname();
 		}
 		return "";
 	}
