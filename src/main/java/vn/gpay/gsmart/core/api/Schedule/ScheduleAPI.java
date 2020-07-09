@@ -330,9 +330,11 @@ public class ScheduleAPI {
 				grant.setUsercreatedid_link(user.getId());
 				grant.setGrantdate(porder.getOrderdate());
 				grant.setGrantamount(porder.getTotalorder());
+				grant.setStatus(1);
 				granttService.save(grant);
 				
 				porder.setStatus(1);
+				porder.setGranttoorgid_link(entity.grant_to_orgid_link);
 			}
 			porderService.save(porder);
 			
