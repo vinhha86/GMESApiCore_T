@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.gpay.gsmart.core.Schedule.Schedule_holiday;
 import vn.gpay.gsmart.core.Schedule.Schedule_plan;
 import vn.gpay.gsmart.core.Schedule.Schedule_porder;
+import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.holiday.Holiday;
 import vn.gpay.gsmart.core.holiday.IHolidayService;
 import vn.gpay.gsmart.core.org.Org;
@@ -149,6 +150,8 @@ public class ScheduleAPI {
 						sch_porder.setVendorname(pordergrant.getVendorname());
 						sch_porder.setBuyername(pordergrant.getBuyername());
 						sch_porder.setPordercode(pordergrant.getpordercode());
+						sch_porder.setParentid_origin(orgid);
+						sch_porder.setStatus(-1);
 						
 						response.events.rows.add(sch_porder);
 					}
@@ -178,6 +181,7 @@ public class ScheduleAPI {
 						sch_porder.setBuyername(pordergrant.getBuyername());
 						sch_porder.setPordercode(pordergrant.getpordercode());
 						sch_porder.setParentid_origin(orgid);
+						sch_porder.setStatus(pordergrant.getStatusPorder());
 						
 						response.events.rows.add(sch_porder);
 					}
@@ -233,6 +237,8 @@ public class ScheduleAPI {
 					sch_porder.setVendorname(porderfree.getVendorname());
 					sch_porder.setBuyername(porderfree.getBuyername());
 					sch_porder.setPordercode(porderfree.getOrdercode());
+					sch_porder.setParentid_origin(org_factory.getId());
+					sch_porder.setStatus(0);
 					
 					response.events.rows.add(sch_porder);
 					id++;
@@ -264,7 +270,7 @@ public class ScheduleAPI {
 	}
 	
 	@RequestMapping(value = "/update",method = RequestMethod.POST)
-	public ResponseEntity<update_schedule_response> Product_Filter(HttpServletRequest request,
+	public ResponseEntity<update_schedule_response> Update(HttpServletRequest request,
 			@RequestBody update_schedule_request entity) {
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		update_schedule_response response = new update_schedule_response();
@@ -284,7 +290,7 @@ public class ScheduleAPI {
 			long porderid_link = entity.data.getId_origin();
 			POrder porder = porderService.findOne(porderid_link);
 			porder.setProductiondate_plan(entity.data.getStartDate());
-			porder.setFinishdate_plan(entity.data.getEndDate());
+			porder.setFinishdate_plan(commonService.getPrevious(entity.data.getEndDate()));
 			porderService.save(porder);
 			
 			response.data = event;
@@ -295,6 +301,45 @@ public class ScheduleAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<update_schedule_response>(response, HttpStatus.OK);
+		}
+	} 
+	
+	@RequestMapping(value = "/update_porder",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> UpdatePorder(HttpServletRequest request,
+			@RequestBody update_porder_request entity) {
+		ResponseBase response = new ResponseBase();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			//update vao lenh
+			long porderid_link = entity.porderid_link;
+			POrder porder = porderService.findOne(porderid_link);
+			porder.setProductiondate_plan(entity.StartDate);
+			porder.setFinishdate_plan(entity.EndDate);
+			
+			
+			if(entity.grant_to_orgid_link!=0) {
+				POrderGrant grant = new POrderGrant();
+				grant.setGranttoorgid_link(entity.grant_to_orgid_link);
+				grant.setId(null);
+				grant.setOrdercode(porder.getOrdercode());
+				grant.setOrgrootid_link(orgrootid_link);
+				grant.setPorderid_link(porderid_link);
+				grant.setTimecreated(new Date());
+				grant.setUsercreatedid_link(user.getId());
+				granttService.save(grant);
+				
+				porder.setStatus(1);
+			}
+			porderService.save(porder);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 		}
 	} 
 }

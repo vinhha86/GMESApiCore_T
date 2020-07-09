@@ -205,4 +205,12 @@ public class Common {
 		Date date_ret = start.getTime();
 		return date_ret;
 	}
+	
+	public Date getPrevious(Date date) {
+		Calendar start = Calendar.getInstance();
+		start.setTime(date);
+		start.add(Calendar.MINUTE, -1);
+		Date date_ret = start.getTime();
+		return date_ret;
+	}
 }

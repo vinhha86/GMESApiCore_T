@@ -86,6 +86,12 @@ public class POrderGrant implements Serializable {
 			return porder.getOrdercode();
 		return "";
 	}
+	@Transient
+	public int getStatusPorder() {
+		if(porder!=null)
+			return porder.getStatus();
+		return 0;
+	}
 	
 	@Transient
 	public String getBuyername() {
