@@ -23,6 +23,8 @@ public interface Operations<T extends Serializable> {
     
     T save(final T entity);
     
+    T saveAndFlush(final T entity);
+    
     T update(final T entity);
 
     void delete(final T entity);

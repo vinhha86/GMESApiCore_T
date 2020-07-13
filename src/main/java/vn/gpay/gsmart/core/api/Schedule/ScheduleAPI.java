@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.api.Schedule;
 
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -26,10 +27,18 @@ import vn.gpay.gsmart.core.holiday.Holiday;
 import vn.gpay.gsmart.core.holiday.IHolidayService;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.org.OrgServiceImpl;
+import vn.gpay.gsmart.core.pcontract.IPContractService;
+import vn.gpay.gsmart.core.pcontract.PContract;
+import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
+import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
+import vn.gpay.gsmart.core.porder_req.POrder_Req;
+import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
+import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
@@ -42,6 +51,10 @@ public class ScheduleAPI {
 	@Autowired IPOrder_Service porderService;
 	@Autowired IPOrderGrant_Service granttService;
 	@Autowired Common commonService;
+	@Autowired IPOrderProcessing_Service processService;
+	@Autowired IPOrder_Req_Service reqService;
+	@Autowired IPContractService pcontractService;
+	@Autowired IPContract_POService poService;
 	
 	@RequestMapping(value = "/getplan",method = RequestMethod.POST)
 	public ResponseEntity<get_schedule_porder_response> GetAll(HttpServletRequest request,
@@ -378,8 +391,20 @@ public class ScheduleAPI {
 			pg.setStatus(1);
 			granttService.save(pg);
 			
+			POrderProcessing pp = new POrderProcessing();
+			pp.setOrdercode(porder.getOrdercode());
+			pp.setOrderdate(porder.getOrderdate());
+			pp.setOrgrootid_link(orgrootid_link);
+			pp.setPorderid_link(porder.getId());
+			pp.setTotalorder(porder.getTotalorder());
+			pp.setUsercreatedid_link(user.getId());
+			pp.setStatus(1);
+			pp.setGranttoorgid_link(entity.orggrantto);
+			
+			processService.save(pp);
+			
 			Date startDate = porder.getProductiondate_plan();
-			Date endDate = porder.getFinishdate_plan();
+			Date endDate = commonService.getEndOfDate(porder.getFinishdate_plan());
 			int duration = commonService.getDuration(startDate, endDate, orgrootid_link, year);
 			int productivity = (int)Math.ceil(porder.getTotalorder() / duration);
 			
@@ -401,6 +426,103 @@ public class ScheduleAPI {
 			sch.setStatus(1);
 			sch.setTotalpackage(porder.getTotalorder());
 			sch.setVendorname(porder.getVendorname());
+			
+			response.data = sch;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<create_pordergrant_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<create_pordergrant_response>(response, HttpStatus.OK);
+		}
+	} 
+	
+	@RequestMapping(value = "/create_pordergrant_test",method = RequestMethod.POST)
+	public ResponseEntity<create_pordergrant_response> CreatePorderGrantTest(HttpServletRequest request,
+			@RequestBody create_porder_test_request entity) {
+		create_pordergrant_response response = new create_pordergrant_response();
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		long orgrootid_link = user.getRootorgid_link();
+		int year = Calendar.getInstance().get(Calendar.YEAR);
+		
+		try {
+			POrder_Req req = reqService.findOne(entity.porder_reqid_link);
+			req.setStatus(1);
+			reqService.save(req);
+			
+			String po_code = req.getPo_buyer().length() > 0?req.getPo_vendor():req.getPo_buyer();
+			POrder porder = new POrder();
+			porder.setOrdercode(po_code);
+			porder.setFinishdate_plan(req.getShipdate());
+			porder.setGolivedate(req.getShipdate());
+			porder.setStatus(-1);
+			porder.setGranttoorgid_link(entity.orggrantto);
+			porder.setId(null);
+			porder.setOrgrootid_link(orgrootid_link);
+			porder.setPcontract_poid_link(req.getPcontract_poid_link());
+			porder.setPcontractid_link(req.getPcontractid_link());
+			porder.setProductiondate(req.getPO_Productiondate());
+			porder.setUsercreatedid_link(user.getId());
+			porder.setTimecreated(new Date());
+			porder.setProductiondate_plan(req.getPO_Productiondate());
+			porder.setPorderreqid_link(entity.porder_reqid_link);
+			porder.setTotalorder(req.getTotalorder());
+			porder.setProductid_link(req.getProductid_link());
+			porderService.saveAndFlush(porder);
+			
+			POrderGrant pg = new POrderGrant();
+			pg.setId(null);
+			pg.setUsercreatedid_link(user.getId());
+			pg.setTimecreated(new Date());
+			pg.setGrantdate(new Date());
+			pg.setGrantamount(porder.getTotalorder());
+			pg.setGranttoorgid_link(entity.orggrantto);
+			pg.setOrdercode(porder.getOrdercode());
+			pg.setPorderid_link(porder.getId());
+			pg.setOrgrootid_link(orgrootid_link);
+			pg.setStatus(-1);
+			granttService.save(pg);
+			
+			Date startDate = porder.getProductiondate_plan();
+			Date endDate = commonService.getEndOfDate(porder.getFinishdate_plan());
+			int duration = commonService.getDuration(startDate, endDate, orgrootid_link, year);
+			int productivity = (int)Math.ceil(porder.getTotalorder() / duration);
+			PContract contract = pcontractService.findOne(req.getPcontractid_link());
+			PContract_PO po = poService.findOne(req.getPcontract_poid_link());
+			
+			String name = "";
+			int total = porder.getTotalorder() == null ? 0 : porder.getTotalorder();
+			float totalPO = po == null ? 0 : po.getPo_quantity();
+			
+			DecimalFormat decimalFormat = new DecimalFormat("#,###");
+			decimalFormat.setGroupingSize(3);
+			
+			if(contract != null && po!=null) {
+				String ST = contract.getBuyername() == null ? "" : contract.getBuyername();
+				String PO = po.getPo_buyer() == null ? "" : po.getPo_vendor();
+				name += "#"+ST+"-PO: "+PO+"-"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
+			}
+			
+			Schedule_porder sch = new Schedule_porder();
+			sch.setDuration(duration);
+			sch.setProductivity(productivity);
+			sch.setBuyername(contract.getBuyername());
+			sch.setCls(porder.getCls());
+			sch.setDuration(duration);
+			sch.setEndDate(endDate);
+			sch.setId_origin(porder.getId());
+			sch.setMahang(name);
+			sch.setName(name);
+			sch.setParentid_origin(entity.parentid_origin);
+			sch.setPordercode(porder.getOrdercode());
+			sch.setProductivity(productivity);
+			sch.setResourceId(entity.resourceid);
+			sch.setStartDate(startDate);
+			sch.setStatus(1);
+			sch.setTotalpackage(porder.getTotalorder());
+			sch.setVendorname(contract.getVendorname());
 			
 			response.data = sch;
 			

@@ -45,6 +45,11 @@ public abstract class AbstractService<T extends Serializable> implements Operati
     }
     
     @Override
+    public T saveAndFlush(final T entity) {
+        return getRepository().saveAndFlush(entity);
+    }
+    
+    @Override
     public T update(final T entity) {
         return getRepository().save(entity);
     }
