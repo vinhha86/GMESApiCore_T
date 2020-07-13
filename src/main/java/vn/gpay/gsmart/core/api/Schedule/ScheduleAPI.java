@@ -105,6 +105,7 @@ public class ScheduleAPI {
 				sch_org.setName(org_factory.getName());
 				sch_org.setOrgtypeid_link(org_factory.getOrgtypeid_link());
 				sch_org.setParentid_origin(org_factory.getParentid_link());
+				sch_org.setType(0);
 				
 				id++;
 				
@@ -122,6 +123,7 @@ public class ScheduleAPI {
 					sch_org_grant.setName(org_grant.getName());
 					sch_org_grant.setOrgtypeid_link(org_grant.getOrgtypeid_link());
 					sch_org_grant.setParentid_origin(org_grant.getParentid_link());
+					sch_org_grant.setType(1);
 					
 					id++;
 					
@@ -196,61 +198,61 @@ public class ScheduleAPI {
 				}
 				
 				//Lay nhung lenh chua phan chuyen cua moi nha may
-				Schedule_plan porder_free = new Schedule_plan();
-				porder_free.setExpanded(false);
-				porder_free.setId(id);
-				porder_free.setId_origin(0);
-				porder_free.setLeaf(false);
-				porder_free.setName("Chưa phân chuyền");
-				porder_free.setIconCls("x-fa fa-file-o");
-				porder_free.setParentid_origin(org_factory.getId());
-				id++;
-				
-				List<POrder> listporder_free = porderService.get_free_bygolivedate(startdate, toDate, org_factory.getId(),
-						PO_code, orgbuyerid_link, orgvendorid_link);
-				for(POrder porderfree : listporder_free) {
-					Schedule_plan sch_porderfree = new Schedule_plan();
-					
-					sch_porderfree.setExpanded(false);
-					sch_porderfree.setId(id);
-					sch_porderfree.setId_origin(0);
-					sch_porderfree.setLeaf(true);
-					sch_porderfree.setName(porderfree.getOrdercode());
-					sch_porderfree.setIconCls("x-fa fa-industry");
-					sch_porderfree.setParentid_origin(org_factory.getId());
-										
-					porder_free.getChildren().add(sch_porderfree);
-					
-					Schedule_porder sch_porder = new Schedule_porder();
-					Date _end = porderfree.getFinishdate_plan();
-					
-					sch_porder.setCls(porderfree.getCls());
-					sch_porder.setEndDate(commonService.getEndOfDate(_end));
-					sch_porder.setId_origin(porderfree.getId());
-					sch_porder.setMahang(porderfree.getMaHang());
-					sch_porder.setName(porderfree.getMaHang());
-					sch_porder.setResourceId(id);
-					sch_porder.setStartDate(porderfree.getProductiondate_plan());
-					sch_porder.setDuration(0);
-					sch_porder.setTotalpackage(porderfree.getTotalorder());
-					sch_porder.setProductivity(0);
-					sch_porder.setVendorname(porderfree.getVendorname());
-					sch_porder.setBuyername(porderfree.getBuyername());
-					sch_porder.setPordercode(porderfree.getOrdercode());
-					sch_porder.setParentid_origin(org_factory.getId());
-					sch_porder.setStatus(0);
-					
-					response.events.rows.add(sch_porder);
-					id++;
-				}
-				if(isAllgrant) {
-					sch_org.getChildren().add(porder_free);
-				}
-				else {
-					if(listporder_free.size() > 0) {
-						sch_org.getChildren().add(porder_free);
-					}
-				}
+//				Schedule_plan porder_free = new Schedule_plan();
+//				porder_free.setExpanded(false);
+//				porder_free.setId(id);
+//				porder_free.setId_origin(0);
+//				porder_free.setLeaf(false);
+//				porder_free.setName("Chưa phân chuyền");
+//				porder_free.setIconCls("x-fa fa-file-o");
+//				porder_free.setParentid_origin(org_factory.getId());
+//				id++;
+//				
+//				List<POrder> listporder_free = porderService.get_free_bygolivedate(startdate, toDate, org_factory.getId(),
+//						PO_code, orgbuyerid_link, orgvendorid_link);
+//				for(POrder porderfree : listporder_free) {
+//					Schedule_plan sch_porderfree = new Schedule_plan();
+//					
+//					sch_porderfree.setExpanded(false);
+//					sch_porderfree.setId(id);
+//					sch_porderfree.setId_origin(0);
+//					sch_porderfree.setLeaf(true);
+//					sch_porderfree.setName(porderfree.getOrdercode());
+//					sch_porderfree.setIconCls("x-fa fa-industry");
+//					sch_porderfree.setParentid_origin(org_factory.getId());
+//										
+//					porder_free.getChildren().add(sch_porderfree);
+//					
+//					Schedule_porder sch_porder = new Schedule_porder();
+//					Date _end = porderfree.getFinishdate_plan();
+//					
+//					sch_porder.setCls(porderfree.getCls());
+//					sch_porder.setEndDate(commonService.getEndOfDate(_end));
+//					sch_porder.setId_origin(porderfree.getId());
+//					sch_porder.setMahang(porderfree.getMaHang());
+//					sch_porder.setName(porderfree.getMaHang());
+//					sch_porder.setResourceId(id);
+//					sch_porder.setStartDate(porderfree.getProductiondate_plan());
+//					sch_porder.setDuration(0);
+//					sch_porder.setTotalpackage(porderfree.getTotalorder());
+//					sch_porder.setProductivity(0);
+//					sch_porder.setVendorname(porderfree.getVendorname());
+//					sch_porder.setBuyername(porderfree.getBuyername());
+//					sch_porder.setPordercode(porderfree.getOrdercode());
+//					sch_porder.setParentid_origin(org_factory.getId());
+//					sch_porder.setStatus(0);
+//					
+//					response.events.rows.add(sch_porder);
+//					id++;
+//				}
+//				if(isAllgrant) {
+//					sch_org.getChildren().add(porder_free);
+//				}
+//				else {
+//					if(listporder_free.size() > 0) {
+//						sch_org.getChildren().add(porder_free);
+//					}
+//				}
 				
 				list_sch_plan.add(sch_org);
 			}
@@ -349,6 +351,68 @@ public class ScheduleAPI {
 			return new ResponseEntity<update_porder_response>(response, HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/create_pordergrant",method = RequestMethod.POST)
+	public ResponseEntity<create_pordergrant_response> CreatePorderGrant(HttpServletRequest request,
+			@RequestBody create_pordergrant_request entity) {
+		create_pordergrant_response response = new create_pordergrant_response();
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		long orgrootid_link = user.getRootorgid_link();
+		int year = Calendar.getInstance().get(Calendar.YEAR);
+		
+		try {
+			POrder porder = porderService.findOne(entity.porderid_link);
+			porder.setStatus(1);
+			porderService.save(porder);
+			
+			POrderGrant pg = new POrderGrant();
+			pg.setId(null);
+			pg.setUsercreatedid_link(user.getId());
+			pg.setTimecreated(new Date());
+			pg.setGrantdate(new Date());
+			pg.setGrantamount(porder.getTotalorder());
+			pg.setGranttoorgid_link(entity.orggrantto);
+			pg.setOrdercode(porder.getOrdercode());
+			pg.setPorderid_link(porder.getId());
+			pg.setOrgrootid_link(orgrootid_link);
+			pg.setStatus(1);
+			granttService.save(pg);
+			
+			Date startDate = porder.getProductiondate_plan();
+			Date endDate = porder.getFinishdate_plan();
+			int duration = commonService.getDuration(startDate, endDate, orgrootid_link, year);
+			int productivity = (int)Math.ceil(porder.getTotalorder() / duration);
+			
+			Schedule_porder sch = new Schedule_porder();
+			sch.setDuration(duration);
+			sch.setProductivity(productivity);
+			sch.setBuyername(porder.getBuyername());
+			sch.setCls(porder.getCls());
+			sch.setDuration(duration);
+			sch.setEndDate(endDate);
+			sch.setId_origin(porder.getId());
+			sch.setMahang(porder.getMaHang());
+			sch.setName(porder.getMaHang());
+			sch.setParentid_origin(entity.parentid_origin);
+			sch.setPordercode(porder.getOrdercode());
+			sch.setProductivity(productivity);
+			sch.setResourceId(entity.resourceid);
+			sch.setStartDate(startDate);
+			sch.setStatus(1);
+			sch.setTotalpackage(porder.getTotalorder());
+			sch.setVendorname(porder.getVendorname());
+			
+			response.data = sch;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<create_pordergrant_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<create_pordergrant_response>(response, HttpStatus.OK);
+		}
+	} 
 	
 	@RequestMapping(value = "/update_date",method = RequestMethod.POST)
 	public ResponseEntity<update_duration_porder_response> UpdateStartDate(HttpServletRequest request,
