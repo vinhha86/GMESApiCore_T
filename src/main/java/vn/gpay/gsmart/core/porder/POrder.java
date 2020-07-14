@@ -154,21 +154,22 @@ public class POrder implements Serializable {
 				return pcontract.getcls();
 			else
 				return "gray";
-		return "";
+		return "gray";
 	}
 	
 	@Transient
 	public String getMaHang() {
 		String name = "";
 		int total = totalorder == null ? 0 : totalorder;
-		String ST = product.getBuyercode() == null ? "" : product.getBuyercode();
-		String PO = pcontract_po.getPo_buyer() == null ? "" : pcontract_po.getPo_vendor();
+		float totalPO = pcontract_po == null ? 0 : pcontract_po.getPo_quantity();
 		
 		DecimalFormat decimalFormat = new DecimalFormat("#,###");
 		decimalFormat.setGroupingSize(3);
 		
-		if(product != null && pcontract_po!=null) {
-			name += "(ST: "+ST+")-(PO: "+PO+")-(SL: "+decimalFormat.format(total)+")";
+		if(pcontract != null && pcontract_po!=null) {
+			String ST = pcontract.getBuyername() == null ? "" : pcontract.getBuyername();
+			String PO = pcontract_po.getPo_buyer() == null ? "" : pcontract_po.getPo_vendor();
+			name += "#"+ST+"-PO: "+PO+"-"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
 		}
 		
 		return name;

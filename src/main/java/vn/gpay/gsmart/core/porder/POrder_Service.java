@@ -166,8 +166,7 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 			long orgbuyerid_link,long orgvendorid_link){
 		int status = 0;
 		Specification<POrder> specification = Specifications.<POrder>and()
-				.le("status", 0)
-				.ge("status", status)
+				.eq("status", status)
 	            .eq("granttoorgid_link", granttoorgid_link)
 	            .ge(Objects.nonNull(golivedate_from),"golivedate",DateFormat.atStartOfDay(golivedate_from))
                 .le(Objects.nonNull(golivedate_to),"golivedate",DateFormat.atEndOfDay(golivedate_to))

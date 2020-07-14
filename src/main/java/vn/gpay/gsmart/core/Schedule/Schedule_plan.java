@@ -13,6 +13,7 @@ public class Schedule_plan {
 	private String code;
 	private long parentid_origin;
 	private long orgtypeid_link;
+	private Integer type;
 
 	@JsonProperty("Name")
 	private String Name;
@@ -83,6 +84,12 @@ public class Schedule_plan {
 	}
 	public void setOrgtypeid_link(long orgtypeid_link) {
 		this.orgtypeid_link = orgtypeid_link;
+	}
+	public Integer getType() {
+		return type;
+	}
+	public void setType(Integer type) {
+		this.type = type;
 	}
 	
 	

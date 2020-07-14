@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.porder_req;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -121,22 +122,20 @@ public class POrder_Req_Service extends AbstractService<POrder_Req> implements I
 	public List<POrder_Req> get_by_org(long orgid_link) {
 		// TODO Auto-generated method stub
 		Specification<POrder_Req> specification = Specifications.<POrder_Req>and()
-				.ne("status", -1)
-				.le("status", 5)
-	            .eq("granttoorgid_link", orgid_link)
+				.eq("granttoorgid_link", orgid_link)
 	            .build();
 		Sort sort = Sorts.builder()
-		        .desc("ordercode")
+		        .desc("id")
 		        .build();
 		List<POrder_Req> a = repo.findAll(specification,sort);
-		return a;
+		return a.size() > 0 ? a : new ArrayList<POrder_Req>();
 	}
 	
 	@Override
 	//Danh sach cac lenh duoc phan cho Phan xuong nhung chua duoc phan chuyen
 	public List<POrder_Req> get_free_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link){
 		Specification<POrder_Req> specification = Specifications.<POrder_Req>and()
-				.le("status", 0)
+				.eq("status", 0)
 	            .eq("granttoorgid_link", granttoorgid_link)
 	            .ge(Objects.nonNull(golivedate_from),"golivedate",DateFormat.atStartOfDay(golivedate_from))
                 .le(Objects.nonNull(golivedate_to),"golivedate",DateFormat.atEndOfDay(golivedate_to))

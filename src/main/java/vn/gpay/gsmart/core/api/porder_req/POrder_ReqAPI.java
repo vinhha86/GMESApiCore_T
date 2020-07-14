@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.api.porder_req;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
+import vn.gpay.gsmart.core.org.IOrgService;
+import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
@@ -37,6 +40,8 @@ public class POrder_ReqAPI {
 	@Autowired private IPOrder_Req_Service porder_req_Service;
 	@Autowired IPContract_POService pcontract_POService;
 	@Autowired IPOrder_Service porderService;
+	@Autowired IOrgService orgService;
+	@Autowired IPOrder_Req_Service reqService;
     ObjectMapper mapper = new ObjectMapper();
 	
 	@RequestMapping(value = "/getone",method = RequestMethod.POST)
@@ -106,6 +111,33 @@ public class POrder_ReqAPI {
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<POrder_Req_GetByPO_Response>(response, HttpStatus.BAD_REQUEST);
 		}
+	}
+	
+	@RequestMapping(value = "/getby_org", method = RequestMethod.POST)
+	public ResponseEntity<POrder_Req_getbyorg_response> GetByOrg(HttpServletRequest request){
+		POrder_Req_getbyorg_response response = new POrder_Req_getbyorg_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgid_link = user.getOrgid_link();
+			List<String> orgTypes = new ArrayList<String>();
+			orgTypes.add("13");
+			orgTypes.add("14");
+			List<Org> lsOrgChild = orgService.getorgChildrenbyOrg(orgid_link,orgTypes);
+			for(Org theOrg:lsOrgChild){
+				List<POrder_Req> a = reqService.get_by_org(theOrg.getId());
+				if(a.size()>0)
+					response.data.addAll(a);
+			}
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<POrder_Req_getbyorg_response>(response, HttpStatus.OK);
+		}
+		catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<POrder_Req_getbyorg_response>(response, HttpStatus.BAD_REQUEST);
+		}
+		
 	}
 
 	@RequestMapping(value = "/gen_porder", method = RequestMethod.POST)

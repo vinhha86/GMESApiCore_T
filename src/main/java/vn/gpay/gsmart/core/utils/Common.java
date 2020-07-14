@@ -197,6 +197,11 @@ public class Common {
 		return duration;
 	}
 	
+	public int getProductivity(int total, int duration) {
+		int ret = ((int)Math.ceil(total/duration) + (total % duration == 0 ? 0 : 1));
+		return ret;
+	}
+	
 	public boolean check_dayoff(Calendar _date, long orgrootid_link ,int year) {
 		if(_date.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
 			return true;
@@ -222,7 +227,7 @@ public class Common {
 		Calendar _date = Calendar.getInstance();
 		_date.setTime(date);
 		
-		while(count<amount) {
+		while(count<amount-1) {
 			_date.add(Calendar.DATE, 1);
 			if(!check_dayoff(_date, orgrootid_link, year)) {
 				count++;
