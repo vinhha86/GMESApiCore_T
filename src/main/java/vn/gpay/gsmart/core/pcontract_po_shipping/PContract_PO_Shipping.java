@@ -10,12 +10,17 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.category.Port;
+import vn.gpay.gsmart.core.security.GpayUser;
 
 @Table(name="pcontract_po_shipping")
 @Entity
@@ -46,6 +51,32 @@ public class PContract_PO_Shipping implements Serializable {/**
     @JoinColumn(name="pcontract_po_shippingid_link",insertable=false,updatable =false)
     private List<PContract_PO_Shipping_D> shipping_d = new ArrayList<PContract_PO_Shipping_D>();
 
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="portfromid_link",insertable=false,updatable =false)
+    private Port port_from;
+	
+	@Transient
+	public String getPortfromname() {
+		if(port_from != null) {
+			return port_from.getName();
+		}
+		return "";
+	}
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="porttoid_link",insertable=false,updatable =false)
+    private Port port_to;
+	
+	@Transient
+	public String getPorttoname() {
+		if(port_to != null) {
+			return port_to.getName();
+		}
+		return "";
+	}
+	
 	public Long getId() {
 		return id;
 	}

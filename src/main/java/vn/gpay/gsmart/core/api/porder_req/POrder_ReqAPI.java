@@ -117,6 +117,7 @@ public class POrder_ReqAPI {
 			Long orgrootid_link = user.getRootorgid_link();
 		
 			POrder_Req porder_req = entity.data;
+			float poQuantity = 0;
 			
 			//Lay thong tin PO
 			PContract_PO thePO = pcontract_POService.findOne(porder_req.getPcontract_poid_link());
@@ -125,9 +126,11 @@ public class POrder_ReqAPI {
 				List<PContract_Price> thePriceList;
 				if (null == thePO.getParentpoid_link()){
 					thePriceList = thePO.getPcontract_price();
+					poQuantity = thePO.getPo_quantity();
 				} else {
 					PContract_PO thePO_parent = pcontract_POService.findOne(thePO.getParentpoid_link());
 					thePriceList = thePO_parent.getPcontract_price();
+					poQuantity = thePO_parent.getPo_quantity();
 				}
 				for (PContract_Price thePrice: thePriceList){
 					if (thePrice.getProducttypeid_link() != ProductType.SKU_TYPE_PRODUCT_PAIR){
@@ -153,7 +156,11 @@ public class POrder_ReqAPI {
 							porder.setGranttoorgid_link(porder_req.getGranttoorgid_link());
 							porder.setProductid_link(thePrice.getProductid_link());
 							porder.setSizesetid_link(thePrice.getSizesetid_link());
-							porder.setTotalorder(thePrice.getQuantity());
+							
+							int totalOrder = 0;
+							if (poQuantity != 0)
+								totalOrder = (int) (porder_req.getTotalorder() * (thePrice.getQuantity()/poQuantity));
+							porder.setTotalorder(totalOrder);
 							
 							porder.setOrgrootid_link(orgrootid_link);
 							porder.setOrderdate(new Date());

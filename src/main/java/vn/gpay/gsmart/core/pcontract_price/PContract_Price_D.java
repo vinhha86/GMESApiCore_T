@@ -16,6 +16,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.category.Unit;
 import vn.gpay.gsmart.core.fob_price.FOBPrice;
 import vn.gpay.gsmart.core.security.GpayUser;
 
@@ -67,6 +68,11 @@ public class PContract_Price_D implements Serializable {/**
     @JoinColumn(name="fobpriceid_link",insertable=false,updatable =false)
     private FOBPrice fobprice;
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="unitid_link",insertable=false,updatable =false)
+    private Unit unit;
+	
 	@Transient
 	public String getFobprice_name() {
 		if(fobprice != null) {
@@ -79,6 +85,14 @@ public class PContract_Price_D implements Serializable {/**
 	public String getUsercreatedName() {
 		if(usercreated != null) {
 			return usercreated.getFullName();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getUnitcode() {
+		if(unit != null) {
+			return unit.getCode();
 		}
 		return "";
 	}
