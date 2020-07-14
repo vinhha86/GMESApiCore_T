@@ -148,7 +148,7 @@ public class ScheduleAPI {
 						Date start = pordergrant.getProductiondate_plan();
 						Date end = commonService.getEndOfDate(pordergrant.getEndDatePlan());
 						int duration = commonService.getDuration(start, end, orgrootid_link, year);
-						int productivity = pordergrant.getTotalpackage() / duration; 
+						int productivity = commonService.getProductivity(pordergrant.getTotalpackage(), duration); 
 						
 						Schedule_porder sch_porder = new Schedule_porder();
 						sch_porder.setCls(pordergrant.getCls());
@@ -165,7 +165,7 @@ public class ScheduleAPI {
 						sch_porder.setBuyername(pordergrant.getBuyername());
 						sch_porder.setPordercode(pordergrant.getpordercode());
 						sch_porder.setParentid_origin(orgid);
-						sch_porder.setStatus(-1);
+						sch_porder.setStatus(pordergrant.getStatus());
 						
 						response.events.rows.add(sch_porder);
 					}
@@ -178,7 +178,7 @@ public class ScheduleAPI {
 						Date start = pordergrant.getProductiondate_plan();
 						Date end = commonService.getEndOfDate(pordergrant.getEndDatePlan());
 						int duration = commonService.getDuration(start, end, orgrootid_link, year);
-						int productivity = pordergrant.getTotalpackage() / duration; 
+						int productivity = commonService.getProductivity(pordergrant.getTotalpackage(), duration); 
 						
 						Schedule_porder sch_porder = new Schedule_porder();
 						sch_porder.setCls(pordergrant.getCls());
@@ -297,7 +297,7 @@ public class ScheduleAPI {
 			int year = Calendar.getInstance().get(Calendar.YEAR);
 			
 			int duration = commonService.getDuration(start, end, orgrootid_link, year);
-			int productivity = event.getTotalpackage() / duration; 
+			int productivity = commonService.getProductivity(event.getTotalpackage(), duration); 
 			event.setDuration(duration);
 			event.setProductivity(productivity);
 			
@@ -354,7 +354,7 @@ public class ScheduleAPI {
 			porderService.save(porder);
 			
 			response.duration = commonService.getDuration(entity.StartDate, entity.EndDate, orgrootid_link, year);
-			response.productivity = porder.getTotalorder() / response.duration;
+			response.productivity = commonService.getProductivity(porder.getTotalorder(), response.duration);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<update_porder_response>(response, HttpStatus.OK);
@@ -362,6 +362,32 @@ public class ScheduleAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<update_porder_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/update_porder_productivity",method = RequestMethod.POST)
+	public ResponseEntity<update_porder_productivity_response> UpdatePorderProductivity(HttpServletRequest request,
+			@RequestBody update_porder_productivity_request entity) {
+		update_porder_productivity_response response = new update_porder_productivity_response();
+		try {
+			long porderid_link = entity.data.getId_origin();
+			POrder porder = porderService.findOne(porderid_link);
+			porder.setProductiondate_plan(entity.data.getStartDate());
+			porder.setFinishdate_plan(commonService.getEndOfDate(entity.data.getEndDate()));
+			porderService.save(porder);
+			
+			Schedule_porder sch = entity.data;
+			sch.setEndDate(porder.getFinishdate_plan());
+			
+			response.data = sch;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<update_porder_productivity_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<update_porder_productivity_response>(response, HttpStatus.OK);
 		}
 	}
 	
@@ -488,9 +514,9 @@ public class ScheduleAPI {
 			Date startDate = porder.getProductiondate_plan();
 			Date endDate = commonService.getEndOfDate(porder.getFinishdate_plan());
 			int duration = commonService.getDuration(startDate, endDate, orgrootid_link, year);
-			int productivity = (int)Math.ceil(porder.getTotalorder() / duration);
-			PContract contract = pcontractService.findOne(req.getPcontractid_link());
-			PContract_PO po = poService.findOne(req.getPcontract_poid_link());
+			int productivity = commonService.getProductivity(porder.getTotalorder(), duration);
+			PContract contract = req.getPcontract();
+			PContract_PO po = req.getPcontract_po();
 			
 			String name = "";
 			int total = porder.getTotalorder() == null ? 0 : porder.getTotalorder();
@@ -546,7 +572,7 @@ public class ScheduleAPI {
 		
 		try {
 			int duration = commonService.getDuration(entity.data.getStartDate(), entity.data.getEndDate(), orgrootid_link, year);
-			int productivity = entity.data.getTotalpackage() / duration;
+			int productivity = commonService.getProductivity(entity.data.getTotalpackage(), duration);
 			
 			Schedule_porder sch = entity.data;
 			sch.setDuration(duration);
@@ -574,8 +600,7 @@ public class ScheduleAPI {
 		
 		try {
 			Date end = commonService.Date_Add_with_holiday(entity.data.getStartDate(), entity.data.getDuration(), orgrootid_link, year);
-			int productivity = entity.data.getTotalpackage() / entity.data.getDuration();
-			
+			int productivity = commonService.getProductivity(entity.data.getTotalpackage(), entity.data.getDuration());
 			Schedule_porder sch = entity.data;
 			sch.setEndDate(end);
 			sch.setProductivity(productivity);

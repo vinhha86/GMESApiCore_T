@@ -313,5 +313,17 @@ public class POrder_Req implements Serializable {
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
+
+	public PContract getPcontract() {
+		return pcontract;
+	}
+
+	public PContract_PO getPcontract_po() {
+		return pcontract_po;
+	}
+
+	public Product getProduct() {
+		return product;
+	}
 	
 }
