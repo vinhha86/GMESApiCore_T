@@ -198,6 +198,8 @@ public class Common {
 	}
 	
 	public int getProductivity(int total, int duration) {
+		if(duration ==0 ) return total;
+		
 		int ret = ((int)Math.ceil(total/duration) + (total % duration == 0 ? 0 : 1));
 		return ret;
 	}
@@ -252,5 +254,20 @@ public class Common {
 		start.add(Calendar.MINUTE, -1);
 		Date date_ret = start.getTime();
 		return date_ret;
+	}
+	
+	public List<Date> getList_SunDay_byYear(int year){
+		Calendar start = Calendar.getInstance();
+		Calendar end = Calendar.getInstance();
+		start.set(year, 1, 1, 0,0,0);
+		end.set(year+1, 1, 1,0,0,0);
+		List<Date> list = new ArrayList<Date>();
+		while(start.before(end)) {
+			if(start.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
+				list.add(start.getTime());
+			start.add(Calendar.DATE, 1);
+		}
+		
+		return list;
 	}
 }

@@ -24,6 +24,7 @@ public class Schedule_porder {
 	private String pordercode;
 	private Integer totalpackage;
 	private Long parentid_origin;
+	public long porder_grantid_link;
 	private Integer status;
 		
 	public Long getParentid_origin() {
@@ -123,6 +124,12 @@ public class Schedule_porder {
 	}
 	public void setStatus(Integer status) {
 		this.status = status;
+	}
+	public long getPorder_grantid_link() {
+		return porder_grantid_link;
+	}
+	public void setPorder_grantid_link(long porder_grantid_link) {
+		this.porder_grantid_link = porder_grantid_link;
 	}
 	
 	
