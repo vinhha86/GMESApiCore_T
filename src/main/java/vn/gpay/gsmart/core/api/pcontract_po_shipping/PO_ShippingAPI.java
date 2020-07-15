@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
+import vn.gpay.gsmart.core.packingtype.IPackingTypeService;
+import vn.gpay.gsmart.core.packingtype.PackingType;
 import vn.gpay.gsmart.core.pcontract_po_shipping.IPContract_PO_ShippingService;
 import vn.gpay.gsmart.core.pcontract_po_shipping.IPContract_PO_Shipping_DService;
 import vn.gpay.gsmart.core.pcontract_po_shipping.PContract_PO_Shipping;
@@ -28,6 +30,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 public class PO_ShippingAPI {
 	@Autowired IPContract_PO_ShippingService PO_ShippingService;
 	@Autowired IPContract_PO_Shipping_DService PO_Shipping_DService;
+	@Autowired IPackingTypeService packingtypeService;
 	
 	@RequestMapping(value = "/create",method = RequestMethod.POST)
 	public ResponseEntity<PO_Shipping_create_response> Create(@RequestBody PO_Shipping_create_request entity,HttpServletRequest request ) {
@@ -62,10 +65,11 @@ public class PO_ShippingAPI {
 
 			//them list moi
 			List<PContract_PO_Shipping_D> list_shipping_d  = entity.data.getShipping_d();
-			for(PContract_PO_Shipping_D price : list_shipping_d) {
-				price.setId(null);
-				price.setPcontract_po_shippingid_link(pcontract_po_shippingid_link);
-				PO_Shipping_DService.save(price);
+			for(PContract_PO_Shipping_D shipping_d : list_shipping_d) {
+				shipping_d.setId(null);
+				shipping_d.setPcontract_po_shippingid_link(pcontract_po_shippingid_link);
+				shipping_d.setOrgrootid_link(orgrootid_link);
+				PO_Shipping_DService.save(shipping_d);
 			}
 			
 			//Response to Client
@@ -87,12 +91,24 @@ public class PO_ShippingAPI {
 		PO_Shipping_getbypo_response response = new PO_Shipping_getbypo_response();
 		try {
 			List<PContract_PO_Shipping> po_shipping = PO_ShippingService.getByPOID(entity.pcontract_poid_link);
+			for(PContract_PO_Shipping theShipping: po_shipping){
+				if (theShipping.getPackingnotice().length() > 0){
+					String packingcodelist = "";
+					String[] array = theShipping.getPackingnotice().split(";");
+					for(int i=0; i<array.length; i++){
+						PackingType thepackingtype = packingtypeService.findOne(Long.parseLong(array[i]));
+						packingcodelist = packingcodelist + thepackingtype.getCode() + ";";
+					}
+					theShipping.setPackingnoticecode(packingcodelist);
+				}
+			}
 			response.data = po_shipping;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<PO_Shipping_getbypo_response>(response,HttpStatus.OK);
 		}catch (Exception e) {
+			e.printStackTrace();
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<PO_Shipping_getbypo_response>(response, HttpStatus.BAD_REQUEST);

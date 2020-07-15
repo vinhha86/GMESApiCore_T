@@ -20,7 +20,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.category.Port;
-import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 
 @Table(name="pcontract_po_shipping")
 @Entity
@@ -43,9 +43,18 @@ public class PContract_PO_Shipping implements Serializable {/**
 	private Long portfromid_link;
 	private Long porttoid_link;
 	private String packingnotice;
+	@Transient
+	private String packingnoticecode;
 	private Long usercreatedid_link;
 	private Date timecreate;
 	
+	public String getPackingnoticecode() {
+		return packingnoticecode;
+	}
+	public void setPackingnoticecode(String packingnoticecode) {
+		this.packingnoticecode = packingnoticecode;
+	}
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
     @JoinColumn(name="pcontract_po_shippingid_link",insertable=false,updatable =false)
@@ -75,6 +84,19 @@ public class PContract_PO_Shipping implements Serializable {/**
 			return port_to.getName();
 		}
 		return "";
+	}
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
+    private PContract_PO po;
+	
+	@Transient
+	public Long getPcontractid_link() {
+		if(po != null) {
+			return po.getPcontractid_link();
+		}
+		return null;
 	}
 	
 	public Long getId() {

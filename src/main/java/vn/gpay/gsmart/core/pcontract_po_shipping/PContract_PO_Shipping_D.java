@@ -6,9 +6,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.sku.SKU;
 
 @Table(name="pcontract_po_shipping_d")
 @Entity
@@ -25,6 +32,34 @@ public class PContract_PO_Shipping_D implements Serializable {/**
 	private Long pcontract_po_shippingid_link;
 	private Long skuid_link;
 	private Integer amount;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="skuid_link",insertable=false,updatable =false)
+    private SKU sku;
+	
+	@Transient
+	public String getSkucode() {
+		if(sku != null) {
+			return sku.getCode();
+		}
+		return "";
+	}	
+	@Transient
+	public String getMauSanPham() {
+		if(sku != null) {
+			return sku.getMauSanPham();
+		}
+		return "";
+	}	
+	@Transient
+	public String getCoSanPham() {
+		if(sku != null) {
+			return sku.getCoSanPham();
+		}
+		return "";
+	}
+	
 	public Long getId() {
 		return id;
 	}
