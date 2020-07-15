@@ -153,8 +153,8 @@ public class POrder implements Serializable {
 			if(status > -1)
 				return pcontract.getcls();
 			else
-				return "gray";
-		return "gray";
+				return "test";
+		return "test";
 	}
 	
 	@Transient

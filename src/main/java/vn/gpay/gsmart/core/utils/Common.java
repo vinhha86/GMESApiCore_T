@@ -221,6 +221,9 @@ public class Common {
 		Calendar _date = Calendar.getInstance();
 		_date.setTime(date);
 		_date.add(Calendar.DATE, amount);
+		_date.set(Calendar.HOUR_OF_DAY, 0);
+		_date.set(Calendar.MINUTE, 0);
+		_date.set(Calendar.SECOND, 0);
 		return _date.getTime();
 	}
 	public Date Date_Add_with_holiday(Date date, int amount, long orgrootid_link, int year) {
@@ -235,6 +238,11 @@ public class Common {
 				count++;
 			}
 		}
+		_date.set(Calendar.HOUR_OF_DAY, 0);
+		_date.set(Calendar.MINUTE, 0);
+		_date.set(Calendar.SECOND, 0);
+		_date.add(Calendar.DAY_OF_WEEK, 1);
+		_date.add(Calendar.MINUTE, -1);
 		
 		return _date.getTime();
 	}
@@ -242,8 +250,22 @@ public class Common {
 	public Date getEndOfDate(Date date) {
 		Calendar start = Calendar.getInstance();
 		start.setTime(date);
+		start.set(Calendar.HOUR_OF_DAY, 0);
+		start.set(Calendar.MINUTE, 0);
+		start.set(Calendar.SECOND, 0);
+		
 		start.add(Calendar.DAY_OF_WEEK, 1);
 		start.add(Calendar.MINUTE, -1);
+		Date date_ret = start.getTime();
+		return date_ret;
+	}
+	
+	public Date getBeginOfDate(Date date) {
+		Calendar start = Calendar.getInstance();
+		start.setTime(date);
+		start.set(Calendar.HOUR_OF_DAY, 0);
+		start.set(Calendar.MINUTE, 0);
+		start.set(Calendar.SECOND, 0);
 		Date date_ret = start.getTime();
 		return date_ret;
 	}

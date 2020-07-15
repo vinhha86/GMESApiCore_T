@@ -26,6 +26,8 @@ public class Schedule_porder {
 	private Long parentid_origin;
 	public long porder_grantid_link;
 	private Integer status;
+	private long productid_link;
+	private long pcontract_poid_link;
 		
 	public Long getParentid_origin() {
 		return parentid_origin;
@@ -130,6 +132,18 @@ public class Schedule_porder {
 	}
 	public void setPorder_grantid_link(long porder_grantid_link) {
 		this.porder_grantid_link = porder_grantid_link;
+	}
+	public long getProductid_link() {
+		return productid_link;
+	}
+	public long getPcontract_poid_link() {
+		return pcontract_poid_link;
+	}
+	public void setProductid_link(long productid_link) {
+		this.productid_link = productid_link;
+	}
+	public void setPcontract_poid_link(long pcontract_poid_link) {
+		this.pcontract_poid_link = pcontract_poid_link;
 	}
 	
 	

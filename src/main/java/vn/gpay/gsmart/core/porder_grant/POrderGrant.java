@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.porder_grant;
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -64,6 +65,9 @@ public class POrderGrant implements Serializable {
 	
 	@Column(name ="timecreated")
     private Date timecreated;
+	
+	private Date start_date_plan;
+	private Date finish_date_plan;
 
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
@@ -85,6 +89,18 @@ public class POrderGrant implements Serializable {
 		if(porder!=null)
 			return porder.getOrdercode();
 		return "";
+	}
+	@Transient
+	public long getProductid_link() {
+		if(porder!=null)
+			return porder.getProductid_link();
+		return 0;
+	}
+	@Transient
+	public long getPcontract_poid_link() {
+		if(porder!=null)
+			return porder.getPcontract_poid_link();
+		return 0;
 	}
 	@Transient
 	public int getStatusPorder() {
@@ -111,10 +127,40 @@ public class POrderGrant implements Serializable {
 	
 	@Transient
 	public String getMaHang() {
-		if(porder!=null)
-			return porder.getMaHang();
-		return "";
+		String name = "";
+		int total = grantamount == null ? 0 : grantamount;
+		
+		DecimalFormat decimalFormat = new DecimalFormat("#,###");
+		decimalFormat.setGroupingSize(3);
+		
+		if(porder != null) {
+			float totalPO = porder.getPo_quantity() == null ? 0 : porder.getPo_quantity();
+			String ST = porder.getBuyername() == null ? "" : porder.getBuyername();
+			String PO = porder.getPo_buyer() == null ? "" : porder.getPo_vendor();
+			name += "#"+ST+"-PO: "+PO+"-"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
+		}
+		
+		return name;
 	}
+	
+	@Transient
+	public String getMaHang(POrder porder) {
+		String name = "";
+		int total = grantamount == null ? 0 : grantamount;
+		
+		DecimalFormat decimalFormat = new DecimalFormat("#,###");
+		decimalFormat.setGroupingSize(3);
+		
+		if(porder != null) {
+			float totalPO = porder.getPo_quantity() == null ? 0 : porder.getPo_quantity();
+			String ST = porder.getBuyername() == null ? "" : porder.getBuyername();
+			String PO = porder.getPo_buyer() == null ? "" : porder.getPo_vendor();
+			name += "#"+ST+"-PO: "+PO+"-"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
+		}
+		
+		return name;
+	}
+	
 	@Transient
 	public String getCls() {
 		if(porder!=null) {
@@ -273,6 +319,18 @@ public class POrderGrant implements Serializable {
 	}
 	public void setPorder_grant_sku(List<POrderGrant_SKU> porder_grant_sku) {
 		this.porder_grant_sku = porder_grant_sku;
+	}
+	public Date getStart_date_plan() {
+		return start_date_plan;
+	}
+	public Date getFinish_date_plan() {
+		return finish_date_plan;
+	}
+	public void setStart_date_plan(Date start_date_plan) {
+		this.start_date_plan = start_date_plan;
+	}
+	public void setFinish_date_plan(Date finish_date_plan) {
+		this.finish_date_plan = finish_date_plan;
 	}
 
 }
