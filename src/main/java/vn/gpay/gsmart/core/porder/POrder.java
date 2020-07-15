@@ -150,7 +150,7 @@ public class POrder implements Serializable {
 	@Transient 
 	public String getCls() {
 		if(pcontract!=null)
-			if(status > -1)
+			if(status != null && status > -1)
 				return pcontract.getcls();
 			else
 				return "test";

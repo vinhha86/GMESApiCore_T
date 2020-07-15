@@ -181,4 +181,20 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 		List<POrder> a = repo.findAll(specification);
 		return a;
 	}
+
+	@Override
+	public List<POrder> getPOrderListBySearch(String ordercode, String po, String style, Long buyerid, Long vendorid, Date orderdatefrom, Date orderdateto) {
+
+		Specification<POrder> specification = Specifications.<POrder>and()
+				.like(Objects.nonNull(ordercode), "ordercode", "%"+ordercode+"%")
+				.like(Objects.nonNull(po), "pcontract_po.po_buyer", "%"+po+"%")
+				.like(Objects.nonNull(style), "product.buyercode", "%"+style+"%")
+				.eq(Objects.nonNull(buyerid), "pcontract.orgbuyerid_link", buyerid)
+				.eq(Objects.nonNull(vendorid), "pcontract.orgvendorid_link", vendorid)
+				.ge(Objects.nonNull(orderdatefrom),"orderdate",DateFormat.atStartOfDay(orderdatefrom))
+                .le(Objects.nonNull(orderdateto),"orderdate",DateFormat.atEndOfDay(orderdateto))
+				.build();
+		
+		return repo.findAll(specification);
+	}
 }
