@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import vn.gpay.gsmart.core.attribute.Attribute;
 import vn.gpay.gsmart.core.attribute.IAttributeService;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -24,7 +23,6 @@ import vn.gpay.gsmart.core.sizeset.SizeSet;
 import vn.gpay.gsmart.core.sizesetattributevalue.ISizeSetAttributeService;
 import vn.gpay.gsmart.core.sizesetattributevalue.SizeSetAttributeValue;
 import vn.gpay.gsmart.core.sizesetattributevalue.SizeSetAttributeValueBinding;
-import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 
@@ -105,11 +103,8 @@ public class SizeSetAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
 					.getPrincipal();
 			SizeSet sizeset = entity.data;
-			long orgrootid_link = user.getRootorgid_link();
-			boolean isNew = false;
 			
 			if (sizeset.getId() == null || sizeset.getId() == 0) {
-				isNew = true;
 				sizeset.setOrgrootid_link(user.getRootorgid_link());
 				sizeset.setUsercreatedid_link(user.getId());
 				sizeset.setTimecreate(new Date());

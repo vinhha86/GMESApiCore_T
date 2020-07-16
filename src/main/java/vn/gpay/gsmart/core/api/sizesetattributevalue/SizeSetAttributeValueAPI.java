@@ -1,7 +1,6 @@
 package vn.gpay.gsmart.core.api.sizesetattributevalue;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,11 +21,8 @@ import vn.gpay.gsmart.core.attributevalue.IAttributeValueService;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sizeset.ISizeSetService;
-import vn.gpay.gsmart.core.sizeset.SizeSet;
 import vn.gpay.gsmart.core.sizesetattributevalue.ISizeSetAttributeService;
 import vn.gpay.gsmart.core.sizesetattributevalue.SizeSetAttributeValue;
-import vn.gpay.gsmart.core.sku.SKU;
-import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -48,7 +44,6 @@ public class SizeSetAttributeValueAPI {
 
 			List<SizeSetAttributeValue> lst = sizesetAttrService.getList_byAttId(entity.attributeid_link,
 					entity.sizesetid_link);
-			SizeSet sizeset = sizesetService.findOne(entity.sizesetid_link);
 
 			for (SizeSetAttributeValue sizesetAttributeValue : lst) {
 				sizesetAttrService.delete(sizesetAttributeValue);

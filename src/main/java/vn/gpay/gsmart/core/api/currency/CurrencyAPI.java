@@ -1,7 +1,5 @@
 package vn.gpay.gsmart.core.api.currency;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,7 +32,6 @@ public class CurrencyAPI {
 			Currency currency = entity.data;
 			currency.setLastuserupdateid_link(user.getRootorgid_link());
 			// time update
-			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 			Date date = new Date();
 			currency.setTimeupdate(date);
 			service.save(currency);
