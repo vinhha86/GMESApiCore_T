@@ -231,6 +231,8 @@ public class POrderProcessing implements Serializable {
 	
 	@Column(name ="timecreated")
     private Date timecreated ;
+	
+	private Long pordergrantid_link;
 
 	@Transient
 	private Integer iscuttt;
@@ -961,6 +963,12 @@ public class POrderProcessing implements Serializable {
 
 	public void setAmounttolinesumprev(Integer amounttolinesumprev) {
 		this.amounttolinesumprev = amounttolinesumprev;
+	}
+	public Long getPordergrantid_link() {
+		return pordergrantid_link;
+	}
+	public void setPordergrantid_link(Long pordergrantid_link) {
+		this.pordergrantid_link = pordergrantid_link;
 	}
 	
 	
