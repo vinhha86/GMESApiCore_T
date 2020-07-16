@@ -1,7 +1,6 @@
 package vn.gpay.gsmart.core.api.porder_list;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,25 +27,25 @@ public class POrderListAPI {
 	@Autowired private IPContractService pcontractService;
 	
 	@RequestMapping(value = "/getall",method = RequestMethod.POST)
-	public ResponseEntity<PorderList_getlist_response> POrderGetAll(HttpServletRequest request ) {
-		PorderList_getlist_response response = new PorderList_getlist_response();
+	public ResponseEntity<POrderList_getlist_response> POrderGetAll(HttpServletRequest request ) {
+		POrderList_getlist_response response = new POrderList_getlist_response();
 		try {
 			
 			response.data = porderService.findAll();
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<PorderList_getlist_response>(response,HttpStatus.OK);
+			return new ResponseEntity<POrderList_getlist_response>(response,HttpStatus.OK);
 		}catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-		    return new ResponseEntity<PorderList_getlist_response>(response, HttpStatus.BAD_REQUEST);
+		    return new ResponseEntity<POrderList_getlist_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
 	
 	@RequestMapping(value = "/getallbysearch",method = RequestMethod.POST)
-	public ResponseEntity<PorderList_getlist_response> POrderGetAllBySearch(@RequestBody POrderList_getlist_request entity, HttpServletRequest request ) {
-		PorderList_getlist_response response = new PorderList_getlist_response();
+	public ResponseEntity<POrderList_getlist_response> POrderGetAllBySearch(@RequestBody POrderList_getlist_request entity, HttpServletRequest request ) {
+		POrderList_getlist_response response = new POrderList_getlist_response();
 		try {
 			response.data = porderService.getPOrderListBySearch(
 					entity.ordercode, // ordercode
@@ -60,11 +59,11 @@ public class POrderListAPI {
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<PorderList_getlist_response>(response,HttpStatus.OK);
+			return new ResponseEntity<POrderList_getlist_response>(response,HttpStatus.OK);
 		}catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-		    return new ResponseEntity<PorderList_getlist_response>(response, HttpStatus.BAD_REQUEST);
+		    return new ResponseEntity<POrderList_getlist_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
 	
