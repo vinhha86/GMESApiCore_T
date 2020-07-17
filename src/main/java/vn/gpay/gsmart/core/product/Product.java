@@ -71,8 +71,7 @@ public class Product implements Serializable {/**
 	private String imgurl4;
 	
 	private String imgurl5;
-	
-	
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="designerid_link",insertable=false,updatable =false)

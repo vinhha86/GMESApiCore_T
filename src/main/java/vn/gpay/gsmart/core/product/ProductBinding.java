@@ -11,6 +11,8 @@ public class ProductBinding {
 	private String tenMauNPL;
 	private long id;
 	private String designerName;
+	private Integer pairamount;
+	private Integer pquantity;
 	public byte[] getUrlimage() {
 		return urlimage;
 	}
@@ -71,4 +73,17 @@ public class ProductBinding {
 	public void setDesignerName(String designerName) {
 		this.designerName = designerName;
 	}
+	public Integer getPairamount() {
+		return pairamount;
+	}
+	public void setPairamount(Integer pairamount) {
+		this.pairamount = pairamount;
+	}
+	public Integer getPquantity() {
+		return pquantity;
+	}
+	public void setPquantity(Integer pquantity) {
+		this.pquantity = pquantity;
+	}
+	
 }

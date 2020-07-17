@@ -37,6 +37,8 @@ import vn.gpay.gsmart.core.product.ProductImg;
 import vn.gpay.gsmart.core.productattributevalue.IProductAttributeService;
 import vn.gpay.gsmart.core.productattributevalue.ProductAttributeValue;
 import vn.gpay.gsmart.core.productattributevalue.ProductAttributeValueBinding;
+import vn.gpay.gsmart.core.productpairing.IProductPairingService;
+import vn.gpay.gsmart.core.productpairing.ProductPairing;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 import vn.gpay.gsmart.core.sku.ISKU_Service;
@@ -51,20 +53,14 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 @RestController
 @RequestMapping("/api/v1/product")
 public class ProductAPI {
-	@Autowired
-	IProductService productService;
-	@Autowired
-	IAttributeService attrService;
-	@Autowired
-	IProductAttributeService pavService;
-	@Autowired
-	ISKU_AttributeValue_Service skuattService;
-	@Autowired
-	ISKU_Service skuService;
-	@Autowired
-	IProductBomService productbomservice;
-	@Autowired
-	Common commonService;
+	@Autowired IProductService productService;
+	@Autowired IAttributeService attrService;
+	@Autowired IProductAttributeService pavService;
+	@Autowired ISKU_AttributeValue_Service skuattService;
+	@Autowired ISKU_Service skuService;
+	@Autowired IProductBomService productbomservice;
+	@Autowired Common commonService;
+	@Autowired IProductPairingService productPairingService;
 
 	@RequestMapping(value = "/filter", method = RequestMethod.POST)
 	public ResponseEntity<Product_filter_response> Product_Filter(HttpServletRequest request,
@@ -1042,6 +1038,8 @@ public class ProductAPI {
 				
 				
 				for (Product _product : list) {
+					ProductPairing pairInfo = productPairingService.getproduct_pairing_bykey(_product.getId(), entity.product_pairid_link);
+					
 					ProductBinding pb = new ProductBinding();
 					pb.setId(_product.getId());
 					pb.setCode(_product.getCode());
@@ -1051,7 +1049,10 @@ public class ProductAPI {
 					pb.setCoKho(_product.getCoKho());
 					pb.setThanhPhanVai(_product.getThanhPhanVai());
 					pb.setTenMauNPL(_product.getTenMauNPL());
-					
+					pb.setPairamount(pairInfo.getAmount());
+					if (entity.po_quantity != null){
+						pb.setPquantity(pairInfo.getAmount()*entity.po_quantity);
+					}
 					String FolderPath = commonService.getFolderPath(_product.getProducttypeid_link());
 					String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
 					

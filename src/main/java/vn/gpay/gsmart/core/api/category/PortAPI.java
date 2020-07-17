@@ -5,7 +5,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,7 +14,6 @@ import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.base.ResponseError;
 import vn.gpay.gsmart.core.category.IPortService;
 import vn.gpay.gsmart.core.category.Port;
-import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController

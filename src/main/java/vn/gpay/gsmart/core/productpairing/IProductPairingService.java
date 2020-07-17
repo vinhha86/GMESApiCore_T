@@ -9,4 +9,5 @@ public interface IProductPairingService extends Operations<ProductPairing> {
 	public List<ProductPairing> getproduct_pairing_bycontract(long orgrootid_link, long pcontractid_link);
 	public List<ProductPairing> getproduct_pairing_detail_bycontract(long orgrootid_link, long pcontractid_link, long productpairid_link);
 	public List<Long> getproductid_pairing_bycontract(long orgrootid_link, long pcontractid_link);
+	ProductPairing getproduct_pairing_bykey(long productid_link, long productpairid_link);
 }
