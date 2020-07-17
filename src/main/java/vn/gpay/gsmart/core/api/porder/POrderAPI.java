@@ -116,14 +116,15 @@ public class POrderAPI {
 		Long orgid_link = user.getOrgid_link();
 		POrderResponse response = new POrderResponse();
 		try {
-			
-			List<POrder> lsPOrder = porderService.get_free_bygolivedate(entity.golivedate_from, entity.golivedate_to, orgid_link, "", 0, 0);
+			long i = (long)0;
+			List<POrder> lsPOrder = porderService.get_free_bygolivedate(entity.golivedate_from, entity.golivedate_to, orgid_link, "", i, i);
 			List<String> orgTypes = new ArrayList<String>();
 			orgTypes.add("13");
 			orgTypes.add("14");
 			List<Org> lsOrgChild = orgService.getorgChildrenbyOrg(orgid_link,orgTypes);
 			for(Org theOrg:lsOrgChild){
-				lsPOrder.addAll(porderService.get_free_bygolivedate(entity.golivedate_from, entity.golivedate_to, theOrg.getId(), "", 0, 0));
+				long orgid = theOrg.getId();
+				lsPOrder.addAll(porderService.get_free_bygolivedate(entity.golivedate_from, entity.golivedate_to, orgid , "", i, i));
 			}
 			response.data = lsPOrder;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

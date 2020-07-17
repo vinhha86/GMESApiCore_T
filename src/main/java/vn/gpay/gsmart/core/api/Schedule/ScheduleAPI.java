@@ -157,7 +157,7 @@ public class ScheduleAPI {
 					List<POrderGrant> list_porder = granttService.get_granted_bygolivedate(startdate, toDate, org_grant.getId(),
 							PO_code, orgbuyerid_link, orgvendorid_link);
 					for(POrderGrant pordergrant : list_porder) {
-						Date start = pordergrant.getStart_date_plan();
+						Date start = commonService.getBeginOfDate(pordergrant.getStart_date_plan());
 						Date end = commonService.getEndOfDate(pordergrant.getFinish_date_plan());
 						int duration = commonService.getDuration(start, end, orgrootid_link, year);
 						int productivity = commonService.getProductivity(pordergrant.getGrantamount(), duration); 
@@ -190,7 +190,7 @@ public class ScheduleAPI {
 							org_grant.getId(), PO_code, orgbuyerid_link, orgvendorid_link);
 					
 					for(POrderGrant pordergrant : list_porder_test) {
-						Date start = pordergrant.getStart_date_plan();
+						Date start = commonService.getBeginOfDate(pordergrant.getStart_date_plan());
 						Date end = commonService.getEndOfDate(pordergrant.getFinish_date_plan());
 						int duration = commonService.getDuration(start, end, orgrootid_link, year);
 						int productivity = commonService.getProductivity(pordergrant.getGrantamount(), duration); 
@@ -464,7 +464,7 @@ public class ScheduleAPI {
 			pg.setStatus(1);
 			pg.setStart_date_plan(porder.getProductiondate_plan());
 			pg.setFinish_date_plan(porder.getFinishdate_plan());
-			granttService.save(pg);
+			pg = granttService.save(pg);
 			
 			POrderProcessing pp = new POrderProcessing();
 			pp.setOrdercode(porder.getOrdercode());
@@ -475,6 +475,9 @@ public class ScheduleAPI {
 			pp.setUsercreatedid_link(user.getId());
 			pp.setStatus(1);
 			pp.setGranttoorgid_link(entity.orggrantto);
+			pp.setProcessingdate(new Date());
+			pp.setTimecreated(new Date());
+			pp.setPordergrantid_link(pg.getId());
 			
 			processService.save(pp);
 			
@@ -500,6 +503,7 @@ public class ScheduleAPI {
 			sch.setStatus(1);
 			sch.setTotalpackage(porder.getTotalorder());
 			sch.setVendorname(porder.getVendorname());
+			sch.setPorder_grantid_link(pg.getId());
 			
 			response.data = sch;
 			
@@ -719,6 +723,60 @@ public class ScheduleAPI {
 		}
 	} 
 	
+	@RequestMapping(value = "/merger_porder",method = RequestMethod.POST)
+	public ResponseEntity<merger_porder_response> MergerPorder(HttpServletRequest request,
+			@RequestBody merger_porder_request entity) {
+		merger_porder_response response = new merger_porder_response();
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		long orgrootid_link = user.getRootorgid_link();
+		int year = Calendar.getInstance().get(Calendar.YEAR);
+		
+		try {
+			POrderGrant grant_src = granttService.findOne(entity.pordergrantid_link_src);
+			POrderGrant grant_des = granttService.findOne(entity.pordergrantid_link_des);
+			
+			int total = grant_des.getGrantamount() + grant_src.getGrantamount();
+			
+			Date start = grant_des.getStart_date_plan().before(entity.sch.getStartDate()) ? grant_des.getStart_date_plan() : entity.sch.getStartDate();
+			Date end = grant_des.getFinish_date_plan().after(entity.sch.getEndDate()) ? grant_des.getFinish_date_plan() : entity.sch.getEndDate();
+			int duration = commonService.getDuration(start, end, orgrootid_link, year);
+			int productivity = commonService.getProductivity(total, duration);
+			
+			//Xoa grant nguon va processing nguon
+			
+			List<POrderProcessing> list_process = processService.getByOrderId_and_GrantId(grant_src.getPorderid_link(), entity.pordergrantid_link_des);
+			for(POrderProcessing process : list_process) {
+				processService.delete(process);
+			}
+			
+			granttService.deleteById(entity.pordergrantid_link_des);
+			
+			//Cap nhat grant dich
+			grant_src.setGrantamount(total);
+			grant_src.setStart_date_plan(commonService.getBeginOfDate(start));
+			grant_src.setFinish_date_plan(commonService.getEndOfDate(end));
+			grant_src = granttService.save(grant_src);
+			
+			Schedule_porder sch = entity.sch;
+			sch.setStartDate(grant_src.getStart_date_plan());
+			sch.setEndDate(grant_src.getFinish_date_plan());
+			sch.setDuration(duration);
+			sch.setProductivity(productivity);
+			sch.setName(grant_src.getMaHang());
+			sch.setMahang(grant_src.getMaHang());
+			sch.setTotalpackage(total);
+			
+			response.data = sch;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<merger_porder_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<merger_porder_response>(response, HttpStatus.OK);
+		}
+	} 
+	
 	@RequestMapping(value = "/break_porder",method = RequestMethod.POST)
 	public ResponseEntity<break_porder_response> BreakPorder(HttpServletRequest request,
 			@RequestBody break_porder_request entity) {
@@ -753,7 +811,7 @@ public class ScheduleAPI {
 			old.setMahang(grant_old.getMaHang());
 			response.old_data = old;
 			
-			//Sinh lenh moi
+			//Sinh grant moi
 			Date start_new = commonService.Date_Add(end_old, 1);
 			int duration_new = entity.duration - duration_old;
 			int productivity = commonService.getProductivity(entity.quantity, duration_new);
@@ -775,6 +833,23 @@ public class ScheduleAPI {
 			grant = granttService.save(grant);
 			
 			POrder porder = porderService.findOne(entity.porderid_link);
+			
+			//Sinh 1 dong trong Processing
+			POrderProcessing process = new POrderProcessing();
+			process.setId(null);
+			process.setOrdercode(porder.getOrdercode());
+			process.setOrderdate(porder.getOrderdate());
+			process.setOrgrootid_link(orgrootid_link);
+			process.setPorderid_link(porder.getId());
+			process.setPordergrantid_link(grant.getId());
+			process.setProcessingdate(new Date());
+			process.setGranttoorgid_link(grant.getGranttoorgid_link());
+			process.setTotalorder(grant.getGrantamount());
+			process.setStatus(1);
+			process.setUsercreatedid_link(user.getId());
+			process.setTimecreated(new Date());
+			processService.save(process);
+			
 			Schedule_porder new_data = new Schedule_porder();
 			new_data.setCls(grant_old.getCls());
 			new_data.setEndDate(commonService.getEndOfDate(end_new));
@@ -791,6 +866,7 @@ public class ScheduleAPI {
 			new_data.setPordercode(grant_old.getOrdercode());
 			new_data.setParentid_origin(entity.parentid_origin);
 			new_data.setStatus(1);
+			new_data.setPorder_grantid_link(grant.getId());
 			response.new_data = new_data;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

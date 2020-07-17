@@ -17,7 +17,7 @@ public interface IPOrder_Service extends Operations<POrder> {
 	List<POrder> get_by_org(long orgid_link);
 	List<POrder> getByContractAndPO(Long pcontractid_link, Long pcontract_poid_link);
 	Long savePOrder(POrder porder, String po_code);
-	List<POrder> get_free_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link,String PO_code,long orgbuyerid_link,long orgvendorid_link);
+	List<POrder> get_free_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link,String PO_code,Long orgbuyerid_link,Long orgvendorid_link);
 	List<POrder> getByPOrder_Req(Long pcontract_poid_link, Long porderreqid_link);
 	POrder get_oneby_po_price(long orgrootid_link, long granttoorgid_link, long pcontract_poid_link, long productid_link, long sizesetid_link);
 	

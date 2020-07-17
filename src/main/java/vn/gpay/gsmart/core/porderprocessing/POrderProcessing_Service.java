@@ -96,4 +96,10 @@ public class POrderProcessing_Service extends AbstractService<POrderProcessing> 
 	public List<POrderProcessing>getByOrderId(Long porderid_link){
 		return repo.getByOrderId(porderid_link);
 	}
+
+	@Override
+	public List<POrderProcessing> getByOrderId_and_GrantId(Long porderid_link, Long pordergrantid_link) {
+		// TODO Auto-generated method stub
+		return repo.getByOrderId_And_GrantId(porderid_link, pordergrantid_link);
+	}
 }

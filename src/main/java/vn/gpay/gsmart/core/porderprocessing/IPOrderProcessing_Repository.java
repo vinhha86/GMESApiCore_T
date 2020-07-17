@@ -77,6 +77,11 @@ public interface IPOrderProcessing_Repository extends JpaRepository<POrderProces
 
 	@Query(value = "select a from POrderProcessing a where a.porderid_link = :porderid_link order by processingdate asc")
 	public List<POrderProcessing>getByOrderId(@Param ("porderid_link")final Long porderid_link);
+	
+	@Query(value = "select a from POrderProcessing a where a.porderid_link = :porderid_link and pordergrantid_link = :pordergrantid_link order by processingdate asc")
+	public List<POrderProcessing>getByOrderId_And_GrantId(
+			@Param ("porderid_link")final Long porderid_link,
+			@Param ("pordergrantid_link")final Long pordergrantid_link);
 
 	//get all processing of an order after the given date
 	@Query(value = "select a from POrderProcessing a where a.porderid_link = :porderid and a.processingdate > :processingdate_to order by a.processingdate ASC")

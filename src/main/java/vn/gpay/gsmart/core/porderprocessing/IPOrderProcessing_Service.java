@@ -35,5 +35,7 @@ public interface IPOrderProcessing_Service extends Operations<POrderProcessing>{
 	List<POrderProcessing> getBySalaryMonth(Integer salaryyear, Integer salarymonth);
 
 	List<POrderProcessing> getByOrderId(Long porderid_link);
+	
+	List<POrderProcessing> getByOrderId_and_GrantId(Long porderid_link, Long pordergrantid_link);
 
 }

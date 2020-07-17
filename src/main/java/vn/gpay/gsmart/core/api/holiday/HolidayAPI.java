@@ -34,8 +34,7 @@ public class HolidayAPI {
 	public ResponseEntity<Holiday_getall_response> GetAll(HttpServletRequest request ) {
 		Holiday_getall_response response = new Holiday_getall_response();
 		try {
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			long orgrootid_link = user.getRootorgid_link();
+			
 			response.data = holidayService.findAll();
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -51,8 +50,7 @@ public class HolidayAPI {
 	public ResponseEntity<Holiday_getallYears_response> GetAllYears(HttpServletRequest request ) {
 		Holiday_getallYears_response response = new Holiday_getallYears_response();
 		try {
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			long orgrootid_link = user.getRootorgid_link();
+			
 			int thisYear = Calendar.getInstance().get(Calendar.YEAR);
 			
 			List<Integer> years = holidayService.getAllYears();
