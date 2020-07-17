@@ -47,15 +47,44 @@ public class POrderListAPI {
 	public ResponseEntity<POrderList_getlist_response> POrderGetAllBySearch(@RequestBody POrderList_getlist_request entity, HttpServletRequest request ) {
 		POrderList_getlist_response response = new POrderList_getlist_response();
 		try {
-			response.data = porderService.getPOrderListBySearch(
-					entity.ordercode, // ordercode
-					entity.po, // po
-					entity.style, // style
-					entity.buyerid, // buyerid
-					entity.vendorid, // vendorid
-					entity.orderdatefrom, // orderdatefrom
-					entity.orderdateto // orderdateto
-					);
+			List<Long> status = entity.status;
+			response.data = new ArrayList<>();
+			
+			if(status.size() == 0) {
+				response.data = porderService.getPOrderListBySearch(
+							entity.po, // po
+							entity.style, // style
+							entity.buyerid, // buyerid
+							entity.vendorid, // vendorid
+							entity.orderdatefrom, // orderdatefrom
+							entity.orderdateto, // orderdateto
+							null
+							);
+			}else {
+				for(Long num : status) {
+					List<POrder> temp = porderService.getPOrderListBySearch(
+							entity.po, // po
+							entity.style, // style
+							entity.buyerid, // buyerid
+							entity.vendorid, // vendorid
+							entity.orderdatefrom, // orderdatefrom
+							entity.orderdateto, // orderdateto
+							num
+							);
+					response.data.addAll(temp);
+				}
+			}
+			
+			
+//			response.data = porderService.getPOrderListBySearch(
+//					entity.po, // po
+//					entity.style, // style
+//					entity.buyerid, // buyerid
+//					entity.vendorid, // vendorid
+//					entity.orderdatefrom, // orderdatefrom
+//					entity.orderdateto, // orderdateto
+//					
+//					);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
