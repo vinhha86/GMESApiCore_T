@@ -32,6 +32,7 @@ import vn.gpay.gsmart.core.menu.MenuServiceImpl;
 import vn.gpay.gsmart.core.menu.UserMenu;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
+import vn.gpay.gsmart.core.pcontract.IPContractService;
 import vn.gpay.gsmart.core.security.GpayAuthentication;
 import vn.gpay.gsmart.core.security.GpayRole;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -54,6 +55,7 @@ public class UserAPI {
 	@Autowired AppUserFunction_Service appuserfService;
 	@Autowired AppRole_User_Service roleuserService;
 	@Autowired IAppFunctionService appfuncService;
+	@Autowired IPContractService pcontractService;
 	
 	@RequestMapping(value = "/user_create",method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> GetSkuByCode( @RequestBody UserCreateRequest entity,HttpServletRequest request ) {
@@ -146,6 +148,31 @@ public class UserAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<UserResponse>(response,HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/getby_org_buyer",method = RequestMethod.POST)
+	public ResponseEntity<getby_org_pcontract_response> GetByOrg( @RequestBody getby_org_pcontract_request entity,HttpServletRequest request ) {
+		getby_org_pcontract_response response = new getby_org_pcontract_response();
+		try {
+			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
+			long orgrootid_link = user.getRootorgid_link();
+			long orgid_link = entity.orgid_link;
+			long orgbuyerid_link = entity.orgbuyerid_link;
+			
+			response.data=userDetailsService.getUserList(orgid_link,"", 1);
+			
+			for(GpayUser _user : response.data) {
+				long merchandiserid_link = _user.getId();
+				_user.index = pcontractService.getby_buyer_merchandiser(orgrootid_link, orgbuyerid_link, merchandiserid_link);
+			}
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getby_org_pcontract_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<getby_org_pcontract_response>(response,HttpStatus.OK);
 		}
 	}
 	

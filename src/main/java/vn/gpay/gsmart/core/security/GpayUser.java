@@ -69,6 +69,7 @@ public class GpayUser implements UserDetails {
 	@JoinColumn( name="user_id", referencedColumnName="id")
 	private List<AppRole_User>  list_menu  = new ArrayList<AppRole_User>();
 	
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
 	//@BatchSize(size=10)
@@ -95,6 +96,10 @@ public class GpayUser implements UserDetails {
 		
 		return listmenu;
 	}
+	@Transient
+	
+	public Long index;
+	
 	@Transient
 	public String getFullName() {
 		String name = firstname;
