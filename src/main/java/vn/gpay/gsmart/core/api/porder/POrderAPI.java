@@ -408,26 +408,48 @@ public class POrderAPI {
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+	@RequestMapping(value = "/create_skulist", method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> createPOrder_SKUList(HttpServletRequest request,
+			@RequestBody POrderSKU_delete_request entity) {
+		ResponseBase response = new ResponseBase();
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Long orgrootid_link = user.getRootorgid_link();
+	
+		try {
+			for(POrder_Product_SKU thePOrderSKU: entity.data){
+				List<POrder_Product_SKU> lstPOrderSKU = porderskuService.getby_porderandsku(thePOrderSKU.getPorderid_link(),thePOrderSKU.getSkuid_link());
+				 if (lstPOrderSKU.size() == 0){
+					thePOrderSKU.setOrgrootid_link(orgrootid_link);
+					porderskuService.save(thePOrderSKU);
+				} 
+			}
+			
+			updateTotalOrder(entity.porderid_link);
+//			updateContractSKU(thePOrderSKU.getPorderid_link(),thePOrderSKU.getSkuid_link());
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+		}
+	}	
 	@RequestMapping(value = "/delete_sku", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> deletePOrder_SKU(HttpServletRequest request,
-			@RequestBody POrderSKU_update_request entity) {
+			@RequestBody POrderSKU_delete_request entity) {
 		ResponseBase response = new ResponseBase();
 		try {
-			POrder_Product_SKU thePOrderSKU = porderskuService.findOne(entity.data.getId());
-			 if (null != thePOrderSKU){
+			for(POrder_Product_SKU thePOrderSKU: entity.data){
 				porderskuService.delete(thePOrderSKU);
-				
-				updateTotalOrder(thePOrderSKU.getPorderid_link());
-				updateContractSKU(thePOrderSKU.getPorderid_link(),thePOrderSKU.getSkuid_link());
-
-				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-				return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
-			} else {
-				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_BAD_REQUEST));
-				return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
-			}
+			} 
+			updateTotalOrder(entity.porderid_link);
+//			updateContractSKU(thePOrderSKU.getPorderid_link(),thePOrderSKU.getSkuid_link());
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
@@ -438,7 +460,7 @@ public class POrderAPI {
 		POrder thePOrder = porderService.findOne(porderid_link);
 		int totalorder = 0;
 		for(POrder_Product_SKU thePorderSKU:thePOrder.getPorder_product_sku()){
-			totalorder += thePorderSKU.getPquantity_total();
+			totalorder += null==thePorderSKU.getPquantity_total()?0:thePorderSKU.getPquantity_total();
 		}
 		thePOrder.setTotalorder(totalorder);
 		porderService.save(thePOrder);

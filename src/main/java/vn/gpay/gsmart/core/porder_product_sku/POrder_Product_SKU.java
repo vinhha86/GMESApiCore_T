@@ -39,6 +39,7 @@ public class POrder_Product_SKU implements Serializable {
 	private Integer pquantity_porder;
 	private Integer pquantity_total;
 	private Integer pquantity_granted;
+	private Integer pquantity_production;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -154,6 +155,12 @@ public class POrder_Product_SKU implements Serializable {
 	}
 	public void setPquantity_granted(Integer pquantity_granted) {
 		this.pquantity_granted = pquantity_granted;
+	}
+	public Integer getPquantity_production() {
+		return pquantity_production;
+	}
+	public void setPquantity_production(Integer pquantity_production) {
+		this.pquantity_production = pquantity_production;
 	}
 	
 }
