@@ -20,6 +20,8 @@ import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.base.ResponseError;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
+import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
+import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.security.GpayAuthentication;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
@@ -29,6 +31,8 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 public class OrgAPI {
 
 	@Autowired IOrgService orgService;
+	@Autowired IPOrder_Req_Service reqService;
+	
     @GetMapping("/tosx")
     public List<Org> getAllOrgs_Tosx() throws IOException {
     	GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -82,6 +86,31 @@ public class OrgAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_SERVER_ERROR);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/get_orgreq",method = RequestMethod.POST)
+	public ResponseEntity<get_orgreq_response> getOrg_Req(@RequestBody get_orgreq_request entity, HttpServletRequest request ) {//@RequestParam("type") 
+		get_orgreq_response response = new get_orgreq_response();
+		try {
+			List<POrder_Req> list_req = reqService.getByPO(entity.pcontract_poid_link);
+			List<Long> list_org = new ArrayList<Long>();
+			for(POrder_Req req : list_req) {
+				if(!list_org.contains(req.getGranttoorgid_link())) {
+					list_org.add(req.getGranttoorgid_link());
+				}
+			}
+			
+			for (long id : list_org) {
+				response.data.add(orgService.findOne(id));
+			}
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<get_orgreq_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_SERVER_ERROR);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<get_orgreq_response>(response,HttpStatus.OK);
 		}
 	}
 	

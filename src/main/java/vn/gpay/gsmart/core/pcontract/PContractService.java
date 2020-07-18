@@ -47,5 +47,22 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 		// TODO Auto-generated method stub
 		return repo.get_byorgrootid_link_and_contractcode(orgrootid_link, pcontractid_link, contractcode);
 	}
+	@Override
+	public long getby_buyer_merchandiser(long orgrootid_link, long orgbuyerid_link, long merchandiserid_link) {
+		// TODO Auto-generated method stub
+		Specification<PContract> specification = Specifications.<PContract>and()
+	            .eq(orgbuyerid_link > 0, "orgbuyerid_link", orgbuyerid_link)
+	            .eq(merchandiserid_link > 0, "merchandiserid_link", merchandiserid_link)
+	            .eq("status", 1)
+	            .eq("orgrootid_link", orgrootid_link)
+	            .build();
+		
+		Sort sort = Sorts.builder()
+		        .desc("datecreated")
+		        .build();
+		
+		List<PContract> lst = repo.findAll(specification, sort);
+		return lst.size() == 0 ? 0 : lst.get(0).getId() ;
+	}
 
 }

@@ -394,6 +394,7 @@ public class ScheduleAPI {
 			sch.setEndDate(grant.getFinish_date_plan());
 			sch.setDuration(commonService.getDuration(grant.getStart_date_plan(), grant.getFinish_date_plan(), orgrootid_link, year));
 			sch.setProductivity(commonService.getProductivity(grant.getGrantamount(), sch.getDuration()));
+			sch.setPorder_grantid_link(entity.pordergrant_id_link);
 			
 			response.data = sch;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
