@@ -16,4 +16,6 @@ public interface IPOrderGrant_Service extends Operations<POrderGrant>{
 	POrderGrant getByOrderIDAndOrg(Long granttoorgid_link, Long porderid_link);
 	List<POrderGrant> get_porder_test(Date golivedate_from, Date golivedate_to, Long granttoorgid_link, 
 			String POBuyer, Long orgbuyerid_link , Long orgvendorid_link);
+	
+	List<POrderGrant>getByOrderId(Long porderid_link);
 }

@@ -18,6 +18,8 @@ import vn.gpay.gsmart.core.pcontract.IPContractService;
 import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -25,6 +27,8 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 public class POrderListAPI {
 	@Autowired private IPOrder_Service porderService;
 	@Autowired private IPContractService pcontractService;
+	@Autowired private IPOrderGrant_Service pordergrantService;
+	@Autowired private IPOrderGrant_SKUService pordergrantskuService;
 	
 	@RequestMapping(value = "/getall",method = RequestMethod.POST)
 	public ResponseEntity<POrderList_getlist_response> POrderGetAll(HttpServletRequest request ) {
@@ -74,17 +78,6 @@ public class POrderListAPI {
 					response.data.addAll(temp);
 				}
 			}
-			
-			
-//			response.data = porderService.getPOrderListBySearch(
-//					entity.po, // po
-//					entity.style, // style
-//					entity.buyerid, // buyerid
-//					entity.vendorid, // vendorid
-//					entity.orderdatefrom, // orderdatefrom
-//					entity.orderdateto, // orderdateto
-//					
-//					);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -164,5 +157,36 @@ public class POrderListAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/getgrantbyporderid",method = RequestMethod.POST)
+	public ResponseEntity<POrderList_getGrantByPorderId_response> getGrantByPorderId(@RequestBody POrderList_getGrantByPorderId_request entity, HttpServletRequest request ) {
+		POrderList_getGrantByPorderId_response response = new POrderList_getGrantByPorderId_response();
+		try {
+			response.data = pordergrantService.getByOrderId(entity.porderid);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<POrderList_getGrantByPorderId_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<POrderList_getGrantByPorderId_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/getgrantskubygrantid",method = RequestMethod.POST)
+	public ResponseEntity<POrderList_getPOrderGrantSKUbyGrantId_response> getGrantSKUByGrantId(@RequestBody POrderList_getPOrderGrantSKUbyGrantId_request entity, HttpServletRequest request ) {
+		POrderList_getPOrderGrantSKUbyGrantId_response response = new POrderList_getPOrderGrantSKUbyGrantId_response();
+		try {
+			response.data = pordergrantskuService.getPOrderGrant_SKU(entity.pordergrantid);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<POrderList_getPOrderGrantSKUbyGrantId_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<POrderList_getPOrderGrantSKUbyGrantId_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 	
 }
