@@ -60,7 +60,7 @@ public class PContractskuAPI {
 	(HttpServletRequest request, @RequestBody pcontractsku_getby_po_product_request entity ) {
 		PContractSKU_getbyproduct_response response = new PContractSKU_getbyproduct_response();
 		try {
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long pcontract_poid_link = entity.pcontract_poid_link;
 			long productid_link = entity.productid_link;
 			

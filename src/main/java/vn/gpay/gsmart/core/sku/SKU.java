@@ -19,9 +19,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import vn.gpay.gsmart.core.category.Unit;
 import vn.gpay.gsmart.core.product.Product;
-import vn.gpay.gsmart.core.productattributevalue.ProductAttributeValue;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
 
 @Table(name="sku")
