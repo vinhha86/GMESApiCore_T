@@ -4,8 +4,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import javax.persistence.criteria.CriteriaBuilder;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -203,7 +201,6 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 	@Override
 	public List<POrder> getPOrderListBySearch(String po, String style, Long buyerid, Long vendorid, Date orderdatefrom, Date orderdateto, Long status) {
 
-		CriteriaBuilder criteriaBuilder;
 		Specification<POrder> specification = Specifications.<POrder>and()
 				.like(Objects.nonNull(po), "pcontract_po.po_buyer", "%"+po+"%")
 				.like(Objects.nonNull(style), "product.buyercode", "%"+style+"%")
