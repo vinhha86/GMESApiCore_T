@@ -70,4 +70,9 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 				golivedate_to, POBuyer, orgbuyerid_link, orgvendorid_link);
 		return a;
 	}
+
+	@Override
+	public List<POrderGrant> getByOrderId(Long porderid_link) {
+		return repo.getByOrderId(porderid_link);
+	}
 }
