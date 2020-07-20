@@ -54,5 +54,10 @@ public interface IProductRepository extends JpaRepository<Product, Long>, JpaSpe
 	public List<Product> getby_pairid(
 			@Param ("productid_link")final  Long productid_link);
 	
+	@Query(value = "select c.id from Product c "
+			+ "left join PContractProduct d on c.id = d.productid_link "
+			+ "where d.id is null "
+			+ "group by c.id")
+	public List<Long> getproduct_notinbuyer();
 
 }

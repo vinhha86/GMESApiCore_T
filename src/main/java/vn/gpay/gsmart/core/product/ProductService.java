@@ -54,6 +54,8 @@ public class ProductService extends AbstractService<Product> implements IProduct
 	EntityManager em;
 	@Autowired
 	IPContractProductPairingRepository pcontractpairingRepo;
+	@Autowired
+	IProductRepository productRepo;
 
 	@Override
 	protected JpaRepository<Product, Long> getRepository() {
@@ -88,6 +90,13 @@ public class ProductService extends AbstractService<Product> implements IProduct
 			if (lsProduct_Id.size() == 0)
 				return null;
 		}
+		
+		//Lấy những sản phẩm mà chưa thuộc khách hàng nào
+		
+		List<Long> list_product = productRepo.getproduct_notinbuyer();
+		if(list_product.size() > 0)
+			lsProduct_Id.addAll(list_product);
+		
 		// Tim danh sach Product thoa man dieu kien trong Attribute
 		List<Long> lsAttr_Final = new ArrayList<Long>();
 		if (attributes.size() > 0) {
