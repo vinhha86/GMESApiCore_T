@@ -218,7 +218,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
 			
-			List<PContract_PO> pcontract = pcontract_POService.getPOByContractProduct(orgrootid_link, entity.pcontractid_link, entity.productid_link);
+			List<PContract_PO> pcontract = pcontract_POService.getPOByContractProduct(orgrootid_link, entity.pcontractid_link, entity.productid_link, user.getId());
 			response.data = pcontract;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -238,7 +238,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
 			
-			List<PContract_PO> pcontract = pcontract_POService.getPO_LeafOnly(orgrootid_link, entity.pcontractid_link, entity.productid_link);
+			List<PContract_PO> pcontract = pcontract_POService.getPO_LeafOnly(orgrootid_link, entity.pcontractid_link, entity.productid_link, user.getId());
 			response.data = pcontract;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

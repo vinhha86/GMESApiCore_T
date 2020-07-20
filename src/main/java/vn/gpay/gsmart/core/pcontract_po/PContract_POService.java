@@ -21,16 +21,17 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	}
 	@Override
 	public List<PContract_PO> getPOByContractProduct(Long orgrootid_link,
-			Long pcontractid_link,Long productid_link){
-		return repo.getPOByContractProduct(orgrootid_link, pcontractid_link, productid_link);
+			Long pcontractid_link,Long productid_link, Long userid_link){
+		if(userid_link == 1) userid_link = null;
+		return repo.getPOByContractProduct(orgrootid_link, pcontractid_link, productid_link, userid_link);
 	}
 
 	@Override
 	//Chi lay cac PO o muc la
 	public List<PContract_PO> getPO_LeafOnly(Long orgrootid_link,
-			Long pcontractid_link,Long productid_link){
+			Long pcontractid_link,Long productid_link, Long userid_link){
 		try{
-			List<PContract_PO> a = repo.getPOByContractProduct(orgrootid_link, pcontractid_link, productid_link);
+			List<PContract_PO> a = repo.getPOByContractProduct(orgrootid_link, pcontractid_link, productid_link, userid_link);
 //			List<PContract_PO> parentPO = new ArrayList<PContract_PO>();
 			List<PContract_PO> returnPO = new ArrayList<PContract_PO>();
 			for(PContract_PO thePO: a){

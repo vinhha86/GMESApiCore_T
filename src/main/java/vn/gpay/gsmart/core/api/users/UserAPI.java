@@ -374,6 +374,7 @@ public class UserAPI {
 				user.setEnabled(true);
 				user.setUserrole("ROLE_USER");
 				user.setOrg_type(1);
+				user.setRootorgid_link(user.getRootorgid_link());
 
 				user = userDetailsService.save(user);
 			}
