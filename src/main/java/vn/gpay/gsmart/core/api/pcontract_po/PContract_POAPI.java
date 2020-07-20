@@ -259,6 +259,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 			PContract_PO po = pcontract_POService.findOne(entity.pcontract_poid_link);
 			po.setOrgmerchandiseid_link(entity.orgid_link);
 			po.setMerchandiserid_link(entity.userid_link);
+			po.setStatus(POStatus.PO_STATUS_CONFIRMED);
 			
 			pcontract_POService.save(po);			
 			

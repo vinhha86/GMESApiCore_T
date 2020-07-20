@@ -236,11 +236,14 @@ public class UserAPI {
 		UserByIdResponse response = new UserByIdResponse();
 		try {
 			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
+			
 			if(entity.id == null || entity.id == 0) {
 				response.data=userDetailsService.findById(user.getUserId());
 			}
 			else
 				response.data=userDetailsService.findById(entity.id);
+			
+			// TODO: kiem tra quyen truoc khi tra len
 			
 			response.data.setPassword("");
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
