@@ -159,7 +159,7 @@ public class POrder_ReqAPI {
 			PContract_PO thePO = pcontract_POService.findOne(porder_req.getPcontract_poid_link());
 			if (thePO.getStatus() == POStatus.PO_STATUS_CONFIRMED){
 				String po_code = thePO.getPo_vendor().length() > 0?thePO.getPo_vendor():thePO.getPo_buyer();
-				List<PContractProductSKU> po_SKUList = pcontract_ProductSKUService.getbypo_and_product_free(porder_req.getPcontractid_link(), porder_req.getPcontract_poid_link(), entity.productid_link);				
+				List<PContractProductSKU> po_SKUList = pcontract_ProductSKUService.getbypo_and_product_free(entity.porderreqid_link, porder_req.getPcontractid_link(), porder_req.getPcontract_poid_link(), entity.productid_link);				
 				POrder thePOrder = porderService.get_oneby_po_org_product(orgrootid_link, porder_req.getGranttoorgid_link(), thePO.getId(), entity.productid_link);
 				List<POrder_Product_SKU> porder_SKU = new ArrayList<POrder_Product_SKU>();
 				Integer totalorder = 0;

@@ -72,7 +72,7 @@ public class PContractProductSKUService extends AbstractService<PContractProduct
 	
 	//Chi lay cac SKU chua co trong Lenh SX
 	@Override
-	public List<PContractProductSKU> getbypo_and_product_free(long pcontractid_link, long pcontract_poid_link, long productid_link) {
+	public List<PContractProductSKU> getbypo_and_product_free(long porderreqid_link, long pcontractid_link, long pcontract_poid_link, long productid_link) {
 		// TODO Auto-generated method stub
 		List<PContractProductSKU> a = repo.getlistsku_bypo_and_product(pcontract_poid_link, productid_link);
 		
