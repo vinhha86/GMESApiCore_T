@@ -202,8 +202,8 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 	public List<POrder> getPOrderListBySearch(String po, String style, Long buyerid, Long vendorid, Date orderdatefrom, Date orderdateto, Long status) {
 
 		Specification<POrder> specification = Specifications.<POrder>and()
-				.like(Objects.nonNull(po), "pcontract_po.po_buyer", "%"+po+"%")
-				.like(Objects.nonNull(style), "product.buyercode", "%"+style+"%")
+//				.like(Objects.nonNull(po), "pcontract_po.po_buyer", "%"+po+"%")
+//				.like(Objects.nonNull(style), "product.buyercode", "%"+style+"%")
 				.eq(Objects.nonNull(buyerid), "pcontract.orgbuyerid_link", buyerid)
 				.eq(Objects.nonNull(vendorid), "pcontract.orgvendorid_link", vendorid)
 				.ge(Objects.nonNull(orderdatefrom),"orderdate",DateFormat.atStartOfDay(orderdatefrom))

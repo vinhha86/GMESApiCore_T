@@ -53,9 +53,10 @@ public class POrderListAPI {
 		try {
 			List<Long> status = entity.status;
 			response.data = new ArrayList<>();
+			List<POrder> result = new ArrayList<>();
 			
 			if(status.size() == 0) {
-				response.data = porderService.getPOrderListBySearch(
+				result = porderService.getPOrderListBySearch(
 							entity.po, // po
 							entity.style, // style
 							entity.buyerid, // buyerid
@@ -75,8 +76,24 @@ public class POrderListAPI {
 							entity.orderdateto, // orderdateto
 							num
 							);
-					response.data.addAll(temp);
+					result.addAll(temp);
 				}
+			}
+			if(entity.po == null) entity.po="";
+			if(entity.style == null) entity.style="";
+			
+			for(POrder porder : result) {
+				String po_buyer = porder.getPo_buyer().toLowerCase();
+				String po = entity.po.toLowerCase();
+				String stylebuyer = porder.getStylebuyer().toLowerCase();
+				String style = entity.style.toLowerCase();
+				if(!po_buyer.contains(po)) {
+					continue;
+				}
+				if(!stylebuyer.contains(style)) {
+					continue;
+				}
+				response.data.add(porder);
 			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
