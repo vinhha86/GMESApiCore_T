@@ -125,7 +125,8 @@ public class Product implements Serializable {/**
 	public List<Long> getProductAttribute() {
 		List<Long> lst = new ArrayList<Long>();
 		for (ProductAttributeValue pav : listPAvalue) {
-			if(lst.contains((long)pav.getAttributeid_link())) continue;
+			long attributeid_link = pav == null ? 0 : pav.getAttributeid_link();
+			if(lst.contains(attributeid_link)) continue;
 			
 			lst.add(pav.getAttributeid_link());
 		}

@@ -644,6 +644,7 @@ public class ProductAPI {
 				product.setOrgrootid_link(product_old.getOrgrootid_link());
 				product.setUsercreateid_link(product_old.getUsercreateid_link());
 				product.setTimecreate(product_old.getTimecreate());
+				product.setListPAvalue(product_old.getListPAvalue());
 			}
 
 			List<Product> pcheck = productService.getone_by_code(orgrootid_link,product.getCode(),
