@@ -18,6 +18,10 @@ public class ResponseMessage {
     public static int KEY_RC_ACTIVE_FAIL            = 904;
     public static int KEY_RC_KEY_DUPLICATION        = 905;
     
+    //POrder_Req Messages (1000-10010)
+    public static int KEY_POREQ_DELETE_PORDEREXISTED 		= 1000;
+    public static String MES_POREQ_DELETE_PORDEREXISTED   	= "Đang tồn tại lệnh sản xuất liên quan, không thể xóa";
+    
     
     public static String MES_RC_SUCCESS   = "OK - Everything Worked";
     public static String MES_RC_BAD_REQUEST   = "Bad Request - Invalid Parameter or Data Integrity Issue";
@@ -53,6 +57,8 @@ public class ResponseMessage {
         hMes.put(KEY_RC_APPROVE_FAIL, MES_RC_APPROVE_FAIL);
         hMes.put(KEY_RC_ACTIVE_FAIL, MES_RC_ACTIVE_FAIL);
         hMes.put(KEY_RC_CREATE_INVCHECK_FAIL, MES_RC_CREATE_INVCHECK_FAIL);
+        
+        hMes.put(KEY_POREQ_DELETE_PORDEREXISTED, MES_POREQ_DELETE_PORDEREXISTED);
         return hMes.get(code);
     }
 }

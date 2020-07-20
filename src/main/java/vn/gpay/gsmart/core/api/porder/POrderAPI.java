@@ -326,7 +326,7 @@ public class POrderAPI {
 		ResponseBase response = new ResponseBase();
 		try {
 			 POrder thePOrder = porderService.findOne(entity.id);
-			 if (null != thePOrder && thePOrder.getStatus() == POrderStatus.PORDER_STATUS_FREE){
+			 if (null != thePOrder && thePOrder.getStatus() <= POrderStatus.PORDER_STATUS_FREE){
 				GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 				Long productid_link = thePOrder.getProductid_link();
 				Long contractid_link = thePOrder.getPcontractid_link();

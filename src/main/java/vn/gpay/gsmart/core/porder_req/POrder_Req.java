@@ -24,7 +24,7 @@ import org.hibernate.annotations.NotFoundAction;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
-import vn.gpay.gsmart.core.porder_product.POrder_Product;
+import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.sizeset.SizeSet;
 
@@ -54,7 +54,21 @@ public class POrder_Req implements Serializable {
 	private Long usercreatedid_link;
 	private Date timecreated;
 	private Integer status;
+
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
+	@JoinColumn( name="porderreqid_link", referencedColumnName="id")
+	private List<POrder>  porderlist  = new ArrayList<>();	
 	
+	
+	public List<POrder> getPorderlist() {
+		return porderlist;
+	}
+
+	public void setPorderlist(List<POrder> porderlist) {
+		this.porderlist = porderlist;
+	}
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="granttoorgid_link",insertable=false,updatable =false)
@@ -220,19 +234,7 @@ public class POrder_Req implements Serializable {
 		return "";
 	}
 	
-	
-	@NotFound(action = NotFoundAction.IGNORE)
-	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
-	@JoinColumn( name="porderid_link", referencedColumnName="id")
-	private List<POrder_Product>  porder_product  = new ArrayList<>();
-	
-	public List<POrder_Product> getPorder_product() {
-		return porder_product;
-	}
-	public void setPorder_product(List<POrder_Product> porder_product) {
-		this.porder_product = porder_product;
-	}
-	
+
 	public Long getId() {
 		return id;
 	}
