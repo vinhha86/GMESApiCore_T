@@ -19,7 +19,9 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
+import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.security.GpayUser;
 
 @Table(name="pcontract_po")
@@ -64,7 +66,6 @@ public class PContract_PO implements Serializable {/**
 	private Long usercreatedid_link;
 	private Date datecreated;
 	private Integer status;
-	private String factories;
 	private Integer productiondays;
 	private Long orgmerchandiseid_link;
 	private Long merchandiserid_link;
@@ -81,6 +82,23 @@ public class PContract_PO implements Serializable {/**
 	}
 	
 	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
+    private List<POrder_Req> porder_req = new ArrayList<POrder_Req>();
+    
+    @Transient
+    public String getFactories() {
+    	String name = "";
+    	for(POrder_Req req : porder_req) {
+    		if(name == "")
+    			name += req.getGranttoorgname();
+    		else
+    			name += ", " + req.getGranttoorgname();
+    	}
+    	return name;
+    }
+    
+    @NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
     @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
     private List<PContract_Price> pcontract_price = new ArrayList<PContract_Price>();
@@ -110,8 +128,27 @@ public class PContract_PO implements Serializable {/**
 
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="usercreatedid_link",insertable=false,updatable =false)
-    private GpayUser usercreated;
+    @JoinColumn(name="merchandiserid_link",insertable=false,updatable =false)
+    private GpayUser merchandiser;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="orgmerchandiseid_link",insertable=false,updatable =false)
+    private Org org_factory;
+	
+	@Transient
+	public String getFactory_name() {
+		if(org_factory!=null)
+			return org_factory.getName();
+		return "";
+	}
+	@Transient
+	public String getMerchandiser_name() {
+		if(merchandiser!=null) {
+			return merchandiser.getFullname();
+		}
+		return "";
+	}
 	
 	@Transient
 	public String getUsercreatedName() {
@@ -120,6 +157,11 @@ public class PContract_PO implements Serializable {/**
 		}
 		return "";
 	}
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="usercreatedid_link",insertable=false,updatable =false)
+    private GpayUser usercreated;
 	
 	public Long getId() {
 		return id;
@@ -367,14 +409,6 @@ public class PContract_PO implements Serializable {/**
 
 	public void setStatus(Integer status) {
 		this.status = status;
-	}
-
-	public String getFactories() {
-		return factories;
-	}
-
-	public void setFactories(String factories) {
-		this.factories = factories;
 	}
 
 	public String getQcorgname() {

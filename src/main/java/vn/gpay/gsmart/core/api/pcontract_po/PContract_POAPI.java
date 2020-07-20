@@ -218,7 +218,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
 			
-			List<PContract_PO> pcontract = pcontract_POService.getPOByContractProduct(orgrootid_link, entity.pcontractid_link, entity.productid_link);
+			List<PContract_PO> pcontract = pcontract_POService.getPOByContractProduct(orgrootid_link, entity.pcontractid_link, entity.productid_link, user.getId());
 			response.data = pcontract;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -238,7 +238,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
 			
-			List<PContract_PO> pcontract = pcontract_POService.getPO_LeafOnly(orgrootid_link, entity.pcontractid_link, entity.productid_link);
+			List<PContract_PO> pcontract = pcontract_POService.getPO_LeafOnly(orgrootid_link, entity.pcontractid_link, entity.productid_link, user.getId());
 			response.data = pcontract;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -259,6 +259,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 			PContract_PO po = pcontract_POService.findOne(entity.pcontract_poid_link);
 			po.setOrgmerchandiseid_link(entity.orgid_link);
 			po.setMerchandiserid_link(entity.userid_link);
+			po.setStatus(POStatus.PO_STATUS_CONFIRMED);
 			
 			pcontract_POService.save(po);			
 			
