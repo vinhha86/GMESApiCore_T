@@ -754,7 +754,7 @@ public class ProductAPI {
 					.getPrincipal();
 			Product product = productService.findOne(entity.id);
 			
-			product.setCode(entity.code);
+			product.setBuyercode(entity.code);
 			product.setName(entity.name);
 
 			List<Product> pcheck = productService.getone_by_code(user.getRootorgid_link(),

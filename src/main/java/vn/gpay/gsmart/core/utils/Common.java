@@ -22,6 +22,8 @@ import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBOMColorService;
 import vn.gpay.gsmart.core.pcontractbomcolor.PContractBOMColor;
 import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOMSKUService;
 import vn.gpay.gsmart.core.pcontractbomsku.PContractBOMSKU;
+import vn.gpay.gsmart.core.pcontractconfigamount.ConfigAmount;
+import vn.gpay.gsmart.core.pcontractconfigamount.IConfigAmountService;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBomService;
 import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom;
 import vn.gpay.gsmart.core.pcontratproductsku.IPContractProductSKUService;
@@ -40,6 +42,7 @@ public class Common {
 	@Autowired IPContractProductSKUService ppskuService;
 	@Autowired IPContractProductBomService ppbomService;
 	@Autowired IHolidayService holidayService;
+	@Autowired IConfigAmountService cfamountService;
 	
 	@Autowired IStockingUniqueService stockService;
 	
@@ -291,5 +294,23 @@ public class Common {
 		}
 		
 		return list;
+	}
+	
+	public int Calculate_pquantity_production(int amount) {
+		int pquantity_production = 0;
+		ConfigAmount list_cfg = cfamountService.getby_amount(amount);
+		if(list_cfg!=null) {
+			// type = 0: add, 1: percent
+			if(list_cfg.getType() == 0) {
+				int plus = Math.abs(list_cfg.getAmount_plus()) == list_cfg.getAmount_plus() ? 0 : 1;
+				pquantity_production = amount + (int)Math.abs(list_cfg.getAmount_plus()) + plus;
+			}
+			else {
+				int amount_plus =  Math.abs(amount*list_cfg.getAmount_plus()/100) == amount*list_cfg.getAmount_plus()/100 ? 0 : 1;
+				pquantity_production = amount + (int)Math.abs(amount*list_cfg.getAmount_plus()/100) + amount_plus;
+			}
+		}
+		
+		return pquantity_production;
 	}
 }

@@ -24,6 +24,7 @@ import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 import vn.gpay.gsmart.core.sku.SKU_Attribute_Value;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
+import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 
@@ -34,6 +35,7 @@ public class PContractskuAPI {
 	@Autowired IPContractProductAtrributeValueService pcpavservice;
 	@Autowired ISKU_AttributeValue_Service skuavService;
 	@Autowired IPOrder_Service porder_Service;
+	@Autowired Common commonService;
 	
 	@RequestMapping(value = "/getbypcontract_product",method = RequestMethod.POST)
 	public ResponseEntity<PContractSKU_getbyproduct_response> SKU_GetbyProduct
@@ -124,11 +126,16 @@ public class PContractskuAPI {
 	}
 	
 	@RequestMapping(value = "/update",method = RequestMethod.POST)
-	public ResponseEntity<ResponseBase> SKU_Update
+	public ResponseEntity<PContractSKYU_update_response> SKU_Update
 	(HttpServletRequest request, @RequestBody PContractSKYU_update_request entity ) {
-		ResponseBase response = new ResponseBase();
+		PContractSKYU_update_response response = new PContractSKYU_update_response();
 		try {
-			pskuservice.save(entity.data);
+			PContractProductSKU sku = entity.data;
+			if(entity.isupdte_amount) {
+				sku.setPquantity_production(commonService.Calculate_pquantity_production(sku.getPquantity_porder()));
+			}
+			sku = pskuservice.save(sku);
+			response.amount = sku.getPquantity_production();
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -138,7 +145,7 @@ public class PContractskuAPI {
 			response.setMessage(e.getMessage());
 		}
 		
-		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		return new ResponseEntity<PContractSKYU_update_response>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/delete",method = RequestMethod.POST)

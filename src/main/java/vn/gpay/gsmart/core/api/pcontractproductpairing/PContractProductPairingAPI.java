@@ -191,7 +191,7 @@ public class PContractProductPairingAPI {
 			long orgrootid_link = user.getRootorgid_link();
 			long pcontractid_link = entity.pcontractid_link;
 			long productpairid_link = entity.productpairid_link;
-			
+			response.mesErr = "";
 			//Kiểm tra xem bộ đã tồn tại hay chưa
 			List<ProductPairing> list_pair = prodctpairservice.getproduct_pairing_bycontract(orgrootid_link, pcontractid_link);
 			

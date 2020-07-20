@@ -48,7 +48,7 @@ public class PContractProductPairing implements Serializable {/**
 	@Transient
 	public String getproductpairCode(){
 		if(product != null)
-			return product.getCode();
+			return product.getBuyercode();
 		return "";
 	}
 

@@ -4,4 +4,5 @@ import vn.gpay.gsmart.core.pcontratproductsku.PContractProductSKU;
 
 public class PContractSKYU_update_request {
 	public PContractProductSKU data;
+	public boolean isupdte_amount;
 }
