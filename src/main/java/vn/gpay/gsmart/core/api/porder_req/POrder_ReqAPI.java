@@ -212,7 +212,8 @@ public class POrder_ReqAPI {
 						porderService.savePOrder(porder, po_code);
 					}				
 				} else {
-					
+					System.out.println(entity.size_list);
+					System.out.println(entity.color_list);
 				}
 
 				
