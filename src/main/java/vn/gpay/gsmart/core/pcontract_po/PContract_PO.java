@@ -91,9 +91,9 @@ public class PContract_PO implements Serializable {/**
     	String name = "";
     	for(POrder_Req req : porder_req) {
     		if(name == "")
-    			name += req.getGranttoorgname();
+    			name += req.getGranttoorgcode();
     		else
-    			name += ", " + req.getGranttoorgname();
+    			name += ", " + req.getGranttoorgcode();
     	}
     	return name;
     }
