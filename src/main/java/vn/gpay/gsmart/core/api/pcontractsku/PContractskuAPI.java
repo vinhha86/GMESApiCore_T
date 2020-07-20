@@ -19,6 +19,7 @@ import vn.gpay.gsmart.core.pcontractattributevalue.IPContractProductAtrributeVal
 import vn.gpay.gsmart.core.pcontractattributevalue.PContractAttributeValue;
 import vn.gpay.gsmart.core.pcontratproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontratproductsku.PContractProductSKU;
+import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 import vn.gpay.gsmart.core.sku.SKU_Attribute_Value;
@@ -32,6 +33,7 @@ public class PContractskuAPI {
 	@Autowired IPContractProductSKUService pskuservice;
 	@Autowired IPContractProductAtrributeValueService pcpavservice;
 	@Autowired ISKU_AttributeValue_Service skuavService;
+	@Autowired IPOrder_Service porder_Service;
 	
 	@RequestMapping(value = "/getbypcontract_product",method = RequestMethod.POST)
 	public ResponseEntity<PContractSKU_getbyproduct_response> SKU_GetbyProduct
@@ -87,6 +89,29 @@ public class PContractskuAPI {
 			long pcontract_poid_link = entity.pcontract_poid_link;
 			
 			response.data = pskuservice.getlistsku_bypo_and_pcontract(orgrootid_link, pcontract_poid_link, pcontractid_link);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		}
+		catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		
+		return new ResponseEntity<PContractSKU_getbyproduct_response>(response, HttpStatus.OK);
+	}
+	
+	//Lay danh sach cac SKU cua PO chua dc phan cho POrder nao
+	@RequestMapping(value = "/getposku_free",method = RequestMethod.POST)
+	public ResponseEntity<PContractSKU_getbyproduct_response> getPOSKU_Free
+	(HttpServletRequest request, @RequestBody PContractSKU_getbypo_request entity ) {
+		PContractSKU_getbyproduct_response response = new PContractSKU_getbyproduct_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			long pcontractid_link = entity.pcontractid_link;
+			long pcontract_poid_link = entity.pcontract_poid_link;
+			
+			response.data = pskuservice.getlistsku_bypo_and_pcontract_free(orgrootid_link, pcontract_poid_link, pcontractid_link);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 		}
