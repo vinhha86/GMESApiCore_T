@@ -16,6 +16,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.category.Unit;
 import vn.gpay.gsmart.core.sku.SKU;
 
 @Table(name="pcontract_bom_product")
@@ -38,6 +39,7 @@ public class PContractProductBom implements Serializable{/**
 	private Date createddate;
 	private Long orgrootid_link;
 	private Long pcontractid_link;
+	private Long unitid_link;
 	
 //	@NotFound(action = NotFoundAction.IGNORE)
 //	@ManyToOne
@@ -47,6 +49,11 @@ public class PContractProductBom implements Serializable{/**
 	@ManyToOne
     @JoinColumn(name="materialid_link",insertable=false,updatable =false)
     private SKU sku;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="unitid_link",insertable=false,updatable =false)
+    private Unit unit;
 	
 	@Transient
 	public String getMaterialName() {
@@ -106,8 +113,8 @@ public class PContractProductBom implements Serializable{/**
 	
 	@Transient
 	public String getUnitName() {
-		if(sku !=null) {
-			return sku.getUnit_name();
+		if(unit !=null) {
+			return unit.getCode();
 		}
 		return "";
 	}
@@ -190,5 +197,13 @@ public class PContractProductBom implements Serializable{/**
 
 	public void setPcontractid_link(Long pcontractid_link) {
 		this.pcontractid_link = pcontractid_link;
+	}
+
+	public Long getUnitid_link() {
+		return unitid_link;
+	}
+
+	public void setUnitid_link(Long unitid_link) {
+		this.unitid_link = unitid_link;
 	}
 }
