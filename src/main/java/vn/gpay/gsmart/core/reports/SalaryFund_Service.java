@@ -24,14 +24,14 @@ import vn.gpay.gsmart.core.utils.POrderStatus;
 
 
 @Service
-public class CMP_Service implements ICMP_Service {
+public class SalaryFund_Service implements ISalaryFund_Service {
 	@Autowired IOrgService orgService;
 	@Autowired IPOrder_Repository repoPOrder;
 	@Autowired IPContract_Price_Service priceService;
 	
 	@Override
-	public List<CMP_Data> getData_ByMonth(Long userrootorgid_link, Long userorgid_link, int month, int year, int reportmonths){
-		List<CMP_Data> data =  new ArrayList<CMP_Data>();
+	public List<SalaryFund_Data> getData_ByMonth(Long userrootorgid_link, Long userorgid_link, int month, int year, int reportmonths){
+		List<SalaryFund_Data> data =  new ArrayList<SalaryFund_Data>();
 		List<ReportMonth> month_data =  new ArrayList<ReportMonth>();
 		//Tinh nam va thang cua thang truoc do
 		int month_prev = month -1;
@@ -69,18 +69,18 @@ public class CMP_Service implements ICMP_Service {
 			for(Org theOrg: ls_tosx){
 //				System.out.println(theOrg.getCode());
 				for(ReportMonth theRMonth: month_data){
-					Float cmp_month = getCMP_Month(theOrg.getId(), theRMonth.getMonth(),theRMonth.getYear());
+					Integer cmp_month = getSalaryFund_Month(theOrg.getId(), theRMonth.getMonth(),theRMonth.getYear());
 					
-					CMP_Data data_month = new CMP_Data();
+					SalaryFund_Data data_month = new SalaryFund_Data();
 					data_month.setId(id);
 					data_month.setMonth(theRMonth.getMonth());
 					data_month.setYear(theRMonth.getYear());
 					data_month.setOrgid_link(theOrg.getId());
 					data_month.setOrgname(theOrg.getCode());
-	//				data_month.setParentorgid_link(theOrg.getParentid_link());
-	//				data_month.setParentorgname(theOrg.getParentcode());
+	//				data_prev.setParentorgid_link(theOrg.getParentid_link());
+	//				data_prev.setParentorgname(theOrg.getParentcode());
 					
-					data_month.setCmpamount(cmp_month);
+					data_month.setSalaryfundamount(cmp_month);
 					data.add(data_month);
 					id++;
 				}
@@ -90,7 +90,7 @@ public class CMP_Service implements ICMP_Service {
 		}
 		return data;
 	}
-	private Float getCMP_Month(long orgid_link, Integer month, Integer year){
+	private Integer getSalaryFund_Month(long orgid_link, Integer month, Integer year){
 		//StartDate from 00:00:00 of the Date 7 of the month
 		//EndDate from 23:59:59 of the Date 6 of next month
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
@@ -116,19 +116,21 @@ public class CMP_Service implements ICMP_Service {
 			        .desc("ordercode")
 			        .build();
 			List<POrder> lsPOrder = repoPOrder.findAll(specification,sort);
-			Float totalCMP = (float) 0;
+			Integer totalSalaryFund = 0;
 			for(POrder thePOrder: lsPOrder){
-				//Lay gia CMP cua san pham trong pcontract_price
-				PContract_Price thePriceCMP = priceService.getPrice_CMP(thePOrder.getPcontract_poid_link(), thePOrder.getProductid_link());
-				if (null != thePriceCMP) {
-					totalCMP = totalCMP + (null==thePriceCMP.getPrice_cmp()?0:thePriceCMP.getPrice_cmp())*(null==thePOrder.getTotalorder()?0:thePOrder.getTotalorder());
+				//Neu Price_Sewingcost =0 --> Lay gia Price_Sweingtarget. Else lay gia Price_Sewingcost
+				PContract_Price thePrice = priceService.getPrice_CMP(thePOrder.getPcontract_poid_link(), thePOrder.getProductid_link());
+				if (null != thePrice) {
+					int price = Math.round(thePrice.getPrice_sewingcost()>0?thePrice.getPrice_sewingcost():thePrice.getPrice_sewingtarget());
+					int totalorder = Math.round(null==thePOrder.getTotalorder()?0:thePOrder.getTotalorder());
+					totalSalaryFund = totalSalaryFund + (price*totalorder);
 				}
 			}
-			return totalCMP;
+			return totalSalaryFund;
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return (float) 0;
+			return 0;
 		}
 
 		
