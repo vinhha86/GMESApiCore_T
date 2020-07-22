@@ -208,7 +208,8 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 				.eq(Objects.nonNull(vendorid), "pcontract.orgvendorid_link", vendorid)
 				.ge(Objects.nonNull(orderdatefrom),"orderdate",DateFormat.atStartOfDay(orderdatefrom))
                 .le(Objects.nonNull(orderdateto),"orderdate",DateFormat.atEndOfDay(orderdateto))
-                .eq(Objects.nonNull(status), "status", status)
+//                .eq(Objects.nonNull(status), "status", status)
+                .eq(Objects.nonNull(status), "porderstatus.id", status)
 				.build();
 		
 		return repo.findAll(specification);

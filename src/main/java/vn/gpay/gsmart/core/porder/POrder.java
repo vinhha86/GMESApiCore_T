@@ -27,6 +27,7 @@ import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.porder_bom_sku.POrderBOMSKU;
 import vn.gpay.gsmart.core.porder_product.POrder_Product;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
+import vn.gpay.gsmart.core.porder_status.POrder_Status;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.sizeset.SizeSet;
 
@@ -82,6 +83,7 @@ public class POrder implements Serializable {
 	private Date productiondate_fact;
 	private Date finishdate_plan;
 	private Date finishdate_fact;
+	private Long porder_statusid_link;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -107,6 +109,19 @@ public class POrder implements Serializable {
 	@ManyToOne
     @JoinColumn(name="productid_link",insertable=false,updatable =false)
     private Product product;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="porder_statusid_link",insertable=false,updatable =false)
+    private POrder_Status porderstatus;
+	
+	@Transient
+	public String getStatusName() {
+		if(porderstatus != null) {
+			return porderstatus.getName();
+		}
+		return "";
+	}	
 	
 	@Transient
 	public String getStylebuyer() {
@@ -545,6 +560,12 @@ public class POrder implements Serializable {
 
 	public void setFinishdate_fact(Date finishdate_fact) {
 		this.finishdate_fact = finishdate_fact;
+	}
+	public Long getPorder_statusid_link() {
+		return porder_statusid_link;
+	}
+	public void setPorder_statusid_link(Long porder_statusid_link) {
+		this.porder_statusid_link = porder_statusid_link;
 	}
 	
 }
