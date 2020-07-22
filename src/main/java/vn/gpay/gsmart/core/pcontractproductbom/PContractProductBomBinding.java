@@ -1,8 +1,6 @@
 package vn.gpay.gsmart.core.pcontractproductbom;
 
 import java.util.Date;
-import java.util.Map;
-
 
 public class PContractProductBomBinding {
 	private Long id;

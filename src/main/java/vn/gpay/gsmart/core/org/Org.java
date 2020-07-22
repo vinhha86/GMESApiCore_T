@@ -93,6 +93,26 @@ public class Org implements Serializable {
     @JoinColumn(name="colorid_link",insertable=false,updatable =false)
     private Color color;
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="parentid_link",insertable=false,updatable =false)
+    private Org parent;
+	
+	@Transient
+	public String getParentcode() {
+		if(parent!=null) {
+			return parent.getCode();
+		}
+		return "";
+	}
+	@Transient
+	public String getParentname() {
+		if(parent!=null) {
+			return parent.getName();
+		}
+		return "";
+	}
+	
 	@Transient
 	public boolean checked;
 	
