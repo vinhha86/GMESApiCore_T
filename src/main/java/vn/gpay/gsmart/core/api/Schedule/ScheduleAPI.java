@@ -181,6 +181,7 @@ public class ScheduleAPI {
 						sch_porder.setPorder_grantid_link(pordergrant.getId());
 						sch_porder.setProductid_link(pordergrant.getProductid_link());
 						sch_porder.setPcontract_poid_link(pordergrant.getPcontract_poid_link());
+						sch_porder.setPcontractid_link(pordergrant.getPcontractid_link());
 						
 						response.events.rows.add(sch_porder);
 					}

@@ -103,6 +103,12 @@ public class POrderGrant implements Serializable {
 		return 0;
 	}
 	@Transient
+	public long getPcontractid_link() {
+		if(porder!=null)
+			return porder.getPcontractid_link();
+		return 0;
+	}
+	@Transient
 	public int getStatusPorder() {
 		if(porder!=null)
 			return porder.getStatus();

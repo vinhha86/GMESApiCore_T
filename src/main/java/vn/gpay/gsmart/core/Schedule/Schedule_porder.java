@@ -28,6 +28,7 @@ public class Schedule_porder {
 	private Integer status;
 	private long productid_link;
 	private long pcontract_poid_link;
+	private long pcontractid_link;
 		
 	public Long getParentid_origin() {
 		return parentid_origin;
@@ -144,6 +145,12 @@ public class Schedule_porder {
 	}
 	public void setPcontract_poid_link(long pcontract_poid_link) {
 		this.pcontract_poid_link = pcontract_poid_link;
+	}
+	public long getPcontractid_link() {
+		return pcontractid_link;
+	}
+	public void setPcontractid_link(long pcontractid_link) {
+		this.pcontractid_link = pcontractid_link;
 	}
 	
 	
