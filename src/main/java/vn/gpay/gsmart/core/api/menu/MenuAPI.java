@@ -22,6 +22,7 @@ import vn.gpay.gsmart.core.menu.IMenuService;
 import vn.gpay.gsmart.core.menu.Menu;
 import vn.gpay.gsmart.core.menu.MenuTree;
 import vn.gpay.gsmart.core.security.GpayAuthentication;
+import vn.gpay.gsmart.core.security.IGpayUserService;
 
 @RestController
 @RequestMapping("/api/v1/menu")
@@ -29,6 +30,7 @@ public class MenuAPI {
 
 	@Autowired IMenuService menuService;
 	@Autowired IAppRoleMenuService rolemenuService;
+	@Autowired IGpayUserService  userDetailsService ;
 	
 	@RequestMapping(value = "/menu_data",method = RequestMethod.POST)
 	//@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -68,6 +70,10 @@ public class MenuAPI {
 			List<Menu> menu = menuService.findByUserid(user.getUserId());
 			List<MenuTree> children = menuService.createTree(menu);
 			response.children=children;
+			
+			response.data=userDetailsService.findById(user.getUserId());
+			response.data.setPassword("");
+			
 			return new ResponseEntity<MenuTreeResponse>(response,HttpStatus.OK);
 		}catch (RuntimeException e) {
 			ResponseError errorBase = new ResponseError();

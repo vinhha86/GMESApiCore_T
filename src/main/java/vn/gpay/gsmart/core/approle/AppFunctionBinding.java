@@ -8,6 +8,7 @@ public class AppFunctionBinding {
 	private String name_en;
 	private String icon;
 	private boolean checked;
+	private boolean readonly;
 	public Long getId() {
 		return id;
 	}
@@ -49,6 +50,12 @@ public class AppFunctionBinding {
 	}
 	public void setChecked(boolean checked) {
 		this.checked = checked;
+	}
+	public boolean isReadonly() {
+		return readonly;
+	}
+	public void setReadonly(boolean readonly) {
+		this.readonly = readonly;
 	}
 	
 	

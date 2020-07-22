@@ -24,6 +24,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import vn.gpay.gsmart.core.approle.AppRoleFunction;
 import vn.gpay.gsmart.core.approle.AppRole_User;
 import vn.gpay.gsmart.core.org.Org;
 
@@ -81,6 +82,15 @@ public class GpayUser implements UserDetails {
 		if(org!=null)
 			return org.getName();
 		return "";
+	}
+	
+	@Transient
+	public List<AppRoleFunction> getList_function(){
+		List<AppRoleFunction> list = new ArrayList<AppRoleFunction>();
+		for(AppRole_User role: list_menu) {
+			list.addAll(role.getList_function());
+		}
+		return list;
 	}
 	
 	@Transient

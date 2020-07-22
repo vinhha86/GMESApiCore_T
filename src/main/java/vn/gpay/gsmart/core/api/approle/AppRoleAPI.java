@@ -185,6 +185,8 @@ public class AppRoleAPI {
 		try {
 			long roleid_link = entity.roleid_link;
 			long functionid_link = entity.functionid_link;
+			boolean isreadonly = entity.isreadonly;
+			
 			
 			if(entity.checked) {
 				AppRoleFunction approleFunction = approlefunctionService.getby_role_and_function(roleid_link, functionid_link);
@@ -193,11 +195,14 @@ public class AppRoleAPI {
 					approleFunction.setFunctionid_link(functionid_link);
 					approleFunction.setId(null);
 					approleFunction.setIshidden(false);
-					approleFunction.setIsreadonly(false);
+					approleFunction.setIsreadonly(isreadonly);
 					approleFunction.setRoleid_link(roleid_link);
 					
-					approlefunctionService.save(approleFunction);
 				}
+				else {
+					approleFunction.setIsreadonly(isreadonly);
+				}
+				approlefunctionService.save(approleFunction);
 				
 				//Kiểm tra menu đang chọn đã được check chưa?  chưa thì phải check
 				AppFunction appfunction = appfunctionService.findOne(functionid_link);
@@ -211,11 +216,21 @@ public class AppRoleAPI {
 					
 					rolemenuService.save(role_menu);
 				}
-;			}
+			}
 			else {
 				AppRoleFunction appFunction = approlefunctionService.getby_role_and_function(roleid_link, functionid_link);
 				if(appFunction != null) {
 					approlefunctionService.delete(appFunction);
+				}
+				else {
+					AppRoleFunction approleFunction = new AppRoleFunction();
+					approleFunction.setFunctionid_link(functionid_link);
+					approleFunction.setId(null);
+					approleFunction.setIshidden(false);
+					approleFunction.setIsreadonly(isreadonly);
+					approleFunction.setRoleid_link(roleid_link);
+					
+					approlefunctionService.save(approleFunction);
 				}
 			}
 			

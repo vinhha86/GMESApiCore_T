@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.approle.AppFunction;
 import vn.gpay.gsmart.core.approle.AppFunctionBinding;
+import vn.gpay.gsmart.core.approle.AppRoleFunction;
 import vn.gpay.gsmart.core.approle.IAppFunctionService;
 import vn.gpay.gsmart.core.approle.IAppRoleFunctionService;
 import vn.gpay.gsmart.core.base.ResponseError;
@@ -43,10 +44,16 @@ public class AppFunctionAPI {
 				binding.setIcon(appfunc.getIcon());
 				binding.setId(appfunc.getId());
 				binding.setName(appfunc.getName());
-				if(list_app_role_func.contains(appfunc.getId()))
+				if(list_app_role_func.contains(appfunc.getId())) {
 					binding.setChecked(true);
-				else
+					AppRoleFunction arf = approlefuncService.getby_role_and_function(roleid_link, appfunc.getId());
+					binding.setReadonly(arf.getIsreadonly());
+				}					
+				else {
 					binding.setChecked(false);
+					binding.setReadonly(false);
+				}
+					
 				
 				listbinding.add(binding);
 			}

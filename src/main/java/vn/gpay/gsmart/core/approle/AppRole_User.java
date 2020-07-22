@@ -1,6 +1,8 @@
 package vn.gpay.gsmart.core.approle;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -37,6 +39,13 @@ public class AppRole_User implements Serializable {
 	//@BatchSize(size=10)
 	@JoinColumn( name="role_id",insertable=false,updatable =false)
 	private AppRole approle ;
+	
+	@Transient
+	public List<AppRoleFunction> getList_function(){
+		if(approle!=null)
+			return approle.getList_function();
+		return new ArrayList<AppRoleFunction>();
+	}
 	
 	@Transient
 	public String getRolename() {
