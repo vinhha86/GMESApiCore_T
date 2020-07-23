@@ -57,7 +57,6 @@ public class POrderListAPI {
 			
 			if(status.size() == 0) {
 				result = porderService.getPOrderListBySearch(
-							entity.po, // po
 							entity.style, // style
 							entity.buyerid, // buyerid
 							entity.vendorid, // vendorid
@@ -68,7 +67,6 @@ public class POrderListAPI {
 			}else {
 				for(Long num : status) {
 					List<POrder> temp = porderService.getPOrderListBySearch(
-							entity.po, // po
 							entity.style, // style
 							entity.buyerid, // buyerid
 							entity.vendorid, // vendorid
@@ -79,15 +77,21 @@ public class POrderListAPI {
 					result.addAll(temp);
 				}
 			}
-			if(entity.po == null) entity.po="";
+			if(entity.pobuyer == null) entity.pobuyer="";
+			if(entity.povendor == null) entity.povendor="";
 			if(entity.style == null) entity.style="";
 			
 			for(POrder porder : result) {
 				String po_buyer = porder.getPo_buyer().toLowerCase();
-				String po = entity.po.toLowerCase();
+				String po_buyer_req = entity.pobuyer.toLowerCase();
+				String po_vendor = porder.getPo_vendor().toLowerCase();
+				String po_vendor_req = entity.povendor.toLowerCase();
 				String stylebuyer = porder.getStylebuyer().toLowerCase();
 				String style = entity.style.toLowerCase();
-				if(!po_buyer.contains(po)) {
+				if(!po_buyer.contains(po_buyer_req)) {
+					continue;
+				}
+				if(!po_vendor.contains(po_vendor_req)) {
 					continue;
 				}
 				if(!stylebuyer.contains(style)) {
