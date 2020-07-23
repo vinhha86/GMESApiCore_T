@@ -1027,6 +1027,8 @@ public class ProductAPI {
 					pb.setThanhPhanVai(product.getThanhPhanVai());
 					pb.setTenMauNPL(product.getTenMauNPL());
 					
+					pb.setPquantity(entity.po_quantity);
+					
 					String FolderPath = commonService.getFolderPath(product.getProducttypeid_link());
 					String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
 					

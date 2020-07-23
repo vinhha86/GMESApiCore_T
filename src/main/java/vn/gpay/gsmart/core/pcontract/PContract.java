@@ -1,7 +1,9 @@
 package vn.gpay.gsmart.core.pcontract;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -18,6 +21,8 @@ import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.branch.Branch;
 import vn.gpay.gsmart.core.org.Org;
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
+import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.season.Season;
 import vn.gpay.gsmart.core.security.GpayUser;
 
@@ -212,8 +217,6 @@ public class PContract implements Serializable {/**
 		this.contractdate = contractdate;
 	}
 
-
-
 	public Date getConfirmdate() {
 		return confirmdate;
 	}
@@ -346,4 +349,34 @@ public class PContract implements Serializable {/**
 		this.marketypeid_link = marketypeid_link;
 	}
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+    @JoinColumn(name="pcontractid_link",insertable=false,updatable =false)
+    private List<PContract_PO> pos = new ArrayList<PContract_PO>();
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+    @JoinColumn(name="pcontractid_link",insertable=false,updatable =false)
+    private List<PContractProduct> products = new ArrayList<PContractProduct>();
+	
+	@Transient
+	public String getProductlist() {
+		String a = "";
+		if(products!=null ){
+			for(PContractProduct product:products){
+				a += product.getProductBuyerCode() + "; ";
+			}
+		}
+		return a;
+	}
+	@Transient
+	public String getPolist() {
+		String a = "";
+		if(pos!=null ){
+			for(PContract_PO po:pos){
+				a += po.getPo_buyer() + "; ";
+			}
+		}
+		return a;
+	}
 }

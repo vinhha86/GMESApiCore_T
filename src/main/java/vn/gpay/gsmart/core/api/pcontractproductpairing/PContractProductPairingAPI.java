@@ -154,8 +154,8 @@ public class PContractProductPairingAPI {
 			@RequestBody PContractProductPair_delete_request entity) {
 		ResponseBase response = new ResponseBase();
 		try {
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
-					.getPrincipal();
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+//					.getPrincipal();
 			long id = entity.id;
 			ppPairingservice.deleteById(id);
 			
