@@ -83,7 +83,7 @@ public class POrder implements Serializable {
 	private Date productiondate_fact;
 	private Date finishdate_plan;
 	private Date finishdate_fact;
-	private Long porder_statusid_link;
+//	private Long porder_statusid_link;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -112,7 +112,7 @@ public class POrder implements Serializable {
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="porder_statusid_link",insertable=false,updatable =false)
+    @JoinColumn(name="status",insertable=false,updatable =false)
     private POrder_Status porderstatus;
 	
 	@Transient
@@ -561,11 +561,11 @@ public class POrder implements Serializable {
 	public void setFinishdate_fact(Date finishdate_fact) {
 		this.finishdate_fact = finishdate_fact;
 	}
-	public Long getPorder_statusid_link() {
-		return porder_statusid_link;
-	}
-	public void setPorder_statusid_link(Long porder_statusid_link) {
-		this.porder_statusid_link = porder_statusid_link;
-	}
-	
+//	public Long getPorder_statusid_link() {
+//		return porder_statusid_link;
+//	}
+//	public void setPorder_statusid_link(Long porder_statusid_link) {
+//		this.porder_statusid_link = porder_statusid_link;
+//	}
+//	
 }

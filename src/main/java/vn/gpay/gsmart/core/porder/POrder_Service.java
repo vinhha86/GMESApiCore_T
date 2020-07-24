@@ -199,16 +199,13 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 	}
 
 	@Override
-	public List<POrder> getPOrderListBySearch(String po, String style, Long buyerid, Long vendorid, Date orderdatefrom, Date orderdateto, Long status) {
+	public List<POrder> getPOrderListBySearch(String style, Long buyerid, Long vendorid, Date orderdatefrom, Date orderdateto, Long status) {
 
 		Specification<POrder> specification = Specifications.<POrder>and()
-//				.like(Objects.nonNull(po), "pcontract_po.po_buyer", "%"+po+"%")
-//				.like(Objects.nonNull(style), "product.buyercode", "%"+style+"%")
 				.eq(Objects.nonNull(buyerid), "pcontract.orgbuyerid_link", buyerid)
 				.eq(Objects.nonNull(vendorid), "pcontract.orgvendorid_link", vendorid)
 				.ge(Objects.nonNull(orderdatefrom),"orderdate",DateFormat.atStartOfDay(orderdatefrom))
                 .le(Objects.nonNull(orderdateto),"orderdate",DateFormat.atEndOfDay(orderdateto))
-//                .eq(Objects.nonNull(status), "status", status)
                 .eq(Objects.nonNull(status), "porderstatus.id", status)
 				.build();
 		
