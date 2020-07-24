@@ -35,6 +35,8 @@ import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
+import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
@@ -453,6 +455,7 @@ public class ScheduleAPI {
 			porder.setStatus(1);
 			porderService.save(porder);
 			
+			//Tao POrder_grant
 			POrderGrant pg = new POrderGrant();
 			pg.setId(null);
 			pg.setUsercreatedid_link(user.getId());
@@ -466,6 +469,15 @@ public class ScheduleAPI {
 			pg.setStatus(1);
 			pg.setStart_date_plan(porder.getProductiondate_plan());
 			pg.setFinish_date_plan(porder.getFinishdate_plan());
+			
+			//Lay toan bo SKU tu POrder sang POrder_grant_sku
+			for(POrder_Product_SKU pSKU: porder.getPorder_product_sku()){
+				POrderGrant_SKU pgSKU = new POrderGrant_SKU();
+				pgSKU.setOrgrootid_link(orgrootid_link);
+				pgSKU.setSkuid_link(pSKU.getSkuid_link());
+				pgSKU.setGrantamount(pSKU.getPquantity_total());
+				pg.getPorder_grant_sku().add(pgSKU);
+			}
 			pg = granttService.save(pg);
 			
 			POrderProcessing pp = new POrderProcessing();

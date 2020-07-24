@@ -133,6 +133,7 @@ public class PContractskuAPI {
 			PContractProductSKU sku = entity.data;
 			if(entity.isupdte_amount) {
 				sku.setPquantity_production(commonService.Calculate_pquantity_production(sku.getPquantity_porder()));
+				sku.setPquantity_total(sku.getPquantity_production() + sku.getPquantity_sample());
 			}
 			sku = pskuservice.save(sku);
 			response.amount = sku.getPquantity_production();
