@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,6 +26,7 @@ import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
 import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
+import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -251,13 +253,25 @@ public class POrderListAPI {
 		try {
 //			System.out.println(entity.idSkus);
 //			System.out.println(entity.idGrant);
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			
 			// save to porder_grant_sku
 			for(Long productsku_id : entity.idSkus) {
 				POrder_Product_SKU pps = porderskuService.findOne(productsku_id);
 				POrderGrant_SKU pgs = pordergrantskuService.getPOrderGrant_SKUbySKUid_link(pps.getSkuid_link());
-				pgs.setPordergrantid_link(entity.idGrant);
-				pordergrantskuService.save(pgs);
+				if(pgs == null) {
+					pgs = new POrderGrant_SKU();
+					pgs.setId(0L);
+					pgs.setOrgrootid_link(user.getRootorgid_link());
+					pgs.setPordergrantid_link(entity.idGrant);
+					pgs.setSkuid_link(pps.getSkuid_link());
+					pgs.setGrantamount(pps.getPquantity_total());
+					pordergrantskuService.save(pgs);
+				}else {
+					pgs.setPordergrantid_link(entity.idGrant);
+					pordergrantskuService.save(pgs);
+				}
+				
 			}
 			
 			// re-calculate porder_grant grant_amount
