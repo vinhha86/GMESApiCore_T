@@ -278,14 +278,14 @@ public class POrderListAPI {
 			List<POrderGrant> pglist = pordergrantService.getByOrderId(entity.idPOrder);
 			
 			for(POrderGrant pg : pglist) {
-				Integer grandamounntSum = 0;
+				Integer grantamountSum = 0;
 				
 				List<POrderGrant_SKU> pgslist = pordergrantskuService.getPOrderGrant_SKU(pg.getId());
 				for(POrderGrant_SKU pgs : pgslist) {
-					grandamounntSum+=pgs.getGrantamount();
+					grantamountSum+=pgs.getGrantamount();
 				}
 				
-				pg.setGrantamount(grandamounntSum);
+				pg.setGrantamount(grantamountSum);
 				pordergrantService.save(pg);
 			}
 			
