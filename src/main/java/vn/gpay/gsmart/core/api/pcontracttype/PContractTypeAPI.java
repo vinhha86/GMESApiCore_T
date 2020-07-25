@@ -49,8 +49,8 @@ public class PContractTypeAPI {
 	public ResponseEntity<PContractType_getall_response> GetAll(HttpServletRequest request ) {
 		PContractType_getall_response response = new PContractType_getall_response();
 		try {
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			long orgrootid_link = user.getRootorgid_link();
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//			long orgrootid_link = user.getRootorgid_link();
 			response.data = service.findAll();
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

@@ -11,12 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.UnsupportedJwtException;
-
-
 // We should use OncePerRequestFilter since we are doing a database call, there is no point in doing this more than once
 public class JwtTokenFilter extends OncePerRequestFilter {
 

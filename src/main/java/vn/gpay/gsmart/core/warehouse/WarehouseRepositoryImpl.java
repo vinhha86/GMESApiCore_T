@@ -10,10 +10,7 @@ import org.springframework.stereotype.Service;
 
 import vn.gpay.gsmart.core.base.StringAbstractService;
 import vn.gpay.gsmart.core.invcheck.InvcheckEpc;
-import vn.gpay.gsmart.core.invcheck.InvcheckEpcID;
 import vn.gpay.gsmart.core.invcheck.InvcheckSku;
-import vn.gpay.gsmart.core.invcheck.InvcheckSkuID;
-import vn.gpay.gsmart.core.stockin.Results;
 
 @Service
 public class WarehouseRepositoryImpl extends StringAbstractService<Warehouse> implements IWarehouseService{

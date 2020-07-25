@@ -13,7 +13,5 @@ import org.springframework.transaction.annotation.Transactional;
 public interface UserMenuRepository extends JpaRepository<UserMenu, Long>{
 
 	@Query(value = "Select a from UserMenu a where a.userid=:userid")
-	public List<UserMenu>findByUserid(@Param ("userid")final long userid);
-	
-
+	public List<UserMenu>findByUserid(@Param ("userid")final Long userid);
 }

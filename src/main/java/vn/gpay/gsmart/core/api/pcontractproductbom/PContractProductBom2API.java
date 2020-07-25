@@ -20,13 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.pcontractattributevalue.IPContractProductAtrributeValueService;
 import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBom2ColorService;
-import vn.gpay.gsmart.core.pcontractbomcolor.PContractBOMColor;
 import vn.gpay.gsmart.core.pcontractbomcolor.PContractBom2Color;
 import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOM2SKUService;
 import vn.gpay.gsmart.core.pcontractbomsku.PContractBOM2SKU;
-import vn.gpay.gsmart.core.pcontractbomsku.PContractBOMSKU;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
-import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom;
 import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom2;
 import vn.gpay.gsmart.core.pcontratproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -321,8 +318,8 @@ public class PContractProductBom2API {
 			@RequestBody PContractProductBOM_getbomcolor_request entity) {
 		PContractProductBOM_getbomcolor_response response = new PContractProductBOM_getbomcolor_response();
 		try {
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
-					.getPrincipal();
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+//					.getPrincipal();
 			long pcontractid_link = entity.pcontractid_link;
 			long productid_link = entity.productid_link;
 			long colorid_link = entity.colorid_link;
@@ -337,7 +334,7 @@ public class PContractProductBom2API {
 					//ppbomskuservice.getsize_bycolor(pcontractid_link, productid_link, colorid_link);
 			
 			for (PContractProductBom2 pContractProductBom : listbom) {
-				Map<String, String> map = new HashMap();
+				Map<String, String> map = new HashMap<String, String>();
 				List<PContractBom2Color> listbomcolorclone = new ArrayList<PContractBom2Color>(listbomcolor);
 				listbomcolorclone.removeIf(c -> !c.getMaterialid_link().equals(pContractProductBom.getMaterialid_link()));
 				

@@ -88,7 +88,7 @@ public class PorderPlanBinding {
 		PercentDone = percentDone;
 	}
 	public void setName(String name) {
-		name = name;
+		this.Name = name;
 	}
 	public void setParentId(Long parentId) {
 		this.parentId = parentId;

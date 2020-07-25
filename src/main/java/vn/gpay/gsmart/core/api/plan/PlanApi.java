@@ -591,7 +591,7 @@ public class PlanApi {
 			@RequestBody plan_create_request entity) {
 		plan_create_response response = new plan_create_response();
 		try {
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Porder_Plan data = entity.data;
 			
 			Porder_Plan edit = planService.findOne(data.getId());

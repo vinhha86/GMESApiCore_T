@@ -21,7 +21,6 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.sku.SKU;
 
 @Table(name="stockout_d")

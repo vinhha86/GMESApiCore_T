@@ -15,8 +15,6 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import vn.gpay.gsmart.core.org.Org;
-
 @Table(name="app_role_function")
 @Entity
 public class AppRoleFunction implements Serializable {

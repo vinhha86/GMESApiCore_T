@@ -21,7 +21,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
 import org.apache.poi.xssf.usermodel.XSSFDrawing;
-import org.apache.poi.xssf.usermodel.XSSFPicture;
+//import org.apache.poi.xssf.usermodel.XSSFPicture;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +53,7 @@ public class ReportAPI {
 		long productid_link = 0;
 		long pcontractid_link = entity.pcontractid_link;
 		
-		String FILE_NAME = request.getServletContext().getRealPath("report/Template/MyFirstExcel.xlsx"); // đường dẫn file template
+//		String FILE_NAME = request.getServletContext().getRealPath("report/Template/MyFirstExcel.xlsx"); // đường dẫn file template
 		
 		String uploadRoot = request.getServletContext().getRealPath("report/Export");
 		File uploadRootDir = new File(uploadRoot);

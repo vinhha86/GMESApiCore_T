@@ -22,15 +22,12 @@ import vn.gpay.gsmart.core.pcontractattributevalue.IPContractProductAtrributeVal
 import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBOMColorService;
 import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBom2ColorService;
 import vn.gpay.gsmart.core.pcontractbomcolor.PContractBOMColor;
-import vn.gpay.gsmart.core.pcontractbomcolor.PContractBom2Color;
 import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOM2SKUService;
 import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOMSKUService;
-import vn.gpay.gsmart.core.pcontractbomsku.PContractBOM2SKU;
 import vn.gpay.gsmart.core.pcontractbomsku.PContractBOMSKU;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBomService;
 import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom;
-import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom2;
 import vn.gpay.gsmart.core.pcontratproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
@@ -302,8 +299,8 @@ public class PContractProductBomAPI {
 			@RequestBody PContractProductBOM_getbomcolor_request entity) {
 		PContractProductBOM_getbomcolor_response response = new PContractProductBOM_getbomcolor_response();
 		try {
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
-					.getPrincipal();
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+//					.getPrincipal();
 			long pcontractid_link = entity.pcontractid_link;
 			long productid_link = entity.productid_link;
 			long colorid_link = entity.colorid_link;
@@ -318,7 +315,7 @@ public class PContractProductBomAPI {
 					//ppbomskuservice.getsize_bycolor(pcontractid_link, productid_link, colorid_link);
 			
 			for (PContractProductBom pContractProductBom : listbom) {
-				Map<String, String> map = new HashMap();
+				Map<String, String> map = new HashMap<String, String>();
 				List<PContractBOMColor> listbomcolorclone = new ArrayList<PContractBOMColor>(listbomcolor);
 				listbomcolorclone.removeIf(c -> !c.getMaterialid_link().equals(pContractProductBom.getMaterialid_link()));
 				

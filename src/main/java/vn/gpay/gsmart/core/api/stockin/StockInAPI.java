@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.base.ResponseError;
-import vn.gpay.gsmart.core.base.Stockintype;
 import vn.gpay.gsmart.core.invoice.IInvoiceService;
 import vn.gpay.gsmart.core.packinglist.IPackingListService;
 import vn.gpay.gsmart.core.packinglist.PackingList;
@@ -30,7 +29,6 @@ import vn.gpay.gsmart.core.stockout.IStockOutService;
 import vn.gpay.gsmart.core.tagencode.ITagEncodeService;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 import vn.gpay.gsmart.core.warehouse.IWarehouseService;
-import vn.gpay.gsmart.core.warehouse.Warehouse;
 
 @RestController
 @RequestMapping("/api/v1/stockin")

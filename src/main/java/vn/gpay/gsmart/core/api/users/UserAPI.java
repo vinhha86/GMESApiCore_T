@@ -210,7 +210,7 @@ public class UserAPI {
 	public ResponseEntity<UserResponse> GetUserList_Page( @RequestBody User_getList_byPage_request entity,HttpServletRequest request ) {
 		UserResponse response = new UserResponse();
 		try {
-			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
+//			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
 			//GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
 			//		.getPrincipal();
 			String firstname = entity.firstname;
