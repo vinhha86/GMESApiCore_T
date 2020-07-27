@@ -769,6 +769,7 @@ public class ScheduleAPI {
 			grant_src.setGrantamount(total);
 			grant_src.setStart_date_plan(commonService.getBeginOfDate(start));
 			grant_src.setFinish_date_plan(commonService.getEndOfDate(end));
+			grant_src.setGranttoorgid_link(grant_des.getGranttoorgid_link());
 			grant_src = granttService.save(grant_src);
 			
 			Schedule_porder sch = entity.sch;
