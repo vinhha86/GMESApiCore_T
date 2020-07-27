@@ -53,7 +53,24 @@ public class POrder_GrantAPI {
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<POrder_Grant_GetOne_Response>(response, HttpStatus.BAD_REQUEST);
 		}
-	} 
+	}
+	
+	@RequestMapping(value = "/findone",method = RequestMethod.POST)
+	public ResponseEntity<POrder_Grant_GetOne_Response> POrderFindOne(@RequestBody POrder_Grant_findOne_request entity,HttpServletRequest request ) {
+		POrder_Grant_GetOne_Response response = new POrder_Grant_GetOne_Response();
+		try {
+			
+			response.data = porderGrantService.findOne(entity.idPorderGrant);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<POrder_Grant_GetOne_Response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<POrder_Grant_GetOne_Response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ResponseEntity<POrder_GrantCreate_response> Create(HttpServletRequest request,
