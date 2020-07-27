@@ -323,6 +323,8 @@ public class ScheduleAPI {
 			int productivity = commonService.getProductivity(event.getTotalpackage(), duration); 
 			event.setDuration(duration);
 			event.setProductivity(productivity);
+			event.setStartDate(commonService.getBeginOfDate(entity.data.getStartDate()));
+			event.setEndDate(commonService.getEndOfDate(entity.data.getEndDate()));
 			
 			//update vao grant
 			long pordergrantid_link = entity.data.getPorder_grantid_link();
@@ -396,7 +398,7 @@ public class ScheduleAPI {
 			porderService.save(porder);
 			
 			Schedule_porder sch = entity.schedule;
-			sch.setEndDate(grant.getFinish_date_plan());
+			sch.setEndDate(commonService.getEndOfDate(grant.getFinish_date_plan()));
 			sch.setDuration(commonService.getDuration(grant.getStart_date_plan(), grant.getFinish_date_plan(), orgrootid_link, year));
 			sch.setProductivity(commonService.getProductivity(grant.getGrantamount(), sch.getDuration()));
 			sch.setPorder_grantid_link(entity.pordergrant_id_link);
@@ -425,7 +427,7 @@ public class ScheduleAPI {
 			
 			long pordergrantid_link = entity.data.getPorder_grantid_link();
 			POrderGrant grant = granttService.findOne(pordergrantid_link);
-			grant.setStart_date_plan(entity.data.getStartDate());
+			grant.setStart_date_plan(commonService.getBeginOfDate(entity.data.getStartDate()));
 			grant.setFinish_date_plan(commonService.getEndOfDate(entity.data.getEndDate()));
 			granttService.save(grant);
 			
@@ -497,7 +499,7 @@ public class ScheduleAPI {
 			
 			processService.save(pp);
 			
-			Date startDate = porder.getProductiondate_plan();
+			Date startDate = commonService.getBeginOfDate(porder.getProductiondate_plan());
 			Date endDate = commonService.getEndOfDate(porder.getFinishdate_plan());
 			int duration = commonService.getDuration(startDate, endDate, orgrootid_link, year);
 			int productivity = commonService.getProductivity(porder.getTotalorder(), duration);
@@ -581,7 +583,7 @@ public class ScheduleAPI {
 			pg.setFinish_date_plan(req.getShipdate());
 			pg = granttService.save(pg);
 			
-			Date startDate = porder.getProductiondate_plan();
+			Date startDate = commonService.getBeginOfDate(porder.getProductiondate_plan());
 			Date endDate = commonService.getEndOfDate(porder.getFinishdate_plan());
 			int duration = commonService.getDuration(startDate, endDate, orgrootid_link, year);
 			int productivity = commonService.getProductivity(porder.getTotalorder(), duration);
