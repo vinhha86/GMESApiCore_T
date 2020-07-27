@@ -1,12 +1,13 @@
 package vn.gpay.gsmart.core.api.pcontract;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -91,8 +92,49 @@ public class PContractAPI {
 			long orgrootid_link = user.getRootorgid_link();
 			
 			Page<PContract> pcontract = pcontractService.getall_by_orgrootid_paging(orgrootid_link, entity);
+			
 			response.data = pcontract.getContent();
 			response.totalCount = pcontract.getTotalElements();
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<PContract_getbypaging_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/getlistbypaging",method = RequestMethod.POST)
+	public ResponseEntity<PContract_getbypaging_response> PContractGetpageList(@RequestBody PContract_getbypaging_request entity,HttpServletRequest request ) {
+		PContract_getbypaging_response response = new PContract_getbypaging_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			
+			List<PContract> pcontract = pcontractService.getalllist_by_orgrootid_paging(orgrootid_link, entity);
+			
+			response.data = new ArrayList<PContract>();
+			
+			for(PContract pc : pcontract) {
+				String cc = pc.getContractcode().toLowerCase();
+				String pl = pc.getProductlist().toLowerCase();
+				String pol = pc.getPolist().toLowerCase();
+				if(!cc.contains(entity.contractcode.toLowerCase())) continue;
+				if(!pl.contains(entity.style.toLowerCase())) continue;
+				if(!pol.contains(entity.po.toLowerCase())) continue;
+				response.data.add(pc);
+			}
+			response.totalCount = response.data.size();
+			
+			PageRequest page = PageRequest.of(entity.page - 1, entity.limit);
+			int start = (int) page.getOffset();
+			int end = (start + page.getPageSize()) > response.data.size() ? response.data.size() : (start + page.getPageSize());
+			Page<PContract> pageToReturn = new PageImpl<PContract>(response.data.subList(start, end), page, response.data.size()); 
+			
+			response.data = pageToReturn.getContent();
+//			response.totalCount = pcontract.getTotalElements();
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
