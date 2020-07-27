@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.pcontract_po;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,5 +57,11 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	public List<PContract_PO> getPOByContract(Long orgrootid_link,
 			Long pcontractid_link){
 		return repo.getPOByContract(orgrootid_link, pcontractid_link);
+	}
+	
+	@Override
+	public List<PContract_PO> getPO_LaterShipdate(Long orgrootid_link,
+			Long pcontractid_link, Long productid_link, Date shipdate){
+		return repo.getPO_LaterShipdate(orgrootid_link, pcontractid_link, productid_link, shipdate);
 	}
 }

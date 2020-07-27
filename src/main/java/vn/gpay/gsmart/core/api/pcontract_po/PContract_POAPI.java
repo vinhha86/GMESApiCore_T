@@ -66,50 +66,17 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 			pcontract_po = pcontract_POService.save(pcontract_po);
 			
 			long pcontract_poid_link = pcontract_po.getId();
-			//Cập nhật lại giá
-
-			//Xóa list cũ
-			List<PContract_Price> list_price = pcontractpriceService.getPrice_ByPO(pcontract_poid_link);
-			for(PContract_Price price : list_price) {
-				pcontractpriceService.delete(price);
-			}
-			List<PContract_Price_D> list_price_d = pcontractpriceDService.getPrice_D_ByPO(pcontract_poid_link);
-			for(PContract_Price_D price_d : list_price_d) {
-				pcontractpriceDService.delete(price_d);
-			}
-
-			//them list moi
-			List<PContract_Price> list_price_new  = entity.data.getPcontract_price();
-			for(PContract_Price price : list_price_new) {
-				price.setId(null);
-				price.setPcontract_poid_link(pcontract_poid_link);
-				price.setPcontractid_link(pcontractid_link);
-				price.setOrgrootid_link(orgrootid_link);
-				pcontractpriceService.save(price);
-			}
+			//Update Price cua PO hien tai
+			updatePriceList(usercreatedid_link, orgrootid_link, pcontractid_link,pcontract_poid_link,entity.data.getPcontract_price());
 			
-			//Update POrders
-//			List<POrder> lst_porders = entity.po_orders;
-//			String po_code = pcontract_po.getPo_vendor().length() > 0?pcontract_po.getPo_vendor():pcontract_po.getPo_buyer();
-//			for(POrder porder : lst_porders) {
-//				if (null == porder.getId() || 0 == porder.getId()){
-//					//Them moi POrder
-//					porder.setPcontractid_link(pcontractid_link);
-//					porder.setPcontract_poid_link(pcontract_poid_link);
-//					
-//					porder.setGolivedate(pcontract_po.getShipdate());
-//					porder.setProductiondate(pcontract_po.getProductiondate());
-//					
-//					porder.setOrgrootid_link(orgrootid_link);
-//					porder.setProductid_link(pcontract_po.getProductid_link());
-//					porder.setOrderdate(new Date());
-//					porder.setUsercreatedid_link(user.getId());
-//					porder.setStatus(pcontract_po.getStatus() == POStatus.PO_STATUS_UNCONFIRM?POrderStatus.PORDER_STATUS_UNCONFIRM:POrderStatus.PORDER_STATUS_FREE);
-//					porder.setTimecreated(new Date());
-//				} 
-//				//Save to DB
-//				porderService.savePOrder(porder, po_code);
-//			}
+			//Update List Price cua cac PO co Shipdate sau PO hien tai va cua cung PContract va Product
+			List<PContract_PO> listpo_latershipdate = pcontract_POService.getPO_LaterShipdate(orgrootid_link, pcontractid_link, pcontract_po.getProductid_link(), pcontract_po.getShipdate());
+			for(PContract_PO thePO_Latershipdate: listpo_latershipdate){
+				thePO_Latershipdate.setSewtarget_percent(pcontract_po.getSewtarget_percent());
+				thePO_Latershipdate.setExchangerate(pcontract_po.getExchangerate());
+				pcontract_POService.save(thePO_Latershipdate);
+				updatePriceList(usercreatedid_link, orgrootid_link, pcontractid_link,thePO_Latershipdate.getId(),entity.data.getPcontract_price());
+			}
 			
 			//Update POrder_Req
 			List<POrder> lst_porders = entity.po_orders;
@@ -154,6 +121,61 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<PContract_pocreate_response>(response, HttpStatus.BAD_REQUEST);
 		}
+	}
+	private void updatePriceList(Long usercreatedid_link, Long orgrootid_link, Long pcontractid_link, Long pcontract_poid_link, List<PContract_Price> list_price_new){
+		//Xoa list price cu của PO
+		List<PContract_Price> list_price = pcontractpriceService.getPrice_ByPO(pcontract_poid_link);
+		for(PContract_Price price : list_price) {
+			pcontractpriceService.delete(price);
+		}
+		List<PContract_Price_D> list_price_d = pcontractpriceDService.getPrice_D_ByPO(pcontract_poid_link);
+		for(PContract_Price_D price_d : list_price_d) {
+			pcontractpriceDService.delete(price_d);
+		}
+
+		//them Price list moi
+		for(PContract_Price price : list_price_new) {
+			PContract_Price newPrice = new PContract_Price();
+//			newPrice.setId(null);
+			newPrice.setPcontract_poid_link(pcontract_poid_link);
+			newPrice.setPcontractid_link(pcontractid_link);
+			newPrice.setOrgrootid_link(orgrootid_link);
+			
+			newPrice.setProductid_link(price.getProductid_link());
+			newPrice.setSizesetid_link(price.getSizesetid_link());
+			newPrice.setPrice_cmp(price.getPrice_cmp());
+			newPrice.setPrice_fob(price.getPrice_fob());
+			newPrice.setPrice_sewingcost(price.getPrice_sewingcost());
+			newPrice.setPrice_sewingtarget(price.getPrice_sewingtarget());
+			newPrice.setPrice_vendortarget(price.getPrice_vendortarget());
+			newPrice.setTotalprice(price.getTotalprice());
+			newPrice.setSalaryfund(price.getSalaryfund());
+			newPrice.setQuantity(price.getQuantity());
+			
+			for(PContract_Price_D price_d: price.getPcontract_price_d()){
+				PContract_Price_D newPrice_D = new PContract_Price_D();
+				newPrice_D.setPcontract_poid_link(pcontract_poid_link);
+				newPrice_D.setPcontractid_link(pcontractid_link);
+				newPrice_D.setOrgrootid_link(orgrootid_link);
+				
+				newPrice_D.setProductid_link(price_d.getProductid_link());
+				newPrice_D.setPrice(price_d.getPrice());
+				newPrice_D.setCurrencyid_link(price_d.getCurrencyid_link());
+				newPrice_D.setExchangerate(price_d.getExchangerate());
+				newPrice_D.setCost(price_d.getCost());
+				newPrice_D.setIsfob(price_d.getIsfob());
+				newPrice_D.setFobpriceid_link(price_d.getFobpriceid_link());
+				newPrice_D.setSizesetid_link(price_d.getSizesetid_link());
+				newPrice_D.setQuota(price_d.getQuota());
+				newPrice_D.setUnitprice(price_d.getUnitprice());
+				newPrice_D.setUnitid_link(price_d.getUnitid_link());
+				newPrice_D.setUsercreatedid_link(usercreatedid_link);
+				newPrice_D.setDatecreated(new Date());
+				
+				newPrice.getPcontract_price_d().add(newPrice_D);
+			}
+			pcontractpriceService.save(newPrice);
+		}		
 	}
 	
 	@RequestMapping(value = "/update",method = RequestMethod.POST)

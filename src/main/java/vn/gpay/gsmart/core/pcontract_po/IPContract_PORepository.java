@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.pcontract_po;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,4 +29,16 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			+ "and c.pcontractid_link = :pcontractid_link ")
 	public List<PContract_PO> getPOByContract(@Param ("orgrootid_link")final  Long orgrootid_link,
 			@Param ("pcontractid_link")final  Long pcontractid_link);
+
+	@Query(value = "select c from PContract_PO c "
+			+ "where c.orgrootid_link = :orgrootid_link "
+			+ "and c.pcontractid_link = :pcontractid_link "
+			+ "and c.productid_link = :productid_link "
+			+ "and c.shipdate > :shipdate "
+			)
+	public List<PContract_PO> getPO_LaterShipdate(@Param ("orgrootid_link")final  Long orgrootid_link,
+			@Param ("pcontractid_link")final  Long pcontractid_link, 
+			@Param ("productid_link")final  Long productid_link, 
+			@Param ("shipdate")final  Date shipdate
+			);
 }
