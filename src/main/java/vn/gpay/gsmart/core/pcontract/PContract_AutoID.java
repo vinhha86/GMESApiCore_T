@@ -1,4 +1,4 @@
-package vn.gpay.gsmart.core.porder;
+package vn.gpay.gsmart.core.pcontract;
 
 import java.io.Serializable;
 
@@ -10,16 +10,16 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
-@Table(name="porders_autoid")
+@Table(name="pcontract_autoid")
 @Entity
-public class POrder_AutoID implements Serializable {
+public class PContract_AutoID implements Serializable {
     /**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "porders_autoid_generator")
-	@SequenceGenerator(name="porders_autoid_generator", sequenceName = "porders_autoid_id_seq", allocationSize=1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pcontract_autoid_generator")
+	@SequenceGenerator(name="pcontract_autoid_generator", sequenceName = "pcontract_autoid_id_seq", allocationSize=1)
 	private Long id;
 
 	private String prefix;

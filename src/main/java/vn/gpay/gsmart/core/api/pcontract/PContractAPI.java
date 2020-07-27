@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
+import vn.gpay.gsmart.core.org.IOrgService;
+import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract.IPContractService;
+import vn.gpay.gsmart.core.pcontract.IPContract_AutoID_Service;
 import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
@@ -26,6 +29,8 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 @RequestMapping("/api/v1/pcontract")
 public class PContractAPI {
 	@Autowired IPContractService pcontractService;
+	@Autowired IPContract_AutoID_Service pcontract_AutoID_Service;
+	@Autowired IOrgService orgService;
 	
 	@RequestMapping(value = "/create",method = RequestMethod.POST)
 	public ResponseEntity<PContract_create_response> PContractCreate(@RequestBody PContract_create_request entity,HttpServletRequest request ) {
@@ -37,6 +42,23 @@ public class PContractAPI {
 			
 			PContract pcontract = entity.data;
 			if(pcontract.getId() == 0 || pcontract.getId() == null) {
+				if (null == pcontract.getContractcode() || pcontract.getContractcode().length() == 0){
+					Org theBuyer = orgService.findOne(pcontract.getOrgbuyerid_link());
+					if (null != theBuyer)
+						pcontract.setContractcode(pcontract_AutoID_Service.getLastID(theBuyer.getCode()));
+					else
+						pcontract.setContractcode(pcontract_AutoID_Service.getLastID("UNKNOWN"));
+				} else {
+					String contractcode = pcontract.getContractcode();
+					long pcontractid_link = pcontract.getId();
+					
+					List<PContract> lstcheck = pcontractService.getby_code(orgrootid_link, contractcode, pcontractid_link);
+					if(lstcheck.size() > 0) {
+						response.setRespcode(ResponseMessage.KEY_RC_BAD_REQUEST);
+						response.setMessage("Mã đã tồn tại trong hệ thống!");
+						return new ResponseEntity<PContract_create_response>(response, HttpStatus.BAD_REQUEST);
+					}					
+				}
 				pcontract.setOrgrootid_link(orgrootid_link);
 				pcontract.setUsercreatedid_link(usercreatedid_link);
 				pcontract.setDatecreated(new Date());
@@ -48,28 +70,17 @@ public class PContractAPI {
 				pcontract.setDatecreated(pc_old.getDatecreated());
 			}
 			
-			
-			
-			String contractcode = pcontract.getContractcode();
-			long pcontractid_link = pcontract.getId();
-			
-			List<PContract> lstcheck = pcontractService.getby_code(orgrootid_link, contractcode, pcontractid_link);
-			if(lstcheck.size() > 0) {
-				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-				response.setMessage("Mã đã tồn tại trong hệ thống!");
-			}
-			else {
-				pcontract = pcontractService.save(pcontract);				
-				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));			
-			}
+			pcontract = pcontractService.save(pcontract);
 			response.id = pcontract.getId();
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<PContract_create_response>(response, HttpStatus.OK);
 			
 		}catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
+			return new ResponseEntity<PContract_create_response>(response, HttpStatus.BAD_REQUEST);
 		}
-	    return new ResponseEntity<PContract_create_response>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/getbypaging",method = RequestMethod.POST)

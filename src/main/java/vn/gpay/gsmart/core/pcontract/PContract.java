@@ -95,6 +95,12 @@ public class PContract implements Serializable {/**
     private Org vendor;
 	
 	@Transient
+	public String getBuyercode() {
+		if(buyer!=null)
+			return buyer.getCode();
+		return "";
+	}
+	@Transient
 	public String getBuyername() {
 		if(buyer!=null)
 			return buyer.getName();
