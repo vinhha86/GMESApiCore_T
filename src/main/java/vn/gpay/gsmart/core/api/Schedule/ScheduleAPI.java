@@ -168,6 +168,7 @@ public class ScheduleAPI {
 						sch_porder.setCls(pordergrant.getCls());
 						sch_porder.setEndDate(end);
 						sch_porder.setId_origin(pordergrant.getPorderid_link());
+						sch_porder.setPorderid_link(pordergrant.getPorderid_link());
 						sch_porder.setMahang(pordergrant.getMaHang());
 						sch_porder.setName(pordergrant.getMaHang());
 						sch_porder.setResourceId(sch_org_grant.getId());
@@ -217,6 +218,7 @@ public class ScheduleAPI {
 						sch_porder.setPorder_grantid_link(pordergrant.getId());
 						sch_porder.setProductid_link(pordergrant.getProductid_link());
 						sch_porder.setPcontract_poid_link(pordergrant.getPcontract_poid_link());
+						sch_porder.setPorderid_link(pordergrant.getPorderid_link());
 						
 						response.events.rows.add(sch_porder);
 					}
