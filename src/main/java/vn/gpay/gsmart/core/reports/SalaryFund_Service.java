@@ -43,7 +43,7 @@ public class SalaryFund_Service implements ISalaryFund_Service {
 	
 		//Neu month_prev <> 1 va 12 --> Tinh luon cac thang tu dau nam (de hien duoc so tong ca nam trong bang CMP)
 		if (month_prev !=1 && month_prev !=12){
-			for(int i=1;i<month_prev;i++){
+			for(int i=1;i<=month_prev;i++){
 				month_data.add(new ReportMonth(i,year_prev));
 			}
 		}

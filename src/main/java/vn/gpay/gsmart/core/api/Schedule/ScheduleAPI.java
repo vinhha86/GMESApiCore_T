@@ -390,7 +390,7 @@ public class ScheduleAPI {
 			POrder porder = porderService.findOne(porderid_link);
 			porder.setProductiondate_plan(entity.startdate);
 			porder.setFinishdate_plan(entity.enddate);
-			porder.setGranttoorgid_link(entity.orggrant_toid_link);			
+//			porder.setGranttoorgid_link(entity.orggrant_toid_link);			
 			porderService.save(porder);
 			
 			Schedule_porder sch = entity.schedule;
@@ -550,7 +550,7 @@ public class ScheduleAPI {
 			porder.setFinishdate_plan(req.getShipdate());
 			porder.setGolivedate(req.getShipdate());
 			porder.setStatus(-1);
-			porder.setGranttoorgid_link(entity.orggrantto);
+			porder.setGranttoorgid_link(req.getGranttoorgid_link());
 			porder.setId(null);
 			porder.setOrgrootid_link(orgrootid_link);
 			porder.setPcontract_poid_link(req.getPcontract_poid_link());

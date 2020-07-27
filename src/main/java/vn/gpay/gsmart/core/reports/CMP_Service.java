@@ -7,11 +7,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import com.github.wenhao.jpa.Sorts;
 import com.github.wenhao.jpa.Specifications;
 
 import vn.gpay.gsmart.core.org.IOrgService;
@@ -49,7 +47,7 @@ public class CMP_Service implements ICMP_Service {
 		}
 		month_data.add(new ReportMonth(month_prev,year_prev));
 		month_data.add(new ReportMonth(month,year));
-		for(int i=0;i<reportmonths;i++){
+		for(int i=0;i<=reportmonths;i++){
 			int month_next = month + 1;
 			int year_next = year;
 			if (month_next == 13){
@@ -112,10 +110,11 @@ public class CMP_Service implements ICMP_Service {
 		            .ge("pcontract_po.shipdate",dateStart)
 	                .le("pcontract_po.shipdate",dateEnd)
 		            .build();
-			Sort sort = Sorts.builder()
-			        .desc("ordercode")
-			        .build();
-			List<POrder> lsPOrder = repoPOrder.findAll(specification,sort);
+//			Sort sort = Sorts.builder()
+//			        .desc("ordercode")
+//			        .build();
+			List<POrder> lsPOrder = repoPOrder.findAll(specification);
+//			System.out.println(lsPOrder);
 			Float totalCMP = (float) 0;
 			for(POrder thePOrder: lsPOrder){
 				//Lay gia CMP cua san pham trong pcontract_price
