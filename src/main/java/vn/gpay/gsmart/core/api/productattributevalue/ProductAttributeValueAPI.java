@@ -123,6 +123,8 @@ public class ProductAttributeValueAPI {
 						Attributevalue valuemau = avService.findOne(attrMau);
 						Attributevalue valueco = avService.findOne(attCo);
 						
+						if(valuemau.getIsdefault() == null || valueco.getIsdefault() == null) continue;
+						
 						if(!valuemau.getIsdefault() && !valueco.getIsdefault()) {
 							if (pavMau.getAttributevalueid_link() != 0 && pavCo.getAttributevalueid_link() != 0) {
 								SKU sku = new SKU();
@@ -457,13 +459,15 @@ public class ProductAttributeValueAPI {
 			HttpServletRequest request) {
 		ResponseBase response = new ResponseBase();
 		try {
-
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
 			for (Long id : entity.listId) {
 				ProductAttributeValue data = new ProductAttributeValue();
 				data.setId((long) 0);
 				data.setAttributeid_link(id);
 				data.setAttributevalueid_link((long) 0);
 				data.setProductid_link(entity.productid_link);
+				data.setOrgrootid_link(user.getRootorgid_link());
 
 				pavService.save(data);
 			}
