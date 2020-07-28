@@ -306,8 +306,10 @@ public class Common {
 				pquantity_production = amount + (int)Math.abs(list_cfg.getAmount_plus()) + plus;
 			}
 			else {
-				int amount_plus =  Math.abs(amount*list_cfg.getAmount_plus()/100) == amount*list_cfg.getAmount_plus()/100 ? 0 : 1;
-				pquantity_production = amount + (int)Math.abs(amount*list_cfg.getAmount_plus()/100) + amount_plus;
+				float a = amount*list_cfg.getAmount_plus()/100;
+				int b = (int)Math.abs(a);
+				int amount_plus =  a - (float)b < 0.5 ? 0 : 1;
+				pquantity_production = amount + (int)Math.abs(a) + amount_plus;
 			}
 		}
 		

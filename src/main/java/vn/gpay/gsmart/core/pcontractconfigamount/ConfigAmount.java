@@ -24,7 +24,7 @@ public class ConfigAmount implements Serializable {
 	private Long id;
 	private Integer amount_from;
 	private Integer amount_to;
-	private Double amount_plus;
+	private Float amount_plus;
 	private Integer type;
 	public Long getId() {
 		return id;
@@ -35,7 +35,7 @@ public class ConfigAmount implements Serializable {
 	public Integer getAmount_to() {
 		return amount_to;
 	}
-	public Double getAmount_plus() {
+	public Float getAmount_plus() {
 		return amount_plus;
 	}
 	public Integer getType() {
@@ -50,7 +50,7 @@ public class ConfigAmount implements Serializable {
 	public void setAmount_to(Integer amount_to) {
 		this.amount_to = amount_to;
 	}
-	public void setAmount_plus(Double amount_plus) {
+	public void setAmount_plus(Float amount_plus) {
 		this.amount_plus = amount_plus;
 	}
 	public void setType(Integer type) {
