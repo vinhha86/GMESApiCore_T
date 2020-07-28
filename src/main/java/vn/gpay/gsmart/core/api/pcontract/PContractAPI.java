@@ -22,6 +22,28 @@ import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract.IPContractService;
 import vn.gpay.gsmart.core.pcontract.IPContract_AutoID_Service;
 import vn.gpay.gsmart.core.pcontract.PContract;
+import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
+import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBOMColorService;
+import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBom2ColorService;
+import vn.gpay.gsmart.core.pcontractbomcolor.PContractBOMColor;
+import vn.gpay.gsmart.core.pcontractbomcolor.PContractBom2Color;
+import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOM2SKUService;
+import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOMSKUService;
+import vn.gpay.gsmart.core.pcontractbomsku.PContractBOM2SKU;
+import vn.gpay.gsmart.core.pcontractbomsku.PContractBOMSKU;
+import vn.gpay.gsmart.core.pcontractproduct.IPContractProductService;
+import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
+import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
+import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBomService;
+import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom;
+import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom2;
+import vn.gpay.gsmart.core.pcontractproductdocument.IPContractProducDocumentService;
+import vn.gpay.gsmart.core.pcontractproductdocument.PContractProductDocument;
+import vn.gpay.gsmart.core.pcontractproductpairing.IPContractProductPairingService;
+import vn.gpay.gsmart.core.pcontractproductpairing.PContractProductPairing;
+import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
+import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
+import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -32,6 +54,18 @@ public class PContractAPI {
 	@Autowired IPContractService pcontractService;
 	@Autowired IPContract_AutoID_Service pcontract_AutoID_Service;
 	@Autowired IOrgService orgService;
+	@Autowired IPContract_POService poService;
+	@Autowired IPOrder_Service porderService;
+	@Autowired IPContractProductSKUService pcontract_sku_Service;
+	@Autowired IPContractProductService pcontract_product_Service;
+	@Autowired IPContractProductPairingService pcontract_pairing_Service;
+	@Autowired IPContractProducDocumentService pcontract_document_Service;
+	@Autowired IPContractProductBomService pcontract_bom_Service;
+	@Autowired IPContractProductBom2Service pcontract_bom2_Service;
+	@Autowired IPContractBOMColorService pcontract_bom_color_Service;
+	@Autowired IPContractBom2ColorService pcontract_bom2_color_Service;
+	@Autowired IPContractBOMSKUService pcontract_bom_sku_Service;
+	@Autowired IPContractBOM2SKUService pcontract_bom2_sku_Service;
 	
 	@RequestMapping(value = "/create",method = RequestMethod.POST)
 	public ResponseEntity<PContract_create_response> PContractCreate(@RequestBody PContract_create_request entity,HttpServletRequest request ) {
@@ -167,16 +201,70 @@ public class PContractAPI {
 	public ResponseEntity<ResponseBase> PContractDelete(@RequestBody PContract_delete_request entity
 			,HttpServletRequest request ) {
 		ResponseBase response = new ResponseBase();
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		try {
+			long orgrootid_link = user.getRootorgid_link();
+			//Check if having PO? refuse deleting if have
+			if (poService.getPOByContract(orgrootid_link, entity.id).size() > 0){
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage("Hiện vẫn đang có đơn hàng (PO) trong hợp đồng! Cần xóa hết PO trước khi xóa hợp đồng");
+				return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);				
+			}
+			//Check if having POrder? refuse deleting if have
+			if (porderService.getByContract(entity.id).size() > 0){
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage("Hiện vẫn đang có Lệnh SX trong hợp đồng! Cần xóa hết Lệnh SX trước khi xóa hợp đồng");
+				return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);				
+				
+			}
+			//Delete products
+			//pcontract_products;pcontract_product_sku;pcontract_product_pairing;pcontract_product_document
+			for(PContractProduct theProduct:pcontract_product_Service.get_by_pcontract(orgrootid_link, entity.id)){
+				pcontract_product_Service.delete(theProduct);
+			}
+			for(PContractProductSKU theSku:pcontract_sku_Service.getlistsku_bypcontract(orgrootid_link, entity.id)){
+				pcontract_sku_Service.delete(theSku);
+			}
+			for(PContractProductPairing thePairing:pcontract_pairing_Service.getall_bypcontract(orgrootid_link, entity.id)){
+				pcontract_pairing_Service.delete(thePairing);
+			}
+			for(PContractProductDocument theDocument:pcontract_document_Service.getlist_bycontract(orgrootid_link, entity.id)){
+				pcontract_document_Service.delete(theDocument);
+			}
 			
+			//Delete BOM 
+			//pcontract_bom_sku;pcontract_bom_product;pcontract_bom_color
+			//pcontract_bom2_sku;pcontract_bom2_product;pcontract_bom2_color
+			for(PContractProductBom theBom:pcontract_bom_Service.getall_bypcontract(orgrootid_link, entity.id)){
+				pcontract_bom_Service.delete(theBom);
+			}
+			for(PContractBOMColor theBomcolor:pcontract_bom_color_Service.getall_bypcontract(orgrootid_link, entity.id)){
+				pcontract_bom_color_Service.delete(theBomcolor);
+			}
+			for(PContractBOMSKU theBomsku:pcontract_bom_sku_Service.getall_bypcontract(orgrootid_link, entity.id)){
+				pcontract_bom_sku_Service.delete(theBomsku);
+			}
+			
+			for(PContractProductBom2 theBom2:pcontract_bom2_Service.getall_bypcontract(orgrootid_link, entity.id)){
+				pcontract_bom2_Service.delete(theBom2);
+			}
+			for(PContractBom2Color theBom2color:pcontract_bom2_color_Service.getall_bypcontract(orgrootid_link, entity.id)){
+				pcontract_bom2_color_Service.delete(theBom2color);
+			}
+			for(PContractBOM2SKU theBom2sku:pcontract_bom2_sku_Service.getall_bypcontract(orgrootid_link, entity.id)){
+				pcontract_bom2_sku_Service.delete(theBom2sku);
+			}
+			
+			//Delete PContract
 			pcontractService.deleteById(entity.id); 
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 		}catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 		}
-	    return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 	}
 }

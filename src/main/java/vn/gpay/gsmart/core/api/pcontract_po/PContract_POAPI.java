@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
+import vn.gpay.gsmart.core.pcontract_po_shipping.IPContract_PO_ShippingService;
+import vn.gpay.gsmart.core.pcontract_po_shipping.PContract_PO_Shipping;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_DService;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Service;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
@@ -39,6 +41,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 	@Autowired IPContract_Price_DService pcontractpriceDService;
 	@Autowired IPOrder_Service porderService;
 	@Autowired private IPOrder_Req_Service porder_req_Service;
+	@Autowired IPContract_PO_ShippingService poshippingService;
 	
 	@RequestMapping(value = "/create",method = RequestMethod.POST)
 	public ResponseEntity<PContract_pocreate_response> PContractCreate(@RequestBody PContract_pocreate_request entity,HttpServletRequest request ) {
@@ -341,16 +344,40 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 			,HttpServletRequest request ) {
 		ResponseBase response = new ResponseBase();
 		try {
-			
+
 			PContract_PO thePO = pcontract_POService.findOne(entity.id);
 			if (null != thePO){
+				//Check if having POrder? refuse deleting if have
+				if (porderService.getByContractAndPO(thePO.getPcontractid_link(), thePO.getId()).size() > 0){
+					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+					response.setMessage("Hiện vẫn đang có Lệnh SX của đơn hàng! Cần xóa hết Lệnh SX trước khi xóa đơn hàng");
+					return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);				
+				}
+				
+				//Delete POrder_Req
+				for(POrder_Req thePOrder_Req: porder_req_Service.getByPO(thePO.getId())){
+					porder_req_Service.delete(thePOrder_Req);
+				}
+				
+				//Delete Shipping
+				for(PContract_PO_Shipping theShipping: poshippingService.getByPOID(thePO.getId())){
+					poshippingService.delete(theShipping);
+				}
+				
+				//Delete PO Prices
 				for(PContract_Price thePrice: thePO.getPcontract_price()){
 					for (PContract_Price_D thePrice_D: thePrice.getPcontract_price_d()){
 						pcontractpriceDService.delete(thePrice_D);
 					}
 					pcontractpriceService.delete(thePrice);
 				}
+				
+				//Delete PO
 				pcontract_POService.delete(thePO);
+			} else {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage("Đơn hàng không tồn tại");
+				return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);				
 			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

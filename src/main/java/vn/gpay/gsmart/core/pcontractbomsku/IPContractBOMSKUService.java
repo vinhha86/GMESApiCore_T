@@ -12,4 +12,5 @@ public interface IPContractBOMSKUService extends Operations<PContractBOMSKU>{
 	public List<PContractBOMSKU> getmaterial_bycolorid_link(long pcontractid_link, long productid_link, long colorid_link, long materialid_link);
 	public List<Long> getsize_bycolor(long pcontractid_link, long productid_link, long colorid_link);
 	List<PContractBOMSKU> getMaterials_BySKUId(Long skuid_link);
+	List<PContractBOMSKU> getall_bypcontract(long orgrootid_link, long pcontractid_link);
 }

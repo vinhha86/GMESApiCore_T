@@ -1,4 +1,4 @@
-package vn.gpay.gsmart.core.pcontratproductsku;
+package vn.gpay.gsmart.core.pcontractproductsku;
 
 import java.util.List;
 
@@ -25,5 +25,7 @@ public interface IPContractProductSKUService extends Operations<PContractProduct
 
 	List<PContractProductSKU> getbypo_and_product_free(long porderreqid_link, long pcontractid_link, long pcontract_poid_link,
 			long productid_link);
+
+	List<PContractProductSKU> getlistsku_bypcontract(long orgrootid_link, long pcontractid_link);
 	
 }

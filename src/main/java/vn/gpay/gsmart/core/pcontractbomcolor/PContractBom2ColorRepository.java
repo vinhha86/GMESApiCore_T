@@ -38,4 +38,11 @@ public interface PContractBom2ColorRepository extends JpaRepository<PContractBom
 	public List<PContractBom2Color> getall_in_productBOMColor(
 			@Param ("productid_link")final  long productid_link,
 			@Param ("pcontractid_link")final  long pcontractid_link);
+	
+	@Query(value = "select c from PContractBom2Color c "
+			+ "where c.orgrootid_link = :orgrootid_link "
+			+ "and c.pcontractid_link = :pcontractid_link")
+	public List<PContractBom2Color> getall_bypcontract(
+			@Param ("orgrootid_link")final  Long orgrootid_link, 
+			@Param ("pcontractid_link")final  Long pcontractid_link);
 }

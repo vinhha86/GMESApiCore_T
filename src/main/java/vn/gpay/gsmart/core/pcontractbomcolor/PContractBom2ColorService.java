@@ -33,4 +33,10 @@ public class PContractBom2ColorService extends AbstractService<PContractBom2Colo
 		// TODO Auto-generated method stub
 		return repo.getall_in_productBOMColor(productid_link, pcontractid_link);
 	}
+	
+	@Override
+	public List<PContractBom2Color> getall_bypcontract(long orgrootid_link, long pcontractid_link) {
+		// TODO Auto-generated method stub
+		return repo.getall_bypcontract(orgrootid_link, pcontractid_link);
+	}
 }

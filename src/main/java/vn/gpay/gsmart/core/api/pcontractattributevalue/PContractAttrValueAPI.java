@@ -21,8 +21,8 @@ import vn.gpay.gsmart.core.pcontractattributevalue.IPContractProductAtrributeVal
 import vn.gpay.gsmart.core.pcontractattributevalue.PContractAttributeValueBinding;
 import vn.gpay.gsmart.core.pcontractproductcolor.IPContractProductColorService;
 import vn.gpay.gsmart.core.pcontractproductcolor.PContractProductColor;
-import vn.gpay.gsmart.core.pcontratproductsku.IPContractProductSKUService;
-import vn.gpay.gsmart.core.pcontratproductsku.PContractProductSKU;
+import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
+import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.product.IProductService;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.productattributevalue.IProductAttributeService;

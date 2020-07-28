@@ -22,6 +22,7 @@ import org.hibernate.annotations.NotFoundAction;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
+import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
 
 @Table(name="pcontract_po")
@@ -162,6 +163,19 @@ public class PContract_PO implements Serializable {/**
 	@ManyToOne
     @JoinColumn(name="usercreatedid_link",insertable=false,updatable =false)
     private GpayUser usercreated;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="productid_link",insertable=false,updatable =false)
+    private Product product;
+	
+	@Transient
+	public String getProductbuyercode() {
+		if(product != null) {
+			return product.getBuyercode();
+		}
+		return "";
+	}
 	
 	public Long getId() {
 		return id;

@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-
 @Repository
 @Transactional
 public interface IPContractBOMColorRepository extends JpaRepository<PContractBOMColor, Long>, JpaSpecificationExecutor<PContractBOMColor> {
@@ -39,4 +38,11 @@ public interface IPContractBOMColorRepository extends JpaRepository<PContractBOM
 	public List<PContractBOMColor> getall_in_productBOMColor(
 			@Param ("productid_link")final  long productid_link,
 			@Param ("pcontractid_link")final  long pcontractid_link);
+	
+	@Query(value = "select c from PContractBOMColor c "
+			+ "where c.orgrootid_link = :orgrootid_link "
+			+ "and c.pcontractid_link = :pcontractid_link")
+	public List<PContractBOMColor> getall_bypcontract(
+			@Param ("orgrootid_link")final  Long orgrootid_link, 
+			@Param ("pcontractid_link")final  Long pcontractid_link);
 }

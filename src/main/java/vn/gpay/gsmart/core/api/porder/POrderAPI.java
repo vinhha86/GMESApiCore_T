@@ -26,12 +26,12 @@ import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
-import vn.gpay.gsmart.core.pcontratproductsku.IPContractProductSKUService;
-import vn.gpay.gsmart.core.pcontratproductsku.PContractProductSKU;
+import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
+import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder.POrderFilter;
-
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
@@ -53,6 +53,7 @@ public class POrderAPI {
     @Autowired private IActionLogs_Service actionLogsRepository;
     @Autowired private IPOrderProcessing_Service porderprocessingService;
     @Autowired private IOrgService orgService;
+    @Autowired private IPOrderGrant_Service pordergrantService;
     ObjectMapper mapper = new ObjectMapper();
 	
 	@RequestMapping(value = "/getone",method = RequestMethod.POST)
@@ -327,21 +328,28 @@ public class POrderAPI {
 		try {
 			 POrder thePOrder = porderService.findOne(entity.id);
 			 if (null != thePOrder && thePOrder.getStatus() <= POrderStatus.PORDER_STATUS_FREE){
-				GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-				Long productid_link = thePOrder.getProductid_link();
-				Long contractid_link = thePOrder.getPcontractid_link();
-				Long orgrootid_link = user.getRootorgid_link();
+//				GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//				Long productid_link = thePOrder.getProductid_link();
+//				Long contractid_link = thePOrder.getPcontractid_link();
+//				Long orgrootid_link = user.getRootorgid_link();
+				
+				//Check if having POrder_Grant. Refuse deleting if have
+				if (pordergrantService.getByOrderId(thePOrder.getId()).size() > 0){
+					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+					response.setMessage("Lệnh sản xuất đã được phân chuyền! Cần hủy phân chuyền trước khi xóa lệnh ");
+					return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+				}
 				
 				porderService.delete(thePOrder);
 
-				updateContractGranted(orgrootid_link,contractid_link, productid_link);
+//				updateContractGranted(orgrootid_link,contractid_link, productid_link);
 
 				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 				return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 			} else {
 				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_BAD_REQUEST));
+				response.setMessage("Lệnh sản xuất đã được phân chuyền! Cần hủy phân chuyền trước khi xóa lệnh ");
 				return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 			}
 		} catch (Exception e) {
@@ -482,22 +490,22 @@ public class POrderAPI {
 			pskuservice.save(theSKU);
 		}
 	}
-	private void updateContractGranted(Long orgrootid_link, Long contractid_link, Long productid_link){
-		List<PContractProductSKU> lstSKU = pskuservice.getlistsku_byproduct_and_pcontract(orgrootid_link, productid_link, contractid_link);
-		for(PContractProductSKU theSKU:lstSKU){
-			int totalgranted = 0;
-			//Duyet danh sach cac Lenhsx cua san pham trong don hang
-			List<POrder> lstPOrder = porderService.getByContractAndProduct(contractid_link, productid_link);
-			for(POrder order: lstPOrder){
-				List<POrder_Product_SKU> lstPorderSKU = porderskuService.getby_porderandsku(order.getId(), theSKU.getSkuid_link());
-				for(POrder_Product_SKU porderSKU:lstPorderSKU){
-					totalgranted += porderSKU.getPquantity_total();
-				}
-			}
-			theSKU.setPquantity_granted(totalgranted);
-			pskuservice.save(theSKU);
-		}
-	}
+//	private void updateContractGranted(Long orgrootid_link, Long contractid_link, Long productid_link){
+//		List<PContractProductSKU> lstSKU = pskuservice.getlistsku_byproduct_and_pcontract(orgrootid_link, productid_link, contractid_link);
+//		for(PContractProductSKU theSKU:lstSKU){
+//			int totalgranted = 0;
+//			//Duyet danh sach cac Lenhsx cua san pham trong don hang
+//			List<POrder> lstPOrder = porderService.getByContractAndProduct(contractid_link, productid_link);
+//			for(POrder order: lstPOrder){
+//				List<POrder_Product_SKU> lstPorderSKU = porderskuService.getby_porderandsku(order.getId(), theSKU.getSkuid_link());
+//				for(POrder_Product_SKU porderSKU:lstPorderSKU){
+//					totalgranted += porderSKU.getPquantity_total();
+//				}
+//			}
+//			theSKU.setPquantity_granted(totalgranted);
+//			pskuservice.save(theSKU);
+//		}
+//	}
 	
 	//Lấy danh sách và tình trạng chuẩn bị NPL của 1 lệnh
 	@RequestMapping(value = "/getbalance",method = RequestMethod.POST)

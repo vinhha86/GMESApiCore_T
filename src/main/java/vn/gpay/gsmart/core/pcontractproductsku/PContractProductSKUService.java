@@ -1,4 +1,4 @@
-package vn.gpay.gsmart.core.pcontratproductsku;
+package vn.gpay.gsmart.core.pcontractproductsku;
 
 import java.util.List;
 
@@ -26,6 +26,11 @@ public class PContractProductSKUService extends AbstractService<PContractProduct
 			long pcontractid_link) {
 		// TODO Auto-generated method stub
 		return repo.getlistsku_byproduct_and_pcontract(orgrootid_link, productid_link, pcontractid_link);
+	}	
+	@Override
+	public List<PContractProductSKU> getlistsku_bypcontract(long orgrootid_link, long pcontractid_link) {
+		// TODO Auto-generated method stub
+		return repo.getlistsku_bypcontract(orgrootid_link, pcontractid_link);
 	}
 	@Override
 	public List<PContractProductSKU> getlistsku_bypo_and_pcontract(long orgrootid_link, long pcontract_poid_link,

@@ -1,8 +1,8 @@
 package vn.gpay.gsmart.core.api.pcontractsku;
 
-import vn.gpay.gsmart.core.pcontratproductsku.PContractProductSKU;
+import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 
-public class PContractSKYU_update_request {
+public class PContractSKU_update_request {
 	public PContractProductSKU data;
 	public boolean isupdte_amount;
 }

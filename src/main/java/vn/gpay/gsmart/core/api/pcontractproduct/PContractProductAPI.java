@@ -28,8 +28,8 @@ import vn.gpay.gsmart.core.pcontractproductdocument.IPContractProducDocumentServ
 import vn.gpay.gsmart.core.pcontractproductdocument.PContractProductDocument;
 import vn.gpay.gsmart.core.pcontractproductpairing.IPContractProductPairingService;
 import vn.gpay.gsmart.core.pcontractproductpairing.PContractProductPairing;
-import vn.gpay.gsmart.core.pcontratproductsku.IPContractProductSKUService;
-import vn.gpay.gsmart.core.pcontratproductsku.PContractProductSKU;
+import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
+import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.product.IProductService;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;

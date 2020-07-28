@@ -21,4 +21,11 @@ public interface IPContractProductDocumentRepository extends JpaRepository<PCont
 			@Param ("orgrootid_link")final  Long orgrootid_link,
 			@Param ("pcontractid_link")final  Long pcontractid_link,
 			@Param ("productid_link")final  Long productid_link);
+	
+	@Query(value = "select c from PContractProductDocument c "
+			+ "where c.orgrootid_link = :orgrootid_link "
+			+ "and c.pcontractid_link = :pcontractid_link ")
+	public List<PContractProductDocument> getall_bycontract(
+			@Param ("orgrootid_link")final  Long orgrootid_link,
+			@Param ("pcontractid_link")final  Long pcontractid_link);
 }

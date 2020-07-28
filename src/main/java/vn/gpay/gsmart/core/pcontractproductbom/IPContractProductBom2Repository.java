@@ -36,4 +36,11 @@ public interface IPContractProductBom2Repository extends JpaRepository<PContract
 	public List<Long> getall_materialid_in_pcontract_productBOM(
 			@Param ("productid_link")final  Long productid_link,
 			@Param ("pcontractid_link")final  Long pcontractid_link);
+	
+	@Query(value = "select c from PContractProductBom2 c "
+			+ "where c.orgrootid_link = :orgrootid_link "
+			+ "and c.pcontractid_link = :pcontractid_link")
+	public List<PContractProductBom2> getall_bypcontract(
+			@Param ("orgrootid_link")final  Long orgrootid_link, 
+			@Param ("pcontractid_link")final  Long pcontractid_link);
 }

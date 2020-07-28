@@ -9,8 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-
-
 @Repository
 @Transactional
 public interface IPContractBOMSKURepository extends JpaRepository<PContractBOMSKU, Long>, JpaSpecificationExecutor<PContractBOMSKU> {
@@ -59,4 +57,11 @@ public interface IPContractBOMSKURepository extends JpaRepository<PContractBOMSK
 	
 	@Query(value = "select c from PContractBOMSKU c where c.skuid_link = :skuid_link")
 	public List<PContractBOMSKU> getMaterials_BySKUId(@Param ("skuid_link")final  Long skuid_link);
+	
+	@Query(value = "select c from PContractBOMSKU c "
+			+ "where c.orgrootid_link = :orgrootid_link "
+			+ "and c.pcontractid_link = :pcontractid_link")
+	public List<PContractBOMSKU> getall_bypcontract(
+			@Param ("orgrootid_link")final  Long orgrootid_link, 
+			@Param ("pcontractid_link")final  Long pcontractid_link);
 }

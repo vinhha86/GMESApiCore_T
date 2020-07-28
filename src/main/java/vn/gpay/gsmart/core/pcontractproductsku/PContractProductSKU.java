@@ -1,4 +1,4 @@
-package vn.gpay.gsmart.core.pcontratproductsku;
+package vn.gpay.gsmart.core.pcontractproductsku;
 
 
 import java.io.Serializable;

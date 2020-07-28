@@ -7,8 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import vn.gpay.gsmart.core.base.AbstractService;
-
-
 @Service
 public class PContractBOMColorService extends AbstractService<PContractBOMColor> implements IPContractBOMColorService {
 	@Autowired IPContractBOMColorRepository repo;
@@ -34,5 +32,9 @@ public class PContractBOMColorService extends AbstractService<PContractBOMColor>
 		// TODO Auto-generated method stub
 		return repo.getall_in_productBOMColor(productid_link, pcontractid_link);
 	}
-
+	@Override
+	public List<PContractBOMColor> getall_bypcontract(long orgrootid_link, long pcontractid_link) {
+		// TODO Auto-generated method stub
+		return repo.getall_bypcontract(orgrootid_link, pcontractid_link);
+	}
 }

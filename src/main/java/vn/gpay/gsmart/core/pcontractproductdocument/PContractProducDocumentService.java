@@ -23,5 +23,9 @@ public class PContractProducDocumentService extends AbstractService<PContractPro
 		// TODO Auto-generated method stub
 		return repo.getall_byproduct(orgrootid_link, pcontractid_link, productid_link);
 	}
-
+	@Override
+	public List<PContractProductDocument> getlist_bycontract(long orgrootid_link, long pcontractid_link) {
+		// TODO Auto-generated method stub
+		return repo.getall_bycontract(orgrootid_link, pcontractid_link);
+	}
 }
