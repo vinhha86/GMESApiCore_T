@@ -87,8 +87,6 @@ public class ProductService extends AbstractService<Product> implements IProduct
 		List<Long> lsProduct_Id = new ArrayList<Long>();
 		if (null != orgcustomerid_link && orgcustomerid_link != 0) {
 			lsProduct_Id = serviceContractProduct.get_by_orgcustomer(orgrootid_link, orgcustomerid_link);
-			if (lsProduct_Id.size() == 0)
-				return null;
 		}
 		
 		//Lấy những sản phẩm mà chưa thuộc khách hàng nào
@@ -96,6 +94,10 @@ public class ProductService extends AbstractService<Product> implements IProduct
 		List<Long> list_product = productRepo.getproduct_notinbuyer();
 		if(list_product.size() > 0)
 			lsProduct_Id.addAll(list_product);
+		
+
+		if (lsProduct_Id.size() == 0)
+			return null;
 		
 		// Tim danh sach Product thoa man dieu kien trong Attribute
 		List<Long> lsAttr_Final = new ArrayList<Long>();
