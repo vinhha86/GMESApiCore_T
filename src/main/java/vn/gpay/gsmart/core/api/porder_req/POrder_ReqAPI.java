@@ -130,8 +130,20 @@ public class POrder_ReqAPI {
 			List<Org> lsOrgChild = orgService.getorgChildrenbyOrg(orgid_link,orgTypes);
 			for(Org theOrg:lsOrgChild){
 				List<POrder_Req> a = reqService.get_by_org(theOrg.getId());
-				if(a.size()>0)
-					response.data.addAll(a);
+				
+				List<POrder_Req> result = new ArrayList<POrder_Req>();
+				for(POrder_Req pr : a) {
+					long porderreqid_link = pr.getId();
+					long pcontract_poid_link = pr.getPcontract_poid_link();
+					List<POrder> p = porderService.getByPOrder_Req(pcontract_poid_link, porderreqid_link);
+					if(p.size() == 0)
+						result.add(pr);
+				}
+				
+//				if(a.size()>0)
+//					response.data.addAll(a);
+				if(result.size()>0)
+					response.data.addAll(result);
 			}
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
