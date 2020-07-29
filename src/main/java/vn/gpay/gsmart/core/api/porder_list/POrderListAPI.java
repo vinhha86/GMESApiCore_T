@@ -59,6 +59,12 @@ public class POrderListAPI {
 	public ResponseEntity<POrderList_getlist_response> POrderGetAllBySearch(@RequestBody POrderList_getlist_request entity, HttpServletRequest request ) {
 		POrderList_getlist_response response = new POrderList_getlist_response();
 		try {
+			GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long user_orgid_link = user.getOrgid_link();
+			Long granttoorgid_link = (long)0;
+			if(user_orgid_link == (long)1) granttoorgid_link = null;
+			else granttoorgid_link = user_orgid_link;
+			
 			List<Long> status = entity.status;
 			response.data = new ArrayList<>();
 			List<POrder> result = new ArrayList<>();
@@ -70,7 +76,8 @@ public class POrderListAPI {
 							entity.vendorid, // vendorid
 							entity.orderdatefrom, // orderdatefrom
 							entity.orderdateto, // orderdateto
-							null
+							null,
+							granttoorgid_link
 							);
 			}else {
 				for(Long num : status) {
@@ -80,7 +87,8 @@ public class POrderListAPI {
 							entity.vendorid, // vendorid
 							entity.orderdatefrom, // orderdatefrom
 							entity.orderdateto, // orderdateto
-							num
+							num,
+							granttoorgid_link
 							);
 					result.addAll(temp);
 				}
