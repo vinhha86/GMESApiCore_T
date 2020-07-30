@@ -40,15 +40,19 @@ public class SKU_AttributeValue_Service extends AbstractService<SKU_Attribute_Va
 	@Override
 	public long getsku_byproduct_and_valuemau_valueco(long productid_link, long value_mau, long value_co) {
 		// TODO Auto-generated method stub
-		List<SKU_Attribute_Value> lst = repo.getList_by_valueMau_and_valueCo(value_mau, value_co, productid_link);
-		if(lst.size() > 1) {
-			long skuid = lst.get(0).getSkuid_link();
-			for(int i =1; i<lst.size(); i++) {
-				if(skuid != (long)lst.get(i).getSkuid_link())
-					return 0;
-			}
-			return skuid;
-		}
+//		List<SKU_Attribute_Value> lst = repo.getList_by_valueMau_and_valueCo(value_mau, value_co, productid_link);
+//		if(lst.size() > 1) {
+//			long skuid = lst.get(0).getSkuid_link();
+//			for(int i =1; i<lst.size(); i++) {
+//				if(skuid != (long)lst.get(i).getSkuid_link())
+//					return 0;
+//			}
+//			return skuid;
+//		}
+//		return 0;
+		List<Long> list = repo.getskuid_by_valueMau_and_valueCo(value_mau, value_co, productid_link);
+		if(list.size() >0)
+			return list.get(0);
 		return 0;
 	}
 

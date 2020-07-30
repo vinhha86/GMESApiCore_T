@@ -7,10 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import vn.gpay.gsmart.core.base.AbstractService;
+import vn.gpay.gsmart.core.porder.IPOrder_Repository;
+import vn.gpay.gsmart.core.sku.ISKU_AttValue_Repository;
 
 @Service
 public class POrderBOMSKU_Service extends AbstractService<POrderBOMSKU> implements IPOrderBOMSKU_Service {
 	@Autowired IPOrderBOMSKU_Repository repo;
+	@Autowired ISKU_AttValue_Repository sku_att_repo;
 	@Override
 	protected JpaRepository<POrderBOMSKU, Long> getRepository() {
 		// TODO Auto-generated method stub
@@ -53,5 +56,36 @@ public class POrderBOMSKU_Service extends AbstractService<POrderBOMSKU> implemen
 			lsBOMSKU.add(theBOMSKU);
 		}
 		return lsBOMSKU;
+	}
+
+	@Override
+	public List<POrderBOMSKU> getby_porder_and_color(Long porderid_link, Long colorid_link) {
+		// TODO Auto-generated method stub
+		return repo.getByPOrder_and_color(porderid_link, colorid_link);
+	}
+
+	@Override
+	public List<POrderBOMSKU> getby_porder_and_material(Long porderid_link, Long materialid_link) {
+		// TODO Auto-generated method stub
+		return repo.getByPOrder_and_material(porderid_link, materialid_link);
+	}
+
+	@Override
+	public List<POrderBOMSKU> getby_porder_and_material_and_color(Long porderid_link, Long materialid_link,
+			long colorid_link) {
+		// TODO Auto-generated method stub
+		return repo.getByPOrder_and_material_and_color(porderid_link, materialid_link, colorid_link);
+	}
+
+	@Override
+	public List<POrderBOMSKU> getby_porder_and_material_and_color_and_size(Long porderid_link, Long productid_link, 
+			Long materialid_link, long colorid_link,long sizeid_link) {
+		// TODO Auto-generated method stub
+		List<Long> list_sku = sku_att_repo.getskuid_by_valueMau_and_valueCo(colorid_link, sizeid_link, productid_link);
+		long skuid_link = 0;
+		if(list_sku.size() > 0) {
+			skuid_link = list_sku.get(0);
+		}
+		return repo.getByPOrder_and_material_and_sku(porderid_link, materialid_link, skuid_link);
 	}
 }

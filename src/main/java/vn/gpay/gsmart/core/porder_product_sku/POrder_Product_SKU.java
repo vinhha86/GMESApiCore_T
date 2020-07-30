@@ -47,6 +47,14 @@ public class POrder_Product_SKU implements Serializable {
     private SKU sku;
 	
 	@Transient
+	public Long getColor_id() {
+		if(sku!=null) {
+			return sku.getColor_id();
+		}
+		return (long)0;
+	}
+	
+	@Transient
 	public String getSkucode() {
 		if(sku != null) {
 			return sku.getCode();
@@ -78,6 +86,14 @@ public class POrder_Product_SKU implements Serializable {
 			return porder.getOrdercode();
 		}
 		return "";
+	}
+	
+	@Transient
+	public Long getSizeid_link() {
+		if(sku != null) {
+			return sku.getSize_id();
+		}
+		return (long)0;
 	}
 	
 	@Transient

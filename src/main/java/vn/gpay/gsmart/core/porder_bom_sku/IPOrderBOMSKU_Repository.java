@@ -16,6 +16,40 @@ public interface IPOrderBOMSKU_Repository extends JpaRepository<POrderBOMSKU, Lo
 	@Query("SELECT c FROM POrderBOMSKU c where c.porderid_link = :porderid_link")
 	public List<POrderBOMSKU> getByPOrderID(@Param ("porderid_link")final Long porderid_link);
 	
+	@Query("SELECT c FROM POrderBOMSKU c "
+			+ "inner join SKU_Attribute_Value d on c.skuid_link = d.skuid_link "
+			+ "where c.porderid_link = :porderid_link"
+			+ " and d.attributevalueid_link = :colorid_link")
+	public List<POrderBOMSKU> getByPOrder_and_color(
+			@Param ("porderid_link")final Long porderid_link,
+			@Param ("colorid_link")final Long colorid_link);
+	
+	@Query("SELECT c FROM POrderBOMSKU c "
+			+ "where c.porderid_link = :porderid_link"
+			+ " and c.materialid_link = :materialid_link")
+	public List<POrderBOMSKU> getByPOrder_and_material(
+			@Param ("porderid_link")final Long porderid_link,
+			@Param ("materialid_link")final Long materialid_link);
+	
+	@Query("SELECT c FROM POrderBOMSKU c "
+			+ "where c.porderid_link = :porderid_link"
+			+ " and c.materialid_link = :materialid_link"
+			+ " and c.skuid_link = :skuid_link")
+	public List<POrderBOMSKU> getByPOrder_and_material_and_sku(
+			@Param ("porderid_link")final Long porderid_link,
+			@Param ("materialid_link")final Long materialid_link,
+			@Param ("skuid_link")final Long skuid_link);
+	
+	@Query("SELECT c FROM POrderBOMSKU c "
+			+ "inner join SKU_Attribute_Value d on c.skuid_link = d.skuid_link "
+			+ "where c.porderid_link = :porderid_link "
+			+ "and c.materialid_link = :materialid_link "
+			+ " and d.attributevalueid_link = :colorid_link")
+	public List<POrderBOMSKU> getByPOrder_and_material_and_color(
+			@Param ("porderid_link")final Long porderid_link,
+			@Param ("materialid_link")final Long materialid_link,
+			@Param ("colorid_link")final Long colorid_link);
+	
 	@Query("SELECT c FROM POrderBOMSKU c where c.porderid_link = :porderid_link and materialid_link = :materialid_link")
 	public List<POrderBOMSKU> getSKUByMaterial(@Param ("porderid_link")final Long porderid_link, @Param ("materialid_link")final Long materialid_link);
 
