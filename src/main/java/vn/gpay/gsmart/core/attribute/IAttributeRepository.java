@@ -28,4 +28,6 @@ public interface IAttributeRepository extends JpaRepository<Attribute, Long>, Jp
 	@Query(value = "select c from Attribute c where c.ispackingtrims= True and c.orgrootid_link = :orgrootid_link ")
 	public List<Attribute> getattribute_for_PackingTrim(@Param ("orgrootid_link")final  Long orgrootid_link);
 	
+	@Query(value = "select c from Attribute c where c.isthread= True and c.orgrootid_link = :orgrootid_link ")
+	public List<Attribute> getattribute_for_SewingThread(@Param ("orgrootid_link")final  Long orgrootid_link);
 	}

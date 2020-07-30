@@ -17,6 +17,9 @@ public class ProductType {
     public static int SKU_TYPE_SWEINGTRIM_MIN    	= 30;
     public static int SKU_TYPE_SWEINGTRIM_MAX    	= 39;
     
+    public static int SKU_TYPE_SWEINGTHREAD_MIN    	= 50;
+    public static int SKU_TYPE_SWEINGTHREAD_MAX    	= 59;    
+    
     public static int SKU_TYPE_PACKINGTRIM_MIN    	= 40;
     public static int SKU_TYPE_PACKINGTRIM_MAX    	= 49;
     

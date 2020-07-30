@@ -1043,7 +1043,7 @@ public class ProductAPI {
 			Product_type_response response = new Product_type_response();
 			try {
 
-				response.data = productService.getall_ProductTypes(ProductType.SKU_TYPE_MATERIAL_MIN,ProductType.SKU_TYPE_PACKINGTRIM_MAX);
+				response.data = productService.getall_ProductTypes(ProductType.SKU_TYPE_MATERIAL_MIN,ProductType.SKU_TYPE_SWEINGTHREAD_MAX);
 				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 				return new ResponseEntity<Product_type_response>(response, HttpStatus.OK);

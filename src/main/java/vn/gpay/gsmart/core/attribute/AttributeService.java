@@ -52,6 +52,9 @@ public class AttributeService extends AbstractService<Attribute> implements IAtt
 				else
 					if (product_type >= ProductType.SKU_TYPE_PACKINGTRIM_MIN && product_type <= ProductType.SKU_TYPE_PACKINGTRIM_MAX)
 						list = repository.getattribute_for_PackingTrim(orgrootid_link);
+					else
+						if (product_type >= ProductType.SKU_TYPE_SWEINGTHREAD_MIN && product_type <= ProductType.SKU_TYPE_SWEINGTHREAD_MAX)
+							list = repository.getattribute_for_SewingThread(orgrootid_link);
 		return list;
 	}
 
