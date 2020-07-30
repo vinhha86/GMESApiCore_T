@@ -17,9 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import vn.gpay.gsmart.core.api.pcontractproductbom.PContractBOMColor_update_request;
-import vn.gpay.gsmart.core.api.pcontractproductbom.PContractBOMSKU_update_request;
-import vn.gpay.gsmart.core.api.pcontractproductbom.PContractProductBom2_update_request;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBom2ColorService;
 import vn.gpay.gsmart.core.pcontractbomcolor.PContractBom2Color;

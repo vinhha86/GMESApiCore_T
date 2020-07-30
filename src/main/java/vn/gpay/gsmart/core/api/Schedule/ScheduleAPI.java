@@ -618,10 +618,11 @@ public class ScheduleAPI {
 			sch.setProductivity(productivity);
 			sch.setResourceId(entity.resourceid);
 			sch.setStartDate(startDate);
-			sch.setStatus(1);
+			sch.setStatus(-1);
 			sch.setTotalpackage(porder.getTotalorder());
 			sch.setVendorname(contract.getVendorname());
 			sch.setPorder_grantid_link(pg.getId());
+			sch.setPorderid_link(porder.getId());
 			
 			response.data = sch;
 			
@@ -632,6 +633,36 @@ public class ScheduleAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<create_pordergrant_response>(response, HttpStatus.OK);
+		}
+	} 
+	
+	@RequestMapping(value = "/delete_porder_test",method = RequestMethod.POST)
+	public ResponseEntity<delete_porder_req_response> DeletePorderTest(HttpServletRequest request,
+			@RequestBody delete_porder_req_request entity) {
+		delete_porder_req_response response = new delete_porder_req_response();
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		long porderid_link = entity.porderid_link;
+		long pordergrantid_link = entity.pordergrantid_link;
+		POrder porder = porderService.findOne(porderid_link);
+		try {
+			//xoa trong bang poder_grant
+			granttService.deleteById(pordergrantid_link);
+			
+			//Xoa trong bang porder
+			porderService.deleteById(porderid_link);
+			
+			//Cap nhat lai bang porder_req
+			POrder_Req req = reqService.findOne(porder.getPorderreqid_link());
+			req.setStatus(0);
+			reqService.save(req);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<delete_porder_req_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<delete_porder_req_response>(response, HttpStatus.OK);
 		}
 	} 
 	
