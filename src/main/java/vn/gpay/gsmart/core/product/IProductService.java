@@ -25,4 +25,5 @@ public interface IProductService extends Operations<Product> {
 	List<Product> filter(Long orgrootid_link,int product_type, String code, String partnercode, List<Attribute> attributes, Long productid_link, Long orgcustomerid_link);
 	public List<ProductTree> createTree(final List<PContractProductBinding> nodes, Long pcontractid_link);
 	public List<Product> getby_pairid(long productpairid_link);
+	Page<Product> getall_sewingthread(Long orgrootid_link, Product_getall_request request);
 }

@@ -292,6 +292,51 @@ public class ProductAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/getall_sewingthread", method = RequestMethod.POST)
+	public ResponseEntity<Product_getall_response> Product_GetAll_SewingThread(HttpServletRequest request,
+			@RequestBody Product_getall_request entity) {
+		Product_getall_response response = new Product_getall_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+			Page<Product> pProduct = productService.getall_sewingthread(user.getRootorgid_link(), entity);
+			List<Product> lstproduct = pProduct.getContent();
+			List<ProductBinding> lstdata = new ArrayList<>();
+			String FolderPath = "upload/sewingthread";
+			
+			for (Product product : lstproduct) {
+				ProductBinding pb = new ProductBinding();
+				
+				pb.setId(product.getId());
+				pb.setCode(product.getCode());
+				pb.setName(product.getName());
+				pb.setProduct_type(product.getProducttypeid_link());
+				pb.setProduct_typeName(product.getProducttype_name());
+				pb.setCoKho(product.getCoKho());
+				pb.setThanhPhanVai(product.getThanhPhanVai());
+				pb.setTenMauNPL(product.getTenMauNPL());
+				pb.setDesignerName(product.getDesignerName());
+				
+				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+				
+				pb.setUrlimage(getimg(product.getImgurl1(),uploadRootPath));
+				lstdata.add(pb);
+			}
+			
+			response.pagedata = lstdata;
+			response.totalCount = pProduct.getTotalElements();
+			response.data = productService.getall_by_orgrootid(user.getRootorgid_link(),
+					entity.product_type);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<Product_getall_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<Product_getall_response>(response, HttpStatus.OK);
+		}
+	}
+
 	@RequestMapping(value = "/getall_packingtrim", method = RequestMethod.POST)
 	public ResponseEntity<Product_getall_response> Product_GetAll_PackingTrim(HttpServletRequest request,
 			@RequestBody Product_getall_request entity) {

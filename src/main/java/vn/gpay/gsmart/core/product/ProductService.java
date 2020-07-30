@@ -254,6 +254,23 @@ public class ProductService extends AbstractService<Product> implements IProduct
 		return lst;
 	}
 
+	@Override
+	public Page<Product> getall_sewingthread(Long orgrootid_link, Product_getall_request request) {
+		// TODO Auto-generated method stub
+		String name = request.name;
+		String code = request.code;
+		Specification<Product> specification = Specifications.<Product>and()
+//	            .eq("product_type", request.product_type)
+				.eq("status", 1).eq("orgrootid_link", orgrootid_link)
+				.like(name != "" && name != null, "name", "%" + name + "%")
+				.like(code != "" && code != null, "code", "%" + code + "%").between("producttypeid_link", 50, 59)
+				.build();
+		Sort sort = Sorts.builder().asc("name").build();
+
+		Page<Product> lst = repo.findAll(specification, PageRequest.of(request.page - 1, request.limit, sort));
+		return lst;
+	}
+	
 	public Page<Product> getall_packingtrim(Long orgrootid_link, Product_getall_request request) {
 		// TODO Auto-generated method stub
 		String name = request.name;
