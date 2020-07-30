@@ -53,6 +53,16 @@ public class Attribute implements Serializable {
 	@Column(name ="ispackingtrims")
 	private Boolean ispackingtrims;
 	
+	private Boolean isthread;
+	
+	public Boolean getIsthread() {
+		return isthread;
+	}
+
+	public void setIsthread(Boolean isthread) {
+		this.isthread = isthread;
+	}
+
 	//Danh sach cac value dc chon trong cau lenh tim kiem Sku
 	@Transient
 	private String selectedids;

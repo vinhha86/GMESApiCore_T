@@ -66,4 +66,11 @@ public interface IPContractBOM2SKURepository extends JpaRepository<PContractBOM2
 	public List<PContractBOM2SKU> getall_bypcontract(
 			@Param ("orgrootid_link")final  Long orgrootid_link, 
 			@Param ("pcontractid_link")final  Long pcontractid_link);
+	
+	@Query(value = "select c from PContractBOM2SKU c "
+			+ "where c.productid_link = :productid_link "
+			+ "and c.pcontractid_link = :pcontractid_link")
+	public List<PContractBOM2SKU> getall_bypcontract_andproduct(
+			@Param ("productid_link")final  Long productid_link, 
+			@Param ("pcontractid_link")final  Long pcontractid_link);
 }

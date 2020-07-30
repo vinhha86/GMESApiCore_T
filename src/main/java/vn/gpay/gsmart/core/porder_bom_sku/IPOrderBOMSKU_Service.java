@@ -13,5 +13,8 @@ public interface IPOrderBOMSKU_Service extends Operations<POrderBOMSKU>{
 	List<POrderBOMSKU_By_Color> getByPOrderID_GroupByColor(Long porderid_link);
 
 	List<POrderBOMSKU> getSKUByMaterial(Long porderid_link, Long materialid_link);
-
+	List<POrderBOMSKU> getby_porder_and_color(Long porderid_link, Long colorid_link);
+	List<POrderBOMSKU> getby_porder_and_material(Long porderid_link, Long materialid_link);
+	List<POrderBOMSKU> getby_porder_and_material_and_color(Long porderid_link, Long materialid_link, long colorid_link);
+	List<POrderBOMSKU> getby_porder_and_material_and_color_and_size(Long porderid_link, Long productid_link, Long materialid_link, long colorid_link,long sizeid_link);
 }

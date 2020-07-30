@@ -198,11 +198,6 @@ public class POrderBOMSKU implements Serializable {/**
 	public String getProductcolor_name() {
 		return productcolor_name;
 	}
-
-
-	public void setProductcolor_name(String productcolor_name) {
-		this.productcolor_name = productcolor_name;
-	}
 	
 	
 }
