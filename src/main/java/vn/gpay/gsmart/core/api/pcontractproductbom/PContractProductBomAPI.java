@@ -70,6 +70,7 @@ public class PContractProductBomAPI {
 					productbom.setCreateddate(new Date());
 					productbom.setOrgrootid_link(user.getRootorgid_link());
 					productbom.setPcontractid_link(pcontractid_link);
+					productbom.setForothercontract(false);
 					
 					ppbomservice.save(productbom);
 					
@@ -324,6 +325,8 @@ public class PContractProductBomAPI {
 					amount_color = listbomcolorclone.get(0).getAmount();
 				
 				map.put("amount", pContractProductBom.getAmount().toString());
+				
+				map.put("forothercontract_name",pContractProductBom.getForothercontract().toString());
 				
 				map.put("amount_color", amount_color.toString());
 				

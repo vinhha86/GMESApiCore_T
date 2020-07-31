@@ -40,6 +40,9 @@ public class PContractProductBom implements Serializable{/**
 	private Long orgrootid_link;
 	private Long pcontractid_link;
 	private Long unitid_link;
+	private Boolean forothercontract;
+	
+	
 	
 //	@NotFound(action = NotFoundAction.IGNORE)
 //	@ManyToOne
@@ -205,5 +208,13 @@ public class PContractProductBom implements Serializable{/**
 
 	public void setUnitid_link(Long unitid_link) {
 		this.unitid_link = unitid_link;
+	}
+
+	public Boolean getForothercontract() {
+		return forothercontract;
+	}
+
+	public void setForothercontract(Boolean forothercontract) {
+		this.forothercontract = forothercontract;
 	}
 }
