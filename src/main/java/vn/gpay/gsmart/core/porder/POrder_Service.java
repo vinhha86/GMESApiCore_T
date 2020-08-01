@@ -207,6 +207,7 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 				.ge(Objects.nonNull(orderdatefrom),"orderdate",DateFormat.atStartOfDay(orderdatefrom))
                 .le(Objects.nonNull(orderdateto),"orderdate",DateFormat.atEndOfDay(orderdateto))
                 .eq(Objects.nonNull(status), "porderstatus.id", status)
+                .ne("porderstatus.id", -1)
                 .eq(Objects.nonNull(granttoorgid_link), "granttoorgid_link", granttoorgid_link)
 				.build();
 		
