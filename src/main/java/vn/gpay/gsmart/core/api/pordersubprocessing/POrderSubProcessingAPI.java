@@ -63,11 +63,11 @@ public class POrderSubProcessingAPI {
     	try {
 	    	for (WorkingProcess processItem: process_list){
 	    		List<POrderSubProcessing> ord_subprocess = subprocessingRepository.findByProcessID(entity.porderid_link, processItem.getId());
-	    		if (ord_subprocess.size() > 0){
-	    			processItem.setIsselected(true);
-	    		}else {
-	    			processItem.setIsselected(false);
-	    		}
+//	    		if (ord_subprocess.size() > 0){
+//	    			processItem.setIsselected(true);
+//	    		}else {
+//	    			processItem.setIsselected(false);
+//	    		}
 	    	}
 			response.data=process_list;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

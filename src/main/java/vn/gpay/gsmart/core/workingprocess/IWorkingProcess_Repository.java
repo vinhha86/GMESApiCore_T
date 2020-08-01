@@ -3,6 +3,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 //import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,4 +15,9 @@ public interface IWorkingProcess_Repository extends JpaRepository<WorkingProcess
 	public List<WorkingProcess>findAll_SubProcess();
 	@Query(value = "Select a from WorkingProcess a where a.process_type=0")
 	public List<WorkingProcess>findAll_MainProcess();	
+	
+	@Query(value = "Select a from WorkingProcess a where a.process_type=1 and a.productid_link = :productid_link")
+	public List<WorkingProcess>getby_product(
+			@Param("productid_link") final Long productid_link
+			);
 }

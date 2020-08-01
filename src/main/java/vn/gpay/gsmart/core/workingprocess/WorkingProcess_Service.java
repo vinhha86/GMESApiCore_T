@@ -25,4 +25,10 @@ public class WorkingProcess_Service extends AbstractService<WorkingProcess> impl
 	public List<WorkingProcess>findAll_MainProcess(){
 		return repo.findAll_MainProcess();
 	}
+
+	@Override
+	public List<WorkingProcess> getby_product(Long productid_link) {
+		// TODO Auto-generated method stub
+		return repo.getby_product(productid_link);
+	}
 }
