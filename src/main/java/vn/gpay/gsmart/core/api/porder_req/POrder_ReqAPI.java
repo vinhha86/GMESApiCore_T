@@ -124,18 +124,40 @@ public class POrder_ReqAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgid_link = user.getOrgid_link();
+//			long orgid_link = 2;
 			List<String> orgTypes = new ArrayList<String>();
 			orgTypes.add("13");
 			orgTypes.add("14");
 			List<Org> lsOrgChild = orgService.getorgChildrenbyOrg(orgid_link,orgTypes);
-			for(Org theOrg:lsOrgChild){
-				List<POrder_Req> a = reqService.get_by_org(theOrg.getId());
+			
+			if(orgid_link == 1) {
+				for(Org theOrg:lsOrgChild){
+					List<POrder_Req> a = reqService.get_by_org(theOrg.getId());
+					
+					List<POrder_Req> result = new ArrayList<POrder_Req>();
+					for(POrder_Req pr : a) {
+						long porderreqid_link = pr.getId();
+						long pcontract_poid_link = pr.getPcontract_poid_link();
+						List<POrder> p = porderService.getByPOrder_Req(pcontract_poid_link, porderreqid_link);
+						
+						if(p.size() == 0)
+							result.add(pr);
+					}
+					
+	//				if(a.size()>0)
+	//					response.data.addAll(a);
+					if(result.size()>0)
+						response.data.addAll(result);
+				}
+			}else {
+				List<POrder_Req> a = reqService.get_by_org(orgid_link);
 				
 				List<POrder_Req> result = new ArrayList<POrder_Req>();
 				for(POrder_Req pr : a) {
 					long porderreqid_link = pr.getId();
 					long pcontract_poid_link = pr.getPcontract_poid_link();
 					List<POrder> p = porderService.getByPOrder_Req(pcontract_poid_link, porderreqid_link);
+					
 					if(p.size() == 0)
 						result.add(pr);
 				}
