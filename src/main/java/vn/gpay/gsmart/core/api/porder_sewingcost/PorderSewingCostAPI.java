@@ -14,15 +14,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.gpay.gsmart.core.pcontract.PContract;
+import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Service;
+import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
+import vn.gpay.gsmart.core.porder.IPOrder_Service;
+import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_sewingcost.IPorderSewingCost_Service;
 import vn.gpay.gsmart.core.porder_sewingcost.POrderSewingCost;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
+import vn.gpay.gsmart.core.workingprocess.IWorkingProcess_Service;
+import vn.gpay.gsmart.core.workingprocess.WorkingProcess;
 
 @RestController
 @RequestMapping("/api/v1/pordersewingcost")
 public class PorderSewingCostAPI {
 	@Autowired IPorderSewingCost_Service pordersewingService;
+	@Autowired IWorkingProcess_Service workingprocessService;
+	@Autowired IPOrder_Service porderService;
+	@Autowired IPContract_Price_Service pcontractpriceService;
 	
 	 @RequestMapping(value = "/create",method = RequestMethod.POST)
 		public ResponseEntity<create_pordersewingcost_response> Create(HttpServletRequest request, @RequestBody create_pordersewingcost_request entity ) {
@@ -84,7 +94,22 @@ public class PorderSewingCostAPI {
 		public ResponseEntity<update_pordersewingcost_response> Update(HttpServletRequest request, @RequestBody update_pordersewingcost_request entity ) {
 			update_pordersewingcost_response response = new update_pordersewingcost_response();
 			try {
+				POrderSewingCost pordersewingcost = pordersewingService.findOne(entity.data.getId());
+				float cost_old = pordersewingcost.getTotalcost();
 				pordersewingService.save(entity.data);
+				
+				//Cap nhat gia moi nhat cho san pham vao bang workingprocess
+				WorkingProcess wp = workingprocessService.findOne(entity.data.getWorkingprocessid_link());
+				wp.setLastcost(entity.data.getCost());
+				workingprocessService.save(wp);
+				
+				//Cap nhat gia len PContract_PO
+				POrder porder = porderService.findOne(entity.data.getPorderid_link());
+				long pcontract_poid_link = porder.getPcontract_poid_link();
+				long productid_link = porder.getProductid_link();
+				PContract_Price price = pcontractpriceService.getPrice_CMP(pcontract_poid_link, productid_link);
+				float price_cost_old = price.getPrice_sewingcost();
+				price.setPrice_sewingcost(price_cost_old - cost_old + entity.data.getTotalcost());
 				
 				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

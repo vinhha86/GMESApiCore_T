@@ -66,7 +66,10 @@ public class WorkingProcess implements Serializable {
 
 	@Column(name ="isselected")
     private Boolean isselected;
-
+	
+	private Float lastcost;
+	
+	
 	
 	public Boolean getIsselected() {
 		return isselected;
@@ -199,6 +202,14 @@ public class WorkingProcess implements Serializable {
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+
+	public Float getLastcost() {
+		return lastcost;
+	}
+
+	public void setLastcost(Float lastcost) {
+		this.lastcost = lastcost;
 	}
 
 
