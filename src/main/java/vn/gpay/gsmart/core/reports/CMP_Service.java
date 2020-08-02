@@ -14,6 +14,8 @@ import com.github.wenhao.jpa.Specifications;
 
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
+import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Service;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 import vn.gpay.gsmart.core.porder.IPOrder_Repository;
@@ -26,6 +28,7 @@ public class CMP_Service implements ICMP_Service {
 	@Autowired IOrgService orgService;
 	@Autowired IPOrder_Repository repoPOrder;
 	@Autowired IPContract_Price_Service priceService;
+	@Autowired IPContract_POService poService;
 	
 	@Override
 	public List<CMP_Data> getData_ByMonth(Long userrootorgid_link, Long userorgid_link, int month, int year, int reportmonths){
@@ -121,6 +124,18 @@ public class CMP_Service implements ICMP_Service {
 				PContract_Price thePriceCMP = priceService.getPrice_CMP(thePOrder.getPcontract_poid_link(), thePOrder.getProductid_link());
 				if (null != thePriceCMP) {
 					totalCMP = totalCMP + (null==thePriceCMP.getPrice_cmp()?0:thePriceCMP.getPrice_cmp())*(null==thePOrder.getTotalorder()?0:thePOrder.getTotalorder());
+				} else {
+					//Kiem tra xem PO co phai PO con ko
+					PContract_PO thePO = poService.findOne(thePOrder.getPcontract_poid_link());
+					if (null != thePO){
+						if (null != thePO.getParentpoid_link()){
+							//Lay gia CMP cua san pham trong PO cha
+							PContract_Price thePriceCMP_Parent = priceService.getPrice_CMP(thePO.getParentpoid_link(), thePOrder.getProductid_link());
+							if (null != thePriceCMP_Parent){
+								totalCMP = totalCMP + (null==thePriceCMP_Parent.getPrice_cmp()?0:thePriceCMP_Parent.getPrice_cmp())*(null==thePOrder.getTotalorder()?0:thePOrder.getTotalorder());
+							}
+						}
+					}
 				}
 			}
 			return totalCMP;
