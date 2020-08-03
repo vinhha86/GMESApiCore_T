@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.base.ResponseError;
+import vn.gpay.gsmart.core.devices.DeviceGroup;
 import vn.gpay.gsmart.core.devices.Devices;
+import vn.gpay.gsmart.core.devices.IDeviceGroupService;
 import vn.gpay.gsmart.core.devices.IDevicesService;
 import vn.gpay.gsmart.core.security.GpayAuthentication;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
@@ -26,6 +28,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 public class DevicesAPI {
    
 	@Autowired IDevicesService devicesService;
+	@Autowired IDeviceGroupService deviceGroupService;
 	
 	@RequestMapping(value = "/device_listtree",method = RequestMethod.POST)
 	public ResponseEntity<?> DeviceListtree(@RequestBody DeviceTreeRequest entity,HttpServletRequest request ) {
@@ -162,6 +165,52 @@ public class DevicesAPI {
 			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
 			errorBase.setMessage(e.getMessage());
 		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@RequestMapping(value = "/getalldevicegroup",method = RequestMethod.POST)
+	public ResponseEntity<DeviceGroupResponse> GetAllDeviceGroup(HttpServletRequest request ) {
+		DeviceGroupResponse response = new DeviceGroupResponse();
+		try {
+			response.data = deviceGroupService.findAllByOrderByIdAsc();
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<DeviceGroupResponse>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<DeviceGroupResponse>(response,HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/createDeviceGroup",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> CreateDeviceGroup(@RequestBody DeviceGroupRequest entity, HttpServletRequest request ) {//@RequestParam("type") 
+		ResponseBase response = new ResponseBase();
+		try {
+			DeviceGroup dg = entity.data;
+			deviceGroupService.save(dg);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_SERVER_ERROR);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<ResponseBase>(response,HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/deleteDeviceGroup",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> DeleteDeviceGroup(@RequestBody DeviceGroupRequest entity, HttpServletRequest request ) {//@RequestParam("type") 
+		ResponseBase response = new ResponseBase();
+		try {
+			deviceGroupService.deleteById(entity.id);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_SERVER_ERROR);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<ResponseBase>(response,HttpStatus.BAD_REQUEST);
 		}
 	}
 }

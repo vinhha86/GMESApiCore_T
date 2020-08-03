@@ -1,5 +1,7 @@
 package vn.gpay.gsmart.core.devices;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,11 +13,12 @@ import javax.persistence.Table;
 
 @Table(name="device_group")
 @Entity
-public class DeviceGroup {
+public class DeviceGroup implements Serializable {
+	private static final long serialVersionUID = 1L;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "device_group_generator")
-	@SequenceGenerator(name="devices_generator", sequenceName = "device_group_id_seq", allocationSize=1)
+	@SequenceGenerator(name="device_group_generator", sequenceName = "device_group_id_seq", allocationSize=1)
 	protected Long id;
 	
 	@Column(name ="name",length=200)
