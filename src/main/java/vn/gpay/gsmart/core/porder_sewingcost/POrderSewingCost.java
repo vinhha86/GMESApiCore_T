@@ -16,6 +16,8 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.category.LaborLevel;
+import vn.gpay.gsmart.core.devices.DeviceGroup;
 import vn.gpay.gsmart.core.workingprocess.WorkingProcess;
 
 @Table(name="porders_sewingcost")
@@ -39,16 +41,46 @@ public class POrderSewingCost implements Serializable {
 	private Float totalcost;
 	private Long usercreatedid_link;
 	private Date datecreated;
+	private Integer timespent_standard;
+	private Long devicerequiredid_link;
+	private Long laborrequiredid_link;
+	private String techcomment;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="workingprocessid_link",insertable=false,updatable =false)
     private WorkingProcess workingprocess;
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="devicerequiredid_link",insertable=false,updatable =false)
+    private DeviceGroup devicegroup;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="laborrequiredid_link",insertable=false,updatable =false)
+    private LaborLevel laborlevel;
+	
 	@Transient
 	public String getWorkingprocess_name() {
 		if(workingprocess != null) {
 			return workingprocess.getName();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getDevicegroup_name() {
+		if(devicegroup != null) {
+			return devicegroup.getName();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getLaborlevel_name() {
+		if(laborlevel != null) {
+			return laborlevel.getName();
 		}
 		return "";
 	}
@@ -107,6 +139,37 @@ public class POrderSewingCost implements Serializable {
 	public void setDatecreated(Date datecreated) {
 		this.datecreated = datecreated;
 	}
-	
+
+	public Integer getTimespent_standard() {
+		return timespent_standard;
+	}
+
+	public void setTimespent_standard(Integer timespent_standard) {
+		this.timespent_standard = timespent_standard;
+	}
+
+	public Long getDevicerequiredid_link() {
+		return devicerequiredid_link;
+	}
+
+	public void setDevicerequiredid_link(Long devicerequiredid_link) {
+		this.devicerequiredid_link = devicerequiredid_link;
+	}
+
+	public Long getLaborrequiredid_link() {
+		return laborrequiredid_link;
+	}
+
+	public void setLaborrequiredid_link(Long laborrequiredid_link) {
+		this.laborrequiredid_link = laborrequiredid_link;
+	}
+
+	public String getTechcomment() {
+		return techcomment;
+	}
+
+	public void setTechcomment(String techcomment) {
+		this.techcomment = techcomment;
+	}
 	
 }

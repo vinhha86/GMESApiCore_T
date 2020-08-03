@@ -8,10 +8,19 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 //import javax.persistence.JoinColumn;
 //import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 //import javax.persistence.Transient;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.category.LaborLevel;
+import vn.gpay.gsmart.core.devices.DeviceGroup;
 
 @Table(name="workingprocess")
 @Entity
@@ -69,7 +78,31 @@ public class WorkingProcess implements Serializable {
 	
 	private Float lastcost;
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="devicerequiredid_link",insertable=false,updatable =false)
+    private DeviceGroup devicegroup;	
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="laborrequiredid_link",insertable=false,updatable =false)
+    private LaborLevel laborlevel;
+	
+	@Transient
+	public String getDevicegroup_name() {
+		if(devicegroup != null) {
+			return devicegroup.getName();
+		}
+		return "";
+	}	
+	
+	@Transient
+	public String getLaborlevel_name() {
+		if(laborlevel != null) {
+			return laborlevel.getName();
+		}
+		return "";
+	}
 	
 	public Boolean getIsselected() {
 		return isselected;
