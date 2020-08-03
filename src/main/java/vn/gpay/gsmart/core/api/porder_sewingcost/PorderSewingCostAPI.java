@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Service;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
@@ -44,6 +43,8 @@ public class PorderSewingCostAPI {
 				List<Long> list_id = entity.list_working;
 				
 				for(Long workingprocessid_link : list_id) {
+					WorkingProcess wp = workingprocessService.findOne(workingprocessid_link);
+					
 					List<POrderSewingCost> list_sewing = pordersewingService.getby_porder_and_workingprocess(porderid_link, workingprocessid_link);
 					if(list_sewing.size() == 0) {
 						POrderSewingCost porderSewing = new POrderSewingCost();
@@ -56,6 +57,10 @@ public class PorderSewingCostAPI {
 						porderSewing.setTotalcost((float)0);
 						porderSewing.setUsercreatedid_link(user.getId());
 						porderSewing.setWorkingprocessid_link(workingprocessid_link);
+						porderSewing.setTechcomment(wp.getTechcomment());
+						porderSewing.setLaborrequiredid_link(wp.getLaborrequiredid_link());
+						porderSewing.setDevicerequiredid_link(wp.getDevicerequiredid_link());
+						porderSewing.setTimespent_standard(wp.getTimespent_standard());
 						
 						pordersewingService.save(porderSewing);
 					}
