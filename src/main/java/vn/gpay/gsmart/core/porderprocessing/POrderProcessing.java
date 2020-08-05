@@ -16,7 +16,9 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 
 @Table(name="porder_processing")
 @DynamicUpdate(true) //Chi update cac thuoc tinh thay doi, cac thuoc tinh khac giu nguyen gia tri
@@ -57,9 +59,6 @@ public class POrderProcessing implements Serializable {
 	
 	@Column(name ="granttoorgid_link")
     private Long granttoorgid_link;	
-	
-	@Column(name ="granttoorgname",length=100)
-    private String granttoorgname ;	
 	
 	@Column(name ="totalorder")
     private Integer totalorder ;	
@@ -244,6 +243,24 @@ public class POrderProcessing implements Serializable {
     @JoinColumn(name="porderid_link",insertable=false,updatable =false)
     private POrder porder;
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="pordergrantid_link",insertable=false,updatable =false)
+    private POrderGrant porder_grant;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="granttoorgid_link",insertable=false,updatable =false)
+    private Org orggrant;	
+	
+	@Transient
+	public String getGranttoorgname() {
+		if(orggrant != null) {
+			return orggrant.getName();
+		}
+		return "";
+	}
+	
 	@Transient
 	public Date getProductiondate() {
 		if(porder != null) {
@@ -410,15 +427,6 @@ public class POrderProcessing implements Serializable {
 
 	public void setGranttoorgid_link(Long granttoorgid_link) {
 		this.granttoorgid_link = granttoorgid_link;
-	}
-
-	
-	public String getGranttoorgname() {
-		return granttoorgname;
-	}
-
-	public void setGranttoorgname(String granttoorgname) {
-		this.granttoorgname = granttoorgname;
 	}
 
 	public Integer getTotalorder() {

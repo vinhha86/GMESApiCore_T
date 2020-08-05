@@ -3,6 +3,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 //import org.springframework.data.repository.query.Param;
@@ -11,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
-public interface IPOrderProcessing_Repository extends JpaRepository<POrderProcessing, Long>{
+public interface IPOrderProcessing_Repository extends JpaRepository<POrderProcessing, Long>, JpaSpecificationExecutor<POrderProcessing>{
 	//get all production order until the time of querying
 	@Query(value = "select a from POrderProcessing a where a.status <6 and a.processingdate = "
 			+ "(select max(b.processingdate) from POrderProcessing b where b.porderid_link = a.porderid_link)")
@@ -22,6 +23,13 @@ public interface IPOrderProcessing_Repository extends JpaRepository<POrderProces
 			+ "(select max(b.processingdate) from POrderProcessing b where b.processingdate <= :processingdate_to "
 			+ "and b.porderid_link = a.porderid_link)")
 	public List<POrderProcessing>getByDate(@Param ("processingdate_to")final Date processingdate_to);
+	
+	@Query(value = "select a from POrderProcessing a inner join POrder c on a.porderid_link = c.id "
+			+ "where c.granttoorgid_link = :factoryid_link "
+			+ "and a.status <6 and a.processingdate = "
+			+ "(select max(b.processingdate) from POrderProcessing b where b.processingdate <= :processingdate_to "
+			+ "and b.porderid_link = a.porderid_link)")
+	public List<POrderProcessing>getByDateAndFactory(@Param ("processingdate_to")final Date processingdate_to, @Param ("factoryid_link")final Long factoryid_link);
 	
 	//get all by salaryymonth
 	@Query(value = "select a from POrderProcessing a inner join POrder b on a.porderid_link = b.id where b.salaryyear=:salaryyear and b.salarymonth=:salarymonth")

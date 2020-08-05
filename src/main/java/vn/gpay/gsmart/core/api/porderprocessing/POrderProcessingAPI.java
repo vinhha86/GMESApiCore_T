@@ -27,8 +27,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 //import vn.gpay.gsmart.core.actionlog.IActionLogs_Service;
 import vn.gpay.gsmart.core.base.ResponseBase;
-import vn.gpay.gsmart.core.org.IOrgService;
-import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder.POrderSetReady;
@@ -49,7 +47,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 public class POrderProcessingAPI {
     @Autowired private IPOrderProcessing_Service pprocessRepository;
     @Autowired private IPOrder_Service pordersRepository;
-    @Autowired private IOrgService orgsRepository;
+//    @Autowired private IOrgService orgsRepository;
     @Autowired private IPOrderGrant_Service pordergrantRepository;
 //    @Autowired private IActionLogs_Service actionLogsRepository;
     ObjectMapper mapper = new ObjectMapper();
@@ -81,7 +79,7 @@ public class POrderProcessingAPI {
 	public ResponseEntity<POrderProcessingResponse> getByDate(@RequestBody PProcessByDateRequest entity, HttpServletRequest request) {
 		POrderProcessingResponse response = new POrderProcessingResponse();
 		try {
-			List<POrderProcessing> pprocessList = pprocessRepository.getByDate(entity.processingdate_to);
+			List<POrderProcessing> pprocessList = pprocessRepository.getByDateAndFactory(entity.processingdate_to,entity.orgid);
 			
 			//If processingdate <> entity.processingdate_to --> Calcucate Amount's value of provided date
 			for(POrderProcessing pprocess: pprocessList){
@@ -737,7 +735,7 @@ public class POrderProcessingAPI {
 		        	pprocess.setPorderid_link(entity.data.getPorderid_link());
 		        	pprocess.setOrdercode(entity.data.getOrdercode());
 		        	pprocess.setGranttoorgid_link(entity.data.getGranttoorgid_link());
-		        	pprocess.setGranttoorgname(entity.data.getGranttoorgname());
+//		        	pprocess.setGranttoorgname(entity.data.getGranttoorgname());
 		        	pprocess.setTotalorder(entity.data.getTotalorder());
 		        	
 			        pprocess.setAmountcut(entity.data.getAmountcut());
@@ -897,7 +895,7 @@ public class POrderProcessingAPI {
 			for(POrderGrant pprocessgrant: entity.data){
 		        POrder porder = pordersRepository.findOne(pprocessgrant.getPorderid_link());
 				//Get Org Information
-		        Org org = orgsRepository.findOne(pprocessgrant.getGranttoorgid_link());
+//		        Org org = orgsRepository.findOne(pprocessgrant.getGranttoorgid_link());
 		        
 		        if (null != porder){
 					//Remove from POrder_Grant
@@ -927,7 +925,7 @@ public class POrderProcessingAPI {
 				        pprocess.setPorderid_link(porder.getId());
 				        pprocess.setOrdercode(porder.getOrdercode());
 				        pprocess.setGranttoorgid_link(pprocessgrant.getGranttoorgid_link());
-				        pprocess.setGranttoorgname(org.getName());
+//				        pprocess.setGranttoorgname(org.getName());
 				        pprocess.setTotalorder(porder.getTotalorder());
 				        
 				        pprocess.setProcessingdate(new Date());

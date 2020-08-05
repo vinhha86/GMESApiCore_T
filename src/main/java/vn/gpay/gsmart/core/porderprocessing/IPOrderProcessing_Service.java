@@ -38,4 +38,6 @@ public interface IPOrderProcessing_Service extends Operations<POrderProcessing>{
 	
 	List<POrderProcessing> getByOrderId_and_GrantId(Long porderid_link, Long pordergrantid_link);
 
+	List<POrderProcessing> getByDateAndFactory(Date processingdate_to, Long factoryid);
+
 }

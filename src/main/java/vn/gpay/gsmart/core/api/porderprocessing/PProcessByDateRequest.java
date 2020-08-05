@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class PProcessByDateRequest{
 	public Date processingdate_to;
-	public String orgid = "";
+	public Long orgid;
 	public Integer salaryyear;
 	public Integer salarymonth;
 }

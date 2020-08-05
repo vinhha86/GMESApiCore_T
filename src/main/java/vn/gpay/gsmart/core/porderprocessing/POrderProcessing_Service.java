@@ -29,6 +29,16 @@ public class POrderProcessing_Service extends AbstractService<POrderProcessing> 
 	}
 	
 	@Override
+	public List<POrderProcessing>getByDateAndFactory(Date processingdate_to, Long factoryid){
+//		Specification<POrderProcessing> specification = Specifications.<POrderProcessing>and()
+//				.eq("porder.granttoorgid_link", factoryid)
+//	            .build();
+//		List<POrderProcessing> a = repo.getSpecificationByDate(specification,processingdate_to);
+		List<POrderProcessing> a = repo.getByDateAndFactory(processingdate_to, factoryid);
+		return a;
+	}
+	
+	@Override
 	public List<POrderProcessing>getBySalaryMonth(Integer salaryyear, Integer salarymonth){
 		return repo.getBySalaryMonth(salaryyear, salarymonth);
 	}
