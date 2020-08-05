@@ -38,6 +38,10 @@ public class MenuServiceImpl extends StringAbstractService<Menu> implements IMen
 	public List<MenuTree> createTree(final List<Menu> nodes) {
 		 
         Map<String, MenuTree> mapTmp = new HashMap<>();
+        List<Menu> secondMenuList = new ArrayList<>(); // cần vì trong list nodes chứa duplicate Menu
+//        for(Menu menu : nodes) {
+//        	System.out.println(menu.getText_vi());
+//        }
         
         //Save all nodes to a map
         for (Menu current : nodes) {
@@ -65,11 +69,17 @@ public class MenuServiceImpl extends StringAbstractService<Menu> implements IMen
         	menu.setTitle_en(current.getTitle_list_vi());
         	menu.setExpanded(true);
         	menu.setChecked(current.checked);
+        	
+        	if(mapTmp.containsKey(current.getId())) {
+        		continue;
+        	}
+        	
             mapTmp.put(current.getId(), menu);
+            secondMenuList.add(current);
         }
  
         //loop and assign parent/child relationships
-        for (Menu current : nodes) {
+        for (Menu current : secondMenuList) {
             String parentId = current.getParent_id();
  
             if (parentId != null ) {
