@@ -58,9 +58,6 @@ public class POrderProcessing implements Serializable {
 	@Column(name ="granttoorgid_link")
     private Long granttoorgid_link;	
 	
-	@Column(name ="granttoorgname",length=100)
-    private String granttoorgname ;	
-	
 	@Column(name ="totalorder")
     private Integer totalorder ;	
 	
