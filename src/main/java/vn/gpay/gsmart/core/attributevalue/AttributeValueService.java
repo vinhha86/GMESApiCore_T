@@ -24,6 +24,12 @@ public class AttributeValueService extends AbstractService<Attributevalue> imple
 		// TODO Auto-generated method stub
 		return repo.getlist_ByidAttribute(id);
 	}
+	
+	@Override
+	public Integer getMaxSortValue(Long id) {
+		// TODO Auto-generated method stub
+		return repo.getMaxSortValue(id)+1;
+	}
 
 	@Override
 	protected JpaRepository<Attributevalue, Long> getRepository() {

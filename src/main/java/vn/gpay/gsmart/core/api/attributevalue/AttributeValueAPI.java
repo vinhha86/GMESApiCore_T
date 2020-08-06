@@ -75,6 +75,7 @@ public class AttributeValueAPI {
 				attvalue.setUsercreateid_link(user.getId());
 				attvalue.setIsdefault(false);
 				attvalue.setTimecreate(new Date());
+				attvalue.setSortvalue(attValueService.getMaxSortValue(attvalue.getAttributeid_link()));
 			}else {
 				Attributevalue value_old =  attValueService.findOne(attvalue.getId());
 				attvalue.setOrgrootid_link(value_old.getOrgrootid_link());
@@ -91,18 +92,42 @@ public class AttributeValueAPI {
 		    return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 		}
 	}
-		@RequestMapping(value = "/attributevalue_delete",method = RequestMethod.POST)
-		public ResponseEntity<ResponseBase> AttributeValueDelete(@RequestBody Attributevalue_delete_request entity,HttpServletRequest request ) {
-			ResponseBase response = new ResponseBase();
-			try {
-				attValueService.deleteById(entity.id);
-				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-				return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
-			}catch (Exception e) {
-				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_EXCEPTION));
-			    return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+	
+	@RequestMapping(value = "/attributevalue_delete",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> AttributeValueDelete(@RequestBody Attributevalue_delete_request entity,HttpServletRequest request ) {
+		ResponseBase response = new ResponseBase();
+		try {
+			attValueService.deleteById(entity.id);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_EXCEPTION));
+		    return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/attributevalue_reorder",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> AttributeValueReorder(@RequestBody Attributevalue_reorder_request entity,HttpServletRequest request ) {
+		ResponseBase response = new ResponseBase();
+		try {
+		
+			for (Attributevalue attvalue:entity.data){
+				Attributevalue Attr = attValueService.findOne(attvalue.getId());
+				if (null != Attr){
+					Attr.setSortvalue(attvalue.getSortvalue());
+					attValueService.save(Attr);
+				}
+				
 			}
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_EXCEPTION));
+		    return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+		}
 	}
 }

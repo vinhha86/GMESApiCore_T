@@ -14,7 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 public interface IAttibuteValueRepository extends JpaRepository<Attributevalue, Long>, JpaSpecificationExecutor<Attributevalue> {
 	@Query(value = "select c from Attributevalue c "
 			+ "where c.attributeid_link =:attributeid_link "
-			+ "order by isdefault desc, value")
+			+ "order by sortvalue")
 	public List<Attributevalue> getlist_ByidAttribute(@Param ("attributeid_link")final long attributeid_link);
 	
+	@Query(value = "select max(sortvalue) from Attributevalue c "
+			+ "where c.attributeid_link =:attributeid_link ")	
+	public int getMaxSortValue(@Param ("attributeid_link")final long attributeid_link);
 }

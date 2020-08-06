@@ -45,6 +45,7 @@ public class Attributevalue implements Serializable {/**
 	private Date timecreate;
 	
 	private Boolean isdefault;	
+	private Integer sortvalue;	
 	
 
 	public Long getId() {
@@ -118,5 +119,14 @@ public class Attributevalue implements Serializable {/**
 	public void setIsdefault(Boolean isdefault) {
 		this.isdefault = isdefault;
 	}
+
+	public Integer getSortvalue() {
+		return sortvalue;
+	}
+
+	public void setSortvalue(Integer sortvalue) {
+		this.sortvalue = sortvalue;
+	}
+
 	
 }
