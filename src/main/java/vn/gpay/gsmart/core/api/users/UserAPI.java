@@ -1,12 +1,21 @@
 package vn.gpay.gsmart.core.api.users;
 
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JsonParser;
+import org.springframework.boot.json.JsonParserFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +24,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import vn.gpay.gsmart.core.approle.AppFunction;
 import vn.gpay.gsmart.core.approle.AppRole_User;
@@ -132,6 +144,65 @@ public class UserAPI {
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<UserResponse>(response,HttpStatus.OK);
 		}
+	}
+	
+	@RequestMapping(value = "/updatepass",method = RequestMethod.POST)
+	public ResponseEntity<update_pass_response> UpdatePass( @RequestBody update_pass_request entity,HttpServletRequest request ) {
+		update_pass_response response = new update_pass_response();
+		try {
+			String result = "";
+			String line;
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			String urlPush = "http://localhost:8181/o2admin/changepass";
+			String token = request.getHeader("Authorization");
+						
+			URL url = new URL(urlPush);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.setRequestProperty("authorization", token);
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setRequestMethod("POST");
+            
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode appParNode = objectMapper.createObjectNode();
+            appParNode.put("username", user.getUsername());
+            appParNode.put("oldpwd", entity.old_pass);
+            appParNode.put("newpwd", entity.new_pass);
+            String jsonReq = objectMapper.writeValueAsString(appParNode);
+            
+            OutputStream os = conn.getOutputStream();
+            os.write(jsonReq.getBytes());
+            os.flush();
+                     
+            BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            while ((line = rd.readLine()) != null) {
+                result += line;
+            }
+            rd.close();
+            
+            conn.disconnect();
+            
+            JsonParser springParser = JsonParserFactory.getJsonParser();
+            Map<String, Object> map = springParser.parseMap(result);
+            
+            String status = map.get("status").toString();
+            if(!status.equals("0")) {
+            	response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+    			response.setMessage(map.get("msg").toString());
+            }
+            else {
+            	response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+    			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+            }
+			
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    
+		}
+		return new ResponseEntity<update_pass_response>(response,HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/getbyorg",method = RequestMethod.POST)
