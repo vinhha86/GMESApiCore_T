@@ -83,6 +83,7 @@ public class POrderProcessingAPI {
 			
 			//If processingdate <> entity.processingdate_to --> Calcucate Amount's value of provided date
 			for(POrderProcessing pprocess: pprocessList){
+				System.out.println(pprocess.getGranttoorgid_link());
 				//Nếu số cắt TT ==0 --> gán bằng số cắt dự kiến để vẫn cho vào chuyền, hiện đỏ để lưu í
 				pprocess.setIscuttt(0);
 				if (null == pprocess.getAmountcutsum() || 0 == pprocess.getAmountcutsum()){

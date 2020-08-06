@@ -28,7 +28,7 @@ public interface IPOrderProcessing_Repository extends JpaRepository<POrderProces
 			+ "where c.granttoorgid_link = :factoryid_link "
 			+ "and a.status <6 and a.processingdate = "
 			+ "(select max(b.processingdate) from POrderProcessing b where b.processingdate <= :processingdate_to "
-			+ "and b.porderid_link = a.porderid_link)")
+			+ "and b.porderid_link = a.porderid_link and b.pordergrantid_link = a.pordergrantid_link)")
 	public List<POrderProcessing>getByDateAndFactory(@Param ("processingdate_to")final Date processingdate_to, @Param ("factoryid_link")final Long factoryid_link);
 	
 	//get all by salaryymonth

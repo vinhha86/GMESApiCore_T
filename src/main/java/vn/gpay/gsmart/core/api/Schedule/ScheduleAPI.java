@@ -400,6 +400,22 @@ public class ScheduleAPI {
 				POrderProcessing theProcess = lsProcessing.get(0);
 				theProcess.setGranttoorgid_link(entity.orggrant_toid_link);
 				processService.save(theProcess);
+			} else {
+				//Tao moi POrderProcessing
+				POrderProcessing pp = new POrderProcessing();
+				pp.setOrdercode(grant.getOrdercode());
+				pp.setOrderdate(grant.getOrderdate());
+				pp.setOrgrootid_link(orgrootid_link);
+				pp.setPorderid_link(grant.getPorderid_link());
+				pp.setTotalorder(grant.getGrantamount());
+				pp.setUsercreatedid_link(user.getId());
+				pp.setStatus(1);
+				pp.setGranttoorgid_link(entity.orggrant_toid_link);
+				pp.setProcessingdate(new Date());
+				pp.setTimecreated(new Date());
+				pp.setPordergrantid_link(grant.getId());
+				
+				processService.save(pp);				
 			}
 			//Cap nhat lai porder			
 //			POrder porder = porderService.findOne(porderid_link);
@@ -863,6 +879,13 @@ public class ScheduleAPI {
 			grant_old.setFinish_date_plan(end_old);
 			grant_old = granttService.save(grant_old);
 			
+			//Cap nhat lai Processing cu sau khi tach
+			List<POrderProcessing> lsProcessing = processService.getByOrderId_and_GrantId(grant_old.getPorderid_link(), grant_old.getId());
+			for(POrderProcessing process : lsProcessing) {
+				process.setTotalorder(totalorder_old);
+				processService.save(process);
+			}
+			
 			Schedule_porder old = new Schedule_porder();
 			old.setEndDate(commonService.getEndOfDate(end_old));
 			old.setDuration(duration_old);
@@ -894,7 +917,7 @@ public class ScheduleAPI {
 			
 			POrder porder = porderService.findOne(entity.porderid_link);
 			
-			//Sinh 1 dong trong Processing
+			//Sinh 1 dong moi trong Processing
 			POrderProcessing process = new POrderProcessing();
 			process.setId(null);
 			process.setOrdercode(porder.getOrdercode());
