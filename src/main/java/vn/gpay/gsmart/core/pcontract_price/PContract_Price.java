@@ -19,6 +19,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.attributevalue.Attributevalue;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.sizeset.SizeSet;
 
@@ -60,6 +61,13 @@ public class PContract_Price implements Serializable {/**
 		}
 		return "";
 	}	
+	
+	public List<String> getlist_sizename(){
+		if(sizeset != null) {
+			return sizeset.getlist_sizename();
+		}
+		return new ArrayList<String>();
+	}
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne

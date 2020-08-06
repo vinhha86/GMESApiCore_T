@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.sizeset;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -48,12 +49,24 @@ public class SizeSet implements Serializable {/**
 			for(SizeSetAttributeValue sizeSetAttributeValue : list) {
 				if(values.equals("")) {
 					values+=sizeSetAttributeValue.getAttributeValueName();
-				}else {
+				}
+				else {
 					values+=", " + sizeSetAttributeValue.getAttributeValueName();
 				}
 			}
 		}
 		return values;
+	}
+	
+	@Transient
+	public List<String> getlist_sizename(){
+		List<String> list_name = new ArrayList<String>();
+		if(list.size()!=0) {
+			for(SizeSetAttributeValue sizeSetAttributeValue : list) {
+				list_name.add(sizeSetAttributeValue.getAttributeValueName());
+			}
+		}
+		return list_name;
 	}
 
 	public Long getId() {

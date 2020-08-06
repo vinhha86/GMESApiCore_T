@@ -19,6 +19,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.currency.Currency;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
@@ -104,7 +105,6 @@ public class PContract_PO implements Serializable {/**
     @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
     private List<PContract_Price> pcontract_price = new ArrayList<PContract_Price>();
 
-    
 	public List<PContract_Price> getPcontract_price() {
 		return pcontract_price;
 	}
@@ -112,6 +112,7 @@ public class PContract_PO implements Serializable {/**
 	public void setPcontract_price(List<PContract_Price> pcontract_price) {
 		this.pcontract_price = pcontract_price;
 	}
+	
 
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
@@ -131,6 +132,18 @@ public class PContract_PO implements Serializable {/**
 	@ManyToOne
     @JoinColumn(name="merchandiserid_link",insertable=false,updatable =false)
     private GpayUser merchandiser;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="currencyid_link",insertable=false,updatable =false)
+    private Currency currency;
+	
+	@Transient
+	public String getCurrencyCode() {
+		if(currency!=null)
+			currency.getCode();
+		return "$";
+	}
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne

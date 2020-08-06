@@ -24,4 +24,12 @@ public interface IPContract_Price_Repository extends JpaRepository<PContract_Pri
 			@Param ("pcontract_poid_link")final  Long pcontract_poid_link,
 			@Param ("productid_link")final  Long productid_link
 			);
+	
+	@Query(value = "select c from PContract_Price c "
+			+ "where pcontract_poid_link = :pcontract_poid_link and "
+			+ "productid_link = :productid_link")
+	public List<PContract_Price> getPrice_by_product(
+			@Param ("pcontract_poid_link")final  Long pcontract_poid_link,
+			@Param ("productid_link")final  Long productid_link
+			);
 }

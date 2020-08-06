@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -34,7 +35,9 @@ import vn.gpay.gsmart.core.stockingunique.IStockingUniqueService;
 import vn.gpay.gsmart.core.stockingunique.StockingUniqueCode;
 
 @Service
-public class Common {
+public class Common  {
+	
+
 	@Autowired IPContractBOMSKUService pcontractBOMSKUService;
 	@Autowired ISKU_AttributeValue_Service skuavService;
 	@Autowired IPContractBOMColorService bomcolorService;
@@ -45,6 +48,7 @@ public class Common {
 	@Autowired IConfigAmountService cfamountService;
 	
 	@Autowired IStockingUniqueService stockService;
+	
 	
 	public List<PContractBOMSKU> getBOMSKU_PContract_Product(long pcontractid_link, long productid_link, List<PContractProductSKU> listsku){
 		List<PContractBOMSKU> listbomsku = new ArrayList<PContractBOMSKU>();
@@ -314,5 +318,20 @@ public class Common {
 		}
 		
 		return pquantity_production;
+	}
+	
+	public String FormatNumber(int a) {
+		 DecimalFormat myFormatter = new DecimalFormat("#,###");
+		 return myFormatter.format(a);
+	}
+	
+	public String getString_currency(Long id) {
+		switch (id.intValue()) {
+		case 1:
+			return "$";
+
+		default:
+			return "$";
+		}
 	}
 }
