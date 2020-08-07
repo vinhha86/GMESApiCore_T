@@ -176,8 +176,8 @@ public class ReportAPI {
 		XSSFCellStyle cellStyle_aligncenter_fontBold = workbook.createCellStyle();
 		cellStyle_aligncenter_fontBold.setAlignment(HorizontalAlignment.CENTER);
 		cellStyle_aligncenter_fontBold.setVerticalAlignment(VerticalAlignment.CENTER);
-		cellStyle_aligncenter_fontBold.setFillForegroundColor(HSSFColor.LIGHT_CORNFLOWER_BLUE.index);
-		cellStyle_aligncenter_fontBold.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+//		cellStyle_aligncenter_fontBold.setFillForegroundColor(HSSFColor.LIGHT_CORNFLOWER_BLUE.index);
+//		cellStyle_aligncenter_fontBold.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 		cellStyle_aligncenter_fontBold.setBorderTop(BorderStyle.THIN);
 		cellStyle_aligncenter_fontBold.setBorderBottom(BorderStyle.THIN);
 		cellStyle_aligncenter_fontBold.setBorderLeft(BorderStyle.THIN);
@@ -187,8 +187,8 @@ public class ReportAPI {
 		XSSFCellStyle cellStyle_aligncenter = workbook.createCellStyle();
 		cellStyle_aligncenter.setAlignment(HorizontalAlignment.CENTER);
 		cellStyle_aligncenter.setVerticalAlignment(VerticalAlignment.CENTER);
-		cellStyle_aligncenter.setFillForegroundColor(HSSFColor.SKY_BLUE.index);
-		cellStyle_aligncenter.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+//		cellStyle_aligncenter.setFillForegroundColor(HSSFColor.SKY_BLUE.index);
+//		cellStyle_aligncenter.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 		cellStyle_aligncenter.setBorderTop(BorderStyle.THIN);
 		cellStyle_aligncenter.setBorderBottom(BorderStyle.THIN);
 		cellStyle_aligncenter.setBorderLeft(BorderStyle.THIN);
@@ -197,8 +197,8 @@ public class ReportAPI {
 		XSSFCellStyle cellStyle_align_right = workbook.createCellStyle();
 		cellStyle_align_right.setAlignment(HorizontalAlignment.RIGHT);
 		cellStyle_align_right.setVerticalAlignment(VerticalAlignment.CENTER);
-		cellStyle_align_right.setFillForegroundColor(HSSFColor.SKY_BLUE.index);
-		cellStyle_align_right.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+//		cellStyle_align_right.setFillForegroundColor(HSSFColor.SKY_BLUE.index);
+//		cellStyle_align_right.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 		cellStyle_align_right.setBorderTop(BorderStyle.THIN);
 		cellStyle_align_right.setBorderBottom(BorderStyle.THIN);
 		cellStyle_align_right.setBorderLeft(BorderStyle.THIN);
@@ -208,8 +208,8 @@ public class ReportAPI {
 		XSSFCellStyle cellStyle_align_left = workbook.createCellStyle();
 		cellStyle_align_left.setAlignment(HorizontalAlignment.LEFT);
 		cellStyle_align_left.setVerticalAlignment(VerticalAlignment.CENTER);
-		cellStyle_align_left.setFillBackgroundColor(HSSFColor.SKY_BLUE.index);
-		cellStyle_align_left.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+//		cellStyle_align_left.setFillBackgroundColor(HSSFColor.SKY_BLUE.index);
+//		cellStyle_align_left.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 		cellStyle_align_left.setBorderTop(BorderStyle.THIN);
 		cellStyle_align_left.setBorderBottom(BorderStyle.THIN);
 		cellStyle_align_left.setBorderLeft(BorderStyle.THIN);
@@ -269,14 +269,18 @@ public class ReportAPI {
 					if(key == "Shipdate" || key == "Material") {
 						cell.setCellStyle(cellStyle_aligncenter);
 					}
-					else if (key == "Description" || key == "Style" || key == "Detail") {
+					else if (key == "Description" ||  key == "Detail") {
 						cell.setCellStyle(cellStyle_aligncenter);
+					}
+					else if (key == "Style" ) {
+						cell.setCellStyle(cellStyle_aligncenter_fontBold);
 					}
 					else {
 						cell.setCellStyle(cellStyle_align_right);
 					}
 				}
 				else {
+					cell.setCellStyle(cellStyle_aligncenter);
 					String FolderPath = commonService.getFolderPath(10);
 					String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
 					

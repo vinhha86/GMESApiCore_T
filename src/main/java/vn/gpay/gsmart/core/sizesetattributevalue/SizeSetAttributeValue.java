@@ -73,6 +73,15 @@ public class SizeSetAttributeValue implements Serializable{
 		}
 		return "";
 	}
+	
+	@Transient
+	public Integer getAttributeValueSortValue() {
+		Integer sortVal = 0;
+		if(attributevalue!=null) {
+			return attributevalue.getSortvalue();
+		}
+		return sortVal;
+	}
 
 	public Long getId() {
 		return id;
