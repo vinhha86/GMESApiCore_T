@@ -155,7 +155,6 @@ public class SizeSetAttributeValueAPI {
 			List<Attributevalue> listToRmove = new ArrayList<Attributevalue>();
 			Attributevalue valAll = new Attributevalue();
 			
-			
 			for(Attributevalue attrValue : listAttr) {
 				if(attrValue.getValue().equals("ALL")) {
 					valAll = attrValue;
@@ -164,8 +163,9 @@ public class SizeSetAttributeValueAPI {
 			listAttr.remove(valAll);
 			
 			for(Attributevalue attrValue : listAttr) {
+				System.out.println("--------");
 				for(SizeSetAttributeValue sizesetAttrValue : listOther) {
-					if(attrValue.getId() == sizesetAttrValue.getAttributevalueid_link()) {
+					if(attrValue.getId().equals(sizesetAttrValue.getAttributevalueid_link())) {
 						listToRmove.add(attrValue);
 						break;
 					}

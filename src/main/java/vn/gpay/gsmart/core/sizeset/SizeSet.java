@@ -2,7 +2,9 @@ package vn.gpay.gsmart.core.sizeset;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -42,17 +44,39 @@ public class SizeSet implements Serializable {/**
     @JoinColumn(name="sizesetid_link",insertable=false,updatable =false)
     private List<SizeSetAttributeValue> list;
 	
+//	@Transient
+//	public String getAttrValues() {
+//		String values = "";
+//		if(list.size()!=0) {
+//			for(SizeSetAttributeValue sizeSetAttributeValue : list) {
+//				if(values.equals("")) {
+//					values+=sizeSetAttributeValue.getAttributeValueName();
+//				}
+//				else {
+//					values+=", " + sizeSetAttributeValue.getAttributeValueName();
+//				}
+//			}
+//		}
+//		return values;
+//	}
+	
 	@Transient
 	public String getAttrValues() {
 		String values = "";
 		if(list.size()!=0) {
+			HashMap<Integer, String> map = new HashMap<>();
 			for(SizeSetAttributeValue sizeSetAttributeValue : list) {
+				map.put(sizeSetAttributeValue.getAttributeValueSortValue(), sizeSetAttributeValue.getAttributeValueName());
+			}
+			List<Integer> listSortVal = new ArrayList<>(map.keySet());
+			Collections.sort(listSortVal);
+			for(Integer num : listSortVal) {
 				if(values.equals("")) {
-					values+=sizeSetAttributeValue.getAttributeValueName();
+					values += map.get(num);
+				}else {
+					values += ", " + map.get(num);
 				}
-				else {
-					values+=", " + sizeSetAttributeValue.getAttributeValueName();
-				}
+				
 			}
 		}
 		return values;
