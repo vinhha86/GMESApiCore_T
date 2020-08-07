@@ -140,7 +140,7 @@ public class CutAPI {
 	        POrder porder = pordersService.findOne(entity.data.getPorderid_link());
 
 	        //If having processing data on date --> Update; else --> Create New processing line
-	        List<POrderProcessing> pprocessList = pprocessService.findByIdAndPDate(entity.data.getPorderid_link(), entity.data.getProcessingdate());
+	        List<POrderProcessing> pprocessList = pprocessService.findByIdAndPDate(entity.data.getPorderid_link(), entity.data.getPordergrantid_link(), entity.data.getProcessingdate());
 	        
 	        if (pprocessList.size() > 0) {
 	        	System.out.println("update processing cutting");
@@ -189,7 +189,7 @@ public class CutAPI {
 		        //Cộng dồn trong trường hợp sửa số của ngày trước ngày hiện tại
 		        //Update Amount SUM of following days. In case update amount of prev day
 		        
-		        List<POrderProcessing> pprocessListAfter = pprocessService.getAfterDate(entity.data.getPorderid_link(), entity.data.getProcessingdate());
+		        List<POrderProcessing> pprocessListAfter = pprocessService.getAfterDate(entity.data.getPorderid_link(),entity.data.getPordergrantid_link(), entity.data.getProcessingdate());
 		        
 		        int iAmountCuttingSum = null==pprocess.getAmountcuttingsum()?0:pprocess.getAmountcuttingsum();
 		        int iAmountNumberingSum = null==pprocess.getAmountnumberingsum()?0:pprocess.getAmountnumberingsum();

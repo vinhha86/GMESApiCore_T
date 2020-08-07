@@ -79,6 +79,9 @@ public interface IPOrderProcessing_Repository extends JpaRepository<POrderProces
 	@Query(value = "select a from POrderProcessing a where a.processingdate = :processingdate and a.porderid_link = :porderid")
 	public List<POrderProcessing>findByIdAndPDate(@Param ("porderid")final Long porderid, @Param ("processingdate")final Date processingdate);
 	
+	@Query(value = "select a from POrderProcessing a where a.processingdate = :processingdate and a.porderid_link = :porderid_link and a.pordergrantid_link = :pordergrantid_link")
+	public List<POrderProcessing>findByIdAndPDate(@Param ("porderid_link")final Long porderid_link, @Param ("pordergrantid_link")final Long pordergrantid_link, @Param ("processingdate")final Date processingdate);
+
 	//get a line of processing by date and code
 	@Query(value = "select a from POrderProcessing a where a.processingdate = :processingdate and a.ordercode = :ordercode")
 	public List<POrderProcessing>findByCodeAndPDate(@Param ("ordercode")final String ordercode, @Param ("processingdate")final Date processingdate);
@@ -92,7 +95,7 @@ public interface IPOrderProcessing_Repository extends JpaRepository<POrderProces
 			@Param ("pordergrantid_link")final Long pordergrantid_link);
 
 	//get all processing of an order after the given date
-	@Query(value = "select a from POrderProcessing a where a.porderid_link = :porderid and a.processingdate > :processingdate_to order by a.processingdate ASC")
-	public List<POrderProcessing>getAfterDate(@Param ("porderid")final Long porderid, @Param ("processingdate_to")final Date processingdate_to);
+	@Query(value = "select a from POrderProcessing a where a.porderid_link = :porderid_link and a.pordergrantid_link = :pordergrantid_link and a.processingdate > :processingdate_to order by a.processingdate ASC")
+	public List<POrderProcessing>getAfterDate(@Param ("porderid_link")final Long porderid_link, @Param ("pordergrantid_link")final Long pordergrantid_link, @Param ("processingdate_to")final Date processingdate_to);
 
 }

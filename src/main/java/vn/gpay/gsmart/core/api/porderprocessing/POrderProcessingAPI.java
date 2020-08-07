@@ -578,7 +578,7 @@ public class POrderProcessingAPI {
 					porder.setProductiondate(entity.data.getProcessingdate());
 				
 		        //If having processing data on date --> Update; else --> Create New processing line
-		        List<POrderProcessing> pprocessList = pprocessRepository.findByIdAndPDate(entity.data.getPorderid_link(), entity.data.getProcessingdate());
+		        List<POrderProcessing> pprocessList = pprocessRepository.findByIdAndPDate(entity.data.getPorderid_link(), entity.data.getPordergrantid_link(), entity.data.getProcessingdate());
 		        
 		        if (pprocessList.size() > 0) {
 		        	POrderProcessing pprocess = pprocessList.get(0);
@@ -650,7 +650,7 @@ public class POrderProcessingAPI {
 			        //Cộng dồn trong trường hợp sửa số của ngày trước ngày hiện tại
 			        //Update Amount SUM of following days. In case update amount of prev day
 			        
-			        List<POrderProcessing> pprocessListAfter = pprocessRepository.getAfterDate(entity.data.getPorderid_link(), entity.data.getProcessingdate());
+			        List<POrderProcessing> pprocessListAfter = pprocessRepository.getAfterDate(entity.data.getPorderid_link(), entity.data.getPordergrantid_link(), entity.data.getProcessingdate());
 			        
 			        int iAmountCutSum = null==pprocess.getAmountcutsum()?0:pprocess.getAmountcutsum();
 			        int iAmountInputSum = null==pprocess.getAmountinputsum()?0:pprocess.getAmountinputsum();
@@ -734,6 +734,7 @@ public class POrderProcessingAPI {
 		        	pprocess.setOrgrootid_link(entity.data.getOrgrootid_link()); 
 		        	pprocess.setProcessingdate(entity.processingdate);
 		        	pprocess.setPorderid_link(entity.data.getPorderid_link());
+		        	pprocess.setPordergrantid_link(entity.data.getPordergrantid_link());
 		        	pprocess.setOrdercode(entity.data.getOrdercode());
 		        	pprocess.setGranttoorgid_link(entity.data.getGranttoorgid_link());
 //		        	pprocess.setGranttoorgname(entity.data.getGranttoorgname());
@@ -797,7 +798,7 @@ public class POrderProcessingAPI {
 			        //Cộng dồn trong trường hợp sửa số của ngày trước ngày hiện tại
 			        //Update Amount SUM of following days. In case update amount of prev day
 			        
-			        List<POrderProcessing> pprocessListAfter = pprocessRepository.getAfterDate(entity.data.getPorderid_link(), entity.data.getProcessingdate());
+			        List<POrderProcessing> pprocessListAfter = pprocessRepository.getAfterDate(entity.data.getPorderid_link(), entity.data.getPordergrantid_link(), entity.data.getProcessingdate());
 			        
 			        int iAmountCutSum = pprocess.getAmountcutsum();
 			        int iAmountInputSum = pprocess.getAmountinputsum();

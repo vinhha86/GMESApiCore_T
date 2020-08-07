@@ -80,8 +80,8 @@ public class POrderProcessing_Service extends AbstractService<POrderProcessing> 
 	}
 
 	@Override
-	public List<POrderProcessing>findByIdAndPDate(Long porderid, Date processingdate){
-		return repo.findByIdAndPDate(porderid, processingdate);
+	public List<POrderProcessing>findByIdAndPDate(Long porderid_link, Long pordergrantid_link, Date processingdate){
+		return repo.findByIdAndPDate(porderid_link, pordergrantid_link, processingdate);
 	}
 	
 	@Override
@@ -90,8 +90,8 @@ public class POrderProcessing_Service extends AbstractService<POrderProcessing> 
 	}
 
 	@Override
-	public List<POrderProcessing>getAfterDate(Long porderid, Date processingdate_to){
-		return repo.getAfterDate(porderid, processingdate_to);
+	public List<POrderProcessing>getAfterDate(Long porderid_link, Long pordergrantid_link, Date processingdate_to){
+		return repo.getAfterDate(porderid_link, pordergrantid_link, processingdate_to);
 	}
 	
 	@Override

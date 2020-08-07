@@ -46,6 +46,29 @@ public class OrgAPI {
     	
     	return ls_tosx;
     }	
+	@RequestMapping(value = "/tosxbyparent",method = RequestMethod.POST)
+	public ResponseEntity<?> getToSX_ByParent(@RequestBody GetOrgById_request entity, HttpServletRequest request ) {//@RequestParam("type") 
+		OrgResponse response = new OrgResponse();
+		try {
+			GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			List<Org> ls_tosx = orgService.findChildByType(user.getRootorgid_link(),entity.id,14);
+	    	//Thêm điều kiện chọn tất để bỏ lọc trên giao diện
+	    	Org all_option =  new Org();
+	    	all_option.setId((long)-1);
+	    	all_option.setName("Xem tất");
+	    	ls_tosx.add(all_option);
+	    	
+	    	response.data = ls_tosx;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<OrgResponse>(response,HttpStatus.OK);
+		}catch (RuntimeException e) {
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(e.getMessage());
+		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}    
 	@RequestMapping(value = "/getOrgByType",method = RequestMethod.POST)
 	public ResponseEntity<?> GetOrgByType(@RequestBody OrgByTypeRequest entity, HttpServletRequest request ) {//@RequestParam("type") 
 		OrgResponse response = new OrgResponse();
