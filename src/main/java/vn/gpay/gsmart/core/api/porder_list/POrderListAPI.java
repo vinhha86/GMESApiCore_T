@@ -263,11 +263,20 @@ public class POrderListAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			POrderGrant grant = pordergrantService.findOne(entity.idGrant);
 			POrder porder = porderService.findOne(entity.idPOrder);
+			List<POrderGrant> listGrant = pordergrantService.getByOrderId(entity.idPOrder);
 			
 			// save to porder_grant_sku
 			for(Long productsku_id : entity.idSkus) {
 				POrder_Product_SKU pps = porderskuService.findOne(productsku_id);
-				POrderGrant_SKU pgs = pordergrantskuService.getPOrderGrant_SKUbySKUid_link(pps.getSkuid_link());
+				POrderGrant_SKU pgs = null;
+				
+				for(POrderGrant pg : listGrant) {
+					pgs = pordergrantskuService.getPOrderGrant_SKUbySKUid_linkAndGrantId( pps.getSkuid_link(),  pg.getId());
+					if(pgs == null) continue;
+					if(pgs != null) break;
+				}
+				
+				
 				if(pgs == null) {
 					pgs = new POrderGrant_SKU();
 					pgs.setId(0L);
@@ -282,7 +291,6 @@ public class POrderListAPI {
 				}
 				
 			}
-			
 			// re-calculate porder_grant grant_amount
 			List<POrderGrant> pglist = pordergrantService.getByOrderId(entity.idPOrder);
 			
