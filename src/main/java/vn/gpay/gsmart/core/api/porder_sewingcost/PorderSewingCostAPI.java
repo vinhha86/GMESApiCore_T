@@ -61,6 +61,8 @@ public class PorderSewingCostAPI {
 						porderSewing.setLaborrequiredid_link(wp.getLaborrequiredid_link());
 						porderSewing.setDevicerequiredid_link(wp.getDevicerequiredid_link());
 						porderSewing.setTimespent_standard(wp.getTimespent_standard());
+						porderSewing.setDevicerequiredid_link(wp.getDevicerequiredid_link());
+						porderSewing.setLaborrequiredid_link(wp.getLaborrequiredid_link());
 						
 						pordersewingService.save(porderSewing);
 					}

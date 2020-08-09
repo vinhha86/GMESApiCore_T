@@ -17,7 +17,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.category.LaborLevel;
-import vn.gpay.gsmart.core.devices.DeviceGroup;
+import vn.gpay.gsmart.core.devices.Devices;
 import vn.gpay.gsmart.core.workingprocess.WorkingProcess;
 
 @Table(name="porders_sewingcost")
@@ -54,7 +54,7 @@ public class POrderSewingCost implements Serializable {
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="devicerequiredid_link",insertable=false,updatable =false)
-    private DeviceGroup devicegroup;
+    private Devices device;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -70,9 +70,9 @@ public class POrderSewingCost implements Serializable {
 	}
 	
 	@Transient
-	public String getDevicegroup_name() {
-		if(devicegroup != null) {
-			return devicegroup.getName();
+	public String getDevice_name() {
+		if(device != null) {
+			return device.getName();
 		}
 		return "";
 	}

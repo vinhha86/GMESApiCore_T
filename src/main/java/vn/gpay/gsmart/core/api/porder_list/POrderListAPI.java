@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.api.porder_list;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -256,12 +257,12 @@ public class POrderListAPI {
 	}
 	
 	@RequestMapping(value = "/addskutogrant",method = RequestMethod.POST)
-	public ResponseEntity<ResponseBase> addSkuToGrant(@RequestBody POrderList_addSkuToGrant_request entity, HttpServletRequest request ) {
-		ResponseBase response = new ResponseBase();
+	public ResponseEntity<addskutogrant_response> addSkuToGrant(@RequestBody POrderList_addSkuToGrant_request entity, HttpServletRequest request ) {
+		addskutogrant_response response = new addskutogrant_response();
 		try {
-//			System.out.println(entity.idSkus);
-//			System.out.println(entity.idGrant);
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			POrderGrant grant = pordergrantService.findOne(entity.idGrant);
+			POrder porder = porderService.findOne(entity.idPOrder);
 			
 			// save to porder_grant_sku
 			for(Long productsku_id : entity.idSkus) {
@@ -297,14 +298,29 @@ public class POrderListAPI {
 				pordergrantService.save(pg);
 			}
 			
+			String name = "";
+			int total = grant.getGrantamount() == null ? 0 : grant.getGrantamount();
+			
+			DecimalFormat decimalFormat = new DecimalFormat("#,###");
+			decimalFormat.setGroupingSize(3);
+			
+			if(porder != null) {
+				float totalPO = porder.getPo_quantity() == null ? 0 : porder.getPo_quantity();
+				String ST = porder.getBuyername() == null ? "" : porder.getBuyername();
+				String PO = porder.getPo_buyer() == null ? "" : porder.getPo_vendor();
+				name += "#"+ST+"-PO: "+PO+"-"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
+			}
+			
+			response.porderinfo = name;
+			response.amount = total;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+			return new ResponseEntity<addskutogrant_response>(response,HttpStatus.OK);
 		}catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-		    return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+		    return new ResponseEntity<addskutogrant_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
 	

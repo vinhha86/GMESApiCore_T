@@ -950,6 +950,7 @@ public class ScheduleAPI {
 			new_data.setParentid_origin(entity.parentid_origin);
 			new_data.setStatus(1);
 			new_data.setPorder_grantid_link(grant.getId());
+			new_data.setPorderid_link(grant.getPorderid_link());
 			response.new_data = new_data;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

@@ -125,7 +125,8 @@ public class ProductAttributeValueAPI {
 						
 						if(valuemau.getIsdefault() == null || valueco.getIsdefault() == null) continue;
 						
-						if(!valuemau.getIsdefault() && !valueco.getIsdefault()) {
+						if((!valuemau.getIsdefault() && !valueco.getIsdefault()) ||
+								(valuemau.getIsdefault() && valueco.getIsdefault())) {
 							if (pavMau.getAttributevalueid_link() != 0 && pavCo.getAttributevalueid_link() != 0) {
 								SKU sku = new SKU();
 								sku.setId(skuid_link);
@@ -161,7 +162,7 @@ public class ProductAttributeValueAPI {
 
 								savService.save(savCo);
 							}
-						}						
+						}
 					}
 
 				}

@@ -101,6 +101,7 @@ public class WorkingProcessAPI {
 			wp.setUsercreatedid_link(user.getId());
 			wp.setTimecreated(new Date());
 			wp.setOrgrootid_link(orgrootid_link);
+			wp.setProcess_type(1);
 			
 			response.data = workingprocessService.save(wp);
 			

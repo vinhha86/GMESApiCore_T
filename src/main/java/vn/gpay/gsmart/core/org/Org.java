@@ -26,7 +26,6 @@ public class Org implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-//	@GeneratedValue(strategy=GenerationType.AUTO)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "org_generator")
 	@SequenceGenerator(name="org_generator", sequenceName = "org_id_seq", allocationSize=1)
 	protected Long id;
