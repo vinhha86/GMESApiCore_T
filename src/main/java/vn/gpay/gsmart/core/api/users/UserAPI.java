@@ -153,7 +153,7 @@ public class UserAPI {
 			String result = "";
 			String line;
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			String urlPush = "http://localhost:8181/o2admin/changepass";
+			String urlPush = "http://gpay.vn:8181/o2admin/changepass";
 			String token = request.getHeader("Authorization");
 						
 			URL url = new URL(urlPush);

@@ -334,7 +334,7 @@ public class POrderProcessingAPI {
 			
 			for(POrderProcessing orderRunning: pList_RUNNING){
 
-				if (null != orderRunning.getOrdercode())
+				if (null != orderRunning.getOrdercode()&&null!=orderRunning.getAmountoutputsum()&&null!=orderRunning.getAmountinputsum())
 				if (orderRunning.getAmountoutputsum() > 0 || orderRunning.getAmountinputsum() > 0)
 				{
 //					switch(orderRunning.getGranttoorgid_link().intValue()){
