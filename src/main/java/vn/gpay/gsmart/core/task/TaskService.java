@@ -1,0 +1,18 @@
+package vn.gpay.gsmart.core.task;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Service;
+
+import vn.gpay.gsmart.core.base.AbstractService;
+
+@Service
+public class TaskService extends AbstractService<Task> implements ITask_Service {
+	@Autowired Task_Repository repo;
+	@Override
+	protected JpaRepository<Task, Long> getRepository() {
+		// TODO Auto-generated method stub
+		return repo;
+	}
+
+}
