@@ -6,6 +6,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import vn.gpay.gsmart.core.task_checklist.SubTask;
+import vn.gpay.gsmart.core.task_flow.Comment;
 
 public class TaskBinding {
 
@@ -21,8 +22,14 @@ public class TaskBinding {
 	private Integer PercentDone;
 	@JsonProperty("Duration")
 	private Integer Duration;
+	@JsonProperty("Description")
+	private String Description;
 	@JsonProperty("SubTasks")
 	private List<SubTask> SubTasks = new ArrayList<SubTask>();
+	@JsonProperty("Comments")
+	private List<Comment> Comments = new ArrayList<Comment>();
+	private Long tasktypeid_link;
+	private String cls_task;
 	public Long getId() {
 		return Id;
 	}
@@ -64,6 +71,30 @@ public class TaskBinding {
 	}
 	public void setSubTasks(List<SubTask> subTasks) {
 		SubTasks = subTasks;
+	}
+	public String getDescription() {
+		return Description;
+	}
+	public void setDescription(String description) {
+		Description = description;
+	}
+	public List<Comment> getComments() {
+		return Comments;
+	}
+	public void setComments(List<Comment> comments) {
+		Comments = comments;
+	}
+	public Long getTasktypeid_link() {
+		return tasktypeid_link;
+	}
+	public void setTasktypeid_link(Long tasktypeid_link) {
+		this.tasktypeid_link = tasktypeid_link;
+	}
+	public String getCls_task() {
+		return cls_task;
+	}
+	public void setCls_task(String cls_task) {
+		this.cls_task = cls_task;
 	}
 	
 	

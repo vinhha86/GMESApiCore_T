@@ -42,7 +42,7 @@ public class GpayUserImpl  extends AbstractService<GpayUser> implements IGpayUse
 	public List<GpayUser> getUserList(long orgid_link, String textsearch, int status) {
 		Specification<GpayUser> specification = Specifications.<GpayUser>and()
 	            .eq( status!=-1,"status", status)
-	            .eq(orgid_link!=0,"orgid_link", orgid_link)
+	            .eq(orgid_link > 1 ,"orgid_link", orgid_link)
 	            .predicate(Specifications.or()
 	            		.like("useremail","%"+textsearch+"%")
 	            		.like("firstname","%"+textsearch+"%")

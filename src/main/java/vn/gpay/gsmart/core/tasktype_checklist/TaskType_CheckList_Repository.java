@@ -14,5 +14,5 @@ import org.springframework.transaction.annotation.Transactional;
 public interface TaskType_CheckList_Repository extends JpaRepository<TaskType_CheckList, Long>, JpaSpecificationExecutor<TaskType_CheckList>{
 	@Query(value = "select c from TaskType_CheckList c where tasktypeid_link = :tasktypeid_link")
 	public List<TaskType_CheckList> getby_tasktype(
-			@Param ("tasktypeid_link")final  int tasktypeid_link);
+			@Param ("tasktypeid_link")final  long tasktypeid_link);
 }

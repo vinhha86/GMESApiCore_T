@@ -15,13 +15,11 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataFormat;
-import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
@@ -264,7 +262,6 @@ public class ReportAPI {
 								
 				Cell cell = row.createCell(col_idx);
 				if(key != "Picture") {
-					String name = map.get(key);
 					cell.setCellValue(map.get(key));
 					if(key == "Shipdate" || key == "Material") {
 						cell.setCellStyle(cellStyle_aligncenter);

@@ -41,7 +41,7 @@ public class Task implements Serializable {
 	private Date duedate;
 	private Integer percentdone;
 	private Integer statusid_link;
-	private Integer tasktypeid_link;
+	private Long tasktypeid_link;
 	private Long userinchargeid_link; 
 	private Date datefinished;
 	private Long objectid_link;
@@ -114,10 +114,10 @@ public class Task implements Serializable {
 	public void setStatusid_link(Integer statusid_link) {
 		this.statusid_link = statusid_link;
 	}
-	public Integer getTasktypeid_link() {
+	public Long getTasktypeid_link() {
 		return tasktypeid_link;
 	}
-	public void setTasktypeid_link(Integer tasktypeid_link) {
+	public void setTasktypeid_link(Long tasktypeid_link) {
 		this.tasktypeid_link = tasktypeid_link;
 	}
 	public Long getUserinchargeid_link() {

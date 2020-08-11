@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -210,6 +209,11 @@ public class UserAPI {
 		UserResponse response = new UserResponse();
 		try {
 			long orgid_link = entity.orgid_link;
+			
+			if(orgid_link == -1) {
+				GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
+				orgid_link = user.getOrgId();
+			}
 			
 			response.data=userDetailsService.getUserList(orgid_link,"", 1);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

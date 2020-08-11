@@ -19,7 +19,7 @@ public class Task_Grant_Service extends AbstractService<Task_Grant> implements I
 	}
 
 	@Override
-	public List<Task_Grant> getby_tasktype_and_org(int tasktypeid_link, Long orgid_link) {
+	public List<Task_Grant> getby_tasktype_and_org(long tasktypeid_link, Long orgid_link) {
 		// TODO Auto-generated method stub
 		return repo.getby_tasktype_and_org(tasktypeid_link, orgid_link);
 	}

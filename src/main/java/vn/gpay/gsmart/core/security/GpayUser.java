@@ -24,6 +24,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import vn.gpay.gsmart.core.approle.AppRoleFunction;
 import vn.gpay.gsmart.core.approle.AppRole_User;
 import vn.gpay.gsmart.core.org.Org;
@@ -37,6 +39,7 @@ public class GpayUser implements UserDetails {
 	@Id
 //	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_generator")
 //	@SequenceGenerator(name="user_generator", sequenceName = "user_id_seq", allocationSize=1)
+	@JsonProperty("Id")
 	protected Long id;
 	
 	private String email;
@@ -48,6 +51,7 @@ public class GpayUser implements UserDetails {
 	private String firstname;
 	
 	private String middlename;
+	@JsonProperty("Name")
 	private String fullname;
 	private String lastname;
 	private Integer status;

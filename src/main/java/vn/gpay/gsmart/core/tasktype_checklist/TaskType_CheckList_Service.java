@@ -17,7 +17,7 @@ public class TaskType_CheckList_Service extends AbstractService<TaskType_CheckLi
 		return repo;
 	}
 	@Override
-	public List<TaskType_CheckList> getby_tasktype(int tasktypeid_link) {
+	public List<TaskType_CheckList> getby_tasktype(long tasktypeid_link) {
 		// TODO Auto-generated method stub
 		return repo.getby_tasktype(tasktypeid_link);
 	}

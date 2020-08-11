@@ -20,11 +20,11 @@ public class TaskType implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tasktype_generator")
 	@SequenceGenerator(name="tasktype_generator", sequenceName = "tasktype_id_seq", allocationSize=1)
-	private Integer id;
+	private Long id;
 	private String name;
 	private String description;
 	private Integer duration;
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 	public String getName() {
@@ -36,7 +36,7 @@ public class TaskType implements Serializable {
 	public Integer getDuration() {
 		return duration;
 	}
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	public void setName(String name) {

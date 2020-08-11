@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.api.taskboard;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +22,11 @@ import vn.gpay.gsmart.core.task.TaskBinding;
 import vn.gpay.gsmart.core.task_checklist.ITask_CheckList_Service;
 import vn.gpay.gsmart.core.task_checklist.SubTask;
 import vn.gpay.gsmart.core.task_checklist.Task_CheckList;
+import vn.gpay.gsmart.core.task_flow.Comment;
+import vn.gpay.gsmart.core.task_flow.ITask_Flow_Service;
+import vn.gpay.gsmart.core.task_flow.Task_Flow;
+import vn.gpay.gsmart.core.tasktype.ITaskType_Service;
+import vn.gpay.gsmart.core.tasktype.TaskType;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -28,10 +35,12 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 public class TaskAPI {
 	@Autowired ITask_Service taskService;
 	@Autowired ITask_CheckList_Service checklistService;
+	@Autowired ITask_Flow_Service commentService;
 	@Autowired Common commonService;
+	@Autowired ITaskType_Service tasktypeService;
 	
 	@RequestMapping(value = "/getby_user",method = RequestMethod.POST)
-	public ResponseEntity<getby_user_response> Product_GetAll(HttpServletRequest request ) {
+	public ResponseEntity<getby_user_response> GetByUser(HttpServletRequest request ) {
 		getby_user_response response = new getby_user_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -46,7 +55,11 @@ public class TaskAPI {
 				binding.setPercentDone(task.getPercentdone());
 				binding.setResourceId(task.getUserinchargeid_link());
 				binding.setState(commonService.getState(task.getStatusid_link()));
+				binding.setDescription(task.getDescription());
+				binding.setTasktypeid_link(task.getTasktypeid_link());
+				binding.setCls_task(commonService.getCls(task.getTasktypeid_link()));
 				
+				//get checklist
 				List<SubTask> list_subtask = new ArrayList<SubTask>();
 				List<Task_CheckList> checklists = task.getSubTasks();
 				for(Task_CheckList checklist : checklists) {
@@ -60,6 +73,22 @@ public class TaskAPI {
 				}
 				
 				binding.setSubTasks(list_subtask);
+				
+				//get comment
+				List<Task_Flow> list_task_flow = commentService.getby_task(task.getId());
+				List<Comment> list_comment = new ArrayList<Comment>();
+				for(Task_Flow flow : list_task_flow) {
+					Comment comment = new Comment();
+					comment.setDate(flow.getDatecreated());
+					comment.setTaskId(task.getId());
+					comment.setText(flow.getDescription());
+					comment.setUserId(flow.getFromuserid_link());
+					
+					list_comment.add(comment);
+				}
+				
+				binding.setComments(list_comment);
+				
 				list_binding.add(binding);
 			}
 			
@@ -72,6 +101,91 @@ public class TaskAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<getby_user_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/add_comment",method = RequestMethod.POST)
+	public ResponseEntity<add_comment_response> AddComment(HttpServletRequest request, @RequestBody add_comment_request entity) {
+		add_comment_response response = new add_comment_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Date date = new Date();
+			Task_Flow flow = new Task_Flow();
+			flow.setDatecreated(date);
+			flow.setDescription(entity.text);
+			flow.setFromuserid_link(user.getId());
+			flow.setId(null);
+			flow.setOrgrootid_link(user.getRootorgid_link());
+			flow.setStatusid_link(0);
+			flow.setTaskid_link(entity.taskid_link);
+			
+			flow = commentService.save(flow);
+			
+			Comment comment = new Comment();
+			comment.setDate(date);
+			comment.setTaskId(entity.taskid_link);
+			comment.setText(flow.getDescription());
+			comment.setUserId(flow.getFromuserid_link());
+			
+			response.data = comment;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<add_comment_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<add_comment_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/add_othertask",method = RequestMethod.POST)
+	public ResponseEntity<add_othertask_response> AddOtherTask(HttpServletRequest request, @RequestBody add_othertask_request entity) {
+		add_othertask_response response = new add_othertask_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			long userid_link = user.getId();
+			long orgid_link = user.getOrgid_link();
+			long tasktypeid_link = -1;
+			Long pcontractid_link = null, pcontract_poid_link = null, porderid_link = null, objectid_link = null;
+			
+			TaskType tasktype = tasktypeService.findOne(tasktypeid_link);
+			
+			String taskname = tasktype.getName();
+			
+			Task task = new Task();
+			task.setDatecreated(new Date());
+			task.setId(null);
+			task.setName(taskname);
+			task.setOrgrootid_link(orgrootid_link);
+			task.setUserinchargeid_link(userid_link);
+			task.setStatusid_link(0);
+			task.setPercentdone(0);
+			task.setTasktypeid_link((long)-1);
+			task.setUsercreatedid_link(userid_link);
+			task.setDescription(entity.text);
+			task = taskService.save(task);
+			
+			TaskBinding binding = new TaskBinding();
+			binding.setDescription(task.getDescription());
+			binding.setId(task.getId());
+			binding.setName(task.getName());
+			binding.setPercentDone(task.getPercentdone());
+			binding.setResourceId(task.getUserinchargeid_link());
+			binding.setState(commonService.getState(task.getStatusid_link()));
+			binding.setTasktypeid_link(task.getTasktypeid_link());
+			binding.setDescription(task.getDescription());
+			
+			response.data = binding;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<add_othertask_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<add_othertask_response>(response, HttpStatus.OK);
 		}
 	}
 }

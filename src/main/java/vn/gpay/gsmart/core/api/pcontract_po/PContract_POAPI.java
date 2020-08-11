@@ -28,6 +28,7 @@ import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.POStatus;
 import vn.gpay.gsmart.core.utils.POrderReqStatus;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
@@ -42,6 +43,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 	@Autowired IPOrder_Service porderService;
 	@Autowired private IPOrder_Req_Service porder_req_Service;
 	@Autowired IPContract_PO_ShippingService poshippingService;
+	@Autowired Common commonService;
 	
 	@RequestMapping(value = "/create",method = RequestMethod.POST)
 	public ResponseEntity<PContract_pocreate_response> PContractCreate(@RequestBody PContract_pocreate_request entity,HttpServletRequest request ) {
@@ -103,7 +105,11 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 					porder_req.setTimecreated(new Date());
 					
 					//Save to DB
-					porder_req_Service.savePOrder_Req(porder_req);
+					long objectid_link = porder_req_Service.savePOrder_Req(porder_req);
+					
+					//Create taskboard
+					long orgid_link = porder.getGranttoorgid_link();
+					commonService.CreateTask(orgrootid_link, orgid_link, usercreatedid_link, 0, pcontractid_link, pcontract_poid_link, null, objectid_link);
 				} else {
 					POrder_Req porder_req = porder_req_Service.findOne(porder.getId());
 					porder_req.setTotalorder(porder.getTotalorder());

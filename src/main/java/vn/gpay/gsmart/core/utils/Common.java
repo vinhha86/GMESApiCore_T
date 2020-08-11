@@ -6,7 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -18,6 +20,8 @@ import org.springframework.stereotype.Service;
 
 import vn.gpay.gsmart.core.holiday.Holiday;
 import vn.gpay.gsmart.core.holiday.IHolidayService;
+import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontractattributevalue.IPContractProductAtrributeValueService;
 import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBOMColorService;
 import vn.gpay.gsmart.core.pcontractbomcolor.PContractBOMColor;
@@ -36,11 +40,13 @@ import vn.gpay.gsmart.core.stockingunique.StockingUniqueCode;
 import vn.gpay.gsmart.core.task.ITask_Service;
 import vn.gpay.gsmart.core.task.Task;
 import vn.gpay.gsmart.core.task_checklist.ITask_CheckList_Service;
+import vn.gpay.gsmart.core.task_checklist.Task_CheckList;
 import vn.gpay.gsmart.core.task_grant.ITask_Grant_Service;
 import vn.gpay.gsmart.core.task_grant.Task_Grant;
 import vn.gpay.gsmart.core.tasktype.ITaskType_Service;
 import vn.gpay.gsmart.core.tasktype.TaskType;
 import vn.gpay.gsmart.core.tasktype_checklist.ITaskType_CheckList_Service;
+import vn.gpay.gsmart.core.tasktype_checklist.TaskType_CheckList;
 
 @Service
 public class Common  {
@@ -54,6 +60,8 @@ public class Common  {
 	@Autowired IPContractProductBomService ppbomService;
 	@Autowired IHolidayService holidayService;
 	@Autowired IConfigAmountService cfamountService;
+	@Autowired IPContract_POService poService;
+	
 	@Autowired ITask_Service taskService;
 	@Autowired ITask_CheckList_Service checklistService;
 	@Autowired ITaskType_Service tasktypeService;
@@ -62,11 +70,13 @@ public class Common  {
 	
 	@Autowired IStockingUniqueService stockService;
 	
-	public void CreateTask(Long orgrootid_link, Long orgid_link, Long userid_link, int tasktypeid_link, String TaskName, Long pcontractid_link, Long pcontract_poid_link, Long porderid_link, Long objectid_link) {
+	public Long CreateTask(Long orgrootid_link, Long orgid_link, Long userid_link, long tasktypeid_link, Long pcontractid_link,
+			Long pcontract_poid_link, Long porderid_link, Long objectid_link) {
 		int year = Calendar.getInstance().get(Calendar.YEAR);
 		TaskType tasktype = tasktypeService.findOne(tasktypeid_link);
 		
-		String taskname = tasktypeid_link == -1 ? TaskName : tasktype.getName();
+		String taskname = tasktype.getName();
+		String description = getDescriptoin_bytype(tasktypeid_link, pcontract_poid_link);
 		Long userinchargeid_link = null;
 		List<Task_Grant> grants = taskgrantService.getby_tasktype_and_org(tasktypeid_link, orgid_link);
 		if(grants.size()>0)
@@ -74,7 +84,7 @@ public class Common  {
 		
 		Task task = new Task();
 		task.setDatecreated(new Date());
-		task.setDescription(taskname);
+		task.setDescription(description);
 		task.setDuedate(Date_Add_with_holiday(new Date(), tasktype.getDuration()/24, orgrootid_link, year));
 		task.setDuration(tasktype.getDuration()/24);
 		task.setId(null);
@@ -90,13 +100,36 @@ public class Common  {
 		task.setUsercreatedid_link(userid_link);
 		task.setUserinchargeid_link(userinchargeid_link);
 		
+		task = taskService.save(task);
+		
 		//Tao subtask
+		List<TaskType_CheckList> list_sub = typechecklistService.getby_tasktype(tasktypeid_link);
+		for(TaskType_CheckList sub: list_sub) {
+			Task_CheckList subtask = new Task_CheckList();
+			subtask.setDone(false);
+			subtask.setId(null);
+			subtask.setDatecreated(new Date());
+			subtask.setDescription(sub.getName());
+			subtask.setOrgrootid_link(orgrootid_link);
+			subtask.setTaskid_link(task.getId());
+			subtask.setUsercreatedid_link(userid_link);
+			
+			checklistService.save(subtask);
+		}
+		
+		return task.getId();
 	}
 	
-	public String getTaskName_byType(int tasktypeid_link) {
-		switch (tasktypeid_link) {
+	public String getDescriptoin_bytype(Long tasktypeid_link, long pcontract_poid_link) {
+		String name = "";
+		int typeid = tasktypeid_link.intValue();
+		switch (typeid) {
 		case 0:
-			return TaskType_Name.YeuCauSanXuat;
+			PContract_PO po = poService.findOne(pcontract_poid_link);
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
+			name = "PO Buyer: "+po.getPo_buyer()+ " PO Vendor: "+ po.getPo_vendor() + " Ngày Giao: "+ dateFormat.format(po.getShipdate())
+			+ " SL: " + FormatNumber(po.getPo_quantity().intValue());
+			return name;
 		case 1:
 			return TaskType_Name.ChiTietDonHang;
 		case 2:
@@ -415,6 +448,18 @@ public class Common  {
 			return "Reject";
 		default:
 			return "";
+		}
+	}
+	
+	public String getCls(Long typeid_link) {
+		int typeid = typeid_link.intValue();
+		switch (typeid) {
+		case -1:
+			
+			return "task-header-blue";
+
+		default:
+			return "task-header";
 		}
 	}
 }

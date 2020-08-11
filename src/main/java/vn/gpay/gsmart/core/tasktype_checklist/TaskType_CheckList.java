@@ -22,7 +22,7 @@ public class TaskType_CheckList implements Serializable {
 	@SequenceGenerator(name="tasktype_checklist_generator", sequenceName = "tasktype_checklist_id_seq", allocationSize=1)
 	private Long id;
 	private Long orgrootid_link;
-	private Integer tasktypeid_link;
+	private Long tasktypeid_link;
 	private String name;
 	public Long getId() {
 		return id;
@@ -30,7 +30,7 @@ public class TaskType_CheckList implements Serializable {
 	public Long getOrgrootid_link() {
 		return orgrootid_link;
 	}
-	public Integer getTasktypeid_link() {
+	public Long getTasktypeid_link() {
 		return tasktypeid_link;
 	}
 	public String getName() {
@@ -42,7 +42,7 @@ public class TaskType_CheckList implements Serializable {
 	public void setOrgrootid_link(Long orgrootid_link) {
 		this.orgrootid_link = orgrootid_link;
 	}
-	public void setTasktypeid_link(Integer tasktypeid_link) {
+	public void setTasktypeid_link(Long tasktypeid_link) {
 		this.tasktypeid_link = tasktypeid_link;
 	}
 	public void setName(String name) {
