@@ -37,7 +37,7 @@ import vn.gpay.gsmart.core.stockout.StockOut;
 import vn.gpay.gsmart.core.stockout.StockOutD;
 import vn.gpay.gsmart.core.stockout.StockOutPklist;
 import vn.gpay.gsmart.core.stockout.StockoutReport;
-import vn.gpay.gsmart.core.utils.DateFormat;
+import vn.gpay.gsmart.core.utils.GPAYDateFormat;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 import vn.gpay.gsmart.core.utils.StockoutStatus;
 import vn.gpay.gsmart.core.utils.StockoutTypes;
@@ -166,7 +166,7 @@ public class StockOutAPI {
 	public ResponseEntity<StockoutFilterResponse> Stockout_getbydate(@RequestBody StockoutFilterRequest entity, HttpServletRequest request) {
 		StockoutFilterResponse response = new StockoutFilterResponse();
 		try {
-			response.data = recalStockout_Total(stockOutService.getByDate(entity.stockouttypeid, DateFormat.atStartOfDay(entity.stockoutdate_from), DateFormat.atEndOfDay(entity.stockoutdate_to)));
+			response.data = recalStockout_Total(stockOutService.getByDate(entity.stockouttypeid, GPAYDateFormat.atStartOfDay(entity.stockoutdate_from), GPAYDateFormat.atEndOfDay(entity.stockoutdate_to)));
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -244,11 +244,11 @@ public class StockOutAPI {
 		try {
 			if (entity.skucode.length() > 0){
 				System.out.println("co skucode");
-				response.data = stockout_d_Service.getByDateAndSkucode(entity.stockouttypeid, DateFormat.atStartOfDay(entity.stockoutdate_from), DateFormat.atEndOfDay(entity.stockoutdate_to), entity.skuid_link);
+				response.data = stockout_d_Service.getByDateAndSkucode(entity.stockouttypeid, GPAYDateFormat.atStartOfDay(entity.stockoutdate_from), GPAYDateFormat.atEndOfDay(entity.stockoutdate_to), entity.skuid_link);
 			}
 			else {
 				System.out.println(entity.stockouttypeid);
-				response.data = stockout_d_Service.getByDateAndType(entity.stockouttypeid, DateFormat.atStartOfDay(entity.stockoutdate_from), DateFormat.atEndOfDay(entity.stockoutdate_to));
+				response.data = stockout_d_Service.getByDateAndType(entity.stockouttypeid, GPAYDateFormat.atStartOfDay(entity.stockoutdate_from), GPAYDateFormat.atEndOfDay(entity.stockoutdate_to));
 			}
 			//response.data = stockoutRepository.getAll();
 			actionLogs.setResponse_time(new Date());
@@ -872,9 +872,9 @@ public class StockOutAPI {
 			List<StockOutPklist> processedList = new ArrayList<StockOutPklist>();
 			List<StockOutPklist> checkList = new ArrayList<StockOutPklist>();
 			if (entity.stockouttypeid == 1 || entity.stockouttypeid == -1)
-				processedList = stockOutPklistService.getDetailStockoutForProcess(DateFormat.atStartOfDay(entity.stockoutdate_from), DateFormat.atEndOfDay(entity.stockoutdate_to));
+				processedList = stockOutPklistService.getDetailStockoutForProcess(GPAYDateFormat.atStartOfDay(entity.stockoutdate_from), GPAYDateFormat.atEndOfDay(entity.stockoutdate_to));
 			if (entity.stockouttypeid == 0 || entity.stockouttypeid == -1)
-				checkList = stockOutPklistService.getDetailStockoutForCheck(DateFormat.atStartOfDay(entity.stockoutdate_from), DateFormat.atEndOfDay(entity.stockoutdate_to));
+				checkList = stockOutPklistService.getDetailStockoutForCheck(GPAYDateFormat.atStartOfDay(entity.stockoutdate_from), GPAYDateFormat.atEndOfDay(entity.stockoutdate_to));
 			
 			//Duyet qua cac cay vai da khu co
 			for (StockOutPklist row : processedList) {

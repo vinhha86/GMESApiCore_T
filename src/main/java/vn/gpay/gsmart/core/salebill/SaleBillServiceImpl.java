@@ -17,7 +17,7 @@ import com.github.wenhao.jpa.Sorts;
 import com.github.wenhao.jpa.Specifications;
 
 import vn.gpay.gsmart.core.base.AbstractService;
-import vn.gpay.gsmart.core.utils.DateFormat;
+import vn.gpay.gsmart.core.utils.GPAYDateFormat;
 
 @Service
 public class SaleBillServiceImpl extends AbstractService<SaleBill> implements ISaleBillService{
@@ -39,9 +39,9 @@ public class SaleBillServiceImpl extends AbstractService<SaleBill> implements IS
 		Specification<SaleBill> specification = Specifications.<SaleBill>and()
 	            .eq( Objects.nonNull(orgbillid_link),"orgbillid_link", orgbillid_link)
 	            .like(Objects.nonNull(billcode), "billcode", "%"+billcode+"%")
-	            .ge((salebilldate_from!=null && salebilldate_to==null),"billdate",DateFormat.atStartOfDay(salebilldate_from))
-                .le((salebilldate_from==null && salebilldate_to!=null),"billdate",DateFormat.atEndOfDay(salebilldate_to))
-                .between((salebilldate_from!=null && salebilldate_to!=null),"billdate", DateFormat.atStartOfDay(salebilldate_from), DateFormat.atEndOfDay(salebilldate_to))
+	            .ge((salebilldate_from!=null && salebilldate_to==null),"billdate",GPAYDateFormat.atStartOfDay(salebilldate_from))
+                .le((salebilldate_from==null && salebilldate_to!=null),"billdate",GPAYDateFormat.atEndOfDay(salebilldate_to))
+                .between((salebilldate_from!=null && salebilldate_to!=null),"billdate", GPAYDateFormat.atStartOfDay(salebilldate_from), GPAYDateFormat.atEndOfDay(salebilldate_to))
 	            .build();
 		Sort sort = Sorts.builder()
 		        .desc("id")

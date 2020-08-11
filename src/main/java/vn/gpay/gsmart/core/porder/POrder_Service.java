@@ -14,7 +14,7 @@ import com.github.wenhao.jpa.Sorts;
 import com.github.wenhao.jpa.Specifications;
 
 import vn.gpay.gsmart.core.base.AbstractService;
-import vn.gpay.gsmart.core.utils.DateFormat;
+import vn.gpay.gsmart.core.utils.GPAYDateFormat;
 
 @Service
 public class POrder_Service extends AbstractService<POrder> implements IPOrder_Service {
@@ -93,9 +93,9 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 			            .like(null!=season && season !="", "season", "%"+season+"%")
 			            .eq(Objects.nonNull(salaryyear), "salaryyear", salaryyear)
 			            .eq(null!=salarymonth && salarymonth != -1, "salarymonth", salarymonth)
-			            .ge(Objects.nonNull(processingdate_from),"orderdate",DateFormat.atStartOfDay(processingdate_from))
-		                .le(Objects.nonNull(processingdate_to),"orderdate",DateFormat.atEndOfDay(processingdate_to))
-		                .between(processingdate_from!=null && processingdate_to!=null,"orderdate", DateFormat.atStartOfDay(processingdate_from), DateFormat.atEndOfDay(processingdate_to))
+			            .ge(Objects.nonNull(processingdate_from),"orderdate",GPAYDateFormat.atStartOfDay(processingdate_from))
+		                .le(Objects.nonNull(processingdate_to),"orderdate",GPAYDateFormat.atEndOfDay(processingdate_to))
+		                .between(processingdate_from!=null && processingdate_to!=null,"orderdate", GPAYDateFormat.atStartOfDay(processingdate_from), GPAYDateFormat.atEndOfDay(processingdate_to))
 			            .build();
 				Sort sort = Sorts.builder()
 				        .desc("ordercode")
@@ -112,9 +112,9 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 			            .eq(Objects.nonNull(salaryyear), "salaryyear", salaryyear)
 //			            .eq(null!=salarymonth && salarymonth != -1, "salarymonth", salarymonth)
 			            .eq("salarymonth", salarymonth)
-			            .ge(Objects.nonNull(processingdate_from),"orderdate",DateFormat.atStartOfDay(processingdate_from))
-		                .le(Objects.nonNull(processingdate_to),"orderdate",DateFormat.atEndOfDay(processingdate_to))
-		                .between(processingdate_from!=null && processingdate_to!=null,"orderdate", DateFormat.atStartOfDay(processingdate_from), DateFormat.atEndOfDay(processingdate_to))
+			            .ge(Objects.nonNull(processingdate_from),"orderdate",GPAYDateFormat.atStartOfDay(processingdate_from))
+		                .le(Objects.nonNull(processingdate_to),"orderdate",GPAYDateFormat.atEndOfDay(processingdate_to))
+		                .between(processingdate_from!=null && processingdate_to!=null,"orderdate", GPAYDateFormat.atStartOfDay(processingdate_from), GPAYDateFormat.atEndOfDay(processingdate_to))
 			            .build();
 				Sort sort = Sorts.builder()
 				        .desc("ordercode")
@@ -184,8 +184,8 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 		Specification<POrder> specification = Specifications.<POrder>and()
 				.eq("status", status)
 	            .eq("granttoorgid_link", granttoorgid_link)
-	            .ge(Objects.nonNull(golivedate_from),"golivedate",DateFormat.atStartOfDay(golivedate_from))
-                .le(Objects.nonNull(golivedate_to),"golivedate",DateFormat.atEndOfDay(golivedate_to))
+	            .ge(Objects.nonNull(golivedate_from),"golivedate",GPAYDateFormat.atStartOfDay(golivedate_from))
+                .le(Objects.nonNull(golivedate_to),"golivedate",GPAYDateFormat.atEndOfDay(golivedate_to))
                 .like(Objects.nonNull(PO_code), "pcontract_po.po_buyer", "%"+PO_code+"%")
                 .eq(orgbuyerid_link != 0, "pcontract.orgbuyerid_link",orgbuyerid_link)
                 .eq(orgvendorid_link!=0, "pcontract.orgvendorid_link", orgvendorid_link)
@@ -204,8 +204,8 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 		Specification<POrder> specification = Specifications.<POrder>and()
 				.eq(Objects.nonNull(buyerid), "pcontract.orgbuyerid_link", buyerid)
 				.eq(Objects.nonNull(vendorid), "pcontract.orgvendorid_link", vendorid)
-				.ge(Objects.nonNull(orderdatefrom),"orderdate",DateFormat.atStartOfDay(orderdatefrom))
-                .le(Objects.nonNull(orderdateto),"orderdate",DateFormat.atEndOfDay(orderdateto))
+				.ge(Objects.nonNull(orderdatefrom),"orderdate",GPAYDateFormat.atStartOfDay(orderdatefrom))
+                .le(Objects.nonNull(orderdateto),"orderdate",GPAYDateFormat.atEndOfDay(orderdateto))
                 .eq(Objects.nonNull(status), "porderstatus.id", status)
                 .ne("porderstatus.id", -1)
                 .eq(Objects.nonNull(granttoorgid_link), "granttoorgid_link", granttoorgid_link)

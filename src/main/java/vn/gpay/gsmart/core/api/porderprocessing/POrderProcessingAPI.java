@@ -39,6 +39,7 @@ import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.porderprocessing.TVSOrgStatusShow;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.utils.GPAYDateFormat;
 import vn.gpay.gsmart.core.utils.POrderStatus;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -83,7 +84,7 @@ public class POrderProcessingAPI {
 			
 			//If processingdate <> entity.processingdate_to --> Calcucate Amount's value of provided date
 			for(POrderProcessing pprocess: pprocessList){
-				System.out.println(pprocess.getGranttoorgid_link());
+//				System.out.println(pprocess.getGranttoorgid_link());
 				//Nếu số cắt TT ==0 --> gán bằng số cắt dự kiến để vẫn cho vào chuyền, hiện đỏ để lưu í
 				pprocess.setIscuttt(0);
 				if (null == pprocess.getAmountcutsum() || 0 == pprocess.getAmountcutsum()){
@@ -735,7 +736,7 @@ public class POrderProcessingAPI {
 		        	pprocess.setProcessingdate(entity.processingdate);
 		        	pprocess.setPorderid_link(entity.data.getPorderid_link());
 		        	pprocess.setPordergrantid_link(entity.data.getPordergrantid_link());
-		        	pprocess.setOrdercode(entity.data.getOrdercode());
+//		        	pprocess.setOrdercode(entity.data.getOrdercode());
 		        	pprocess.setGranttoorgid_link(entity.data.getGranttoorgid_link());
 //		        	pprocess.setGranttoorgname(entity.data.getGranttoorgname());
 		        	pprocess.setTotalorder(entity.data.getTotalorder());
@@ -886,6 +887,187 @@ public class POrderProcessingAPI {
 		}    			
 	}
 	
+	//update processing values
+	@RequestMapping(value = "/update_single",method = RequestMethod.POST)
+	public ResponseEntity<PProcessUpdateResponse> updatePProcess_Single(@RequestBody PProcessUpdate_SingleRequest entity, HttpServletRequest request) {
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Long rootorgid_link = user.getRootorgid_link();
+		PProcessUpdateResponse response = new PProcessUpdateResponse();
+		try {
+	        POrderGrant porder_grant = pordergrantRepository.findOne(entity.pordergrantid_link);
+	        if (null != entity.newValue && null != entity.newSumValue && null != porder_grant)
+	        {
+	        	POrderProcessing pprocess;
+		        //If having processing data on date --> Update; else --> Create New processing line
+		        List<POrderProcessing> pprocessList = pprocessRepository.findByIdAndPDate(entity.porderid_link, entity.pordergrantid_link, entity.processingdate);
+	        	if (pprocessList.size() > 0) {
+	        		pprocess = pprocessList.get(0);
+	        	} else {
+		        	pprocess = new POrderProcessing();
+		        	
+		        	pprocess.setOrgrootid_link(rootorgid_link); 
+		        	pprocess.setProcessingdate(entity.processingdate);
+		        	pprocess.setPorderid_link(entity.porderid_link);
+		        	pprocess.setPordergrantid_link(entity.pordergrantid_link);
+		        	pprocess.setGranttoorgid_link(porder_grant.getGranttoorgid_link());
+		        	
+//		        	pprocess.setOrdercode(porder_grant.getOrdercode());
+		        	pprocess.setTotalorder(porder_grant.getGrantamount());	        		
+	        	}
+	        	
+	        	//Update value
+	        	switch(entity.dataIndex) {
+	    			case "amounttarget":
+	    				pprocess.setAmounttarget(entity.newValue);
+	    				break;
+	        		case "amountcut":
+	        			pprocess.setAmountcut(entity.newValue);
+	        			pprocess.setAmountcutsum(entity.newSumValue);
+	        			break;	          				
+	        		case "amountinput":
+	        			pprocess.setAmountinput(entity.newValue);
+	        			pprocess.setAmountinputsum(entity.newSumValue);
+	        			break;
+	        		case "amountoutput":
+	        			pprocess.setAmountoutput(entity.newValue);
+	        			pprocess.setAmountoutputsum(entity.newSumValue);
+	        			break;	  
+	        		case "amounterror":
+	        			pprocess.setAmounterror(entity.newValue);
+	        			pprocess.setAmounterrorsum(entity.newSumValue);
+	    				break;	   	      	        			
+	        		case "amountkcsreg":
+	        			pprocess.setAmountkcsreg(entity.newValue);
+	    				break;	 
+	        		case "amountkcs":
+	        			pprocess.setAmountkcs(entity.newValue);
+	        			pprocess.setAmountkcssum(entity.newSumValue);
+	    				break;  
+	        		case "amountpacked":
+	        			pprocess.setAmountpacked(entity.newValue);
+	        			pprocess.setAmountpackedsum(entity.newSumValue);
+	    				break;  
+	        		case "amountstocked":
+	        			pprocess.setAmountstocked(entity.newValue);
+	        			pprocess.setAmountstockedsum(entity.newSumValue);
+	    				break;       
+	        		case "comment":
+	        			pprocess.setComment(entity.commentValue);
+	    				break;            	        				
+	        	}
+
+	        	//Update trang thai lenh tuong ung
+		        if ((null==pprocess.getAmountinputsum()?0:pprocess.getAmountinputsum()) > 0){
+		        	if (((null==pprocess.getAmountoutputsum()?0:pprocess.getAmountoutputsum()) 
+		        			+ (null==pprocess.getAmounterrorsum()?0:pprocess.getAmounterrorsum()))  
+		        			< (null==pprocess.getAmountcutsum()||0==pprocess.getAmountcutsum()?pprocess.getTotalorder():pprocess.getAmountcutsum())){
+		        		pprocess.setStatus(POrderStatus.PORDER_STATUS_RUNNING);
+		        	}
+		        	else {
+		        		if ((null==pprocess.getAmountpackedsum()?0:pprocess.getAmountpackedsum()) 
+		        				< (null==pprocess.getAmountcutsum()||0==pprocess.getAmountcutsum()?pprocess.getTotalorder():pprocess.getAmountcutsum())){
+		        			pprocess.setStatus(POrderStatus.PORDER_STATUS_DONE);
+		        		}
+		        		else {
+		        			pprocess.setStatus(POrderStatus.PORDER_STATUS_FINISHED);
+		        		}
+		        	}
+		        }
+		        
+		        pprocessRepository.save(pprocess);
+		        
+		        //Cộng dồn trong trường hợp sửa số của ngày trước ngày hiện tại
+		        //Update Amount SUM of following days. In case update amount of prev day
+		        if (GPAYDateFormat.atStartOfDay(entity.processingdate).before(GPAYDateFormat.atStartOfDay(new Date()))){
+			        List<POrderProcessing> pprocessListAfter = pprocessRepository.getAfterDate(entity.porderid_link, entity.pordergrantid_link, entity.processingdate);
+			        
+			        int iAmountCutSum = null==pprocess.getAmountcutsum()?0:pprocess.getAmountcutsum();
+			        int iAmountInputSum = null==pprocess.getAmountinputsum()?0:pprocess.getAmountinputsum();
+			        int iAmountOuputSum = null==pprocess.getAmountoutputsum()?0:pprocess.getAmountoutputsum();
+			        int iAmountErrorSum = null==pprocess.getAmounterrorsum()?0:pprocess.getAmounterrorsum();
+			        int iAmountKcsSum = null==pprocess.getAmountkcssum()?0:pprocess.getAmountkcssum();
+			        int iAmountPackedSum = null==pprocess.getAmountpackedsum()?0:pprocess.getAmountpackedsum();
+			        int iAmountStockedSum = null==pprocess.getAmountstockedsum()?0:pprocess.getAmountstockedsum();
+			        int iLastStatus = pprocess.getStatus();
+			        
+			        for(POrderProcessing pprocessAfter: pprocessListAfter){
+			        	pprocessAfter.setAmountcutsumprev(iAmountCutSum);
+			        	pprocessAfter.setAmountcutsum(iAmountCutSum + (null==pprocessAfter.getAmountcut()?0:pprocessAfter.getAmountcut()));
+			        	
+			        	pprocessAfter.setAmountinputsumprev(iAmountInputSum);
+			        	pprocessAfter.setAmountinputsum(iAmountInputSum + (null==pprocessAfter.getAmountinput()?0:pprocessAfter.getAmountinput()));
+			        	
+			        	pprocessAfter.setAmountoutputsumprev(iAmountOuputSum);
+			        	pprocessAfter.setAmountoutputsum(iAmountOuputSum + (null==pprocessAfter.getAmountoutput()?0:pprocessAfter.getAmountoutput()));
+			        	
+			        	pprocessAfter.setAmounterrorsumprev(iAmountErrorSum);
+			        	pprocessAfter.setAmounterrorsum(iAmountErrorSum + (null==pprocessAfter.getAmounterror()?0:pprocessAfter.getAmounterror()));
+			        	
+			        	pprocessAfter.setAmountkcssumprev(iAmountKcsSum);
+			        	pprocessAfter.setAmountkcssum(iAmountKcsSum + (null==pprocessAfter.getAmountkcssum()?0:pprocessAfter.getAmountkcssum()));
+			        	
+			        	pprocessAfter.setAmountpackedsumprev(iAmountPackedSum);
+			        	pprocessAfter.setAmountpackedsum(iAmountPackedSum + (null==pprocessAfter.getAmountpacked()?0:pprocessAfter.getAmountpacked()));
+			        	
+			        	pprocessAfter.setAmountstockedsumprev(iAmountStockedSum);
+			        	pprocessAfter.setAmountstockedsum(iAmountStockedSum + (null==pprocessAfter.getAmountstocked()?0:pprocessAfter.getAmountstocked()));
+			        	
+				        if ((null==pprocessAfter.getAmountinputsum()?0:pprocessAfter.getAmountinputsum()) > 0){
+				        	if (((null==pprocessAfter.getAmountoutputsum()?0:pprocessAfter.getAmountoutputsum()) 
+				        			+ (null==pprocessAfter.getAmounterrorsum()?0:pprocessAfter.getAmounterrorsum()))  
+				        			< (null==pprocessAfter.getAmountcutsum()||0==pprocessAfter.getAmountcutsum()?pprocessAfter.getTotalorder():pprocessAfter.getAmountcutsum())){
+				        		pprocessAfter.setStatus(POrderStatus.PORDER_STATUS_RUNNING);
+				        	}
+				        	else {
+				        		if ((null==pprocessAfter.getAmountpackedsum()?0:pprocessAfter.getAmountpackedsum()) 
+				        				< (null==pprocessAfter.getAmountcutsum()||0==pprocessAfter.getAmountcutsum()?pprocessAfter.getTotalorder():pprocessAfter.getAmountcutsum())){
+				        			pprocessAfter.setStatus(POrderStatus.PORDER_STATUS_DONE);
+				        		}
+				        		else {
+				        			pprocessAfter.setStatus(POrderStatus.PORDER_STATUS_FINISHED);
+				        		}
+				        	}
+				        }
+				        
+			        	pprocessRepository.save(pprocessAfter);
+				        iLastStatus = pprocessAfter.getStatus();
+			        }
+			        
+			        //Update status of Porder_Grant to last status of Processing
+		        	porder_grant.setStatus(iLastStatus);
+		        	pordergrantRepository.save(porder_grant);		        	
+		        } else {
+		        	porder_grant.setStatus(pprocess.getStatus());
+		        	pordergrantRepository.save(porder_grant);	
+		        }
+
+		        
+		        //Return sum to interface
+		        response.amountcutsum = pprocess.getAmountcutsum();
+		        response.amountinputsum = pprocess.getAmountinputsum();
+		        response.amountoutputsum = pprocess.getAmountoutputsum();
+		        response.amounterrorsum = pprocess.getAmounterrorsum();
+		        response.amountkcssum = pprocess.getAmountkcssum();
+		        response.amountpackedsum = pprocess.getAmountpackedsum();
+		        response.amountstockedsum = pprocess.getAmountstockedsum();		        
+		        response.status = pprocess.getStatus();
+		        
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
+				return new ResponseEntity<PProcessUpdateResponse>(response,HttpStatus.OK);
+				
+	        } else {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage("Không tồn tại lệnh sản xuất được phân cho tổ chuyền");			
+			    return new ResponseEntity<PProcessUpdateResponse>(response,HttpStatus.BAD_REQUEST);
+	        }
+		}catch (Exception e) {
+			e.printStackTrace();
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());			
+		    return new ResponseEntity<PProcessUpdateResponse>(response,HttpStatus.BAD_REQUEST);
+		}    			
+	}	
 	//Grant POrder to Org for processing
 	@RequestMapping(value = "/grant",method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> grantPProcess(@RequestBody POrderGrantRequest entity, HttpServletRequest request) {
@@ -925,7 +1107,7 @@ public class POrderProcessingAPI {
 				        
 				        pprocess.setOrgrootid_link(porder.getOrgrootid_link());
 				        pprocess.setPorderid_link(porder.getId());
-				        pprocess.setOrdercode(porder.getOrdercode());
+//				        pprocess.setOrdercode(porder.getOrdercode());
 				        pprocess.setGranttoorgid_link(pprocessgrant.getGranttoorgid_link());
 //				        pprocess.setGranttoorgname(org.getName());
 				        pprocess.setTotalorder(porder.getTotalorder());

@@ -72,7 +72,7 @@ public class CutAPI {
 						pOrderProcessing.setAmountcutsum(pOrder.getTotalcut());
 						
 						pOrderProcessing.setOrgrootid_link(entity.granttoorgid_link);
-						pOrderProcessing.setOrdercode(pOrder.getOrdercode());
+//						pOrderProcessing.setOrdercode(pOrder.getOrdercode());
 						pOrderProcessing.setPorderid_link(pOrder.getId());
 						
 						pOrderProcessing.setStatus(POrderStatus.PORDER_STATUS_CUTTING);

@@ -68,6 +68,11 @@ public class POrderProcessing_Service extends AbstractService<POrderProcessing> 
 	public List<POrderProcessing>getByBeforeDateAndOrderCode(String ordercode, Date processingdate_to){
 		return repo.getByBeforeDateAndOrderCode(ordercode, processingdate_to);
 	}
+	
+	@Override
+	public List<POrderProcessing>getByBeforeDateAndOrderGrantID(Long pordergrantid_link, Date processingdate_to){
+		return repo.getByBeforeDateAndOrderGrantID(pordergrantid_link, processingdate_to);
+	}
 
 	@Override
 	public List<POrderProcessing>getByBeforeDateAndOrderID(Long porderid_link, Date processingdate_to){

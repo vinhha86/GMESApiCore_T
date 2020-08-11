@@ -121,7 +121,7 @@ public class POrder_GrantAPI {
 		        
 		        pprocess.setOrgrootid_link(porder_grant.getOrgrootid_link());
 		        pprocess.setPorderid_link(porder_grant.getPorderid_link());
-		        pprocess.setOrdercode(thePOrder.getOrdercode());
+//		        pprocess.setOrdercode(thePOrder.getOrdercode());
 		        pprocess.setGranttoorgid_link(porder_grant.getGranttoorgid_link());
 //		        pprocess.setGranttoorgname(porder_grant.getGranttoorgname());
 		        pprocess.setTotalorder(porder_grant.getGrantamount());

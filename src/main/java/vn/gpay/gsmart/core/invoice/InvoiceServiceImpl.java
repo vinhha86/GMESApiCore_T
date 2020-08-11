@@ -19,7 +19,7 @@ import com.github.wenhao.jpa.Sorts;
 import com.github.wenhao.jpa.Specifications;
 
 import vn.gpay.gsmart.core.base.AbstractService;
-import vn.gpay.gsmart.core.utils.DateFormat;
+import vn.gpay.gsmart.core.utils.GPAYDateFormat;
 
 @Service
 public class InvoiceServiceImpl extends AbstractService<Invoice> implements IInvoiceService{
@@ -54,9 +54,9 @@ public class InvoiceServiceImpl extends AbstractService<Invoice> implements IInv
 	            .eq( "orgid_link", orgid_link)
 	            .like(Objects.nonNull(invoicenumber), "invoicenumber", "%"+invoicenumber+"%")
 	            .eq(Objects.nonNull(stockcode), "orgid_to_link", stockcode)
-	            .ge((shipdateto_from!=null && shipdateto_to==null),"invoicedate",DateFormat.atStartOfDay(shipdateto_from))
-                .le((shipdateto_from==null && shipdateto_to!=null),"invoicedate",DateFormat.atEndOfDay(shipdateto_to))
-                .between((shipdateto_from!=null && shipdateto_to!=null),"invoicedate", DateFormat.atStartOfDay(shipdateto_from), DateFormat.atEndOfDay(shipdateto_to))
+	            .ge((shipdateto_from!=null && shipdateto_to==null),"invoicedate",GPAYDateFormat.atStartOfDay(shipdateto_from))
+                .le((shipdateto_from==null && shipdateto_to!=null),"invoicedate",GPAYDateFormat.atEndOfDay(shipdateto_to))
+                .between((shipdateto_from!=null && shipdateto_to!=null),"invoicedate", GPAYDateFormat.atStartOfDay(shipdateto_from), GPAYDateFormat.atEndOfDay(shipdateto_to))
                 .eq(status!=-1, "status", status)
 	            .build();
 
@@ -96,10 +96,10 @@ public class InvoiceServiceImpl extends AbstractService<Invoice> implements IInv
 	            .like(invoicenumber != "" && invoicenumber != null, "invoicenumber", "%"+invoicenumber+"%")
 	            .eq(custom_declaration != "" && custom_declaration != null, "custom_declaration", "%"+invoicenumber+"%")
 	            .eq(org_prodviderid_link != 0, "org_prodviderid_link" , org_prodviderid_link)
-	            .ge((invociedate_from!=null && invoicedate_to==null),"invoicedate",DateFormat.atStartOfDay(invociedate_from))
-                .le((invociedate_from==null && invoicedate_to!=null),"invoicedate",DateFormat.atEndOfDay(invoicedate_to))
+	            .ge((invociedate_from!=null && invoicedate_to==null),"invoicedate",GPAYDateFormat.atStartOfDay(invociedate_from))
+                .le((invociedate_from==null && invoicedate_to!=null),"invoicedate",GPAYDateFormat.atEndOfDay(invoicedate_to))
                 .between((invociedate_from!=null && invoicedate_to!=null),"invoicedate",
-                		DateFormat.atStartOfDay(invociedate_from), DateFormat.atEndOfDay(invoicedate_to))
+                		GPAYDateFormat.atStartOfDay(invociedate_from), GPAYDateFormat.atEndOfDay(invoicedate_to))
                 .eq(status!=0, "status", status)
 	            .build();
 		

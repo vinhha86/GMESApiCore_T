@@ -14,7 +14,7 @@ import com.github.wenhao.jpa.Sorts;
 import com.github.wenhao.jpa.Specifications;
 
 import vn.gpay.gsmart.core.base.AbstractService;
-import vn.gpay.gsmart.core.utils.DateFormat;
+import vn.gpay.gsmart.core.utils.GPAYDateFormat;
 @Service
 public class InvcheckServiceImpl extends AbstractService<Invcheck> implements IInvcheckService{
 
@@ -33,9 +33,9 @@ public class InvcheckServiceImpl extends AbstractService<Invcheck> implements II
 	            .eq( "orgid_link", orgid_link)
 	            .like(Objects.nonNull(stockcode), "invcheckcode", "%"+stockcode+"%")
 //	            .eq(Objects.nonNull(orgfrom_code), "orgcheckid_link", orgfrom_code)
-	            .ge((invdateto_from!=null && invdateto_to==null),"invcheckdatetime",DateFormat.atStartOfDay(invdateto_from))
-                .le((invdateto_from==null && invdateto_to!=null),"invcheckdatetime",DateFormat.atEndOfDay(invdateto_to) )
-                .between((invdateto_from!=null && invdateto_to!=null),"invcheckdatetime", DateFormat.atStartOfDay(invdateto_from), DateFormat.atEndOfDay(invdateto_to))
+	            .ge((invdateto_from!=null && invdateto_to==null),"invcheckdatetime",GPAYDateFormat.atStartOfDay(invdateto_from))
+                .le((invdateto_from==null && invdateto_to!=null),"invcheckdatetime",GPAYDateFormat.atEndOfDay(invdateto_to) )
+                .between((invdateto_from!=null && invdateto_to!=null),"invcheckdatetime", GPAYDateFormat.atStartOfDay(invdateto_from), GPAYDateFormat.atEndOfDay(invdateto_to))
                 .eq( status!=-1,"status", status)
 	            .build();
 		Sort sort = Sorts.builder()

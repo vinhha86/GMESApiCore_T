@@ -19,7 +19,7 @@ import com.github.wenhao.jpa.Sorts;
 import com.github.wenhao.jpa.Specifications;
 
 import vn.gpay.gsmart.core.base.AbstractService;
-import vn.gpay.gsmart.core.utils.DateFormat;
+import vn.gpay.gsmart.core.utils.GPAYDateFormat;
 
 @Service
 public class StockInServiceImpl extends AbstractService<StockIn> implements IStockInService{
@@ -69,9 +69,9 @@ public class StockInServiceImpl extends AbstractService<StockIn> implements ISto
 	            .like(Objects.nonNull(stockincode), "stockincode", "%"+stockincode+"%")
 	            .eq(Objects.nonNull(orgid_from_link), "orgid_from_link", orgid_from_link)
 	            .eq(Objects.nonNull(orgid_to_link), "orgid_to_link", orgid_to_link)
-	            .ge((stockindate_from!=null && stockindate_to==null),"stockindate",DateFormat.atStartOfDay(stockindate_from))
-                .le((stockindate_from==null && stockindate_to!=null),"stockindate",DateFormat.atEndOfDay(stockindate_to))
-                .between((stockindate_from!=null && stockindate_to!=null),"stockindate", DateFormat.atStartOfDay(stockindate_from), DateFormat.atEndOfDay(stockindate_to))
+	            .ge((stockindate_from!=null && stockindate_to==null),"stockindate",GPAYDateFormat.atStartOfDay(stockindate_from))
+                .le((stockindate_from==null && stockindate_to!=null),"stockindate",GPAYDateFormat.atEndOfDay(stockindate_to))
+                .between((stockindate_from!=null && stockindate_to!=null),"stockindate", GPAYDateFormat.atStartOfDay(stockindate_from), GPAYDateFormat.atEndOfDay(stockindate_to))
                 .eq( status!=-1,"status", status)
 	            .build();
 		Sort sort = Sorts.builder()

@@ -39,7 +39,7 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 	            .eq(type!=1, "orgtypeid_link", type)
 	            .build();
 		Sort sort = Sorts.builder()
-		        .desc("id")
+		        .asc("id")
 		        .build();
 	    return repositoty.findAll(specification,sort);
 		
@@ -251,7 +251,7 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 	            .in(list_typeid.size() > 0,"orgtypeid_link", list_typeid.toArray())
 	            .build();
 		Sort sort = Sorts.builder()
-		        .desc("id")
+		        .asc("id")
 		        .build();
 		List<Org> list =  repositoty.findAll(specification,sort);
 		

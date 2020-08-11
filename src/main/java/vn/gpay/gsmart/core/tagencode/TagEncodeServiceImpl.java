@@ -16,7 +16,7 @@ import com.github.wenhao.jpa.Sorts;
 import com.github.wenhao.jpa.Specifications;
 
 import vn.gpay.gsmart.core.base.AbstractService;
-import vn.gpay.gsmart.core.utils.DateFormat;
+import vn.gpay.gsmart.core.utils.GPAYDateFormat;
 
 @Service
 public class TagEncodeServiceImpl extends AbstractService<TagEncode> implements ITagEncodeService{
@@ -39,7 +39,7 @@ public class TagEncodeServiceImpl extends AbstractService<TagEncode> implements 
 	            .eq("orgid_link", orgid_link)
 	            .eq( "deviceid_link", deviceid_link)
 	         //   .eq( "date_trunc('year',timecreate)", new Date())
-	            .between("timecreate", DateFormat.atStartOfDay(new Date()), DateFormat.atEndOfDay(new Date()))
+	            .between("timecreate", GPAYDateFormat.atStartOfDay(new Date()), GPAYDateFormat.atEndOfDay(new Date()))
 	            .build();
 	            
 	            Sort sort = Sorts.builder()

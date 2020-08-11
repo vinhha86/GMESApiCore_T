@@ -403,7 +403,7 @@ public class ScheduleAPI {
 			} else {
 				//Tao moi POrderProcessing
 				POrderProcessing pp = new POrderProcessing();
-				pp.setOrdercode(grant.getOrdercode());
+//				pp.setOrdercode(grant.getOrdercode());
 				pp.setOrderdate(grant.getOrderdate());
 				pp.setOrgrootid_link(orgrootid_link);
 				pp.setPorderid_link(grant.getPorderid_link());
@@ -512,7 +512,7 @@ public class ScheduleAPI {
 			pg = granttService.save(pg);
 			
 			POrderProcessing pp = new POrderProcessing();
-			pp.setOrdercode(porder.getOrdercode());
+//			pp.setOrdercode(porder.getOrdercode());
 			pp.setOrderdate(porder.getOrderdate());
 			pp.setOrgrootid_link(orgrootid_link);
 			pp.setPorderid_link(porder.getId());
@@ -920,7 +920,7 @@ public class ScheduleAPI {
 			//Sinh 1 dong moi trong Processing
 			POrderProcessing process = new POrderProcessing();
 			process.setId(null);
-			process.setOrdercode(porder.getOrdercode());
+//			process.setOrdercode(porder.getOrdercode());
 			process.setOrderdate(porder.getOrderdate());
 			process.setOrgrootid_link(orgrootid_link);
 			process.setPorderid_link(porder.getId());

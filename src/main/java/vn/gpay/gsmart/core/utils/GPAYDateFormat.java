@@ -6,7 +6,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Date;
 
-public class DateFormat {
+public class GPAYDateFormat {
 
 	public static String DateToString(Date date) {
 		

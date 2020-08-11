@@ -19,7 +19,7 @@ import com.github.wenhao.jpa.Sorts;
 import com.github.wenhao.jpa.Specifications;
 
 import vn.gpay.gsmart.core.base.AbstractService;
-import vn.gpay.gsmart.core.utils.DateFormat;
+import vn.gpay.gsmart.core.utils.GPAYDateFormat;
 
 @Service
 public class StockOutServiceImpl extends AbstractService<StockOut> implements IStockOutService{
@@ -87,9 +87,9 @@ public class StockOutServiceImpl extends AbstractService<StockOut> implements IS
 	            .like(Objects.nonNull(stockoutcode), "stockoutcode", "%"+stockoutcode+"%")
 	            .eq(Objects.nonNull(orgid_from_link), "orgid_from_link", orgid_from_link)
 	            .eq(Objects.nonNull(orgid_to_link), "orgid_to_link", orgid_to_link)
-	            .ge(this.check1(stockoutdate_from,stockoutdate_to),"stockoutdate",DateFormat.atStartOfDay(stockoutdate_from))
-                .le(this.check2(stockoutdate_from,stockoutdate_to),"stockoutdate",DateFormat.atEndOfDay(stockoutdate_to))
-                .between(this.check3(stockoutdate_from,stockoutdate_to),"stockoutdate", DateFormat.atStartOfDay(stockoutdate_from), DateFormat.atEndOfDay(stockoutdate_to))
+	            .ge(this.check1(stockoutdate_from,stockoutdate_to),"stockoutdate",GPAYDateFormat.atStartOfDay(stockoutdate_from))
+                .le(this.check2(stockoutdate_from,stockoutdate_to),"stockoutdate",GPAYDateFormat.atEndOfDay(stockoutdate_to))
+                .between(this.check3(stockoutdate_from,stockoutdate_to),"stockoutdate", GPAYDateFormat.atStartOfDay(stockoutdate_from), GPAYDateFormat.atEndOfDay(stockoutdate_to))
                 .eq(status!=-1, "status", status)
 	            .build();
 		Sort sort = Sorts.builder()

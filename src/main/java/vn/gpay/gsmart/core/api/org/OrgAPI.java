@@ -337,6 +337,7 @@ public class OrgAPI {
 		OrgResponse response = new OrgResponse();
 		try {
 			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
+			Long orgrootid_link = user.getRootorgid_link();
 			String[] listtype = entity.listid.split(",");
 			List<String> list = new ArrayList<String>();
 			for (String string : listtype) {
@@ -357,8 +358,17 @@ public class OrgAPI {
 				listreturn.addAll(list_chil);
 			}
 			
-			Org org = orgService.findOne(user.getOrgId());
-			listreturn.add(org);
+			if (user.getOrgId() == orgrootid_link){
+				//Neu nguoi dung thuoc tong cong ty, kiem tra xem co load goc hay ko
+				if (entity.isincludemyself){
+					Org org = orgService.findOne(user.getOrgId());
+					listreturn.add(org);
+				}
+			} else {
+				//Neu user ko phai thuoc tong cong ty --> lay thong tin don vi cua nguoi dung
+				Org org = orgService.findOne(user.getOrgId());
+				listreturn.add(org);
+			}
 			
 			response.data = listreturn;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
