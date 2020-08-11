@@ -1,4 +1,4 @@
-package vn.gpay.gsmart.core.task;
+package vn.gpay.gsmart.core.tasktype_checklist;
 
 import java.util.List;
 
@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
-public interface Task_Repository extends JpaRepository<Task, Long>, JpaSpecificationExecutor<Task> {
-	@Query(value = "select c from Task c where userinchargeid_link = :userid_link")
-	public List<Task> getby_user(
-			@Param ("userid_link")final  long userid_link);
+public interface TaskType_CheckList_Repository extends JpaRepository<TaskType_CheckList, Long>, JpaSpecificationExecutor<TaskType_CheckList>{
+	@Query(value = "select c from TaskType_CheckList c where tasktypeid_link = :tasktypeid_link")
+	public List<TaskType_CheckList> getby_tasktype(
+			@Param ("tasktypeid_link")final  int tasktypeid_link);
 }

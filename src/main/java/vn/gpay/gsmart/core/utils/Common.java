@@ -33,6 +33,14 @@ import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 import vn.gpay.gsmart.core.stockingunique.IStockingUniqueService;
 import vn.gpay.gsmart.core.stockingunique.StockingUniqueCode;
+import vn.gpay.gsmart.core.task.ITask_Service;
+import vn.gpay.gsmart.core.task.Task;
+import vn.gpay.gsmart.core.task_checklist.ITask_CheckList_Service;
+import vn.gpay.gsmart.core.task_grant.ITask_Grant_Service;
+import vn.gpay.gsmart.core.task_grant.Task_Grant;
+import vn.gpay.gsmart.core.tasktype.ITaskType_Service;
+import vn.gpay.gsmart.core.tasktype.TaskType;
+import vn.gpay.gsmart.core.tasktype_checklist.ITaskType_CheckList_Service;
 
 @Service
 public class Common  {
@@ -46,9 +54,69 @@ public class Common  {
 	@Autowired IPContractProductBomService ppbomService;
 	@Autowired IHolidayService holidayService;
 	@Autowired IConfigAmountService cfamountService;
+	@Autowired ITask_Service taskService;
+	@Autowired ITask_CheckList_Service checklistService;
+	@Autowired ITaskType_Service tasktypeService;
+	@Autowired ITask_Grant_Service taskgrantService;
+	@Autowired ITaskType_CheckList_Service typechecklistService;
 	
 	@Autowired IStockingUniqueService stockService;
 	
+	public void CreateTask(Long orgrootid_link, Long orgid_link, Long userid_link, int tasktypeid_link, String TaskName, Long pcontractid_link, Long pcontract_poid_link, Long porderid_link, Long objectid_link) {
+		int year = Calendar.getInstance().get(Calendar.YEAR);
+		TaskType tasktype = tasktypeService.findOne(tasktypeid_link);
+		
+		String taskname = tasktypeid_link == -1 ? TaskName : tasktype.getName();
+		Long userinchargeid_link = null;
+		List<Task_Grant> grants = taskgrantService.getby_tasktype_and_org(tasktypeid_link, orgid_link);
+		if(grants.size()>0)
+			userinchargeid_link = grants.get(0).getUserid_link();
+		
+		Task task = new Task();
+		task.setDatecreated(new Date());
+		task.setDescription(taskname);
+		task.setDuedate(Date_Add_with_holiday(new Date(), tasktype.getDuration()/24, orgrootid_link, year));
+		task.setDuration(tasktype.getDuration()/24);
+		task.setId(null);
+		task.setName(taskname);
+		task.setOrgrootid_link(orgrootid_link);
+		task.setObjectid_link(objectid_link);
+		task.setPcontract_poid_link(pcontract_poid_link);
+		task.setPcontractid_link(pcontractid_link);
+		task.setPercentdone(0);
+		task.setPorderid_link(porderid_link);
+		task.setStatusid_link(0);
+		task.setTasktypeid_link(tasktypeid_link);
+		task.setUsercreatedid_link(userid_link);
+		task.setUserinchargeid_link(userinchargeid_link);
+		
+		//Tao subtask
+	}
+	
+	public String getTaskName_byType(int tasktypeid_link) {
+		switch (tasktypeid_link) {
+		case 0:
+			return TaskType_Name.YeuCauSanXuat;
+		case 1:
+			return TaskType_Name.ChiTietDonHang;
+		case 2:
+			return TaskType_Name.DinhMucHaiQuan;
+		case 3:
+			return TaskType_Name.DinhMucCanDoi;
+		case 4:
+			return TaskType_Name.TaoLenhSanXuat;
+		case 5:
+			return TaskType_Name.PhanChuyen;
+		case 6:
+			return TaskType_Name.DinhMucSanXuat;
+		case 7:
+			return TaskType_Name.QuyTrinhCongNgheSP;
+		case 8:
+			return TaskType_Name.QuyTrinhCongNgheLSX;
+		default:
+			return "";
+		}
+	}
 	
 	public List<PContractBOMSKU> getBOMSKU_PContract_Product(long pcontractid_link, long productid_link, List<PContractProductSKU> listsku){
 		List<PContractBOMSKU> listbomsku = new ArrayList<PContractBOMSKU>();
@@ -332,6 +400,21 @@ public class Common  {
 
 		default:
 			return "$";
+		}
+	}
+	
+	public String getState(int status) {
+		switch (status) {
+		case 0:
+			return "NotStarted";
+		case 1:
+			return "InProgress";
+		case 2:
+			return "Done";
+		case -1:
+			return "Reject";
+		default:
+			return "";
 		}
 	}
 }

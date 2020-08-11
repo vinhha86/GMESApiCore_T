@@ -1,14 +1,23 @@
 package vn.gpay.gsmart.core.task;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.task_checklist.Task_CheckList;
 
 @Table(name="task")
 @Entity
@@ -36,6 +45,15 @@ public class Task implements Serializable {
 	private Long userinchargeid_link; 
 	private Date datefinished;
 	private Long objectid_link;
+	private Long pcontractid_link;
+	private Long pcontract_poid_link;
+	private Long porderid_link;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+    @JoinColumn(name="taskid_link",insertable=false,updatable =false)
+    private List<Task_CheckList> subTasks = new ArrayList<Task_CheckList>();
+	
 	public Long getId() {
 		return id;
 	}
@@ -119,6 +137,27 @@ public class Task implements Serializable {
 	}
 	public void setObjectid_link(Long objectid_link) {
 		this.objectid_link = objectid_link;
+	}
+	public Long getPcontractid_link() {
+		return pcontractid_link;
+	}
+	public Long getPcontract_poid_link() {
+		return pcontract_poid_link;
+	}
+	public Long getPorderid_link() {
+		return porderid_link;
+	}
+	public void setPcontractid_link(Long pcontractid_link) {
+		this.pcontractid_link = pcontractid_link;
+	}
+	public void setPcontract_poid_link(Long pcontract_poid_link) {
+		this.pcontract_poid_link = pcontract_poid_link;
+	}
+	public void setPorderid_link(Long porderid_link) {
+		this.porderid_link = porderid_link;
+	}
+	public List<Task_CheckList> getSubTasks() {
+		return subTasks;
 	}
 	
 	
