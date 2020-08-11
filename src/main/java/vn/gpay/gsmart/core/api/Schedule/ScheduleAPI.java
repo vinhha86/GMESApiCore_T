@@ -667,7 +667,6 @@ public class ScheduleAPI {
 	public ResponseEntity<delete_porder_req_response> DeletePorderTest(HttpServletRequest request,
 			@RequestBody delete_porder_req_request entity) {
 		delete_porder_req_response response = new delete_porder_req_response();
-		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		long porderid_link = entity.porderid_link;
 		long pordergrantid_link = entity.pordergrantid_link;
 		POrder porder = porderService.findOne(porderid_link);
