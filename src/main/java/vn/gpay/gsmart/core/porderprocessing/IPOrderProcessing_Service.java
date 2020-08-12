@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import vn.gpay.gsmart.core.base.Operations;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 public interface IPOrderProcessing_Service extends Operations<POrderProcessing>{
 
 	public List<POrderProcessing> getLatest_All();
@@ -41,5 +42,7 @@ public interface IPOrderProcessing_Service extends Operations<POrderProcessing>{
 	List<POrderProcessing> getByDateAndFactory(Date processingdate_to, Long factoryid);
 
 	List<POrderProcessing> getByBeforeDateAndOrderGrantID(Long pordergrantid_link, Date processingdate_to);
+
+	POrderGrant get_processing_bygolivedate(Long porderid_link, Long pordergrantid_link);
 
 }

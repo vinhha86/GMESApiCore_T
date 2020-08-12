@@ -2,8 +2,6 @@ package vn.gpay.gsmart.core.porder_grant;
 
 import java.util.List;
 
-import org.springframework.data.repository.query.Param;
-
 import vn.gpay.gsmart.core.base.Operations;
 public interface IPOrderGrant_SKUService extends Operations<POrderGrant_SKU>{
 

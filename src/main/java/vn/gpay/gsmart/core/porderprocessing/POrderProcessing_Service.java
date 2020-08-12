@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import vn.gpay.gsmart.core.base.AbstractService;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 
 @Service
 public class POrderProcessing_Service extends AbstractService<POrderProcessing> implements IPOrderProcessing_Service {
@@ -115,5 +116,22 @@ public class POrderProcessing_Service extends AbstractService<POrderProcessing> 
 	public List<POrderProcessing> getByOrderId_and_GrantId(Long porderid_link, Long pordergrantid_link) {
 		// TODO Auto-generated method stub
 		return repo.getByOrderId_And_GrantId(porderid_link, pordergrantid_link);
+	}
+	
+	@Override
+	public POrderGrant get_processing_bygolivedate(Long porderid_link, Long pordergrantid_link){
+		POrderGrant thePorderGrant = new POrderGrant();
+		List<POrderProcessing> aMIN = repo.getMINRunningByOrderId_And_GrantId(porderid_link, pordergrantid_link);
+		List<POrderProcessing> aMAX = repo.getMAXRunningByOrderId_And_GrantId(porderid_link, pordergrantid_link);
+		if (aMIN.size() > 0 && aMAX.size() > 0){
+			thePorderGrant.setStart_date_plan(aMIN.get(0).getProcessingdate());
+			thePorderGrant.setFinish_date_plan(aMAX.get(0).getProcessingdate());
+			thePorderGrant.setGrantamount(null==aMAX.get(0).getAmountoutputsum()?0:aMAX.get(0).getAmountoutputsum());
+			thePorderGrant.setAmountcutsum(null==aMAX.get(0).getAmountoutput()?0:aMAX.get(0).getAmountoutput());
+
+			return thePorderGrant;
+		} else {
+			return null;
+		}
 	}
 }

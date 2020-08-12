@@ -99,7 +99,26 @@ public interface IPOrderProcessing_Repository extends JpaRepository<POrderProces
 	public List<POrderProcessing>getByOrderId_And_GrantId(
 			@Param ("porderid_link")final Long porderid_link,
 			@Param ("pordergrantid_link")final Long pordergrantid_link);
+	
+	@Query(value = "select a from POrderProcessing a where a.status > 3 and a.porderid_link = :porderid_link and pordergrantid_link = :pordergrantid_link order by processingdate asc")
+	public List<POrderProcessing>getRunningByOrderId_And_GrantId(
+			@Param ("porderid_link")final Long porderid_link,
+			@Param ("pordergrantid_link")final Long pordergrantid_link);
+	
+	@Query(value = "select a from POrderProcessing a where a.porderid_link = :porderid_link and a.pordergrantid_link = :pordergrantid_link and a.processingdate = "
+			+ "(select min(b.processingdate) from POrderProcessing b where b.status > 3 "
+			+ "and b.pordergrantid_link = a.pordergrantid_link)")
+	public List<POrderProcessing>getMINRunningByOrderId_And_GrantId(
+			@Param ("porderid_link")final Long porderid_link,
+			@Param ("pordergrantid_link")final Long pordergrantid_link);	
 
+	@Query(value = "select a from POrderProcessing a where a.porderid_link = :porderid_link and a.pordergrantid_link = :pordergrantid_link and a.processingdate = "
+			+ "(select max(b.processingdate) from POrderProcessing b where b.status > 3 "
+			+ "and b.pordergrantid_link = a.pordergrantid_link)")
+	public List<POrderProcessing>getMAXRunningByOrderId_And_GrantId(
+			@Param ("porderid_link")final Long porderid_link,
+			@Param ("pordergrantid_link")final Long pordergrantid_link);	
+	
 	//get all processing of an order after the given date
 	@Query(value = "select a from POrderProcessing a where a.porderid_link = :porderid_link and a.pordergrantid_link = :pordergrantid_link and a.processingdate > :processingdate_to order by a.processingdate ASC")
 	public List<POrderProcessing>getAfterDate(@Param ("porderid_link")final Long porderid_link, @Param ("pordergrantid_link")final Long pordergrantid_link, @Param ("processingdate_to")final Date processingdate_to);

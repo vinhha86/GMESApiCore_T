@@ -10,6 +10,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -155,13 +156,35 @@ public class ScheduleAPI {
 					sch_org_grant.setExpanded(false);
 					sch_org_grant.setIconCls("x-fa fa-sliders");
 					sch_org_grant.setId_origin(org_grant.getId());
-					sch_org_grant.setLeaf(true);
+					sch_org_grant.setLeaf(false);
 					sch_org_grant.setName(org_grant.getName());
 					sch_org_grant.setOrgtypeid_link(org_grant.getOrgtypeid_link());
 					sch_org_grant.setParentid_origin(org_grant.getParentid_link());
 					sch_org_grant.setType(1);
 					
 					id++;
+					
+					//Them dong thong tin tien do
+					Schedule_plan sch_process = new Schedule_plan();
+					sch_process.setId(id);
+					sch_process.setExpanded(false);
+					sch_process.setIconCls("x-fa fa-line-chart");
+					sch_process.setLeaf(true);
+					sch_process.setName("Tiến độ");
+					sch_process.setType(2);
+					sch_org_grant.getChildren().add(sch_process);
+					id++;
+					
+					//Them dong thong tin du doan tien do
+					Schedule_plan sch_estimation = new Schedule_plan();
+					sch_estimation.setId(id);
+					sch_estimation.setExpanded(false);
+					sch_estimation.setIconCls("x-fa fa-binoculars");
+					sch_estimation.setLeaf(true);
+					sch_estimation.setName("Dự báo");
+					sch_estimation.setType(3);
+					sch_org_grant.getChildren().add(sch_estimation);
+					id++;					
 					
 					//Lấy các lệnh của các tổ
 					
@@ -196,6 +219,74 @@ public class ScheduleAPI {
 						sch_porder.setPcontractid_link(pordergrant.getPcontractid_link());
 						
 						response.events.rows.add(sch_porder);
+						
+
+					}
+					
+					//Lay thong tin tien do thuc te cua lenh
+					for(POrderGrant pordergrant : list_porder) {
+						//ngay dau va ngay cuoi cua lenh co trang thai > 3 (dang sx)
+						POrderGrant theProcessing = processService.get_processing_bygolivedate(pordergrant.getPorderid_link(), pordergrant.getId());
+						
+						if (null != theProcessing){
+							Date start = commonService.getBeginOfDate(theProcessing.getStart_date_plan());
+							Date end = commonService.getEndOfDate(theProcessing.getFinish_date_plan());
+							int duration = commonService.getDuration(start, end, orgrootid_link, year);
+							
+							Schedule_porder sch_porder_process = new Schedule_porder();
+							sch_porder_process.setCls(pordergrant.getCls());
+							sch_porder_process.setEndDate(end);
+							sch_porder_process.setId_origin(pordergrant.getPorderid_link());
+							sch_porder_process.setPorderid_link(pordergrant.getPorderid_link());
+							sch_porder_process.setMahang(pordergrant.getMaHang());
+							sch_porder_process.setName(pordergrant.getMaHang());
+							sch_porder_process.setResourceId(sch_process.getId());
+							sch_porder_process.setStartDate(start);
+							sch_porder_process.setDuration(duration);
+							
+							//Gia tri ra chyen luy ke tinh den ngay cuoi cung
+							sch_porder_process.setTotalpackage(pordergrant.getGrantamount());
+							//Gia tri ra chuyen cua ngay cuoi
+							sch_porder_process.setProductivity(theProcessing.getAmountcutsum());
+							
+							sch_porder_process.setVendorname(pordergrant.getVendorname());
+							sch_porder_process.setBuyername(pordergrant.getBuyername());
+							sch_porder_process.setPordercode(pordergrant.getpordercode());
+							sch_porder_process.setParentid_origin(orgid);
+							sch_porder_process.setStatus(pordergrant.getStatus());
+							sch_porder_process.setPorder_grantid_link(pordergrant.getId());
+							sch_porder_process.setProductid_link(pordergrant.getProductid_link());
+							sch_porder_process.setPcontract_poid_link(pordergrant.getPcontract_poid_link());
+							sch_porder_process.setPcontractid_link(pordergrant.getPcontractid_link());
+							
+							response.events.rows.add(sch_porder_process);		
+							
+							//Thong tin du bao
+							Schedule_porder sch_porder_estimation = new Schedule_porder();
+							int daystoend = 0;
+							if (sch_porder_process.getProductivity() > 0){
+								daystoend = (int) Math.ceil((double)pordergrant.getGrantamount() / sch_porder_process.getProductivity()); 
+							} else {
+								if (duration > 0)
+									daystoend = (int) Math.ceil((double)pordergrant.getGrantamount() / duration); 
+								else
+									daystoend = 0;
+							}
+							Date end_estimation = commonService.getEndOfDate(DateUtils.addDays(start, daystoend));
+							int duration_estimation = commonService.getDuration(start, end_estimation, orgrootid_link, year);
+							
+							sch_porder_estimation.setCls(pordergrant.getCls());
+							sch_porder_estimation.setStartDate(start);
+							sch_porder_estimation.setEndDate(end_estimation);
+							sch_porder_estimation.setDuration(duration_estimation);
+							sch_porder_estimation.setTotalpackage(pordergrant.getGrantamount());
+							sch_porder_estimation.setProductivity(sch_porder_process.getProductivity());
+
+							sch_porder_estimation.setResourceId(sch_estimation.getId());
+							sch_porder_estimation.setMahang(pordergrant.getMaHang());
+							
+							response.events.rows.add(sch_porder_estimation);	
+						} 
 					}
 					
 					//Lay cac lenh dang thu
