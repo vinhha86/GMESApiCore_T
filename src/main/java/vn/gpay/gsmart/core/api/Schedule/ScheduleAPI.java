@@ -42,6 +42,12 @@ import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.task.ITask_Service;
+import vn.gpay.gsmart.core.task.Task;
+import vn.gpay.gsmart.core.task_checklist.ITask_CheckList_Service;
+import vn.gpay.gsmart.core.task_checklist.Task_CheckList;
+import vn.gpay.gsmart.core.task_object.ITask_Object_Service;
+import vn.gpay.gsmart.core.task_object.Task_Object;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -57,6 +63,9 @@ public class ScheduleAPI {
 	@Autowired IPOrder_Req_Service reqService;
 	@Autowired IPContractService pcontractService;
 	@Autowired IPContract_POService poService;
+	@Autowired ITask_Object_Service taskobjectService;
+	@Autowired ITask_CheckList_Service checklistService;
+	@Autowired ITask_Service taskService;
 	
 	@RequestMapping(value = "/getplan",method = RequestMethod.POST)
 	public ResponseEntity<get_schedule_porder_response> GetAll(HttpServletRequest request,
@@ -652,6 +661,36 @@ public class ScheduleAPI {
 			sch.setPorderid_link(porder.getId());
 			
 			response.data = sch;
+			
+			//Cap nhat lai check list trong taskboard
+			long objecttypeid_link = 8;
+			List<Task_Object> listobj = taskobjectService.getbyObjectType_and_objectid_link(objecttypeid_link, entity.porder_reqid_link);
+			if(listobj.size()>0) {
+				Task_Object obj = listobj.get(0);
+				long taskid_link = obj.getTaskid_link();
+				long tasktype_checklits_id_link = 1; // id trong DB
+				List<Task_CheckList> checklist = checklistService.getby_taskid_link_and_typechecklist(taskid_link, tasktype_checklits_id_link);
+				if(checklist.size()>0) {
+					Task_CheckList subTask = checklist.get(0);
+					subTask.setDone(true);
+					subTask.setDatefinished(new Date());
+					subTask.setUserfinishedid_link(user.getId());
+					checklistService.save(subTask);
+					
+					int status = 1;
+					//Kiem tra cong viec hoan thanh het chua
+					List<Task_CheckList> list_sub = checklistService.getby_taskid_link(taskid_link);
+					list_sub.removeIf(c-> c.getDone() == true);
+					if(list_sub.size() == 0)
+						status = 2;
+					Task task = taskService.findOne(taskid_link);
+					task.setStatusid_link(status);
+					if(status == 2) {
+						task.setDatefinished(new Date());
+					}
+					taskService.save(task);
+				}
+			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
