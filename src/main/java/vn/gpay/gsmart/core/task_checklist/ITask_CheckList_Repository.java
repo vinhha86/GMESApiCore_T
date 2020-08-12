@@ -15,4 +15,10 @@ public interface ITask_CheckList_Repository extends JpaRepository<Task_CheckList
 	@Query(value = "select c from Task_CheckList c where taskid_link = :taskid_link")
 	public List<Task_CheckList> getby_taskid_link(
 			@Param ("taskid_link")final  long taskid_link);
+	
+	@Query(value = "select c from Task_CheckList c where taskid_link = :taskid_link "
+			+ "and tasktype_checklist_id_link = :tasktype_checklist_id_link")
+	public List<Task_CheckList> getby_taskid_link_and_tasktype_checlist_id_link(
+			@Param ("taskid_link")final  long taskid_link,
+			@Param ("tasktype_checklist_id_link")final  long tasktype_checklist_id_link);
 }

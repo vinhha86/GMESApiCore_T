@@ -32,6 +32,7 @@ public class Task_CheckList implements Serializable {
 	private Date datefinished;
 	private Long userfinishedid_link;
 	private Boolean done;
+	private Long tasktype_checklist_id_link;
 	
 	public Long getId() {
 		return id;
@@ -92,6 +93,12 @@ public class Task_CheckList implements Serializable {
 	}
 	public void setDone(Boolean done) {
 		this.done = done;
+	}
+	public Long getTasktype_checklist_id_link() {
+		return tasktype_checklist_id_link;
+	}
+	public void setTasktype_checklist_id_link(Long tasktype_checklist_id_link) {
+		this.tasktype_checklist_id_link = tasktype_checklist_id_link;
 	}
 	
 	

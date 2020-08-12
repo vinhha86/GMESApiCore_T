@@ -146,9 +146,7 @@ public class TaskAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
 			long userid_link = user.getId();
-			long orgid_link = user.getOrgid_link();
 			long tasktypeid_link = -1;
-			Long pcontractid_link = null, pcontract_poid_link = null, porderid_link = null, objectid_link = null;
 			
 			TaskType tasktype = tasktypeService.findOne(tasktypeid_link);
 			
@@ -176,6 +174,7 @@ public class TaskAPI {
 			binding.setState(commonService.getState(task.getStatusid_link()));
 			binding.setTasktypeid_link(task.getTasktypeid_link());
 			binding.setDescription(task.getDescription());
+			binding.setCls_task(commonService.getCls(task.getTasktypeid_link()));
 			
 			response.data = binding;
 			
@@ -186,6 +185,76 @@ public class TaskAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<add_othertask_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/add_checklist",method = RequestMethod.POST)
+	public ResponseEntity<add_checklist_response> AddCheckList(HttpServletRequest request, @RequestBody add_checklist_request entity) {
+		add_checklist_response response = new add_checklist_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			long userid_link = user.getId();
+			Task_CheckList checklist = new Task_CheckList();
+			checklist.setDatecreated(new Date());
+			checklist.setDescription(entity.checklist);
+			checklist.setDone(false);
+			checklist.setId(null);
+			checklist.setOrgrootid_link(orgrootid_link);
+			checklist.setTaskid_link(entity.taskid_link);
+			checklist.setUsercreatedid_link(userid_link);
+			checklist = checklistService.save(checklist);
+			
+			response.data = checklist;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<add_checklist_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<add_checklist_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/update_checklist",method = RequestMethod.POST)
+	public ResponseEntity<update_checklist_done_response> UpdateCheckList(HttpServletRequest request, @RequestBody update_checklist_done_request entity) {
+		update_checklist_done_response response = new update_checklist_done_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long userid_link = user.getId();
+			int status = 0;
+			long taskid_link = 0;
+			
+			for(SubTask checklist : entity.data) {
+				Task_CheckList subTask = checklistService.findOne(checklist.getId());
+				subTask.setDone(checklist.getDone());
+				if(checklist.getDone()) {
+					subTask.setDatefinished(new Date());
+					subTask.setUserfinishedid_link(userid_link);
+					status = 1;
+					taskid_link = subTask.getTaskid_link();
+				}
+				checklistService.save(subTask);
+			}		
+			
+			List<Task_CheckList> list_sub = checklistService.getby_taskid_link(taskid_link);
+			list_sub.removeIf(c-> c.getDone() == true);
+			if(list_sub.size() == 0) status = 2;
+			
+			Task task = taskService.findOne(taskid_link);
+			task.setStatusid_link(status);
+			if(status == 2)
+				task.setDatefinished(new Date());
+			task = taskService.save(task);	
+			
+			response.status = commonService.getState(task.getStatusid_link());
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<update_checklist_done_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<update_checklist_done_response>(response, HttpStatus.OK);
 		}
 	}
 }

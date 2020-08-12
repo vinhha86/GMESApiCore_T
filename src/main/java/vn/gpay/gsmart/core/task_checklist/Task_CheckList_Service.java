@@ -21,5 +21,10 @@ public class Task_CheckList_Service extends AbstractService<Task_CheckList> impl
 		// TODO Auto-generated method stub
 		return repo.getby_taskid_link(taskid_link);
 	}
+	@Override
+	public List<Task_CheckList> getby_taskid_link_and_typechecklist(Long taskid_link, Long tasktype_checklist_id_link) {
+		// TODO Auto-generated method stub
+		return repo.getby_taskid_link_and_tasktype_checlist_id_link(taskid_link, tasktype_checklist_id_link);
+	}
 
 }

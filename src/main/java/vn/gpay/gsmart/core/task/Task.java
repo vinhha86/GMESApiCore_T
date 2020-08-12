@@ -44,10 +44,6 @@ public class Task implements Serializable {
 	private Long tasktypeid_link;
 	private Long userinchargeid_link; 
 	private Date datefinished;
-	private Long objectid_link;
-	private Long pcontractid_link;
-	private Long pcontract_poid_link;
-	private Long porderid_link;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
@@ -131,30 +127,6 @@ public class Task implements Serializable {
 	}
 	public void setDatefinished(Date datefinished) {
 		this.datefinished = datefinished;
-	}
-	public Long getObjectid_link() {
-		return objectid_link;
-	}
-	public void setObjectid_link(Long objectid_link) {
-		this.objectid_link = objectid_link;
-	}
-	public Long getPcontractid_link() {
-		return pcontractid_link;
-	}
-	public Long getPcontract_poid_link() {
-		return pcontract_poid_link;
-	}
-	public Long getPorderid_link() {
-		return porderid_link;
-	}
-	public void setPcontractid_link(Long pcontractid_link) {
-		this.pcontractid_link = pcontractid_link;
-	}
-	public void setPcontract_poid_link(Long pcontract_poid_link) {
-		this.pcontract_poid_link = pcontract_poid_link;
-	}
-	public void setPorderid_link(Long porderid_link) {
-		this.porderid_link = porderid_link;
 	}
 	public List<Task_CheckList> getSubTasks() {
 		return subTasks;
