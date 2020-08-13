@@ -763,9 +763,12 @@ public class ScheduleAPI {
 				List<Task_CheckList> checklist = checklistService.getby_taskid_link_and_typechecklist(taskid_link, tasktype_checklits_id_link);
 				if(checklist.size()>0) {
 					Task_CheckList subTask = checklist.get(0);
+					String description = subTask.getDescription();
+					description += " ("+user.getFullname()+")";
 					subTask.setDone(true);
 					subTask.setDatefinished(new Date());
 					subTask.setUserfinishedid_link(user.getId());
+					subTask.setDescription(description);
 					checklistService.save(subTask);
 					
 					int status = 1;

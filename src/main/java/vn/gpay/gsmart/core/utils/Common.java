@@ -44,6 +44,8 @@ import vn.gpay.gsmart.core.task.ITask_Service;
 import vn.gpay.gsmart.core.task.Task;
 import vn.gpay.gsmart.core.task_checklist.ITask_CheckList_Service;
 import vn.gpay.gsmart.core.task_checklist.Task_CheckList;
+import vn.gpay.gsmart.core.task_flow.ITask_Flow_Service;
+import vn.gpay.gsmart.core.task_flow.Task_Flow;
 import vn.gpay.gsmart.core.task_grant.ITask_Grant_Service;
 import vn.gpay.gsmart.core.task_grant.Task_Grant;
 import vn.gpay.gsmart.core.task_object.ITask_Object_Service;
@@ -75,6 +77,7 @@ public class Common  {
 	@Autowired ITask_Grant_Service taskgrantService;
 	@Autowired ITaskType_CheckList_Service typechecklistService;
 	@Autowired ITask_Object_Service taskobjectService;
+	@Autowired ITask_Flow_Service flowService;
 	
 	@Autowired IStockingUniqueService stockService;
 	
@@ -129,6 +132,19 @@ public class Common  {
 			
 			taskobjectService.save(object);
 		}
+		
+		//Tao Flow
+		Task_Flow flow = new Task_Flow();
+		flow.setDatecreated(new Date());
+		flow.setDescription("Tạo việc");
+		flow.setFlowstatusid_link(1);
+		flow.setFromuserid_link(userid_link);
+		flow.setId(null);
+		flow.setOrgrootid_link(orgrootid_link);
+		flow.setTaskid_link(task.getId());
+		flow.setTaskstatusid_link(0);
+		flow.setTouserid_link(userinchargeid_link);
+		flowService.save(flow);
 		
 		return task.getId();
 	}
