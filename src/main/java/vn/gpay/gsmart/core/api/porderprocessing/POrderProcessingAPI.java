@@ -84,12 +84,12 @@ public class POrderProcessingAPI {
 			
 			//If processingdate <> entity.processingdate_to --> Calcucate Amount's value of provided date
 			for(POrderProcessing pprocess: pprocessList){
-//				System.out.println(pprocess.getGranttoorgid_link());
+				System.out.println(pprocess.getGranttoorgid_link());
 				//Nếu số cắt TT ==0 --> gán bằng số cắt dự kiến để vẫn cho vào chuyền, hiện đỏ để lưu í
 				pprocess.setIscuttt(0);
 				if (null == pprocess.getAmountcutsum() || 0 == pprocess.getAmountcutsum()){
 					pprocess.setIscuttt(1);
-					pprocess.setAmountcutsum(pprocess.getTotalorder());
+					pprocess.setAmountcutsum(pprocess.getGrantamount());
 				}
 				
 				if (pprocess.getProcessingdate().before(entity.processingdate_to)){
@@ -894,12 +894,12 @@ public class POrderProcessingAPI {
 		Long rootorgid_link = user.getRootorgid_link();
 		PProcessUpdateResponse response = new PProcessUpdateResponse();
 		try {
-	        POrderGrant porder_grant = pordergrantRepository.findOne(entity.pordergrantid_link);
-	        if (null != entity.newValue && null != entity.newSumValue && null != porder_grant)
+	        POrderGrant porder_grant = pordergrantRepository.findOne(entity.data.getPordergrantid_link());
+	        if (null != porder_grant)
 	        {
 	        	POrderProcessing pprocess;
 		        //If having processing data on date --> Update; else --> Create New processing line
-		        List<POrderProcessing> pprocessList = pprocessRepository.findByIdAndPDate(entity.porderid_link, entity.pordergrantid_link, entity.processingdate);
+		        List<POrderProcessing> pprocessList = pprocessRepository.findByIdAndPDate(entity.data.getPorderid_link(), entity.data.getPordergrantid_link(), entity.processingdate);
 	        	if (pprocessList.size() > 0) {
 	        		pprocess = pprocessList.get(0);
 	        	} else {
@@ -907,52 +907,62 @@ public class POrderProcessingAPI {
 		        	
 		        	pprocess.setOrgrootid_link(rootorgid_link); 
 		        	pprocess.setProcessingdate(entity.processingdate);
-		        	pprocess.setPorderid_link(entity.porderid_link);
-		        	pprocess.setPordergrantid_link(entity.pordergrantid_link);
+		        	pprocess.setPorderid_link(entity.data.getPorderid_link());
+		        	pprocess.setPordergrantid_link(entity.data.getPordergrantid_link());
 		        	pprocess.setGranttoorgid_link(porder_grant.getGranttoorgid_link());
 		        	
 //		        	pprocess.setOrdercode(porder_grant.getOrdercode());
-		        	pprocess.setTotalorder(porder_grant.getGrantamount());	        		
+		        	pprocess.setTotalorder(porder_grant.getGrantamount());	  
+		        	
+		        	pprocess.setUsercreatedid_link(user.getId());
+		        	pprocess.setTimecreated(new Date());
 	        	}
 	        	
 	        	//Update value
 	        	switch(entity.dataIndex) {
 	    			case "amounttarget":
-	    				pprocess.setAmounttarget(entity.newValue);
+	    				pprocess.setAmounttarget(entity.data.getAmounttarget());
 	    				break;
 	        		case "amountcut":
-	        			pprocess.setAmountcut(entity.newValue);
-	        			pprocess.setAmountcutsum(entity.newSumValue);
-	        			break;	          				
+	        			pprocess.setAmountcut(entity.data.getAmountcut());
+	        			pprocess.setAmountcutsum((null==entity.data.getAmountcutsumprev()?0:entity.data.getAmountcutsumprev()) 
+	        					+ (null==entity.data.getAmountcut()?0:entity.data.getAmountcut()));
+	        			break;
 	        		case "amountinput":
-	        			pprocess.setAmountinput(entity.newValue);
-	        			pprocess.setAmountinputsum(entity.newSumValue);
+	        			pprocess.setAmountinput(entity.data.getAmountinput());
+	        			pprocess.setAmountinputsum((null==entity.data.getAmountinputsumprev()?0:entity.data.getAmountinputsumprev()) 
+	        					+ (null==entity.data.getAmountinput()?0:entity.data.getAmountinput()));
 	        			break;
 	        		case "amountoutput":
-	        			pprocess.setAmountoutput(entity.newValue);
-	        			pprocess.setAmountoutputsum(entity.newSumValue);
-	        			break;	  
+	        			pprocess.setAmountoutput(entity.data.getAmountoutput());
+	        			pprocess.setAmountoutputsum((null==entity.data.getAmountoutputsumprev()?0:entity.data.getAmountoutputsumprev()) 
+	        					+ (null==entity.data.getAmountoutput()?0:entity.data.getAmountoutput()));
+	        			break; 
 	        		case "amounterror":
-	        			pprocess.setAmounterror(entity.newValue);
-	        			pprocess.setAmounterrorsum(entity.newSumValue);
-	    				break;	   	      	        			
+	        			pprocess.setAmounterror(entity.data.getAmounterror());
+	        			pprocess.setAmounterrorsum((null==entity.data.getAmounterrorsumprev()?0:entity.data.getAmounterrorsumprev()) 
+	        					+ (null==entity.data.getAmounterror()?0:entity.data.getAmounterror()));
+	        			break;   	      	        			
 	        		case "amountkcsreg":
-	        			pprocess.setAmountkcsreg(entity.newValue);
+	        			pprocess.setAmountkcsreg(entity.data.getAmountkcsreg());
 	    				break;	 
 	        		case "amountkcs":
-	        			pprocess.setAmountkcs(entity.newValue);
-	        			pprocess.setAmountkcssum(entity.newSumValue);
-	    				break;  
+	        			pprocess.setAmountkcs(entity.data.getAmountkcs());
+	        			pprocess.setAmountkcssum((null==entity.data.getAmountkcssumprev()?0:entity.data.getAmountkcssumprev()) 
+	        					+ (null==entity.data.getAmountkcs()?0:entity.data.getAmountkcs()));
+	        			break;
 	        		case "amountpacked":
-	        			pprocess.setAmountpacked(entity.newValue);
-	        			pprocess.setAmountpackedsum(entity.newSumValue);
-	    				break;  
+	        			pprocess.setAmountpacked(entity.data.getAmountpacked());
+	        			pprocess.setAmountpackedsum((null==entity.data.getAmountpackedsumprev()?0:entity.data.getAmountpackedsumprev()) 
+	        					+ (null==entity.data.getAmountpacked()?0:entity.data.getAmountpacked()));
+	        			break;
 	        		case "amountstocked":
-	        			pprocess.setAmountstocked(entity.newValue);
-	        			pprocess.setAmountstockedsum(entity.newSumValue);
-	    				break;       
+	        			pprocess.setAmountstocked(entity.data.getAmountstocked());
+	        			pprocess.setAmountstockedsum((null==entity.data.getAmountstockedsumprev()?0:entity.data.getAmountstockedsumprev()) 
+	        					+ (null==entity.data.getAmountstocked()?0:entity.data.getAmountstocked()));
+	        			break;
 	        		case "comment":
-	        			pprocess.setComment(entity.commentValue);
+	        			pprocess.setComment(entity.data.getComment());
 	    				break;            	        				
 	        	}
 
@@ -979,7 +989,7 @@ public class POrderProcessingAPI {
 		        //Cộng dồn trong trường hợp sửa số của ngày trước ngày hiện tại
 		        //Update Amount SUM of following days. In case update amount of prev day
 		        if (GPAYDateFormat.atStartOfDay(entity.processingdate).before(GPAYDateFormat.atStartOfDay(new Date()))){
-			        List<POrderProcessing> pprocessListAfter = pprocessRepository.getAfterDate(entity.porderid_link, entity.pordergrantid_link, entity.processingdate);
+			        List<POrderProcessing> pprocessListAfter = pprocessRepository.getAfterDate(entity.data.getPorderid_link(), entity.data.getPordergrantid_link(), entity.processingdate);
 			        
 			        int iAmountCutSum = null==pprocess.getAmountcutsum()?0:pprocess.getAmountcutsum();
 			        int iAmountInputSum = null==pprocess.getAmountinputsum()?0:pprocess.getAmountinputsum();
