@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.security.IGpayUserService;
 import vn.gpay.gsmart.core.task.ITask_Service;
 import vn.gpay.gsmart.core.task.Task;
 import vn.gpay.gsmart.core.task.TaskBinding;
@@ -25,6 +26,8 @@ import vn.gpay.gsmart.core.task_checklist.Task_CheckList;
 import vn.gpay.gsmart.core.task_flow.Comment;
 import vn.gpay.gsmart.core.task_flow.ITask_Flow_Service;
 import vn.gpay.gsmart.core.task_flow.Task_Flow;
+import vn.gpay.gsmart.core.task_flow_status.ITask_Flow_Status_Service;
+import vn.gpay.gsmart.core.task_flow_status.Task_Flow_Status;
 import vn.gpay.gsmart.core.tasktype.ITaskType_Service;
 import vn.gpay.gsmart.core.tasktype.TaskType;
 import vn.gpay.gsmart.core.utils.Common;
@@ -38,6 +41,8 @@ public class TaskAPI {
 	@Autowired ITask_Flow_Service commentService;
 	@Autowired Common commonService;
 	@Autowired ITaskType_Service tasktypeService;
+	@Autowired ITask_Flow_Status_Service flowstatusService;
+	@Autowired IGpayUserService userService;
 	
 	@RequestMapping(value = "/getby_user",method = RequestMethod.POST)
 	public ResponseEntity<getby_user_response> GetByUser(HttpServletRequest request ) {
@@ -83,6 +88,7 @@ public class TaskAPI {
 					comment.setTaskId(task.getId());
 					comment.setText(flow.getDescription());
 					comment.setUserId(flow.getFromuserid_link());
+					comment.setTypename(flow.getTypeName());
 					
 					list_comment.add(comment);
 				}
@@ -119,14 +125,16 @@ public class TaskAPI {
 			flow.setOrgrootid_link(user.getRootorgid_link());
 			flow.setTaskstatusid_link(task.getStatusid_link());
 			flow.setTaskid_link(entity.taskid_link);
+			flow.setFlowstatusid_link(3);
 			
 			flow = commentService.save(flow);
-			
+			Task_Flow_Status status = flowstatusService.findOne(3);
 			Comment comment = new Comment();
 			comment.setDate(date);
 			comment.setTaskId(entity.taskid_link);
 			comment.setText(flow.getDescription());
 			comment.setUserId(flow.getFromuserid_link());
+			comment.setTypename(status.getName());
 			
 			response.data = comment;
 			
@@ -169,7 +177,7 @@ public class TaskAPI {
 			Task_Flow flow = new Task_Flow();
 			flow.setDatecreated(new Date());
 			flow.setDescription("Tạo việc");
-			flow.setFlowstatusid_link(1);
+			flow.setFlowstatusid_link(3);
 			flow.setFromuserid_link(userid_link);
 			flow.setId(null);
 			flow.setOrgrootid_link(orgrootid_link);
@@ -280,16 +288,42 @@ public class TaskAPI {
 		}
 	}
 	
-	@RequestMapping(value = "/update_task_userinchage",method = RequestMethod.POST)
+	@RequestMapping(value = "/update_task_userincharge",method = RequestMethod.POST)
 	public ResponseEntity<update_task_userinchage_response> UpdateTaskUserInchage(HttpServletRequest request, @RequestBody update_task_userinchage_request entity) {
 		update_task_userinchage_response response = new update_task_userinchage_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			long userid_link = user.getId();
 			long taskid_link = entity.taskid_link;
-			long userinchageid_link = entity.userid_link;
+			long userinchargeid_link = entity.userid_link;
+			long orgrootid_link = user.getRootorgid_link();
 			
-						
+			GpayUser user_incharge = userService.findOne(userinchargeid_link);
+			
+			Task task = taskService.findOne(taskid_link);
+			task.setUserinchargeid_link(userinchargeid_link);
+			taskService.save(task);
+			
+			//sinh task flow
+			String description = user.getFullname() + " giao việc cho " + user_incharge.getFullname();
+			Task_Flow comment = new Task_Flow();
+			comment.setDatecreated(new Date());
+			comment.setDescription(description);
+			comment.setFlowstatusid_link(5);
+			comment.setFromuserid_link(user.getId());
+			comment.setId(null);
+			comment.setOrgrootid_link(orgrootid_link);
+			comment.setTaskid_link(taskid_link);
+			comment.setTaskstatusid_link(task.getStatusid_link());
+			comment.setTouserid_link(userinchargeid_link);
+			commentService.save(comment);
+			
+			Comment cmt = new Comment();
+			cmt.setDate(new Date());
+			cmt.setTaskId(taskid_link);
+			cmt.setText(description);
+			cmt.setUserId(user.getId());
+			
+			response.data = cmt;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -298,6 +332,22 @@ public class TaskAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<update_task_userinchage_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/getall_flowstatus",method = RequestMethod.POST)
+	public ResponseEntity<getall_flowstatus_reponse> GetAllFlowStatus(HttpServletRequest request) {
+		getall_flowstatus_reponse response = new getall_flowstatus_reponse();
+		try {
+			response.data = flowstatusService.findAll();
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getall_flowstatus_reponse>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<getall_flowstatus_reponse>(response, HttpStatus.OK);
 		}
 	}
 }

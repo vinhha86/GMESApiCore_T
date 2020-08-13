@@ -16,7 +16,9 @@ public class Comment {
 	
 	@JsonProperty("Text")
 	private String Text;
-
+	
+	private String typename;
+		
 	public Date getDate() {
 		return this.Date;
 	}
@@ -47,6 +49,14 @@ public class Comment {
 
 	public void setText(String text) {
 		Text = text;
+	}
+
+	public String getTypename() {
+		return typename;
+	}
+
+	public void setTypename(String typename) {
+		this.typename = typename;
 	}
 	
 	
