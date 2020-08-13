@@ -30,7 +30,21 @@ public class Task_Flow implements Serializable {
 	private Date datecreated;
 	private String description;
 	private Integer flowdirection;
-	private Integer statusid_link;
+	private Integer taskstatusid_link;
+	private Integer flowstatusid_link;
+	
+	public Integer getTaskstatusid_link() {
+		return taskstatusid_link;
+	}
+	public void setTaskstatusid_link(Integer taskstatusid_link) {
+		this.taskstatusid_link = taskstatusid_link;
+	}
+	public Integer getFlowstatusid_link() {
+		return flowstatusid_link;
+	}
+	public void setFlowstatusid_link(Integer flowstatusid_link) {
+		this.flowstatusid_link = flowstatusid_link;
+	}
 	public Long getId() {
 		return id;
 	}
@@ -78,12 +92,6 @@ public class Task_Flow implements Serializable {
 	}
 	public void setFlowdirection(Integer flowdirection) {
 		this.flowdirection = flowdirection;
-	}
-	public Integer getStatusid_link() {
-		return statusid_link;
-	}
-	public void setStatusid_link(Integer statusid_link) {
-		this.statusid_link = statusid_link;
 	}
 	
 	

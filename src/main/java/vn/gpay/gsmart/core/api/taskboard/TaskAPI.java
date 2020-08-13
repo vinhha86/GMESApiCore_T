@@ -109,6 +109,7 @@ public class TaskAPI {
 		add_comment_response response = new add_comment_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Task task = taskService.findOne(entity.taskid_link);
 			Date date = new Date();
 			Task_Flow flow = new Task_Flow();
 			flow.setDatecreated(date);
@@ -116,7 +117,7 @@ public class TaskAPI {
 			flow.setFromuserid_link(user.getId());
 			flow.setId(null);
 			flow.setOrgrootid_link(user.getRootorgid_link());
-			flow.setStatusid_link(0);
+			flow.setTaskstatusid_link(task.getStatusid_link());
 			flow.setTaskid_link(entity.taskid_link);
 			
 			flow = commentService.save(flow);
@@ -165,6 +166,26 @@ public class TaskAPI {
 			task.setDescription(entity.text);
 			task = taskService.save(task);
 			
+			Task_Flow flow = new Task_Flow();
+			flow.setDatecreated(new Date());
+			flow.setDescription("Tạo việc");
+			flow.setFlowstatusid_link(1);
+			flow.setFromuserid_link(userid_link);
+			flow.setId(null);
+			flow.setOrgrootid_link(orgrootid_link);
+			flow.setTaskid_link(task.getId());
+			flow.setTaskstatusid_link(task.getStatusid_link());
+			flow.setTouserid_link(userid_link);
+			commentService.save(flow);
+
+			List<Comment> comments = new ArrayList<Comment>();
+			Comment comment = new Comment();
+			comment.setDate(new Date());
+			comment.setTaskId(task.getId());
+			comment.setText("Tạo việc");
+			comment.setUserId(userid_link);
+			comments.add(comment);
+			
 			TaskBinding binding = new TaskBinding();
 			binding.setDescription(task.getDescription());
 			binding.setId(task.getId());
@@ -175,6 +196,7 @@ public class TaskAPI {
 			binding.setTasktypeid_link(task.getTasktypeid_link());
 			binding.setDescription(task.getDescription());
 			binding.setCls_task(commonService.getCls(task.getTasktypeid_link()));
+			binding.setComments(comments);
 			
 			response.data = binding;
 			
@@ -255,6 +277,27 @@ public class TaskAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<update_checklist_done_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/update_task_userinchage",method = RequestMethod.POST)
+	public ResponseEntity<update_task_userinchage_response> UpdateTaskUserInchage(HttpServletRequest request, @RequestBody update_task_userinchage_request entity) {
+		update_task_userinchage_response response = new update_task_userinchage_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long userid_link = user.getId();
+			long taskid_link = entity.taskid_link;
+			long userinchageid_link = entity.userid_link;
+			
+						
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<update_task_userinchage_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<update_task_userinchage_response>(response, HttpStatus.OK);
 		}
 	}
 }

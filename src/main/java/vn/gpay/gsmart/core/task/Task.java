@@ -18,6 +18,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.task_checklist.Task_CheckList;
+import vn.gpay.gsmart.core.task_flow.Task_Flow;
 
 @Table(name="task")
 @Entity
@@ -49,9 +50,14 @@ public class Task implements Serializable {
 	@OneToMany
     @JoinColumn(name="taskid_link",insertable=false,updatable =false)
     private List<Task_CheckList> subTasks = new ArrayList<Task_CheckList>();
+    
+    @NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+    @JoinColumn(name="taskid_link",insertable=false,updatable =false)
+    private List<Task_Flow> comments = new ArrayList<Task_Flow>();
 	
 	public Long getId() {
-		return id;
+		return id; 
 	}
 	public void setId(Long id) {
 		this.id = id;
@@ -130,6 +136,15 @@ public class Task implements Serializable {
 	}
 	public List<Task_CheckList> getSubTasks() {
 		return subTasks;
+	}
+	public List<Task_Flow> getComments() {
+		return comments;
+	}
+	public void setComments(List<Task_Flow> comments) {
+		this.comments = comments;
+	}
+	public void setSubTasks(List<Task_CheckList> subTasks) {
+		this.subTasks = subTasks;
 	}
 	
 	
