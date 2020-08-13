@@ -61,14 +61,14 @@ public class POrderSubProcessingAPI {
     	WorkingProcessResponse response = new WorkingProcessResponse();
     	
     	try {
-	    	for (WorkingProcess processItem: process_list){
-	    		List<POrderSubProcessing> ord_subprocess = subprocessingRepository.findByProcessID(entity.porderid_link, processItem.getId());
-//	    		if (ord_subprocess.size() > 0){
-//	    			processItem.setIsselected(true);
-//	    		}else {
-//	    			processItem.setIsselected(false);
-//	    		}
-	    	}
+//	    	for (WorkingProcess processItem: process_list){
+//	    		List<POrderSubProcessing> ord_subprocess = subprocessingRepository.findByProcessID(entity.porderid_link, processItem.getId());
+////	    		if (ord_subprocess.size() > 0){
+////	    			processItem.setIsselected(true);
+////	    		}else {
+////	    			processItem.setIsselected(false);
+////	    		}
+//	    	}
 			response.data=process_list;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
