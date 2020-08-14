@@ -15,4 +15,10 @@ public interface ITask_Flow_Repository extends JpaRepository<Task_Flow, Long>, J
 	@Query(value = "select c from Task_Flow c where taskid_link = :taskid_link")
 	public List<Task_Flow> getby_task(
 			@Param ("taskid_link")final  long taskid_link);
+	
+	@Query(value = "select c from Task_Flow c where taskid_link = :taskid_link "
+			+ "and touserid_link = :touserid_link order by id desc")
+	public List<Task_Flow> getby_task_and_userto(
+			@Param ("taskid_link")final  long taskid_link,
+			@Param ("touserid_link")final  long touserid_link);
 }

@@ -137,7 +137,7 @@ public class Common  {
 		Task_Flow flow = new Task_Flow();
 		flow.setDatecreated(new Date());
 		flow.setDescription("Tạo việc");
-		flow.setFlowstatusid_link(1);
+		flow.setFlowstatusid_link(5);
 		flow.setFromuserid_link(userid_link);
 		flow.setId(null);
 		flow.setOrgrootid_link(orgrootid_link);

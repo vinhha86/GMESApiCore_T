@@ -21,5 +21,10 @@ public class Task_Flow_Service extends AbstractService<Task_Flow> implements ITa
 		// TODO Auto-generated method stub
 		return repo.getby_task(taskid_link);
 	}
+	@Override
+	public List<Task_Flow> get_lasttest_by_userto(long userto_id_link, long taskid_link) {
+		// TODO Auto-generated method stub
+		return repo.getby_task_and_userto(taskid_link, userto_id_link);
+	}
 
 }

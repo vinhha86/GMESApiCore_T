@@ -350,4 +350,55 @@ public class TaskAPI {
 		    return new ResponseEntity<getall_flowstatus_reponse>(response, HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/reject_porder_req",method = RequestMethod.POST)
+	public ResponseEntity<reject_porder_req_response> RejectPorderReq(HttpServletRequest request, @RequestBody reject_porder_req_request entity) {
+		reject_porder_req_response response = new reject_porder_req_response();
+		try {
+			//Lay nguoi phu trach truoc
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long userid_link = user.getId();
+			long orgrootid_link = user.getRootorgid_link();
+			long taskid_link = entity.taskid_link;
+			long user_back_id_link = 0;
+			List<Task_Flow> list_flow = commentService.get_lasttest_by_userto(userid_link, taskid_link);
+			if(list_flow.size()>0) {
+				user_back_id_link = list_flow.get(0).getFromuserid_link();
+			}
+			
+			//Neu user back trung voi user dang nhap thi chuyen trang thai viec ve tu choi
+			Task task = taskService.findOne(taskid_link);
+			if(user_back_id_link == userid_link) {				
+				task.setStatusid_link(-1);
+			}
+			else {
+				task.setUserinchargeid_link(user_back_id_link);
+				task = taskService.save(task);
+								
+				//Tao comment 
+				String description = "";
+				GpayUser user_back = userService.findOne(user_back_id_link);
+				description = entity.comment + ", Việc được giao lại cho " + user_back.getFullname();
+				Task_Flow flow = new Task_Flow();
+				flow.setDatecreated(new Date());
+				flow.setDescription(description);
+				flow.setFlowstatusid_link(entity.status);
+				flow.setFromuserid_link(user.getId());
+				flow.setId(null);
+				flow.setOrgrootid_link(orgrootid_link);
+				flow.setTaskid_link(taskid_link);
+				flow.setTaskstatusid_link(task.getStatusid_link());
+				flow.setTouserid_link(user_back_id_link);
+				commentService.save(flow);
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<reject_porder_req_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<reject_porder_req_response>(response, HttpStatus.OK);
+		}
+	}
 }
