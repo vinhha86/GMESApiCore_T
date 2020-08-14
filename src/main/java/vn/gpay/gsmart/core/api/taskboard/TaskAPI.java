@@ -301,6 +301,7 @@ public class TaskAPI {
 			
 			Task task = taskService.findOne(taskid_link);
 			task.setUserinchargeid_link(userinchargeid_link);
+			task.setStatusid_link(1);
 			taskService.save(task);
 			
 			//sinh task flow
@@ -351,6 +352,61 @@ public class TaskAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/accept_porer_req",method = RequestMethod.POST)
+	public ResponseEntity<accept_task_response> AcceptPorderReq(HttpServletRequest request, @RequestBody accept_task_request entity) {
+		accept_task_response response = new accept_task_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			//Cap nhat trang thai cua task la da xong
+			Task task = taskService.findOne(entity.taskid_link);
+			task.setStatusid_link(2);
+			task.setDatefinished(new Date());
+			taskService.save(task);
+			
+			//Cap nhat cac check list la da done
+			List<Task_CheckList> list_checklist = checklistService.getby_taskid_link(entity.taskid_link);
+			for(Task_CheckList checklist : list_checklist) {
+				if(!checklist.getDone()) {
+					checklist.setDone(true);
+					checklist.setDatefinished(new Date());
+				}
+			}
+			
+			//Tao comment
+			String description = entity.comment;
+			Task_Flow flow = new Task_Flow();
+			flow.setDatecreated(new Date());
+			flow.setDescription(description);
+			flow.setFlowstatusid_link(1);
+			flow.setFromuserid_link(user.getId());
+			flow.setId(null);
+			flow.setOrgrootid_link(orgrootid_link);
+			flow.setTaskid_link(entity.taskid_link);
+			flow.setTaskstatusid_link(task.getStatusid_link());
+			flow.setTouserid_link(user.getId());
+			commentService.save(flow);
+			
+			Task_Flow_Status status = flowstatusService.findOne(1);
+			Comment comment = new Comment();
+			comment.setDate(new Date());
+			comment.setTaskId(entity.taskid_link);
+			comment.setText(entity.comment);
+			comment.setTypename(status.getName());
+			comment.setUserId(user.getId());
+			
+			response.comment = comment;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<accept_task_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<accept_task_response>(response, HttpStatus.OK);
+		}
+	}
+	
 	@RequestMapping(value = "/reject_porder_req",method = RequestMethod.POST)
 	public ResponseEntity<reject_porder_req_response> RejectPorderReq(HttpServletRequest request, @RequestBody reject_porder_req_request entity) {
 		reject_porder_req_response response = new reject_porder_req_response();
@@ -368,29 +424,25 @@ public class TaskAPI {
 			
 			//Neu user back trung voi user dang nhap thi chuyen trang thai viec ve tu choi
 			Task task = taskService.findOne(taskid_link);
-			if(user_back_id_link == userid_link) {				
-				task.setStatusid_link(-1);
-			}
-			else {
-				task.setUserinchargeid_link(user_back_id_link);
-				task = taskService.save(task);
-								
-				//Tao comment 
-				String description = "";
-				GpayUser user_back = userService.findOne(user_back_id_link);
-				description = entity.comment + ", Việc được giao lại cho " + user_back.getFullname();
-				Task_Flow flow = new Task_Flow();
-				flow.setDatecreated(new Date());
-				flow.setDescription(description);
-				flow.setFlowstatusid_link(entity.status);
-				flow.setFromuserid_link(user.getId());
-				flow.setId(null);
-				flow.setOrgrootid_link(orgrootid_link);
-				flow.setTaskid_link(taskid_link);
-				flow.setTaskstatusid_link(task.getStatusid_link());
-				flow.setTouserid_link(user_back_id_link);
-				commentService.save(flow);
-			}
+			task.setUserinchargeid_link(user_back_id_link);
+			task.setStatusid_link(-1);
+			task = taskService.save(task);
+							
+			//Tao comment 
+			String description = "";
+			GpayUser user_back = userService.findOne(user_back_id_link);
+			description = entity.comment + ", Việc được giao lại cho " + user_back.getFullname();
+			Task_Flow flow = new Task_Flow();
+			flow.setDatecreated(new Date());
+			flow.setDescription(description);
+			flow.setFlowstatusid_link(entity.status);
+			flow.setFromuserid_link(user.getId());
+			flow.setId(null);
+			flow.setOrgrootid_link(orgrootid_link);
+			flow.setTaskid_link(taskid_link);
+			flow.setTaskstatusid_link(task.getStatusid_link());
+			flow.setTouserid_link(user_back_id_link);
+			commentService.save(flow);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
