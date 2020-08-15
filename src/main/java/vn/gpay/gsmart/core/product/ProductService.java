@@ -298,6 +298,7 @@ public class ProductService extends AbstractService<Product> implements IProduct
 				.build();
 
 		List<Product> lst = repo.findAll(specification);
+//		List<Product> lst = repo.findAllIgnoreCase(specification);
 		return lst;
 	}
 

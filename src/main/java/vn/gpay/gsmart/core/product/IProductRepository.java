@@ -59,5 +59,8 @@ public interface IProductRepository extends JpaRepository<Product, Long>, JpaSpe
 			+ "where d.id is null "
 			+ "group by c.id")
 	public List<Long> getproduct_notinbuyer();
+	
+//	@Query(value = "select c from Product c")
+//	public List<Product> findAllIgnoreCase(@Nullable Specification<Product> spec);
 
 }

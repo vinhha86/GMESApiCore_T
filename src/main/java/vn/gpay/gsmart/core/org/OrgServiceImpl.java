@@ -248,6 +248,7 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 		// TODO Auto-generated method stub
 		Specification<Org> specification = Specifications.<Org>and()
 	            .eq("parentid_link", orgid_link)
+	            .ge("status", 0)
 	            .in(list_typeid.size() > 0,"orgtypeid_link", list_typeid.toArray())
 	            .build();
 		Sort sort = Sorts.builder()

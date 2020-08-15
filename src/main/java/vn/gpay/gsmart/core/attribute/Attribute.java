@@ -1,16 +1,27 @@
 package vn.gpay.gsmart.core.attribute;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.attributevalue.Attributevalue;
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 @Table(name="attribute")
@@ -55,6 +66,20 @@ public class Attribute implements Serializable {
 	
 	private Boolean isthread;
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
+	@JoinColumn( name="attributeid_link", referencedColumnName="id")	
+    private List<Attributevalue> attvalues = new ArrayList<Attributevalue>();
+	
+    
+	public List<Attributevalue> getAttvalues() {
+		return attvalues;
+	}
+
+	public void setAttvalues(List<Attributevalue> attvalues) {
+		this.attvalues = attvalues;
+	}
+
 	public Boolean getIsthread() {
 		return isthread;
 	}

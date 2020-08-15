@@ -113,6 +113,19 @@ public class AttributeAPI {
 				attribute.setOrgrootid_link(user.getRootorgid_link());
 				attribute.setUsercreateid_link(user.getId());
 				attribute.setTimecreate(new Date());
+				
+				//Tao gia tri thuoc tinh mac dinh ALL
+				Attributevalue attvalue = new Attributevalue();
+				attvalue.setAttributeid_link(attribute.getId());
+				attvalue.setValue("ALL");
+				attvalue.setOrgrootid_link(user.getRootorgid_link());
+				attvalue.setUsercreateid_link(user.getId());
+				attvalue.setIsdefault(true);
+				attvalue.setTimecreate(new Date());
+				attvalue.setSortvalue(1);
+				
+				attribute.getAttvalues().add(attvalue);
+				
 			}else {
 				Attribute _old =  attService.findOne(attribute.getId());
 				attribute.setOrgrootid_link(_old.getOrgrootid_link());
@@ -120,6 +133,7 @@ public class AttributeAPI {
 				attribute.setTimecreate(_old.getTimecreate());
 			}
 			attService.save(attribute);
+			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
