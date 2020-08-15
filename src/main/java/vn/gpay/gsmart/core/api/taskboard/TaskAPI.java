@@ -301,7 +301,7 @@ public class TaskAPI {
 			
 			Task task = taskService.findOne(taskid_link);
 			task.setUserinchargeid_link(userinchargeid_link);
-			task.setStatusid_link(1);
+			task.setStatusid_link(0);
 			taskService.save(task);
 			
 			//sinh task flow
@@ -316,6 +316,7 @@ public class TaskAPI {
 			comment.setTaskid_link(taskid_link);
 			comment.setTaskstatusid_link(task.getStatusid_link());
 			comment.setTouserid_link(userinchargeid_link);
+			comment.setFlowstatusid_link(3);
 			commentService.save(comment);
 			
 			Comment cmt = new Comment();
@@ -349,6 +350,28 @@ public class TaskAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<getall_flowstatus_reponse>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/update_state_task",method = RequestMethod.POST)
+	public ResponseEntity<update_task_state_response> UpdateTaskState(HttpServletRequest request, @RequestBody update_task_state_request entity) {
+		update_task_state_response response = new update_task_state_response();
+		try {
+			Task task = taskService.findOne(entity.taskid_link);
+			task.setStatusid_link(entity.taskstatusid_link);
+			if(entity.taskstatusid_link == 2) {
+				task.setDatefinished(new Date());
+				task.setPercentdone(100);
+			}
+			taskService.save(task);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<update_task_state_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<update_task_state_response>(response, HttpStatus.OK);
 		}
 	}
 	

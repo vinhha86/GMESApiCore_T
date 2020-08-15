@@ -460,13 +460,13 @@ public class Common  {
 	public String getState(int status) {
 		switch (status) {
 		case 0:
-			return "NotStarted";
+			return "ChuaLam";
 		case 1:
-			return "InProgress";
+			return "DangLam";
 		case 2:
-			return "Done";
+			return "DaXong";
 		case -1:
-			return "Reject";
+			return "TuChoi";
 		default:
 			return "";
 		}
