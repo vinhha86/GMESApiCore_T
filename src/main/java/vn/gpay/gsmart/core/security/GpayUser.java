@@ -73,10 +73,16 @@ public class GpayUser implements UserDetails {
 	private List<AppRole_User>  list_menu  = new ArrayList<AppRole_User>();
 	
 	@Transient
-	public Long Id = id;
+	@JsonProperty("Id")
+	public Long Id() {
+		return id;
+	}
 	
 	@Transient
-	public String Name = fullname;
+	@JsonProperty("Name")
+	public String Name() {
+		return fullname;
+	}
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
