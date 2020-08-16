@@ -39,7 +39,6 @@ public class GpayUser implements UserDetails {
 	@Id
 //	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_generator")
 //	@SequenceGenerator(name="user_generator", sequenceName = "user_id_seq", allocationSize=1)
-	@JsonProperty("Id")
 	protected Long id;
 	
 	private String email;
@@ -51,7 +50,6 @@ public class GpayUser implements UserDetails {
 	private String firstname;
 	
 	private String middlename;
-	@JsonProperty("Name")
 	private String fullname;
 	private String lastname;
 	private Integer status;
@@ -74,6 +72,11 @@ public class GpayUser implements UserDetails {
 	@JoinColumn( name="user_id", referencedColumnName="id")
 	private List<AppRole_User>  list_menu  = new ArrayList<AppRole_User>();
 	
+	@Transient
+	public Long Id = id;
+	
+	@Transient
+	public String Name = fullname;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
