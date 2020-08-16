@@ -65,6 +65,7 @@ public class GpayUser implements UserDetails {
 	private String userrole;
 	private String tel_mobile;
 	private String tel_office;
+	private Long org_grant_id_link;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
@@ -340,6 +341,14 @@ public class GpayUser implements UserDetails {
 
 	public void setCredentialsNonExpired(boolean credentialsNonExpired) {
 		this.credentialsNonExpired = credentialsNonExpired;
+	}
+
+	public Long getOrg_grant_id_link() {
+		return org_grant_id_link;
+	}
+
+	public void setOrg_grant_id_link(Long org_grant_id_link) {
+		this.org_grant_id_link = org_grant_id_link;
 	}
 	
 	

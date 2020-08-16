@@ -344,6 +344,7 @@ public class UserAPI {
 			appuser.setTel_mobile(entity.user.getTel_mobile());
 			appuser.setTel_office(entity.user.getTel_office());
 			appuser.setStatus(entity.user.getStatus());
+			appuser.setOrg_grant_id_link(entity.user.getOrg_grant_id_link());
 			
 			userDetailsService.save(appuser);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

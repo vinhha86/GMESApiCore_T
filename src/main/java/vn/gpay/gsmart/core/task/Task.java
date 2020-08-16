@@ -55,6 +55,7 @@ public class Task implements Serializable {
 	@OneToMany
     @JoinColumn(name="taskid_link",insertable=false,updatable =false)
     private List<Task_Flow> comments = new ArrayList<Task_Flow>();
+    
 	
 	public Long getId() {
 		return id; 
