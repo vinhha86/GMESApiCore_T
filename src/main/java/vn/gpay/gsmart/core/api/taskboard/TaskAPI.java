@@ -63,6 +63,7 @@ public class TaskAPI {
 				binding.setDescription(task.getDescription());
 				binding.setTasktypeid_link(task.getTasktypeid_link());
 				binding.setCls_task(commonService.getCls(task.getTasktypeid_link()));
+				binding.setOrgid_link(task.getOrgid_link());
 				
 				//get checklist
 				List<SubTask> list_subtask = new ArrayList<SubTask>();
@@ -350,6 +351,22 @@ public class TaskAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<getall_flowstatus_reponse>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/getall_tasktype",method = RequestMethod.POST)
+	public ResponseEntity<getall_tasktype_response> GetAllTaskType(HttpServletRequest request) {
+		getall_tasktype_response response = new getall_tasktype_response();
+		try {
+			response.data = tasktypeService.findAll();
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getall_tasktype_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<getall_tasktype_response>(response, HttpStatus.OK);
 		}
 	}
 	

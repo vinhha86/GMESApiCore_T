@@ -10,13 +10,16 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.task_checklist.Task_CheckList;
 import vn.gpay.gsmart.core.task_flow.Task_Flow;
 
@@ -56,6 +59,17 @@ public class Task implements Serializable {
     @JoinColumn(name="taskid_link",insertable=false,updatable =false)
     private List<Task_Flow> comments = new ArrayList<Task_Flow>();
     
+    @NotFound(action = NotFoundAction.IGNORE)
+   	@ManyToOne
+    @JoinColumn(name="userinchargeid_link",insertable=false,updatable =false)
+    private GpayUser user_incharge;
+    
+    @Transient
+    public Long getOrgid_link() {
+    	if(user_incharge!=null)
+    		return user_incharge.getOrgid_link();
+    	return (long)0;
+    }
 	
 	public Long getId() {
 		return id; 

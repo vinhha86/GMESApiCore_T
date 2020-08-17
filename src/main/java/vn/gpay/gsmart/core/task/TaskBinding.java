@@ -30,6 +30,14 @@ public class TaskBinding {
 	private List<Comment> Comments = new ArrayList<Comment>();
 	private Long tasktypeid_link;
 	private String cls_task;
+	private Long orgid_link;
+	
+	public Long getOrgid_link() {
+		return orgid_link;
+	}
+	public void setOrgid_link(Long orgid_link) {
+		this.orgid_link = orgid_link;
+	}
 	public Long getId() {
 		return Id;
 	}
