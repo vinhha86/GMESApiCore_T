@@ -29,6 +29,7 @@ import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.task_object.ITask_Object_Service;
 import vn.gpay.gsmart.core.task_object.Task_Object;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.POStatus;
@@ -47,6 +48,7 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 	@Autowired private IPOrder_Req_Service porder_req_Service;
 	@Autowired IPContract_PO_ShippingService poshippingService;
 	@Autowired Common commonService;
+	@Autowired ITask_Object_Service taskobjectService;
 	
 	@RequestMapping(value = "/create",method = RequestMethod.POST)
 	public ResponseEntity<PContract_pocreate_response> PContractCreate(@RequestBody PContract_pocreate_request entity,HttpServletRequest request ) {
@@ -136,7 +138,7 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 					object_porder_req.setTaskobjecttypeid_link((long)TaskObjectType_Name.YeuCauSanXuat);
 					list_object.add(object_porder_req);
 					
-					commonService.CreateTask(orgrootid_link, orgid_link, usercreatedid_link, tasktypeid_link, list_object);
+					commonService.CreateTask(orgrootid_link, orgid_link, usercreatedid_link, tasktypeid_link, list_object, null);
 				} else {
 					POrder_Req porder_req = porder_req_Service.findOne(porder.getId());
 					porder_req.setTotalorder(porder.getTotalorder());
@@ -318,12 +320,47 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 			HttpServletRequest request ) {
 		ResponseBase response = new ResponseBase();
 		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			long orgid_link = entity.orgid_link;
+			long userid_link = user.getId();
+			
 			PContract_PO po = pcontract_POService.findOne(entity.pcontract_poid_link);
 			po.setOrgmerchandiseid_link(entity.orgid_link);
 			po.setMerchandiserid_link(entity.userid_link);
 			po.setStatus(POStatus.PO_STATUS_CONFIRMED);
 			
 			pcontract_POService.save(po);			
+			
+			//Sinh Cong viec
+			long pcontractid_link = po.getPcontractid_link();
+			long pcontract_poid_link = po.getId();
+			
+			List<Task_Object> list_object = new ArrayList<Task_Object>();
+			
+			Task_Object object_pcontract = new Task_Object();
+			object_pcontract.setId(null);
+			object_pcontract.setObjectid_link(pcontractid_link);
+			object_pcontract.setOrgrootid_link(orgrootid_link);
+			object_pcontract.setTaskobjecttypeid_link((long)TaskObjectType_Name.DonHang);
+			list_object.add(object_pcontract);
+			
+			Task_Object object_pcontractpo = new Task_Object();
+			object_pcontractpo.setId(null);
+			object_pcontractpo.setObjectid_link(pcontract_poid_link);
+			object_pcontractpo.setOrgrootid_link(orgrootid_link);
+			object_pcontractpo.setTaskobjecttypeid_link((long)TaskObjectType_Name.DonHangPO);
+			list_object.add(object_pcontractpo);
+			
+			long userinchargeid_link = entity.userid_link;
+			long tasktypeid_link_chitiet = 1; // chi tiet don hang
+			commonService.CreateTask(orgrootid_link, orgid_link, userid_link, tasktypeid_link_chitiet, list_object, userinchargeid_link);
+			
+			long tasktypeid_link_haiquan = 2; // dinh muc hai quan
+			commonService.CreateTask(orgrootid_link, orgid_link, userid_link, tasktypeid_link_haiquan, list_object, userinchargeid_link);
+			
+			long tasktypeid_link_candoi = 3; // dinh muc can doi
+			commonService.CreateTask(orgrootid_link, orgid_link, userid_link, tasktypeid_link_candoi, list_object, userinchargeid_link);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

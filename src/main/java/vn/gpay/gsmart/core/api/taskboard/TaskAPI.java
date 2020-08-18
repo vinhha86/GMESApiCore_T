@@ -452,7 +452,7 @@ public class TaskAPI {
 			List<Task_Object> list_object = new ArrayList<Task_Object>();
 			list_object = taskobjectService.getbyTask(task.getId());
 			
-			commonService.CreateTask(orgrootid_link, orgid_link, userid_link, tasktypeid_link, list_object);
+			commonService.CreateTask(orgrootid_link, orgid_link, userid_link, tasktypeid_link, list_object, null);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

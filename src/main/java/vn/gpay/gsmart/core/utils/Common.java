@@ -84,7 +84,7 @@ public class Common  {
 	
 	@Autowired IStockingUniqueService stockService;
 	
-	public Long CreateTask(Long orgrootid_link, Long orgid_link, Long userid_link, long tasktypeid_link, List<Task_Object> list_object) {
+	public Long CreateTask(Long orgrootid_link, Long orgid_link, Long userid_link, long tasktypeid_link, List<Task_Object> list_object, Long userinchargeid_link) {
 		int year = Calendar.getInstance().get(Calendar.YEAR);
 		TaskType tasktype = tasktypeService.findOne(tasktypeid_link);
 		
@@ -92,10 +92,12 @@ public class Common  {
 		String taskname = tasktype.getName() + ": "+org.getCode();
 		
 		String description = getDescriptoin_bytype(tasktypeid_link, list_object);
-		Long userinchargeid_link = null;
-		List<Task_Grant> grants = taskgrantService.getby_tasktype_and_org(tasktypeid_link, orgid_link);
-		if(grants.size()>0)
-			userinchargeid_link = grants.get(0).getUserid_link();
+		if(userinchargeid_link == null) {
+			List<Task_Grant> grants = taskgrantService.getby_tasktype_and_org(tasktypeid_link, orgid_link);
+			if(grants.size()>0)
+				userinchargeid_link = grants.get(0).getUserid_link();
+		}
+		
 		
 		Task task = new Task();
 		task.setDatecreated(new Date());
@@ -170,7 +172,7 @@ public class Common  {
 			name = "PO Buyer: "+po.getPo_buyer()+ " PO Vendor: "+ po.getPo_vendor() + " Ngày Giao: "+ dateFormat.format(po.getShipdate())
 			+ " SL: " + FormatNumber(po.getPo_quantity().intValue());
 			return name;
-		case 4:
+		case 1:
 			Long pcontractid_link = null;
 			pcontract_poid_link = null;
 			
@@ -189,6 +191,78 @@ public class Common  {
 			}
 			
 			PContract pcontract = pcontractService.findOne(pcontractid_link);
+			po = poService.findOne(pcontract_poid_link);
+			dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
+			name = "Mã HĐ: " + pcontract.getContractcode()+" PO Buyer: "+po.getPo_buyer()+ " PO Vendor: "+ po.getPo_vendor() + " Ngày Giao: "+ dateFormat.format(po.getShipdate())
+			+ " SL: " + FormatNumber(po.getPo_quantity().intValue());
+			return name;
+		case 2:
+			pcontractid_link = null;
+			pcontract_poid_link = null;
+			
+			for(Task_Object object : list_object) {
+				if(object.getTaskobjecttypeid_link().intValue() == TaskObjectType_Name.DonHang) {
+					pcontractid_link = object.getObjectid_link();
+					break;
+				}
+			}
+			
+			for(Task_Object object : list_object) {
+				if(object.getTaskobjecttypeid_link().intValue() == TaskObjectType_Name.DonHangPO) {
+					pcontract_poid_link = object.getObjectid_link();
+					break;
+				}
+			}
+			
+			pcontract = pcontractService.findOne(pcontractid_link);
+			po = poService.findOne(pcontract_poid_link);
+			dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
+			name = "Mã HĐ: " + pcontract.getContractcode()+" PO Buyer: "+po.getPo_buyer()+ " PO Vendor: "+ po.getPo_vendor() + " Ngày Giao: "+ dateFormat.format(po.getShipdate())
+			+ " SL: " + FormatNumber(po.getPo_quantity().intValue());
+			return name;
+		case 3:
+			pcontractid_link = null;
+			pcontract_poid_link = null;
+			
+			for(Task_Object object : list_object) {
+				if(object.getTaskobjecttypeid_link().intValue() == TaskObjectType_Name.DonHang) {
+					pcontractid_link = object.getObjectid_link();
+					break;
+				}
+			}
+			
+			for(Task_Object object : list_object) {
+				if(object.getTaskobjecttypeid_link().intValue() == TaskObjectType_Name.DonHangPO) {
+					pcontract_poid_link = object.getObjectid_link();
+					break;
+				}
+			}
+			
+			pcontract = pcontractService.findOne(pcontractid_link);
+			po = poService.findOne(pcontract_poid_link);
+			dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
+			name = "Mã HĐ: " + pcontract.getContractcode()+" PO Buyer: "+po.getPo_buyer()+ " PO Vendor: "+ po.getPo_vendor() + " Ngày Giao: "+ dateFormat.format(po.getShipdate())
+			+ " SL: " + FormatNumber(po.getPo_quantity().intValue());
+			return name;
+		case 4:
+			pcontractid_link = null;
+			pcontract_poid_link = null;
+			
+			for(Task_Object object : list_object) {
+				if(object.getTaskobjecttypeid_link().intValue() == TaskObjectType_Name.DonHang) {
+					pcontractid_link = object.getObjectid_link();
+					break;
+				}
+			}
+			
+			for(Task_Object object : list_object) {
+				if(object.getTaskobjecttypeid_link().intValue() == TaskObjectType_Name.DonHangPO) {
+					pcontract_poid_link = object.getObjectid_link();
+					break;
+				}
+			}
+			
+			pcontract = pcontractService.findOne(pcontractid_link);
 			po = poService.findOne(pcontract_poid_link);
 			dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
 			name = "Mã HĐ: " + pcontract.getContractcode()+" PO Buyer: "+po.getPo_buyer()+ " PO Vendor: "+ po.getPo_vendor() + " Ngày Giao: "+ dateFormat.format(po.getShipdate())
