@@ -16,4 +16,6 @@ public interface IPContract_POService extends Operations<PContract_PO> {
 
 	List<PContract_PO> getPO_LaterShipdate(Long orgrootid_link, Long pcontractid_link, Long productid_link,
 			Date shipdate);
+
+	List<PContract_PO> getPOByContractAndProduct(Long pcontractid_link, Long productid_link);
 }

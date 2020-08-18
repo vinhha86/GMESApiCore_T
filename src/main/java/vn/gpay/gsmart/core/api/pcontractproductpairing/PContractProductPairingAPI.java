@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.api.pcontractproduct.PContractProduct_getall_response;
 import vn.gpay.gsmart.core.base.ResponseBase;
+import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontractproduct.IPContractProductService;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProductBinding;
@@ -41,6 +42,7 @@ public class PContractProductPairingAPI {
 	@Autowired IProductPairingService prodctpairservice;
 	@Autowired IProductService productService;
 	@Autowired IPContractProductPairingService ppPairingservice;
+	@Autowired IPContract_POService pcontract_POService;
 	
 	@RequestMapping(value = "/getproductnotpair", method = RequestMethod.POST)
 	public ResponseEntity<PContractProduct_getall_response> GetProductNotPair(HttpServletRequest request,
@@ -156,16 +158,29 @@ public class PContractProductPairingAPI {
 		try {
 //			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
 //					.getPrincipal();
-			long id = entity.id;
-			ppPairingservice.deleteById(id);
+			PContractProductPairing pproduct = ppPairingservice.findOne(entity.id);
+			long pcontractid_link = pproduct.getPcontractid_link();
+			long productid_link = pproduct.getProductpairid_link();
 			
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			//Kiem tra xem co PO lien quan den san pham trong HD khong? Neu co ko cho xoa
+			if (pcontract_POService.getPOByContractAndProduct(pcontractid_link, productid_link).size() > 0){
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage("Đã tồn tại PO của sản phẩm trong Hợp đồng! Không thể xóa sản phẩm");
+				return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+			} else {
+				long id = entity.id;
+				ppPairingservice.deleteById(id);
+				
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+			}
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		
 	}
 	
 	private byte[] getimg(String filename, String uploadRootPath) {

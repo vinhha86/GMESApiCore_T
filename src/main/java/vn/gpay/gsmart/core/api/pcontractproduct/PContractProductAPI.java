@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
+import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontractattributevalue.IPContractProductAtrributeValueService;
 import vn.gpay.gsmart.core.pcontractattributevalue.PContractAttributeValue;
 import vn.gpay.gsmart.core.pcontractproduct.IPContractProductService;
@@ -32,6 +33,7 @@ import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.product.IProductService;
 import vn.gpay.gsmart.core.product.Product;
+import vn.gpay.gsmart.core.productpairing.IProductPairingService;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 import vn.gpay.gsmart.core.sku.SKU_Attribute_Value;
@@ -49,6 +51,8 @@ public class PContractProductAPI {
 	@Autowired IPContractProducDocumentService docService;
 	@Autowired ISKU_AttributeValue_Service skuavService;
 	@Autowired IPContractProductPairingService pppairService;
+	@Autowired IPContract_POService pcontract_POService;
+	@Autowired IProductPairingService productparingService;
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
  	public ResponseEntity<ResponseBase> Create(HttpServletRequest request,
@@ -235,7 +239,7 @@ public class PContractProductAPI {
 	}
 	
 	@RequestMapping(value = "/delete", method = RequestMethod.POST)
-	public ResponseEntity<ResponseBase> Update(HttpServletRequest request,
+	public ResponseEntity<ResponseBase> Delete(HttpServletRequest request,
 			@RequestBody PContractProduct_delete_product_request entity) {
 		ResponseBase response = new ResponseBase();
 		try {
@@ -246,36 +250,53 @@ public class PContractProductAPI {
 			long pcontractid_link = pproduct.getPcontractid_link();
 			long productid_link = pproduct.getProductid_link();
 			
-			//Xoa san pham trong don hang
-			pcpservice.deleteById(entity.id);
-			
-			//Xoa thuoc tinh cua san pham
-			
-			List<PContractAttributeValue> listAttvalue = pcpavservice.getattribute_by_product_and_pcontract(orgrootid_link, pcontractid_link, productid_link);
-			for(PContractAttributeValue pav : listAttvalue) {
-				pcpavservice.delete(pav);
+			//Kim tra xem san pham co nam trong 1 bo san pham cua HD khong? Neu co khong cho xoa
+			List<Long> lsPair = productparingService.getproductid_pairing_bycontract(orgrootid_link, pcontractid_link);
+			for(Long thePair: lsPair){
+				if(productid_link == thePair){
+					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+					response.setMessage("Sản phẩm đang tồn tại trong bộ! Không thể xóa sản phẩm");
+					return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+				}
 			}
-			
-			//Xóa sku của sản phẩm
-			List<PContractProductSKU> listsku = pskuservice.getlistsku_byproduct_and_pcontract(orgrootid_link, productid_link, pcontractid_link);
-			for(PContractProductSKU sku : listsku) {
-				pskuservice.delete(sku);
+			//Kiem tra xem co PO lien quan den san pham trong HD khong? Neu co ko cho xoa
+			if (pcontract_POService.getPOByContractAndProduct(pcontractid_link, productid_link).size() > 0){
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage("Đã tồn tại PO của sản phẩm trong Hợp đồng! Không thể xóa sản phẩm");
+				return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 			}
-			
-			//Xoa tai lieu
-			
-			List<PContractProductDocument> listdoc = docService.getlist_byproduct(orgrootid_link, pcontractid_link, productid_link);
-			for(PContractProductDocument doc : listdoc) {
-				docService.delete(doc);
+			else {
+				//Xoa san pham trong don hang
+				pcpservice.deleteById(entity.id);
+				
+				//Xoa thuoc tinh cua san pham
+				
+				List<PContractAttributeValue> listAttvalue = pcpavservice.getattribute_by_product_and_pcontract(orgrootid_link, pcontractid_link, productid_link);
+				for(PContractAttributeValue pav : listAttvalue) {
+					pcpavservice.delete(pav);
+				}
+				
+				//Xóa sku của sản phẩm
+				List<PContractProductSKU> listsku = pskuservice.getlistsku_byproduct_and_pcontract(orgrootid_link, productid_link, pcontractid_link);
+				for(PContractProductSKU sku : listsku) {
+					pskuservice.delete(sku);
+				}
+				
+				//Xoa tai lieu
+				
+				List<PContractProductDocument> listdoc = docService.getlist_byproduct(orgrootid_link, pcontractid_link, productid_link);
+				for(PContractProductDocument doc : listdoc) {
+					docService.delete(doc);
+				}
+				
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 			}
-			
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
 	

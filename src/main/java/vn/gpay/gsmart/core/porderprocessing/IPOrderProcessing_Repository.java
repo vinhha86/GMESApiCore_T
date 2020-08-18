@@ -21,15 +21,23 @@ public interface IPOrderProcessing_Repository extends JpaRepository<POrderProces
 	//get all production order until the given date
 	@Query(value = "select a from POrderProcessing a where a.status <6 and a.processingdate = "
 			+ "(select max(b.processingdate) from POrderProcessing b where b.processingdate <= :processingdate_to "
-			+ "and b.porderid_link = a.porderid_link)")
+			+ "and b.pordergrantid_link = a.pordergrantid_link)")
 	public List<POrderProcessing>getByDate(@Param ("processingdate_to")final Date processingdate_to);
 	
 	@Query(value = "select a from POrderProcessing a inner join POrder c on a.porderid_link = c.id "
 			+ "where c.granttoorgid_link = :factoryid_link "
 			+ "and a.status <6 and a.processingdate = "
 			+ "(select max(b.processingdate) from POrderProcessing b where b.processingdate <= :processingdate_to "
-			+ "and b.porderid_link = a.porderid_link and b.pordergrantid_link = a.pordergrantid_link)")
+			+ "and b.pordergrantid_link = a.pordergrantid_link)")
 	public List<POrderProcessing>getByDateAndFactory(@Param ("processingdate_to")final Date processingdate_to, @Param ("factoryid_link")final Long factoryid_link);
+	
+	@Query(value = "select a from POrderProcessing a "
+			+ "where a.status <6 and a.processingdate = "
+			+ "(select max(b.processingdate) from POrderProcessing b where b.processingdate <= :processingdate_to "
+			+ "and b.pordergrantid_link = a.pordergrantid_link) "
+			+ "and a.granttoorgid_link in (select id from Org where parentid_link=:factoryid_link)")
+	public List<POrderProcessing>getByDateAndFactory2(@Param ("processingdate_to")final Date processingdate_to, @Param ("factoryid_link")final Long factoryid_link);
+
 	
 	//get all by salaryymonth
 	@Query(value = "select a from POrderProcessing a inner join POrder b on a.porderid_link = b.id where b.salaryyear=:salaryyear and b.salarymonth=:salarymonth")
@@ -64,7 +72,7 @@ public interface IPOrderProcessing_Repository extends JpaRepository<POrderProces
 	public List<POrderProcessing>getByBeforeDateAndOrderCode(@Param ("ordercode")final String ordercode, @Param ("processingdate_to")final Date processingdate_to);
 
 	//get a production order before the given date
-	@Query(value = "select a from POrderProcessing a where a.ordercode = :ordercode and a.processingdate = "
+	@Query(value = "select a from POrderProcessing a where a.pordergrantid_link = :pordergrantid_link and a.processingdate = "
 			+ "(select max(b.processingdate) from POrderProcessing b where b.processingdate < :processingdate_to "
 			+ "and b.pordergrantid_link = :pordergrantid_link)")
 	public List<POrderProcessing>getByBeforeDateAndOrderGrantID(@Param ("pordergrantid_link")final Long pordergrantid_link, @Param ("processingdate_to")final Date processingdate_to);
