@@ -381,6 +381,23 @@ public class POrderProcessing implements Serializable {
 		}
 		return null;
 	}
+	
+	@Transient
+	public String getPo_buyer() {
+		if(porder != null) {
+			return porder.getPo_buyer();
+		}
+		return null;
+	}
+	
+	@Transient
+	public String getPo_vendor() {
+		if(porder != null) {
+			return porder.getPo_vendor();
+		}
+		return null;
+	}
+	
 	public Boolean getIsstockouttocut() {
 		return isstockouttocut;
 	}

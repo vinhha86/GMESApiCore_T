@@ -75,6 +75,85 @@ public class POrderProcessingAPI {
 		    return new ResponseEntity<POrderProcessingResponse>(response,HttpStatus.OK);
 		}    	
     }
+    
+    @RequestMapping(value = "/getbyid",method = RequestMethod.POST)
+	public ResponseEntity<POrderProcessingResponse> getById(@RequestBody PProcessByDateRequest entity, HttpServletRequest request) {
+		POrderProcessingResponse response = new POrderProcessingResponse();
+		try {
+//			List<POrderProcessing> pprocessList = pprocessRepository.getByDateAll(entity.processingdate_to, entity.orgid);
+
+			List<POrderProcessing> pprocessList = new ArrayList<POrderProcessing>();
+			pprocessList.add(pprocessRepository.findOne(entity.orgid)); // entity.orgid here is pprocess id
+			
+			//If processingdate <> entity.processingdate_to --> Calcucate Amount's value of provided date
+			for(POrderProcessing pprocess: pprocessList){
+				System.out.println(pprocess.getGranttoorgid_link());
+				//Nếu số cắt TT ==0 --> gán bằng số cắt dự kiến để vẫn cho vào chuyền, hiện đỏ để lưu í
+				pprocess.setIscuttt(0);
+				if (null == pprocess.getAmountcutsum() || 0 == pprocess.getAmountcutsum()){
+					pprocess.setIscuttt(1);
+					pprocess.setAmountcutsum(pprocess.getGrantamount());
+				}
+				
+				if (GPAYDateFormat.atStartOfDay(pprocess.getProcessingdate()).before(GPAYDateFormat.atStartOfDay(entity.processingdate_to))){
+					pprocess.setProcessingdate(entity.processingdate_to);
+					
+					pprocess.setAmountcutsumprev(pprocess.getAmountcutsum());
+					pprocess.setAmountcut(0);
+					pprocess.setAmountcutsum(pprocess.getAmountcutsum());
+					
+					pprocess.setAmountinputsumprev(pprocess.getAmountinputsum());
+					pprocess.setAmountinput(0);
+					pprocess.setAmountinputsum(pprocess.getAmountinputsum());
+					
+					pprocess.setAmountoutputsumprev(pprocess.getAmountoutputsum());
+					pprocess.setAmountoutput(0);
+					pprocess.setAmountoutputsum(pprocess.getAmountoutputsum());
+					
+					pprocess.setAmounterrorsumprev(pprocess.getAmounterrorsum());
+					pprocess.setAmounterror(0);
+					pprocess.setAmounterrorsum(pprocess.getAmounterrorsum());
+					
+					pprocess.setAmountkcssumprev(pprocess.getAmountkcssum());
+					pprocess.setAmountkcs(0);
+					pprocess.setAmountkcssum(pprocess.getAmountkcssum());	
+					
+					pprocess.setAmountpackedsumprev(pprocess.getAmountpackedsum());
+					pprocess.setAmountpacked(0);
+					pprocess.setAmountpackedsum(pprocess.getAmountpackedsum());		
+					
+					pprocess.setAmountstockedsumprev(pprocess.getAmountstockedsum());
+					pprocess.setAmountstocked(0);
+					pprocess.setAmountstockedsum(pprocess.getAmountstockedsum());
+					
+					pprocess.setAmounttarget(0);
+					pprocess.setAmounttargetprev(pprocess.getAmounttarget());
+					
+					pprocess.setAmountkcsreg(0);
+					pprocess.setAmountkcsregprev(pprocess.getAmountkcsreg());
+					
+					pprocess.setComment("");
+				} else {
+	    			List<POrderProcessing> pprocessList_BeforeDate = pprocessRepository.getByBeforeDateAndOrderGrantID(pprocess.getPordergrantid_link(), entity.processingdate_to);
+	    			if (null != pprocessList_BeforeDate && pprocessList_BeforeDate.size() > 0){
+	    				POrderProcessing pprocess_beforedate = pprocessList_BeforeDate.get(0);
+	    				pprocess.setAmountkcsregprev(pprocess_beforedate.getAmountkcsreg());
+	    				pprocess.setAmounttargetprev(pprocess_beforedate.getAmounttarget());
+	    			}
+				}
+			}
+			
+			response.data=pprocessList;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
+			return new ResponseEntity<POrderProcessingResponse>(response,HttpStatus.OK);
+		}catch (Exception e) {
+
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());			
+		    return new ResponseEntity<POrderProcessingResponse>(HttpStatus.OK);
+		}    			
+	}
      
 	@RequestMapping(value = "/getbydate",method = RequestMethod.POST)
 	public ResponseEntity<POrderProcessingResponse> getByDate(@RequestBody PProcessByDateRequest entity, HttpServletRequest request) {
