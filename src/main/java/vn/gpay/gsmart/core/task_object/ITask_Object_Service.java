@@ -6,4 +6,5 @@ import vn.gpay.gsmart.core.base.Operations;
 
 public interface ITask_Object_Service extends Operations<Task_Object> {
 	List<Task_Object> getbyObjectType_and_objectid_link(Long objecttypeid_link, Long objectid_link);
+	List<Task_Object> getbyTask(Long taskid_link);
 }

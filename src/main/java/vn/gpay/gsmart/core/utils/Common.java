@@ -22,6 +22,8 @@ import vn.gpay.gsmart.core.holiday.Holiday;
 import vn.gpay.gsmart.core.holiday.IHolidayService;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
+import vn.gpay.gsmart.core.pcontract.IPContractService;
+import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontractattributevalue.IPContractProductAtrributeValueService;
@@ -60,6 +62,7 @@ public class Common  {
 	
 
 	@Autowired IPContractBOMSKUService pcontractBOMSKUService;
+	@Autowired IPContractService pcontractService;
 	@Autowired ISKU_AttributeValue_Service skuavService;
 	@Autowired IPContractBOMColorService bomcolorService;
 	@Autowired IPContractProductAtrributeValueService ppavService;
@@ -137,7 +140,7 @@ public class Common  {
 		Task_Flow flow = new Task_Flow();
 		flow.setDatecreated(new Date());
 		flow.setDescription("Tạo việc");
-		flow.setFlowstatusid_link(5);
+		flow.setFlowstatusid_link(3);
 		flow.setFromuserid_link(userid_link);
 		flow.setId(null);
 		flow.setOrgrootid_link(orgrootid_link);
@@ -165,6 +168,30 @@ public class Common  {
 			PContract_PO po = poService.findOne(pcontract_poid_link);
 			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
 			name = "PO Buyer: "+po.getPo_buyer()+ " PO Vendor: "+ po.getPo_vendor() + " Ngày Giao: "+ dateFormat.format(po.getShipdate())
+			+ " SL: " + FormatNumber(po.getPo_quantity().intValue());
+			return name;
+		case 4:
+			Long pcontractid_link = null;
+			pcontract_poid_link = null;
+			
+			for(Task_Object object : list_object) {
+				if(object.getTaskobjecttypeid_link().intValue() == TaskObjectType_Name.DonHang) {
+					pcontractid_link = object.getObjectid_link();
+					break;
+				}
+			}
+			
+			for(Task_Object object : list_object) {
+				if(object.getTaskobjecttypeid_link().intValue() == TaskObjectType_Name.DonHangPO) {
+					pcontract_poid_link = object.getObjectid_link();
+					break;
+				}
+			}
+			
+			PContract pcontract = pcontractService.findOne(pcontractid_link);
+			po = poService.findOne(pcontract_poid_link);
+			dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
+			name = "Mã HĐ: " + pcontract.getContractcode()+" PO Buyer: "+po.getPo_buyer()+ " PO Vendor: "+ po.getPo_vendor() + " Ngày Giao: "+ dateFormat.format(po.getShipdate())
 			+ " SL: " + FormatNumber(po.getPo_quantity().intValue());
 			return name;
 		default:

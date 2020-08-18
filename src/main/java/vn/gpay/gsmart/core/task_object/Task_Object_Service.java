@@ -24,4 +24,10 @@ public class Task_Object_Service extends AbstractService<Task_Object> implements
 		return repo.getby_tasktype_and_objectid_link(objecttypeid_link, objectid_link);
 	}
 
+	@Override
+	public List<Task_Object> getbyTask(Long taskid_link) {
+		// TODO Auto-generated method stub
+		return repo.getbytask(taskid_link);
+	}
+
 }

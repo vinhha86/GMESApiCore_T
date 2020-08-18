@@ -28,6 +28,8 @@ import vn.gpay.gsmart.core.task_flow.ITask_Flow_Service;
 import vn.gpay.gsmart.core.task_flow.Task_Flow;
 import vn.gpay.gsmart.core.task_flow_status.ITask_Flow_Status_Service;
 import vn.gpay.gsmart.core.task_flow_status.Task_Flow_Status;
+import vn.gpay.gsmart.core.task_object.ITask_Object_Service;
+import vn.gpay.gsmart.core.task_object.Task_Object;
 import vn.gpay.gsmart.core.tasktype.ITaskType_Service;
 import vn.gpay.gsmart.core.tasktype.TaskType;
 import vn.gpay.gsmart.core.utils.Common;
@@ -43,6 +45,7 @@ public class TaskAPI {
 	@Autowired ITaskType_Service tasktypeService;
 	@Autowired ITask_Flow_Status_Service flowstatusService;
 	@Autowired IGpayUserService userService;
+	@Autowired ITask_Object_Service taskobjectService;
 	
 	@RequestMapping(value = "/getby_user",method = RequestMethod.POST)
 	public ResponseEntity<getby_user_response> GetByUser(HttpServletRequest request ) {
@@ -310,7 +313,7 @@ public class TaskAPI {
 			Task_Flow comment = new Task_Flow();
 			comment.setDatecreated(new Date());
 			comment.setDescription(description);
-			comment.setFlowstatusid_link(5);
+			comment.setFlowstatusid_link(3);
 			comment.setFromuserid_link(user.getId());
 			comment.setId(null);
 			comment.setOrgrootid_link(orgrootid_link);
@@ -360,6 +363,11 @@ public class TaskAPI {
 		try {
 			response.data = tasktypeService.findAll();
 			
+			TaskType type = new TaskType();
+			type.setId((long)-10);
+			type.setName("Tất cả");
+			response.data.add(type);
+			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<getall_tasktype_response>(response,HttpStatus.OK);
@@ -398,6 +406,7 @@ public class TaskAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
+			long userid_link = user.getId();
 			//Cap nhat trang thai cua task la da xong
 			Task task = taskService.findOne(entity.taskid_link);
 			task.setStatusid_link(2);
@@ -436,6 +445,14 @@ public class TaskAPI {
 			comment.setUserId(user.getId());
 			
 			response.comment = comment;
+			
+			//Tao viec: tao lenh san xuat cho merchandiser 
+			long tasktypeid_link = 4;
+			long orgid_link = user.getOrgid_link();
+			List<Task_Object> list_object = new ArrayList<Task_Object>();
+			list_object = taskobjectService.getbyTask(task.getId());
+			
+			commonService.CreateTask(orgrootid_link, orgid_link, userid_link, tasktypeid_link, list_object);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
