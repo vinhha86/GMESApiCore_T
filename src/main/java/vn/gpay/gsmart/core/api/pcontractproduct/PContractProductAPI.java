@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,6 +38,13 @@ import vn.gpay.gsmart.core.productpairing.IProductPairingService;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 import vn.gpay.gsmart.core.sku.SKU_Attribute_Value;
+import vn.gpay.gsmart.core.task.ITask_Service;
+import vn.gpay.gsmart.core.task.Task;
+import vn.gpay.gsmart.core.task_checklist.ITask_CheckList_Service;
+import vn.gpay.gsmart.core.task_checklist.Task_CheckList;
+import vn.gpay.gsmart.core.task_flow.ITask_Flow_Service;
+import vn.gpay.gsmart.core.task_flow.Task_Flow;
+import vn.gpay.gsmart.core.task_object.ITask_Object_Service;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -53,6 +61,10 @@ public class PContractProductAPI {
 	@Autowired IPContractProductPairingService pppairService;
 	@Autowired IPContract_POService pcontract_POService;
 	@Autowired IProductPairingService productparingService;
+	@Autowired ITask_Object_Service taskobjectService;
+	@Autowired ITask_CheckList_Service checklistService;
+	@Autowired ITask_Service taskService;
+	@Autowired ITask_Flow_Service commentService;
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
  	public ResponseEntity<ResponseBase> Create(HttpServletRequest request,
@@ -97,6 +109,92 @@ public class PContractProductAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/comfim_sizebreakdown", method = RequestMethod.POST)
+ 	public ResponseEntity<confim_sizebreakdown_response> ConfimSizeBreakdown(HttpServletRequest request,
+			@RequestBody confim_sizebreakdown_request entity) {
+ 		confim_sizebreakdown_response response = new confim_sizebreakdown_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			long pcontractid_link = entity.pcontractid_link;
+			long productid_link = entity.productid_link;
+			
+			// Cap nhat trang thai trong bang pcontract_product
+			List<PContractProduct> list_pp = pcpservice.get_by_product_and_pcontract(orgrootid_link, productid_link, pcontractid_link);
+			if(list_pp.size()>0) {
+				PContractProduct pp = list_pp.get(0);
+				pp.setIsbomdone(true);
+				pcpservice.save(pp);
+			}
+			
+			//cap nhat trang thai check list
+			List<Long> list_task = taskobjectService.getby_pcontract_and_product(pcontractid_link, productid_link);
+			for(Long taskid_link : list_task) {
+				
+				//Lay checklist cua task				
+				long tasktype_checklits_id_link = 4;
+				List<Task_CheckList> list_sub = checklistService.getby_taskid_link_and_typechecklist(taskid_link, tasktype_checklits_id_link);
+				
+				if(list_sub.size() > 0 ) {
+					
+					for(Task_CheckList checklist : list_sub) {
+						checklist.setDone(true);
+						checklistService.save(checklist);
+					}
+					
+					int task_status = 2;
+					List<Task_CheckList> list_checklist = checklistService.getby_taskid_link(taskid_link);
+					list_checklist.removeIf(c->c.getDone());
+					
+					if(list_checklist.size() > 0)
+						task_status = 1;
+					
+					Task task = taskService.findOne(taskid_link);
+					task.setStatusid_link(task_status);
+					if(task_status == 2)
+						task.setDatefinished(new Date());
+						
+					taskService.save(task);
+					
+					Task_Flow flow = new Task_Flow();
+					flow.setDatecreated(new Date());
+					flow.setDescription("Đã xác nhận chi tiết số lượng");
+					flow.setFlowstatusid_link(3);
+					flow.setFromuserid_link(user.getId());
+					flow.setId(null);
+					flow.setOrgrootid_link(orgrootid_link);
+					flow.setTaskid_link(taskid_link);
+					flow.setTaskstatusid_link(2);
+					flow.setTouserid_link(task.getUsercreatedid_link());
+					commentService.save(flow);
+					
+					if(task_status == 2) {
+						flow = new Task_Flow();
+						flow.setDatecreated(new Date());
+						flow.setDescription("Đã hoàn tất công việc");
+						flow.setFlowstatusid_link(3);
+						flow.setFromuserid_link(user.getId());
+						flow.setId(null);
+						flow.setOrgrootid_link(orgrootid_link);
+						flow.setTaskid_link(taskid_link);
+						flow.setTaskstatusid_link(2);
+						flow.setTouserid_link(task.getUsercreatedid_link());
+						commentService.save(flow);
+					}
+				}
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<confim_sizebreakdown_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<confim_sizebreakdown_response>(response, HttpStatus.OK);
 		}
 	}
 	

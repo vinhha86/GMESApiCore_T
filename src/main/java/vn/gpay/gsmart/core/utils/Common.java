@@ -38,6 +38,8 @@ import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
+import vn.gpay.gsmart.core.product.IProductService;
+import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 import vn.gpay.gsmart.core.stockingunique.IStockingUniqueService;
@@ -81,6 +83,8 @@ public class Common  {
 	@Autowired ITaskType_CheckList_Service typechecklistService;
 	@Autowired ITask_Object_Service taskobjectService;
 	@Autowired ITask_Flow_Service flowService;
+	
+	@Autowired IProductService productService;
 	
 	@Autowired IStockingUniqueService stockService;
 	
@@ -178,7 +182,7 @@ public class Common  {
 			+ ")-(SL: " + FormatNumber(po.getPo_quantity().intValue()) + ")";
 			return name;
 		case 1:
-			Long pcontractid_link = null;
+			Long pcontractid_link = null, productid_link = null;
 			pcontract_poid_link = null;
 			
 			for(Task_Object object : list_object) {
@@ -191,19 +195,36 @@ public class Common  {
 			for(Task_Object object : list_object) {
 				if(object.getTaskobjecttypeid_link().intValue() == TaskObjectType_Name.DonHangPO) {
 					pcontract_poid_link = object.getObjectid_link();
+					break;
+				}
+			}
+			
+			for(Task_Object object : list_object) {
+				if(object.getTaskobjecttypeid_link().intValue() == TaskObjectType_Name.SanPham) {
+					productid_link = object.getObjectid_link();
 					break;
 				}
 			}
 			
 			PContract pcontract = pcontractService.findOne(pcontractid_link);
+			Product product = productService.findOne(productid_link);
+			
 			po = poService.findOne(pcontract_poid_link);
 			dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
-			name = "(Mã HĐ: " + pcontract.getContractcode()+")-(PO Buyer: "+po.getPo_buyer()+ ")-(PO Vendor: "+ po.getPo_vendor() + ")-(Giao hàng: "+ dateFormat.format(po.getShipdate())
+			name = "(Mã HĐ: " + pcontract.getContractcode()+")-(Sản phẩm: "+ product.getBuyercode() +")-(PO Buyer: "+po.getPo_buyer()+ ")-(PO Vendor: "+ po.getPo_vendor() + ")-(Giao hàng: "+ dateFormat.format(po.getShipdate())
 			+ ")-(SL: " + FormatNumber(po.getPo_quantity().intValue()) + ")";
 			return name;
 		case 2:
 			pcontractid_link = null;
 			pcontract_poid_link = null;
+			productid_link = null;
+			
+			for(Task_Object object : list_object) {
+				if(object.getTaskobjecttypeid_link().intValue() == TaskObjectType_Name.SanPham) {
+					productid_link = object.getObjectid_link();
+					break;
+				}
+			}
 			
 			for(Task_Object object : list_object) {
 				if(object.getTaskobjecttypeid_link().intValue() == TaskObjectType_Name.DonHang) {
@@ -221,17 +242,27 @@ public class Common  {
 			
 			pcontract = pcontractService.findOne(pcontractid_link);
 			po = poService.findOne(pcontract_poid_link);
+			product = productService.findOne(productid_link);
+			
 			dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
-			name = "(Mã HĐ: " + pcontract.getContractcode()+")-(PO Buyer: "+po.getPo_buyer()+ ")-(PO Vendor: "+ po.getPo_vendor() + ")-(Giao hàng: "+ dateFormat.format(po.getShipdate())
+			name = "(Mã HĐ: " + pcontract.getContractcode()+")-(Sản phẩm: "+ product.getBuyercode() +")-(PO Buyer: "+po.getPo_buyer()+ ")-(PO Vendor: "+ po.getPo_vendor() + ")-(Giao hàng: "+ dateFormat.format(po.getShipdate())
 			+ ")-(SL: " + FormatNumber(po.getPo_quantity().intValue()) + ")";
 			return name;
 		case 3:
 			pcontractid_link = null;
 			pcontract_poid_link = null;
+			productid_link = null;
 			
 			for(Task_Object object : list_object) {
 				if(object.getTaskobjecttypeid_link().intValue() == TaskObjectType_Name.DonHang) {
 					pcontractid_link = object.getObjectid_link();
+					break;
+				}
+			}
+			
+			for(Task_Object object : list_object) {
+				if(object.getTaskobjecttypeid_link().intValue() == TaskObjectType_Name.SanPham) {
+					productid_link = object.getObjectid_link();
 					break;
 				}
 			}
@@ -245,8 +276,10 @@ public class Common  {
 			
 			pcontract = pcontractService.findOne(pcontractid_link);
 			po = poService.findOne(pcontract_poid_link);
+			product = productService.findOne(productid_link);
+			
 			dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
-			name = "(Mã HĐ: " + pcontract.getContractcode()+")-(PO Buyer: "+po.getPo_buyer()+ ")-(PO Vendor: "+ po.getPo_vendor() + ")-(Giao hàng: "+ dateFormat.format(po.getShipdate())
+			name = "(Mã HĐ: " + pcontract.getContractcode()+")-(Sản phẩm: "+ product.getBuyercode() +")-(PO Buyer: "+po.getPo_buyer()+ ")-(PO Vendor: "+ po.getPo_vendor() + ")-(Giao hàng: "+ dateFormat.format(po.getShipdate())
 			+ ")-(SL: " + FormatNumber(po.getPo_quantity().intValue()) + ")";
 			return name;
 		case 4:
