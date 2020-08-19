@@ -133,9 +133,14 @@ public class Common  {
 		
 		//Tao Task_Object
 		for(Task_Object object: list_object) {
-			object.setTaskid_link(task.getId());
+			Task_Object obj = new Task_Object();
+			obj.setId(null);
+			obj.setTaskid_link(task.getId());
+			obj.setObjectid_link(object.getObjectid_link());
+			obj.setOrgrootid_link(object.getOrgrootid_link());
+			obj.setTaskobjecttypeid_link(object.getTaskobjecttypeid_link());
 			
-			taskobjectService.save(object);
+			taskobjectService.save(obj);
 		}
 		
 		//Tao Flow

@@ -335,6 +335,7 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 			//Sinh Cong viec
 			long pcontractid_link = po.getPcontractid_link();
 			long pcontract_poid_link = po.getId();
+			long productid_link = po.getProductid_link();
 			
 			List<Task_Object> list_object = new ArrayList<Task_Object>();
 			
@@ -351,6 +352,13 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 			object_pcontractpo.setOrgrootid_link(orgrootid_link);
 			object_pcontractpo.setTaskobjecttypeid_link((long)TaskObjectType_Name.DonHangPO);
 			list_object.add(object_pcontractpo);
+			
+			Task_Object object_product = new Task_Object();
+			object_product.setId(null);
+			object_product.setObjectid_link(productid_link);
+			object_product.setOrgrootid_link(orgrootid_link);
+			object_product.setTaskobjecttypeid_link((long)TaskObjectType_Name.SanPham);
+			list_object.add(object_product);
 			
 			long userinchargeid_link = entity.userid_link;
 			long tasktypeid_link_chitiet = 1; // chi tiet don hang

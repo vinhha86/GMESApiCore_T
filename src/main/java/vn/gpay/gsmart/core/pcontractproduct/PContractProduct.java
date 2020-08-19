@@ -36,7 +36,11 @@ public class PContractProduct implements Serializable {/**
 	private Date delivery_date;
 	private Float unitprice;
 	private Integer emt;
+	private Boolean isbomdone;
+	private Boolean isbom2done;
+	private Boolean is_breakdown_done;
 	
+		
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="productid_link",insertable=false,updatable =false)
@@ -165,6 +169,30 @@ public class PContractProduct implements Serializable {/**
 
 	public void setEmt(Integer emt) {
 		this.emt = emt;
+	}
+
+	public Boolean getIsbomdone() {
+		return isbomdone;
+	}
+
+	public Boolean getIsbom2done() {
+		return isbom2done;
+	}
+
+	public Boolean getIs_breakdown_done() {
+		return is_breakdown_done;
+	}
+
+	public void setIsbomdone(Boolean isbomdone) {
+		this.isbomdone = isbomdone;
+	}
+
+	public void setIsbom2done(Boolean isbom2done) {
+		this.isbom2done = isbom2done;
+	}
+
+	public void setIs_breakdown_done(Boolean is_breakdown_done) {
+		this.is_breakdown_done = is_breakdown_done;
 	}
 	
 	
