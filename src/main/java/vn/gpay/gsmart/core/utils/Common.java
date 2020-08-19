@@ -577,9 +577,19 @@ public class Common  {
 		int typeid = typeid_link.intValue();
 		switch (typeid) {
 		case -1:
-			
 			return "task-header";
-
+		case 0:
+			return "task-header-porderreq";
+		case 1:
+			return "task-header-podetail";
+		case 2:
+			return "task-header-bom";
+		case 3:
+			return "task-header-bom2";
+		case 4:
+			return "task-header-pordercreate";
+		case 5:
+			return "task-header-granttoline";
 		default:
 			return "task-header-blue";
 		}
