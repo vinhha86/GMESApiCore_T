@@ -23,10 +23,19 @@ import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBom2ColorService;
 import vn.gpay.gsmart.core.pcontractbomcolor.PContractBom2Color;
 import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOM2SKUService;
 import vn.gpay.gsmart.core.pcontractbomsku.PContractBOM2SKU;
+import vn.gpay.gsmart.core.pcontractproduct.IPContractProductService;
+import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
 import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom2;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.task.ITask_Service;
+import vn.gpay.gsmart.core.task.Task;
+import vn.gpay.gsmart.core.task_checklist.ITask_CheckList_Service;
+import vn.gpay.gsmart.core.task_checklist.Task_CheckList;
+import vn.gpay.gsmart.core.task_flow.ITask_Flow_Service;
+import vn.gpay.gsmart.core.task_flow.Task_Flow;
+import vn.gpay.gsmart.core.task_object.ITask_Object_Service;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -39,6 +48,11 @@ public class PContractProductBom2API {
 	@Autowired IPContractBOM2SKUService ppbom2skuservice;
 	@Autowired IPContractProductAtrributeValueService ppatt_service;
 	@Autowired IPContractProductSKUService ppskuService;
+	@Autowired IPContractProductService ppService;
+	@Autowired ITask_Object_Service taskobjectService;
+	@Autowired ITask_Service taskService;
+	@Autowired ITask_CheckList_Service checklistService;
+	@Autowired ITask_Flow_Service commentService;
 	
 	@RequestMapping(value = "/create_pcontract_productbom", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> CreateProductBom(HttpServletRequest request,
@@ -79,6 +93,66 @@ public class PContractProductBom2API {
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 		}
+	}
+	
+	@RequestMapping(value = "/confim_bom2", method = RequestMethod.POST)
+	public ResponseEntity<confim_bom2_response> ConfimBom2(HttpServletRequest request,
+			@RequestBody confim_bom1_request entity) {
+		confim_bom2_response response = new confim_bom2_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			long pcontractid_link = entity.pcontractid_link;
+			long productid_link = entity.productid_link;
+			
+			List<PContractProduct> list_pp = ppService.get_by_product_and_pcontract(orgrootid_link, productid_link, pcontractid_link);
+			if(list_pp.size()>0) {
+				PContractProduct pp = list_pp.get(0);
+				pp.setIsbomdone(true);
+				ppService.save(pp);
+			}
+			
+			//Danh dau cong viec da xong
+			List<Long> list_task = taskobjectService.getby_pcontract_and_product(pcontractid_link, productid_link);
+			for(Long taskid_link : list_task) {
+				//Lay checklist cua task
+				
+				long tasktype_checklits_id_link = 8;
+				List<Task_CheckList> list_sub = checklistService.getby_taskid_link_and_typechecklist(taskid_link, tasktype_checklits_id_link);
+				if(list_sub.size() > 0 ) {
+
+					Task task = taskService.findOne(taskid_link);
+					task.setDatefinished(new Date());
+					task.setStatusid_link(2);
+					taskService.save(task);
+					
+					Task_Flow flow = new Task_Flow();
+					flow.setDatecreated(new Date());
+					flow.setDescription("Đã xác nhận định mức");
+					flow.setFlowstatusid_link(3);
+					flow.setFromuserid_link(user.getId());
+					flow.setId(null);
+					flow.setOrgrootid_link(orgrootid_link);
+					flow.setTaskid_link(taskid_link);
+					flow.setTaskstatusid_link(2);
+					flow.setTouserid_link(task.getUsercreatedid_link());
+					commentService.save(flow);
+				}
+				
+				for(Task_CheckList checklist : list_sub) {
+					checklist.setDone(true);
+					checklistService.save(checklist);
+				}
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<confim_bom2_response>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/update_pcontract_productbom", method = RequestMethod.POST)

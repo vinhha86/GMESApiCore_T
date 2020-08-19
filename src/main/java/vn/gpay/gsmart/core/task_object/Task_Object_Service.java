@@ -32,11 +32,15 @@ public class Task_Object_Service extends AbstractService<Task_Object> implements
 	}
 
 	@Override
-	public List<Task_Object> getby_pcontract_and_product(Long pcontractid_link, Long productid_link) {
+	public List<Long> getby_pcontract_and_product(Long pcontractid_link, Long productid_link) {
 		// TODO Auto-generated method stub
-		List<Task_Object> list_pcontract = repo.getby_tasktype_and_objectid_link((long)TaskObjectType_Name.DonHang, pcontractid_link);
-		List<Task_Object> list_product = repo.getby_tasktype_and_objectid_link((long)TaskObjectType_Name.SanPham, productid_link);
-		return null;
+		List<Long> list_pcontract = repo.getlistid_by_tasktype_and_objectid_link((long)TaskObjectType_Name.DonHang, pcontractid_link);
+		List<Long> list_product = repo.getlistid_by_tasktype_and_objectid_link((long)TaskObjectType_Name.SanPham, productid_link);
+		
+		//bo nhung task ko co trong list_product
+		list_pcontract.removeIf(c-> !list_product.contains(c));
+		
+		return list_pcontract;
 	}
 
 }

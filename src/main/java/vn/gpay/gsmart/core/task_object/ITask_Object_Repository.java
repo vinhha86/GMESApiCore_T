@@ -18,6 +18,12 @@ public interface ITask_Object_Repository extends JpaRepository<Task_Object, Long
 			@Param ("objecttypeid_link")final  long objecttypeid_link,
 			@Param ("objectid_link")final  long objectid_link);
 	
+	@Query(value = "select c.taskid_link from Task_Object c where taskobjecttypeid_link = :objecttypeid_link "
+			+ "and objectid_link = :objectid_link group by c.taskid_link")
+	public List<Long> getlistid_by_tasktype_and_objectid_link(
+			@Param ("objecttypeid_link")final  long objecttypeid_link,
+			@Param ("objectid_link")final  long objectid_link);
+	
 	@Query(value = "select c from Task_Object c where taskid_link = :taskid_link")
 	public List<Task_Object> getbytask(
 			@Param ("taskid_link")final  long taskid_link);
