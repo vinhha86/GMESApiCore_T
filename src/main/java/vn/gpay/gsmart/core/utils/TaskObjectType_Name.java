@@ -9,5 +9,6 @@ public class TaskObjectType_Name {
 	public static Integer DinhMucSanXuat = 6;	
 	public static Integer QuyTrinhCongNghe = 7;	
 	public static Integer YeuCauSanXuat = 8;	
-	public static Integer DonHangPO = 9;	
+	public static Integer DonHangPO = 9;
+	public static Integer SanPham = 10;	
 }

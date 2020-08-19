@@ -25,11 +25,14 @@ import vn.gpay.gsmart.core.pcontractbomcolor.PContractBOMColor;
 import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOM2SKUService;
 import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOMSKUService;
 import vn.gpay.gsmart.core.pcontractbomsku.PContractBOMSKU;
+import vn.gpay.gsmart.core.pcontractproduct.IPContractProductService;
+import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBomService;
 import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.task_object.ITask_Object_Service;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -45,6 +48,8 @@ public class PContractProductBomAPI {
 	@Autowired IPContractBOM2SKUService ppbom2skuservice;
 	@Autowired IPContractProductAtrributeValueService ppatt_service;
 	@Autowired IPContractProductSKUService ppskuService;
+	@Autowired IPContractProductService ppService;
+	@Autowired ITask_Object_Service taskobjectService;
 	
 	@RequestMapping(value = "/create_pcontract_productbom", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> CreateProductBom(HttpServletRequest request,
@@ -117,6 +122,36 @@ public class PContractProductBomAPI {
 			response.setMessage(e.getMessage());
 		}
 		return new ResponseEntity<PContractProductBOM_getbyproduct_response>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/confim_bom1", method = RequestMethod.POST)
+	public ResponseEntity<confim_bom1_response> ConfimBom1(HttpServletRequest request,
+			@RequestBody confim_bom1_request entity) {
+		confim_bom1_response response = new confim_bom1_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			long pcontractid_link = entity.pcontractid_link;
+			long productid_link = entity.productid_link;
+			
+			List<PContractProduct> list_pp = ppService.get_by_product_and_pcontract(orgrootid_link, productid_link, pcontractid_link);
+			if(list_pp.size()>0) {
+				PContractProduct pp = list_pp.get(0);
+				pp.setIsbomdone(true);
+				ppService.save(pp);
+			}
+			
+			//Danh dau cong viec da xong
+//			List
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<confim_bom1_response>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/update_pcontract_productbom", method = RequestMethod.POST)
