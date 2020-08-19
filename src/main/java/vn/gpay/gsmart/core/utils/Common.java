@@ -174,8 +174,8 @@ public class Common  {
 						
 			PContract_PO po = poService.findOne(pcontract_poid_link);
 			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
-			name = "PO Buyer: "+po.getPo_buyer()+ " PO Vendor: "+ po.getPo_vendor() + " Ngày Giao: "+ dateFormat.format(po.getShipdate())
-			+ " SL: " + FormatNumber(po.getPo_quantity().intValue());
+			name = "(PO Buyer: "+po.getPo_buyer()+ ")-(PO Vendor: "+ po.getPo_vendor() + ")-(Giao hàng: "+ dateFormat.format(po.getShipdate())
+			+ ")-(SL: " + FormatNumber(po.getPo_quantity().intValue()) + ")";
 			return name;
 		case 1:
 			Long pcontractid_link = null;
@@ -198,8 +198,8 @@ public class Common  {
 			PContract pcontract = pcontractService.findOne(pcontractid_link);
 			po = poService.findOne(pcontract_poid_link);
 			dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
-			name = "Mã HĐ: " + pcontract.getContractcode()+" PO Buyer: "+po.getPo_buyer()+ " PO Vendor: "+ po.getPo_vendor() + " Ngày Giao: "+ dateFormat.format(po.getShipdate())
-			+ " SL: " + FormatNumber(po.getPo_quantity().intValue());
+			name = "(Mã HĐ: " + pcontract.getContractcode()+")-(PO Buyer: "+po.getPo_buyer()+ ")-(PO Vendor: "+ po.getPo_vendor() + ")-(Giao hàng: "+ dateFormat.format(po.getShipdate())
+			+ ")-(SL: " + FormatNumber(po.getPo_quantity().intValue()) + ")";
 			return name;
 		case 2:
 			pcontractid_link = null;
@@ -222,8 +222,8 @@ public class Common  {
 			pcontract = pcontractService.findOne(pcontractid_link);
 			po = poService.findOne(pcontract_poid_link);
 			dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
-			name = "Mã HĐ: " + pcontract.getContractcode()+" PO Buyer: "+po.getPo_buyer()+ " PO Vendor: "+ po.getPo_vendor() + " Ngày Giao: "+ dateFormat.format(po.getShipdate())
-			+ " SL: " + FormatNumber(po.getPo_quantity().intValue());
+			name = "(Mã HĐ: " + pcontract.getContractcode()+")-(PO Buyer: "+po.getPo_buyer()+ ")-(PO Vendor: "+ po.getPo_vendor() + ")-(Giao hàng: "+ dateFormat.format(po.getShipdate())
+			+ ")-(SL: " + FormatNumber(po.getPo_quantity().intValue()) + ")";
 			return name;
 		case 3:
 			pcontractid_link = null;
@@ -246,8 +246,8 @@ public class Common  {
 			pcontract = pcontractService.findOne(pcontractid_link);
 			po = poService.findOne(pcontract_poid_link);
 			dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
-			name = "Mã HĐ: " + pcontract.getContractcode()+" PO Buyer: "+po.getPo_buyer()+ " PO Vendor: "+ po.getPo_vendor() + " Ngày Giao: "+ dateFormat.format(po.getShipdate())
-			+ " SL: " + FormatNumber(po.getPo_quantity().intValue());
+			name = "(Mã HĐ: " + pcontract.getContractcode()+")-(PO Buyer: "+po.getPo_buyer()+ ")-(PO Vendor: "+ po.getPo_vendor() + ")-(Giao hàng: "+ dateFormat.format(po.getShipdate())
+			+ ")-(SL: " + FormatNumber(po.getPo_quantity().intValue()) + ")";
 			return name;
 		case 4:
 			pcontractid_link = null;
@@ -270,8 +270,8 @@ public class Common  {
 			pcontract = pcontractService.findOne(pcontractid_link);
 			po = poService.findOne(pcontract_poid_link);
 			dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
-			name = "Mã HĐ: " + pcontract.getContractcode()+" PO Buyer: "+po.getPo_buyer()+ " PO Vendor: "+ po.getPo_vendor() + " Ngày Giao: "+ dateFormat.format(po.getShipdate())
-			+ " SL: " + FormatNumber(po.getPo_quantity().intValue());
+			name = "(Mã HĐ: " + pcontract.getContractcode()+")-(PO Buyer: "+po.getPo_buyer()+ ")-(PO Vendor: "+ po.getPo_vendor() + ")-(Giao hàng: "+ dateFormat.format(po.getShipdate())
+			+ ")-(SL: " + FormatNumber(po.getPo_quantity().intValue()) + ")";
 			return name;
 		default:
 			return "";
