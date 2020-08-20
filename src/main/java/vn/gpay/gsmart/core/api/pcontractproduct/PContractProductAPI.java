@@ -132,7 +132,7 @@ public class PContractProductAPI {
 			}
 			
 			//cap nhat trang thai check list
-			List<Long> list_task = taskobjectService.getby_pcontract_and_product(pcontractid_link, productid_link);
+			List<Long> list_task = taskobjectService.getby_pcontract_and_product(pcontractid_link, productid_link, null);
 			for(Long taskid_link : list_task) {
 				
 				//Lay checklist cua task				

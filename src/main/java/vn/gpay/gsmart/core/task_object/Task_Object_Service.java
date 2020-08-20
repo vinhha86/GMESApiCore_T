@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.task_object;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +33,28 @@ public class Task_Object_Service extends AbstractService<Task_Object> implements
 	}
 
 	@Override
-	public List<Long> getby_pcontract_and_product(Long pcontractid_link, Long productid_link) {
+	public List<Long> getby_pcontract_and_product(Long pcontractid_link, Long productid_link, Long porder_req_id_link) {
 		// TODO Auto-generated method stub
-		List<Long> list_pcontract = repo.getlistid_by_tasktype_and_objectid_link((long)TaskObjectType_Name.DonHang, pcontractid_link);
-		List<Long> list_product = repo.getlistid_by_tasktype_and_objectid_link((long)TaskObjectType_Name.SanPham, productid_link);
+		List<Long> list_pcontract = new ArrayList<Long>();
+		List<Long> list_product = new ArrayList<Long>();
+		
+		if(pcontractid_link != null)
+			list_pcontract = repo.getlistid_by_tasktype_and_objectid_link((long)TaskObjectType_Name.DonHang, pcontractid_link);
+		
+		if(productid_link != null) {
+			list_product = repo.getlistid_by_tasktype_and_objectid_link((long)TaskObjectType_Name.SanPham, productid_link);
+		}
+			
+		if(porder_req_id_link != null)
+			list_product.addAll(repo.getlistid_by_tasktype_and_objectid_link((long)TaskObjectType_Name.YeuCauSanXuat, porder_req_id_link));
 		
 		//bo nhung task ko co trong list_product
-		list_pcontract.removeIf(c-> !list_product.contains(c));
+		if(list_product.size() > 0) {
+			List<Long> lst = new ArrayList<Long>(list_product);
+			
+			list_pcontract.removeIf(c-> !lst.contains(c));
+		}
+		
 		
 		return list_pcontract;
 	}

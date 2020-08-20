@@ -31,10 +31,20 @@ import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.task.ITask_Service;
+import vn.gpay.gsmart.core.task.Task;
+import vn.gpay.gsmart.core.task_checklist.ITask_CheckList_Service;
+import vn.gpay.gsmart.core.task_checklist.Task_CheckList;
+import vn.gpay.gsmart.core.task_flow.ITask_Flow_Service;
+import vn.gpay.gsmart.core.task_flow.Task_Flow;
+import vn.gpay.gsmart.core.task_object.ITask_Object_Service;
+import vn.gpay.gsmart.core.task_object.Task_Object;
+import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.POStatus;
 import vn.gpay.gsmart.core.utils.POrderReqStatus;
 import vn.gpay.gsmart.core.utils.POrderStatus;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
+import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 
 @RestController
 @RequestMapping("/api/v1/porder_req")
@@ -46,6 +56,11 @@ public class POrder_ReqAPI {
 	@Autowired IPOrder_Req_Service reqService;
 	@Autowired IPContractProductSKUService pcontract_ProductSKUService;
 	@Autowired IPOrder_Product_SKU_Service porder_ProductSKUService;
+	@Autowired ITask_Object_Service taskobjectService;
+	@Autowired ITask_CheckList_Service checklistService;
+	@Autowired ITask_Service taskService;
+	@Autowired ITask_Flow_Service commentService;
+	@Autowired Common commonService;
 	
     ObjectMapper mapper = new ObjectMapper();
 	
@@ -235,8 +250,10 @@ public class POrder_ReqAPI {
 					porder_SKU.add(theporder_SKU);
 				}
 				
+				long porderid_link = 0;
 				if (porder_SKU.size() > 0){
 					if (null != thePOrder){
+						porderid_link = thePOrder.getId();
 						//Xoa product SKU
 						for(POrder_Product_SKU thePOrderSKU: thePOrder.getPorder_product_sku()){
 							porder_ProductSKUService.delete(thePOrderSKU);
@@ -275,9 +292,93 @@ public class POrder_ReqAPI {
 						
 						porder.setPorder_product_sku(porder_SKU);
 						
-						porderService.savePOrder(porder, po_code);
+						porderid_link = porderService.savePOrder(porder, po_code);
 					}
 				}
+				
+				//cap nhat cong viec da xong
+				long pcontractid_link = thePO.getPcontractid_link();
+				long productid_link = entity.productid_link;
+				long porder_req_id_link = entity.porderreqid_link;
+				
+				List<Long> list_task = taskobjectService.getby_pcontract_and_product(pcontractid_link, productid_link, porder_req_id_link);
+				for(Long taskid_link : list_task) {
+					//Lay checklist cua task
+					long tasktype_checklits_id_link = 10;
+					List<Task_CheckList> list_sub = checklistService.getby_taskid_link_and_typechecklist(taskid_link, tasktype_checklits_id_link);
+					
+					if(list_sub.size() > 0 ) {
+						Task task = taskService.findOne(taskid_link);
+						task.setDatefinished(new Date());
+						task.setStatusid_link(2);
+						taskService.save(task);
+						
+						Task_Flow flow = new Task_Flow();
+						flow.setDatecreated(new Date());
+						flow.setDescription("Đã tạo lệnh SX");
+						flow.setFlowstatusid_link(3);
+						flow.setFromuserid_link(user.getId());
+						flow.setId(null);
+						flow.setOrgrootid_link(orgrootid_link);
+						flow.setTaskid_link(taskid_link);
+						flow.setTaskstatusid_link(2);
+						flow.setTouserid_link(task.getUsercreatedid_link());
+						commentService.save(flow);
+					}
+					
+					for(Task_CheckList checklist : list_sub) {
+						checklist.setDone(true);
+						checklistService.save(checklist);
+					}
+				}
+				
+				//Tao viec moi 
+				long orgid_link = porder_req.getGranttoorgid_link();
+				long userid_link = user.getId();
+				Long userinchargeid_link = null;
+				List<Task_Object> list_object = new ArrayList<Task_Object>();
+				
+				Task_Object obj_pcontract = new Task_Object();
+				obj_pcontract.setId(null);
+				obj_pcontract.setObjectid_link(thePO.getPcontractid_link());
+				obj_pcontract.setOrgrootid_link(orgrootid_link);
+				obj_pcontract.setTaskobjecttypeid_link((long)TaskObjectType_Name.DonHang);
+				list_object.add(obj_pcontract);
+				
+				Task_Object obj_product = new Task_Object();
+				obj_product.setId(null);
+				obj_product.setObjectid_link(entity.productid_link);
+				obj_product.setOrgrootid_link(orgrootid_link);
+				obj_product.setTaskobjecttypeid_link((long)TaskObjectType_Name.SanPham);
+				list_object.add(obj_product);
+				
+				Task_Object obj_req = new Task_Object();
+				obj_req.setId(null);
+				obj_req.setObjectid_link(entity.porderreqid_link);
+				obj_req.setOrgrootid_link(orgrootid_link);
+				obj_req.setTaskobjecttypeid_link((long)TaskObjectType_Name.YeuCauSanXuat);
+				list_object.add(obj_req);
+				
+				Task_Object obj_porder = new Task_Object();
+				obj_porder.setId(null);
+				obj_porder.setObjectid_link(porderid_link);
+				obj_porder.setOrgrootid_link(orgrootid_link);
+				obj_porder.setTaskobjecttypeid_link((long)TaskObjectType_Name.LenhSanXuat);
+				list_object.add(obj_porder);
+				
+				Task_Object obj_po = new Task_Object();
+				obj_po.setId(null);
+				obj_po.setObjectid_link(thePO.getId());
+				obj_po.setOrgrootid_link(orgrootid_link);
+				obj_po.setTaskobjecttypeid_link((long)TaskObjectType_Name.DonHangPO);
+				list_object.add(obj_po);
+
+				long tasktypeid_link_phanchuyen = 5; //type phan chuyen
+				commonService.CreateTask(orgrootid_link, orgid_link, userid_link, tasktypeid_link_phanchuyen, list_object, userinchargeid_link);
+				
+				long tasktypeid_link_dmsx = 6; //type phan chuyen
+				commonService.CreateTask(orgrootid_link, orgid_link, userid_link, tasktypeid_link_dmsx, list_object, userinchargeid_link);
+				
 				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 				return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
