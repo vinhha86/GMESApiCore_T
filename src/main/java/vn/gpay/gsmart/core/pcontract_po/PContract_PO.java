@@ -74,6 +74,8 @@ public class PContract_PO implements Serializable {/**
 	private Long parentpoid_link;
 	private Boolean is_tbd;
 	private Float sewtarget_percent;
+	private Long portfromid_link;
+	private Long porttoid_link;
 	
 	public Integer getProductiondays() {
 		return productiondays;
@@ -484,6 +486,22 @@ public class PContract_PO implements Serializable {/**
 
 	public void setSewtarget_percent(Float sewtarget_percent) {
 		this.sewtarget_percent = sewtarget_percent;
+	}
+
+	public Long getPortfromid_link() {
+		return portfromid_link;
+	}
+
+	public void setPortfromid_link(Long portfromid_link) {
+		this.portfromid_link = portfromid_link;
+	}
+
+	public Long getPorttoid_link() {
+		return porttoid_link;
+	}
+
+	public void setPorttoid_link(Long porttoid_link) {
+		this.porttoid_link = porttoid_link;
 	}
 	
 }
