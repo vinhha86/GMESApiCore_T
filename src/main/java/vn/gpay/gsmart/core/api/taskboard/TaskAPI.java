@@ -65,7 +65,7 @@ public class TaskAPI {
 				binding.setState(commonService.getState(task.getStatusid_link()));
 				binding.setDescription(task.getDescription());
 				binding.setTasktypeid_link(task.getTasktypeid_link());
-				binding.setCls_task(commonService.getCls(task.getTasktypeid_link()));
+				binding.setCls_task(commonService.getCls_header(task.getTasktypeid_link()));
 				binding.setOrgid_link(task.getOrgid_link());
 				
 				//get checklist
@@ -207,7 +207,7 @@ public class TaskAPI {
 			binding.setState(commonService.getState(task.getStatusid_link()));
 			binding.setTasktypeid_link(task.getTasktypeid_link());
 			binding.setDescription(task.getDescription());
-			binding.setCls_task(commonService.getCls(task.getTasktypeid_link()));
+			binding.setCls_task(commonService.getCls_header(task.getTasktypeid_link()));
 			binding.setComments(comments);
 			
 			response.data = binding;

@@ -691,7 +691,7 @@ public class Common  {
 		}
 	}
 	
-	public String getCls(Long typeid_link) {
+	public String getCls_header(Long typeid_link) {
 		int typeid = typeid_link.intValue();
 		switch (typeid) {
 		case -1:
@@ -710,6 +710,21 @@ public class Common  {
 			return "task-header-granttoline";
 		default:
 			return "task-header-blue";
+		}
+	}
+	
+	public String getCls_bystatus(int status) {
+		switch (status) {
+		case 0:
+			return "ChuaLam";
+		case 1:
+			return "DangLam";
+		case 2:
+			return "DaXong";
+		case -1:
+			return "TuChoi";
+		default :
+			return "ChuaLam";
 		}
 	}
 }
