@@ -54,6 +54,8 @@ public class MenuTree  implements Serializable{
     
     private String parent_id;
     
+    private String parent_name;
+    
     private Integer index;
 	
 	private MenuTree parent;
@@ -223,4 +225,12 @@ public class MenuTree  implements Serializable{
 	public List<MenuTree> getChildren() {
 		return children;
 	}
+	public String getParent_name() {
+		return parent_name;
+	}
+	public void setParent_name(String parent_name) {
+		this.parent_name = parent_name;
+	}
+	
+	
 }

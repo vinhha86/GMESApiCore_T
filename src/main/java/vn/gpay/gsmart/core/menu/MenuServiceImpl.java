@@ -108,6 +108,7 @@ public class MenuServiceImpl extends StringAbstractService<Menu> implements IMen
                 	current_n.setTitle_vi(current.getTitle_list_vi());
                 	current_n.setTitle_en(current.getTitle_list_vi());     
                 	current_n.setParent_id(parentId);
+                	current_n.setParent_name(parent.getText_vi());
                 	current_n.setChecked(current.checked);
                     parent.addChild(current_n);
                     parent.setExpanded(false);
