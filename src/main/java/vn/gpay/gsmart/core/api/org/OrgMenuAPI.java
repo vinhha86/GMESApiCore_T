@@ -19,6 +19,10 @@ import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.IOrg_AutoID_Service;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.org.OrgTree;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant;
+import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
+import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -29,6 +33,8 @@ public class OrgMenuAPI {
 	
 	@Autowired IOrgService orgService;
 	@Autowired IOrg_AutoID_Service orgAutoidService;
+	@Autowired IPOrderGrant_Service porderGrantService;
+	@Autowired IPOrderProcessing_Service pprocessService;
 	
 	@RequestMapping(value = "/orgmenu_tree",method = RequestMethod.POST)
 	public ResponseEntity<?> OrgMenuTree(HttpServletRequest request ) {
@@ -152,6 +158,29 @@ public class OrgMenuAPI {
 			orgService.deleteById(entity.id);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_SERVER_ERROR);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/deleteProductionLine",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> DeleteProductionLine(@RequestBody Org_delete_request entity, HttpServletRequest request ) {//@RequestParam("type") 
+		ResponseBase response = new ResponseBase();
+		try {
+//			orgService.deleteById(entity.id);
+			List<POrderGrant> listgrant = porderGrantService.getByOrgId(entity.id);
+			List<POrderProcessing> listprocessing = pprocessService.getByOrgId(entity.id);
+			if(listgrant.size() == 0 && listprocessing.size() == 0) {
+				orgService.deleteById(entity.id);
+				response.setMessage("Xoá thành công");
+			}else {
+				response.setMessage("Tổ chuyền đang hoạt động");
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
 		}catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_SERVER_ERROR);
