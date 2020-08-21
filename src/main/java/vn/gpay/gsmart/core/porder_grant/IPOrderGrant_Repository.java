@@ -63,4 +63,7 @@ public interface IPOrderGrant_Repository extends JpaRepository<POrderGrant, Long
 			@Param ("orgbuyerid_link")final Long orgbuyerid_link,
 			@Param ("orgvendorid_link")final Long orgvendorid_link);
 	
+	@Query(value = "select a from POrderGrant a where a.granttoorgid_link = :granttoorgid_link")
+	public List<POrderGrant>getByOrgId(@Param ("granttoorgid_link")final Long granttoorgid_link);
+	
 }

@@ -16,7 +16,6 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.attributevalue.Attributevalue;
-import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 
 import java.io.Serializable;
 import java.util.ArrayList;
