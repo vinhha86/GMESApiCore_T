@@ -6,8 +6,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.task_objecttype.Task_ObjectType;
 
 @Table(name="task_object")
 @Entity
@@ -25,6 +33,19 @@ public class Task_Object implements Serializable {
 	private Long taskid_link;
 	private Long taskobjecttypeid_link;
 	private Long objectid_link;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+   	@ManyToOne
+    @JoinColumn(name="taskobjecttypeid_link",insertable=false,updatable =false)
+    private Task_ObjectType objecttype;
+	
+	@Transient
+	public String getName() {
+		if(objecttype!=null)
+			return objecttype.getName();
+		return "";
+	}
+	
 	public Long getId() {
 		return id;
 	}

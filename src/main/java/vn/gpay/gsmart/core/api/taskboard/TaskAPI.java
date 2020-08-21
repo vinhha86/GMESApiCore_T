@@ -400,6 +400,23 @@ public class TaskAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/get_object_bytask",method = RequestMethod.POST)
+	public ResponseEntity<get_taskobject_bytask_response> GetObjectByTask(HttpServletRequest request, @RequestBody get_taskobject_bytask_request entity) {
+		get_taskobject_bytask_response response = new get_taskobject_bytask_response();
+		try {
+			long taskid_link = entity.taskid_link;
+			response.data = taskobjectService.getbyTask(taskid_link);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<get_taskobject_bytask_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<get_taskobject_bytask_response>(response, HttpStatus.OK);
+		}
+	}
+	
 	@RequestMapping(value = "/accept_porer_req",method = RequestMethod.POST)
 	public ResponseEntity<accept_task_response> AcceptPorderReq(HttpServletRequest request, @RequestBody accept_task_request entity) {
 		accept_task_response response = new accept_task_response();
