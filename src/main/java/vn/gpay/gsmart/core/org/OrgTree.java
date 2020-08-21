@@ -71,7 +71,10 @@ public class OrgTree implements Serializable {
     	if(this.children.size()>0) {
     		return false;
     	}else {
-    		return true;
+    		if (this.orgtypeid_link == 13)
+    			return false;
+    		else
+    			return true;
     	}
     }
     public boolean getSelectable() {
