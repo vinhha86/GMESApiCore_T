@@ -44,5 +44,7 @@ public interface IPOrderProcessing_Service extends Operations<POrderProcessing>{
 	List<POrderProcessing> getByBeforeDateAndOrderGrantID(Long pordergrantid_link, Date processingdate_to);
 
 	POrderGrant get_processing_bygolivedate(Long porderid_link, Long pordergrantid_link);
+	
+	List<POrderProcessing>getByOrgId(Long granttoorgid_link);
 
 }

@@ -69,4 +69,10 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 	public List<POrderGrant> getByOrderId(Long porderid_link) {
 		return repo.getByOrderId(porderid_link);
 	}
+
+	@Override
+	public List<POrderGrant> getByOrgId(Long granttoorgid_link) {
+		// TODO Auto-generated method stub
+		return repo.getByOrgId(granttoorgid_link);
+	}
 }

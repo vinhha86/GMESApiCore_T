@@ -18,4 +18,5 @@ public interface IPOrderGrant_Service extends Operations<POrderGrant>{
 			String POBuyer, Long orgbuyerid_link , Long orgvendorid_link);
 	
 	List<POrderGrant>getByOrderId(Long porderid_link);
+	List<POrderGrant>getByOrgId(Long granttoorgid_link);
 }

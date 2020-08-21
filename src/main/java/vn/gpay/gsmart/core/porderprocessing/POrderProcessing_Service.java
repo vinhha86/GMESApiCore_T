@@ -135,4 +135,10 @@ public class POrderProcessing_Service extends AbstractService<POrderProcessing> 
 			return null;
 		}
 	}
+
+	@Override
+	public List<POrderProcessing> getByOrgId(Long granttoorgid_link) {
+		// TODO Auto-generated method stub
+		return repo.getByOrgId(granttoorgid_link);
+	}
 }
