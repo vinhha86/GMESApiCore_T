@@ -38,7 +38,6 @@ import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
-import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.product.IProductService;
 import vn.gpay.gsmart.core.product.Product;
@@ -346,7 +345,7 @@ public class Common  {
 			pcontract = pcontractService.findOne(pcontractid_link);
 			po = poService.findOne(pcontract_poid_link);
 			product = productService.findOne(productid_link);
-			POrder porder = porderService.findOne(porderid_link);
+//			POrder porder = porderService.findOne(porderid_link);
 			
 			dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
 			name = "(Mã HĐ: " + pcontract.getContractcode()+")-(Sản phẩm: "+ product.getBuyercode() +")-(PO Buyer: "+po.getPo_buyer()+ ")-(PO Vendor: "+ po.getPo_vendor() + ")-(Giao hàng: "+ dateFormat.format(po.getShipdate())
