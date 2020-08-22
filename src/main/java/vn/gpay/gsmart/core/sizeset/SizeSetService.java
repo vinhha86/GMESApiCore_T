@@ -24,4 +24,11 @@ public class SizeSetService extends AbstractService<SizeSet> implements ISizeSet
 		// TODO Auto-generated method stub
 		return repo.getall_byorgrootid(orgrootid_link);
 	}
+	
+	@Override
+	public Integer getMaxSortValue() {
+		// TODO Auto-generated method stub
+		return repo.getMaxSortValue()+1;
+	}
+
 }

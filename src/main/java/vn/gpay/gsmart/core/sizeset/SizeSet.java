@@ -38,6 +38,7 @@ public class SizeSet implements Serializable {/**
 	private String comment;
 	private Long usercreatedid_link;
 	private Date timecreate;
+	private Integer sortvalue;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
@@ -129,4 +130,13 @@ public class SizeSet implements Serializable {/**
 	public void setTimecreate(Date timecreate) {
 		this.timecreate = timecreate;
 	}
+
+	public Integer getSortvalue() {
+		return sortvalue;
+	}
+
+	public void setSortvalue(Integer sortvalue) {
+		this.sortvalue = sortvalue;
+	}
+	
 }

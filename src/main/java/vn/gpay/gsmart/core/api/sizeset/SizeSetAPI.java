@@ -108,6 +108,7 @@ public class SizeSetAPI {
 				sizeset.setOrgrootid_link(user.getRootorgid_link());
 				sizeset.setUsercreatedid_link(user.getId());
 				sizeset.setTimecreate(new Date());
+				sizeset.setSortvalue(sizesetservice.getMaxSortValue());
 				
 			} else {
 				SizeSet sizeset_old = sizesetservice.findOne(sizeset.getId());
@@ -182,6 +183,29 @@ public class SizeSetAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<SizeSet_getattvalue_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/sizeset_reorder",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> AttributeValueReorder(@RequestBody Sizeset_reorder_request entity,HttpServletRequest request ) {
+		ResponseBase response = new ResponseBase();
+		try {
+		
+			for (SizeSet sizeset:entity.data){
+				SizeSet s = sizesetservice.findOne(sizeset.getId());
+				if (null != s){
+					s.setSortvalue(sizeset.getSortvalue());
+					sizesetservice.save(s);
+				}
+				
+			}
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_EXCEPTION));
+		    return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
 }
