@@ -59,7 +59,14 @@ public class PContract_Price implements Serializable {/**
 			return sizeset.getName();
 		}
 		return "";
-	}	
+	}
+	@Transient
+	public Integer getSortvalue() {
+		if(sizeset != null) {
+			return sizeset.getSortvalue();
+		}
+		return 0;
+	}
 	
 	public List<String> getlist_sizename(){
 		if(sizeset != null) {
