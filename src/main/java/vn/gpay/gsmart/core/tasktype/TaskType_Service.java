@@ -14,5 +14,4 @@ public class TaskType_Service extends AbstractService<TaskType> implements ITask
 		// TODO Auto-generated method stub
 		return repo;
 	}
-
 }

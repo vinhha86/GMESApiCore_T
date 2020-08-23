@@ -6,8 +6,18 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.org.Org;
+import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.tasktype.TaskType;
 
 @Table(name="task_grant")
 @Entity
@@ -27,6 +37,46 @@ public class Task_Grant implements Serializable {
 	private Long buyerid_link;
 	private Long vendorid_link;
 	private Long userid_link;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="orgid_link",insertable=false,updatable =false)
+    private Org org;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="tasktypeid_link",insertable=false,updatable =false)
+    private TaskType tasktype;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="userid_link",insertable=false,updatable =false)
+    private GpayUser user;
+	
+	@Transient
+	public String getOrgName() {
+		if(org != null) {
+			return org.getName();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getTaskName() {
+		if(tasktype != null) {
+			return tasktype.getName();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getUserName() {
+		if(user != null) {
+			return user.getFullName();
+		}
+		return "";
+	}
+	
 	public Long getId() {
 		return id;
 	}
