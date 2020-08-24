@@ -135,6 +135,7 @@ public class ProductAttributeValueAPI {
 								sku.setProductid_link(product.getId());
 								sku.setOrgrootid_link(user.getRootorgid_link());
 								sku.setSkutypeid_link(product.getProducttypeid_link());
+								sku.setUnitid_link(product.getUnitid_link());
 
 								sku = skuService.save(sku);
 								skuid_link = sku.getId();

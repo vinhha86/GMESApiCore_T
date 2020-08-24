@@ -31,7 +31,11 @@ import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBomService;
 import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
+import vn.gpay.gsmart.core.product.IProductService;
+import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.sku.ISKU_Service;
+import vn.gpay.gsmart.core.sku.SKU;
 import vn.gpay.gsmart.core.task.ITask_Service;
 import vn.gpay.gsmart.core.task.Task;
 import vn.gpay.gsmart.core.task_checklist.ITask_CheckList_Service;
@@ -59,6 +63,8 @@ public class PContractProductBomAPI {
 	@Autowired ITask_CheckList_Service checklistService;
 	@Autowired ITask_Service taskService;
 	@Autowired ITask_Flow_Service commentService;
+	@Autowired ISKU_Service skuService;
+	@Autowired IProductService productService;
 	
 	@RequestMapping(value = "/create_pcontract_productbom", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> CreateProductBom(HttpServletRequest request,
@@ -70,6 +76,7 @@ public class PContractProductBomAPI {
 			long productid_link = entity.productid_link;
 			long pcontractid_link = entity.pcontractid_link;
 			
+			Product product = productService.findOne(productid_link);
 			for (Long materialid_link : entity.listnpl) {
 				//them vao bang product_bom
 				List<PContractProductBom> listBom = ppbomservice.getby_pcontract_product_material(productid_link, pcontractid_link, materialid_link);
@@ -85,6 +92,7 @@ public class PContractProductBomAPI {
 					productbom.setOrgrootid_link(user.getRootorgid_link());
 					productbom.setPcontractid_link(pcontractid_link);
 					productbom.setForothercontract(false);
+					productbom.setUnitid_link(product.getUnitid_link());
 					
 					ppbomservice.save(productbom);
 					
