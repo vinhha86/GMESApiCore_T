@@ -32,7 +32,6 @@ import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBomService;
 import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.product.IProductService;
-import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_Service;
 import vn.gpay.gsmart.core.sku.SKU;
@@ -76,11 +75,12 @@ public class PContractProductBomAPI {
 			long productid_link = entity.productid_link;
 			long pcontractid_link = entity.pcontractid_link;
 			
-			Product product = productService.findOne(productid_link);
 			for (Long materialid_link : entity.listnpl) {
 				//them vao bang product_bom
 				List<PContractProductBom> listBom = ppbomservice.getby_pcontract_product_material(productid_link, pcontractid_link, materialid_link);
 				if(listBom.size() == 0) {
+					SKU sku = skuService.findOne(materialid_link);
+					
 					PContractProductBom productbom = new PContractProductBom(); 
 					productbom.setProductid_link(productid_link);
 					productbom.setMaterialid_link(materialid_link);
@@ -92,7 +92,7 @@ public class PContractProductBomAPI {
 					productbom.setOrgrootid_link(user.getRootorgid_link());
 					productbom.setPcontractid_link(pcontractid_link);
 					productbom.setForothercontract(false);
-					productbom.setUnitid_link(product.getUnitid_link());
+					productbom.setUnitid_link(sku.getUnitid_link());
 					
 					ppbomservice.save(productbom);
 					
@@ -445,6 +445,8 @@ public class PContractProductBomAPI {
 				map.put("thanhPhanVai", pContractProductBom.getThanhPhanVai().toString());
 				
 				map.put("unitName", pContractProductBom.getUnitName().toString());
+				
+				map.put("unitid_link", pContractProductBom.getUnitid_link().toString());
 				
 				for(Long size : List_size) {
 					List<PContractBOMSKU> listbomsku_clone = new ArrayList<PContractBOMSKU>(listbomsku);

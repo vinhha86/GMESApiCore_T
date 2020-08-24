@@ -125,8 +125,7 @@ public class ProductAttributeValueAPI {
 						
 						if(valuemau.getIsdefault() == null || valueco.getIsdefault() == null) continue;
 						
-						if((!valuemau.getIsdefault() && !valueco.getIsdefault()) ||
-								(valuemau.getIsdefault() && valueco.getIsdefault())) {
+						if((!valuemau.getIsdefault() && !valueco.getIsdefault())) {
 							if (pavMau.getAttributevalueid_link() != 0 && pavCo.getAttributevalueid_link() != 0) {
 								SKU sku = new SKU();
 								sku.setId(skuid_link);
@@ -168,54 +167,54 @@ public class ProductAttributeValueAPI {
 
 				}
 			}
-			List<SKU_Attribute_Value> listSKUMau = new ArrayList<SKU_Attribute_Value>();
-			List<SKU_Attribute_Value> listSKUCo = listSKUMau;
-
-			if (product.getProducttypeid_link() > 9 && product.getProducttypeid_link() < 20) {
-				if (entity.attributeid_link == AtributeFixValues.ATTR_COLOR || entity.attributeid_link == AtributeFixValues.ATTR_SIZE) {
-					listSKUMau = savService.getlist_byProduct_and_attribute(entity.productid_link, AtributeFixValues.ATTR_COLOR);
-					listSKUCo = savService.getlist_byProduct_and_attribute(entity.productid_link, AtributeFixValues.ATTR_SIZE);
-				}
-			} else if (product.getProducttypeid_link() > 19) {
-				if (entity.attributeid_link == AtributeFixValues.ATTR_COLOR || entity.attributeid_link == AtributeFixValues.ATTR_SIZEWIDTH) {
-					listSKUMau = savService.getlist_byProduct_and_attribute(entity.productid_link, AtributeFixValues.ATTR_COLOR);
-					listSKUCo = savService.getlist_byProduct_and_attribute(entity.productid_link, AtributeFixValues.ATTR_SIZEWIDTH);
-				}
-			}
+//			List<SKU_Attribute_Value> listSKUMau = new ArrayList<SKU_Attribute_Value>();
+//			List<SKU_Attribute_Value> listSKUCo = listSKUMau;
+//
+//			if (product.getProducttypeid_link() > 9 && product.getProducttypeid_link() < 20) {
+//				if (entity.attributeid_link == AtributeFixValues.ATTR_COLOR || entity.attributeid_link == AtributeFixValues.ATTR_SIZE) {
+//					listSKUMau = savService.getlist_byProduct_and_attribute(entity.productid_link, AtributeFixValues.ATTR_COLOR);
+//					listSKUCo = savService.getlist_byProduct_and_attribute(entity.productid_link, AtributeFixValues.ATTR_SIZE);
+//				}
+//			} else if (product.getProducttypeid_link() > 19) {
+//				if (entity.attributeid_link == AtributeFixValues.ATTR_COLOR || entity.attributeid_link == AtributeFixValues.ATTR_SIZEWIDTH) {
+//					listSKUMau = savService.getlist_byProduct_and_attribute(entity.productid_link, AtributeFixValues.ATTR_COLOR);
+//					listSKUCo = savService.getlist_byProduct_and_attribute(entity.productid_link, AtributeFixValues.ATTR_SIZEWIDTH);
+//				}
+//			}
 			// Xoa SKU sau khi thay doi gia tri cua mau va co
-			for (SKU_Attribute_Value savMau : listSKUMau) {
-				boolean check = false;
-				for (ProductAttributeValue pavMau : lstmau) {
-					long avidSKU = savMau.getAttributevalueid_link();
-					long avidProduct = pavMau.getAttributevalueid_link();
-					if (avidSKU == avidProduct) {
-						check = true;
-						break;
-					}
-				}
-				if (!check) {
-					skuService.deleteById(savMau.getSkuid_link());
-					savService.delete(savMau);
-				}
-			}
-
-			for (SKU_Attribute_Value savCo : listSKUCo) {
-				boolean check = false;
-				for (ProductAttributeValue pavCo : lstco) {
-					long avidSKU = savCo.getAttributevalueid_link();
-					long avidProduct = pavCo.getAttributevalueid_link();
-					if (avidSKU == avidProduct) {
-						check = true;
-						break;
-					}
-				}
-
-				if (!check) {
-					skuService.deleteById(savCo.getSkuid_link());
-					savService.delete(savCo);
-				}
-
-			}
+//			for (SKU_Attribute_Value savMau : listSKUMau) {
+//				boolean check = false;
+//				for (ProductAttributeValue pavMau : lstmau) {
+//					long avidSKU = savMau.getAttributevalueid_link();
+//					long avidProduct = pavMau.getAttributevalueid_link();
+//					if (avidSKU == avidProduct) {
+//						check = true;
+//						break;
+//					}
+//				}
+//				if (!check) {
+////					skuService.deleteById(savMau.getSkuid_link());
+//					savService.delete(savMau);
+//				}
+//			}
+//
+//			for (SKU_Attribute_Value savCo : listSKUCo) {
+//				boolean check = false;
+//				for (ProductAttributeValue pavCo : lstco) {
+//					long avidSKU = savCo.getAttributevalueid_link();
+//					long avidProduct = pavCo.getAttributevalueid_link();
+//					if (avidSKU == avidProduct) {
+//						check = true;
+//						break;
+//					}
+//				}
+//
+//				if (!check) {
+////					skuService.deleteById(savCo.getSkuid_link());
+//					savService.delete(savCo);
+//				}
+//
+//			}
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -363,50 +362,50 @@ public class ProductAttributeValueAPI {
 
 				}
 			}
-			List<SKU_Attribute_Value> listSKUMau = new ArrayList<SKU_Attribute_Value>();
-			List<SKU_Attribute_Value> listSKUCo = listSKUMau;
-
-			if (product.getProducttypeid_link() > 9 && product.getProducttypeid_link() < 20) {
-				listSKUMau = savService.getlist_byProduct_and_attribute(entity.productid_link, AtributeFixValues.ATTR_COLOR);
-				listSKUCo = savService.getlist_byProduct_and_attribute(entity.productid_link, AtributeFixValues.ATTR_SIZE);
-			} else if (product.getProducttypeid_link() > 19) {
-				listSKUMau = savService.getlist_byProduct_and_attribute(entity.productid_link, AtributeFixValues.ATTR_COLOR);
-				listSKUCo = savService.getlist_byProduct_and_attribute(entity.productid_link, AtributeFixValues.ATTR_SIZEWIDTH);
-			}
+//			List<SKU_Attribute_Value> listSKUMau = new ArrayList<SKU_Attribute_Value>();
+//			List<SKU_Attribute_Value> listSKUCo = listSKUMau;
+//
+//			if (product.getProducttypeid_link() > 9 && product.getProducttypeid_link() < 20) {
+//				listSKUMau = savService.getlist_byProduct_and_attribute(entity.productid_link, AtributeFixValues.ATTR_COLOR);
+//				listSKUCo = savService.getlist_byProduct_and_attribute(entity.productid_link, AtributeFixValues.ATTR_SIZE);
+//			} else if (product.getProducttypeid_link() > 19) {
+//				listSKUMau = savService.getlist_byProduct_and_attribute(entity.productid_link, AtributeFixValues.ATTR_COLOR);
+//				listSKUCo = savService.getlist_byProduct_and_attribute(entity.productid_link, AtributeFixValues.ATTR_SIZEWIDTH);
+//			}
 			// Xoa SKU sau khi thay doi gia tri cua mau va co
-			for (SKU_Attribute_Value savMau : listSKUMau) {
-				boolean check = false;
-				for (ProductAttributeValue pavMau : lstmau) {
-					long avidSKU = savMau.getAttributevalueid_link();
-					long avidProduct = pavMau.getAttributevalueid_link();
-					if (avidSKU == avidProduct) {
-						check = true;
-						break;
-					}
-				}
-				if (!check) {
-					skuService.deleteById(savMau.getSkuid_link());
-					savService.delete(savMau);
-				}
-			}
-
-			for (SKU_Attribute_Value savCo : listSKUCo) {
-				boolean check = false;
-				for (ProductAttributeValue pavCo : lstco) {
-					long avidSKU = savCo.getAttributevalueid_link();
-					long avidProduct = pavCo.getAttributevalueid_link();
-					if (avidSKU == avidProduct) {
-						check = true;
-						break;
-					}
-				}
-
-				if (!check) {
-					skuService.deleteById(savCo.getSkuid_link());
-					savService.delete(savCo);
-				}
-
-			}
+//			for (SKU_Attribute_Value savMau : listSKUMau) {
+//				boolean check = false;
+//				for (ProductAttributeValue pavMau : lstmau) {
+//					long avidSKU = savMau.getAttributevalueid_link();
+//					long avidProduct = pavMau.getAttributevalueid_link();
+//					if (avidSKU == avidProduct) {
+//						check = true;
+//						break;
+//					}
+//				}
+//				if (!check) {
+////					skuService.deleteById(savMau.getSkuid_link());
+//					savService.delete(savMau);
+//				}
+//			}
+//
+//			for (SKU_Attribute_Value savCo : listSKUCo) {
+//				boolean check = false;
+//				for (ProductAttributeValue pavCo : lstco) {
+//					long avidSKU = savCo.getAttributevalueid_link();
+//					long avidProduct = pavCo.getAttributevalueid_link();
+//					if (avidSKU == avidProduct) {
+//						check = true;
+//						break;
+//					}
+//				}
+//
+//				if (!check) {
+////					skuService.deleteById(savCo.getSkuid_link());
+//					savService.delete(savCo);
+//				}
+//
+//			}
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

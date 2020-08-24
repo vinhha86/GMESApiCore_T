@@ -13,7 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 public interface ISKU_Repository extends JpaRepository<SKU, Long>, JpaSpecificationExecutor<SKU> {
-	@Query(value = "select c from SKU c where c.productid_link = :productid_link  order by c.id DESC")
+	@Query(value = "select a from SKU a "
+			+ "inner join SKU_Attribute_Value b on a.id = b.skuid_link "
+			+ "where a.productid_link = :productid_link "
+			+ "group by a "
+			+ "having count(a.id) > 1 "
+			+ "order by a.id DESC")
 	public List<SKU> getlist_byproduct(@Param ("productid_link")final  Long productid_link);
 	
 	@Query(value = "select c from SKU c where UPPER(c.code) = UPPER(:code) and orgrootid_link = :orgrootid_link")

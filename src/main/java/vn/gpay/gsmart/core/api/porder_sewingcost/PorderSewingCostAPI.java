@@ -115,8 +115,17 @@ public class PorderSewingCostAPI {
 				long pcontract_poid_link = porder.getPcontract_poid_link();
 				long productid_link = porder.getProductid_link();
 				PContract_Price price = pcontractpriceService.getPrice_CMP(pcontract_poid_link, productid_link);
-				float price_cost_old = price.getPrice_sewingcost();
+				float price_cost_old = 0;
+				if(price == null) {
+					price = new PContract_Price();
+					price.setPcontract_poid_link(pcontract_poid_link);
+					price.setProductid_link(productid_link);
+				}
+				else {
+					 price_cost_old = price.getPrice_sewingcost();
+				}
 				price.setPrice_sewingcost(price_cost_old - cost_old + entity.data.getTotalcost());
+				pcontractpriceService.save(price);
 				
 				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

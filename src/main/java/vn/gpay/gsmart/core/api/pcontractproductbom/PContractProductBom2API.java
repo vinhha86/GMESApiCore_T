@@ -29,6 +29,8 @@ import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
 import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom2;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.sku.ISKU_Service;
+import vn.gpay.gsmart.core.sku.SKU;
 import vn.gpay.gsmart.core.task.ITask_Service;
 import vn.gpay.gsmart.core.task.Task;
 import vn.gpay.gsmart.core.task_checklist.ITask_CheckList_Service;
@@ -53,6 +55,7 @@ public class PContractProductBom2API {
 	@Autowired ITask_Service taskService;
 	@Autowired ITask_CheckList_Service checklistService;
 	@Autowired ITask_Flow_Service commentService;
+	@Autowired ISKU_Service skuService;
 	
 	@RequestMapping(value = "/create_pcontract_productbom", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> CreateProductBom(HttpServletRequest request,
@@ -68,6 +71,7 @@ public class PContractProductBom2API {
 				//them vao bang product_bom
 				List<PContractProductBom2> listBom = ppbom2service.getby_pcontract_product_material(productid_link, pcontractid_link, materialid_link);
 				if(listBom.size() == 0) {
+					SKU sku = skuService.findOne(materialid_link);
 					
 					PContractProductBom2 productbom2 = new PContractProductBom2(); 
 					productbom2.setProductid_link(productid_link);
@@ -79,6 +83,7 @@ public class PContractProductBom2API {
 					productbom2.setCreateddate(new Date());
 					productbom2.setOrgrootid_link(user.getRootorgid_link());
 					productbom2.setPcontractid_link(pcontractid_link);
+					productbom2.setUnitid_link(sku.getUnitid_link());
 					
 					ppbom2service.save(productbom2);
 				}
@@ -453,6 +458,8 @@ public class PContractProductBom2API {
 				map.put("thanhPhanVai", pContractProductBom.getThanhPhanVai().toString());
 				
 				map.put("unitName", pContractProductBom.getUnitName().toString());
+				
+				map.put("unitid_link", pContractProductBom.getUnitid_link().toString());
 				
 				for(Long size : List_size) {
 					List<PContractBOM2SKU> listbomsku_clone = new ArrayList<PContractBOM2SKU>(listbomsku);

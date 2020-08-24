@@ -59,10 +59,10 @@ public class POrderBomAPI {
 			
 			porderbomproductService.save(entity.data);
 			//Xóa trong bom_color và bom_sku
-			long porderid_link = entity.data.getPorderid_link();
-			long materialid_link = entity.data.getMaterialid_link();
 			
 			if(entity.isUpdateBOM) {
+				long porderid_link = entity.data.getPorderid_link();
+				long materialid_link = entity.data.getMaterialid_link();
 				List<PorderBomColor> listcolor = porderbomcolorService.getby_porder_and_material(porderid_link, materialid_link);
 				for (PorderBomColor pContractBOMColor : listcolor) {
 					porderbomcolorService.delete(pContractBOMColor);
@@ -149,7 +149,7 @@ public class POrderBomAPI {
 			
 			//update lai bang bom amount = 0
 			pContractProductBom.setAmount((float) 0);
-			porderbomproductService.update(pContractProductBom);
+			porderbomproductService.save(pContractProductBom);
 			
 			//update lai bang sku bom
 			List<POrderBOMSKU> listsku = porderbomskuService.getby_porder_and_material_and_color(porderid_link, materialid_link, colorid_link);
@@ -391,6 +391,8 @@ public class POrderBomAPI {
 				map.put("unitName", pContractProductBom.getUnitName().toString());
 				
 				map.put("porderid_link", pContractProductBom.getPorderid_link().toString());
+				
+				map.put("unitid_link", pContractProductBom.getUnitid_link().toString());
 				
 				for(Long size : List_size) {
 					List<POrderBOMSKU> listbomsku_clone = new ArrayList<POrderBOMSKU>(listbomsku);
