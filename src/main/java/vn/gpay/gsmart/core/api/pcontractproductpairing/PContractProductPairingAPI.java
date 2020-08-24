@@ -68,6 +68,7 @@ public class PContractProductPairingAPI {
 				binding.setProductCode(pContractProduct.getProductCode());
 				binding.setProductName(pContractProduct.getProductName());
 				binding.setPquantity(0);
+				binding.setProductBuyerCode(pContractProduct.getProductBuyerCode());
 				
 				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
 				

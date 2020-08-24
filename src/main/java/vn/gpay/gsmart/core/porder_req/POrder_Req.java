@@ -168,7 +168,7 @@ public class POrder_Req implements Serializable {
 		return "";
 	}
 	@Transient
-	public Float getPo_quantity() {
+	public Integer getPo_quantity() {
 		if(pcontract_po != null) {
 			return pcontract_po.getPo_quantity();
 		}

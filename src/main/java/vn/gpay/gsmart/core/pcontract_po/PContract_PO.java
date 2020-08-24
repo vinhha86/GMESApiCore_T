@@ -43,7 +43,7 @@ public class PContract_PO implements Serializable {/**
 	private String po_buyer;
 	private String po_vendor;
 	private Long productid_link;
-	private Float po_quantity;
+	private Integer po_quantity;
 	private Long unitid_link;
 	private Date shipdate;
 	private Date matdate;
@@ -248,11 +248,11 @@ public class PContract_PO implements Serializable {/**
 		this.productid_link = productid_link;
 	}
 
-	public Float getPo_quantity() {
+	public Integer getPo_quantity() {
 		return po_quantity;
 	}
 
-	public void setPo_quantity(Float po_quantity) {
+	public void setPo_quantity(Integer po_quantity) {
 		this.po_quantity = po_quantity;
 	}
 
