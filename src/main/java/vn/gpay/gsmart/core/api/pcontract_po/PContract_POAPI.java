@@ -232,10 +232,12 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 			pcontract_po = pcontract_POService.save(pcontract_po);
 			
 			//Update POrder_Req
+			int total = 0;
 			List<POrder> lst_porders = entity.po_orders;
 //			String po_code = pcontract_po.getPo_vendor().length() > 0?pcontract_po.getPo_vendor():pcontract_po.getPo_buyer();
 			for(POrder porder : lst_porders) {
-				if (null == porder.getId() || 0 == porder.getId()){
+				total += porder.getTotalorder();
+				if (null == porder.getId() || 0 == porder.getId()) {
 					//Them moi POrder
 					POrder_Req porder_req = new POrder_Req();
 					
@@ -261,6 +263,9 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 					porder_req_Service.savePOrder_Req(porder_req);
 				}
 			}
+			pcontract_po.setPo_quantity(total);
+			pcontract_po = pcontract_POService.save(pcontract_po);
+			
 			//Response to Client
 			response.id = pcontract_po.getId();
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
