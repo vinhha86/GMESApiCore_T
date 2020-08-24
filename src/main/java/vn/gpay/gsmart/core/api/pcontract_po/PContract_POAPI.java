@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.api.pcontract_po;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -294,6 +295,30 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/get_productiondate",method = RequestMethod.POST)
+	public ResponseEntity<get_productiondate_response> getProductionDate(@RequestBody get_productiondate_request entity,HttpServletRequest request ) {
+		get_productiondate_response response = new get_productiondate_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			Date date = entity.date_material;
+			int amount = entity.amount_day + 1;
+			int year = Calendar.getInstance().get(Calendar.YEAR);
+			
+			Date production_date = commonService.Date_Add_with_holiday(date, amount, orgrootid_link, year);
+			response.productiondate = commonService.getBeginOfDate(production_date);
+			response.duration = commonService.getDuration(response.productiondate, entity.shipdate, orgrootid_link, year);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<get_productiondate_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<get_productiondate_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
 	

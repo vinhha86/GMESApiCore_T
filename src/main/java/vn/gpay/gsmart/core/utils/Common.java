@@ -312,14 +312,14 @@ public class Common  {
 			pcontractid_link = null;
 			pcontract_poid_link = null;
 			productid_link = null;
-			Long porderid_link = null;
+//			Long porderid_link = null;
 			
-			for(Task_Object object : list_object) {
-				if(object.getTaskobjecttypeid_link().intValue() == TaskObjectType_Name.LenhSanXuat) {
-					porderid_link = object.getObjectid_link();
-					break;
-				}
-			}
+//			for(Task_Object object : list_object) {
+//				if(object.getTaskobjecttypeid_link().intValue() == TaskObjectType_Name.LenhSanXuat) {
+//					porderid_link = object.getObjectid_link();
+//					break;
+//				}
+//			}
 			
 			for(Task_Object object : list_object) {
 				if(object.getTaskobjecttypeid_link().intValue() == TaskObjectType_Name.SanPham) {

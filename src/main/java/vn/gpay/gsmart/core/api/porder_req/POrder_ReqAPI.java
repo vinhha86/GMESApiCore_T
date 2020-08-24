@@ -30,6 +30,8 @@ import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
+import vn.gpay.gsmart.core.productpairing.IProductPairingService;
+import vn.gpay.gsmart.core.productpairing.ProductPairing;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.task.ITask_Service;
 import vn.gpay.gsmart.core.task.Task;
@@ -61,6 +63,7 @@ public class POrder_ReqAPI {
 	@Autowired ITask_Service taskService;
 	@Autowired ITask_Flow_Service commentService;
 	@Autowired Common commonService;
+	@Autowired IProductPairingService pairService;
 	
     ObjectMapper mapper = new ObjectMapper();
 	
@@ -193,6 +196,8 @@ public class POrder_ReqAPI {
 		}
 		
 	}
+	
+	
 
 	@RequestMapping(value = "/gen_porder", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> GenPOrder(HttpServletRequest request,
@@ -352,6 +357,9 @@ public class POrder_ReqAPI {
 						}
 
 						porderService.savePOrder(thePOrder, po_code);
+						
+						porder_req.setTotalorder(totalorder);
+						porder_req_Service.save(porder_req);
 					} else {
 						POrder porder = new POrder();
 						
@@ -379,6 +387,9 @@ public class POrder_ReqAPI {
 						porder.setPorder_product_sku(porder_SKU);
 						
 						porderid_link = porderService.savePOrder(porder, po_code);
+						
+						porder_req.setTotalorder(totalorder);
+						porder_req_Service.save(porder_req);
 						
 						//Tao viec trong taskboard
 						long pcontractid_link = thePO.getPcontractid_link();
@@ -480,6 +491,97 @@ public class POrder_ReqAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/get_total_select", method = RequestMethod.POST)
+	public ResponseEntity<get_totalselect_response> GetTotalSelect(HttpServletRequest request,
+			@RequestBody get_totalselect_request entity) {
+		get_totalselect_response response = new get_totalselect_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long orgrootid_link = user.getRootorgid_link();
+			POrder_Req porder_req = porder_req_Service.findOne(entity.porderreqid_link);
+
+			//Kiem tra san pham co phai la bo hay khong
+			long pcontractid_link = porder_req.getPcontractid_link();
+			List<ProductPairing> list_pair = pairService.getproduct_pairing_detail_bycontract(orgrootid_link, pcontractid_link, entity.productid_link);
+			
+			List<PContractProductSKU> po_SKUList = new ArrayList<PContractProductSKU>();
+			Integer totalorder = 0;
+			List<String> size_list = null;
+			List<String> color_list = null;
+			
+			if(list_pair.size() == 0) {
+				po_SKUList = (pcontract_ProductSKUService.getbypo_and_product_free(
+						entity.porderreqid_link, porder_req.getPcontractid_link(), porder_req.getPcontract_poid_link(), entity.productid_link));
+				
+				if (entity.size_list.length() > 0){
+					String[] size_arr = entity.size_list.split(";");
+					size_list = Arrays.asList(size_arr);
+				}
+				if (entity.color_list.length() > 0){
+					String[] color_arr = entity.color_list.split(";");
+					color_list = Arrays.asList(color_arr);
+				}
+				//Tao danh sach SKU, loc theo size_list va color_list
+				for(PContractProductSKU theSKU:po_SKUList){
+					if (null != size_list){
+						if (!size_list.contains(theSKU.getSizeid_link().toString())){
+							continue;
+						}
+					}
+					if (null != color_list){
+						if (!color_list.contains(theSKU.getColor_id().toString())){
+							continue;
+						}
+					}
+					
+					totalorder += null==theSKU.getPquantity_total()?0:theSKU.getPquantity_total();
+				}
+			}
+			else {
+				for(ProductPairing pair : list_pair) {
+					po_SKUList = (pcontract_ProductSKUService.getbypo_and_product_free(
+							entity.porderreqid_link, porder_req.getPcontractid_link(), porder_req.getPcontract_poid_link(), pair.getProductid_link()));
+					
+					if (entity.size_list.length() > 0){
+						String[] size_arr = entity.size_list.split(";");
+						size_list = Arrays.asList(size_arr);
+					}
+					if (entity.color_list.length() > 0){
+						String[] color_arr = entity.color_list.split(";");
+						color_list = Arrays.asList(color_arr);
+					}
+					//Tao danh sach SKU, loc theo size_list va color_list
+					for(PContractProductSKU theSKU:po_SKUList){
+						if (null != size_list){
+							if (!size_list.contains(theSKU.getSizeid_link().toString())){
+								continue;
+							}
+						}
+						if (null != color_list){
+							if (!color_list.contains(theSKU.getColor_id().toString())){
+								continue;
+							}
+						}
+						
+						totalorder += null==theSKU.getPquantity_total()?0:theSKU.getPquantity_total();
+					}
+				}
+			}
+						
+			response.total = commonService.FormatNumber(totalorder)+" / "+commonService.FormatNumber(porder_req.getTotalorder());
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<get_totalselect_response>(response, HttpStatus.OK);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<get_totalselect_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
 	
