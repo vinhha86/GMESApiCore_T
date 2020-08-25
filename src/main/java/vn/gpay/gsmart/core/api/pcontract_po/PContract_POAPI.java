@@ -263,8 +263,8 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 					porder_req_Service.savePOrder_Req(porder_req);
 				}
 			}
-			pcontract_po.setPo_quantity(total);
-			pcontract_po = pcontract_POService.save(pcontract_po);
+//			pcontract_po.setPo_quantity(total);
+//			pcontract_po = pcontract_POService.save(pcontract_po);
 			
 			//Response to Client
 			response.id = pcontract_po.getId();
