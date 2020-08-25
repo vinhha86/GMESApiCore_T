@@ -561,6 +561,8 @@ public class POrder implements Serializable {
 	public void setFinishdate_fact(Date finishdate_fact) {
 		this.finishdate_fact = finishdate_fact;
 	}
+	
+	
 //	public Long getPorder_statusid_link() {
 //		return porder_statusid_link;
 //	}

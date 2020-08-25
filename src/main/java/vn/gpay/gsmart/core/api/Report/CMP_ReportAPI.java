@@ -40,4 +40,22 @@ public class CMP_ReportAPI {
 			return new ResponseEntity<cmp_report_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+	@RequestMapping(value = "/orgcmp_tosx", method = RequestMethod.POST)
+	public ResponseEntity<cmp_report_response> orgcmp_tosx(HttpServletRequest request,
+			@RequestBody cmp_report_request entity) {
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		cmp_report_response response = new cmp_report_response();
+		try {
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(entity.reportdate);
+			response.data = cmpReportService.getData_ByMonth_ToSX(user.getRootorgid_link(), user.getOrgid_link(), calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR), entity.reportmonths);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<cmp_report_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<cmp_report_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 }

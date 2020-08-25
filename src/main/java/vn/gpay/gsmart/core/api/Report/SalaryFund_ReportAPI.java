@@ -40,4 +40,23 @@ public class SalaryFund_ReportAPI {
 			return new ResponseEntity<salaryfund_report_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	@RequestMapping(value = "/orgsalaryfund_tosx", method = RequestMethod.POST)
+	public ResponseEntity<salaryfund_report_response> orgsalaryfund_tosx(HttpServletRequest request,
+			@RequestBody salaryfund_report_request entity) {
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		salaryfund_report_response response = new salaryfund_report_response();
+		try {
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(entity.reportdate);
+			response.data = salaryfundReportService.getData_ByMonth_ToSX(user.getRootorgid_link(), user.getOrgid_link(), calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR), entity.reportmonths);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<salaryfund_report_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<salaryfund_report_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 }
