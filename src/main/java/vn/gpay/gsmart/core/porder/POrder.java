@@ -28,6 +28,7 @@ import vn.gpay.gsmart.core.porder_bom_sku.POrderBOMSKU;
 import vn.gpay.gsmart.core.porder_product.POrder_Product;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porder_status.POrder_Status;
+import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.sizeset.SizeSet;
 
@@ -111,6 +112,11 @@ public class POrder implements Serializable {
     private Product product;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+    @JoinColumn(name="porderid_link",insertable=false,updatable =false)
+    private List<POrderProcessing> list_process = new ArrayList<POrderProcessing>();
+	
+	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="status",insertable=false,updatable =false)
     private POrder_Status porderstatus;
@@ -122,6 +128,15 @@ public class POrder implements Serializable {
 		}
 		return "";
 	}	
+	
+	@Transient
+	public int getTotal_process() {
+		int total = 0;
+		for(POrderProcessing process : list_process) {
+			total += process.getAmountinput() == null ? 0: process.getAmountinput();
+		}
+		return total;
+	}
 	
 	@Transient
 	public String getStylebuyer() {

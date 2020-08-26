@@ -628,7 +628,7 @@ public class ScheduleAPI {
 			pg = granttService.save(pg);
 			
 			POrderProcessing pp = new POrderProcessing();
-//			pp.setOrdercode(porder.getOrdercode());
+			pp.setOrdercode(porder.getOrdercode());
 			pp.setOrderdate(porder.getOrderdate());
 			pp.setOrgrootid_link(orgrootid_link);
 			pp.setPorderid_link(porder.getId());
@@ -1001,6 +1001,35 @@ public class ScheduleAPI {
 		}
 	} 
 	
+	@RequestMapping(value = "/cancel_pordergrant",method = RequestMethod.POST)
+	public ResponseEntity<cancel_pordergrant_response> CancelPorderGrant(HttpServletRequest request,
+			@RequestBody cancel_pordergrant_request entity) {
+		cancel_pordergrant_response response = new cancel_pordergrant_response();
+		
+		try {
+			POrderGrant grant = granttService.findOne(entity.porder_grantid_link);
+			long porderid_link = grant.getPorderid_link();
+			POrder porder = porderService.findOne(porderid_link);
+			if(porder.getTotal_process() > 0) {
+				response.mes = "Lệnh sản xuất đã vào chuyền không thể hủy!";
+			}
+			else {
+				granttService.delete(grant);
+				processService.deleteByOrderID(porderid_link);
+				porder.setStatus(POrderStatus.PORDER_STATUS_FREE);
+				porderService.save(porder);
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<cancel_pordergrant_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<cancel_pordergrant_response>(response, HttpStatus.OK);
+		}
+	} 
+	
 	@RequestMapping(value = "/break_porder",method = RequestMethod.POST)
 	public ResponseEntity<break_porder_response> BreakPorder(HttpServletRequest request,
 			@RequestBody break_porder_request entity) {
@@ -1109,5 +1138,7 @@ public class ScheduleAPI {
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<break_porder_response>(response, HttpStatus.OK);
 		}
-	} 
+	}
+	
+	
 }

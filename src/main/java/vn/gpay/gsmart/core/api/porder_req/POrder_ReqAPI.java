@@ -350,6 +350,7 @@ public class POrder_ReqAPI {
 							commonService.CreateTask(orgrootid_link, orgid_link, userid_link, tasktypeid_link_dmsx, list_object, userinchargeid_link);
 							
 						}
+						
 						thePOrder.setTotalorder(totalorder);
 						thePOrder.getPorder_product_sku().clear();
 						for(POrder_Product_SKU theSKU: porder_SKU){
