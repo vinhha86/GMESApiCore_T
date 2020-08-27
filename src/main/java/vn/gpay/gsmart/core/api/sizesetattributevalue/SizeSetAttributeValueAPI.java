@@ -163,7 +163,7 @@ public class SizeSetAttributeValueAPI {
 			listAttr.remove(valAll);
 			
 			for(Attributevalue attrValue : listAttr) {
-				System.out.println("--------");
+//				System.out.println("--------");
 				for(SizeSetAttributeValue sizesetAttrValue : listOther) {
 					if(attrValue.getId().equals(sizesetAttrValue.getAttributevalueid_link())) {
 						listToRmove.add(attrValue);

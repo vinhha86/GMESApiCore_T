@@ -101,7 +101,7 @@ public class WareHouseAPI {
 	@RequestMapping(value = "/getMaterialListByLotNumber",method = RequestMethod.POST)
 	public ResponseEntity<?> GetMaterialListByLotNumber( @RequestBody GetMaterialListByLotNumber entity,HttpServletRequest request ) {
 		WareHouseResponse responseBase = new WareHouseResponse();
-		System.out.println("lotnumber:" + entity.lotnumber);
+//		System.out.println("lotnumber:" + entity.lotnumber);
 		try {
 			responseBase.data = warehouseService.findByLotNumber(entity.lotnumber);
 			responseBase.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

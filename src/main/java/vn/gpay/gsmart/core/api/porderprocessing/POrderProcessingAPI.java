@@ -87,7 +87,7 @@ public class POrderProcessingAPI {
 			
 			//If processingdate <> entity.processingdate_to --> Calcucate Amount's value of provided date
 			for(POrderProcessing pprocess: pprocessList){
-				System.out.println(pprocess.getGranttoorgid_link());
+//				System.out.println(pprocess.getGranttoorgid_link());
 				//Nếu số cắt TT ==0 --> gán bằng số cắt dự kiến để vẫn cho vào chuyền, hiện đỏ để lưu í
 				pprocess.setIscuttt(0);
 				if (null == pprocess.getAmountcutsum() || 0 == pprocess.getAmountcutsum()){
@@ -163,7 +163,7 @@ public class POrderProcessingAPI {
 			
 			//If processingdate <> entity.processingdate_to --> Calcucate Amount's value of provided date
 			for(POrderProcessing pprocess: pprocessList){
-				System.out.println(pprocess.getGranttoorgid_link());
+//				System.out.println(pprocess.getGranttoorgid_link());
 				//Nếu số cắt TT ==0 --> gán bằng số cắt dự kiến để vẫn cho vào chuyền, hiện đỏ để lưu í
 				pprocess.setIscuttt(0);
 				if (null == pprocess.getAmountcutsum() || 0 == pprocess.getAmountcutsum()){
@@ -642,7 +642,7 @@ public class POrderProcessingAPI {
 	//update processing values
 	@RequestMapping(value = "/update",method = RequestMethod.POST)
 	public ResponseEntity<PProcessUpdateResponse> updatePProcess(@RequestBody PProcessUpdateRequest entity, HttpServletRequest request) {
-		System.out.println(entity.data.getProcessingdate());
+//		System.out.println(entity.data.getProcessingdate());
 	
 		PProcessUpdateResponse response = new PProcessUpdateResponse();
 		
@@ -807,7 +807,7 @@ public class POrderProcessingAPI {
 			        response.status = pprocess.getStatus();
 		        }
 		        else {
-		        	System.out.println("add new processing line");
+//		        	System.out.println("add new processing line");
 		        	//New line for a processing date
 		        	POrderProcessing pprocess = new POrderProcessing();
 		        	

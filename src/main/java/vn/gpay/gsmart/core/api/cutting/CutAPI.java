@@ -133,7 +133,7 @@ public class CutAPI {
 	//update cutting values
 	@RequestMapping(value = "/update",method = RequestMethod.POST)
 	public ResponseEntity<PProcessUpdateResponse> updatePProcess(@RequestBody PProcessUpdateRequest entity, HttpServletRequest request) {
-		System.out.println(entity.data.getProcessingdate());
+//		System.out.println(entity.data.getProcessingdate());
 	
 		PProcessUpdateResponse response = new PProcessUpdateResponse();
 		try {
@@ -143,7 +143,7 @@ public class CutAPI {
 	        List<POrderProcessing> pprocessList = pprocessService.findByIdAndPDate(entity.data.getPorderid_link(), entity.data.getPordergrantid_link(), entity.data.getProcessingdate());
 	        
 	        if (pprocessList.size() > 0) {
-	        	System.out.println("update processing cutting");
+//	        	System.out.println("update processing cutting");
 	        	POrderProcessing pprocess = pprocessList.get(0);
 	        	
 	        	if (entity.data.getAmountcutting() != entity.data.getAmountcuttingold()){

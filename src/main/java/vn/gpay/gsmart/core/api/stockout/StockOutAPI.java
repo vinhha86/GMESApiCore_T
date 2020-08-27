@@ -243,11 +243,11 @@ public class StockOutAPI {
 		StockoutDFilterResponse response = new StockoutDFilterResponse();
 		try {
 			if (entity.skucode.length() > 0){
-				System.out.println("co skucode");
+//				System.out.println("co skucode");
 				response.data = stockout_d_Service.getByDateAndSkucode(entity.stockouttypeid, GPAYDateFormat.atStartOfDay(entity.stockoutdate_from), GPAYDateFormat.atEndOfDay(entity.stockoutdate_to), entity.skuid_link);
 			}
 			else {
-				System.out.println(entity.stockouttypeid);
+//				System.out.println(entity.stockouttypeid);
 				response.data = stockout_d_Service.getByDateAndType(entity.stockouttypeid, GPAYDateFormat.atStartOfDay(entity.stockoutdate_from), GPAYDateFormat.atEndOfDay(entity.stockoutdate_to));
 			}
 			//response.data = stockoutRepository.getAll();
@@ -258,7 +258,7 @@ public class StockOutAPI {
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			System.out.println(response.data.size());
+//			System.out.println(response.data.size());
 			return new ResponseEntity<StockoutDFilterResponse>(response,HttpStatus.OK);
 		}catch (Exception e) {
 			actionLogs.setResponse_time(new Date());
@@ -280,7 +280,7 @@ public class StockOutAPI {
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			System.out.println(response.data.size());
+//			System.out.println(response.data.size());
 			return new ResponseEntity<StockoutDResponse>(response,HttpStatus.OK);
 		}catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
@@ -311,7 +311,7 @@ public class StockOutAPI {
 				//List<Stockout> stockoutChecklist = stockoutRepository.getBySkucode(StockoutTypes.STOCKOUT_TYPE_FORCHECK, entity.data.getP_skucode());
 				List<StockOut> stockoutChecklist = stockOutService.getByDateAndSkuID(entity.data.getStockoutdate(), entity.data.getStockouttypeid_link(), theSku.getId());
 				if (stockoutChecklist.size() > 0){
-					System.out.println("Key duplication");
+//					System.out.println("Key duplication");
 					response.setRespcode(ResponseMessage.KEY_RC_KEY_DUPLICATION);
 					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_KEY_DUPLICATION));
 					return new ResponseEntity<StockoutCreateResponse>(response,HttpStatus.BAD_REQUEST);
@@ -551,7 +551,7 @@ public class StockOutAPI {
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			System.out.println(response.data.size());
+//			System.out.println(response.data.size());
 			return new ResponseEntity<StockoutPklistResponse>(response,HttpStatus.OK);
 		}catch (Exception e) {
 			e.printStackTrace();
