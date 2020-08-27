@@ -82,9 +82,8 @@ public class ScheduleAPI {
 		long orgbuyerid_link = Buyer == "" ? (long)0 : Long.parseLong(Buyer);
 		long orgvendorid_link = Vendor == "" ? (long)0 : Long.parseLong(Vendor);
 		 
-	    Date startdate = new SimpleDateFormat("yyyy-MM-dd").parse(startDate.substring(0,10));  
-	    
-	    Date toDate = new SimpleDateFormat("yyyy-MM-dd").parse(endDate.substring(0,10));  
+	    Date startdate = commonService.getBeginOfDate(new SimpleDateFormat("yyyy-MM-dd").parse(startDate.substring(0,10))); 
+	    Date toDate = commonService.getEndOfDate(new SimpleDateFormat("yyyy-MM-dd").parse(endDate.substring(0,10)));  
 		
 		String[] listtype = listid.split(",");
 		List<String> list = new ArrayList<String>();
@@ -152,8 +151,6 @@ public class ScheduleAPI {
 				//Lấy các tổ của nhà máy
 				List<Org> listorg_grantt = orgService.getorgChildrenbyOrg(orgid, list);
 				for(Org org_grant : listorg_grantt) {
-					//Xac dinh so ngay lam viec trong khoang thoi gian dang xem
-					int total_day = commonService.getDuration(startdate, toDate, orgrootid_link, year);
 					
 					Schedule_plan sch_org_grant = new Schedule_plan();
 					
@@ -196,10 +193,21 @@ public class ScheduleAPI {
 
 					List<POrderGrant> list_porder = granttService.get_granted_bygolivedate(startdate, toDate, org_grant.getId(),
 							PO_code, orgbuyerid_link, orgvendorid_link);
-					
+
+					//Xac dinh so ngay lam viec trong khoang thoi gian dang xem
+					int total_day = commonService.getDuration(startdate, toDate, orgrootid_link, year);
 					for(POrderGrant pordergrant : list_porder) {
+						total_day = commonService.getDuration(startdate, toDate, orgrootid_link, year);
 						Date start = commonService.getBeginOfDate(pordergrant.getStart_date_plan());
 						Date end = commonService.getEndOfDate(pordergrant.getFinish_date_plan());
+						Date start_free = start, end_free = end;
+						
+						if(start_free.before(startdate))
+							start_free = startdate;
+						
+						if(end_free.after(toDate))
+							end_free = toDate;
+						
 						int duration = commonService.getDuration(start, end, orgrootid_link, year);
 						int productivity = commonService.getProductivity(pordergrant.getGrantamount(), duration); 
 						
@@ -225,11 +233,12 @@ public class ScheduleAPI {
 						sch_porder.setPcontract_poid_link(pordergrant.getPcontract_poid_link());
 						sch_porder.setPcontractid_link(pordergrant.getPcontractid_link());
 						
-						total_day -= commonService.getDuration(start, end, orgrootid_link, year);
+						int d = commonService.getDuration(start_free, end_free, orgrootid_link, year);
+						total_day = total_day - d;
 						
 						response.events.rows.add(sch_porder);
 					}
-					String cls = total_day == 0 ? "" : "free";
+					String cls = total_day <= 0 ? "" : "free";
 					sch_org_grant.setCls(cls);
 
 					//Lay thong tin tien do thuc te cua lenh

@@ -509,6 +509,15 @@ public class Common  {
 	        os.close();
 	    }
 	}
+	
+	public boolean CompareDate(Calendar a, Calendar b) {
+		if(a.get(Calendar.DAY_OF_YEAR) == b.get(Calendar.DAY_OF_YEAR) &&
+				a.get(Calendar.MONTH) == b.get(Calendar.MONTH) &&
+				a.get(Calendar.YEAR) == b.get(Calendar.YEAR)) {
+			return true;
+		}
+		return false;
+	}
 
 	public int getDuration(Date startdate, Date enddate, long orgrootid_link, int year) {
 		int duration = 0;		
@@ -527,7 +536,8 @@ public class Common  {
 				for(Holiday holiday : list_holiday) {
 					Calendar day = Calendar.getInstance();
 					day.setTime(holiday.getDay());
-					if(start.compareTo(day) == 0) {
+					day.setTimeZone(start.getTimeZone());
+					if(CompareDate(start, day)) {
 						check = true;
 						break;
 					}
