@@ -47,6 +47,13 @@ public class POrder_Product_SKU implements Serializable {
     private SKU sku;
 	
 	@Transient
+	public int getSort_size() {
+		if(sku!=null)
+			return sku.getSort_size();
+		return 0;
+	}
+	
+	@Transient
 	public Long getColor_id() {
 		if(sku!=null) {
 			return sku.getColor_id();

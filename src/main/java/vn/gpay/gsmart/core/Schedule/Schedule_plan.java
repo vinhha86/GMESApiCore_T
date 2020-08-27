@@ -14,12 +14,17 @@ public class Schedule_plan {
 	private long parentid_origin;
 	private long orgtypeid_link;
 	private Integer type;
-
+	
+	private Integer amount_free;
+	
 	@JsonProperty("Name")
 	private String Name;
 	
 	@JsonProperty("iconCls")
 	private String iconCls;
+	
+	@JsonProperty("Cls")
+	private String Cls;
 	
 	private Boolean expanded;
 	private Boolean leaf;
@@ -90,6 +95,18 @@ public class Schedule_plan {
 	}
 	public void setType(Integer type) {
 		this.type = type;
+	}
+	public Integer getAmount_free() {
+		return amount_free;
+	}
+	public void setAmount_free(Integer amount_free) {
+		this.amount_free = amount_free;
+	}
+	public String getCls() {
+		return Cls;
+	}
+	public void setCls(String cls) {
+		Cls = cls;
 	}
 	
 	

@@ -78,6 +78,12 @@ public class SKU_Attribute_Value implements Serializable {
     private Attributevalue attributevalue;
 	
 	@Transient
+	public int getSort_Size() {
+		if(attributevalue!=null)
+			return attributevalue.getSortvalue();
+		return 0;
+	}
+	@Transient
 	public String getAttributeValueName() {
 		if(attributevalue!=null) {
 			return attributevalue.getValue();

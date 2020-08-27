@@ -92,6 +92,19 @@ public class SKU implements Serializable {
     private List<SKU_Attribute_Value> listSKUvalue = new ArrayList<SKU_Attribute_Value>();
     
     @Transient
+    public int getSort_size() {
+    	int sort = 0;
+    	for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
+			if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZE || 
+					sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) {
+				sort = sku_Attribute_Value.getSort_Size();
+				break;
+			}			
+		}
+    	return sort;
+    }
+    
+    @Transient
     public String getInfo_sku() {
     	if(product!=null)
     		return product.getInfo();
@@ -101,11 +114,11 @@ public class SKU implements Serializable {
     public String getMauSanPham() {
     	String name ="";
     	for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
-			if(sku_Attribute_Value.getAttributeid_link() == 4) {
+			if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_COLOR) {
 				name = sku_Attribute_Value.getAttributeValueName();
 				break;
 			} 
-			else if(sku_Attribute_Value.getAttributeid_link() == 35) {
+			else if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZE) {
 				name = sku_Attribute_Value.getAttributeValueName();
 				break;
 			}
