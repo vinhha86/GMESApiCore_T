@@ -85,7 +85,7 @@ public class ProductAttributeValueAPI {
 					lstmau = pavService.getList_byAttId(AtributeFixValues.ATTR_COLOR, entity.productid_link);
 					lstco = pavService.getList_byAttId(AtributeFixValues.ATTR_SIZE, entity.productid_link);
 				}
-			} else if (product.getProducttypeid_link() > 19) {
+			} else if (product.getProducttypeid_link() >= 20 && product.getProducttypeid_link() < 30) {
 				if (entity.attributeid_link == AtributeFixValues.ATTR_COLOR || entity.attributeid_link == AtributeFixValues.ATTR_SIZEWIDTH) {
 					lstmau = pavService.getList_byAttId(AtributeFixValues.ATTR_COLOR, entity.productid_link);
 					lstco = pavService.getList_byAttId(AtributeFixValues.ATTR_SIZEWIDTH, entity.productid_link);
@@ -284,7 +284,7 @@ public class ProductAttributeValueAPI {
 			if (product.getProducttypeid_link() > 9 && product.getProducttypeid_link() < 20) {
 				lstmau = pavService.getList_byAttId(AtributeFixValues.ATTR_COLOR, entity.productid_link);
 				lstco = pavService.getList_byAttId(AtributeFixValues.ATTR_SIZE, entity.productid_link);
-			} else if (product.getProducttypeid_link() > 19) {
+			} else if (product.getProducttypeid_link() >= 20 && product.getProducttypeid_link() < 30) {
 				lstmau = pavService.getList_byAttId(AtributeFixValues.ATTR_COLOR, entity.productid_link);
 				lstco = pavService.getList_byAttId(AtributeFixValues.ATTR_SIZEWIDTH, entity.productid_link);
 			}
