@@ -92,6 +92,12 @@ public class SKU implements Serializable {
     private List<SKU_Attribute_Value> listSKUvalue = new ArrayList<SKU_Attribute_Value>();
     
     @Transient
+    public String getInfo_sku() {
+    	if(product!=null)
+    		return product.getInfo();
+    	return "";
+    }
+    @Transient
     public String getMauSanPham() {
     	String name ="";
     	for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {

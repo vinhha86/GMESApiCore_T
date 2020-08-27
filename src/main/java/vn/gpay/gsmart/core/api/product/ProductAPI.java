@@ -577,7 +577,6 @@ public class ProductAPI {
 			pimg.img3 = getimg(response.data.getImgurl3(),uploadRootPath);
 			pimg.img4 = getimg(response.data.getImgurl4(),uploadRootPath);
 			pimg.img5 = getimg(response.data.getImgurl5(),uploadRootPath);
-			pimg.img1_path = uploadRootPath;
 			
 			response.img = pimg;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

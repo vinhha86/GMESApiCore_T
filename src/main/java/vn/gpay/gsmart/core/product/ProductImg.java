@@ -6,5 +6,4 @@ public class ProductImg {
 	public byte[] img3;
 	public byte[] img4;
 	public byte[] img5;
-	public String img1_path;
 }
