@@ -28,7 +28,8 @@ public class AttributeValueService extends AbstractService<Attributevalue> imple
 	@Override
 	public Integer getMaxSortValue(Long id) {
 		// TODO Auto-generated method stub
-		return repo.getMaxSortValue(id)+1;
+		Integer max = repo.getMaxSortValue(id);
+		return max == null ? 1: max+1;
 	}
 
 	@Override
