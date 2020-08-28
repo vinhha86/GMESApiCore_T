@@ -197,7 +197,7 @@ public class ScheduleAPI {
 					//Xac dinh so ngay lam viec trong khoang thoi gian dang xem
 					int total_day = commonService.getDuration(startdate, toDate, orgrootid_link, year);
 					for(POrderGrant pordergrant : list_porder) {
-						total_day = commonService.getDuration(startdate, toDate, orgrootid_link, year);
+//						total_day = commonService.getDuration(startdate, toDate, orgrootid_link, year);
 						Date start = commonService.getBeginOfDate(pordergrant.getStart_date_plan());
 						Date end = commonService.getEndOfDate(pordergrant.getFinish_date_plan());
 						Date start_free = start, end_free = end;
