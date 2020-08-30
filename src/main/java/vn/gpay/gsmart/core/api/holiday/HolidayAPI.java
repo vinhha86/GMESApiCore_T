@@ -53,7 +53,7 @@ public class HolidayAPI {
 			
 			int thisYear = Calendar.getInstance().get(Calendar.YEAR);
 			
-			List<Integer> years = holidayService.getAllYears();
+			List<Integer> years = holidayService.getAllYears(thisYear);
 			if(!years.contains(thisYear))years.add(thisYear);
 			if(!years.contains(thisYear + 1))years.add(thisYear + 1);
 			if(!years.contains(thisYear + 2))years.add(thisYear + 2);

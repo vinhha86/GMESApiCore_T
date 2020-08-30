@@ -22,9 +22,9 @@ public class HolidayService extends AbstractService<Holiday> implements IHoliday
 		return repo.getby_year(orgrootid_link, year);
 	}
 	@Override
-	public List<Integer> getAllYears() {
+	public List<Integer> getAllYears(int year) {
 		// TODO Auto-generated method stub
-		return repo.getAllYears();
+		return repo.getAllYears(year);
 	}
 
 }
