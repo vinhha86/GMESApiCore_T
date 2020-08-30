@@ -135,7 +135,7 @@ public class ScheduleAPI {
 				Schedule_plan sch_org = new Schedule_plan();
 				sch_org.setId(id);
 				sch_org.setCode(org_factory.getCode());
-				sch_org.setExpanded(true);
+				sch_org.setExpanded(false);
 				sch_org.setIconCls("x-fa fa-industry");
 				sch_org.setId_origin(org_factory.getId());
 				sch_org.setLeaf(false);
