@@ -55,6 +55,9 @@ public class HolidayAPI {
 			
 			List<Integer> years = holidayService.getAllYears();
 			if(!years.contains(thisYear))years.add(thisYear);
+			if(!years.contains(thisYear + 1))years.add(thisYear + 1);
+			if(!years.contains(thisYear + 2))years.add(thisYear + 2);
+			if(!years.contains(thisYear + 3))years.add(thisYear + 3);
 			
 			Collections.sort(years, Collections.reverseOrder());
 			years.add(0, null);
