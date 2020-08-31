@@ -49,7 +49,7 @@ public class PContractProduct implements Serializable {/**
 	@Transient
 	public String getProductinfo() {
 		if(product!=null)
-			return product.getInfo();
+			return product.getDescription();
 		return "";
 	}
 	@Transient

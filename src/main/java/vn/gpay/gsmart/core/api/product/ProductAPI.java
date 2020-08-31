@@ -141,7 +141,7 @@ public class ProductAPI {
 				pb.setThanhPhanVai(product.getThanhPhanVai());
 				pb.setTenMauNPL(product.getTenMauNPL());
 				pb.setDesignerName(product.getDesignerName());
-				pb.setInfo(product.getInfo());
+				pb.setInfo(product.getDescription());
 				
 				FolderPath = commonService.getFolderPath(product.getProducttypeid_link());
 				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
@@ -188,7 +188,7 @@ public class ProductAPI {
 				pb.setThanhPhanVai(product.getThanhPhanVai());
 				pb.setTenMauNPL(product.getTenMauNPL());
 				pb.setDesignerName(product.getDesignerName());
-				pb.setInfo(product.getInfo());
+				pb.setInfo(product.getDescription());
 				
 				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
 				
@@ -1108,6 +1108,11 @@ public class ProductAPI {
 					productAttributeValue.setIs_select(entity.check);
 					pavService.save(productAttributeValue);
 				}
+				
+				Product product = productService.findOne(productid_link);
+				product.setDescription(entity.description);
+				productService.save(product);
+				
 				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 				return new ResponseEntity<get_description_response>(response, HttpStatus.OK);
@@ -1135,7 +1140,7 @@ public class ProductAPI {
 					pb.setCoKho(product.getCoKho());
 					pb.setThanhPhanVai(product.getThanhPhanVai());
 					pb.setTenMauNPL(product.getTenMauNPL());
-					pb.setInfo(product.getInfo());
+					pb.setInfo(product.getDescription());
 					
 					pb.setPquantity(entity.po_quantity);
 					

@@ -71,6 +71,8 @@ public class Product implements Serializable {/**
 	private String imgurl4;
 	
 	private String imgurl5;
+	
+	private String description;
 
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -92,28 +94,28 @@ public class Product implements Serializable {/**
     @JoinColumn(name="productid_link",insertable=false,updatable =false)
     private Set<ProductAttributeValue> listPAvalue = new HashSet<ProductAttributeValue>();
 	
-	@Transient
-    public String getInfo() {
-    	String name ="";
-    	for (ProductAttributeValue Attribute_Value : listPAvalue) {
-//    		if(Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_COLOR || Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZE
-//    				|| Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) 
-//    			continue;
-    		if(Attribute_Value.getIsdefaultvalue()) continue;
-    		
-    		if(!Attribute_Value.getIs_select() || Attribute_Value.getIs_select() == null) continue;
-    		
-    		if(Attribute_Value.getAttributevalueid_link() > 0) {
-    			if(name.length() >0) {
-    				name += "; "+ Attribute_Value.getAttributeValueName();
-    			}
-    			else {
-    				name = Attribute_Value.getAttributeValueName();
-    			}
-    		}
-    	}
-    	return name;
-    }
+//	@Transient
+//    public String getInfo() {
+//    	String name ="";
+//    	for (ProductAttributeValue Attribute_Value : listPAvalue) {
+////    		if(Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_COLOR || Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZE
+////    				|| Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) 
+////    			continue;
+//    		if(Attribute_Value.getIsdefaultvalue()) continue;
+//    		
+//    		if(!Attribute_Value.getIs_select() || Attribute_Value.getIs_select() == null) continue;
+//    		
+//    		if(Attribute_Value.getAttributevalueid_link() > 0) {
+//    			if(name.length() >0) {
+//    				name += "; "+ Attribute_Value.getAttributeValueName();
+//    			}
+//    			else {
+//    				name = Attribute_Value.getAttributeValueName();
+//    			}
+//    		}
+//    	}
+//    	return name;
+//    }
 		
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -387,6 +389,16 @@ public class Product implements Serializable {/**
 
 	public void setVendorname(String vendorname) {
 		this.vendorname = vendorname;
+	}
+
+
+	public String getDescription() {
+		return description;
+	}
+
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 	
 }
