@@ -76,6 +76,9 @@ public class PContract_PO implements Serializable {/**
 	private Float sewtarget_percent;
 	private Long portfromid_link;
 	private Long porttoid_link;
+	private Boolean isauto_calculate;
+	
+	
 	
 	public Integer getProductiondays() {
 		return productiondays;
@@ -502,6 +505,14 @@ public class PContract_PO implements Serializable {/**
 
 	public void setPorttoid_link(Long porttoid_link) {
 		this.porttoid_link = porttoid_link;
+	}
+
+	public Boolean getIsauto_calculate() {
+		return isauto_calculate;
+	}
+
+	public void setIsauto_calculate(Boolean isauto_calculate) {
+		this.isauto_calculate = isauto_calculate;
 	}
 	
 }

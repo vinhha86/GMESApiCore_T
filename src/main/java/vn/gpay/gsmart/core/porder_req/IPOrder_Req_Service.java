@@ -18,5 +18,5 @@ public interface IPOrder_Req_Service extends Operations<POrder_Req> {
 	List<POrder_Req> get_free_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link);
 	Long savePOrder_Req(POrder_Req porder_req);
 	List<POrder_Req> getByPO(Long pcontract_poid_link);
-
+	List<POrder_Req> getByPO_is_calculate(Long pcontract_poid_link);
 }

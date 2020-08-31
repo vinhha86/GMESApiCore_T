@@ -149,4 +149,10 @@ public class POrder_Req_Service extends AbstractService<POrder_Req> implements I
 		List<POrder_Req> a = repo.findAll(specification);
 		return a;
 	}
+
+	@Override
+	public List<POrder_Req> getByPO_is_calculate(Long pcontract_poid_link) {
+		// TODO Auto-generated method stub
+		return repo.getByPO_calculate(pcontract_poid_link);
+	}
 }

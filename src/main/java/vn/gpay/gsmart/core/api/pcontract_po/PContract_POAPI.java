@@ -26,7 +26,6 @@ import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Service;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price_D;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
-import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.productpairing.IProductPairingService;
@@ -93,9 +92,9 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 			}
 			
 			//Update POrder_Req
-			List<POrder> lst_porders = entity.po_orders;
+			List<POrder_Req> lst_porders = entity.po_orders;
 //			String po_code = pcontract_po.getPo_vendor().length() > 0?pcontract_po.getPo_vendor():pcontract_po.getPo_buyer();
-			for(POrder porder : lst_porders) {
+			for(POrder_Req porder : lst_porders) {
 				if (null == porder.getId() || 0 == porder.getId()){
 					//Them moi POrder
 					POrder_Req porder_req = new POrder_Req();
@@ -112,6 +111,7 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 					porder_req.setUsercreatedid_link(user.getId());
 					porder_req.setStatus(POrderReqStatus.STATUS_FREE);
 					porder_req.setTimecreated(new Date());
+					porder_req.setIs_calculate(porder.getIs_calculate());
 					
 					//Save to DB
 					long porder_req_id_link = porder_req_Service.savePOrder_Req(porder_req);
@@ -146,6 +146,7 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 				} else {
 					POrder_Req porder_req = porder_req_Service.findOne(porder.getId());
 					porder_req.setTotalorder(porder.getTotalorder());
+					porder_req.setIs_calculate(porder.getIs_calculate());
 					//Save to DB
 					porder_req_Service.savePOrder_Req(porder_req);
 				}
@@ -233,9 +234,9 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 			
 			//Update POrder_Req
 //			int total = 0;
-			List<POrder> lst_porders = entity.po_orders;
+			List<POrder_Req> lst_porders = entity.po_orders;
 //			String po_code = pcontract_po.getPo_vendor().length() > 0?pcontract_po.getPo_vendor():pcontract_po.getPo_buyer();
-			for(POrder porder : lst_porders) {
+			for(POrder_Req porder : lst_porders) {
 //				total += porder.getTotalorder();
 				if (null == porder.getId() || 0 == porder.getId()) {
 					//Them moi POrder

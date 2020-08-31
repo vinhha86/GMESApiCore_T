@@ -54,6 +54,9 @@ public class POrder_Req implements Serializable {
 	private Long usercreatedid_link;
 	private Date timecreated;
 	private Integer status;
+	private Boolean is_calculate;
+	
+	
 
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
@@ -130,7 +133,7 @@ public class POrder_Req implements Serializable {
 	public String getMahang() {
 		String name = "";
 		int total = totalorder == null ? 0 : totalorder;
-		float totalPO = pcontract_po == null ? 0 : pcontract_po.getPo_quantity();
+		float totalPO = pcontract_po.getPo_quantity() == null ? 0 : pcontract_po.getPo_quantity();
 		
 		DecimalFormat decimalFormat = new DecimalFormat("#,###");
 		decimalFormat.setGroupingSize(3);
@@ -326,6 +329,14 @@ public class POrder_Req implements Serializable {
 
 	public Product getProduct() {
 		return product;
+	}
+
+	public Boolean getIs_calculate() {
+		return is_calculate;
+	}
+
+	public void setIs_calculate(Boolean is_calculate) {
+		this.is_calculate = is_calculate;
 	}
 	
 }

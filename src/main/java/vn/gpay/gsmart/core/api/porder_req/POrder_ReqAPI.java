@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
@@ -600,6 +601,18 @@ public class POrder_ReqAPI {
 					return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);					
 				} else {
 					porder_req_Service.delete(thePOrder_Req);
+					
+					long pcontractpo_id_link = thePOrder_Req.getPcontract_poid_link();
+					PContract_PO po = pcontract_POService.findOne(pcontractpo_id_link);
+					List<POrder_Req> list_req = porder_req_Service.getByPO_is_calculate(pcontractpo_id_link);
+					int amount = po.getPo_quantity()/list_req.size();
+					for(POrder_Req req : list_req) {
+						req.setTotalorder(amount);
+						porder_req_Service.save(req);
+					}
+					POrder_Req req = list_req.get(list_req.size()-1);
+					req.setTotalorder(po.getPo_quantity() - amount* (list_req.size()-1));
+					porder_req_Service.save(req);
 	
 					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
