@@ -9,4 +9,5 @@ public class ProductAttribute_createvalue_request extends RequestBase {
 	public Long attributeid_link;
 	public Long productid_link;
 	public List<Long> listvalue;
+	public String description;
 }

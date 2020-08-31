@@ -64,6 +64,7 @@ public class ProductAttributeValueAPI {
 				data.setAttributevalueid_link(id);
 				data.setProductid_link(entity.productid_link);
 				data.setOrgrootid_link(user.getRootorgid_link());
+				data.setIs_select(true);
 
 				pavService.save(data);
 			}
@@ -72,6 +73,8 @@ public class ProductAttributeValueAPI {
 //			Long ID_Mau_NPL = (long) 35, ID_Co_Kho = (long) 36;
 
 			Product product = productService.findOne(entity.productid_link);
+			product.setDescription(entity.description);
+			productService.save(product);
 
 			List<ProductAttributeValue> lstmau = new ArrayList<ProductAttributeValue>();
 			List<ProductAttributeValue> lstco = lstmau;
