@@ -53,6 +53,14 @@ public class PContractProductSKU implements Serializable {/**
 	}
 	
 	@Transient
+	public int getSort_value() {
+		if(sku!=null) {
+			return sku.getSort_size();
+		}
+		return 0;
+	}
+	
+	@Transient
 	public String getSkuCode() {
 		if(sku!=null) {
 			return sku.getCode();
