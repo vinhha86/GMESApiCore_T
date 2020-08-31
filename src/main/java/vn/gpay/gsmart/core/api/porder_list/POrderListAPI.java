@@ -2,12 +2,17 @@ package vn.gpay.gsmart.core.api.porder_list;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -115,6 +120,18 @@ public class POrderListAPI {
 				}
 				response.data.add(porder);
 			}
+			
+			Comparator<POrder> compareByGrantToOrgName = (POrder p1, POrder p2) -> p1.getGranttoorgname().compareTo( p2.getGranttoorgname());
+			Collections.sort(response.data, compareByGrantToOrgName);
+			
+			response.totalCount = response.data.size();
+			
+			PageRequest page = PageRequest.of(entity.page - 1, entity.limit);
+			int start = (int) page.getOffset();
+			int end = (start + page.getPageSize()) > response.data.size() ? response.data.size() : (start + page.getPageSize());
+			Page<POrder> pageToReturn = new PageImpl<POrder>(response.data.subList(start, end), page, response.data.size()); 
+			
+			response.data = pageToReturn.getContent();
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

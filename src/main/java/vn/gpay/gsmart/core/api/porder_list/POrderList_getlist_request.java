@@ -15,4 +15,6 @@ public class POrderList_getlist_request extends RequestBase{
 	public Date orderdatefrom;
 	public Date orderdateto;
 	public List<Long> status;
+	public int limit;
+	public int page;
 }

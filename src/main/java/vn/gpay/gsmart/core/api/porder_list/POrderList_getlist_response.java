@@ -7,4 +7,5 @@ import vn.gpay.gsmart.core.porder.POrder;
 
 public class POrderList_getlist_response extends ResponseBase{
 	public List<POrder> data;
+	public long totalCount;
 }
