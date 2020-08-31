@@ -18,6 +18,9 @@ public class PContractProductBinding {
 	private Integer producttypeid_link;
 	private String productBuyerCode;
 	private String productVendorCode;
+	private String productinfo;
+	
+	
 	
 	public Integer getProducttypeid_link() {
 		return producttypeid_link;
@@ -108,5 +111,11 @@ public class PContractProductBinding {
 	}
 	public void setProductVendorCode(String productVendorCode) {
 		this.productVendorCode = productVendorCode;
+	}
+	public String getProductinfo() {
+		return productinfo;
+	}
+	public void setProductinfo(String productinfo) {
+		this.productinfo = productinfo;
 	}
 }

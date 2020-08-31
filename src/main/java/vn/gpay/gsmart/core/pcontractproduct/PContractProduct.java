@@ -47,6 +47,12 @@ public class PContractProduct implements Serializable {/**
     private Product product;
 	
 	@Transient
+	public String getProductinfo() {
+		if(product!=null)
+			return product.getInfo();
+		return "";
+	}
+	@Transient
 	public String getProductBuyerCode() {
 		if(product!=null)
 			return product.getBuyercode();

@@ -425,6 +425,7 @@ public class PContractProductAPI {
 				binding.setUnitprice(pContractProduct.getUnitprice());
 				binding.setProductVendorCode(pContractProduct.getProductVendorCode());
 				binding.setProductBuyerCode(pContractProduct.getProductBuyerCode());
+				binding.setProductinfo(pContractProduct.getProductinfo());
 				
 				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
 				
