@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.api.pcontractattributevalue;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -113,7 +114,13 @@ public class PContractAttrValueAPI {
 				
 				List<Attributevalue> attributeVals = new ArrayList<>();
 				for(Long idattributeval : idlist) {
-					attributeVals.add(attributeValueService.findOne(idattributeval));
+					try{
+					Attributevalue a = attributeValueService.findOne(idattributeval);
+					if (null != a)
+						attributeVals.add(a);
+					} catch(Exception e){
+						e.printStackTrace();
+					}
 				}
 				Comparator<Attributevalue> compareBySortValue = (Attributevalue a1, Attributevalue a2) -> a1.getSortvalue().compareTo( a2.getSortvalue());
 				Collections.sort(attributeVals, compareBySortValue);
