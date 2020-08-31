@@ -105,6 +105,15 @@ public class PContract_PO implements Serializable {/**
     	return name;
     }
     
+    @Transient
+    public int getAmount_org() {
+    	int total = 0;
+    	for(POrder_Req req : porder_req) {
+    		total += req.getTotalorder();
+    	}
+    	return total;
+    }
+    
     @NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
     @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)

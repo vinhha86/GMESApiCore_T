@@ -52,6 +52,7 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 	@Autowired Common commonService;
 	@Autowired ITask_Object_Service taskobjectService;
 	@Autowired IProductPairingService productpairService;
+	@Autowired IPOrder_Req_Service reqService;
 	
 	@RequestMapping(value = "/create",method = RequestMethod.POST)
 	public ResponseEntity<PContract_pocreate_response> PContractCreate(@RequestBody PContract_pocreate_request entity,HttpServletRequest request ) {
@@ -359,7 +360,18 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 			long orgid_link = entity.orgid_link;
 			long userid_link = user.getId();
 			
+			List<POrder_Req> list_req = reqService.getByPO(entity.pcontract_poid_link);
+			int total = 0 ;
+			for (POrder_Req pOrder_Req : list_req) {
+				total += pOrder_Req.getTotalorder();
+			}
+			
 			PContract_PO po = pcontract_POService.findOne(entity.pcontract_poid_link);
+			if(po.getPo_quantity() != total) {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage("Số lượng PO không trùng với số lượng phân về cho các xưởng!");
+			    return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+			}
 			po.setOrgmerchandiseid_link(entity.orgid_link);
 			po.setMerchandiserid_link(entity.userid_link);
 			po.setStatus(POStatus.PO_STATUS_CONFIRMED);
@@ -452,7 +464,7 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
 		}catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-			response.setMessage(e.getMessage());
+			response.setMessage("Có lỗi trong quá trình xác nhận! Bạn vui lòng thử lại.");
 		    return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
