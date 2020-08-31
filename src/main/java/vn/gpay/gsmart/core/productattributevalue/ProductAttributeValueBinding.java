@@ -3,6 +3,7 @@ package vn.gpay.gsmart.core.productattributevalue;
 public class ProductAttributeValueBinding {
 	
 	private  String attributeValueName;
+	private String list_attributevalueid;
 	private  String attributeName;
 	private Long attributeid_link;
 	private Boolean is_select;
@@ -13,6 +14,12 @@ public class ProductAttributeValueBinding {
 	}
 	public void setAttributeValueName(String attributeValueName) {
 		this.attributeValueName = attributeValueName;
+	}
+	public String getList_attributevalueid() {
+		return list_attributevalueid;
+	}
+	public void setList_attributevalueid(String list_attributevalueid) {
+		this.list_attributevalueid = list_attributevalueid;
 	}
 	public String getAttributeName() {
 		return attributeName;

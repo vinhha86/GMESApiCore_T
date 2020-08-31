@@ -8,6 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -27,6 +30,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import vn.gpay.gsmart.core.attribute.Attribute;
 import vn.gpay.gsmart.core.attribute.IAttributeService;
+import vn.gpay.gsmart.core.attributevalue.Attributevalue;
+import vn.gpay.gsmart.core.attributevalue.IAttributeValueService;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.product.IProductBomService;
 import vn.gpay.gsmart.core.product.IProductService;
@@ -61,6 +66,7 @@ public class ProductAPI {
 	@Autowired IProductBomService productbomservice;
 	@Autowired Common commonService;
 	@Autowired IProductPairingService productPairingService;
+	@Autowired IAttributeValueService attributeValueService;
 
 	@RequestMapping(value = "/filter", method = RequestMethod.POST)
 	public ResponseEntity<Product_filter_response> Product_Filter(HttpServletRequest request,
@@ -634,6 +640,7 @@ public class ProductAPI {
 
 			for (ProductAttributeValueBinding binding : response.data) {
 				String name = "";
+				String id = "";
 				for (ProductAttributeValue productAttributeValue : lst) {
 					if (productAttributeValue.getAttributeName() == binding.getAttributeName()) {
 						String attName = productAttributeValue.getAttributeValueName();
@@ -641,14 +648,46 @@ public class ProductAPI {
 						if (attName != "") {
 							if (name == "") {
 								name += productAttributeValue.getAttributeValueName();
+								id += productAttributeValue.getAttributevalueid_link() == 0 ? "" : productAttributeValue.getAttributevalueid_link();
 							} else {
 								name += ", " + productAttributeValue.getAttributeValueName();
+								id += "," + productAttributeValue.getAttributevalueid_link();
 							}
 						}
 					}
 
 					binding.setAttributeValueName(name);
+					binding.setList_attributevalueid(id);
 				}
+			}
+			
+			for (ProductAttributeValueBinding binding : response.data) {
+				String[] idarray = binding.getList_attributevalueid().split(",");
+				List<String> idliststring = new ArrayList<>(Arrays.asList(idarray));
+				List<Long> idlist = new ArrayList<Long>();
+				for(String idnum : idliststring) {
+					if(!idnum.equals("")) {
+						idlist.add(Long.parseLong(idnum));
+					}
+				}
+				
+				List<Attributevalue> attributeVals = new ArrayList<>();
+				for(Long idattributeval : idlist) {
+					attributeVals.add(attributeValueService.findOne(idattributeval));
+				}
+				Comparator<Attributevalue> compareBySortValue = (Attributevalue a1, Attributevalue a2) -> a1.getSortvalue().compareTo( a2.getSortvalue());
+				Collections.sort(attributeVals, compareBySortValue);
+				
+				binding.setAttributeValueName("");
+				String name = "";
+				for(Attributevalue attributeVal : attributeVals) {
+					if (name.equals("")) {
+						name += attributeVal.getValue();
+					}else {
+						name += ", " + attributeVal.getValue();
+					}
+				}
+				binding.setAttributeValueName(name);
 			}
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

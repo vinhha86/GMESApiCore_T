@@ -1,6 +1,9 @@
 package vn.gpay.gsmart.core.api.pcontractattributevalue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -15,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.gpay.gsmart.core.attributevalue.Attributevalue;
+import vn.gpay.gsmart.core.attributevalue.IAttributeValueService;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.pcontract.IPContractService;
 import vn.gpay.gsmart.core.pcontractattributevalue.IPContractProductAtrributeValueService;
@@ -48,6 +53,7 @@ public class PContractAttrValueAPI {
 	@Autowired ISKU_Service skuService;
 	@Autowired IPContractProductSKUService ppskuService;
 	@Autowired IProductAttributeService pavService;
+	@Autowired IAttributeValueService attributeValueService;
 	
 	@RequestMapping(value = "/getattributebyproduct",method = RequestMethod.POST)
 	public ResponseEntity<PContractProduct_getbyproduct_response> Attribute_GetbyProduct(HttpServletRequest request, @RequestBody PContractProductAttValue_getbyproduct_request entity ) {
@@ -93,6 +99,35 @@ public class PContractAttrValueAPI {
 				}
 				binding.setAttributeValueName(name);
 				binding.setList_attributevalueid(id);
+			}
+			
+			for (PContractAttributeValueBinding binding : response.data) {
+				String[] idarray = binding.getList_attributevalueid().split(",");
+				List<String> idliststring = new ArrayList<>(Arrays.asList(idarray));
+				List<Long> idlist = new ArrayList<Long>();
+				for(String idnum : idliststring) {
+					if(!idnum.equals("")) {
+						idlist.add(Long.parseLong(idnum));
+					}
+				}
+				
+				List<Attributevalue> attributeVals = new ArrayList<>();
+				for(Long idattributeval : idlist) {
+					attributeVals.add(attributeValueService.findOne(idattributeval));
+				}
+				Comparator<Attributevalue> compareBySortValue = (Attributevalue a1, Attributevalue a2) -> a1.getSortvalue().compareTo( a2.getSortvalue());
+				Collections.sort(attributeVals, compareBySortValue);
+				
+				binding.setAttributeValueName("");
+				String name = "";
+				for(Attributevalue attributeVal : attributeVals) {
+					if (name.equals("")) {
+						name += attributeVal.getValue();
+					}else {
+						name += ", " + attributeVal.getValue();
+					}
+				}
+				binding.setAttributeValueName(name);
 			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
