@@ -37,7 +37,12 @@ public class PContractProductPairing implements Serializable {/**
     @JoinColumn(name="productpairid_link",insertable=false,updatable =false)
     private Product product;
 	
-	
+	@Transient
+	public String getProductinfo() {
+		if(product != null)
+			return product.getInfo();
+		return "";
+	}
 	@Transient
 	public String getproductpairName(){
 		if(product != null)

@@ -16,6 +16,7 @@ public class ProductTree implements Serializable{
 	private String text;
 	private Long parent_id;
 	private String code;
+	private String info;
 	private byte[] imgproduct;
 	
 	public String getIconCls() {
@@ -64,5 +65,11 @@ public class ProductTree implements Serializable{
 	}
 	public void setProductid_link(Long productid_link) {
 		this.productid_link = productid_link;
+	}
+	public String getInfo() {
+		return info;
+	}
+	public void setInfo(String info) {
+		this.info = info;
 	}
 }

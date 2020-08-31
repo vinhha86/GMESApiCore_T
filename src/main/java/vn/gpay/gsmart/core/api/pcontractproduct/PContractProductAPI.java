@@ -471,6 +471,7 @@ public class PContractProductAPI {
 				binding.setDelivery_date(pContractProduct.getDelivery_date());
 				binding.setUnitprice(pContractProduct.getUnitprice());
 				binding.setProducttypeid_link(pContractProduct.getProducttypeid_link());
+				binding.setProductinfo(pContractProduct.getProductinfo());
 				
 				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
 				
@@ -490,6 +491,7 @@ public class PContractProductAPI {
 				binding.setProductCode(pair.getproductpairCode());
 				binding.setProductName(pair.getproductpairName());
 				binding.setProducttypeid_link(5);
+				binding.setProductinfo(pair.getProductinfo());
 				
 				data.add(binding);
 			}

@@ -358,6 +358,7 @@ public class ProductService extends AbstractService<Product> implements IProduct
 			product.setText(current.getProductName());
 			product.setCode(current.getProductCode());
 			product.setImgproduct(current.getImgproduct());
+			product.setInfo(current.getProductinfo());
 			mapTmp.put(current.getProductid_link(), product);
 
 			id++;
@@ -385,6 +386,7 @@ public class ProductService extends AbstractService<Product> implements IProduct
 								current_n.setCode(current.getProductCode());
 								current_n.setImgproduct(current.getImgproduct());
 								current_n.setParent_id(parentId);
+								current_n.setInfo(current.getProductinfo());
 
 								parent.getChildren().add(current_n);
 								mapTmp.remove(parentId);

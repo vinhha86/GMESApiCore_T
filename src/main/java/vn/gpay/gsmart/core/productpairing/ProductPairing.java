@@ -46,6 +46,13 @@ public class ProductPairing implements Serializable {
 	}
 	
 	@Transient
+	public  String getProductinfo() {
+		if(product != null)
+			return product.getInfo();
+		return "";
+	}
+	
+	@Transient
 	public  String getProductCode() {
 		if(product != null)
 			return product.getCode();

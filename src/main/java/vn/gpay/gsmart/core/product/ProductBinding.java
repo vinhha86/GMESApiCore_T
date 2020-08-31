@@ -13,6 +13,7 @@ public class ProductBinding {
 	private String designerName;
 	private Integer pairamount;
 	private Integer pquantity;
+	private String info;
 	public byte[] getUrlimage() {
 		return urlimage;
 	}
@@ -84,6 +85,12 @@ public class ProductBinding {
 	}
 	public void setPquantity(Integer pquantity) {
 		this.pquantity = pquantity;
+	}
+	public String getInfo() {
+		return info;
+	}
+	public void setInfo(String info) {
+		this.info = info;
 	}
 	
 }

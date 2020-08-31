@@ -1071,6 +1071,7 @@ public class ProductAPI {
 					pb.setCoKho(product.getCoKho());
 					pb.setThanhPhanVai(product.getThanhPhanVai());
 					pb.setTenMauNPL(product.getTenMauNPL());
+					pb.setInfo(product.getInfo());
 					
 					pb.setPquantity(entity.po_quantity);
 					
@@ -1098,6 +1099,7 @@ public class ProductAPI {
 					pb.setThanhPhanVai(_product.getThanhPhanVai());
 					pb.setTenMauNPL(_product.getTenMauNPL());
 					pb.setPairamount(pairInfo.getAmount());
+					pb.setInfo(pairInfo.getProductinfo());
 					if (entity.po_quantity != null){
 						pb.setPquantity(pairInfo.getAmount()*entity.po_quantity);
 					}
