@@ -99,6 +99,9 @@ public class Product implements Serializable {/**
 //    		if(Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_COLOR || Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZE
 //    				|| Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) 
 //    			continue;
+    		if(Attribute_Value.getIsdefaultvalue()) continue;
+    		
+    		if(!Attribute_Value.getIs_select() || Attribute_Value.getIs_select() == null) continue;
     		
     		if(Attribute_Value.getAttributevalueid_link() > 0) {
     			if(name.length() >0) {

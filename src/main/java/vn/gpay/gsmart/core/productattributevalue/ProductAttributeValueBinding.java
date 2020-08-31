@@ -5,6 +5,9 @@ public class ProductAttributeValueBinding {
 	private  String attributeValueName;
 	private  String attributeName;
 	private Long attributeid_link;
+	private Boolean is_select;
+	
+	
 	public String getAttributeValueName() {
 		return attributeValueName;
 	}
@@ -22,5 +25,11 @@ public class ProductAttributeValueBinding {
 	}
 	public void setAttributeid_link(Long attributeid_link) {
 		this.attributeid_link = attributeid_link;
+	}
+	public Boolean getIs_select() {
+		return is_select;
+	}
+	public void setIs_select(Boolean is_select) {
+		this.is_select = is_select;
 	}
 }

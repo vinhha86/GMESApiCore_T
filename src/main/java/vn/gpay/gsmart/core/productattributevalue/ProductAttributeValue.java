@@ -43,6 +43,9 @@ public class ProductAttributeValue implements Serializable {
 	
 	private Long orgrootid_link;
 	
+	private Boolean is_select;
+	
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="attributeid_link",insertable=false,updatable =false)
@@ -132,6 +135,14 @@ public class ProductAttributeValue implements Serializable {
 
 	public void setIsDefault(Boolean isDefault) {
 		this.isDefault = isDefault;
+	}
+
+	public Boolean getIs_select() {
+		return is_select;
+	}
+
+	public void setIs_select(Boolean is_select) {
+		this.is_select = is_select;
 	}
 	
 	

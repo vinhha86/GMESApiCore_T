@@ -135,6 +135,7 @@ public class ProductAPI {
 				pb.setThanhPhanVai(product.getThanhPhanVai());
 				pb.setTenMauNPL(product.getTenMauNPL());
 				pb.setDesignerName(product.getDesignerName());
+				pb.setInfo(product.getInfo());
 				
 				FolderPath = commonService.getFolderPath(product.getProducttypeid_link());
 				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
@@ -181,6 +182,7 @@ public class ProductAPI {
 				pb.setThanhPhanVai(product.getThanhPhanVai());
 				pb.setTenMauNPL(product.getTenMauNPL());
 				pb.setDesignerName(product.getDesignerName());
+				pb.setInfo(product.getInfo());
 				
 				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
 				
@@ -614,6 +616,7 @@ public class ProductAPI {
 				obj.setAttributeName(productAttributeValue.getAttributeName());
 				obj.setAttributeid_link(productAttributeValue.getAttributeid_link());
 				obj.setAttributeValueName("");
+				obj.setIs_select(productAttributeValue.getIs_select());
 				
 				boolean isExist = false;
 				
@@ -1051,6 +1054,28 @@ public class ProductAPI {
 				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 				response.setMessage(e.getMessage());
 				return new ResponseEntity<Product_type_response>(response, HttpStatus.BAD_REQUEST);
+			}
+		}
+		
+		@RequestMapping(value = "/update_select_att", method = RequestMethod.POST)
+		public ResponseEntity<get_description_response> UpdateAttribute(HttpServletRequest request, @RequestBody get_description_request entity) {
+			get_description_response response = new get_description_response();
+			try {
+				long attributeid_link = entity.attributeid_link;
+				long productid_link = entity.productid_link;
+				
+				List<ProductAttributeValue> pav = pavService.getList_byAttId(attributeid_link, productid_link);
+				for (ProductAttributeValue productAttributeValue : pav) {
+					productAttributeValue.setIs_select(entity.check);
+					pavService.save(productAttributeValue);
+				}
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<get_description_response>(response, HttpStatus.OK);
+			} catch (Exception e) {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage(e.getMessage());
+				return new ResponseEntity<get_description_response>(response, HttpStatus.BAD_REQUEST);
 			}
 		}
 		
