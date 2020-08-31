@@ -1064,7 +1064,7 @@ public class ProductAPI {
 				if(!entity.ishidden_pair || product.getProducttypeid_link() !=5) {
 					ProductBinding pb = new ProductBinding();
 					pb.setId(product.getId());
-					pb.setCode(product.getCode());
+					pb.setCode(product.getBuyercode());
 					pb.setName(product.getName());
 					pb.setProduct_type(product.getProducttypeid_link());
 					pb.setProduct_typeName(product.getProducttype_name());

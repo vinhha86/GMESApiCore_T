@@ -155,6 +155,36 @@ public class OrgAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/get_orgnotreq",method = RequestMethod.POST)
+	public ResponseEntity<get_orgreq_response> getOrg_NotReq(@RequestBody get_orgreq_request entity, HttpServletRequest request ) {//@RequestParam("type") 
+		get_orgreq_response response = new get_orgreq_response();
+		try {
+			GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgid_link = user.getOrgid_link();
+			
+			List<POrder_Req> list_req = reqService.getByPO(entity.pcontract_poid_link);
+			List<Org> list_org = new ArrayList<Org>();
+			List<String> list_typeid = new ArrayList<String>();
+			list_typeid.add("13");
+			
+			list_org = orgService.getorgChildrenbyOrg(orgid_link, list_typeid);
+			
+			for(POrder_Req req : list_req) {
+				list_org.removeIf(c->c.getId().equals(req.getGranttoorgid_link()));
+			}
+			
+			response.data = list_org;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<get_orgreq_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_SERVER_ERROR);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<get_orgreq_response>(response,HttpStatus.OK);
+		}
+	}
+	
 	@RequestMapping(value = "/delete",method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> DeleteOrg(@RequestBody Org_delete_request entity, HttpServletRequest request ) {//@RequestParam("type") 
 		ResponseBase response = new ResponseBase();

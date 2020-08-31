@@ -96,9 +96,9 @@ public class Product implements Serializable {/**
     public String getInfo() {
     	String name ="";
     	for (ProductAttributeValue Attribute_Value : listPAvalue) {
-    		if(Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_COLOR || Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZE
-    				|| Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) 
-    			continue;
+//    		if(Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_COLOR || Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZE
+//    				|| Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) 
+//    			continue;
     		
     		if(Attribute_Value.getAttributevalueid_link() > 0) {
     			if(name.length() >0) {

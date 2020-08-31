@@ -84,6 +84,25 @@ public class POrder_ReqAPI {
 		    return new ResponseEntity<POrder_Req_GetOne_Response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}    
+	
+	@RequestMapping(value = "/update_iscalculate",method = RequestMethod.POST)
+	public ResponseEntity<update_iscalculate_response > UpdateCalculate(@RequestBody update_iscalculate_request entity,HttpServletRequest request ) {
+		update_iscalculate_response response = new update_iscalculate_response();
+		try {
+			POrder_Req req = porder_req_Service.findOne(entity.porder_reqid_link); 
+			req.setIs_calculate(entity.check);
+			porder_req_Service.save(req);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<update_iscalculate_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<update_iscalculate_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}    
+	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ResponseEntity<POrder_Req_Create_Response> Create(HttpServletRequest request,
 			@RequestBody POrder_Req_Create_Request entity) {
