@@ -60,6 +60,13 @@ public class ProductPairing implements Serializable {
 	}
 	
 	@Transient
+	public  String getProductBuyerCode() {
+		if(product != null)
+			return product.getBuyercode();
+		return "";
+	}
+	
+	@Transient
 	public String getImgurl1() {
 		if(product!=null) {
 			return product.getImgurl1();

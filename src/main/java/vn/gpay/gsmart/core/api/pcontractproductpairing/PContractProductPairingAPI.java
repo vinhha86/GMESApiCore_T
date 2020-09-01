@@ -113,6 +113,7 @@ public class PContractProductPairingAPI {
 				binding.setProductCode(productPairing.getProductCode());
 				binding.setProductName(productPairing.getProductName());
 				binding.setAmount(productPairing.getAmount());
+				binding.setProductBuyerCode(productPairing.getProductBuyerCode());
 				
 				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
 				

@@ -1,6 +1,5 @@
 package vn.gpay.gsmart.core.api.pcontractattributevalue;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
