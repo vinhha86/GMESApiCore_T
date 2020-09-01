@@ -193,9 +193,11 @@ public class ScheduleAPI {
 
 					List<POrderGrant> list_porder = granttService.get_granted_bygolivedate(startdate, toDate, org_grant.getId(),
 							PO_code, orgbuyerid_link, orgvendorid_link);
-
-					//Xac dinh so ngay lam viec trong khoang thoi gian dang xem
-					int total_day = commonService.getDuration(startdate, toDate, orgrootid_link, year);
+					
+					int day_grant = 0;
+					Date date_end = null;
+					Date date_start = null;
+					
 					for(POrderGrant pordergrant : list_porder) {
 //						total_day = commonService.getDuration(startdate, toDate, orgrootid_link, year);
 						Date start = commonService.getBeginOfDate(pordergrant.getStart_date_plan());
@@ -207,6 +209,16 @@ public class ScheduleAPI {
 						
 						if(end_free.after(toDate))
 							end_free = toDate;
+						
+						if(date_end == null)
+							date_end = end_free;						
+						else if(end_free.after(date_end))
+							date_end = end_free;
+						
+						if(date_start == null)
+							date_start = start_free;
+						else if (start_free.before(date_start))
+							date_start = start_free;
 						
 						int duration = commonService.getDuration(start, end, orgrootid_link, year);
 						int productivity = commonService.getProductivity(pordergrant.getGrantamount(), duration); 
@@ -234,12 +246,19 @@ public class ScheduleAPI {
 						sch_porder.setPcontractid_link(pordergrant.getPcontractid_link());
 						
 						int d = commonService.getDuration(start_free, end_free, orgrootid_link, year);
-						total_day = total_day - d;
+						day_grant += d;
 						
 						response.events.rows.add(sch_porder);
 					}
-					String cls = total_day <= 0 ? "" : "free";
-					sch_org_grant.setCls(cls);
+
+					//Xac dinh so ngay lam viec trong khoang thoi gian dang xem
+					if(date_end != null  && date_start != null) {
+						int total_day = commonService.getDuration(date_start, date_end, orgrootid_link, year);
+						
+						String cls = (total_day - day_grant) <= 0 ? "" : "free";
+						sch_org_grant.setCls(cls);
+					}
+					
 
 					//Lay thong tin tien do thuc te cua lenh
 //					ArrayList<Thread> arrThreads = new ArrayList<Thread>();
