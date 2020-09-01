@@ -195,6 +195,7 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 			newPrice.setTotalprice(price.getTotalprice());
 			newPrice.setSalaryfund(price.getSalaryfund());
 			newPrice.setQuantity(price.getQuantity());
+			newPrice.setIs_fix(price.getIs_fix());
 			
 			for(PContract_Price_D price_d: price.getPcontract_price_d()){
 				PContract_Price_D newPrice_D = new PContract_Price_D();

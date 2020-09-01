@@ -48,6 +48,7 @@ public class PContract_Price implements Serializable {/**
 	private Float salaryfund;
 	private Integer quantity;
 	private Float price_vendortarget;
+	private Boolean is_fix;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -188,6 +189,12 @@ public class PContract_Price implements Serializable {/**
 	}
 	public void setPrice_vendortarget(Float price_vendortarget) {
 		this.price_vendortarget = price_vendortarget;
+	}
+	public Boolean getIs_fix() {
+		return is_fix;
+	}
+	public void setIs_fix(Boolean is_fix) {
+		this.is_fix = is_fix;
 	}
 
 }
