@@ -111,10 +111,6 @@ public class SKU implements Serializable {
 			if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_COLOR) {
 				name = sku_Attribute_Value.getAttributeValueName();
 				break;
-			} 
-			else if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZE) {
-				name = sku_Attribute_Value.getAttributeValueName();
-				break;
 			}
 		}
     	return name;
@@ -160,11 +156,7 @@ public class SKU implements Serializable {
     public Long getColor_id() {
     	Long name = null;
     	for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
-			if(sku_Attribute_Value.getAttributeid_link() == 4) {
-				name = sku_Attribute_Value.getAttributevalueid_link();
-				break;
-			} 
-			else if(sku_Attribute_Value.getAttributeid_link() == 35) {
+			if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_COLOR) {
 				name = sku_Attribute_Value.getAttributevalueid_link();
 				break;
 			}
@@ -188,11 +180,11 @@ public class SKU implements Serializable {
     public String getCoSanPham() {
     	String name ="";
     	for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
-			if(sku_Attribute_Value.getAttributeid_link() == 30) {
+			if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZE) {
 				name = sku_Attribute_Value.getAttributeValueName();
 				break;
 			}
-			else if(sku_Attribute_Value.getAttributeid_link() == 36) {
+			else if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) {
 				name = sku_Attribute_Value.getAttributeValueName();
 				break;
 			}
