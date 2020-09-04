@@ -32,6 +32,9 @@ public class SKU_API {
 		SKU_getbyproduct_response response = new SKU_getbyproduct_response();
 		try {
 			response.data = skuService.getlist_byProduct(entity.productid_link);
+			if(entity.isremove) {
+				response.data.removeIf(c->c.getIs_default());
+			}
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<SKU_getbyproduct_response>(response,HttpStatus.OK);

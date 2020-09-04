@@ -92,6 +92,16 @@ public class SKU implements Serializable {
     private List<SKU_Attribute_Value> listSKUvalue = new ArrayList<SKU_Attribute_Value>();
     
     @Transient
+    public boolean getIs_default() {
+    	for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
+			if(sku_Attribute_Value.getIsdefaultvalue()) {
+				return true;
+			}			
+		}
+    	return false;
+    }
+    
+    @Transient
     public int getSort_size() {
     	int sort = 0;
     	for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {

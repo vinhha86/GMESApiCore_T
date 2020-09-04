@@ -733,7 +733,7 @@ public class ProductAPI {
 				product.setListPAvalue(product_old.getListPAvalue());
 			}
 
-			List<Product> pcheck = productService.getone_by_code(orgrootid_link,product.getCode(),
+			List<Product> pcheck = productService.getone_by_code(orgrootid_link,product.getBuyercode(),
 					product.getId(), product.getProducttypeid_link());
 
 			if (pcheck.size() > 0) {
@@ -824,12 +824,12 @@ public class ProductAPI {
 	private String genCodeSKU(Product product) {
 		List<SKU> lstSKU = skuService.getlist_byProduct(product.getId());
 		if (lstSKU.size() == 0) {
-			return product.getCode() + "_" + "1";
+			return product.getBuyercode() + "_" + "1";
 		}
 		String old_code = lstSKU.get(0).getCode();
 		String[] obj = old_code.split("_");
 		int a = Integer.parseInt(obj[obj.length-1]);
-		return product.getCode() + "_" + (a + 1);
+		return product.getBuyercode() + "_" + (a + 1);
 	}
 	
 	@RequestMapping(value = "/update_productpair", method = RequestMethod.POST)
@@ -845,7 +845,7 @@ public class ProductAPI {
 			product.setName(entity.name);
 
 			List<Product> pcheck = productService.getone_by_code(user.getRootorgid_link(),
-					product.getCode(), product.getId(), product.getProducttypeid_link());
+					product.getBuyercode(), product.getId(), product.getProducttypeid_link());
 
 			if (pcheck.size() > 0) {
 				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);

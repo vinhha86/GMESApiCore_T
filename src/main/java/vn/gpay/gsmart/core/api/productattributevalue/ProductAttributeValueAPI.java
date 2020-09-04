@@ -423,12 +423,12 @@ public class ProductAttributeValueAPI {
 	private String genCodeSKU(Product product) {
 		List<SKU> lstSKU = skuService.getlist_byProduct(product.getId());
 		if (lstSKU.size() == 0) {
-			return product.getCode() + "_" + "1";
+			return product.getBuyercode() + "_" + "1";
 		}
 		String old_code = lstSKU.get(0).getCode();
 		String[] obj = old_code.split("_");
 		int a = Integer.parseInt(obj[obj.length-1]);
-		return product.getCode() + "_" + (a + 1);
+		return product.getBuyercode() + "_" + (a + 1);
 	}
 
 	@RequestMapping(value = "/getvalue", method = RequestMethod.POST)
