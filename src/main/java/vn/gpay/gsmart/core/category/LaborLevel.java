@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.category;
 
 import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,6 +32,17 @@ public class LaborLevel implements Serializable {
 	
 	@Column(name ="comment",length=200)
     private String comment;
+	
+	@Column(name ="rate",length=200)
+    private Float rate;
+
+	public Float getRate() {
+		return rate;
+	}
+
+	public void setRate(Float rate) {
+		this.rate = rate;
+	}
 
 	public Long getId() {
 		return id;

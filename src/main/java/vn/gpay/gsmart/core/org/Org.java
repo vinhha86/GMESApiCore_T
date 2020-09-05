@@ -87,6 +87,9 @@ public class Org implements Serializable {
 	@Column(name ="linecost")
     private BigDecimal linecost;
 	
+	@Column(name ="costpersec")
+    private Float costpersec;
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="colorid_link",insertable=false,updatable =false)
@@ -297,5 +300,12 @@ public class Org implements Serializable {
 
 	public void setChecked(boolean checked) {
 		this.checked = checked;
+	}
+	
+	public Float getCostpersec() {
+		return costpersec;
+	}
+	public void setCostpersec(Float costpersec) {
+		this.costpersec = costpersec;
 	}
 }

@@ -177,6 +177,7 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 			menu.setOrgrootid_link(current.getOrgrootid_link());
 			menu.setColorid_link(current.getColorid_link());
 			menu.setLinecost(current.getLinecost());
+			menu.setCostpersec(current.getCostpersec());
 			menu.setExpanded(true);
 			menu.setChecked(current.checked);
 			mapTmp.put(current.getId(), menu);
@@ -216,6 +217,7 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 					current_n.setOrgrootid_link(current.getOrgrootid_link());
 					current_n.setColorid_link(current.getColorid_link());
 					current_n.setLinecost(current.getLinecost());
+					current_n.setCostpersec(current.getCostpersec());
 					current_n.setChecked(current.checked);
 					parent.addChild(current_n);
 					parent.setExpanded(false);

@@ -52,6 +52,8 @@ public class OrgTree implements Serializable {
 	
 	private BigDecimal linecost;
 	
+	private Float costpersec;
+	
 	private boolean checked;
     
     private boolean expanded;
@@ -245,6 +247,14 @@ public class OrgTree implements Serializable {
 
 	public void setLinecost(BigDecimal linecost) {
 		this.linecost = linecost;
+	}
+	
+	public Float getCostpersec() {
+		return costpersec;
+	}
+
+	public void setCostpersec(Float costpersec) {
+		this.costpersec = costpersec;
 	}
 
 	public boolean isChecked() {
