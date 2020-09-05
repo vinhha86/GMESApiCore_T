@@ -56,6 +56,13 @@ public class PContractProductPairing implements Serializable {/**
 			return product.getBuyercode();
 		return "";
 	}
+	
+	@Transient
+	public String getproductpairVendorCode(){
+		if(product != null)
+			return product.getVendorcode();
+		return "";
+	}
 
 	public Long getId() {
 		return id;
