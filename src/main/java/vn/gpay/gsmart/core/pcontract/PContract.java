@@ -376,6 +376,16 @@ public class PContract implements Serializable {/**
 		return a;
 	}
 	@Transient
+	public String getProductVendorCodelist() {
+		String a = "";
+		if(products!=null ){
+			for(PContractProduct product:products){
+				a += product.getProductVendorCode() + "; ";
+			}
+		}
+		return a;
+	}
+	@Transient
 	public String getPolist() {
 		String a = "";
 		if(pos!=null ){
