@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.holiday;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,4 +20,9 @@ public interface Holiday_repository extends JpaRepository<Holiday, Long>,JpaSpec
 	
 	@Query(value = "select distinct c.year from Holiday c where c.year >= :year")
 	public List<Integer> getAllYears(@Param ("year")final  Integer year);
+	
+	@Query(value = "select c from Holiday c where c.day = :day and dayto = :dayto")
+	public List<Holiday> getby_date(
+			@Param ("day")final  Date day,
+			@Param ("dayto")final  Date dayto);
 }

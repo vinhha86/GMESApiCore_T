@@ -21,6 +21,7 @@ public class Holiday implements Serializable {
 	
 	private Integer year;
 	private Date day;
+	private Date dayto;
 	private String comment;
 	private Long orgrootid_link;
 	
@@ -33,6 +34,12 @@ public class Holiday implements Serializable {
 	}
 	public Date getDay() {
 		return day;
+	}
+	public Date getDayto() {
+		return dayto;
+	}
+	public void setDayto(Date dayto) {
+		this.dayto = dayto;
 	}
 	public String getComment() {
 		return comment;

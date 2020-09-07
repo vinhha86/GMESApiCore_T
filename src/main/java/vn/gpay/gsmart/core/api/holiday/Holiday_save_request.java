@@ -6,4 +6,5 @@ import vn.gpay.gsmart.core.holiday.Holiday;
 public class Holiday_save_request extends RequestBase{
 	public Holiday data;
 	public Long time;
+	public Long timeto;
 }

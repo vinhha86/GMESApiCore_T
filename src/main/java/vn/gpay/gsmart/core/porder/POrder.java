@@ -25,12 +25,14 @@ import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.porder_bom_sku.POrderBOMSKU;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.porder_product.POrder_Product;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porder_status.POrder_Status;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.sizeset.SizeSet;
+import vn.gpay.gsmart.core.utils.GPAYDateFormat;
 
 @Table(name="porders")
 @Entity
@@ -120,6 +122,53 @@ public class POrder implements Serializable {
 	@ManyToOne
     @JoinColumn(name="status",insertable=false,updatable =false)
     private POrder_Status porderstatus;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+    @JoinColumn(name="porderid_link",insertable=false,updatable =false)
+    private List<POrderGrant> list_pordergrant = new ArrayList<POrderGrant>();
+	
+	@Transient
+	public Date getStartDatePlan() {
+		// lấy ngày vào chuyền sớm nhất của lệnh này theo các tổ đã phân(tính từ ngày hiện tại)
+		Date date = null;
+		Date currentDate = new Date();
+		for(POrderGrant pg : list_pordergrant) {
+			if(pg.getStart_date_plan() != null) {
+				Date startDate = pg.getStart_date_plan();
+				currentDate = GPAYDateFormat.atStartOfDay(currentDate);
+				startDate = GPAYDateFormat.atStartOfDay(startDate);
+				// so sánh với ngày hiện tại
+				if(startDate.compareTo(currentDate) >= 0) {
+					// so sánh với ngày vào chuyền hiện tại
+					if(date == null) {
+						date = startDate;
+					}else {
+						if(date.compareTo(startDate) > 0) {
+							date = startDate;
+						}
+					}
+				}
+			}
+		}
+		// nếu không có ngày vào chuyền từ sau ngày hiện tại
+		if(date == null) {
+			for(POrderGrant pg : list_pordergrant) {
+				if(pg.getStart_date_plan() != null) {
+					Date startDate = pg.getStart_date_plan();
+					startDate = GPAYDateFormat.atStartOfDay(startDate);
+					if(date == null) {
+						date = startDate;
+					}else {
+						if(date.compareTo(startDate) > 0) {
+							date = startDate;
+						}
+					}
+				}
+			}
+		}
+		return date;
+	}
 	
 	@Transient
 	public String getStatusName() {

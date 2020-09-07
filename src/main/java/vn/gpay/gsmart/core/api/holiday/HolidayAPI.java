@@ -23,6 +23,7 @@ import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.holiday.Holiday;
 import vn.gpay.gsmart.core.holiday.IHolidayService;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.utils.GPAYDateFormat;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -52,12 +53,12 @@ public class HolidayAPI {
 		try {
 			
 			int thisYear = Calendar.getInstance().get(Calendar.YEAR);
+			int yearStart = 2020;
 			
 			List<Integer> years = holidayService.getAllYears(thisYear);
-			if(!years.contains(thisYear))years.add(thisYear);
-			if(!years.contains(thisYear + 1))years.add(thisYear + 1);
-			if(!years.contains(thisYear + 2))years.add(thisYear + 2);
-			if(!years.contains(thisYear + 3))years.add(thisYear + 3);
+			for(int i=yearStart;i<=thisYear+3;i++) {
+				if(!years.contains(i))years.add(i);
+			}
 			
 			Collections.sort(years, Collections.reverseOrder());
 			years.add(0, null);
@@ -114,15 +115,16 @@ public class HolidayAPI {
 			LocalDate start = date1.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 			LocalDate end = date2.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-			for (LocalDate date = start; date.isEqual(end) || date.isBefore(end); date = date.plusDays(1)) {
+//			for (LocalDate date = start; date.isEqual(end) || date.isBefore(end); date = date.plusDays(1)) {
 			    Holiday temp = new Holiday();
 			    temp.setId(0L);
-			    temp.setYear(date.getYear());
-			    temp.setDay(Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+			    temp.setYear(start.getYear());
+			    temp.setDay(Date.from(start.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+			    temp.setDayto(Date.from(end.atStartOfDay(ZoneId.systemDefault()).toInstant()));
 			    temp.setComment(comment);
 			    temp.setOrgrootid_link(user.getRootorgid_link());
 			    holidayService.save(temp);
-			}
+//			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -166,14 +168,62 @@ public class HolidayAPI {
 			Date date=new Date(time);
 			LocalDate localdate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 			
+			Long timeto = entity.timeto;
+			Date dateto=new Date(timeto);
+			LocalDate localdateto = dateto.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+			
 			holiday.setId(entity.data.getId());
 			holiday.setYear(localdate.getYear());
 			holiday.setDay(Date.from(localdate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+			holiday.setDayto(Date.from(localdateto.atStartOfDay(ZoneId.systemDefault()).toInstant()));
 			holiday.setComment(entity.data.getComment());
 			holiday.setOrgrootid_link(entity.data.getOrgrootid_link());
 			
 			holidayService.save(holiday);
 
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/clone", method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> Clone(@RequestBody Holiday_clone_request entity,
+			HttpServletRequest request) {
+		ResponseBase response = new ResponseBase();
+		
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			
+			String dateStr1 = entity.year.toString() + "-12-31";
+			String dateStr2 = entity.year.toString() + "-01-01";
+			String dateStr3 = entity.year.toString() + "-04-30";
+			String dateStr4 = entity.year.toString() + "-05-01";
+			List<String> listStr = new ArrayList<String>();
+			listStr.add(dateStr1);
+			listStr.add(dateStr2);
+			listStr.add(dateStr3);
+			listStr.add(dateStr4);
+			
+			for(String dateStr : listStr) {
+				Date date = GPAYDateFormat.StringToDate(dateStr, "yyyy-MM-dd");
+				List<Holiday> l = holidayService.getby_date(date, date);
+				if(l.size() == 0) {
+					Holiday h = new Holiday();
+					h.setId(0L);
+					h.setDay(date);
+					h.setDayto(date);
+					h.setYear(entity.year);
+					h.setOrgrootid_link(user.getRootorgid_link());
+					h.setComment("Nghỉ lễ");
+					holidayService.save(h);
+				}
+			}
+			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);

@@ -1,5 +1,7 @@
 package vn.gpay.gsmart.core.holiday;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,13 @@ public class HolidayService extends AbstractService<Holiday> implements IHoliday
 	public List<Integer> getAllYears(int year) {
 		// TODO Auto-generated method stub
 		return repo.getAllYears(year);
+	}
+	@Override
+	public List<Holiday> getby_date(Date day, Date dayto) {
+		// TODO Auto-generated method stub
+		List<Holiday> list = new ArrayList<Holiday>();
+		list = repo.getby_date(day, dayto);
+		return list;
 	}
 
 }
