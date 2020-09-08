@@ -59,4 +59,10 @@ public class ContractBuyerService extends AbstractService<ContractBuyer> impleme
 		return list;
 	}
 
+	@Override
+	public List<ContractBuyer> getByBuyer(long buyerid_link) {
+		// TODO Auto-generated method stub
+		return repo.getByBuyer(buyerid_link);
+	}
+
 }

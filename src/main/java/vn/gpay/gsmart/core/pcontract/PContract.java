@@ -20,9 +20,12 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.branch.Branch;
+import vn.gpay.gsmart.core.contractbuyer.ContractBuyer;
+import vn.gpay.gsmart.core.markettype.MarketType;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
+import vn.gpay.gsmart.core.pcontracttype.PContractType;
 import vn.gpay.gsmart.core.season.Season;
 import vn.gpay.gsmart.core.security.GpayUser;
 
@@ -60,6 +63,53 @@ public class PContract implements Serializable {/**
 	private Long orgshowid_link;
 	private Long marketypeid_link;
 	private Long contractbuyerid_link;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="contracttypeid_link",insertable=false,updatable =false)
+    private PContractType contracttype;
+	
+	@Transient
+	public String getContractTypeName() {
+		if(contracttype != null) {
+			return contracttype.getName();
+		}
+		return "";
+	}
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="marketypeid_link",insertable=false,updatable =false)
+    private MarketType markettype;
+	
+	@Transient
+	public String getMarketTypeName() {
+		if(markettype != null) {
+			return markettype.getName();
+		}
+		return "";
+	}
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="contractbuyerid_link",insertable=false,updatable =false)
+    private ContractBuyer contractbuyer;
+	
+	@Transient
+	public String getContractBuyerCode() {
+		if(contractbuyer != null) {
+			return contractbuyer.getContract_code();
+		}
+		return "";
+	}
+	
+	@Transient
+	public Integer getContractBuyerYear() {
+		if(contractbuyer != null) {
+			return contractbuyer.getContract_year();
+		}
+		return null;
+	}
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
