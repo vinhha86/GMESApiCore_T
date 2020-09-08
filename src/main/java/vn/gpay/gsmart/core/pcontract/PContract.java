@@ -59,6 +59,7 @@ public class PContract implements Serializable {/**
 	private Long merchandiserid_link;
 	private Long orgshowid_link;
 	private Long marketypeid_link;
+	private Long contractbuyerid_link;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -355,6 +356,15 @@ public class PContract implements Serializable {/**
 		this.marketypeid_link = marketypeid_link;
 	}
 	
+	
+	public Long getContractbuyerid_link() {
+		return contractbuyerid_link;
+	}
+	public void setContractbuyerid_link(Long contractbuyerid_link) {
+		this.contractbuyerid_link = contractbuyerid_link;
+	}
+
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
     @JoinColumn(name="pcontractid_link",insertable=false,updatable =false)
