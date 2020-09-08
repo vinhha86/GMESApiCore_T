@@ -278,7 +278,7 @@ public class PContractProductPairingAPI {
 		for (ProductPairing productPairing : lst) {
 			long productid_link = productPairing.getProductid_link();
 			Product product = productService.findOne(productid_link);
-			name += productPairing.getAmount()+"-"+product.getName()+"; ";
+			name += productPairing.getAmount()+"-"+product.getBuyercode()+"; ";
 		}
 		return name;
 	}

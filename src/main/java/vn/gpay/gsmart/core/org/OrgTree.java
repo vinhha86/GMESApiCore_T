@@ -54,6 +54,8 @@ public class OrgTree implements Serializable {
 	
 	private Float costpersec;
 	
+	private Integer is_manufacturer;
+	
 	private boolean checked;
     
     private boolean expanded;
@@ -255,6 +257,14 @@ public class OrgTree implements Serializable {
 
 	public void setCostpersec(Float costpersec) {
 		this.costpersec = costpersec;
+	}
+	
+	public Integer getIs_manufacturer() {
+		return is_manufacturer;
+	}
+
+	public void setIs_manufacturer(Integer is_manufacturer) {
+		this.is_manufacturer = is_manufacturer;
 	}
 
 	public boolean isChecked() {
