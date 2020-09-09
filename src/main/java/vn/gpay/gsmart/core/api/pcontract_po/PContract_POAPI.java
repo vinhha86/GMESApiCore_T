@@ -373,6 +373,26 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 		}
 	}
 	
+	@RequestMapping(value = "/getpo_offer_accept",method = RequestMethod.POST)
+	public ResponseEntity<PContract_getbycontractproduct_response> getPOAccept(@RequestBody PContract_getbycontractproduct_request entity,HttpServletRequest request ) {
+		PContract_getbycontractproduct_response response = new PContract_getbycontractproduct_response();
+		try {
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//			long orgrootid_link = user.getRootorgid_link();
+			
+			List<PContract_PO> pcontract = pcontract_POService.getPO_Offer_Accept_ByPContract(entity.pcontractid_link);
+			response.data = pcontract;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<PContract_getbycontractproduct_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@RequestMapping(value = "/accept",method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> Accept(@RequestBody PContractPO_accept_request entity,
 			HttpServletRequest request ) {
