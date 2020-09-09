@@ -3,7 +3,9 @@ package vn.gpay.gsmart.core.pcontract_po;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -92,73 +94,27 @@ public class PContract_PO implements Serializable {/**
 	@OneToMany
     @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
     private List<POrder_Req> porder_req = new ArrayList<POrder_Req>();
+    	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="usercreatedid_link",insertable=false,updatable =false)
+    private GpayUser usercreated;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="productid_link",insertable=false,updatable =false)
+    private Product product;
     
-    @Transient
-    public String getFactories() {
-    	String name = "";
-    	for(POrder_Req req : porder_req) {
-    		if(name.contains(req.getGranttoorgname())) continue;
-    		if(name == "")
-    			name += req.getGranttoorgcode();
-    		else
-    			name += ", " + req.getGranttoorgcode();
-    	}
-    	return name;
-    }
-    
-    @Transient
-    public int getAmount_org() {
-    	int total = 0, total_min = 0;
-		long productid_link = 0;
-    	for(POrder_Req req : porder_req) {
-    		int amount = req.getAmount_inset() == null ? 1 : req.getAmount_inset();
-    		if(productid_link == 0) {
-    			total = req.getTotalorder();
-    			productid_link = req.getProductid_link();
-    			total_min = req.getTotalorder()/amount;
-    		}	
-    		
-    		if(req.getProductid_link().equals(productid_link)) {
-    			total += req.getTotalorder();
-    		}
-    		else {
-    			total_min = (total /amount) > total_min ? total_min : (total /amount);
-    			total = req.getTotalorder();
-    		}
-    		
-    		
-    	}
-    	return total_min;
-    }
-    
-    @NotFound(action = NotFoundAction.IGNORE)
+	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
     @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
     private List<PContract_Price> pcontract_price = new ArrayList<PContract_Price>();
-
-	public List<PContract_Price> getPcontract_price() {
-		return pcontract_price;
-	}
-
-	public void setPcontract_price(List<PContract_Price> pcontract_price) {
-		this.pcontract_price = pcontract_price;
-	}
-	
-
+    
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
     @JoinColumn(name="parentpoid_link",insertable=false,updatable =false)
     private List<PContract_PO> sub_po = new ArrayList<PContract_PO>();
-    
-    
-	public List<PContract_PO> getSub_po() {
-		return sub_po;
-	}
-
-	public void setSub_po(List<PContract_PO> sub_po) {
-		this.sub_po = sub_po;
-	}
-
+   
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="merchandiserid_link",insertable=false,updatable =false)
@@ -168,13 +124,6 @@ public class PContract_PO implements Serializable {/**
 	@ManyToOne
     @JoinColumn(name="currencyid_link",insertable=false,updatable =false)
     private Currency currency;
-	
-	@Transient
-	public String getCurrencyCode() {
-		if(currency!=null)
-			currency.getCode();
-		return "$";
-	}
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -203,15 +152,74 @@ public class PContract_PO implements Serializable {/**
 		return "";
 	}
 	
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne
-    @JoinColumn(name="usercreatedid_link",insertable=false,updatable =false)
-    private GpayUser usercreated;
+	@Transient
+	public String getCurrencyCode() {
+		if(currency!=null)
+			currency.getCode();
+		return "$";
+	}
 	
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne
-    @JoinColumn(name="productid_link",insertable=false,updatable =false)
-    private Product product;
+	@Transient
+    public String getFactories() {
+    	String name = "";
+    	for(POrder_Req req : porder_req) {
+    		if(name.contains(req.getGranttoorgname())) continue;
+    		if(name == "")
+    			name += req.getGranttoorgcode();
+    		else
+    			name += ", " + req.getGranttoorgcode();
+    	}
+    	return name;
+    }
+    
+	public List<PContract_Price> getPcontract_price() {
+		return pcontract_price;
+	}
+
+	public void setPcontract_price(List<PContract_Price> pcontract_price) {
+		this.pcontract_price = pcontract_price;
+	}
+	
+	public List<PContract_PO> getSub_po() {
+		return sub_po;
+	}
+
+	public void setSub_po(List<PContract_PO> sub_po) {
+		this.sub_po = sub_po;
+	}
+	
+	@Transient
+    public int getAmount_org() {
+    	int sum_product = 0;
+    	if(parentpoid_link == null) {
+    		if(product.getProducttypeid_link() == 5) {
+    			HashMap<Long, Integer> lst_org = new HashMap<>();
+    			
+    			for(POrder_Req req : porder_req) {
+    	    		if(!lst_org.containsKey(req.getGranttoorgid_link())){
+    	    			lst_org.put(req.getGranttoorgid_link(), (req.getTotalorder() / req.getAmount_inset()));
+    	    		}
+    	    		
+    	    		int amount_org = lst_org.get(req.getGranttoorgid_link());
+    	    		amount_org = (req.getTotalorder() / req.getAmount_inset()) < amount_org ? (req.getTotalorder()/req.getAmount_inset()) : amount_org;
+    	    		lst_org.replace(req.getGranttoorgid_link(), amount_org);
+    	    	}
+    			Set<Long> keySet = lst_org.keySet();
+    			for (Long key : keySet) {
+    				sum_product  = lst_org.get(key);
+    	        }
+    	    	
+    		}
+    		else {
+    			for(POrder_Req req : porder_req) {
+    				sum_product += req.getTotalorder();
+    			}
+    		}
+    	}
+		
+    	
+    	return sum_product;
+    }
 	
 	@Transient
 	public String getProductbuyercode() {
