@@ -222,6 +222,14 @@ public class PContract_PO implements Serializable {/**
 	}
 	
 	@Transient
+	public String getProductvendorcode() {
+		if(product != null) {
+			return product.getVendorcode();
+		}
+		return "";
+	}
+	
+	@Transient
 	public String getProduct_code() {
 		if(product != null) {
 			return product.getBuyercode();
