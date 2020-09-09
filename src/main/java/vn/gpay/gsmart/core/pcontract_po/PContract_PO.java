@@ -108,16 +108,27 @@ public class PContract_PO implements Serializable {/**
     
     @Transient
     public int getAmount_org() {
-    	int total = 0;
-		int productid_link =0;
+    	int total = 0, total_min = 0;
+		long productid_link = 0;
     	for(POrder_Req req : porder_req) {
-//    		if(productid_link) {
-//    			
-//    		}
-//    		
-    		total += req.getTotalorder();
+    		int amount = req.getAmount_inset() == null ? 1 : req.getAmount_inset();
+    		if(productid_link == 0) {
+    			total = req.getTotalorder();
+    			productid_link = req.getProductid_link();
+    			total_min = req.getTotalorder()/amount;
+    		}	
+    		
+    		if(req.getProductid_link().equals(productid_link)) {
+    			total += req.getTotalorder();
+    		}
+    		else {
+    			total_min = (total /amount) > total_min ? total_min : (total /amount);
+    			total = req.getTotalorder();
+    		}
+    		
+    		
     	}
-    	return total;
+    	return total_min;
     }
     
     @NotFound(action = NotFoundAction.IGNORE)

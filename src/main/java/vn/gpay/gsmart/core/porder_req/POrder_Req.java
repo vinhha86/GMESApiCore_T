@@ -55,7 +55,7 @@ public class POrder_Req implements Serializable {
 	private Date timecreated;
 	private Integer status;
 	private Boolean is_calculate;
-	
+	private Integer amount_inset;
 	
 
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -345,6 +345,14 @@ public class POrder_Req implements Serializable {
 
 	public void setIs_calculate(Boolean is_calculate) {
 		this.is_calculate = is_calculate;
+	}
+
+	public Integer getAmount_inset() {
+		return amount_inset;
+	}
+
+	public void setAmount_inset(Integer amount_inset) {
+		this.amount_inset = amount_inset;
 	}
 	
 }

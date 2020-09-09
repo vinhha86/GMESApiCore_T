@@ -105,6 +105,7 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 					
 					porder_req.setTotalorder(porder.getTotalorder());
 					porder_req.setGranttoorgid_link(porder.getGranttoorgid_link());
+					porder_req.setAmount_inset(porder.getAmount_inset());
 					
 					porder_req.setOrgrootid_link(orgrootid_link);
 					porder_req.setProductid_link(porder.getProductid_link());
@@ -249,6 +250,7 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 					
 					porder_req.setTotalorder(porder.getTotalorder());
 					porder_req.setGranttoorgid_link(porder.getGranttoorgid_link());
+					porder_req.setAmount_inset(porder.getAmount_inset());
 					
 					porder_req.setOrgrootid_link(orgrootid_link);
 					porder_req.setProductid_link(porder.getProductid_link());
@@ -381,14 +383,8 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 			long orgid_link = entity.orgid_link;
 			long userid_link = user.getId();
 			
-			List<POrder_Req> list_req = reqService.getByPO(entity.pcontract_poid_link);
-			int total = 0 ;
-			for (POrder_Req pOrder_Req : list_req) {
-				total += pOrder_Req.getTotalorder();
-			}
-			
 			PContract_PO po = pcontract_POService.findOne(entity.pcontract_poid_link);
-			if(po.getPo_quantity() != total) {
+			if(po.getPo_quantity() != po.getAmount_org()) {
 				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 				response.setMessage("Số lượng PO không trùng với số lượng phân về cho các xưởng!");
 			    return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
@@ -397,7 +393,75 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 			po.setMerchandiserid_link(entity.userid_link);
 			po.setStatus(POStatus.PO_STATUS_CONFIRMED);
 			
-			pcontract_POService.save(po);			
+			pcontract_POService.save(po);	
+			
+			//Sinh PO
+			//kiem tra po da co con hay chua thi moi sinh po con
+			if(po.getSub_po().size() == 0) {
+				PContract_PO ponew = new PContract_PO();
+				ponew.setId(null);
+				ponew.setCode(po.getCode());
+				ponew.setActual_quantity(po.getActual_quantity());
+				ponew.setActual_shipdate(po.getActual_shipdate());
+				ponew.setCurrencyid_link(po.getCurrencyid_link());
+				ponew.setDatecreated(new Date());
+				ponew.setEtm_avr(po.getEtm_avr());
+				ponew.setEtm_from(po.getEtm_from());
+				ponew.setEtm_to(po.getEtm_to());
+				ponew.setExchangerate(po.getExchangerate());
+				ponew.setIs_tbd(po.getIs_tbd());
+				ponew.setIsauto_calculate(po.getIsauto_calculate());
+				ponew.setMatdate(po.getMatdate());
+				ponew.setMerchandiserid_link(po.getMerchandiserid_link());
+				ponew.setOrgmerchandiseid_link(po.getOrgmerchandiseid_link());
+				ponew.setPackingnotice(po.getPackingnotice());
+				ponew.setParentpoid_link(po.getId());
+				ponew.setPcontractid_link(po.getPcontractid_link());
+				ponew.setPo_buyer(po.getPo_buyer());
+				ponew.setPo_vendor(po.getPo_vendor());
+				ponew.setPortfromid_link(po.getPortfromid_link());
+				ponew.setPorttoid_link(po.getPorttoid_link());
+				ponew.setPrice_add(po.getPrice_add());
+				ponew.setPrice_cmp(po.getPrice_cmp());
+				ponew.setPrice_sweingfact(po.getPrice_sweingfact());
+				ponew.setPrice_sweingtarget(po.getPrice_sweingtarget());
+				ponew.setProductid_link(po.getProductid_link());
+				ponew.setProductiondate(po.getProductiondate());
+				ponew.setProductiondays(po.getProductiondays());
+				ponew.setSalaryfund(po.getSalaryfund());
+				ponew.setSewtarget_percent(po.getSewtarget_percent());
+				ponew.setShipdate(po.getShipdate());
+				ponew.setStatus(po.getStatus());
+				ponew.setUnitid_link(po.getUnitid_link());
+				ponew.setUsercreatedid_link(userid_link);
+				ponew.setPo_quantity(po.getPo_quantity());
+				ponew = pcontract_POService.save(ponew);
+				
+				List<POrder_Req> list_req = porder_req_Service.getByPO(po.getId());
+				
+				for(POrder_Req porder : list_req) {
+//					
+					POrder_Req porder_req = new POrder_Req();
+					
+					porder_req.setPcontractid_link(ponew.getPcontractid_link());
+					porder_req.setPcontract_poid_link(ponew.getId());
+					
+					porder_req.setTotalorder(porder.getTotalorder());
+					porder_req.setGranttoorgid_link(porder.getGranttoorgid_link());
+					porder_req.setAmount_inset(porder.getAmount_inset());
+					
+					porder_req.setOrgrootid_link(orgrootid_link);
+					porder_req.setProductid_link(porder.getProductid_link());
+					porder_req.setOrderdate(new Date());
+					porder_req.setUsercreatedid_link(userid_link);
+					porder_req.setStatus(POrderReqStatus.STATUS_FREE);
+					porder_req.setTimecreated(new Date());
+					
+					//Save to DB
+					porder_req_Service.savePOrder_Req(porder_req);
+				}
+			}
+			
 			
 			//Sinh Cong viec
 			long pcontractid_link = po.getPcontractid_link();
