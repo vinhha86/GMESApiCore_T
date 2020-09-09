@@ -107,6 +107,14 @@ public class POrder_Req implements Serializable {
 	}
 	
 	@Transient
+	public String getProduct_code() {
+		if(product != null) {
+			return product.getBuyercode();
+		}
+		return "";
+	}
+	
+	@Transient
 	public String getGranttoorgcode() {
 		if(org != null) {
 			return org.getCode();

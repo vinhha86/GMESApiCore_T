@@ -97,6 +97,7 @@ public class PContract_PO implements Serializable {/**
     public String getFactories() {
     	String name = "";
     	for(POrder_Req req : porder_req) {
+    		if(name.contains(req.getGranttoorgname())) continue;
     		if(name == "")
     			name += req.getGranttoorgcode();
     		else
@@ -108,7 +109,12 @@ public class PContract_PO implements Serializable {/**
     @Transient
     public int getAmount_org() {
     	int total = 0;
+		int productid_link =0;
     	for(POrder_Req req : porder_req) {
+//    		if(productid_link) {
+//    			
+//    		}
+//    		
     		total += req.getTotalorder();
     	}
     	return total;
@@ -198,6 +204,14 @@ public class PContract_PO implements Serializable {/**
 	
 	@Transient
 	public String getProductbuyercode() {
+		if(product != null) {
+			return product.getBuyercode();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getProduct_code() {
 		if(product != null) {
 			return product.getBuyercode();
 		}
