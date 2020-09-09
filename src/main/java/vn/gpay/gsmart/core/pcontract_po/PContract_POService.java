@@ -79,9 +79,14 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 			Long pcontractid_link, Long productid_link, Date shipdate){
 		return repo.getPO_LaterShipdate(orgrootid_link, pcontractid_link, productid_link, shipdate);
 	}
-	@Override
+	@Override	
 	public List<PContract_PO> getPO_Offer_Accept_ByPContract(Long pcontractid_link) {
 		// TODO Auto-generated method stub
 		return repo.getPO_Offer_Accept_ByPContract(pcontractid_link);
+	}
+	
+	@Override	
+	public List<PContract_PO> getPcontractPoByPContractAndPOBuyer(Long pcontractid_link, String po_buyer, String buyercode) {
+		return repo.getPcontractPoByPContractAndPOBuyer(pcontractid_link, po_buyer, buyercode);
 	}
 }

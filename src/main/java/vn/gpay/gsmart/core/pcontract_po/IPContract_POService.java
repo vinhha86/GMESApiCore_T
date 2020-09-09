@@ -22,4 +22,6 @@ public interface IPContract_POService extends Operations<PContract_PO> {
 	List<PContract_PO> getPOLeafOnlyByContract(Long pcontractid_link);
 	
 	List<PContract_PO> getPO_Offer_Accept_ByPContract(Long pcontractid_link);
+	
+	List<PContract_PO> getPcontractPoByPContractAndPOBuyer(Long pcontractid_link, String po_buyer, String buyercode);
 }

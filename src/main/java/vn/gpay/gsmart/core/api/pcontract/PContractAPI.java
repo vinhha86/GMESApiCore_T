@@ -23,6 +23,7 @@ import vn.gpay.gsmart.core.pcontract.IPContractService;
 import vn.gpay.gsmart.core.pcontract.IPContract_AutoID_Service;
 import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBOMColorService;
 import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBom2ColorService;
 import vn.gpay.gsmart.core.pcontractbomcolor.PContractBOMColor;
@@ -275,6 +276,12 @@ public class PContractAPI {
 			List<PContract> list = pcontractService.getBySearch(entity);
 			response.data = new ArrayList<PContract>();
 			for(PContract pc : list) {
+				// check PO Buyer, 
+				// check Mã SP(Buyer), 
+				List<PContract_PO> poList = poService.getPcontractPoByPContractAndPOBuyer(pc.getId(), entity.po_code, entity.productbuyer_code);
+				if(poList.size() == 0) continue;
+				
+				// check contractbuyer_code
 				String cc = pc.getContractBuyerCode().toLowerCase();
 				if(!cc.contains(entity.contractbuyer_code.toLowerCase())) continue;
 				response.data.add(pc);
