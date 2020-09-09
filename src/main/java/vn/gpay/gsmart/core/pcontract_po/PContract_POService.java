@@ -59,9 +59,10 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	}
 	
 	@Override
-	public List<PContract_PO> getPOLeafOnlyByContract(Long pcontractid_link){
+	public List<PContract_PO> getPOLeafOnlyByContract(Long pcontractid_link, Long productid_link){
 		try{
-			return repo.getPOLeafOnlyByContract(pcontractid_link);
+			productid_link = productid_link == 0 ? null : productid_link;
+			return repo.getPOLeafOnlyByContract(pcontractid_link, productid_link);
 		} catch(Exception ex){
 			ex.printStackTrace();
 			return null;
@@ -80,9 +81,11 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		return repo.getPO_LaterShipdate(orgrootid_link, pcontractid_link, productid_link, shipdate);
 	}
 	@Override	
-	public List<PContract_PO> getPO_Offer_Accept_ByPContract(Long pcontractid_link) {
+	public List<PContract_PO> getPO_Offer_Accept_ByPContract(Long pcontractid_link, Long productid_link) {
 		// TODO Auto-generated method stub
-		return repo.getPO_Offer_Accept_ByPContract(pcontractid_link);
+		productid_link = productid_link == 0 ? null : productid_link;
+		
+		return repo.getPO_Offer_Accept_ByPContract(pcontractid_link, productid_link);
 	}
 	
 	@Override	

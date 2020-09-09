@@ -360,7 +360,7 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 //			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 //			long orgrootid_link = user.getRootorgid_link();
 			
-			List<PContract_PO> pcontract = pcontract_POService.getPOLeafOnlyByContract(entity.pcontractid_link);
+			List<PContract_PO> pcontract = pcontract_POService.getPOLeafOnlyByContract(entity.pcontractid_link, entity.productid_link);
 			response.data = pcontract;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -374,13 +374,13 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 	}
 	
 	@RequestMapping(value = "/getpo_offer_accept",method = RequestMethod.POST)
-	public ResponseEntity<PContract_getbycontractproduct_response> getPOAccept(@RequestBody PContract_getbycontractproduct_request entity,HttpServletRequest request ) {
+	public ResponseEntity<PContract_getbycontractproduct_response> getPOAccept(@RequestBody getoffer_accept_request entity,HttpServletRequest request ) {
 		PContract_getbycontractproduct_response response = new PContract_getbycontractproduct_response();
 		try {
 //			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 //			long orgrootid_link = user.getRootorgid_link();
 			
-			List<PContract_PO> pcontract = pcontract_POService.getPO_Offer_Accept_ByPContract(entity.pcontractid_link);
+			List<PContract_PO> pcontract = pcontract_POService.getPO_Offer_Accept_ByPContract(entity.pcontractid_link, entity.productid_link);
 			response.data = pcontract;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
