@@ -107,7 +107,7 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 					porder_req.setGranttoorgid_link(porder.getGranttoorgid_link());
 					
 					porder_req.setOrgrootid_link(orgrootid_link);
-					porder_req.setProductid_link(pcontract_po.getProductid_link());
+					porder_req.setProductid_link(porder.getProductid_link());
 					porder_req.setOrderdate(new Date());
 					porder_req.setUsercreatedid_link(user.getId());
 					porder_req.setStatus(POrderReqStatus.STATUS_FREE);
@@ -251,7 +251,7 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 					porder_req.setGranttoorgid_link(porder.getGranttoorgid_link());
 					
 					porder_req.setOrgrootid_link(orgrootid_link);
-					porder_req.setProductid_link(pcontract_po.getProductid_link());
+					porder_req.setProductid_link(porder.getProductid_link());
 					porder_req.setOrderdate(new Date());
 					porder_req.setUsercreatedid_link(usercreatedid_link);
 					porder_req.setStatus(POrderReqStatus.STATUS_FREE);
