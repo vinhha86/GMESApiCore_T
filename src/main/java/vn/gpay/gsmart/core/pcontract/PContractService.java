@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.pcontract;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,6 +15,7 @@ import com.github.wenhao.jpa.Sorts;
 import com.github.wenhao.jpa.Specifications;
 
 import vn.gpay.gsmart.core.api.pcontract.PContract_getbypaging_request;
+import vn.gpay.gsmart.core.api.pcontract.PContract_getbysearch_request;
 import vn.gpay.gsmart.core.base.AbstractService;
 
 @Service
@@ -77,6 +79,22 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 		
 		Sort sort = Sorts.builder()
 		        .desc("datecreated")
+		        .build();
+		
+		List<PContract> lst = repo.findAll(specification, sort);
+		return lst;
+	}
+	
+	@Override
+	public List<PContract> getBySearch(PContract_getbysearch_request entity) {
+		Specification<PContract> specification = Specifications.<PContract>and()
+	            .eq(entity.orgbuyerid_link > 0, "orgbuyerid_link", entity.orgbuyerid_link)
+	            .eq(entity.orgvendorid_link > 0, "orgvendorid_link", entity.orgvendorid_link)
+	            .eq(Objects.nonNull(entity.contractbuyer_year), "contractbuyer.contract_year", entity.contractbuyer_year)
+	            .build();
+		
+		Sort sort = Sorts.builder()
+		        .asc("contractcode")
 		        .build();
 		
 		List<PContract> lst = repo.findAll(specification, sort);

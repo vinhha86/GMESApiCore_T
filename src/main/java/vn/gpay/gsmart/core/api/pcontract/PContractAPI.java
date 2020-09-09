@@ -267,4 +267,26 @@ public class PContractAPI {
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	@RequestMapping(value = "/getbysearch",method = RequestMethod.POST)
+	public ResponseEntity<PContract_getbypaging_response> PContractGetBySearch(@RequestBody PContract_getbysearch_request entity,HttpServletRequest request ) {
+		PContract_getbypaging_response response = new PContract_getbypaging_response();
+		try {
+			List<PContract> list = pcontractService.getBySearch(entity);
+			response.data = new ArrayList<PContract>();
+			for(PContract pc : list) {
+				String cc = pc.getContractBuyerCode().toLowerCase();
+				if(!cc.contains(entity.contractbuyer_code.toLowerCase())) continue;
+				response.data.add(pc);
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<PContract_getbypaging_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
+		}
+	}
 }

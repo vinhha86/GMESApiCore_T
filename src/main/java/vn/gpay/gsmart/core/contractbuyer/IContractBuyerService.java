@@ -10,4 +10,5 @@ public interface IContractBuyerService extends Operations<ContractBuyer>{
 	List<ContractBuyer> getOtherContractBuyerByContractCode(String contract_code, long id);
 	List<Integer> getAllYears();
 	List<ContractBuyer> getContractBuyerBySearch(ContractBuyer_getbypaging_request entity);
+	List<ContractBuyer> getByBuyer(long buyerid_link);
 }

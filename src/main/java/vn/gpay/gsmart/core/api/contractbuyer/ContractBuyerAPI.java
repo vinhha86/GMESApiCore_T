@@ -182,4 +182,19 @@ public class ContractBuyerAPI {
 		    return new ResponseEntity<ContractBuyer_getbypaging_response>(response, HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/getByBuyer",method = RequestMethod.POST)
+	public ResponseEntity<ContractBuyer_getbypaging_response> ContractBuyerGetByBuyer(@RequestBody ContractBuyer_getone_request entity, HttpServletRequest request ) {
+		ContractBuyer_getbypaging_response response = new ContractBuyer_getbypaging_response();
+		try {
+			response.data = contractBuyerService.getByBuyer(entity.id); // buyerid_link
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ContractBuyer_getbypaging_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<ContractBuyer_getbypaging_response>(response, HttpStatus.OK);
+		}
+	}
 }

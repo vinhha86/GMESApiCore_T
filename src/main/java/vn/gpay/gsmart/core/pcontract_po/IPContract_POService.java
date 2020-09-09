@@ -18,4 +18,6 @@ public interface IPContract_POService extends Operations<PContract_PO> {
 			Date shipdate);
 
 	List<PContract_PO> getPOByContractAndProduct(Long pcontractid_link, Long productid_link);
+
+	List<PContract_PO> getPOLeafOnlyByContract(Long pcontractid_link);
 }

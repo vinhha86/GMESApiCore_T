@@ -90,6 +90,9 @@ public class Org implements Serializable {
 	@Column(name ="costpersec")
     private Float costpersec;
 	
+	@Column(name ="is_manufacturer")
+    private Integer is_manufacturer;
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="colorid_link",insertable=false,updatable =false)
@@ -308,4 +311,11 @@ public class Org implements Serializable {
 	public void setCostpersec(Float costpersec) {
 		this.costpersec = costpersec;
 	}
+	public Integer getIs_manufacturer() {
+		return is_manufacturer;
+	}
+	public void setIs_manufacturer(Integer is_manufacturer) {
+		this.is_manufacturer = is_manufacturer;
+	}
+	
 }
