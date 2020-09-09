@@ -642,4 +642,21 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 		}
 	    
 	}
+	
+	@RequestMapping(value = "/getByContractAndProductBuyerCodeAndPOBuyer",method = RequestMethod.POST)
+	public ResponseEntity<PContract_getbycontractproduct_response> getByContractAndProductBuyerCodeAndPOBuyer(@RequestBody PContract_getbycontractproductbuyercodepobuyer_request entity,HttpServletRequest request ) {
+		PContract_getbycontractproduct_response response = new PContract_getbycontractproduct_response();
+		try {
+			List<PContract_PO> pcontractpo = pcontract_POService.getPcontractPoByPContractAndPOBuyer(entity.pcontractid_link, entity.po_buyer, entity.buyercode);
+			response.data = pcontractpo;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<PContract_getbycontractproduct_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 }

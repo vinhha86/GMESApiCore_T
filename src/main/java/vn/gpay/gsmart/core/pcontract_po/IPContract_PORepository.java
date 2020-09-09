@@ -53,4 +53,15 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			@Param ("productid_link")final  Long productid_link, 
 			@Param ("shipdate")final  Date shipdate
 			);
+	
+	@Query(value = "select c from PContract_PO c "
+			+ "inner join Product b on b.id = c.productid_link "
+			+ "where c.pcontractid_link = :pcontractid_link "
+			+ "and lower(c.po_buyer) like lower(concat('%',:po_buyer,'%')) "
+			+ "and lower(b.buyercode) like lower(concat('%',:buyercode,'%')) "
+			)
+	public List<PContract_PO> getPcontractPoByPContractAndPOBuyer(
+			@Param ("pcontractid_link")final Long pcontractid_link,
+			@Param ("po_buyer")final String po_buyer,
+			@Param ("buyercode")final String buyercode);
 }

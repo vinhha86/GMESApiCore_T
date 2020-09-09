@@ -21,4 +21,14 @@ public interface IPContractRepository extends JpaRepository<PContract, Long>, Jp
 			+ "and id != :pcontractid_link")
 	public List<PContract> get_byorgrootid_link_and_contractcode(@Param ("orgrootid_link")final  Long orgrootid_link,
 			@Param ("pcontractid_link")final  Long pcontractid_link,@Param ("contractcode")final  String contractcode);
+	
+	@Query(value = "select c from PContract c "
+			+ "inner join PContract_PO b on b.pcontractid_link = c.id "
+			+ "inner join Product a on b.productid_link = a.id "
+			+ "where b.po_buyer like :po_buyer "
+			+ "and a.buyercode like :buyercode ")
+	public List<PContract> getBySearchIgnoreCase(@Param ("po_buyer")final String po_buyer,
+			@Param ("buyercode")final String buyercode);
+	
+	
 }
