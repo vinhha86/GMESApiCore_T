@@ -196,12 +196,17 @@ public class PContract_PO implements Serializable {/**
     			HashMap<Long, Integer> lst_org = new HashMap<>();
     			
     			for(POrder_Req req : porder_req) {
+	    			Integer amountInset = req.getAmount_inset();
+	    			if(amountInset == null) amountInset = 1;
+	    			
     	    		if(!lst_org.containsKey(req.getGranttoorgid_link())){
-    	    			lst_org.put(req.getGranttoorgid_link(), (req.getTotalorder() / req.getAmount_inset()));
+//    	    			lst_org.put(req.getGranttoorgid_link(), (req.getTotalorder() / req.getAmount_inset()));
+    	    			lst_org.put(req.getGranttoorgid_link(), (req.getTotalorder() / amountInset));
     	    		}
     	    		
     	    		int amount_org = lst_org.get(req.getGranttoorgid_link());
-    	    		amount_org = (req.getTotalorder() / req.getAmount_inset()) < amount_org ? (req.getTotalorder()/req.getAmount_inset()) : amount_org;
+//    	    		amount_org = (req.getTotalorder() / req.getAmount_inset()) < amount_org ? (req.getTotalorder()/req.getAmount_inset()) : amount_org;
+    	    		amount_org = (req.getTotalorder() / amountInset) < amount_org ? (req.getTotalorder()/amountInset) : amount_org;
     	    		lst_org.replace(req.getGranttoorgid_link(), amount_org);
     	    	}
     			Set<Long> keySet = lst_org.keySet();
