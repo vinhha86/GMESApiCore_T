@@ -31,6 +31,8 @@ import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
+import vn.gpay.gsmart.core.product.IProductService;
+import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.productpairing.IProductPairingService;
 import vn.gpay.gsmart.core.productpairing.ProductPairing;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -65,6 +67,7 @@ public class POrder_ReqAPI {
 	@Autowired ITask_Flow_Service commentService;
 	@Autowired Common commonService;
 	@Autowired IProductPairingService pairService;
+	@Autowired IProductService productService;
 	
     ObjectMapper mapper = new ObjectMapper();
 	
@@ -135,6 +138,65 @@ public class POrder_ReqAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<POrder_Req_Create_Response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/create_from_po", method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> CreateFromPO(HttpServletRequest request,
+			@RequestBody create_from_pcontractpo_request entity) {
+		ResponseBase response = new ResponseBase();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long orgrootid_link = user.getRootorgid_link();
+			Long pcontractid_link = entity.data.getPcontractid_link();
+			Long productid_link = entity.data.getProductid_link();
+			
+			Product product = productService.findOne(productid_link);
+			
+			if(product.getProducttypeid_link() == 5) {
+				List<ProductPairing> list_pair = pairService.getproduct_pairing_detail_bycontract(orgrootid_link, pcontractid_link, productid_link);
+				for (ProductPairing productPairing : list_pair) {
+					POrder_Req porder_req = new POrder_Req();
+					porder_req.setGranttoorgid_link(entity.data.getGranttoorgid_link());
+					porder_req.setPcontract_poid_link(entity.data.getPcontract_poid_link());
+					porder_req.setPcontractid_link(entity.data.getPcontractid_link());
+					porder_req.setIs_calculate(false);
+					
+					porder_req.setId(null);
+					porder_req.setTotalorder(entity.data.getTotalorder()*productPairing.getAmount());
+					porder_req.setOrgrootid_link(orgrootid_link);
+					porder_req.setOrderdate(new Date());
+					porder_req.setUsercreatedid_link(user.getId());
+					porder_req.setStatus(POrderReqStatus.STATUS_FREE);
+					porder_req.setTimecreated(new Date());
+					porder_req.setProductid_link(productPairing.getProductid_link());
+					porder_req.setAmount_inset(productPairing.getAmount());
+					porder_req_Service.save(porder_req);
+				}
+			}
+			else {
+				POrder_Req porder_req = entity.data;
+				
+				if (porder_req.getId() == null || porder_req.getId() == 0) {
+					porder_req.setOrgrootid_link(orgrootid_link);
+					porder_req.setOrderdate(new Date());
+					porder_req.setUsercreatedid_link(user.getId());
+					porder_req.setStatus(POrderReqStatus.STATUS_FREE);
+					porder_req.setTimecreated(new Date());
+				}
+				porder_req.setAmount_inset(1);
+				porder_req_Service.save(porder_req);
+			}
+			
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
 	
