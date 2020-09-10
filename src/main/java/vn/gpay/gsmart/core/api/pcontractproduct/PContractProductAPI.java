@@ -409,19 +409,25 @@ public class PContractProductAPI {
 			long orgrootid_link = user.getRootorgid_link();
 			long pcontractid_link = entity.pcontractid_link;
 			long productid_link = entity.productid_link;
-			Product product = pservice.findOne(productid_link);
 			List<PContractProduct> lst = new ArrayList<PContractProduct>();
-			
-			if(product.getProducttypeid_link() == 5) {
-				List<ProductPairing> list_pair = productparingService.getproduct_pairing_detail_bycontract(orgrootid_link, pcontractid_link, productid_link);
-				for (ProductPairing productPairing : list_pair) {
-					lst.addAll(pcpservice.get_by_product_and_pcontract(orgrootid_link, productPairing.getProductid_link(), pcontractid_link));
+			if(productid_link>0) {
+				Product product = pservice.findOne(productid_link);
+				
+				if(product.getProducttypeid_link() == 5) {
+					List<ProductPairing> list_pair = productparingService.getproduct_pairing_detail_bycontract(orgrootid_link, pcontractid_link, productid_link);
+					for (ProductPairing productPairing : list_pair) {
+						lst.addAll(pcpservice.get_by_product_and_pcontract(orgrootid_link, productPairing.getProductid_link(), pcontractid_link));
+					}
 				}
+				else {
+					lst.addAll(pcpservice.get_by_product_and_pcontract(orgrootid_link, productid_link, pcontractid_link));
+				}
+				
 			}
 			else {
 				lst.addAll(pcpservice.get_by_product_and_pcontract(orgrootid_link, productid_link, pcontractid_link));
 			}
-			
+				
 			List<PContractProductBinding> data = new ArrayList<PContractProductBinding>();
 			String FolderPath = "upload/product";
 			
@@ -498,13 +504,19 @@ public class PContractProductAPI {
 			
 			//Lay nhung bo san pham
 			List<PContractProductPairing> listpair = new ArrayList<PContractProductPairing>();
-			Product p = pservice.findOne(entity.productid_link);
-			if(p.getProducttypeid_link() == 5) {
-				listpair.addAll(pppairService.getdetail_bypcontract_and_productpair(orgrootid_link, pcontractid_link, entity.productid_link));
+			if(entity.productid_link > 0) {
+				Product p = pservice.findOne(entity.productid_link);
+				if(p.getProducttypeid_link() == 5) {
+					listpair.addAll(pppairService.getdetail_bypcontract_and_productpair(orgrootid_link, pcontractid_link, entity.productid_link));
+				}
+				else {
+					listpair.addAll(pppairService.getall_bypcontract(orgrootid_link, pcontractid_link));
+				}
 			}
 			else {
 				listpair.addAll(pppairService.getall_bypcontract(orgrootid_link, pcontractid_link));
 			}
+			
 			
 			for(PContractProductPairing pair : listpair) {
 				PContractProductBinding binding = new PContractProductBinding();
