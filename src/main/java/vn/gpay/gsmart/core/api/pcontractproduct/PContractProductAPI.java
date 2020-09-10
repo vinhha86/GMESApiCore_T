@@ -34,7 +34,9 @@ import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.product.IProductService;
 import vn.gpay.gsmart.core.product.Product;
+import vn.gpay.gsmart.core.product.ProductService;
 import vn.gpay.gsmart.core.productpairing.IProductPairingService;
+import vn.gpay.gsmart.core.productpairing.ProductPairing;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 import vn.gpay.gsmart.core.sku.SKU_Attribute_Value;
@@ -407,7 +409,20 @@ public class PContractProductAPI {
 					.getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
 			long pcontractid_link = entity.pcontractid_link;
-			List<PContractProduct> lst = pcpservice.get_by_product_and_pcontract(orgrootid_link, 0, pcontractid_link);
+			long productid_link = entity.productid_link;
+			Product product = pservice.findOne(productid_link);
+			List<PContractProduct> lst = new ArrayList<PContractProduct>();
+			
+			if(product.getProducttypeid_link() == 5) {
+				List<ProductPairing> list_pair = productparingService.getproduct_pairing_detail_bycontract(orgrootid_link, pcontractid_link, productid_link);
+				for (ProductPairing productPairing : list_pair) {
+					lst.addAll(pcpservice.get_by_product_and_pcontract(orgrootid_link, productPairing.getProductid_link(), pcontractid_link));
+				}
+			}
+			else {
+				lst.addAll(pcpservice.get_by_product_and_pcontract(orgrootid_link, productid_link, pcontractid_link));
+			}
+			
 			List<PContractProductBinding> data = new ArrayList<PContractProductBinding>();
 			String FolderPath = "upload/product";
 			
@@ -454,7 +469,9 @@ public class PContractProductAPI {
 					.getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
 			long pcontractid_link = entity.pcontractid_link;
-			List<PContractProduct> lst = pcpservice.get_by_product_and_pcontract(orgrootid_link, 0, pcontractid_link);
+			List<PContractProduct> lst = new ArrayList<PContractProduct>();
+			
+			lst.addAll(pcpservice.get_by_product_and_pcontract(orgrootid_link, entity.productid_link, pcontractid_link));
 			List<PContractProductBinding> data = new ArrayList<PContractProductBinding>();
 			String FolderPath = "upload/product";
 			
@@ -481,7 +498,15 @@ public class PContractProductAPI {
 			}
 			
 			//Lay nhung bo san pham
-			List<PContractProductPairing> listpair = pppairService.getall_bypcontract(orgrootid_link, pcontractid_link);
+			List<PContractProductPairing> listpair = new ArrayList<PContractProductPairing>();
+			Product p = pservice.findOne(entity.productid_link);
+			if(p.getProducttypeid_link() == 5) {
+				listpair.addAll(pppairService.getdetail_bypcontract_and_productpair(orgrootid_link, pcontractid_link, entity.productid_link));
+			}
+			else {
+				listpair.addAll(pppairService.getall_bypcontract(orgrootid_link, pcontractid_link));
+			}
+			
 			for(PContractProductPairing pair : listpair) {
 				PContractProductBinding binding = new PContractProductBinding();
 				binding.setId(pair.getProductpairid_link());

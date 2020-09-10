@@ -142,8 +142,11 @@ public class PContractProductPairingAPI {
 					.getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
 			long pcontractid_link = entity.pcontractid_link;
-			
-			response.data = ppPairingservice.getall_bypcontract(orgrootid_link, pcontractid_link);
+			Product p = productService.findOne(entity.productid_link);
+			if(p.getProducttypeid_link() == 5)
+				response.data = ppPairingservice.getdetail_bypcontract_and_productpair(orgrootid_link, pcontractid_link, entity.productid_link);
+			else
+				response.data = ppPairingservice.getall_bypcontract(orgrootid_link, pcontractid_link);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 		} catch (Exception e) {
