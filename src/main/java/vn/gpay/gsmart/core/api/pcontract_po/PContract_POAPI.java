@@ -361,6 +361,9 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 //			long orgrootid_link = user.getRootorgid_link();
 			
 			List<PContract_PO> pcontract = pcontract_POService.getPOLeafOnlyByContract(entity.pcontractid_link, entity.productid_link);
+			if(entity.pcontractpo_id_link > 0) {
+				pcontract.removeIf(c-> c.getId() != entity.pcontractpo_id_link);
+			}
 			response.data = pcontract;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
