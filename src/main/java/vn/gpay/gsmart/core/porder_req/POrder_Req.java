@@ -118,7 +118,13 @@ public class POrder_Req implements Serializable {
 	public String getProductinfo() {
 		if(product != null) {
 			 DecimalFormat myFormatter = new DecimalFormat("#,###");
-			 String s_quantity =  myFormatter.format(pcontract_po.getPo_quantity()*amount_inset);
+			 Integer amountInset = amount_inset;
+			 Integer poQuantity = pcontract_po.getPo_quantity();
+			 if(amountInset == null) amountInset = 1;
+			 if(poQuantity == null) poQuantity = 0;
+			 
+//			 String s_quantity =  myFormatter.format(pcontract_po.getPo_quantity()*amount_inset);
+			 String s_quantity =  myFormatter.format(poQuantity*amountInset);
 			return product.getBuyercode() + " ("+s_quantity+")";
 		}
 		return "";
