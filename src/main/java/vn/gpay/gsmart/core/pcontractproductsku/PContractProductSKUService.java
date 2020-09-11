@@ -36,13 +36,13 @@ public class PContractProductSKUService extends AbstractService<PContractProduct
 	public List<PContractProductSKU> getlistsku_bypo_and_pcontract(long orgrootid_link, long pcontract_poid_link,
 			long pcontractid_link) {
 		// TODO Auto-generated method stub
-		return repo.getlistsku_bypo_and_pcontract(orgrootid_link, pcontract_poid_link, pcontractid_link);
+		return repo.getlistsku_bypo_and_pcontract(pcontract_poid_link, pcontractid_link);
 	}
 	@Override
 	public List<PContractProductSKU> getlistsku_bypo_and_pcontract_free(long orgrootid_link, long pcontract_poid_link,
 			long pcontractid_link) {
 		// TODO Auto-generated method stub
-		List<PContractProductSKU> a= repo.getlistsku_bypo_and_pcontract(orgrootid_link, pcontract_poid_link, pcontractid_link);
+		List<PContractProductSKU> a= repo.getlistsku_bypo_and_pcontract(pcontract_poid_link, pcontractid_link);
 		
 		List<POrder> lsPOrders = porder_Service.getByContractAndPO(pcontractid_link, pcontract_poid_link);
 		for(POrder thePOrder:lsPOrders){
