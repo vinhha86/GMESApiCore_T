@@ -115,6 +115,16 @@ public class POrder_Req implements Serializable {
 	}
 	
 	@Transient
+	public String getProductinfo() {
+		if(product != null) {
+			 DecimalFormat myFormatter = new DecimalFormat("#,###");
+			 String s_quantity =  myFormatter.format(pcontract_po.getPo_quantity()*amount_inset);
+			return product.getBuyercode() + " ("+s_quantity+")";
+		}
+		return "";
+	}
+	
+	@Transient
 	public String getGranttoorgcode() {
 		if(org != null) {
 			return org.getCode();

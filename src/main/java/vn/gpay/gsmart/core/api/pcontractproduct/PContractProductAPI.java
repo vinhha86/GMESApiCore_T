@@ -477,6 +477,7 @@ public class PContractProductAPI {
 			List<PContractProduct> lst = new ArrayList<PContractProduct>();
 			
 			lst.addAll(pcpservice.get_by_product_and_pcontract(orgrootid_link, entity.productid_link, pcontractid_link));
+			
 			List<PContractProductBinding> data = new ArrayList<PContractProductBinding>();
 			String FolderPath = "upload/product";
 			
@@ -509,9 +510,9 @@ public class PContractProductAPI {
 				if(p.getProducttypeid_link() == 5) {
 					listpair.addAll(pppairService.getdetail_bypcontract_and_productpair(orgrootid_link, pcontractid_link, entity.productid_link));
 				}
-				else {
-					listpair.addAll(pppairService.getall_bypcontract(orgrootid_link, pcontractid_link));
-				}
+//				else {
+//					listpair.addAll(pppairService.getall_bypcontract(orgrootid_link, pcontractid_link));
+//				}
 			}
 			else {
 				listpair.addAll(pppairService.getall_bypcontract(orgrootid_link, pcontractid_link));
