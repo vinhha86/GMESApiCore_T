@@ -211,7 +211,7 @@ public class PContract_PO implements Serializable {/**
     	    	}
     			Set<Long> keySet = lst_org.keySet();
     			for (Long key : keySet) {
-    				sum_product  = lst_org.get(key);
+    				sum_product  += lst_org.get(key);
     	        }
     	    	
     		}
