@@ -276,14 +276,27 @@ public class PContractAPI {
 			List<PContract> list = pcontractService.getBySearch(entity);
 			response.data = new ArrayList<PContract>();
 			for(PContract pc : list) {
-				// check PO Buyer, 
-				// check Mã SP(Buyer), 
-				List<PContract_PO> poList = poService.getPcontractPoByPContractAndPOBuyer(pc.getId(), entity.po_code, entity.productbuyer_code);
-				if(poList.size() == 0) continue;
-				
 				// check contractbuyer_code
 				String cc = pc.getContractBuyerCode().toLowerCase();
 				if(!cc.contains(entity.contractbuyer_code.toLowerCase())) continue;
+				
+				// check PO Buyer, 
+				// check Mã SP(Buyer),
+				
+				if(entity.po_code == "" && entity.productbuyer_code == "") {
+//					List<PContract_PO> poList = poService.getPcontractPoByPContractAndPOBuyer(pc.getId(), entity.po_code, entity.productbuyer_code);
+//					if(poList.size() == 0) continue;
+				}else {
+					List<PContract_PO> poList = poService.getPcontractPoByPContractAndPOBuyer(pc.getId(), entity.po_code, entity.productbuyer_code);
+					List<PContract_PO> temp = new ArrayList<PContract_PO>();
+					for(PContract_PO ppo : poList) {
+						if(ppo.getParentpoid_link() != null) {
+							temp.add(ppo);
+						}
+					}
+					if(temp.size() == 0) continue;
+				}
+				
 				response.data.add(pc);
 			}
 			

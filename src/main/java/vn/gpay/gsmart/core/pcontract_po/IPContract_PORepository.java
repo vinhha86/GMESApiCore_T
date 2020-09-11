@@ -71,6 +71,7 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			+ "where c.pcontractid_link = :pcontractid_link "
 			+ "and lower(c.po_buyer) like lower(concat('%',:po_buyer,'%')) "
 			+ "and lower(b.buyercode) like lower(concat('%',:buyercode,'%')) "
+//			+ "and c.parentpoid_link != null "
 			)
 	public List<PContract_PO> getPcontractPoByPContractAndPOBuyer(
 			@Param ("pcontractid_link")final Long pcontractid_link,

@@ -676,7 +676,14 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 		PContract_getbycontractproduct_response response = new PContract_getbycontractproduct_response();
 		try {
 			List<PContract_PO> pcontractpo = pcontract_POService.getPcontractPoByPContractAndPOBuyer(entity.pcontractid_link, entity.po_buyer, entity.buyercode);
-			response.data = pcontractpo;
+			response.data = new ArrayList<PContract_PO>();
+			
+			// chỉ lấy pcontract_po con
+			for(PContract_PO ppo : pcontractpo) {
+				if(ppo.getParentpoid_link() != null) {
+					response.data.add(ppo);
+				}
+			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
