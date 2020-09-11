@@ -233,6 +233,11 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 			long usercreatedid_link = user.getId();
 			
 			PContract_PO pcontract_po = entity.data;
+			if(pcontract_po.getId() == null || pcontract_po.getId() == 0) {
+				pcontract_po.setUsercreatedid_link(usercreatedid_link);
+				pcontract_po.setDatecreated(new Date());
+			}
+			
 			pcontract_po = pcontract_POService.save(pcontract_po);
 			
 			//Update POrder_Req
