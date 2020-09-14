@@ -34,6 +34,7 @@ import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
@@ -68,6 +69,7 @@ public class ScheduleAPI {
 	@Autowired ITask_Object_Service taskobjectService;
 	@Autowired ITask_CheckList_Service checklistService;
 	@Autowired ITask_Service taskService;
+	@Autowired IPOrderGrant_SKUService grantskuService;
 	
 	@RequestMapping(value = "/getplan",method = RequestMethod.POST)
 	public ResponseEntity<get_schedule_porder_response> GetAll(HttpServletRequest request,
@@ -627,6 +629,26 @@ public class ScheduleAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/gen_pordergrant",method = RequestMethod.POST)
+	public ResponseEntity<gen_pordergrant_response> GenPorderGrant(HttpServletRequest request) {
+		gen_pordergrant_response response = new gen_pordergrant_response();
+		
+		try {
+			POrderGrant grant = new POrderGrant();
+			grant.setId(null);
+			grant = granttService.save(grant);
+			
+			response.id = grant.getId();
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<gen_pordergrant_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<gen_pordergrant_response>(response, HttpStatus.OK);
+		}
+	}
+	
 	@RequestMapping(value = "/create_pordergrant",method = RequestMethod.POST)
 	public ResponseEntity<create_pordergrant_response> CreatePorderGrant(HttpServletRequest request,
 			@RequestBody create_pordergrant_request entity) {
@@ -637,7 +659,7 @@ public class ScheduleAPI {
 		
 		try {
 			POrder porder = porderService.findOne(entity.porderid_link);
-			porder.setStatus(1);
+			porder.setStatus(POrderStatus.PORDER_STATUS_GRANTED);
 			porderService.save(porder);
 			
 			//Tao POrder_grant
@@ -1006,12 +1028,13 @@ public class ScheduleAPI {
 			int productivity = commonService.getProductivity(grant_des.getGrantamount(), duration_des);
 			
 			int duration_src = (int)Math.ceil(grant_src.getGrantamount()/productivity);
-					
-			Date end = commonService.Date_Add_with_holiday(grant_des.getFinish_date_plan(), duration_src, orgrootid_link, year);
+			
+			Date end = grant_des.getFinish_date_plan();
+			end = commonService.Date_Add_with_holiday(end, duration_src, orgrootid_link, year);
 			end = commonService.getEndOfDate(end);
 			
 			int duration = duration_des + duration_src;
-			productivity = (int)Math.ceil(total/duration);
+			productivity = commonService.getProductivity(total, duration);
 			
 			//Xoa grant nguon va processing nguon
 			List<POrderProcessing> list_process = processService.getByOrderId_and_GrantId(grant_src.getPorderid_link(), entity.pordergrantid_link_src);
@@ -1019,7 +1042,6 @@ public class ScheduleAPI {
 				processService.delete(process);
 			}
 			
-			granttService.deleteById(entity.pordergrantid_link_src);
 			
 			//Cap nhat grant dich
 			grant_des.setGrantamount(total);
@@ -1036,6 +1058,28 @@ public class ScheduleAPI {
 			sch.setName(grant_des.getMaHang());
 			sch.setMahang(grant_des.getMaHang());
 			sch.setTotalpackage(total);
+			
+			//chuyen sku cua grant_src sang grant_des
+			List<POrderGrant_SKU> list_sku_src = grantskuService.getPOrderGrant_SKU(entity.pordergrantid_link_src);
+			
+			for (POrderGrant_SKU pOrderGrant_SKU : list_sku_src) {
+				POrderGrant_SKU sku = grantskuService.getPOrderGrant_SKUbySKUid_linkAndGrantId(pOrderGrant_SKU.getSkuid_link(), entity.pordergrantid_link_des);
+				if(sku == null) {
+					POrderGrant_SKU grantsku = new POrderGrant_SKU();
+					grantsku.setGrantamount(pOrderGrant_SKU.getGrantamount());
+					pOrderGrant_SKU.setId(null);
+					pOrderGrant_SKU.setOrgrootid_link(orgrootid_link);
+					pOrderGrant_SKU.setPordergrantid_link(entity.pordergrantid_link_des);
+					pOrderGrant_SKU.setSkuid_link(pOrderGrant_SKU.getSkuid_link());
+					grantskuService.save(pOrderGrant_SKU);
+				} 
+				else {
+					sku.setGrantamount(sku.getGrantamount() + pOrderGrant_SKU.getGrantamount());
+					grantskuService.save(sku);
+				}
+			}
+			
+			granttService.deleteById(entity.pordergrantid_link_src);
 			
 			response.data = sch;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -1063,8 +1107,12 @@ public class ScheduleAPI {
 			else {
 				granttService.delete(grant);
 				processService.deleteByOrderID(porderid_link);
-				porder.setStatus(POrderStatus.PORDER_STATUS_FREE);
-				porderService.save(porder);
+				
+				List<POrderGrant> list_grant = granttService.getByOrderId(porderid_link);
+				if(list_grant.size() == 0) {
+					porder.setStatus(POrderStatus.PORDER_STATUS_FREE);
+					porderService.save(porder);
+				}
 			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -1093,11 +1141,12 @@ public class ScheduleAPI {
 			int total = grant_old.getGrantamount();
 			int totalorder_old = grant_old.getGrantamount() - entity.quantity;
 			Date start_old = grant_old.getStart_date_plan();
+			start_old = commonService.getBeginOfDate(start_old);
 			int duration_old = (int)Math.ceil(totalorder_old/producttivity);
 			duration_old = duration_old < 1 ? 1 : duration_old;
 			int porductivity_old = commonService.getProductivity(totalorder_old, duration_old);
 			
-			Date end_old = commonService.Date_Add_with_holiday(start_old, duration_old, orgrootid_link, year);
+			Date end_old = commonService.Date_Add_with_holiday(start_old, duration_old - 1, orgrootid_link, year);
 			end_old = commonService.getEndOfDate(end_old);
 //			Date end_new = grant_old.getFinish_date_plan();
 //			int productivity_old = commonService.getProductivity(totalorder_old, duration_old);
@@ -1127,7 +1176,7 @@ public class ScheduleAPI {
 			
 			int total_new = total - totalorder_old;
 			int duration_new = (int)Math.ceil(total_new/producttivity);
-			Date end_new = commonService.Date_Add_with_holiday(start_new, duration_new, orgrootid_link, year);
+			Date end_new = commonService.Date_Add_with_holiday(start_new, duration_new - 1, orgrootid_link, year);
 			end_new = commonService.getEndOfDate(end_new);
 			int productivity_new  = (int)Math.ceil(total_new/duration_new);
 			
