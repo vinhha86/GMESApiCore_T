@@ -368,18 +368,40 @@ public class POrderAPI {
 		try {
 			POrder_Product_SKU thePOrderSKU = porderskuService.findOne(entity.data.getId());
 			 if (null != thePOrderSKU){
-				thePOrderSKU.setPquantity_total(entity.data.getPquantity_total());
-				porderskuService.save(thePOrderSKU);
-				
-				updateTotalOrder(thePOrderSKU.getPorderid_link());
-				updateContractSKU(thePOrderSKU.getPorderid_link(),thePOrderSKU.getSkuid_link());
+				 POrder thePorder = porderService.findOne(thePOrderSKU.getPorderid_link());
+				//Kiem tra neu so dieu chinh nhieu hon so con lai --> Khong cho sua
+				long pcontract_poid_link = thePorder.getPcontract_poid_link();
+				long productid_link = thePOrderSKU.getProductid_link();
+				List<PContractProductSKU> data = pskuservice.getPOSKU_Free_ByProduct(productid_link, pcontract_poid_link);
+				PContractProductSKU poSKU = data.stream().filter(sku -> sku.getSkuid_link().equals(thePOrderSKU.getSkuid_link())).findAny().orElse(null);
+				if (null != poSKU){
+					int q_total = null != poSKU.getPquantity_total()?poSKU.getPquantity_total():0;
+					int q_granted = null != poSKU.getPquantity_granted()?poSKU.getPquantity_granted():0;
+					q_granted = q_granted - (null != thePOrderSKU.getPquantity_total()?thePOrderSKU.getPquantity_total():0);
+					if ((q_total - q_granted) >= entity.data.getPquantity_total()){
+						thePOrderSKU.setPquantity_total(entity.data.getPquantity_total());
+						porderskuService.save(thePOrderSKU);
+						
+						updateTotalOrder(thePOrderSKU.getPorderid_link());
+						updateContractSKU(thePOrderSKU.getPorderid_link(),thePOrderSKU.getSkuid_link());
+						
+						response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+						response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+						return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);						
+					} else {
+						response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+						response.setMessage("Số lượng không hợp lệ");
+						return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);						
+					}
+				} else {
+					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+					response.setMessage("Không tìm thấy SKU của PO");
+					return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);						
+				}
 
-				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-				return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 			} else {
 				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_BAD_REQUEST));
+				response.setMessage("Không tìm thấy SKU của Lệnh SX");
 				return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 			}
 		} catch (Exception e) {
