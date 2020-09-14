@@ -2,6 +2,7 @@ package vn.gpay.gsmart.core.porder_product_sku;
 
 import javax.persistence.Transient;
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,6 +17,8 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
 import vn.gpay.gsmart.core.sku.SKU;
 
 @Table(name="porders_product_skus")
@@ -93,6 +96,36 @@ public class POrder_Product_SKU implements Serializable {
 			return porder.getOrdercode();
 		}
 		return "";
+	}
+	
+	@Transient
+	public Integer getRemainQuantity() {
+		if(pquantity_total == null) {
+			return 0;
+		}
+		Integer remain = pquantity_total;
+		return remain - getInProductionQuantity();
+	}
+	
+	@Transient
+	public Integer getInProductionQuantity() {
+		Integer inProduction = 0;
+		if(porder != null) {
+			if(porder.getList_pordergrant() != null) {
+				List<POrderGrant> podergrants = porder.getList_pordergrant();
+				for(POrderGrant pordergrant : podergrants) {
+					if(pordergrant.getPorder_grant_sku() != null) {
+						List<POrderGrant_SKU> pordergrantskus = pordergrant.getPorder_grant_sku();
+						for(POrderGrant_SKU pordergrantsku : pordergrantskus) {
+							if(pordergrantsku.getSkuid_link().equals(skuid_link)) {
+								inProduction+=pordergrantsku.getGrantamount();
+							}
+						}
+					}
+				}
+			}
+		}
+		return inProduction;
 	}
 	
 	@Transient

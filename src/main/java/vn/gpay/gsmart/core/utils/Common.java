@@ -567,9 +567,14 @@ public class Common  {
 		else {
 			List<Holiday> list_holiday = holidayService.getby_year(orgrootid_link, year);
 			for(Holiday holiday : list_holiday) {
-				if(_date.getTime().compareTo(holiday.getDay()) == 0) {
+				Calendar c_holiday = Calendar.getInstance();
+				c_holiday.setTime(holiday.getDay());
+				if(CompareDate(_date, c_holiday)) {
 					return true;
 				}
+//				if(_date.getTime().compareTo(holiday.getDay()) == 0) {
+//					return true;
+//				}
 			}
 		}
 		return false;
@@ -589,12 +594,21 @@ public class Common  {
 		Calendar _date = Calendar.getInstance();
 		_date.setTime(date);
 		
-		while(count<amount-1) {
+		if(amount == 1) {
 			_date.add(Calendar.DATE, 1);
-			if(!check_dayoff(_date, orgrootid_link, year)) {
-				count++;
+			while(check_dayoff(_date, orgrootid_link, year)) {
+				_date.add(Calendar.DATE, 1);
 			}
 		}
+		else {
+			while(count < amount-1) {
+				_date.add(Calendar.DATE, 1);
+				if(!check_dayoff(_date, orgrootid_link, year)) {
+					count++;
+				}
+			}
+		}
+		
 		_date.set(Calendar.HOUR_OF_DAY, 0);
 		_date.set(Calendar.MINUTE, 0);
 		_date.set(Calendar.SECOND, 0);

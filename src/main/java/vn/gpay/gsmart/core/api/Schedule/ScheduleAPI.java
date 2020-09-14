@@ -999,33 +999,42 @@ public class ScheduleAPI {
 			
 			int total = grant_des.getGrantamount() + grant_src.getGrantamount();
 			
-			Date start = grant_des.getStart_date_plan().before(entity.sch.getStartDate()) ? grant_des.getStart_date_plan() : entity.sch.getStartDate();
-			Date end = grant_des.getFinish_date_plan().after(entity.sch.getEndDate()) ? grant_des.getFinish_date_plan() : entity.sch.getEndDate();
-			int duration = commonService.getDuration(start, end, orgrootid_link, year);
-			int productivity = commonService.getProductivity(total, duration);
+			Date start = grant_des.getStart_date_plan();
+			start = commonService.getBeginOfDate(start);
+			
+			int duration_des = commonService.getDuration(start, grant_des.getFinish_date_plan(), orgrootid_link, year);
+			int productivity = commonService.getProductivity(grant_des.getGrantamount(), duration_des);
+			
+			int duration_src = (int)Math.ceil(grant_src.getGrantamount()/productivity);
+					
+			Date end = commonService.Date_Add_with_holiday(grant_des.getFinish_date_plan(), duration_src, orgrootid_link, year);
+			end = commonService.getEndOfDate(end);
+			
+			int duration = duration_des + duration_src;
+			productivity = (int)Math.ceil(total/duration);
 			
 			//Xoa grant nguon va processing nguon
-			List<POrderProcessing> list_process = processService.getByOrderId_and_GrantId(grant_src.getPorderid_link(), entity.pordergrantid_link_des);
+			List<POrderProcessing> list_process = processService.getByOrderId_and_GrantId(grant_src.getPorderid_link(), entity.pordergrantid_link_src);
 			for(POrderProcessing process : list_process) {
 				processService.delete(process);
 			}
 			
-			granttService.deleteById(entity.pordergrantid_link_des);
+			granttService.deleteById(entity.pordergrantid_link_src);
 			
 			//Cap nhat grant dich
-			grant_src.setGrantamount(total);
-			grant_src.setStart_date_plan(commonService.getBeginOfDate(start));
-			grant_src.setFinish_date_plan(commonService.getEndOfDate(end));
-			grant_src.setGranttoorgid_link(grant_des.getGranttoorgid_link());
-			grant_src = granttService.save(grant_src);
+			grant_des.setGrantamount(total);
+			grant_des.setStart_date_plan(start);
+			grant_des.setFinish_date_plan(end);
+			grant_des.setGranttoorgid_link(grant_des.getGranttoorgid_link());
+			grant_des = granttService.save(grant_des);
 			
 			Schedule_porder sch = entity.sch;
-			sch.setStartDate(grant_src.getStart_date_plan());
-			sch.setEndDate(grant_src.getFinish_date_plan());
+			sch.setStartDate(start);
+			sch.setEndDate(end);
 			sch.setDuration(duration);
 			sch.setProductivity(productivity);
-			sch.setName(grant_src.getMaHang());
-			sch.setMahang(grant_src.getMaHang());
+			sch.setName(grant_des.getMaHang());
+			sch.setMahang(grant_des.getMaHang());
 			sch.setTotalpackage(total);
 			
 			response.data = sch;
@@ -1081,14 +1090,17 @@ public class ScheduleAPI {
 			//Cập nhật lại grant cũ sau khi tách
 			POrderGrant grant_old = granttService.findOne(entity.pordergrant_id_link);
 			
+			int total = grant_old.getGrantamount();
 			int totalorder_old = grant_old.getGrantamount() - entity.quantity;
 			Date start_old = grant_old.getStart_date_plan();
 			int duration_old = (int)Math.ceil(totalorder_old/producttivity);
 			duration_old = duration_old < 1 ? 1 : duration_old;
+			int porductivity_old = commonService.getProductivity(totalorder_old, duration_old);
 			
 			Date end_old = commonService.Date_Add_with_holiday(start_old, duration_old, orgrootid_link, year);
-			Date end_new = grant_old.getFinish_date_plan();
-			int productivity_old = commonService.getProductivity(totalorder_old, duration_old);
+			end_old = commonService.getEndOfDate(end_old);
+//			Date end_new = grant_old.getFinish_date_plan();
+//			int productivity_old = commonService.getProductivity(totalorder_old, duration_old);
 						
 			grant_old.setGrantamount(totalorder_old);
 			grant_old.setFinish_date_plan(end_old);
@@ -1102,17 +1114,24 @@ public class ScheduleAPI {
 			}
 			
 			Schedule_porder old = new Schedule_porder();
-			old.setEndDate(commonService.getEndOfDate(end_old));
+			old.setEndDate(end_old);
 			old.setDuration(duration_old);
-			old.setProductivity(productivity_old);
+			old.setProductivity(porductivity_old);
 			old.setName(grant_old.getMaHang());
 			old.setMahang(grant_old.getMaHang());
 			response.old_data = old;
 			
 			//Sinh grant moi
-			Date start_new = commonService.Date_Add(end_old, 1);
-			int duration_new = entity.duration - duration_old;
-			int productivity = commonService.getProductivity(entity.quantity, duration_new);
+			Date start_new = commonService.Date_Add_with_holiday(end_old, 1, orgrootid_link, year);
+			start_new= commonService.getBeginOfDate(start_new);
+			
+			int total_new = total - totalorder_old;
+			int duration_new = (int)Math.ceil(total_new/producttivity);
+			Date end_new = commonService.Date_Add_with_holiday(start_new, duration_new, orgrootid_link, year);
+			end_new = commonService.getEndOfDate(end_new);
+			int productivity_new  = (int)Math.ceil(total_new/duration_new);
+			
+//			int productivity = commonService.getProductivity(entity.quantity, duration_new);
 			
 			POrderGrant grant = new POrderGrant();
 			grant.setGranttoorgid_link(grant_old.getGranttoorgid_link());
@@ -1123,11 +1142,11 @@ public class ScheduleAPI {
 			grant.setTimecreated(new Date());
 			grant.setUsercreatedid_link(user.getId());
 			grant.setGrantdate(new Date());
-			grant.setGrantamount(entity.quantity);
+			grant.setGrantamount(total_new);
 			grant.setStatus(1);
 			grant.setOrgrootid_link(orgrootid_link);
-			grant.setStart_date_plan(commonService.getBeginOfDate(start_new));
-			grant.setFinish_date_plan(commonService.getEndOfDate(end_new));
+			grant.setStart_date_plan(start_new);
+			grant.setFinish_date_plan(end_new);
 			grant = granttService.save(grant);
 			
 			POrder porder = porderService.findOne(entity.porderid_link);
@@ -1150,15 +1169,15 @@ public class ScheduleAPI {
 			
 			Schedule_porder new_data = new Schedule_porder();
 			new_data.setCls(grant_old.getCls());
-			new_data.setEndDate(commonService.getEndOfDate(end_new));
+			new_data.setEndDate(end_new);
 			new_data.setId_origin(grant_old.getPorderid_link());
 			new_data.setMahang(grant.getMaHang(porder));
 			new_data.setName(grant.getMaHang(porder));
 			new_data.setResourceId(entity.resourceid);
 			new_data.setStartDate(start_new);
 			new_data.setDuration(duration_new);
-			new_data.setTotalpackage(entity.quantity);
-			new_data.setProductivity(productivity);
+			new_data.setTotalpackage(total_new);
+			new_data.setProductivity(productivity_new);
 			new_data.setVendorname(grant_old.getVendorname());
 			new_data.setBuyername(grant_old.getBuyername());
 			new_data.setPordercode(grant_old.getOrdercode());
