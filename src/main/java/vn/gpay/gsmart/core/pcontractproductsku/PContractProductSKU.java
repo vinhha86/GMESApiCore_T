@@ -13,12 +13,14 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.sku.SKU;
 
 @Table(name="pcontract_product_skus")
+@DynamicUpdate(true)
 @Entity
 public class PContractProductSKU implements Serializable {/**
 	 * 
@@ -35,6 +37,7 @@ public class PContractProductSKU implements Serializable {/**
 	private Integer pquantity_sample;//SL mau
 	private Integer pquantity_porder;//SL don
 	private Integer pquantity_total;//SL tong sx
+	@Transient
 	private Integer pquantity_granted;//SL da phan chuyen
 	private Integer pquantity_production;//SL yeu cau sx
 	private Long pcontract_poid_link;

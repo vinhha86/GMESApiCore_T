@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -98,6 +99,7 @@ public class POrderAPI {
 			} 
 			
 			response.id = porderService.savePOrder(porder, po_code);
+			response.data = porderService.findOne(response.id);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -106,7 +108,7 @@ public class POrderAPI {
 			e.printStackTrace();
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			return new ResponseEntity<POrder_Create_response>(response, HttpStatus.OK);
+			return new ResponseEntity<POrder_Create_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
 	
@@ -426,10 +428,17 @@ public class POrderAPI {
 		try {
 			for(POrder_Product_SKU thePOrderSKU: entity.data){
 				List<POrder_Product_SKU> lstPOrderSKU = porderskuService.getby_porderandsku(thePOrderSKU.getPorderid_link(),thePOrderSKU.getSkuid_link());
-				 if (lstPOrderSKU.size() == 0){
+				if (lstPOrderSKU.size() == 0){
 					thePOrderSKU.setOrgrootid_link(orgrootid_link);
 					porderskuService.save(thePOrderSKU);
-				} 
+				} else {
+					//Update SL SKU trong lenh tang theo SL moi
+					for(POrder_Product_SKU theSKU:lstPOrderSKU){
+						theSKU.setPquantity_total(
+								(null != theSKU.getPquantity_total()?theSKU.getPquantity_total():0) + 
+								(null !=thePOrderSKU.getPquantity_total()?thePOrderSKU.getPquantity_total():0));
+					}
+				}
 			}
 			
 			updateTotalOrder(entity.porderid_link);
@@ -439,6 +448,7 @@ public class POrderAPI {
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 		} catch (Exception e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
@@ -459,6 +469,7 @@ public class POrderAPI {
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 		} catch (Exception e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);

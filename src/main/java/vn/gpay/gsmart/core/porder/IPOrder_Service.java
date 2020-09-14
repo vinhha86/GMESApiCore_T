@@ -24,5 +24,7 @@ public interface IPOrder_Service extends Operations<POrder> {
 	public List<POrder> getPOrderListBySearch(String style, Long buyerid, Long vendorid, Date orderdatefrom, Date orderdateto, Long status, Long granttoorgid_link);
 	POrder get_oneby_po_org_product(long orgrootid_link, long granttoorgid_link, long pcontract_poid_link,
 			long productid_link);
+	List<POrder> getByContractAndPO_Granted(Long pcontractid_link, Long pcontract_poid_link);
+	List<POrder> getByPOAndProduct(Long pcontract_poid_link, Long productid_link);
 
 }

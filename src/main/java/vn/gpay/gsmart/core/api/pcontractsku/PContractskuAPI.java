@@ -125,6 +125,28 @@ public class PContractskuAPI {
 		return new ResponseEntity<PContractSKU_getbyproduct_response>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/getposku_free_byproduct",method = RequestMethod.POST)
+	public ResponseEntity<PContractSKU_getbyproduct_response> getPOSKU_Free_ByProduct
+	(HttpServletRequest request, @RequestBody PContractSKU_getbypo_request entity ) {
+		PContractSKU_getbyproduct_response response = new PContractSKU_getbyproduct_response();
+		try {
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//			long orgrootid_link = user.getRootorgid_link();
+//			long pcontractid_link = entity.pcontractid_link;
+			long pcontract_poid_link = entity.pcontract_poid_link;
+			long productid_link = entity.productid_link;
+			
+			response.data = pskuservice.getPOSKU_Free_ByProduct(productid_link, pcontract_poid_link);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		}
+		catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		
+		return new ResponseEntity<PContractSKU_getbyproduct_response>(response, HttpStatus.OK);
+	}	
 	@RequestMapping(value = "/update",method = RequestMethod.POST)
 	public ResponseEntity<PContractSKU_update_response> SKU_Update
 	(HttpServletRequest request, @RequestBody PContractSKU_update_request entity ) {

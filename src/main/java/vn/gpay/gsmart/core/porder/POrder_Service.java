@@ -49,12 +49,26 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 	public List<POrder> getByContractAndProduct(Long pcontractid_link, Long productid_link){
 		return repo.getByContractAndProduct(pcontractid_link,productid_link);
 	}
-	
+	@Override
+	public List<POrder> getByPOAndProduct(Long pcontract_poid_link, Long productid_link){
+		return repo.getByPOAndProduct(pcontract_poid_link,productid_link);
+	}	
 	@Override
 	public List<POrder> getByContractAndPO(Long pcontractid_link, Long pcontract_poid_link){
 		return repo.getByContractAndPO(pcontractid_link,pcontract_poid_link);
 	}
-	
+	@Override
+	public List<POrder> getByContractAndPO_Granted(Long pcontractid_link, Long pcontract_poid_link) {
+//		// TODO Auto-generated method stub
+//		Specification<POrder> specification = Specifications.<POrder>and()
+//				.ge("status", 0)
+//				.eq("pcontractid_link", pcontractid_link)
+//	            .eq("pcontract_poid_link", pcontract_poid_link)
+//	            .build();
+//		List<POrder> a = repo.findAll(specification);
+//		return a;
+		return repo.getByContractAndPO_Granted(pcontractid_link,pcontract_poid_link);
+	}	
 	@Override
 	public List<POrder> getByPOrder_Req(Long pcontract_poid_link, Long porderreqid_link){
 		return repo.getByPOrder_Req(pcontract_poid_link,porderreqid_link);
