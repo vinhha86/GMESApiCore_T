@@ -625,6 +625,15 @@ public class POrder implements Serializable {
 	public void setFinishdate_fact(Date finishdate_fact) {
 		this.finishdate_fact = finishdate_fact;
 	}
+
+	public List<POrderGrant> getList_pordergrant() {
+		return list_pordergrant;
+	}
+
+	public void setList_pordergrant(List<POrderGrant> list_pordergrant) {
+		this.list_pordergrant = list_pordergrant;
+	}
+	
 	
 	
 //	public Long getPorder_statusid_link() {

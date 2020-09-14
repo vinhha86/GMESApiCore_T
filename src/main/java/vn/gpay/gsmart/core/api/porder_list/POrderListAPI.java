@@ -272,6 +272,25 @@ public class POrderListAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/getallproductskubyporder",method = RequestMethod.POST)
+	public ResponseEntity<POrderList_getProductSKUbyPorder_response> getAllProductSKUbyPorder(@RequestBody POrderList_getProductSKUbyPorder_request entity, HttpServletRequest request ) {
+		POrderList_getProductSKUbyPorder_response response = new POrderList_getProductSKUbyPorder_response();
+		try {
+			response.data = new ArrayList<POrder_Product_SKU>();
+			List<POrder_Product_SKU> porderProductSkus = porderskuService.getby_porder(entity.porderid);
+			
+			response.data = porderProductSkus;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<POrderList_getProductSKUbyPorder_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<POrderList_getProductSKUbyPorder_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@RequestMapping(value = "/addskutogrant",method = RequestMethod.POST)
 	public ResponseEntity<addskutogrant_response> addSkuToGrant(@RequestBody POrderList_addSkuToGrant_request entity, HttpServletRequest request ) {
 		addskutogrant_response response = new addskutogrant_response();
@@ -286,12 +305,13 @@ public class POrderListAPI {
 				POrder_Product_SKU pps = porderskuService.findOne(productsku_id);
 				POrderGrant_SKU pgs = null;
 				
-				for(POrderGrant pg : listGrant) {
-					pgs = pordergrantskuService.getPOrderGrant_SKUbySKUid_linkAndGrantId( pps.getSkuid_link(),  pg.getId());
-					if(pgs == null) continue;
-					if(pgs != null) break;
-				}
+//				for(POrderGrant pg : listGrant) {
+//					pgs = pordergrantskuService.getPOrderGrant_SKUbySKUid_linkAndGrantId( pps.getSkuid_link(),  pg.getId());
+//					if(pgs == null) continue;
+//					if(pgs != null) break;
+//				}
 				
+				pgs = pordergrantskuService.getPOrderGrant_SKUbySKUid_linkAndGrantId( pps.getSkuid_link(),  entity.idGrant);
 				
 				if(pgs == null) {
 					pgs = new POrderGrant_SKU();
@@ -299,11 +319,28 @@ public class POrderListAPI {
 					pgs.setOrgrootid_link(user.getRootorgid_link());
 					pgs.setPordergrantid_link(entity.idGrant);
 					pgs.setSkuid_link(pps.getSkuid_link());
-					pgs.setGrantamount(pps.getPquantity_total());
+					pgs.setGrantamount(pps.getRemainQuantity());
 					pordergrantskuService.save(pgs);
 				}else {
-					pgs.setPordergrantid_link(entity.idGrant);
-					pordergrantskuService.save(pgs);
+					System.out.println(pgs.getPordergrantid_link());
+					System.out.println(entity.idGrant);
+					if(pgs.getPordergrantid_link().equals(entity.idGrant)) {
+						System.out.println("bang nhau");
+						pgs.setOrgrootid_link(user.getRootorgid_link());
+						pgs.setPordergrantid_link(entity.idGrant);
+						pgs.setSkuid_link(pps.getSkuid_link());
+						pgs.setGrantamount(pgs.getGrantamount() + pps.getRemainQuantity());
+						pordergrantskuService.save(pgs);
+					}else {
+						System.out.println("ko bang nhau");
+						pgs = new POrderGrant_SKU();
+						pgs.setId(0L);
+						pgs.setOrgrootid_link(user.getRootorgid_link());
+						pgs.setPordergrantid_link(entity.idGrant);
+						pgs.setSkuid_link(pps.getSkuid_link());
+						pgs.setGrantamount(pps.getRemainQuantity());
+						pordergrantskuService.save(pgs);
+					}
 				}
 				
 			}
@@ -348,4 +385,107 @@ public class POrderListAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/removeskufromgrant",method = RequestMethod.POST)
+	public ResponseEntity<addskutogrant_response> removeSkuFromGrant(@RequestBody POrderList_addSkuToGrant_request entity, HttpServletRequest request ) {
+		addskutogrant_response response = new addskutogrant_response();
+		try {
+			POrderGrant grant = pordergrantService.findOne(entity.idGrant);
+			POrder porder = porderService.findOne(entity.idPOrder);
+			// save to porder_grant_sku
+			List<Long> idGrantSkus = entity.idSkus;
+			for(Long idGrantSku : idGrantSkus) {
+				pordergrantskuService.deleteById(idGrantSku);
+			}
+			
+			// re-calculate porder_grant grant_amount
+			List<POrderGrant> pglist = pordergrantService.getByOrderId(entity.idPOrder);
+			
+			for(POrderGrant pg : pglist) {
+				Integer grantamountSum = 0;
+				
+				List<POrderGrant_SKU> pgslist = pordergrantskuService.getPOrderGrant_SKU(pg.getId());
+				for(POrderGrant_SKU pgs : pgslist) {
+					grantamountSum+=pgs.getGrantamount();
+				}
+				
+				pg.setGrantamount(grantamountSum);
+				pordergrantService.save(pg);
+			}
+			
+			String name = "";
+			int total = grant.getGrantamount() == null ? 0 : grant.getGrantamount();
+			
+			DecimalFormat decimalFormat = new DecimalFormat("#,###");
+			decimalFormat.setGroupingSize(3);
+			
+			if(porder != null) {
+				float totalPO = porder.getPo_quantity() == null ? 0 : porder.getPo_quantity();
+				String ST = porder.getBuyername() == null ? "" : porder.getBuyername();
+				String PO = porder.getPo_buyer() == null ? "" : porder.getPo_vendor();
+				name += "#"+ST+"-PO: "+PO+"-"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
+			}
+			
+			response.porderinfo = name;
+			response.amount = total;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<addskutogrant_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<addskutogrant_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/savegrantskuonchange",method = RequestMethod.POST)
+	public ResponseEntity<addskutogrant_response> saveGrantSkuOnChange(@RequestBody POrderList_saveGrantSkuOnChange_request entity, HttpServletRequest request ) {
+		addskutogrant_response response = new addskutogrant_response();
+		try {
+			POrderGrant grant = pordergrantService.findOne(entity.idGrant);
+			POrder porder = porderService.findOne(entity.idPOrder);
+			// save to porder_grant_sku
+			POrderGrant_SKU pordergrantsku = entity.data;
+			pordergrantskuService.save(pordergrantsku);
+			
+			// re-calculate porder_grant grant_amount
+			List<POrderGrant> pglist = pordergrantService.getByOrderId(entity.idPOrder);
+			
+			for(POrderGrant pg : pglist) {
+				Integer grantamountSum = 0;
+				
+				List<POrderGrant_SKU> pgslist = pordergrantskuService.getPOrderGrant_SKU(pg.getId());
+				for(POrderGrant_SKU pgs : pgslist) {
+					grantamountSum+=pgs.getGrantamount();
+				}
+				
+				pg.setGrantamount(grantamountSum);
+				pordergrantService.save(pg);
+			}
+			
+			String name = "";
+			int total = grant.getGrantamount() == null ? 0 : grant.getGrantamount();
+			
+			DecimalFormat decimalFormat = new DecimalFormat("#,###");
+			decimalFormat.setGroupingSize(3);
+			
+			if(porder != null) {
+				float totalPO = porder.getPo_quantity() == null ? 0 : porder.getPo_quantity();
+				String ST = porder.getBuyername() == null ? "" : porder.getBuyername();
+				String PO = porder.getPo_buyer() == null ? "" : porder.getPo_vendor();
+				name += "#"+ST+"-PO: "+PO+"-"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
+			}
+			
+			response.porderinfo = name;
+			response.amount = total;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<addskutogrant_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<addskutogrant_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 }
