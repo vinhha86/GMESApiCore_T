@@ -536,7 +536,6 @@ public class Common  {
 				for(Holiday holiday : list_holiday) {
 					Calendar day = Calendar.getInstance();
 					day.setTime(holiday.getDay());
-					day.setTimeZone(start.getTimeZone());
 					if(CompareDate(start, day)) {
 						check = true;
 						break;
@@ -589,8 +588,6 @@ public class Common  {
 		return _date.getTime();
 	}
 	public Date Date_Add_with_holiday(Date date, int amount, long orgrootid_link, int year) {
-		int count = 0;
-		
 		Calendar _date = Calendar.getInstance();
 		_date.setTime(date);
 		
@@ -601,10 +598,10 @@ public class Common  {
 			}
 		}
 		else {
-			while(count < amount-1) {
+			while(amount > 0) {
 				_date.add(Calendar.DATE, 1);
 				if(!check_dayoff(_date, orgrootid_link, year)) {
-					count++;
+					amount--;
 				}
 			}
 		}
