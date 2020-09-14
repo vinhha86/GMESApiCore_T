@@ -70,8 +70,8 @@ public class POrderGrant implements Serializable {
 	private Date finish_date_plan;
 
 	@NotFound(action = NotFoundAction.IGNORE)
-	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
-	@JoinColumn( name="pordergrantid_link", referencedColumnName="id")
+	@OneToMany
+	@JoinColumn( name="pordergrantid_link",insertable=false,updatable =false)
 	private List<POrderGrant_SKU>  porder_grant_sku  = new ArrayList<>();
 	
 	@NotFound(action = NotFoundAction.IGNORE)

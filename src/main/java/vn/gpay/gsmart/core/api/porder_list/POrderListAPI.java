@@ -444,7 +444,24 @@ public class POrderListAPI {
 			POrder porder = porderService.findOne(entity.idPOrder);
 			// save to porder_grant_sku
 			POrderGrant_SKU pordergrantsku = entity.data;
-			pordergrantskuService.save(pordergrantsku);
+			POrderGrant_SKU original = pordergrantskuService.findOne(pordergrantsku.getId());
+			List<POrder_Product_SKU> porderproductskus = porderskuService.getby_porderandsku(entity.idPOrder, pordergrantsku.getSkuid_link());
+			POrder_Product_SKU porderproductsku = porderproductskus.get(0);
+			int remain = porderproductsku.getRemainQuantity();
+			
+			if(pordergrantsku.getGrantamount() == 0) {
+				// delete
+				System.out.println(pordergrantsku.getId());
+				pordergrantskuService.deleteById(pordergrantsku.getId());
+				response.setMessage("Xóa thành công");
+			}else {
+				if(remain < pordergrantsku.getGrantamount() - original.getGrantamount()) {
+					response.setMessage("Vượt quá số lượng chưa vào chuyền");
+				}else {
+					pordergrantskuService.save(pordergrantsku);
+					response.setMessage("Lưu thành công");
+				}
+			}
 			
 			// re-calculate porder_grant grant_amount
 			List<POrderGrant> pglist = pordergrantService.getByOrderId(entity.idPOrder);
@@ -478,7 +495,7 @@ public class POrderListAPI {
 			response.amount = total;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+//			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<addskutogrant_response>(response,HttpStatus.OK);
 		}catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);

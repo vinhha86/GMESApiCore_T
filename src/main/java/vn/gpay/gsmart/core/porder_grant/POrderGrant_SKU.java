@@ -43,6 +43,13 @@ public class POrderGrant_SKU implements Serializable {
 	@ManyToOne
     @JoinColumn(name="skuid_link",insertable=false,updatable =false)
     private SKU sku;
+
+	@Transient
+	public int getSort_size() {
+		if(sku!=null)
+			return sku.getSort_size();
+		return 0;
+	}
 	
 	@Transient
 	@JsonProperty("skucode")

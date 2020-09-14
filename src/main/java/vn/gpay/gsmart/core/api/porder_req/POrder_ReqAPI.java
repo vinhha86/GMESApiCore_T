@@ -236,11 +236,7 @@ public class POrder_ReqAPI {
 					
 					List<POrder_Req> result = new ArrayList<POrder_Req>();
 					for(POrder_Req pr : a) {
-						long porderreqid_link = pr.getId();
-						long pcontract_poid_link = pr.getPcontract_poid_link();
-						List<POrder> p = porderService.getByPOrder_Req(pcontract_poid_link, porderreqid_link);
-						
-						if(p.size() == 0)
+						if(pr.getPorderlist().size() == 0)
 							result.add(pr);
 					}
 					
@@ -254,11 +250,7 @@ public class POrder_ReqAPI {
 				
 				List<POrder_Req> result = new ArrayList<POrder_Req>();
 				for(POrder_Req pr : a) {
-					long porderreqid_link = pr.getId();
-					long pcontract_poid_link = pr.getPcontract_poid_link();
-					List<POrder> p = porderService.getByPOrder_Req(pcontract_poid_link, porderreqid_link);
-					
-					if(p.size() == 0)
+					if(pr.getPorderlist().size() == 0)
 						result.add(pr);
 				}
 				
