@@ -1135,6 +1135,7 @@ public class ScheduleAPI {
 		int producttivity = entity.producttivity;
 		
 		try {
+			//Kiem tra so luong tung sku xem co bi vuot qua kho
 			//Cập nhật lại grant cũ sau khi tách
 			POrderGrant grant_old = granttService.findOne(entity.pordergrant_id_link);
 			
