@@ -298,7 +298,7 @@ public class POrderListAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			POrderGrant grant = pordergrantService.findOne(entity.idGrant);
 			POrder porder = porderService.findOne(entity.idPOrder);
-			List<POrderGrant> listGrant = pordergrantService.getByOrderId(entity.idPOrder);
+//			List<POrderGrant> listGrant = pordergrantService.getByOrderId(entity.idPOrder);
 			
 			// save to porder_grant_sku
 			for(Long productsku_id : entity.idSkus) {
@@ -325,14 +325,12 @@ public class POrderListAPI {
 					System.out.println(pgs.getPordergrantid_link());
 					System.out.println(entity.idGrant);
 					if(pgs.getPordergrantid_link().equals(entity.idGrant)) {
-						System.out.println("bang nhau");
 						pgs.setOrgrootid_link(user.getRootorgid_link());
 						pgs.setPordergrantid_link(entity.idGrant);
 						pgs.setSkuid_link(pps.getSkuid_link());
 						pgs.setGrantamount(pgs.getGrantamount() + pps.getRemainQuantity());
 						pordergrantskuService.save(pgs);
 					}else {
-						System.out.println("ko bang nhau");
 						pgs = new POrderGrant_SKU();
 						pgs.setId(0L);
 						pgs.setOrgrootid_link(user.getRootorgid_link());
