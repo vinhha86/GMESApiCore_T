@@ -90,11 +90,13 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 		Specification<PContract> specification = Specifications.<PContract>and()
 	            .eq(entity.orgbuyerid_link > 0, "orgbuyerid_link", entity.orgbuyerid_link)
 	            .eq(entity.orgvendorid_link > 0, "orgvendorid_link", entity.orgvendorid_link)
-	            .eq(Objects.nonNull(entity.contractbuyer_year), "contractbuyer.contract_year", entity.contractbuyer_year)
+//	            .eq(Objects.nonNull(entity.contractbuyer_year), "contractbuyer.contract_year", entity.contractbuyer_year)
+	            .ge(Objects.nonNull(entity.contractbuyer_yearfrom), "contractbuyer.contract_year", entity.contractbuyer_yearfrom)
+	            .le(Objects.nonNull(entity.contractbuyer_yearto), "contractbuyer.contract_year", entity.contractbuyer_yearto)
 	            .build();
 		
 		Sort sort = Sorts.builder()
-		        .asc("contractcode")
+		        .desc("contractdate")
 		        .build();
 		
 		List<PContract> lst = repo.findAll(specification, sort);

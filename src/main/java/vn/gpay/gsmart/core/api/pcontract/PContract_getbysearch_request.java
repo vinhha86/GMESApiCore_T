@@ -8,5 +8,6 @@ public class PContract_getbysearch_request extends RequestBase {
 	public Integer orgbuyerid_link;
 	public Integer orgvendorid_link;
 	public String contractbuyer_code;
-	public Integer contractbuyer_year;
+	public Integer contractbuyer_yearfrom;
+	public Integer contractbuyer_yearto;
 }
