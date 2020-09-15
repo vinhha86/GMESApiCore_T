@@ -106,6 +106,9 @@ public class POrderAPI {
 				porder.setGolivedate(thePO.getShipdate());
 				porder.setProductiondate(thePO.getProductiondate());
 				
+				porder.setFinishdate_plan(thePO.getShipdate());
+				porder.setProductiondate_plan(thePO.getProductiondate());
+				
 				porder.setOrgrootid_link(orgrootid_link);
 				porder.setOrderdate(new Date());
 				porder.setUsercreatedid_link(user.getId());
