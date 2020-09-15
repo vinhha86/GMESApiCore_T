@@ -1156,7 +1156,7 @@ public class ScheduleAPI {
 				start_old = commonService.getBeginOfDate(start_old);
 				int duration_old = (int)Math.ceil(totalorder_old/producttivity);
 				duration_old = duration_old < 1 ? 1 : duration_old;
-				int porductivity_old = commonService.getProductivity(totalorder_old, duration_old);
+//				int porductivity_old = commonService.getProductivity(totalorder_old, duration_old);
 				
 				Date end_old = commonService.Date_Add_with_holiday(start_old, duration_old - 1, orgrootid_link, year);
 				end_old = commonService.getEndOfDate(end_old);
@@ -1177,7 +1177,7 @@ public class ScheduleAPI {
 				Schedule_porder old = new Schedule_porder();
 				old.setEndDate(end_old);
 				old.setDuration(duration_old);
-				old.setProductivity(porductivity_old);
+				old.setProductivity(producttivity);
 				old.setName(grant_old.getMaHang());
 				old.setMahang(grant_old.getMaHang());
 				response.old_data = old;
@@ -1187,10 +1187,10 @@ public class ScheduleAPI {
 				start_new= commonService.getBeginOfDate(start_new);
 				
 				int total_new = total - totalorder_old;
-				int duration_new = (int)Math.ceil(total_new/producttivity);
+				int duration_new = ((int)Math.ceil(total_new/producttivity) + (total_new % producttivity == 0 ? 0 : 1));
 				Date end_new = commonService.Date_Add_with_holiday(start_new, duration_new - 1, orgrootid_link, year);
 				end_new = commonService.getEndOfDate(end_new);
-				int productivity_new  = (int)Math.ceil(total_new/duration_new);
+//				int productivity_new  = (int)Math.ceil(total_new/duration_new);
 				
 //				int productivity = commonService.getProductivity(entity.quantity, duration_new);
 				
@@ -1238,7 +1238,7 @@ public class ScheduleAPI {
 				new_data.setStartDate(start_new);
 				new_data.setDuration(duration_new);
 				new_data.setTotalpackage(total_new);
-				new_data.setProductivity(productivity_new);
+				new_data.setProductivity(producttivity);
 				new_data.setVendorname(grant_old.getVendorname());
 				new_data.setBuyername(grant_old.getBuyername());
 				new_data.setPordercode(grant_old.getOrdercode());
