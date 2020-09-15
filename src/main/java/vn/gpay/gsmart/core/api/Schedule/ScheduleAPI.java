@@ -1133,109 +1133,137 @@ public class ScheduleAPI {
 		long orgrootid_link = user.getRootorgid_link();
 		int year = Calendar.getInstance().get(Calendar.YEAR);
 		int producttivity = entity.producttivity;
-		
+		response.mes = "";
 		try {
-			//Kiem tra so luong tung sku xem co bi vuot qua kho
-			//Cập nhật lại grant cũ sau khi tách
-			POrderGrant grant_old = granttService.findOne(entity.pordergrant_id_link);
-			
-			int total = grant_old.getGrantamount();
-			int totalorder_old = grant_old.getGrantamount() - entity.quantity;
-			Date start_old = grant_old.getStart_date_plan();
-			start_old = commonService.getBeginOfDate(start_old);
-			int duration_old = (int)Math.ceil(totalorder_old/producttivity);
-			duration_old = duration_old < 1 ? 1 : duration_old;
-			int porductivity_old = commonService.getProductivity(totalorder_old, duration_old);
-			
-			Date end_old = commonService.Date_Add_with_holiday(start_old, duration_old - 1, orgrootid_link, year);
-			end_old = commonService.getEndOfDate(end_old);
-//			Date end_new = grant_old.getFinish_date_plan();
-//			int productivity_old = commonService.getProductivity(totalorder_old, duration_old);
-						
-			grant_old.setGrantamount(totalorder_old);
-			grant_old.setFinish_date_plan(end_old);
-			grant_old = granttService.save(grant_old);
-			
-			//Cap nhat lai Processing cu sau khi tach
-			List<POrderProcessing> lsProcessing = processService.getByOrderId_and_GrantId(grant_old.getPorderid_link(), grant_old.getId());
-			for(POrderProcessing process : lsProcessing) {
-				process.setTotalorder(totalorder_old);
-				processService.save(process);
+			//Kiem tra so luong tung sku xem co bi vuot qua khong
+			List<POrderGrant_SKU> list_sku = entity.data;
+			for (POrderGrant_SKU pOrderGrant_SKU : list_sku) {
+				POrderGrant_SKU sku = grantskuService.getPOrderGrant_SKUbySKUid_linkAndGrantId(pOrderGrant_SKU.getSkuid_link(), pOrderGrant_SKU.getPordergrantid_link());
+				if(pOrderGrant_SKU.getGrantamount() > sku.getGrantamount()) {
+					response.mes = "Bạn không được tách vượt quá số lượng đang được giao cho tổ!";
+					response.sku = grantskuService.getPOrderGrant_SKU(pOrderGrant_SKU.getPordergrantid_link());
+					break;
+				}
 			}
 			
-			Schedule_porder old = new Schedule_porder();
-			old.setEndDate(end_old);
-			old.setDuration(duration_old);
-			old.setProductivity(porductivity_old);
-			old.setName(grant_old.getMaHang());
-			old.setMahang(grant_old.getMaHang());
-			response.old_data = old;
-			
-			//Sinh grant moi
-			Date start_new = commonService.Date_Add_with_holiday(end_old, 1, orgrootid_link, year);
-			start_new= commonService.getBeginOfDate(start_new);
-			
-			int total_new = total - totalorder_old;
-			int duration_new = (int)Math.ceil(total_new/producttivity);
-			Date end_new = commonService.Date_Add_with_holiday(start_new, duration_new - 1, orgrootid_link, year);
-			end_new = commonService.getEndOfDate(end_new);
-			int productivity_new  = (int)Math.ceil(total_new/duration_new);
-			
-//			int productivity = commonService.getProductivity(entity.quantity, duration_new);
-			
-			POrderGrant grant = new POrderGrant();
-			grant.setGranttoorgid_link(grant_old.getGranttoorgid_link());
-			grant.setId(null);
-			grant.setOrdercode(grant_old.getOrdercode());
-			grant.setOrgrootid_link(orgrootid_link);
-			grant.setPorderid_link(grant_old.getPorderid_link());
-			grant.setTimecreated(new Date());
-			grant.setUsercreatedid_link(user.getId());
-			grant.setGrantdate(new Date());
-			grant.setGrantamount(total_new);
-			grant.setStatus(1);
-			grant.setOrgrootid_link(orgrootid_link);
-			grant.setStart_date_plan(start_new);
-			grant.setFinish_date_plan(end_new);
-			grant = granttService.save(grant);
-			
-			POrder porder = porderService.findOne(entity.porderid_link);
-			
-			//Sinh 1 dong moi trong Processing
-			POrderProcessing process = new POrderProcessing();
-			process.setId(null);
-//			process.setOrdercode(porder.getOrdercode());
-			process.setOrderdate(porder.getOrderdate());
-			process.setOrgrootid_link(orgrootid_link);
-			process.setPorderid_link(porder.getId());
-			process.setPordergrantid_link(grant.getId());
-			process.setProcessingdate(new Date());
-			process.setGranttoorgid_link(grant.getGranttoorgid_link());
-			process.setTotalorder(grant.getGrantamount());
-			process.setStatus(POrderStatus.PORDER_STATUS_GRANTED);
-			process.setUsercreatedid_link(user.getId());
-			process.setTimecreated(new Date());
-			processService.save(process);
-			
-			Schedule_porder new_data = new Schedule_porder();
-			new_data.setCls(grant_old.getCls());
-			new_data.setEndDate(end_new);
-			new_data.setId_origin(grant_old.getPorderid_link());
-			new_data.setMahang(grant.getMaHang(porder));
-			new_data.setName(grant.getMaHang(porder));
-			new_data.setResourceId(entity.resourceid);
-			new_data.setStartDate(start_new);
-			new_data.setDuration(duration_new);
-			new_data.setTotalpackage(total_new);
-			new_data.setProductivity(productivity_new);
-			new_data.setVendorname(grant_old.getVendorname());
-			new_data.setBuyername(grant_old.getBuyername());
-			new_data.setPordercode(grant_old.getOrdercode());
-			new_data.setParentid_origin(entity.parentid_origin);
-			new_data.setStatus(1);
-			new_data.setPorder_grantid_link(grant.getId());
-			new_data.setPorderid_link(grant.getPorderid_link());
-			response.new_data = new_data;
+			if(response.mes == "") {
+				//Cập nhật lại grant cũ sau khi tách
+				POrderGrant grant_old = granttService.findOne(entity.pordergrant_id_link);
+				
+				int total = grant_old.getGrantamount();
+				int totalorder_old = grant_old.getGrantamount() - entity.quantity;
+				Date start_old = grant_old.getStart_date_plan();
+				start_old = commonService.getBeginOfDate(start_old);
+				int duration_old = (int)Math.ceil(totalorder_old/producttivity);
+				duration_old = duration_old < 1 ? 1 : duration_old;
+				int porductivity_old = commonService.getProductivity(totalorder_old, duration_old);
+				
+				Date end_old = commonService.Date_Add_with_holiday(start_old, duration_old - 1, orgrootid_link, year);
+				end_old = commonService.getEndOfDate(end_old);
+//				Date end_new = grant_old.getFinish_date_plan();
+//				int productivity_old = commonService.getProductivity(totalorder_old, duration_old);
+							
+				grant_old.setGrantamount(totalorder_old);
+				grant_old.setFinish_date_plan(end_old);
+				grant_old = granttService.save(grant_old);
+				
+				//Cap nhat lai Processing cu sau khi tach
+				List<POrderProcessing> lsProcessing = processService.getByOrderId_and_GrantId(grant_old.getPorderid_link(), grant_old.getId());
+				for(POrderProcessing process : lsProcessing) {
+					process.setTotalorder(totalorder_old);
+					processService.save(process);
+				}
+				
+				Schedule_porder old = new Schedule_porder();
+				old.setEndDate(end_old);
+				old.setDuration(duration_old);
+				old.setProductivity(porductivity_old);
+				old.setName(grant_old.getMaHang());
+				old.setMahang(grant_old.getMaHang());
+				response.old_data = old;
+				
+				//Sinh grant moi
+				Date start_new = commonService.Date_Add_with_holiday(end_old, 1, orgrootid_link, year);
+				start_new= commonService.getBeginOfDate(start_new);
+				
+				int total_new = total - totalorder_old;
+				int duration_new = (int)Math.ceil(total_new/producttivity);
+				Date end_new = commonService.Date_Add_with_holiday(start_new, duration_new - 1, orgrootid_link, year);
+				end_new = commonService.getEndOfDate(end_new);
+				int productivity_new  = (int)Math.ceil(total_new/duration_new);
+				
+//				int productivity = commonService.getProductivity(entity.quantity, duration_new);
+				
+				POrderGrant grant = new POrderGrant();
+				grant.setGranttoorgid_link(grant_old.getGranttoorgid_link());
+				grant.setId(null);
+				grant.setOrdercode(grant_old.getOrdercode());
+				grant.setOrgrootid_link(orgrootid_link);
+				grant.setPorderid_link(grant_old.getPorderid_link());
+				grant.setTimecreated(new Date());
+				grant.setUsercreatedid_link(user.getId());
+				grant.setGrantdate(new Date());
+				grant.setGrantamount(total_new);
+				grant.setStatus(1);
+				grant.setOrgrootid_link(orgrootid_link);
+				grant.setStart_date_plan(start_new);
+				grant.setFinish_date_plan(end_new);
+				grant = granttService.save(grant);
+				
+				POrder porder = porderService.findOne(entity.porderid_link);
+				
+				//Sinh 1 dong moi trong Processing
+				POrderProcessing process = new POrderProcessing();
+				process.setId(null);
+//				process.setOrdercode(porder.getOrdercode());
+				process.setOrderdate(porder.getOrderdate());
+				process.setOrgrootid_link(orgrootid_link);
+				process.setPorderid_link(porder.getId());
+				process.setPordergrantid_link(grant.getId());
+				process.setProcessingdate(new Date());
+				process.setGranttoorgid_link(grant.getGranttoorgid_link());
+				process.setTotalorder(grant.getGrantamount());
+				process.setStatus(POrderStatus.PORDER_STATUS_GRANTED);
+				process.setUsercreatedid_link(user.getId());
+				process.setTimecreated(new Date());
+				processService.save(process);
+				
+				Schedule_porder new_data = new Schedule_porder();
+				new_data.setCls(grant_old.getCls());
+				new_data.setEndDate(end_new);
+				new_data.setId_origin(grant_old.getPorderid_link());
+				new_data.setMahang(grant.getMaHang(porder));
+				new_data.setName(grant.getMaHang(porder));
+				new_data.setResourceId(entity.resourceid);
+				new_data.setStartDate(start_new);
+				new_data.setDuration(duration_new);
+				new_data.setTotalpackage(total_new);
+				new_data.setProductivity(productivity_new);
+				new_data.setVendorname(grant_old.getVendorname());
+				new_data.setBuyername(grant_old.getBuyername());
+				new_data.setPordercode(grant_old.getOrdercode());
+				new_data.setParentid_origin(entity.parentid_origin);
+				new_data.setStatus(1);
+				new_data.setPorder_grantid_link(grant.getId());
+				new_data.setPorderid_link(grant.getPorderid_link());
+				response.new_data = new_data;
+				 
+				//gan sku vao grant moi sinh ra va tru sku o grant tach
+				
+				for (POrderGrant_SKU pOrderGrant_SKU : list_sku) {
+					POrderGrant_SKU sku = new POrderGrant_SKU();
+					sku.setGrantamount(pOrderGrant_SKU.getGrantamount());
+					sku.setId(null);
+					sku.setOrgrootid_link(orgrootid_link);
+					sku.setPordergrantid_link(grant.getId());
+					sku.setSkuid_link(pOrderGrant_SKU.getSkuid_link());
+					grantskuService.save(sku);
+					
+					POrderGrant_SKU sku_old = grantskuService.getPOrderGrant_SKUbySKUid_linkAndGrantId(pOrderGrant_SKU.getSkuid_link(), pOrderGrant_SKU.getPordergrantid_link());
+					sku_old.setGrantamount(sku_old.getGrantamount() - pOrderGrant_SKU.getGrantamount());
+					grantskuService.save(sku_old);
+				}
+			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
