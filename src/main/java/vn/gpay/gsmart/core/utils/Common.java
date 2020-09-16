@@ -553,6 +553,11 @@ public class Common  {
 		return duration;
 	}
 	
+	public int getDuration_byProductivity(int total, int productivity) {
+		int duration = ((int)Math.ceil(total/productivity) + (total % productivity == 0 ? 0 : 1));
+		return duration;
+	}
+	
 	public int getProductivity(int total, int duration) {
 		if(duration ==0 ) return total;
 		

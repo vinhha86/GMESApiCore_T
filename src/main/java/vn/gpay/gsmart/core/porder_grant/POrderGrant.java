@@ -66,8 +66,25 @@ public class POrderGrant implements Serializable {
     private Date timecreated;
 	
 	private Date start_date_plan;
-	private Date finish_date_plan;
+	private Date finish_date_plan;	
 
+	private Integer productivity;
+	private Integer duration;
+	
+	
+
+	public Integer getProductivity() {
+		return productivity;
+	}
+	public void setProductivity(Integer productivity) {
+		this.productivity = productivity;
+	}
+	public Integer getDuration() {
+		return duration;
+	}
+	public void setDuration(Integer duration) {
+		this.duration = duration;
+	}
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
 	@JoinColumn( name="pordergrantid_link",insertable=false,updatable =false)

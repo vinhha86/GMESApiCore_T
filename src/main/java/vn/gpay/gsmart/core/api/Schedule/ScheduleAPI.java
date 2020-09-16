@@ -222,8 +222,8 @@ public class ScheduleAPI {
 						else if (start_free.before(date_start))
 							date_start = start_free;
 						
-						int duration = commonService.getDuration(start, end, orgrootid_link, year);
-						int productivity = commonService.getProductivity(pordergrant.getGrantamount(), duration); 
+						int duration = pordergrant.getDuration();
+						int productivity = pordergrant.getProductivity();
 						
 						Schedule_porder sch_porder = new Schedule_porder();
 						sch_porder.setCls(pordergrant.getCls());
@@ -352,8 +352,8 @@ public class ScheduleAPI {
 					for(POrderGrant pordergrant : list_porder_test) {
 						Date start = commonService.getBeginOfDate(pordergrant.getStart_date_plan());
 						Date end = commonService.getEndOfDate(pordergrant.getFinish_date_plan());
-						int duration = commonService.getDuration(start, end, orgrootid_link, year);
-						int productivity = commonService.getProductivity(pordergrant.getGrantamount(), duration); 
+						int duration = pordergrant.getDuration();
+						int productivity = pordergrant.getProductivity(); 
 						
 						Schedule_porder sch_porder = new Schedule_porder();
 						sch_porder.setCls(pordergrant.getCls());
@@ -487,6 +487,8 @@ public class ScheduleAPI {
 			POrderGrant grant = granttService.findOne(pordergrantid_link);
 			grant.setStart_date_plan(entity.data.getStartDate());
 			grant.setFinish_date_plan(commonService.getPrevious(entity.data.getEndDate()));
+			grant.setDuration(duration);
+			grant.setProductivity(productivity);
 			granttService.save(grant);
 			
 			response.data = event;
@@ -512,12 +514,17 @@ public class ScheduleAPI {
 			//update vao grantt
 			long pordergrantid_link = entity.pordergrantid_link;
 			POrderGrant grant = granttService.findOne(pordergrantid_link);
+			int duration = commonService.getDuration(entity.StartDate, entity.EndDate, orgrootid_link, year);
+			int productivity = commonService.getProductivity(grant.getGrantamount(), response.duration);
+			
 			grant.setStart_date_plan(entity.StartDate);
 			grant.setFinish_date_plan(entity.EndDate);
+			grant.setDuration(duration);
+			grant.setProductivity(productivity);
 			granttService.save(grant);
 			
-			response.duration = commonService.getDuration(entity.StartDate, entity.EndDate, orgrootid_link, year);
-			response.productivity = commonService.getProductivity(grant.getGrantamount(), response.duration);
+			response.duration = duration;
+			response.productivity = productivity;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<update_porder_response>(response, HttpStatus.OK);
@@ -544,13 +551,13 @@ public class ScheduleAPI {
 			
 			//Giu lai grantorg cu de update Porder_processing
 //			long granttoorgid_link_old = grant.getGranttoorgid_link();
-			
-			Date end_date = commonService.Date_Add_with_holiday(entity.startdate, (entity.schedule.getDuration() - 1), orgrootid_link, year);
+			int duration = entity.schedule.getDuration();
+			Date end_date = commonService.Date_Add_with_holiday(entity.startdate, duration - 1, orgrootid_link, year);
 			
 			grant.setGranttoorgid_link(entity.orggrant_toid_link);
 			grant.setStart_date_plan(commonService.getBeginOfDate(entity.startdate));
 			grant.setFinish_date_plan(commonService.getEndOfDate(end_date));
-			granttService.save(grant);
+			grant = granttService.save(grant);
 			
 			//Cap nhat lai Porder_processing
 			List<POrderProcessing> lsProcessing = processService.getByOrderId_and_GrantId(porderid_link, pordergrantid_link);
@@ -583,7 +590,7 @@ public class ScheduleAPI {
 //			porderService.save(porder);
 			
 			Schedule_porder sch = entity.schedule;
-			sch.setEndDate(grant.getFinish_date_plan());
+			sch.setEndDate(commonService.getEndOfDate(end_date));
 			sch.setStartDate(grant.getStart_date_plan());
 //			sch.setDuration(commonService.getDuration(grant.getStart_date_plan(), grant.getFinish_date_plan(), orgrootid_link, year));
 //			sch.setProductivity(commonService.getProductivity(grant.getGrantamount(), sch.getDuration()));
@@ -615,6 +622,8 @@ public class ScheduleAPI {
 			POrderGrant grant = granttService.findOne(pordergrantid_link);
 			grant.setStart_date_plan(commonService.getBeginOfDate(entity.data.getStartDate()));
 			grant.setFinish_date_plan(commonService.getEndOfDate(entity.data.getEndDate()));
+			grant.setDuration(entity.data.getDuration());
+			grant.setProductivity(entity.data.getProductivity());
 			granttService.save(grant);
 			
 			Schedule_porder sch = entity.data;
@@ -632,26 +641,6 @@ public class ScheduleAPI {
 		}
 	}
 	
-	@RequestMapping(value = "/gen_pordergrant",method = RequestMethod.POST)
-	public ResponseEntity<gen_pordergrant_response> GenPorderGrant(HttpServletRequest request) {
-		gen_pordergrant_response response = new gen_pordergrant_response();
-		
-		try {
-			POrderGrant grant = new POrderGrant();
-			grant.setId(null);
-			grant = granttService.save(grant);
-			
-			response.id = grant.getId();
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<gen_pordergrant_response>(response, HttpStatus.OK);
-		} catch (Exception e) {
-			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-			response.setMessage(e.getMessage());
-			return new ResponseEntity<gen_pordergrant_response>(response, HttpStatus.OK);
-		}
-	}
-	
 	@RequestMapping(value = "/create_pordergrant",method = RequestMethod.POST)
 	public ResponseEntity<create_pordergrant_response> CreatePorderGrant(HttpServletRequest request,
 			@RequestBody create_pordergrant_request entity) {
@@ -662,6 +651,12 @@ public class ScheduleAPI {
 		
 		try {
 			POrder porder = porderService.findOne(entity.porderid_link);
+
+			Date startDate = commonService.getBeginOfDate(porder.getProductiondate_plan());
+			Date endDate = commonService.getEndOfDate(porder.getFinishdate_plan());
+			int duration = commonService.getDuration(startDate, endDate, orgrootid_link, year);
+			int productivity = commonService.getProductivity(porder.getTotalorder(), duration);
+			
 			porder.setStatus(POrderStatus.PORDER_STATUS_GRANTED);
 			porderService.save(porder);
 			
@@ -679,6 +674,8 @@ public class ScheduleAPI {
 			pg.setStatus(1);
 			pg.setStart_date_plan(porder.getProductiondate_plan());
 			pg.setFinish_date_plan(porder.getFinishdate_plan());
+			pg.setProductivity(productivity);
+			pg.setDuration(duration);
 			
 			pg = granttService.save(pg);
 			
@@ -707,10 +704,6 @@ public class ScheduleAPI {
 			
 			processService.save(pp);
 			
-			Date startDate = commonService.getBeginOfDate(porder.getProductiondate_plan());
-			Date endDate = commonService.getEndOfDate(porder.getFinishdate_plan());
-			int duration = commonService.getDuration(startDate, endDate, orgrootid_link, year);
-			int productivity = commonService.getProductivity(porder.getTotalorder(), duration);
 			
 			Schedule_porder sch = new Schedule_porder();
 			sch.setDuration(duration);
@@ -752,6 +745,7 @@ public class ScheduleAPI {
 		int year = Calendar.getInstance().get(Calendar.YEAR);
 		
 		try {
+
 			POrder_Req req = reqService.findOne(entity.porder_reqid_link);
 			req.setStatus(1);
 			reqService.save(req);
@@ -774,7 +768,12 @@ public class ScheduleAPI {
 			porder.setPorderreqid_link(entity.porder_reqid_link);
 			porder.setTotalorder(req.getTotalorder());
 			porder.setProductid_link(req.getProductid_link());
-			porderService.saveAndFlush(porder);
+			porder = porderService.saveAndFlush(porder);
+			
+			Date startDate = commonService.getBeginOfDate(porder.getProductiondate_plan());
+			Date endDate = commonService.getEndOfDate(porder.getFinishdate_plan());
+			int duration = commonService.getDuration(startDate, endDate, orgrootid_link, year);
+			int productivity = commonService.getProductivity(porder.getTotalorder(), duration);
 			
 			POrderGrant pg = new POrderGrant();
 			pg.setId(null);
@@ -789,12 +788,10 @@ public class ScheduleAPI {
 			pg.setStatus(-1);
 			pg.setStart_date_plan(req.getPO_Productiondate());
 			pg.setFinish_date_plan(req.getShipdate());
+			pg.setProductivity(productivity);
+			pg.setDuration(duration);
 			pg = granttService.save(pg);
 			
-			Date startDate = commonService.getBeginOfDate(porder.getProductiondate_plan());
-			Date endDate = commonService.getEndOfDate(porder.getFinishdate_plan());
-			int duration = commonService.getDuration(startDate, endDate, orgrootid_link, year);
-			int productivity = commonService.getProductivity(porder.getTotalorder(), duration);
 			PContract contract = req.getPcontract();
 			PContract_PO po = req.getPcontract_po();
 			
@@ -1029,17 +1026,12 @@ public class ScheduleAPI {
 			Date start = grant_des.getStart_date_plan();
 			start = commonService.getBeginOfDate(start);
 			
-			int duration_des = commonService.getDuration(start, grant_des.getFinish_date_plan(), orgrootid_link, year);
-			int productivity = commonService.getProductivity(grant_des.getGrantamount(), duration_des);
-			
-			int duration_src = (int)Math.ceil(grant_src.getGrantamount()/productivity);
-			
-			Date end = grant_des.getFinish_date_plan();
-			end = commonService.Date_Add_with_holiday(end, duration_src, orgrootid_link, year);
+			int productivity = grant_des.getProductivity();
+									
+			int duration = commonService.getDuration_byProductivity(total, productivity);
+
+			Date end = commonService.Date_Add_with_holiday(start, duration - 1, orgrootid_link, year);
 			end = commonService.getEndOfDate(end);
-			
-			int duration = duration_des + duration_src;
-			productivity = commonService.getProductivity(total, duration);
 			
 			//Xoa grant nguon va processing nguon
 			List<POrderProcessing> list_process = processService.getByOrderId_and_GrantId(grant_src.getPorderid_link(), entity.pordergrantid_link_src);
@@ -1053,6 +1045,7 @@ public class ScheduleAPI {
 			grant_des.setStart_date_plan(start);
 			grant_des.setFinish_date_plan(end);
 			grant_des.setGranttoorgid_link(grant_des.getGranttoorgid_link());
+			grant_des.setDuration(duration);
 			grant_des = granttService.save(grant_des);
 			
 			Schedule_porder sch = entity.sch;
@@ -1159,9 +1152,7 @@ public class ScheduleAPI {
 				int totalorder_old = grant_old.getGrantamount() - entity.quantity;
 				Date start_old = grant_old.getStart_date_plan();
 				start_old = commonService.getBeginOfDate(start_old);
-				int duration_old = (int)Math.ceil(totalorder_old/producttivity);
-				duration_old = duration_old < 1 ? 1 : duration_old;
-//				int porductivity_old = commonService.getProductivity(totalorder_old, duration_old);
+				int duration_old = commonService.getDuration_byProductivity(totalorder_old, producttivity);
 				
 				Date end_old = commonService.Date_Add_with_holiday(start_old, duration_old - 1, orgrootid_link, year);
 				end_old = commonService.getEndOfDate(end_old);
@@ -1170,6 +1161,7 @@ public class ScheduleAPI {
 							
 				grant_old.setGrantamount(totalorder_old);
 				grant_old.setFinish_date_plan(end_old);
+				grant_old.setDuration(duration_old);
 				grant_old = granttService.save(grant_old);
 				
 				//Cap nhat lai Processing cu sau khi tach
@@ -1180,6 +1172,7 @@ public class ScheduleAPI {
 				}
 				
 				Schedule_porder old = new Schedule_porder();
+				old.setStartDate(start_old);
 				old.setEndDate(end_old);
 				old.setDuration(duration_old);
 				old.setProductivity(producttivity);
@@ -1192,12 +1185,9 @@ public class ScheduleAPI {
 				start_new= commonService.getBeginOfDate(start_new);
 				
 				int total_new = total - totalorder_old;
-				int duration_new = ((int)Math.ceil(total_new/producttivity) + (total_new % producttivity == 0 ? 0 : 1));
+				int duration_new = commonService.getDuration_byProductivity(total_new, producttivity);
 				Date end_new = commonService.Date_Add_with_holiday(start_new, duration_new - 1, orgrootid_link, year);
 				end_new = commonService.getEndOfDate(end_new);
-//				int productivity_new  = (int)Math.ceil(total_new/duration_new);
-				
-//				int productivity = commonService.getProductivity(entity.quantity, duration_new);
 				
 				POrderGrant grant = new POrderGrant();
 				grant.setGranttoorgid_link(grant_old.getGranttoorgid_link());
@@ -1213,6 +1203,8 @@ public class ScheduleAPI {
 				grant.setOrgrootid_link(orgrootid_link);
 				grant.setStart_date_plan(start_new);
 				grant.setFinish_date_plan(end_new);
+				grant.setProductivity(producttivity);
+				grant.setDuration(duration_new);
 				grant = granttService.save(grant);
 				
 				POrder porder = porderService.findOne(entity.porderid_link);
