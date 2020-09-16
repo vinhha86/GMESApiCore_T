@@ -32,6 +32,7 @@ public class ContractBuyer implements Serializable{
 	private Date contract_date;
 	private Long buyerid_link;
 	private Long vendorid_link;
+	private Date contract_date_finish;
 	private String comment;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -115,6 +116,12 @@ public class ContractBuyer implements Serializable{
 	}
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+	public Date getContract_date_finish() {
+		return contract_date_finish;
+	}
+	public void setContract_date_finish(Date contract_date_finish) {
+		this.contract_date_finish = contract_date_finish;
 	}
 	
 	

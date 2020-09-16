@@ -123,7 +123,7 @@ public class POrder_Req_Service extends AbstractService<POrder_Req> implements I
 		// TODO Auto-generated method stub
 		Specification<POrder_Req> specification = Specifications.<POrder_Req>and()
 				.eq("granttoorgid_link", orgid_link)
-//				.eq("status", 0)
+				.eq("status", 0)
 				.le("pcontract_po.status", 0)
 	            .build();
 		Sort sort = Sorts.builder()
