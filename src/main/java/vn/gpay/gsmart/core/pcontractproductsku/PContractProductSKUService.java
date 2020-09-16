@@ -43,21 +43,24 @@ public class PContractProductSKUService extends AbstractService<PContractProduct
 	public List<PContractProductSKU> getlistsku_bypo_and_pcontract_free(long orgrootid_link, long pcontract_poid_link,
 			long pcontractid_link) {
 		try {
-			List<PContractProductSKU> a= repo.getlistsku_bypo_and_pcontract(pcontract_poid_link, pcontractid_link);
+			List<PContractProductSKU> lstPContractProductSKU= repo.getlistsku_bypo(pcontract_poid_link);
+			for(PContractProductSKU thePContractProductSKU: lstPContractProductSKU){
+				thePContractProductSKU.setPquantity_lenhsx(0);
+			}
 			//Update SL da phan lenh, SL con lai
 			List<POrder> lsPOrders = porder_Service.getByContractAndPO_Granted(pcontractid_link, pcontract_poid_link);
 			for(POrder thePOrder:lsPOrders){
 				for(POrder_Product_SKU thePorderSKU:thePOrder.getPorder_product_sku()){
 	//				a.removeIf(sku -> sku.getSkuid_link().equals(thePorderSKU.getSkuid_link()));
-					PContractProductSKU poSKU = a.stream().filter(sku -> sku.getSkuid_link().equals(thePorderSKU.getSkuid_link())).findAny().orElse(null);
+					PContractProductSKU poSKU = lstPContractProductSKU.stream().filter(sku -> sku.getSkuid_link().equals(thePorderSKU.getSkuid_link())).findAny().orElse(null);
 					if (null != poSKU){
-						int curNum_Granted = null!=poSKU.getPquantity_granted()?poSKU.getPquantity_granted():0;
+						int curNum_Granted = null!=poSKU.getPquantity_lenhsx()?poSKU.getPquantity_lenhsx():0;
 						int curNum_Total = null!=thePorderSKU.getPquantity_total()?thePorderSKU.getPquantity_total():0;
-						poSKU.setPquantity_granted(curNum_Granted + curNum_Total);
+						poSKU.setPquantity_lenhsx(curNum_Granted + curNum_Total);
 					}
 				}
 			}
-			return a;
+			return lstPContractProductSKU;
 		} catch(Exception e){
 			e.printStackTrace();
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -75,9 +78,9 @@ public class PContractProductSKUService extends AbstractService<PContractProduct
 	//				a.removeIf(sku -> sku.getSkuid_link().equals(thePorderSKU.getSkuid_link()));
 					PContractProductSKU poSKU = a.stream().filter(sku -> sku.getSkuid_link().equals(thePorderSKU.getSkuid_link())).findAny().orElse(null);
 					if (null != poSKU){
-						int curNum_Granted = null!=poSKU.getPquantity_granted()?poSKU.getPquantity_granted():0;
+						int curNum_Granted = null!=poSKU.getPquantity_lenhsx()?poSKU.getPquantity_lenhsx():0;
 						int curNum_Total = null!=thePorderSKU.getPquantity_total()?thePorderSKU.getPquantity_total():0;
-						poSKU.setPquantity_granted(curNum_Granted + curNum_Total);
+						poSKU.setPquantity_lenhsx(curNum_Granted + curNum_Total);
 					}
 				}
 			}
