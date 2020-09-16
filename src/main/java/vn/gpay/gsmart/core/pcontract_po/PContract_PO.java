@@ -131,6 +131,20 @@ public class PContract_PO implements Serializable {/**
     private Org org_factory;
 	
 	@Transient
+	public Float getTotalprice() {
+		Float price = null;
+		if(pcontract_price!=null){
+			for(PContract_Price thePrice:pcontract_price){
+				if (thePrice.getProductid_link().compareTo(productid_link) == 0)
+					if(thePrice.getSizesetid_link() == 1){
+						price = thePrice.getTotalprice();
+					}
+			}
+		} 
+		return price;
+	}
+	
+	@Transient
 	public String getFactory_name() {
 		if(org_factory!=null)
 			return org_factory.getName();

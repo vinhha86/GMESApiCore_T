@@ -402,26 +402,30 @@ public class POrderAPI {
 	@RequestMapping(value = "/update_sku", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> updatePOrder_SKU(HttpServletRequest request,
 			@RequestBody POrderSKU_update_request entity) {
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Long orgrootid_link = user.getRootorgid_link();		
 		ResponseBase response = new ResponseBase();
 		try {
 			POrder_Product_SKU thePOrderSKU = porderskuService.findOne(entity.data.getId());
 			 if (null != thePOrderSKU){
 				 POrder thePorder = porderService.findOne(thePOrderSKU.getPorderid_link());
 				//Kiem tra neu so dieu chinh nhieu hon so con lai --> Khong cho sua
+				long pcontractid_link = thePorder.getPcontractid_link();
 				long pcontract_poid_link = thePorder.getPcontract_poid_link();
 				long productid_link = thePOrderSKU.getProductid_link();
 				List<PContractProductSKU> data = pskuservice.getPOSKU_Free_ByProduct(productid_link, pcontract_poid_link);
 				PContractProductSKU poSKU = data.stream().filter(sku -> sku.getSkuid_link().equals(thePOrderSKU.getSkuid_link())).findAny().orElse(null);
 				if (null != poSKU){
 					int q_total = null != poSKU.getPquantity_total()?poSKU.getPquantity_total():0;
-					int q_granted = null != poSKU.getPquantity_granted()?poSKU.getPquantity_granted():0;
+					int q_granted = null != poSKU.getPquantity_lenhsx()?poSKU.getPquantity_lenhsx():0;
 					q_granted = q_granted - (null != thePOrderSKU.getPquantity_total()?thePOrderSKU.getPquantity_total():0);
 					if ((q_total - q_granted) >= entity.data.getPquantity_total()){
 						thePOrderSKU.setPquantity_total(entity.data.getPquantity_total());
 						porderskuService.save(thePOrderSKU);
 						
 						updateTotalOrder(thePOrderSKU.getPorderid_link());
-						updateContractSKU(thePOrderSKU.getPorderid_link(),thePOrderSKU.getSkuid_link());
+						updatePOStatus(orgrootid_link,pcontract_poid_link,pcontractid_link);
+//						updateContractSKU(thePOrderSKU.getPorderid_link(),thePOrderSKU.getSkuid_link());
 						
 						response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 						response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -462,7 +466,8 @@ public class POrderAPI {
 				porderskuService.save(entity.data);
 				
 				updateTotalOrder(entity.data.getPorderid_link());
-				updateContractSKU(entity.data.getPorderid_link(),entity.data.getSkuid_link());
+				
+//				updateContractSKU(entity.data.getPorderid_link(),entity.data.getSkuid_link());
 
 				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -486,6 +491,10 @@ public class POrderAPI {
 		Long orgrootid_link = user.getRootorgid_link();
 	
 		try {
+			POrder thePorder = porderService.findOne(entity.porderid_link);
+			long pcontractid_link = thePorder.getPcontractid_link();
+			long pcontract_poid_link = thePorder.getPcontract_poid_link();
+		
 			for(POrder_Product_SKU thePOrderSKU: entity.data){
 				List<POrder_Product_SKU> lstPOrderSKU = porderskuService.getby_porderandsku(thePOrderSKU.getPorderid_link(),thePOrderSKU.getSkuid_link());
 				if (lstPOrderSKU.size() == 0){
@@ -502,6 +511,7 @@ public class POrderAPI {
 			}
 			
 			updateTotalOrder(entity.porderid_link);
+			updatePOStatus(orgrootid_link,pcontract_poid_link,pcontractid_link);
 //			updateContractSKU(thePOrderSKU.getPorderid_link(),thePOrderSKU.getSkuid_link());
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -518,11 +528,19 @@ public class POrderAPI {
 	public ResponseEntity<ResponseBase> deletePOrder_SKU(HttpServletRequest request,
 			@RequestBody POrderSKU_delete_request entity) {
 		ResponseBase response = new ResponseBase();
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Long orgrootid_link = user.getRootorgid_link();
+		
 		try {
+			POrder thePorder = porderService.findOne(entity.porderid_link);
+			long pcontractid_link = thePorder.getPcontractid_link();
+			long pcontract_poid_link = thePorder.getPcontract_poid_link();
+			
 			for(POrder_Product_SKU thePOrderSKU: entity.data){
 				porderskuService.delete(thePOrderSKU);
 			} 
 			updateTotalOrder(entity.porderid_link);
+			updatePOStatus(orgrootid_link,pcontract_poid_link,pcontractid_link);
 //			updateContractSKU(thePOrderSKU.getPorderid_link(),thePOrderSKU.getSkuid_link());
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -544,6 +562,24 @@ public class POrderAPI {
 		thePOrder.setTotalorder(totalorder);
 		porderService.save(thePOrder);
 	}
+	
+	private void updatePOStatus(long orgrootid_link, long pcontract_poid_link, long pcontractid_link){
+		PContract_PO thePO = pcontract_POService.findOne(pcontract_poid_link);
+		if (null != thePO){
+			int totalFree = 0;
+			List<PContractProductSKU> data = pskuservice.getlistsku_bypo_and_pcontract_free(orgrootid_link, pcontract_poid_link,pcontractid_link);
+			for(PContractProductSKU theSKU:data){
+				totalFree += (null != theSKU.getPquantity_total()?theSKU.getPquantity_total():0) - (null !=theSKU.getPquantity_lenhsx()?theSKU.getPquantity_lenhsx():0);
+			}
+			if (totalFree == 0){
+				if (thePO.getStatus() == POStatus.PO_STATUS_CONFIRMED) thePO.setStatus(POStatus.PO_STATUS_PORDER_ALL);
+				
+			} else {
+				if (thePO.getStatus() == POStatus.PO_STATUS_PORDER_ALL) thePO.setStatus(POStatus.PO_STATUS_CONFIRMED);
+			}
+			pcontract_POService.save(thePO);
+		}
+	}
 	private void updateContractSKU(Long porderid_link, Long skuid_link){
 		POrder thePOrder = porderService.findOne(porderid_link);
 		List<PContractProductSKU> lstSKU = pskuservice.getlistsku_bysku_and_pcontract(skuid_link, thePOrder.getPcontractid_link());
@@ -561,22 +597,6 @@ public class POrderAPI {
 			pskuservice.save(theSKU);
 		}
 	}
-//	private void updateContractGranted(Long orgrootid_link, Long contractid_link, Long productid_link){
-//		List<PContractProductSKU> lstSKU = pskuservice.getlistsku_byproduct_and_pcontract(orgrootid_link, productid_link, contractid_link);
-//		for(PContractProductSKU theSKU:lstSKU){
-//			int totalgranted = 0;
-//			//Duyet danh sach cac Lenhsx cua san pham trong don hang
-//			List<POrder> lstPOrder = porderService.getByContractAndProduct(contractid_link, productid_link);
-//			for(POrder order: lstPOrder){
-//				List<POrder_Product_SKU> lstPorderSKU = porderskuService.getby_porderandsku(order.getId(), theSKU.getSkuid_link());
-//				for(POrder_Product_SKU porderSKU:lstPorderSKU){
-//					totalgranted += porderSKU.getPquantity_total();
-//				}
-//			}
-//			theSKU.setPquantity_granted(totalgranted);
-//			pskuservice.save(theSKU);
-//		}
-//	}
 	
 	//Lấy danh sách và tình trạng chuẩn bị NPL của 1 lệnh
 	@RequestMapping(value = "/getbalance",method = RequestMethod.POST)
