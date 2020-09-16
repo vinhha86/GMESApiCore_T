@@ -188,7 +188,7 @@ public class PContract implements Serializable {/**
 	
 	@Transient
 	public int getPayer() {
-		if(orgpayerid_link == orgvendorid_link )
+		if(orgpayerid_link.equals(orgvendorid_link) )
 			return 1;
 		else
 			return 2;
