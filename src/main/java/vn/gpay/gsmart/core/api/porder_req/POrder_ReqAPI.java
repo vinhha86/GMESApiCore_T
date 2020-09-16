@@ -678,15 +678,17 @@ public class POrder_ReqAPI {
 					long pcontractpo_id_link = thePOrder_Req.getPcontract_poid_link();
 					PContract_PO po = pcontract_POService.findOne(pcontractpo_id_link);
 					List<POrder_Req> list_req = porder_req_Service.getByPO_is_calculate(pcontractpo_id_link);
-					int size = list_req.size() == 0 ? 1 : list_req.size();
-					int amount = po.getPo_quantity()/size;
-					for(POrder_Req req : list_req) {
-						req.setTotalorder(amount);
+					if(list_req.size() > 0) {
+						int amount = po.getPo_quantity()/list_req.size();
+						for(POrder_Req req : list_req) {
+							req.setTotalorder(amount);
+							porder_req_Service.save(req);
+						}
+						POrder_Req req = list_req.get(list_req.size()-1);
+						req.setTotalorder(po.getPo_quantity() - amount* (list_req.size()-1));
 						porder_req_Service.save(req);
 					}
-					POrder_Req req = list_req.get(list_req.size()-1);
-					req.setTotalorder(po.getPo_quantity() - amount* (list_req.size()-1));
-					porder_req_Service.save(req);
+					
 	
 					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

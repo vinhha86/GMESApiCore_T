@@ -677,15 +677,17 @@ public class ScheduleAPI {
 			pg.setStart_date_plan(porder.getProductiondate_plan());
 			pg.setFinish_date_plan(porder.getFinishdate_plan());
 			
+			pg = granttService.save(pg);
+			
 			//Lay toan bo SKU tu POrder sang POrder_grant_sku
 			for(POrder_Product_SKU pSKU: porder.getPorder_product_sku()){
 				POrderGrant_SKU pgSKU = new POrderGrant_SKU();
 				pgSKU.setOrgrootid_link(orgrootid_link);
 				pgSKU.setSkuid_link(pSKU.getSkuid_link());
 				pgSKU.setGrantamount(pSKU.getPquantity_total());
-				pg.getPorder_grant_sku().add(pgSKU);
+				pgSKU.setPordergrantid_link(pg.getId());
+				grantskuService.save(pgSKU);
 			}
-			pg = granttService.save(pg);
 			
 			POrderProcessing pp = new POrderProcessing();
 			pp.setOrdercode(porder.getOrdercode());

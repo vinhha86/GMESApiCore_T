@@ -403,45 +403,45 @@ public class PContractProductBomAPI {
 				if(listbomcolorclone.size() > 0)
 					amount_color = listbomcolorclone.get(0).getAmount();
 				
-				map.put("amount", pContractProductBom.getAmount().toString());
+				map.put("amount", pContractProductBom.getAmount()+"");
 				
-				map.put("forothercontract_name",pContractProductBom.getForothercontract().toString());
+				map.put("forothercontract_name",pContractProductBom.getForothercontract()+"");
 				
-				map.put("amount_color", amount_color.toString());
+				map.put("amount_color", amount_color+"");
 				
-				map.put("coKho", pContractProductBom.getCoKho().toString());
+				map.put("coKho", pContractProductBom.getCoKho()+"");
 				
-				map.put("createddate", pContractProductBom.getCreateddate().toString());
+				map.put("createddate", pContractProductBom.getCreateddate()+"");
 				
-				map.put("createduserid_link", pContractProductBom.getCreateduserid_link().toString());
+				map.put("createduserid_link", pContractProductBom.getCreateduserid_link()+"");
 				
-				map.put("description", pContractProductBom.getDescription().toString());
+				map.put("description", pContractProductBom.getDescription()+"");
 				
-				map.put("id", pContractProductBom.getId().toString());
+				map.put("id", pContractProductBom.getId()+"");
 				
-				map.put("lost_ratio", pContractProductBom.getLost_ratio().toString());
+				map.put("lost_ratio", pContractProductBom.getLost_ratio()+"");
 				
-				map.put("materialid_link", pContractProductBom.getMaterialid_link().toString());
+				map.put("materialid_link", pContractProductBom.getMaterialid_link()+"");
 				
-				map.put("materialName", pContractProductBom.getMaterialName().toString());
+				map.put("materialName", pContractProductBom.getMaterialName()+"");
 				
-				map.put("materialCode", pContractProductBom.getMaterialCode().toString());
+				map.put("materialCode", pContractProductBom.getMaterialCode()+"");
 				
-				map.put("orgrootid_link", pContractProductBom.getOrgrootid_link().toString());
+				map.put("orgrootid_link", pContractProductBom.getOrgrootid_link()+"");
 				
-				map.put("pcontractid_link", pContractProductBom.getPcontractid_link().toString());
+				map.put("pcontractid_link", pContractProductBom.getPcontractid_link()+"");
 				
 				map.put("product_type", pContractProductBom.getProduct_type()+"");
 				
-				map.put("product_typename", pContractProductBom.getProduct_typeName().toString());
+				map.put("product_typename", pContractProductBom.getProduct_typeName()+"");
 				
-				map.put("productid_link", pContractProductBom.getProductid_link().toString());
+				map.put("productid_link", pContractProductBom.getProductid_link()+"");
 				
-				map.put("tenMauNPL", pContractProductBom.getTenMauNPL().toString());
+				map.put("tenMauNPL", pContractProductBom.getTenMauNPL()+"");
 				
-				map.put("thanhPhanVai", pContractProductBom.getThanhPhanVai().toString());
+				map.put("thanhPhanVai", pContractProductBom.getThanhPhanVai()+"");
 				
-				map.put("unitName", pContractProductBom.getUnitName().toString());
+				map.put("unitName", pContractProductBom.getUnitName()+"");
 				
 				for(Long size : List_size) {
 					List<PContractBOMSKU> listbomsku_clone = new ArrayList<PContractBOMSKU>(listbomsku);
