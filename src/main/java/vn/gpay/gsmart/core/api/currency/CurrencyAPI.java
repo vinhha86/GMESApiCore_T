@@ -59,4 +59,19 @@ public class CurrencyAPI {
 		    return new ResponseEntity<Currency_getall_response>(response,HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/getone",method = RequestMethod.POST)
+	public ResponseEntity<Currency_getone_response> GetOne(@RequestBody Currency_getone_request entity,HttpServletRequest request ) {
+		Currency_getone_response response = new Currency_getone_response();
+		try {
+			response.data = service.findOne(entity.id);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<Currency_getone_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<Currency_getone_response>(response,HttpStatus.OK);
+		}
+	}
 }
