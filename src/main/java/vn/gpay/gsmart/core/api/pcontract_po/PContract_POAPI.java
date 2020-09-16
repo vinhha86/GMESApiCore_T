@@ -467,27 +467,27 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 				
 				List<POrder_Req> list_req = porder_req_Service.getByPO(po.getId());
 				
-//				for(POrder_Req porder : list_req) {
-////					
-//					POrder_Req porder_req = new POrder_Req();
+				for(POrder_Req porder : list_req) {
 //					
-//					porder_req.setPcontractid_link(ponew.getPcontractid_link());
-//					porder_req.setPcontract_poid_link(ponew.getId());
-//					
-//					porder_req.setTotalorder(porder.getTotalorder());
-//					porder_req.setGranttoorgid_link(porder.getGranttoorgid_link());
-//					porder_req.setAmount_inset(porder.getAmount_inset());
-//					
-//					porder_req.setOrgrootid_link(orgrootid_link);
-//					porder_req.setProductid_link(porder.getProductid_link());
-//					porder_req.setOrderdate(new Date());
-//					porder_req.setUsercreatedid_link(userid_link);
-//					porder_req.setStatus(POrderReqStatus.STATUS_FREE);
-//					porder_req.setTimecreated(new Date());
-//					
-//					//Save to DB
-//					porder_req_Service.savePOrder_Req(porder_req);
-//				}
+					POrder_Req porder_req = new POrder_Req();
+					
+					porder_req.setPcontractid_link(ponew.getPcontractid_link());
+					porder_req.setPcontract_poid_link(ponew.getId());
+					
+					porder_req.setTotalorder(porder.getTotalorder());
+					porder_req.setGranttoorgid_link(porder.getGranttoorgid_link());
+					porder_req.setAmount_inset(porder.getAmount_inset());
+					
+					porder_req.setOrgrootid_link(orgrootid_link);
+					porder_req.setProductid_link(porder.getProductid_link());
+					porder_req.setOrderdate(new Date());
+					porder_req.setUsercreatedid_link(userid_link);
+					porder_req.setStatus(POrderReqStatus.STATUS_POCONFFIRMED);
+					porder_req.setTimecreated(new Date());
+					
+					//Save to DB
+					porder_req_Service.savePOrder_Req(porder_req);
+				}
 			}
 			
 			
