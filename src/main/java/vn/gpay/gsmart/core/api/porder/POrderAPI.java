@@ -35,6 +35,8 @@ import vn.gpay.gsmart.core.porder.POrderFilter;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
+import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
+import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -49,6 +51,7 @@ import vn.gpay.gsmart.core.task_object.Task_Object;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.NetworkUtils;
 import vn.gpay.gsmart.core.utils.POStatus;
+import vn.gpay.gsmart.core.utils.POrderReqStatus;
 import vn.gpay.gsmart.core.utils.POrderStatus;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
@@ -57,19 +60,20 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 @RequestMapping("/api/v1/porder")
 public class POrderAPI {
 	@Autowired private IPOrder_Service porderService;
-	@Autowired IPContract_POService pcontract_POService;
+	@Autowired private IPContract_POService pcontract_POService;
 	@Autowired private IPOrder_Product_SKU_Service porderskuService;
 	@Autowired private IPContractProductSKUService pskuservice;
     @Autowired private IActionLogs_Service actionLogsRepository;
     @Autowired private IPOrderProcessing_Service porderprocessingService;
     @Autowired private IOrgService orgService;
     @Autowired private IPOrderGrant_Service pordergrantService;
+    @Autowired private IPOrder_Req_Service porder_reqService;
     
-	@Autowired ITask_Object_Service taskobjectService;
-	@Autowired ITask_CheckList_Service checklistService;
-	@Autowired ITask_Service taskService;
-	@Autowired ITask_Flow_Service commentService;   
-	@Autowired Common commonService;
+	@Autowired private ITask_Object_Service taskobjectService;
+	@Autowired private ITask_CheckList_Service checklistService;
+	@Autowired private ITask_Service taskService;
+	@Autowired private ITask_Flow_Service commentService;   
+	@Autowired private Common commonService;
     ObjectMapper mapper = new ObjectMapper();
 	
 	@RequestMapping(value = "/getone",method = RequestMethod.POST)
@@ -124,6 +128,21 @@ public class POrderAPI {
 					porder = porderService.findOne(response.id);
 					response.data = porder;
 					
+					//Update lai trng thai cua Porder_req ve da tao lenh
+					List<POrder_Req> lsPOrder_Req = porder_reqService.getByOrg_PO_Product(porder.getPcontract_poid_link(), porder.getProductid_link(), porder.getGranttoorgid_link());
+					for(POrder_Req thePOrder_Req: lsPOrder_Req){
+						thePOrder_Req.setStatus(POrderReqStatus.STATUS_PORDERED);
+						porder_reqService.save(thePOrder_Req);
+					}
+					
+					//Update lai trng thai cua Porder_req cua PO cha ve da tao lenh
+					List<POrder_Req> lsPOrder_Req_parent = porder_reqService.getByOrg_PO_Product(thePO.getParentpoid_link(), porder.getProductid_link(), porder.getGranttoorgid_link());
+					for(POrder_Req thePOrder_Req_parent: lsPOrder_Req_parent){
+						thePOrder_Req_parent.setStatus(POrderReqStatus.STATUS_PORDERED);
+						porder_reqService.save(thePOrder_Req_parent);
+					}
+					
+					
 					//Tao Task
 					long userid_link = user.getId();
 					long pcontractid_link = porder.getPcontractid_link();
@@ -157,6 +176,7 @@ public class POrderAPI {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<POrder_Create_response>(response, HttpStatus.BAD_REQUEST);
