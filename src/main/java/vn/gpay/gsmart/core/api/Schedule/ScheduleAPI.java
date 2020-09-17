@@ -1178,6 +1178,7 @@ public class ScheduleAPI {
 				old.setProductivity(producttivity);
 				old.setName(grant_old.getMaHang());
 				old.setMahang(grant_old.getMaHang());
+				old.setTotalpackage(totalorder_old);
 				response.old_data = old;
 				
 				//Sinh grant moi
