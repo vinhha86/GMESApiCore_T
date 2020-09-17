@@ -100,48 +100,61 @@ public class POrderAPI {
 			
 			//Lay thong tin PO
 			PContract_PO thePO = pcontract_POService.findOne(porder.getPcontract_poid_link());
-			String po_code = thePO.getPo_vendor().length() > 0?thePO.getPo_vendor():thePO.getPo_buyer();
 			
-			if (porder.getId() == null || porder.getId() == 0) {
-				porder.setGolivedate(thePO.getShipdate());
-				porder.setProductiondate(thePO.getProductiondate());
-				
-				porder.setFinishdate_plan(thePO.getShipdate());
-				porder.setProductiondate_plan(thePO.getProductiondate());
-				
-				porder.setOrgrootid_link(orgrootid_link);
-				porder.setOrderdate(new Date());
-				porder.setUsercreatedid_link(user.getId());
-				porder.setStatus(thePO.getStatus() == POStatus.PO_STATUS_UNCONFIRM?POrderStatus.PORDER_STATUS_UNCONFIRM:POrderStatus.PORDER_STATUS_FREE);
-				porder.setTimecreated(new Date());
-			} 
-			
-			response.id = porderService.savePOrder(porder, po_code);
-			porder = porderService.findOne(response.id);
-			response.data = porder;
-			
-			//Tao Task
-			long userid_link = user.getId();
-			long pcontractid_link = porder.getPcontractid_link();
-			long pcontract_poid_link = porder.getPcontract_poid_link();
-			long porder_req_id_link = porder.getPorderreqid_link();
-			long porderid_link = porder.getId();
-			long productid_link = porder.getProductid_link();
-			long granttoorgid_link = porder.getGranttoorgid_link();
-			createTask_AfterPorderCreating(
-					orgrootid_link,
-					userid_link,
-					pcontractid_link,
-					pcontract_poid_link,
-					porder_req_id_link,
-					porderid_link,
-					productid_link,
-					granttoorgid_link						
-				);
-			
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<POrder_Create_response>(response, HttpStatus.OK);
+			if (null !=thePO){
+				//Kiem tra da khai bao chi tiet SKU cho san pham trong PO chua
+				if (pskuservice.getbypo_and_product(thePO.getId(), porder.getProductid_link()).size() > 0){
+					String po_code = thePO.getPo_vendor().length() > 0?thePO.getPo_vendor():thePO.getPo_buyer();
+					
+					if (porder.getId() == null || porder.getId() == 0) {
+						porder.setGolivedate(thePO.getShipdate());
+						porder.setProductiondate(thePO.getProductiondate());
+						
+						porder.setFinishdate_plan(thePO.getShipdate());
+						porder.setProductiondate_plan(thePO.getProductiondate());
+						
+						porder.setOrgrootid_link(orgrootid_link);
+						porder.setOrderdate(new Date());
+						porder.setUsercreatedid_link(user.getId());
+						porder.setStatus(thePO.getStatus() == POStatus.PO_STATUS_UNCONFIRM?POrderStatus.PORDER_STATUS_UNCONFIRM:POrderStatus.PORDER_STATUS_FREE);
+						porder.setTimecreated(new Date());
+					} 
+					
+					response.id = porderService.savePOrder(porder, po_code);
+					porder = porderService.findOne(response.id);
+					response.data = porder;
+					
+					//Tao Task
+					long userid_link = user.getId();
+					long pcontractid_link = porder.getPcontractid_link();
+					long pcontract_poid_link = porder.getPcontract_poid_link();
+					long porder_req_id_link = porder.getPorderreqid_link();
+					long porderid_link = porder.getId();
+					long productid_link = porder.getProductid_link();
+					long granttoorgid_link = porder.getGranttoorgid_link();
+					createTask_AfterPorderCreating(
+							orgrootid_link,
+							userid_link,
+							pcontractid_link,
+							pcontract_poid_link,
+							porder_req_id_link,
+							porderid_link,
+							productid_link,
+							granttoorgid_link						
+						);
+					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+					return new ResponseEntity<POrder_Create_response>(response, HttpStatus.OK);					
+				} else {
+					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+					response.setMessage("Chưa khai báo chi tiết màu, cỡ cho sản phẩm trong chi tiết PO");
+					return new ResponseEntity<POrder_Create_response>(response, HttpStatus.BAD_REQUEST);
+				}
+			} else {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage("PO không tồn tại");
+				return new ResponseEntity<POrder_Create_response>(response, HttpStatus.BAD_REQUEST);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
@@ -580,23 +593,25 @@ public class POrderAPI {
 			pcontract_POService.save(thePO);
 		}
 	}
-	private void updateContractSKU(Long porderid_link, Long skuid_link){
-		POrder thePOrder = porderService.findOne(porderid_link);
-		List<PContractProductSKU> lstSKU = pskuservice.getlistsku_bysku_and_pcontract(skuid_link, thePOrder.getPcontractid_link());
-		for(PContractProductSKU theSKU:lstSKU){
-			int totalgranted = 0;
-			//Duyet danh sach cac Lenhsx cua san pham trong don hang
-			List<POrder> lstPOrder = porderService.getByContractAndProduct(thePOrder.getPcontractid_link(), thePOrder.getProductid_link());
-			for(POrder order: lstPOrder){
-				List<POrder_Product_SKU> lstPorderSKU = porderskuService.getby_porderandsku(order.getId(), skuid_link);
-				for(POrder_Product_SKU porderSKU:lstPorderSKU){
-					totalgranted += porderSKU.getPquantity_total();
-				}
-			}
-			theSKU.setPquantity_granted(totalgranted);
-			pskuservice.save(theSKU);
-		}
-	}
+	
+	//Hien tai ko dung den func nay
+//	private void updateContractSKU(Long porderid_link, Long skuid_link){
+//		POrder thePOrder = porderService.findOne(porderid_link);
+//		List<PContractProductSKU> lstSKU = pskuservice.getlistsku_bysku_and_pcontract(skuid_link, thePOrder.getPcontractid_link());
+//		for(PContractProductSKU theSKU:lstSKU){
+//			int totalgranted = 0;
+//			//Duyet danh sach cac Lenhsx cua san pham trong don hang
+//			List<POrder> lstPOrder = porderService.getByContractAndProduct(thePOrder.getPcontractid_link(), thePOrder.getProductid_link());
+//			for(POrder order: lstPOrder){
+//				List<POrder_Product_SKU> lstPorderSKU = porderskuService.getby_porderandsku(order.getId(), skuid_link);
+//				for(POrder_Product_SKU porderSKU:lstPorderSKU){
+//					totalgranted += porderSKU.getPquantity_total();
+//				}
+//			}
+//			theSKU.setPquantity_granted(totalgranted);
+//			pskuservice.save(theSKU);
+//		}
+//	}
 	
 	//Lấy danh sách và tình trạng chuẩn bị NPL của 1 lệnh
 	@RequestMapping(value = "/getbalance",method = RequestMethod.POST)
