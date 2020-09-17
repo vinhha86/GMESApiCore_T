@@ -1243,9 +1243,9 @@ public class ScheduleAPI {
 				new_data.setStatus(1);
 				new_data.setPorder_grantid_link(grant.getId());
 				new_data.setPorderid_link(grant.getPorderid_link());
-				new_data.setPcontract_poid_link(grant.getPcontract_poid_link());
-				new_data.setProductid_link(grant.getProductid_link());
-				new_data.setPcontractid_link(grant.getPcontractid_link());
+				new_data.setPcontract_poid_link(grant_old.getPcontract_poid_link());
+				new_data.setProductid_link(grant_old.getProductid_link());
+				new_data.setPcontractid_link(grant_old.getPcontractid_link());
 				response.new_data = new_data;
 				 
 				//gan sku vao grant moi sinh ra va tru sku o grant tach
