@@ -1161,7 +1161,7 @@ public class ProductAPI {
 					
 					ProductBinding pb = new ProductBinding();
 					pb.setId(_product.getId());
-					pb.setCode(_product.getCode());
+					pb.setCode(_product.getBuyercode());
 					pb.setName(_product.getName());
 					pb.setProduct_type(_product.getProducttypeid_link());
 					pb.setProduct_typeName(_product.getProducttype_name());
