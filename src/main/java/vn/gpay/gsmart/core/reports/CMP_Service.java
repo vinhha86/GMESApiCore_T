@@ -127,8 +127,13 @@ public class CMP_Service implements ICMP_Service {
 			year = year_next;
 		}
 		
-		//Lay danh sach toan bo cac phan xuong trong he thong
-		List<Org> ls_tosx = orgService.findOrgByType(userrootorgid_link, userorgid_link,14);
+		List<Org> ls_tosx;
+		if (userrootorgid_link == userorgid_link)
+			//Lay danh sach toan bo cac phan xuong trong he thong
+			ls_tosx = orgService.findOrgByType(userrootorgid_link, userorgid_link,14);
+		else
+			//Lay danh sach toan bo cac to thuoc phan xuong
+			ls_tosx = orgService.findChildByType(userrootorgid_link, userorgid_link,14);		
 		int id=0;
 		try {
 			for(Org theOrg: ls_tosx){
