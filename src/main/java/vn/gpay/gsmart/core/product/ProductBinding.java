@@ -14,6 +14,8 @@ public class ProductBinding {
 	private Integer pairamount;
 	private Integer pquantity;
 	private String info;
+	private String code_amount;
+	
 	public byte[] getUrlimage() {
 		return urlimage;
 	}
@@ -91,6 +93,12 @@ public class ProductBinding {
 	}
 	public void setInfo(String info) {
 		this.info = info;
+	}
+	public String getCode_amount() {
+		return code_amount;
+	}
+	public void setCode_amount(String code_amount) {
+		this.code_amount = code_amount;
 	}
 	
 }

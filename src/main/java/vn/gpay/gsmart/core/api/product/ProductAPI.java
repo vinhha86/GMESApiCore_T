@@ -1132,6 +1132,8 @@ public class ProductAPI {
 				response.data = new ArrayList<ProductBinding>();
 				Product product = productService.findOne(entity.product_pairid_link);
 				if(!entity.ishidden_pair || product.getProducttypeid_link() !=5) {
+					int po_quantity = entity.po_quantity == null ? 0 : entity.po_quantity;
+					
 					ProductBinding pb = new ProductBinding();
 					pb.setId(product.getId());
 					pb.setCode(product.getBuyercode());
@@ -1142,6 +1144,7 @@ public class ProductAPI {
 					pb.setThanhPhanVai(product.getThanhPhanVai());
 					pb.setTenMauNPL(product.getTenMauNPL());
 					pb.setInfo(product.getDescription());
+					pb.setCode_amount(product.getBuyercode()+" ("+commonService.FormatNumber(po_quantity)+")");
 					
 					pb.setPquantity(entity.po_quantity);
 					
@@ -1172,6 +1175,7 @@ public class ProductAPI {
 					pb.setInfo(pairInfo.getProductinfo());
 					if (entity.po_quantity != null){
 						pb.setPquantity(pairInfo.getAmount()*entity.po_quantity);
+						pb.setCode_amount(product.getBuyercode()+" ("+commonService.FormatNumber(pb.getPquantity())+")");
 					}
 					String FolderPath = commonService.getFolderPath(_product.getProducttypeid_link());
 					String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
