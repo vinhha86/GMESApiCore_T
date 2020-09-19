@@ -6,7 +6,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 
 @Table(name="Port")
@@ -29,7 +35,23 @@ public class Port implements Serializable {
 	
 	@Column(name ="orgid_link")
     private Long orgid_link;
+	
+	@Column(name ="shipmodeid_link")
+    private Long shipmodeid_link;
 
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="shipmodeid_link",insertable=false,updatable =false)
+    private ShipMode shipmode;
+	
+	@Transient
+	public String getShipModeName() {
+		if(shipmode != null) {
+			return shipmode.getName();
+		}
+		return "";
+	}
+	
 	public Long getId() {
 		return id;
 	}
@@ -68,6 +90,14 @@ public class Port implements Serializable {
 
 	public void setOrgid_link(Long orgid_link) {
 		this.orgid_link = orgid_link;
+	}
+
+	public Long getShipmodeid_link() {
+		return shipmodeid_link;
+	}
+
+	public void setShipmodeid_link(Long shipmodeid_link) {
+		this.shipmodeid_link = shipmodeid_link;
 	}
 	
 	
