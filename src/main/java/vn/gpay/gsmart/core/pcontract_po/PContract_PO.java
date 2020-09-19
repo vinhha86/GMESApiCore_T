@@ -79,9 +79,16 @@ public class PContract_PO implements Serializable {/**
 	private Long portfromid_link;
 	private Long porttoid_link;
 	private Boolean isauto_calculate;
+	private Long shipmodeid_link;
 	
-	
-	
+	public Long getShipmodeid_link() {
+		return shipmodeid_link;
+	}
+
+	public void setShipmodeid_link(Long shipmodeid_link) {
+		this.shipmodeid_link = shipmodeid_link;
+	}
+
 	public Integer getProductiondays() {
 		return productiondays;
 	}
