@@ -24,6 +24,8 @@ public class TaskBinding {
 	private Integer Duration;
 	@JsonProperty("Description")
 	private String Description;
+	@JsonProperty("UserInChargeName")
+	private String UserInChargeName;
 	@JsonProperty("SubTasks")
 	private List<SubTask> SubTasks = new ArrayList<SubTask>();
 	@JsonProperty("Comments")
@@ -85,6 +87,12 @@ public class TaskBinding {
 	}
 	public void setDescription(String description) {
 		Description = description;
+	}
+	public String getUserInChargeName() {
+		return UserInChargeName;
+	}
+	public void setUserInChargeName(String userInChargeName) {
+		UserInChargeName = userInChargeName;
 	}
 	public List<Comment> getComments() {
 		return Comments;

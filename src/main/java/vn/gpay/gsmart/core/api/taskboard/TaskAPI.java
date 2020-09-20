@@ -64,6 +64,7 @@ public class TaskAPI {
 				binding.setResourceId(task.getUserinchargeid_link());
 				binding.setState(commonService.getState(task.getStatusid_link()));
 				binding.setDescription(task.getDescription());
+				binding.setUserInChargeName(task.getUserInChargeName());
 				binding.setTasktypeid_link(task.getTasktypeid_link());
 				binding.setCls_task(commonService.getCls_header(task.getTasktypeid_link()));
 				binding.setOrgid_link(task.getOrgid_link());

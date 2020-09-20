@@ -70,6 +70,13 @@ public class Task implements Serializable {
     		return user_incharge.getOrgid_link();
     	return (long)0;
     }
+    
+    @Transient
+    public String getUserInChargeName() {
+    	if(user_incharge!=null)
+    		return user_incharge.getFullName();
+    	return "";
+    }
 	
 	public Long getId() {
 		return id; 
