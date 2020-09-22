@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.api.taskboard;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -116,6 +117,39 @@ public class TaskAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/getcommentbytask",method = RequestMethod.POST)
+	public ResponseEntity<get_commentbytask_response> GetCommentByTask(@RequestBody get_commentbytask_request entity, HttpServletRequest request ) {
+		get_commentbytask_response response = new get_commentbytask_response();
+		try {
+			
+				
+				//get comment
+				List<Task_Flow> list_task_flow = commentService.getby_task(entity.taskid);
+				List<Comment> list_comment = new ArrayList<Comment>();
+				for(Task_Flow flow : list_task_flow) {
+					Comment comment = new Comment();
+					comment.setDate(flow.getDatecreated());
+					comment.setTaskId(entity.taskid);
+					comment.setText(flow.getDescription());
+					comment.setUserId(flow.getFromuserid_link());
+					comment.setTypename(flow.getTypeName());
+					comment.setUserFullName(flow.getFromUserName());
+					
+					list_comment.add(comment);
+				}
+			Collections.reverse(list_comment);
+			response.data = list_comment;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<get_commentbytask_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<get_commentbytask_response>(response, HttpStatus.OK);
+		}
+	}
+	
 	@RequestMapping(value = "/add_comment",method = RequestMethod.POST)
 	public ResponseEntity<add_comment_response> AddComment(HttpServletRequest request, @RequestBody add_comment_request entity) {
 		add_comment_response response = new add_comment_response();
@@ -141,6 +175,7 @@ public class TaskAPI {
 			comment.setText(flow.getDescription());
 			comment.setUserId(flow.getFromuserid_link());
 			comment.setTypename(status.getName());
+			comment.setUserFullName(user.getFullName());
 			
 			response.data = comment;
 			
@@ -330,6 +365,8 @@ public class TaskAPI {
 			cmt.setTaskId(taskid_link);
 			cmt.setText(description);
 			cmt.setUserId(user.getId());
+			cmt.setUserFullName(user.getFullName());
+			cmt.setTypename("Tin nhắn");
 			
 			response.data = cmt;
 			

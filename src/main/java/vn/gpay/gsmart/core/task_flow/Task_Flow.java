@@ -16,6 +16,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.task_flow_status.Task_Flow_Status;
 
 @Table(name="task_flow")
@@ -40,6 +41,18 @@ public class Task_Flow implements Serializable {
 	private Integer flowdirection;
 	private Integer taskstatusid_link;
 	private Integer flowstatusid_link;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="fromuserid_link",insertable=false,updatable =false)
+	private GpayUser fromuser;
+	
+	@Transient
+	public String getFromUserName() {
+		if(fromuser != null)
+			return fromuser.getFullName();
+		return "";
+	}
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne

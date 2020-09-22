@@ -17,6 +17,9 @@ public class Comment {
 	@JsonProperty("Text")
 	private String Text;
 	
+	@JsonProperty("UserFullName")
+	private String UserFullName;
+	
 	private String typename;
 		
 	public Date getDate() {
@@ -57,6 +60,14 @@ public class Comment {
 
 	public void setTypename(String typename) {
 		this.typename = typename;
+	}
+
+	public String getUserFullName() {
+		return UserFullName;
+	}
+
+	public void setUserFullName(String userFullName) {
+		UserFullName = userFullName;
 	}
 	
 	
