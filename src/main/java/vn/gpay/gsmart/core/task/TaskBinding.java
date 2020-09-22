@@ -26,6 +26,8 @@ public class TaskBinding {
 	private String Description;
 	@JsonProperty("UserInChargeName")
 	private String UserInChargeName;
+	@JsonProperty("userinchargeid_link")
+	private Long userinchargeid_link;
 	@JsonProperty("SubTasks")
 	private List<SubTask> SubTasks = new ArrayList<SubTask>();
 	@JsonProperty("Comments")
@@ -93,6 +95,12 @@ public class TaskBinding {
 	}
 	public void setUserInChargeName(String userInChargeName) {
 		UserInChargeName = userInChargeName;
+	}
+	public Long getUserinchargeid_link() {
+		return userinchargeid_link;
+	}
+	public void setUserinchargeid_link(Long userinchargeid_link) {
+		this.userinchargeid_link = userinchargeid_link;
 	}
 	public List<Comment> getComments() {
 		return Comments;
