@@ -96,4 +96,10 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	public List<PContract_PO> getPcontractPoByPContractAndPOBuyer(Long pcontractid_link, String po_buyer, String buyercode) {
 		return repo.getPcontractPoByPContractAndPOBuyer(pcontractid_link, po_buyer, buyercode);
 	}
+	@Override
+	public List<PContract_PO> getone_by_template(String PO_No, Date ShipDate, long productid_link,
+			long shipmodeid_link) {
+		// TODO Auto-generated method stub
+		return repo.getone_by_template(PO_No, shipmodeid_link, productid_link, ShipDate);
+	}
 }

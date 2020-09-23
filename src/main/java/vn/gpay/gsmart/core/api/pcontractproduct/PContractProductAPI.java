@@ -487,7 +487,7 @@ public class PContractProductAPI {
 				binding.setOrgrootid_link(orgrootid_link);
 				binding.setPcontractid_link(pContractProduct.getPcontractid_link());
 				binding.setProductid_link(pContractProduct.getProductid_link());
-				binding.setProductCode(pContractProduct.getProductCode());
+				binding.setProductCode(pContractProduct.getProductBuyerCode());
 				binding.setProductName(pContractProduct.getProductName());
 				binding.setPquantity(pContractProduct.getPquantity());
 				binding.setProduction_date(pContractProduct.getProduction_date());

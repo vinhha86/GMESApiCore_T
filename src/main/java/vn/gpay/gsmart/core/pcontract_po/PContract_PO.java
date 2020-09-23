@@ -80,6 +80,9 @@ public class PContract_PO implements Serializable {/**
 	private Long porttoid_link;
 	private Boolean isauto_calculate;
 	private Long shipmodeid_link;
+	private Date date_importdata;
+	
+	
 	
 	public Long getShipmodeid_link() {
 		return shipmodeid_link;
@@ -589,6 +592,14 @@ public class PContract_PO implements Serializable {/**
 
 	public void setIsauto_calculate(Boolean isauto_calculate) {
 		this.isauto_calculate = isauto_calculate;
+	}
+
+	public Date getDate_importdata() {
+		return date_importdata;
+	}
+
+	public void setDate_importdata(Date date_importdata) {
+		this.date_importdata = date_importdata;
 	}
 	
 }

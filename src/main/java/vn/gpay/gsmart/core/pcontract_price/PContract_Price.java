@@ -2,6 +2,7 @@ package vn.gpay.gsmart.core.pcontract_price;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -49,6 +50,8 @@ public class PContract_Price implements Serializable {/**
 	private Integer quantity;
 	private Float price_vendortarget;
 	private Boolean is_fix;
+	private Date date_importdata;
+	
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -195,6 +198,12 @@ public class PContract_Price implements Serializable {/**
 	}
 	public void setIs_fix(Boolean is_fix) {
 		this.is_fix = is_fix;
+	}
+	public Date getDate_importdata() {
+		return date_importdata;
+	}
+	public void setDate_importdata(Date date_importdata) {
+		this.date_importdata = date_importdata;
 	}
 
 }
