@@ -120,6 +120,11 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 						//Kiểm tra sản phẩm có chưa thì sinh id sản phẩm
 						long productid_link = 0;
 						String product_code = row.getCell(3).getStringCellValue();
+						int product_quantity = (int)row.getCell(5).getNumericCellValue();
+						int po_quantity = (int)row.getCell(5).getNumericCellValue() / (int)row.getCell(4).getNumericCellValue();
+						String product_set_code = row.getCell(2).getStringCellValue();
+						int amount = (int)row.getCell(4).getNumericCellValue() == 0 ? 1 : (int)row.getCell(4).getNumericCellValue();
+						
 						List<Product> products = productService.getone_by_code(orgrootid_link, product_code, (long)0, ProductType.SKU_TYPE_COMPLETEPRODUCT);
 						if(products.size() == 0) {
 							Product p = new Product();
@@ -140,7 +145,6 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 						}
 						
 						//Kiem tra xem co phai PO cua hang bo hay khong
-						String product_set_code = row.getCell(2).getStringCellValue();
 						long product_set_id_link = 0;
 						if(product_set_code != null && product_set_code != "") {
 							List<Product> product_set = productService.getone_by_code(orgrootid_link, product_set_code, (long)0, ProductType.SKU_TYPE_PRODUCT_PAIR);
@@ -168,8 +172,6 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 							ProductPairing pair = productpairService.getproduct_pairing_bykey(productid_link, product_set_id_link);
 							if(pair == null) {
 								ProductPairing newpair = new ProductPairing();
-								double d_amount = row.getCell(4).getNumericCellValue();
-								int amount = row.getCell(4).getStringCellValue() == "" ? 1 : (int)row.getCell(4).getNumericCellValue();
 								newpair.setAmount(amount);
 								newpair.setId(null);
 								newpair.setOrgrootid_link(orgrootid_link);
@@ -215,25 +217,30 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 						}
 						
 						//Kiem tra chao gia da ton tai hay chua
-						String PO_No = row.getCell(1).getStringCellValue();
+						String PO_No = commonService.getStringValue(row.getCell(1));
+						PO_No = PO_No == "" ? "TBD" : PO_No;
 						Date ShipDate = row.getCell(6).getDateCellValue();
 						long po_productid_link = product_set_id_link > 0 ? product_set_id_link : productid_link;
+						long pcontractpo_id_link = 0;
+
+						float price_cmp = (float)row.getCell(9).getNumericCellValue();
+						float price_fob = (float)row.getCell(10).getNumericCellValue();
+						float vendor_target = (float)row.getCell(8).getNumericCellValue();
 						
 						List<PContract_PO> listpo = pcontract_POService.getone_by_template(PO_No, ShipDate, po_productid_link, shipmodeid_link);
 						if(listpo.size() == 0) {
-							int po_quantity = (int)row.getCell(5).getNumericCellValue() / (int)row.getCell(4).getNumericCellValue();
 							
 							PContract_PO po_new = new PContract_PO();
 							po_new.setId(null);
-							po_new.setCode("TBD");
+							po_new.setCode(PO_No);
 							po_new.setCurrencyid_link((long)1);
 							po_new.setDatecreated(current_time);
 							po_new.setIs_tbd(true);
 							po_new.setIsauto_calculate(true);
 							po_new.setOrgrootid_link(orgrootid_link);
 							po_new.setPcontractid_link(pcontractid_link);
-							po_new.setPo_buyer("TBD");
-							po_new.setPo_vendor("TBD");
+							po_new.setPo_buyer(PO_No);
+							po_new.setPo_vendor(PO_No);
 							po_new.setPo_quantity(po_quantity);
 							po_new.setProductid_link(po_productid_link);
 							po_new.setShipdate(ShipDate);
@@ -245,9 +252,6 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 							po_new = pcontract_POService.save(po_new);
 							
 							//Them co All vao chao gia
-							float price_cmp = (float)row.getCell(9).getNumericCellValue();
-							float price_fob = (float)row.getCell(10).getNumericCellValue();
-							float vendor_target = (float)row.getCell(8).getNumericCellValue();
 							
 							//Them cho san pham con
 							PContract_Price price_all = new PContract_Price();
@@ -260,7 +264,7 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 							price_all.setPrice_cmp(price_cmp);
 							price_all.setPrice_fob(price_fob);
 							price_all.setProductid_link(productid_link);
-							price_all.setQuantity(po_quantity);
+							price_all.setQuantity(product_quantity);
 							price_all.setSizesetid_link(commonService.getSizeSetid_link_by_name("ALL"));
 							price_all.setDate_importdata(current_time);
 							priceService.save(price_all);
@@ -313,8 +317,8 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 										price.setOrgrootid_link(orgrootid_link);
 										price.setPcontract_poid_link(po_new.getId());
 										price.setPcontractid_link(pcontractid_link);
-										price.setQuantity(amount_sizeset);
-										price.setProductid_link(productid_link);
+										price.setQuantity(amount_sizeset/(int)row.getCell(4).getNumericCellValue());
+										price.setProductid_link(product_set_id_link);
 										price.setSizesetid_link(commonService.getSizeSetid_link_by_name(sizesetname));
 										price.setDate_importdata(current_time);
 										priceService.save(price);
@@ -323,6 +327,45 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 							}
 							
 							
+						}
+						//truong hop hang bo p oda co roi
+						else {
+							pcontractpo_id_link = listpo.get(0).getId();
+							//them dai co vao san pham con
+							PContract_Price price_all_set = new PContract_Price();
+							price_all_set.setId(null);
+							price_all_set.setIs_fix(false);
+							price_all_set.setOrgrootid_link(orgrootid_link);
+							price_all_set.setPcontract_poid_link(pcontractpo_id_link);
+							price_all_set.setPcontractid_link(pcontractid_link);
+							price_all_set.setPrice_vendortarget(vendor_target);
+							price_all_set.setPrice_cmp(price_cmp);
+							price_all_set.setPrice_fob(price_fob);
+							price_all_set.setProductid_link(productid_link);
+							price_all_set.setQuantity(product_quantity);
+							price_all_set.setSizesetid_link(commonService.getSizeSetid_link_by_name("ALL"));
+							price_all_set.setDate_importdata(current_time);
+							priceService.save(price_all_set);
+							
+							//
+							for(int i= 11;i<17;i++) {
+								Row row_header = sheet.getRow(0);
+								String sizesetname = row_header.getCell(i).getStringCellValue();
+								int amount_sizeset = (int)row.getCell(i).getNumericCellValue();
+								if(amount_sizeset > 0) {
+									PContract_Price price = new PContract_Price();
+									price.setId(null);
+									price.setIs_fix(false);
+									price.setOrgrootid_link(orgrootid_link);
+									price.setPcontract_poid_link(pcontractpo_id_link);
+									price.setPcontractid_link(pcontractid_link);
+									price.setQuantity(amount_sizeset);
+									price.setProductid_link(productid_link);
+									price.setSizesetid_link(commonService.getSizeSetid_link_by_name(sizesetname));
+									price.setDate_importdata(current_time);
+									priceService.save(price);
+								}
+							}
 						}
 						rowNum++;
 						row = sheet.getRow(rowNum);
@@ -334,17 +377,19 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 				
 				workbook.close();
 				serverFile.delete();				
-				
-				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				if(mes_err=="") {
+					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				}
+				else {
+					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+					response.setMessage("Có lỗi trong quá trình upload! Bạn hãy thử lại");
+				}
 			}
 			else {
 				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 				response.setMessage("Có lỗi trong quá trình upload! Bạn hãy thử lại");
 			}
-			
-						
-			
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
