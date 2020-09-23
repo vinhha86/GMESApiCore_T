@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.poi.ss.usermodel.Cell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -765,5 +766,15 @@ public class Common  {
 		map.put("Plus", (long)7);
 		
 		return map.get(name);
+	}
+	
+	public String getStringValue(Cell cell) {
+		try {
+			int valua = (int)cell.getNumericCellValue();
+			return valua+"";
+		}
+		catch (Exception e) {
+			return cell.getStringCellValue();
+		}
 	}
 }
