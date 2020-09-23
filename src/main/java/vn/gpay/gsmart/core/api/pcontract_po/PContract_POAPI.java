@@ -245,8 +245,9 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 							po_new = pcontract_POService.save(po_new);
 							
 							//Them co All vao chao gia
-//							float price_cmp = (float)row.getCell(8).getNumericCellValue();
-							float price_fob = (float)row.getCell(8).getNumericCellValue();
+							float price_cmp = (float)row.getCell(9).getNumericCellValue();
+							float price_fob = (float)row.getCell(10).getNumericCellValue();
+							float vendor_target = (float)row.getCell(8).getNumericCellValue();
 							
 							//Them cho san pham con
 							PContract_Price price_all = new PContract_Price();
@@ -255,14 +256,16 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 							price_all.setOrgrootid_link(orgrootid_link);
 							price_all.setPcontract_poid_link(po_new.getId());
 							price_all.setPcontractid_link(pcontractid_link);
-							price_all.setPrice_vendortarget(price_fob);
+							price_all.setPrice_vendortarget(vendor_target);
+							price_all.setPrice_cmp(price_cmp);
+							price_all.setPrice_fob(price_fob);
 							price_all.setProductid_link(productid_link);
 							price_all.setQuantity(po_quantity);
 							price_all.setSizesetid_link(commonService.getSizeSetid_link_by_name("ALL"));
 							price_all.setDate_importdata(current_time);
 							priceService.save(price_all);
 							
-							for(int i= 9;i<15;i++) {
+							for(int i= 11;i<17;i++) {
 								Row row_header = sheet.getRow(0);
 								String sizesetname = row_header.getCell(i).getStringCellValue();
 								int amount_sizeset = (int)row.getCell(i).getNumericCellValue();
@@ -289,7 +292,9 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 								price_all_set.setOrgrootid_link(orgrootid_link);
 								price_all_set.setPcontract_poid_link(po_new.getId());
 								price_all_set.setPcontractid_link(pcontractid_link);
-								price_all_set.setPrice_vendortarget(price_fob);
+								price_all_set.setPrice_vendortarget(vendor_target);
+								price_all_set.setPrice_cmp(price_cmp);
+								price_all_set.setPrice_fob(price_fob);
 								price_all_set.setProductid_link(product_set_id_link);
 								price_all_set.setQuantity(po_quantity);
 								price_all_set.setSizesetid_link(commonService.getSizeSetid_link_by_name("ALL"));
@@ -297,7 +302,7 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 								priceService.save(price_all_set);
 								
 								//
-								for(int i= 9;i<15;i++) {
+								for(int i= 11;i<17;i++) {
 									Row row_header = sheet.getRow(0);
 									String sizesetname = row_header.getCell(i).getStringCellValue();
 									int amount_sizeset = (int)row.getCell(i).getNumericCellValue();
