@@ -37,6 +37,7 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 	            .eq( "orgrootid_link", root_orgid)
 	            .ne("id", orgid)
 	            .eq(type!=1, "orgtypeid_link", type)
+	            .ge("status", 0)
 	            .build();
 		Sort sort = Sorts.builder()
 		        .asc("id")
@@ -52,6 +53,7 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 	            .eq( "orgrootid_link", orgrootid_link)
 	            .eq("parentid_link", parentid_link)
 	            .eq(type!=1, "orgtypeid_link", type)
+	            .ge("status", 0)
 	            .build();
 		Sort sort = Sorts.builder()
 		        .desc("id")
