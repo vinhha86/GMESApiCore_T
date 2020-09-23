@@ -114,17 +114,19 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 				//Kiem tra header 
 				int rowNum = 1;
 				String mes_err = "";
+				Row row = sheet.getRow(rowNum);
 				try {
-					Row row = sheet.getRow(rowNum);
-					while ((int)row.getCell(0).getNumericCellValue() != 0) {
+					while (commonService.getStringValue(row.getCell(0)) != "") {
 						//Kiểm tra sản phẩm có chưa thì sinh id sản phẩm
 						long productid_link = 0;
 						String product_code = row.getCell(3).getStringCellValue();
 						int product_quantity = (int)row.getCell(5).getNumericCellValue();
-						int po_quantity = (int)row.getCell(5).getNumericCellValue() / (int)row.getCell(4).getNumericCellValue();
 						String product_set_code = row.getCell(2).getStringCellValue();
 						int amount = (int)row.getCell(4).getNumericCellValue() == 0 ? 1 : (int)row.getCell(4).getNumericCellValue();
-						
+						int po_quantity = (int)row.getCell(5).getNumericCellValue() / amount;
+						if(product_code == "224G680") {
+							int i = 1;
+						}
 						List<Product> products = productService.getone_by_code(orgrootid_link, product_code, (long)0, ProductType.SKU_TYPE_COMPLETEPRODUCT);
 						if(products.size() == 0) {
 							Product p = new Product();
@@ -317,7 +319,7 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 										price.setOrgrootid_link(orgrootid_link);
 										price.setPcontract_poid_link(po_new.getId());
 										price.setPcontractid_link(pcontractid_link);
-										price.setQuantity(amount_sizeset/(int)row.getCell(4).getNumericCellValue());
+										price.setQuantity(amount_sizeset/amount);
 										price.setProductid_link(product_set_id_link);
 										price.setSizesetid_link(commonService.getSizeSetid_link_by_name(sizesetname));
 										price.setDate_importdata(current_time);
@@ -372,6 +374,7 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 					}
 				}
 				catch (Exception e) {
+					String a = commonService.getStringValue(row.getCell(2));
 					mes_err = e.getMessage();
 				}
 				
@@ -383,7 +386,7 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 				}
 				else {
 					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-					response.setMessage("Có lỗi trong quá trình upload! Bạn hãy thử lại");
+					response.setMessage(mes_err);
 				}
 			}
 			else {
