@@ -30,6 +30,9 @@ public class Schedule_porder {
 	private long pcontract_poid_link;
 	private long pcontractid_link;
 	private long porderid_link;
+	private String productbuyercode;
+	
+	
 		
 	public Long getParentid_origin() {
 		return parentid_origin;
@@ -158,6 +161,12 @@ public class Schedule_porder {
 	}
 	public void setPorderid_link(long porderid_link) {
 		this.porderid_link = porderid_link;
+	}
+	public String getProductbuyercode() {
+		return productbuyercode;
+	}
+	public void setProductbuyercode(String productbuyercode) {
+		this.productbuyercode = productbuyercode;
 	}
 	
 	

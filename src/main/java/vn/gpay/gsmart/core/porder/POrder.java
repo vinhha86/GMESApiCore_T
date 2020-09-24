@@ -264,6 +264,14 @@ public class POrder implements Serializable {
 	}
 	
 	@Transient
+	public String getProductcode() {
+		if(product != null) {
+			return product.getBuyercode();
+		}
+		return "";
+	}
+	
+	@Transient
 	public String getPo_buyer() {
 		if(pcontract_po != null) {
 			return pcontract_po.getPo_buyer();

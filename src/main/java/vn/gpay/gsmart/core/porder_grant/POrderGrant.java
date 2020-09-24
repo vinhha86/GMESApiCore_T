@@ -106,12 +106,20 @@ public class POrderGrant implements Serializable {
 			return porder.getOrdercode();
 		return "";
 	}
+	
+	@Transient
+	public String getProductcode() {
+		if(porder!=null)
+			return porder.getProductcode();
+		return "";
+	}
 	@Transient
 	public long getProductid_link() {
 		if(porder!=null)
 			return porder.getProductid_link();
 		return 0;
 	}
+	
 	@Transient
 	public long getPcontract_poid_link() {
 		if(porder!=null)
@@ -151,6 +159,7 @@ public class POrderGrant implements Serializable {
 	public String getMaHang() {
 		String name = "";
 		int total = grantamount == null ? 0 : grantamount;
+		String code = getProductcode();
 		
 		DecimalFormat decimalFormat = new DecimalFormat("#,###");
 		decimalFormat.setGroupingSize(3);
@@ -159,7 +168,7 @@ public class POrderGrant implements Serializable {
 			float totalPO = porder.getPo_quantity() == null ? 0 : porder.getPo_quantity();
 			String ST = porder.getBuyername() == null ? "" : porder.getBuyername();
 			String PO = porder.getPo_buyer() == null ? "" : porder.getPo_vendor();
-			name += "#"+ST+"-PO: "+PO+" - "+decimalFormat.format(total)+" / "+decimalFormat.format(totalPO);
+			name += ""+code+"/"+PO+" - "+decimalFormat.format(total)+" / "+decimalFormat.format(totalPO);
 		}
 		
 		return name;
@@ -169,6 +178,7 @@ public class POrderGrant implements Serializable {
 	public String getMaHang(POrder porder) {
 		String name = "";
 		int total = grantamount == null ? 0 : grantamount;
+		String code = getProductcode();
 		
 		DecimalFormat decimalFormat = new DecimalFormat("#,###");
 		decimalFormat.setGroupingSize(3);
@@ -177,7 +187,7 @@ public class POrderGrant implements Serializable {
 			float totalPO = porder.getPo_quantity() == null ? 0 : porder.getPo_quantity();
 			String ST = porder.getBuyername() == null ? "" : porder.getBuyername();
 			String PO = porder.getPo_buyer() == null ? "" : porder.getPo_vendor();
-			name += "#"+ST+"-PO: "+PO+"-"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
+			name += "#"+code+"/"+PO+"-"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
 		}
 		
 		return name;

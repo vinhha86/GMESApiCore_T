@@ -247,6 +247,7 @@ public class ScheduleAPI {
 						sch_porder.setProductid_link(pordergrant.getProductid_link());
 						sch_porder.setPcontract_poid_link(pordergrant.getPcontract_poid_link());
 						sch_porder.setPcontractid_link(pordergrant.getPcontractid_link());
+						sch_porder.setProductbuyercode(pordergrant.getProductcode());
 						
 						int d = commonService.getDuration(start_free, end_free, orgrootid_link, year);
 						day_grant += d;
@@ -808,7 +809,7 @@ public class ScheduleAPI {
 				String productcode = product.getBuyercode();
 //				String ST = contract.getBuyername() == null ? "" : contract.getBuyername();
 				String PO = po.getPo_buyer() == null ? "" : po.getPo_vendor();
-				name += "#"+productcode+"-PO: "+PO+"-"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
+				name += productcode+"/"+PO+"-"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
 			}
 			
 			Schedule_porder sch = new Schedule_porder();
