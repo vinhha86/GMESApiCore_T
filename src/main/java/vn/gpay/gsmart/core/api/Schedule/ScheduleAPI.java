@@ -43,6 +43,7 @@ import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
+import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.task.ITask_Service;
 import vn.gpay.gsmart.core.task.Task;
@@ -794,6 +795,7 @@ public class ScheduleAPI {
 			
 			PContract contract = req.getPcontract();
 			PContract_PO po = req.getPcontract_po();
+			Product product = req.getProduct();
 			
 			String name = "";
 			int total = pg.getGrantamount() == null ? 0 : pg.getGrantamount();
@@ -802,10 +804,11 @@ public class ScheduleAPI {
 			DecimalFormat decimalFormat = new DecimalFormat("#,###");
 			decimalFormat.setGroupingSize(3);
 			
-			if(contract != null && po!=null) {
-				String ST = contract.getBuyername() == null ? "" : contract.getBuyername();
+			if(po!=null && product != null) {
+				String productcode = product.getBuyercode();
+//				String ST = contract.getBuyername() == null ? "" : contract.getBuyername();
 				String PO = po.getPo_buyer() == null ? "" : po.getPo_vendor();
-				name += "#"+ST+"-PO: "+PO+"-"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
+				name += "#"+productcode+"-PO: "+PO+"-"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
 			}
 			
 			Schedule_porder sch = new Schedule_porder();
