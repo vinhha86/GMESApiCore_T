@@ -168,7 +168,7 @@ public class POrderGrant implements Serializable {
 			float totalPO = porder.getPo_quantity() == null ? 0 : porder.getPo_quantity();
 			String ST = porder.getBuyername() == null ? "" : porder.getBuyername();
 			String PO = porder.getPo_buyer() == null ? "" : porder.getPo_vendor();
-			name += ""+code+"/"+PO+" - "+decimalFormat.format(total)+" / "+decimalFormat.format(totalPO);
+			name += ""+code+"/"+PO+"/"+decimalFormat.format(total)+" / "+decimalFormat.format(totalPO);
 		}
 		
 		return name;
@@ -187,7 +187,7 @@ public class POrderGrant implements Serializable {
 			float totalPO = porder.getPo_quantity() == null ? 0 : porder.getPo_quantity();
 			String ST = porder.getBuyername() == null ? "" : porder.getBuyername();
 			String PO = porder.getPo_buyer() == null ? "" : porder.getPo_vendor();
-			name += "#"+code+"/"+PO+"-"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
+			name += "#"+code+"/"+PO+"/"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
 		}
 		
 		return name;
