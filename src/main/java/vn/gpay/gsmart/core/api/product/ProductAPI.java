@@ -1175,7 +1175,7 @@ public class ProductAPI {
 					pb.setInfo(pairInfo.getProductinfo());
 					if (entity.po_quantity != null){
 						pb.setPquantity(pairInfo.getAmount()*entity.po_quantity);
-						pb.setCode_amount(product.getBuyercode()+" ("+commonService.FormatNumber(pb.getPquantity())+")");
+						pb.setCode_amount(_product.getBuyercode()+" ("+commonService.FormatNumber(pb.getPquantity())+")");
 					}
 					String FolderPath = commonService.getFolderPath(_product.getProducttypeid_link());
 					String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
