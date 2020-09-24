@@ -25,5 +25,5 @@ public interface IPContract_POService extends Operations<PContract_PO> {
 	
 	List<PContract_PO> getPcontractPoByPContractAndPOBuyer(Long pcontractid_link, String po_buyer, String buyercode);
 	
-	List<PContract_PO> getone_by_template(String PO_No, Date ShipDate, long productid_link, long shipmodeid_link);
+	List<PContract_PO> getone_by_template(String PO_No, Date ShipDate, long productid_link, long shipmodeid_link, long pcontractid_link);
 }

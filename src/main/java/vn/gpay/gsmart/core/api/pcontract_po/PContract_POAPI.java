@@ -229,7 +229,7 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 						float price_fob = (float)row.getCell(10).getNumericCellValue();
 						float vendor_target = (float)row.getCell(8).getNumericCellValue();
 						
-						List<PContract_PO> listpo = pcontract_POService.getone_by_template(PO_No, ShipDate, po_productid_link, shipmodeid_link);
+						List<PContract_PO> listpo = pcontract_POService.getone_by_template(PO_No, ShipDate, po_productid_link, shipmodeid_link, pcontractid_link);
 						if(listpo.size() == 0) {
 							
 							PContract_PO po_new = new PContract_PO();

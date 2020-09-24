@@ -98,8 +98,8 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	}
 	@Override
 	public List<PContract_PO> getone_by_template(String PO_No, Date ShipDate, long productid_link,
-			long shipmodeid_link) {
+			long shipmodeid_link, long pcontractid_link) {
 		// TODO Auto-generated method stub
-		return repo.getone_by_template(PO_No, shipmodeid_link, productid_link, ShipDate);
+		return repo.getone_by_template(PO_No, shipmodeid_link, productid_link, ShipDate, pcontractid_link);
 	}
 }
