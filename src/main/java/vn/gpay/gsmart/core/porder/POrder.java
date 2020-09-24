@@ -57,6 +57,7 @@ public class POrder implements Serializable {
 	private Long sizesetid_link;
 	private Long productid_link;
 	private Integer totalorder;
+	private Integer totalorder_req;//SL yeu cau tu Porder_req
 	private Integer totalcut;
 	private Integer totalstocked;
 	private Date golivedate;
@@ -632,6 +633,14 @@ public class POrder implements Serializable {
 
 	public void setList_pordergrant(List<POrderGrant> list_pordergrant) {
 		this.list_pordergrant = list_pordergrant;
+	}
+
+	public Integer getTotalorder_req() {
+		return totalorder_req;
+	}
+
+	public void setTotalorder_req(Integer totalorder_req) {
+		this.totalorder_req = totalorder_req;
 	}
 	
 	

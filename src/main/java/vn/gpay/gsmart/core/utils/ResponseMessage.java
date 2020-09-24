@@ -18,10 +18,18 @@ public class ResponseMessage {
     public static int KEY_RC_ACTIVE_FAIL            = 904;
     public static int KEY_RC_KEY_DUPLICATION        = 905;
     
-    //POrder_Req Messages (1000-10010)
+    //POrder_Req Messages (1000-1010)
     public static int KEY_POREQ_DELETE_PORDEREXISTED 		= 1000;
     public static String MES_POREQ_DELETE_PORDEREXISTED   	= "Đang tồn tại lệnh sản xuất liên quan, không thể xóa";
     
+    //POrder Create Messages (1011-1020)
+    public static int KEY_RC_PORDER_EXISTED 		= 1011;
+    public static String MES_RC_PORDER_EXISTED   	= "Đã có lệnh sản xuất, không thể tạo thêm";
+    public static int KEY_RC_PORDER_NOSKU 			= 1012;
+    public static String MES_RC_PORDER_NOSKU   		= "Chưa khai báo chi tiết màu, cỡ cho sản phẩm trong chi tiết PO";    
+    public static int KEY_RC_PORDER_NOPO 			= 1013;
+    public static String MES_RC_PORDER_NOPO   		= "PO không tồn tại";    
+
     
     public static String MES_RC_SUCCESS   = "OK - Everything Worked";
     public static String MES_RC_BAD_REQUEST   = "Bad Request - Invalid Parameter or Data Integrity Issue";

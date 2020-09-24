@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -93,6 +94,7 @@ public class POrderAPI {
 		}
 	}    
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
+	@Transactional(rollbackFor = RuntimeException.class)
 	public ResponseEntity<POrder_Create_response> Create(HttpServletRequest request,
 			@RequestBody POrder_Create_request entity) {
 		POrder_Create_response response = new POrder_Create_response();
@@ -102,83 +104,93 @@ public class POrderAPI {
 		
 			POrder porder = entity.data;
 			
-			//Lay thong tin PO
-			PContract_PO thePO = pcontract_POService.findOne(porder.getPcontract_poid_link());
-			
-			if (null !=thePO){
-				//Kiem tra da khai bao chi tiet SKU cho san pham trong PO chua
-				if (pskuservice.getbypo_and_product(thePO.getId(), porder.getProductid_link()).size() > 0){
-					String po_code = thePO.getPo_vendor().length() > 0?thePO.getPo_vendor():thePO.getPo_buyer();
-					
-					if (porder.getId() == null || porder.getId() == 0) {
-						porder.setGolivedate(thePO.getShipdate());
-						porder.setProductiondate(thePO.getProductiondate());
-						
-						porder.setFinishdate_plan(thePO.getShipdate());
-						porder.setProductiondate_plan(thePO.getProductiondate());
-						
-						porder.setOrgrootid_link(orgrootid_link);
-						porder.setOrderdate(new Date());
-						porder.setUsercreatedid_link(user.getId());
-						porder.setStatus(thePO.getStatus() == POStatus.PO_STATUS_UNCONFIRM?POrderStatus.PORDER_STATUS_UNCONFIRM:POrderStatus.PORDER_STATUS_FREE);
-						porder.setTimecreated(new Date());
-					} 
-					
-					response.id = porderService.savePOrder(porder, po_code);
-					porder = porderService.findOne(response.id);
-					response.data = porder;
-					
-					//Update lai trng thai cua Porder_req ve da tao lenh
-					List<POrder_Req> lsPOrder_Req = porder_reqService.getByOrg_PO_Product(porder.getPcontract_poid_link(), porder.getProductid_link(), porder.getGranttoorgid_link());
-					for(POrder_Req thePOrder_Req: lsPOrder_Req){
-						thePOrder_Req.setStatus(POrderReqStatus.STATUS_PORDERED);
-						porder_reqService.save(thePOrder_Req);
-					}
-					
-					//Update lai trng thai cua Porder_req cua PO cha ve da tao lenh
-					List<POrder_Req> lsPOrder_Req_parent = porder_reqService.getByOrg_PO_Product(thePO.getParentpoid_link(), porder.getProductid_link(), porder.getGranttoorgid_link());
-					for(POrder_Req thePOrder_Req_parent: lsPOrder_Req_parent){
-						thePOrder_Req_parent.setStatus(POrderReqStatus.STATUS_PORDERED);
-						porder_reqService.save(thePOrder_Req_parent);
-					}
-					
-					
-					//Tao Task
-					long userid_link = user.getId();
-					long pcontractid_link = porder.getPcontractid_link();
-					long pcontract_poid_link = porder.getPcontract_poid_link();
-					long porder_req_id_link = porder.getPorderreqid_link();
-					long porderid_link = porder.getId();
-					long productid_link = porder.getProductid_link();
-					long granttoorgid_link = porder.getGranttoorgid_link();
-					createTask_AfterPorderCreating(
-							orgrootid_link,
-							userid_link,
-							pcontractid_link,
-							pcontract_poid_link,
-							porder_req_id_link,
-							porderid_link,
-							productid_link,
-							granttoorgid_link						
-						);
-					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-					return new ResponseEntity<POrder_Create_response>(response, HttpStatus.OK);					
-				} else {
-					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-					response.setMessage("Chưa khai báo chi tiết màu, cỡ cho sản phẩm trong chi tiết PO");
-					return new ResponseEntity<POrder_Create_response>(response, HttpStatus.BAD_REQUEST);
-				}
+			//Kiem tra xem POrder_req da duoc tao lenhsx hay chua?
+			if (porderService.getByPOrder_Req(porder.getPcontract_poid_link(), porder.getPorderreqid_link()).size() > 0){
+				response.setRespcode(ResponseMessage.KEY_RC_PORDER_EXISTED);
+				response.setMessage(ResponseMessage.MES_RC_PORDER_EXISTED);
+				throw new RuntimeException(ResponseMessage.MES_RC_PORDER_EXISTED);
 			} else {
-				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-				response.setMessage("PO không tồn tại");
-				return new ResponseEntity<POrder_Create_response>(response, HttpStatus.BAD_REQUEST);
+				//Lay thong tin PO
+				PContract_PO thePO = pcontract_POService.findOne(porder.getPcontract_poid_link());
+				
+				if (null !=thePO){
+					//Kiem tra da khai bao chi tiet SKU cho san pham trong PO chua
+					if (pskuservice.getbypo_and_product(thePO.getId(), porder.getProductid_link()).size() == 0 
+							&& entity.isBypassSKUEmpty == false){
+						response.setRespcode(ResponseMessage.KEY_RC_PORDER_NOSKU);
+						response.setMessage(ResponseMessage.MES_RC_PORDER_NOSKU);
+						throw new RuntimeException(ResponseMessage.MES_RC_PORDER_NOSKU);					
+					} else {
+						String po_code = thePO.getPo_vendor().length() > 0?thePO.getPo_vendor():thePO.getPo_buyer();
+						
+						if (porder.getId() == null || porder.getId() == 0) {
+					
+							porder.setGolivedate(thePO.getShipdate());
+							porder.setProductiondate(thePO.getProductiondate());
+							
+							porder.setFinishdate_plan(thePO.getShipdate());
+							porder.setProductiondate_plan(thePO.getProductiondate());
+							
+							porder.setOrgrootid_link(orgrootid_link);
+							porder.setOrderdate(new Date());
+							porder.setUsercreatedid_link(user.getId());
+							porder.setStatus(thePO.getStatus() == POStatus.PO_STATUS_UNCONFIRM?POrderStatus.PORDER_STATUS_UNCONFIRM:POrderStatus.PORDER_STATUS_FREE);
+							porder.setTimecreated(new Date());
+						} 
+						
+						response.id = porderService.savePOrder(porder, po_code);
+						porder = porderService.findOne(response.id);
+						response.data = porder;
+						
+						//Update lai trng thai cua Porder_req ve da tao lenh
+						List<POrder_Req> lsPOrder_Req = porder_reqService.getByOrg_PO_Product(porder.getPcontract_poid_link(), porder.getProductid_link(), porder.getGranttoorgid_link());
+						for(POrder_Req thePOrder_Req: lsPOrder_Req){
+							thePOrder_Req.setStatus(POrderReqStatus.STATUS_PORDERED);
+							porder_reqService.save(thePOrder_Req);
+						}
+						
+						//Update lai trng thai cua Porder_req cua PO cha ve da tao lenh
+						List<POrder_Req> lsPOrder_Req_parent = porder_reqService.getByOrg_PO_Product(thePO.getParentpoid_link(), porder.getProductid_link(), porder.getGranttoorgid_link());
+						for(POrder_Req thePOrder_Req_parent: lsPOrder_Req_parent){
+							thePOrder_Req_parent.setStatus(POrderReqStatus.STATUS_PORDERED);
+							porder_reqService.save(thePOrder_Req_parent);
+						}
+						
+						
+						//Tao Task
+						long userid_link = user.getId();
+						long pcontractid_link = porder.getPcontractid_link();
+						long pcontract_poid_link = porder.getPcontract_poid_link();
+						long porder_req_id_link = porder.getPorderreqid_link();
+						long porderid_link = porder.getId();
+						long productid_link = porder.getProductid_link();
+						long granttoorgid_link = porder.getGranttoorgid_link();
+						createTask_AfterPorderCreating(
+								orgrootid_link,
+								userid_link,
+								pcontractid_link,
+								pcontract_poid_link,
+								porder_req_id_link,
+								porderid_link,
+								productid_link,
+								granttoorgid_link						
+							);
+						response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+						response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+						return new ResponseEntity<POrder_Create_response>(response, HttpStatus.OK);					
+					}
+				} else {
+					response.setRespcode(ResponseMessage.KEY_RC_PORDER_NOPO);
+					response.setMessage(ResponseMessage.MES_RC_PORDER_NOPO);
+					throw new RuntimeException(ResponseMessage.MES_RC_PORDER_NOPO);
+				}
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (RuntimeException e) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-			response.setMessage(e.getMessage());
+			if (response.getRespcode() == ResponseBase.RESPCODE_NOERROR){
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage(e.getMessage());
+			}
 			return new ResponseEntity<POrder_Create_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
