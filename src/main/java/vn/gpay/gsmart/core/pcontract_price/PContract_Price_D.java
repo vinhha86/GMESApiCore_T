@@ -18,6 +18,8 @@ import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.category.Unit;
 import vn.gpay.gsmart.core.fob_price.FOBPrice;
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
+import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
 
 @Table(name="pcontract_price_d")
@@ -56,6 +58,56 @@ public class PContract_Price_D implements Serializable {/**
 
 	public void setFobpriceid_link(Long fobpriceid_link) {
 		this.fobpriceid_link = fobpriceid_link;
+	}
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="pcontractpriceid_link",insertable=false,updatable =false)
+    private PContract_Price pcontractPrice;
+	
+	@Transient
+	public String getSizesetname() {
+		if(pcontractPrice != null) {
+			return pcontractPrice.getSizesetname();
+		}
+		return "";
+	}
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
+    private PContract_PO pContractPO;
+	
+	@Transient
+	public String getCurrencyName() {
+		if(pContractPO != null) {
+			if(pContractPO.getCurrencyid_link() == null || pContractPO.getCurrencyid_link().equals(0L)) {
+				return "US Dollar";
+			}
+			return pContractPO.getCurrencyName();
+		}
+		return "US Dollar";
+	}
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="productid_link",insertable=false,updatable =false)
+    private Product product;
+	
+	@Transient
+	public String getProductCode() {
+		if(product != null) {
+			return product.getCode();
+		}
+		return "";
+	}
+	
+	@Transient
+	public Integer getProductType() {
+		if(product != null) {
+			return product.getProducttypeid_link();
+		}
+		return 0;
 	}
 
 	@NotFound(action = NotFoundAction.IGNORE)

@@ -202,6 +202,13 @@ public class PContract_PO implements Serializable {/**
 	}
 	
 	@Transient
+	public String getCurrencyName() {
+		if(currency!=null)
+			currency.getName();
+		return "US Dollar";
+	}
+	
+	@Transient
     public String getFactories() {
     	String name = "";
     	for(POrder_Req req : porder_req) {
