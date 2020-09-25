@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import vn.gpay.gsmart.core.attribute.Attribute;
+import vn.gpay.gsmart.core.attribute.IAttributeService;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.category.IShipModeService;
 import vn.gpay.gsmart.core.category.ShipMode;
@@ -44,11 +46,18 @@ import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.product.IProductService;
 import vn.gpay.gsmart.core.product.Product;
+import vn.gpay.gsmart.core.productattributevalue.IProductAttributeService;
+import vn.gpay.gsmart.core.productattributevalue.ProductAttributeValue;
 import vn.gpay.gsmart.core.productpairing.IProductPairingService;
 import vn.gpay.gsmart.core.productpairing.ProductPairing;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
+import vn.gpay.gsmart.core.sku.ISKU_Service;
+import vn.gpay.gsmart.core.sku.SKU;
+import vn.gpay.gsmart.core.sku.SKU_Attribute_Value;
 import vn.gpay.gsmart.core.task_object.ITask_Object_Service;
 import vn.gpay.gsmart.core.task_object.Task_Object;
+import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.ColumnTemplate;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.POStatus;
@@ -61,7 +70,10 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 @RequestMapping("/api/v1/pcontract_po")
 public class PContract_POAPI {
 	@Autowired
+	IAttributeService attrService;
+	@Autowired
 	IPContract_POService pcontract_POService;
+	@Autowired IProductAttributeService pavService;
 	@Autowired
 	IPContract_Price_Service pcontractpriceService;
 	@Autowired
@@ -69,7 +81,9 @@ public class PContract_POAPI {
 	@Autowired
 	IPOrder_Service porderService;
 	@Autowired
-	private IPOrder_Req_Service porder_req_Service;
+	IPOrder_Req_Service porder_req_Service;
+	@Autowired ISKU_AttributeValue_Service skuattService;
+	@Autowired ISKU_Service skuService;
 	@Autowired
 	IPContract_PO_ShippingService poshippingService;
 	@Autowired
@@ -155,6 +169,68 @@ public class PContract_POAPI {
 							p = productService.save(p);
 
 							productid_link = p.getId();
+							
+							//Sinh thuoc tinh mac dinh cho san pham
+							List<Attribute> lstAttr = attrService.getList_attribute_forproduct(ProductType.SKU_TYPE_COMPLETEPRODUCT,
+									user.getRootorgid_link());
+							for (Attribute attribute : lstAttr) {
+								ProductAttributeValue pav = new ProductAttributeValue();
+								long value = 0;
+								
+								if(attribute.getId() == AtributeFixValues.ATTR_COLOR) {
+									value = AtributeFixValues.value_color_all;
+								}
+								else if(attribute.getId() == AtributeFixValues.ATTR_SIZE) {
+									value = AtributeFixValues.value_size_all;
+								} else if(attribute.getId() == AtributeFixValues.ATTR_SIZEWIDTH) {
+									value = AtributeFixValues.value_sizewidth_all;
+								}
+								
+								pav.setId((long) 0);
+								pav.setProductid_link(productid_link);
+								pav.setAttributeid_link(attribute.getId());
+								pav.setAttributevalueid_link(value);
+								pav.setOrgrootid_link(user.getRootorgid_link());
+								pavService.save(pav);
+							}
+							
+							//Sinh SKU cho mau all va co all
+							long skuid_link = 0;
+							
+							SKU sku = new SKU();
+							sku.setId(skuid_link);
+							sku.setCode(genCodeSKU(p));
+							sku.setName(p.getBuyername());
+							sku.setProductid_link(productid_link);
+							sku.setOrgrootid_link(user.getRootorgid_link());
+							sku.setSkutypeid_link(ProductType.SKU_TYPE_COMPLETEPRODUCT);
+
+							sku = skuService.save(sku);
+							skuid_link = sku.getId();
+							
+							// Them vao bang sku_attribute_value
+							SKU_Attribute_Value savMau = new SKU_Attribute_Value();
+							savMau.setId((long) 0);
+							savMau.setAttributevalueid_link(AtributeFixValues.value_color_all);
+							savMau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
+							savMau.setOrgrootid_link(user.getRootorgid_link());
+							savMau.setSkuid_link(skuid_link);
+							savMau.setUsercreateid_link(user.getId());
+							savMau.setTimecreate(new Date());
+
+							skuattService.save(savMau);
+
+							SKU_Attribute_Value savCo = new SKU_Attribute_Value();
+							savCo.setId((long) 0);
+							savCo.setAttributevalueid_link(AtributeFixValues.value_size_all);
+							savCo.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
+							savCo.setOrgrootid_link(user.getRootorgid_link());
+							savCo.setSkuid_link(skuid_link);
+							savCo.setUsercreateid_link(user.getId());
+							savCo.setTimecreate(new Date());
+
+							skuattService.save(savCo);
+							
 						} else {
 							productid_link = products.get(0).getId();
 						}
@@ -168,7 +244,8 @@ public class PContract_POAPI {
 								Product set = new Product();
 								set.setId(null);
 								set.setBuyercode(product_set_code);
-								set.setBuyername(product_set_code);
+								set.setBuyername(amount+"-"+product_set_code);
+								set.setDescription(amount+"-"+product_set_code);
 								set.setOrgrootid_link(orgrootid_link);
 								set.setStatus(1);
 								set.setUsercreateid_link(user.getId());
@@ -194,6 +271,8 @@ public class PContract_POAPI {
 								newpair.setProductid_link(productid_link);
 								newpair.setProductpairid_link(product_set_id_link);
 								productpairService.save(newpair);
+								
+								
 							}
 						}
 
@@ -405,7 +484,6 @@ public class PContract_POAPI {
 						row = sheet.getRow(rowNum);
 					}
 				} catch (Exception e) {
-					String a = commonService.getStringValue(row.getCell(2));
 					mes_err = e.getMessage();
 				}
 
@@ -427,6 +505,17 @@ public class PContract_POAPI {
 			response.setMessage(e.getMessage());
 		}
 		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+	}
+	
+	private String genCodeSKU(Product product) {
+		List<SKU> lstSKU = skuService.getlist_byProduct(product.getId());
+		if (lstSKU.size() == 0) {
+			return product.getBuyercode() + "_" + "1";
+		}
+		String old_code = lstSKU.get(0).getCode();
+		String[] obj = old_code.split("_");
+		int a = Integer.parseInt(obj[obj.length-1]);
+		return product.getBuyercode() + "_" + (a + 1);
 	}
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)

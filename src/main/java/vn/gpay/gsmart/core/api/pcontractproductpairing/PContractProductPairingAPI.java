@@ -250,6 +250,7 @@ public class PContractProductPairingAPI {
 				}
 				
 				product.setName(getNameproductPair(entity.listpair));
+				product.setDescription(getNameproductPair(entity.listpair));
 				
 				product = productService.save(product);
 				
