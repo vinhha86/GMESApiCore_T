@@ -944,6 +944,8 @@ public class PContract_POAPI {
 				ponew.setUnitid_link(po.getUnitid_link());
 				ponew.setUsercreatedid_link(userid_link);
 				ponew.setPo_quantity(po.getPo_quantity());
+				ponew.setPlan_productivity(po.getPlan_productivity());
+				ponew.setPlan_linerequired(po.getPlan_linerequired());
 				ponew = pcontract_POService.save(ponew);
 
 				List<POrder_Req> list_req = porder_req_Service.getByPO(po.getId());
