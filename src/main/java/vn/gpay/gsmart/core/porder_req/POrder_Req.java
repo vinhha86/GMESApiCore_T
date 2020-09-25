@@ -97,7 +97,12 @@ public class POrder_Req implements Serializable {
     @JoinColumn(name="productid_link",insertable=false,updatable =false)
     private Product product;
 	
-	
+	@Transient
+	public int get_ProductivityPO() {
+		if(pcontract_po!=null)
+			return pcontract_po.getPlan_productivity();
+		return 0;
+	}
 	@Transient
 	public String getGranttoorgname() {
 		if(org != null) {

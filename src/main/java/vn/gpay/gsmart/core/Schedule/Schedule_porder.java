@@ -32,8 +32,31 @@ public class Schedule_porder {
 	private long porderid_link;
 	private String productbuyercode;
 	
+
+	@JsonProperty("Cls")
+	private String Cls;
+	
+	private long id_origin;
+	
+	private int duration;
+	private int productivity;
+	private int productivity_po;
+	private int productivity_porder;
+	
 	
 		
+	public int getProductivity_po() {
+		return productivity_po;
+	}
+	public void setProductivity_po(int productivity_po) {
+		this.productivity_po = productivity_po;
+	}
+	public int getProductivity_porder() {
+		return productivity_porder;
+	}
+	public void setProductivity_porder(int productivity_porder) {
+		this.productivity_porder = productivity_porder;
+	}
 	public Long getParentid_origin() {
 		return parentid_origin;
 	}
@@ -46,13 +69,6 @@ public class Schedule_porder {
 	public void setPordercode(String pordercode) {
 		this.pordercode = pordercode;
 	}
-	@JsonProperty("Cls")
-	private String Cls;
-	
-	private long id_origin;
-	
-	private int duration;
-	private int productivity;
 	
 	public long getResourceId() {
 		return ResourceId;

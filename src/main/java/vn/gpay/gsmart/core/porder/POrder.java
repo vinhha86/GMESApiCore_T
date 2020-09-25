@@ -133,7 +133,12 @@ public class POrder implements Serializable {
 	@OneToMany
     @JoinColumn(name="porderid_link",insertable=false,updatable =false)
     private List<POrderGrant> list_pordergrant = new ArrayList<POrderGrant>();
-	
+	@Transient
+	public int getProductivity_po() {
+		if(pcontract_po!=null)
+			return pcontract_po.getPlan_productivity() == null ? 0 : pcontract_po.getPlan_productivity();
+		return 0;
+	}
 	@Transient
 	public Date getStartDatePlan() {
 		// lấy ngày vào chuyền sớm nhất của lệnh này theo các tổ đã phân(tính từ ngày hiện tại)
@@ -673,7 +678,7 @@ public class POrder implements Serializable {
 	}
 
 	public Integer getPlan_productivity() {
-		return plan_productivity;
+		return plan_productivity == null ? 0 : plan_productivity;
 	}
 
 	public void setPlan_productivity(Integer plan_productivity) {
@@ -689,7 +694,7 @@ public class POrder implements Serializable {
 	}
 
 	public Integer getPlan_duration() {
-		return plan_duration;
+		return plan_duration == null ? 1 : plan_duration;
 	}
 
 	public void setPlan_duration(Integer plan_duration) {

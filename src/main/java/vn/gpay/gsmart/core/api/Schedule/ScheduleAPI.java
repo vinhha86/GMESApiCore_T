@@ -248,6 +248,8 @@ public class ScheduleAPI {
 						sch_porder.setPcontract_poid_link(pordergrant.getPcontract_poid_link());
 						sch_porder.setPcontractid_link(pordergrant.getPcontractid_link());
 						sch_porder.setProductbuyercode(pordergrant.getProductcode());
+						sch_porder.setProductivity_po(pordergrant.getProductivity_po());
+						sch_porder.setProductivity_porder(pordergrant.getProductivity_porder());
 						
 						int d = commonService.getDuration(start_free, end_free, orgrootid_link, year);
 						day_grant += d;
@@ -377,6 +379,8 @@ public class ScheduleAPI {
 						sch_porder.setProductid_link(pordergrant.getProductid_link());
 						sch_porder.setPcontract_poid_link(pordergrant.getPcontract_poid_link());
 						sch_porder.setPorderid_link(pordergrant.getPorderid_link());
+						sch_porder.setProductivity_po(pordergrant.getProductivity_po());
+						sch_porder.setProductivity_porder(pordergrant.getProductivity_porder());
 						
 						response.events.rows.add(sch_porder);
 					}
@@ -649,7 +653,6 @@ public class ScheduleAPI {
 		create_pordergrant_response response = new create_pordergrant_response();
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		long orgrootid_link = user.getRootorgid_link();
-		int year = Calendar.getInstance().get(Calendar.YEAR);
 		
 		try {
 			POrder porder = porderService.findOne(entity.porderid_link);
@@ -725,6 +728,9 @@ public class ScheduleAPI {
 			sch.setTotalpackage(porder.getTotalorder());
 			sch.setVendorname(porder.getVendorname());
 			sch.setPorder_grantid_link(pg.getId());
+			sch.setProductivity_po(pg.getProductivity_po());
+			sch.setProductivity_porder(porder.getPlan_productivity());
+			sch.setProductivity_po(porder.getProductivity_po());
 			
 			response.data = sch;
 			
@@ -770,6 +776,7 @@ public class ScheduleAPI {
 			porder.setPorderreqid_link(entity.porder_reqid_link);
 			porder.setTotalorder(req.getTotalorder());
 			porder.setProductid_link(req.getProductid_link());
+			porder.setPlan_productivity(req.get_ProductivityPO());
 			porder = porderService.saveAndFlush(porder);
 			
 			Date startDate = commonService.getBeginOfDate(porder.getProductiondate_plan());
@@ -1251,6 +1258,8 @@ public class ScheduleAPI {
 				new_data.setPcontract_poid_link(grant_old.getPcontract_poid_link());
 				new_data.setProductid_link(grant_old.getProductid_link());
 				new_data.setPcontractid_link(grant_old.getPcontractid_link());
+				new_data.setProductivity_po(grant_old.getProductivity_po());
+				new_data.setProductivity_porder(grant_old.getProductivity_porder());
 				response.new_data = new_data;
 				 
 				//gan sku vao grant moi sinh ra va tru sku o grant tach
