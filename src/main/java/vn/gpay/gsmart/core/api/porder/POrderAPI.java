@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.math3.util.Precision;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -141,8 +140,8 @@ public class POrderAPI {
 							
 							porder.setPlan_productivity(thePO.getPlan_productivity());
 						} 
-						Float productiondays = (float)thePO.getProductiondays();
-						porder = porderService.savePOrder(calPlan_Linerequired(orgrootid_link, porder,productiondays), po_code);
+//						Float productiondays = (float)thePO.getProductiondays();
+						porder = porderService.savePOrder(calPlan_FinishDate(orgrootid_link, porder), po_code);
 						
 						response.id = porder.getId();
 						response.data = porder;
@@ -213,8 +212,8 @@ public class POrderAPI {
 			//Lay thong tin PO
 			PContract_PO thePO = pcontract_POService.findOne(porder.getPcontract_poid_link());
 			if (null !=thePO){
-				Float productiondays = (float)thePO.getProductiondays();
-				porder = porderService.save(calPlan_Linerequired(orgrootid_link, porder,productiondays));
+//				Float productiondays = (float)thePO.getProductiondays();
+				porder = porderService.save(calPlan_FinishDate(orgrootid_link, porder));
 				response.data = porder;
 
 				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -235,9 +234,8 @@ public class POrderAPI {
 			return new ResponseEntity<POrder_Create_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
-	private POrder calPlan_Linerequired(long orgrootid_link, POrder porder, Float productiondays){
-		if (null != productiondays && 0 != productiondays &&
-				null != porder.getTotalorder() && 0 != porder.getTotalorder() && 
+	private POrder calPlan_FinishDate(Long orgrootid_link, POrder porder){
+		if (null != porder.getTotalorder() && 0 != porder.getTotalorder() && 
 				null != porder.getPlan_productivity() && 0 != porder.getPlan_productivity()){
 			//Tinh toan SL chuyen yeu cau
 			Float totalorder = (float)porder.getTotalorder();
@@ -528,7 +526,7 @@ public class POrderAPI {
 						thePOrderSKU.setPquantity_total(entity.data.getPquantity_total());
 						porderskuService.save(thePOrderSKU);
 						
-						updateTotalOrder(thePOrderSKU.getPorderid_link());
+						updateTotalOrder(orgrootid_link, thePOrderSKU.getPorderid_link());
 						updatePOStatus(orgrootid_link,pcontract_poid_link,pcontractid_link);
 //						updateContractSKU(thePOrderSKU.getPorderid_link(),thePOrderSKU.getSkuid_link());
 						
@@ -570,7 +568,7 @@ public class POrderAPI {
 			 if (lstPOrderSKU.size() == 0){
 				porderskuService.save(entity.data);
 				
-				updateTotalOrder(entity.data.getPorderid_link());
+				updateTotalOrder(orgrootid_link, entity.data.getPorderid_link());
 				
 //				updateContractSKU(entity.data.getPorderid_link(),entity.data.getSkuid_link());
 
@@ -615,7 +613,7 @@ public class POrderAPI {
 				}
 			}
 			
-			updateTotalOrder(entity.porderid_link);
+			updateTotalOrder(orgrootid_link, entity.porderid_link);
 			updatePOStatus(orgrootid_link,pcontract_poid_link,pcontractid_link);
 //			updateContractSKU(thePOrderSKU.getPorderid_link(),thePOrderSKU.getSkuid_link());
 			
@@ -644,7 +642,7 @@ public class POrderAPI {
 			for(POrder_Product_SKU thePOrderSKU: entity.data){
 				porderskuService.delete(thePOrderSKU);
 			} 
-			updateTotalOrder(entity.porderid_link);
+			updateTotalOrder(orgrootid_link, entity.porderid_link);
 			updatePOStatus(orgrootid_link,pcontract_poid_link,pcontractid_link);
 //			updateContractSKU(thePOrderSKU.getPorderid_link(),thePOrderSKU.getSkuid_link());
 			
@@ -658,13 +656,14 @@ public class POrderAPI {
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 		}
 	}	
-	private void updateTotalOrder(Long porderid_link){
+	private void updateTotalOrder(Long orgrootid_link, Long porderid_link){
 		POrder thePOrder = porderService.findOne(porderid_link);
 		int totalorder = 0;
 		for(POrder_Product_SKU thePorderSKU:thePOrder.getPorder_product_sku()){
 			totalorder += null==thePorderSKU.getPquantity_total()?0:thePorderSKU.getPquantity_total();
 		}
 		thePOrder.setTotalorder(totalorder);
+		calPlan_FinishDate(orgrootid_link,thePOrder);
 		porderService.save(thePOrder);
 	}
 	
