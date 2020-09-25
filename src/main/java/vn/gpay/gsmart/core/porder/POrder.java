@@ -385,8 +385,8 @@ public class POrder implements Serializable {
 	}
 	
 	@NotFound(action = NotFoundAction.IGNORE)
-	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
-	@JoinColumn( name="porderid_link", referencedColumnName="id")
+	@OneToMany
+	@JoinColumn( name="porderid_link", referencedColumnName="id",insertable=false,updatable =false)
 	private List<POrder_Product_SKU>  porder_product_sku  = new ArrayList<>();
 	
 	@NotFound(action = NotFoundAction.IGNORE)
