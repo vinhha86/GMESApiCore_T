@@ -19,6 +19,9 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 	@Query("SELECT c FROM POrder c where c.pcontractid_link = :pcontractid_link")
 	public List<POrder> getByContract(@Param ("pcontractid_link")final Long pcontractid_link);
 	
+	@Query("SELECT c FROM POrder c where c.id = :id")
+	public List<POrder> getById(@Param ("id")final Long id);
+
 	@Query("SELECT c FROM POrder c where c.pcontractid_link = :pcontractid_link and c.productid_link = :productid_link")
 	public List<POrder> getByContractAndProduct(@Param ("pcontractid_link")final Long pcontractid_link, @Param ("productid_link")final Long productid_link);
 

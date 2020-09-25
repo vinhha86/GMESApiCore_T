@@ -32,13 +32,22 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 	}
 	
 	@Override
-	public Long savePOrder(POrder porder, String po_code){
+	public POrder getById(Long id){
+		List<POrder> a = repo.getById(id);
+		if (a.size() > 0)
+			return a.get(0);
+		else
+			return null;
+	}
+	
+	@Override
+	public POrder savePOrder(POrder porder, String po_code){
 		try {
 			if (porder.getId() == null || porder.getId() == 0) {
 				porder.setOrdercode(porder_AutoID_Service.getLastID(po_code));
 			} 
 			porder = this.save(porder);
-			return porder.getId();
+			return porder;
 		} catch (Exception e){
 			e.printStackTrace();
 			return null;

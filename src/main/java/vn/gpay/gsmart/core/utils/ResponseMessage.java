@@ -29,7 +29,8 @@ public class ResponseMessage {
     public static String MES_RC_PORDER_NOSKU   		= "Chưa khai báo chi tiết màu, cỡ cho sản phẩm trong chi tiết PO";    
     public static int KEY_RC_PORDER_NOPO 			= 1013;
     public static String MES_RC_PORDER_NOPO   		= "PO không tồn tại";    
-
+    public static int KEY_RC_PORDER_CALCULATION		= 1014;
+    public static String MES_RC_PORDER_CALCULATION  = "Năng suất xưởng hoặc Số lượng yêu cầu sản xuất không hợp lệ";    
     
     public static String MES_RC_SUCCESS   = "OK - Everything Worked";
     public static String MES_RC_BAD_REQUEST   = "Bad Request - Invalid Parameter or Data Integrity Issue";

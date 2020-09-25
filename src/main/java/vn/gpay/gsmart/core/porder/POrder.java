@@ -87,6 +87,10 @@ public class POrder implements Serializable {
 	private Date productiondate_fact;
 	private Date finishdate_plan;
 	private Date finishdate_fact;
+	private Boolean isbomdone;
+	private Boolean issewingcostdone;
+	private Integer plan_productivity;
+	private Float plan_linerequired;
 //	private Long porder_statusid_link;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -649,6 +653,38 @@ public class POrder implements Serializable {
 
 	public void setTotalorder_req(Integer totalorder_req) {
 		this.totalorder_req = totalorder_req;
+	}
+
+	public Boolean getIsbomdone() {
+		return isbomdone;
+	}
+
+	public void setIsbomdone(Boolean isbomdone) {
+		this.isbomdone = isbomdone;
+	}
+
+	public Boolean getIssewingcostdone() {
+		return issewingcostdone;
+	}
+
+	public void setIssewingcostdone(Boolean issewingcostdone) {
+		this.issewingcostdone = issewingcostdone;
+	}
+
+	public Integer getPlan_productivity() {
+		return plan_productivity;
+	}
+
+	public void setPlan_productivity(Integer plan_productivity) {
+		this.plan_productivity = plan_productivity;
+	}
+
+	public Float getPlan_linerequired() {
+		return plan_linerequired;
+	}
+
+	public void setPlan_linerequired(Float plan_linerequired) {
+		this.plan_linerequired = plan_linerequired;
 	}
 	
 	

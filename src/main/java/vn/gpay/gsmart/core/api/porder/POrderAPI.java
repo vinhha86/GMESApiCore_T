@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.math3.util.Precision;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -136,10 +137,13 @@ public class POrderAPI {
 							porder.setUsercreatedid_link(user.getId());
 							porder.setStatus(thePO.getStatus() == POStatus.PO_STATUS_UNCONFIRM?POrderStatus.PORDER_STATUS_UNCONFIRM:POrderStatus.PORDER_STATUS_FREE);
 							porder.setTimecreated(new Date());
+							
+//							porder.setPlan_productivity(thePO.g);
 						} 
+						Float productiondays = (float)thePO.getProductiondays();
+						porder = porderService.savePOrder(calPlan_Linerequired(porder,productiondays), po_code);
 						
-						response.id = porderService.savePOrder(porder, po_code);
-						porder = porderService.findOne(response.id);
+						response.id = porder.getId();
 						response.data = porder;
 						
 						//Update lai trng thai cua Porder_req ve da tao lenh
@@ -189,10 +193,58 @@ public class POrderAPI {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			if (response.getRespcode() == ResponseBase.RESPCODE_NOERROR){
 				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-				response.setMessage(e.getMessage());
+				response.setMessage("Lỗi hệ thống: " + e.getMessage());
 			}
 			return new ResponseEntity<POrder_Create_response>(response, HttpStatus.BAD_REQUEST);
 		}
+	}
+	
+	@RequestMapping(value = "/update", method = RequestMethod.POST)
+	@Transactional(rollbackFor = RuntimeException.class)
+	public ResponseEntity<POrder_Create_response> Update(HttpServletRequest request,
+			@RequestBody POrder_Create_request entity) {
+		POrder_Create_response response = new POrder_Create_response();
+		try {
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+			POrder porder = entity.data;
+			//Lay thong tin PO
+			PContract_PO thePO = pcontract_POService.findOne(porder.getPcontract_poid_link());
+			if (null !=thePO){
+				Float productiondays = (float)thePO.getProductiondays();
+				porder = porderService.save(calPlan_Linerequired(porder,productiondays));
+				response.data = porder;
+
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<POrder_Create_response>(response, HttpStatus.OK);	
+			} else {
+				response.setRespcode(ResponseMessage.KEY_RC_PORDER_NOPO);
+				response.setMessage(ResponseMessage.MES_RC_PORDER_NOPO);
+				throw new RuntimeException(ResponseMessage.MES_RC_PORDER_NOPO);
+			}
+
+		} catch (RuntimeException e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			if (response.getRespcode() == ResponseBase.RESPCODE_NOERROR){
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage("Lỗi hệ thống: " + e.getMessage());
+			}
+			return new ResponseEntity<POrder_Create_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	private POrder calPlan_Linerequired(POrder porder, Float productiondays){
+		Float totalorder = (float)porder.getTotalorder();
+		Float plan_productivity = (float)porder.getPlan_productivity();
+		if (null != productiondays && 0 != productiondays &&
+				null != totalorder && 0 != totalorder && 
+				null != plan_productivity && 0 != plan_productivity){
+			//Tinh toan SL chuyen yeu cau
+			porder.setPlan_linerequired(totalorder/productiondays/plan_productivity);
+		} else {
+			porder.setPlan_linerequired(null);				
+		}		
+		return porder;
 	}
 	
 	@RequestMapping(value = "/get_free_bygolivedate", method = RequestMethod.POST)

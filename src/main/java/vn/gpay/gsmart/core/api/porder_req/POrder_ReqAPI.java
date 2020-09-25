@@ -461,7 +461,7 @@ public class POrder_ReqAPI {
 						
 						porder.setPorder_product_sku(porder_SKU);
 						
-						porderid_link = porderService.savePOrder(porder, po_code);
+						porderid_link = porderService.savePOrder(porder, po_code).getId();
 						
 						porder_req.setTotalorder(totalorder);
 						porder_req_Service.save(porder_req);
