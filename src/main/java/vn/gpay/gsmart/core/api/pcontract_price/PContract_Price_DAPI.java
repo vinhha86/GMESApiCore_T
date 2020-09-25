@@ -42,7 +42,10 @@ public class PContract_Price_DAPI {
 					Float price0 = (float) 0;
 					if(pcontractpriced.getIsfob() == false) continue;
 //					if(pcontractpriced.getSizesetname().equals("ALL")) continue;
-					if(pcontractpriced.getPrice().equals(price0)) continue;
+					if(pcontractpriced.getPrice().equals(price0) 
+							&& pcontractpriced.getUnitid_link() == null 
+							&& pcontractpriced.getUnitprice() == null
+							&& pcontractpriced.getQuota() == null) continue;
 					response.data.add(pcontractpriced);
 				}
 			}
