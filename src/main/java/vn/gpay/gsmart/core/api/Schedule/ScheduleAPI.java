@@ -656,8 +656,8 @@ public class ScheduleAPI {
 
 			Date startDate = commonService.getBeginOfDate(porder.getProductiondate_plan());
 			Date endDate = commonService.getEndOfDate(porder.getFinishdate_plan());
-			int duration = commonService.getDuration(startDate, endDate, orgrootid_link, year);
-			int productivity = commonService.getProductivity(porder.getTotalorder(), duration);
+			int duration = porder.getPlan_duration();
+			int productivity = porder.getPlan_productivity();
 			
 			porder.setStatus(POrderStatus.PORDER_STATUS_GRANTED);
 			porderService.save(porder);
