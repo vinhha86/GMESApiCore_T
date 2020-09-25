@@ -138,7 +138,7 @@ public class POrderAPI {
 							porder.setStatus(thePO.getStatus() == POStatus.PO_STATUS_UNCONFIRM?POrderStatus.PORDER_STATUS_UNCONFIRM:POrderStatus.PORDER_STATUS_FREE);
 							porder.setTimecreated(new Date());
 							
-//							porder.setPlan_productivity(thePO.g);
+							porder.setPlan_productivity(thePO.getPlan_productivity());
 						} 
 						Float productiondays = (float)thePO.getProductiondays();
 						porder = porderService.savePOrder(calPlan_Linerequired(porder,productiondays), po_code);
@@ -234,12 +234,12 @@ public class POrderAPI {
 		}
 	}
 	private POrder calPlan_Linerequired(POrder porder, Float productiondays){
-		Float totalorder = (float)porder.getTotalorder();
-		Float plan_productivity = (float)porder.getPlan_productivity();
 		if (null != productiondays && 0 != productiondays &&
-				null != totalorder && 0 != totalorder && 
-				null != plan_productivity && 0 != plan_productivity){
+				null != porder.getTotalorder() && 0 != porder.getTotalorder() && 
+				null != porder.getPlan_productivity() && 0 != porder.getPlan_productivity()){
 			//Tinh toan SL chuyen yeu cau
+			Float totalorder = (float)porder.getTotalorder();
+			Float plan_productivity = (float)porder.getPlan_productivity();			
 			porder.setPlan_linerequired(totalorder/productiondays/plan_productivity);
 		} else {
 			porder.setPlan_linerequired(null);				
