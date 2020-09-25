@@ -81,9 +81,27 @@ public class PContract_PO implements Serializable {/**
 	private Boolean isauto_calculate;
 	private Long shipmodeid_link;
 	private Date date_importdata;
+	private Integer plan_productivity;
+	private Float plan_linerequired;
 	
 	
 	
+	public Integer getPlan_productivity() {
+		return plan_productivity;
+	}
+
+	public void setPlan_productivity(Integer plan_productivity) {
+		this.plan_productivity = plan_productivity;
+	}
+
+	public Float getPlan_linerequired() {
+		return plan_linerequired;
+	}
+
+	public void setPlan_linerequired(Float plan_linerequired) {
+		this.plan_linerequired = plan_linerequired;
+	}
+
 	public Long getShipmodeid_link() {
 		return shipmodeid_link;
 	}
