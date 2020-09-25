@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.api.porder;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -141,7 +142,7 @@ public class POrderAPI {
 							porder.setPlan_productivity(thePO.getPlan_productivity());
 						} 
 						Float productiondays = (float)thePO.getProductiondays();
-						porder = porderService.savePOrder(calPlan_Linerequired(porder,productiondays), po_code);
+						porder = porderService.savePOrder(calPlan_Linerequired(orgrootid_link, porder,productiondays), po_code);
 						
 						response.id = porder.getId();
 						response.data = porder;
@@ -205,14 +206,15 @@ public class POrderAPI {
 			@RequestBody POrder_Create_request entity) {
 		POrder_Create_response response = new POrder_Create_response();
 		try {
-//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			
 			POrder porder = entity.data;
 			//Lay thong tin PO
 			PContract_PO thePO = pcontract_POService.findOne(porder.getPcontract_poid_link());
 			if (null !=thePO){
 				Float productiondays = (float)thePO.getProductiondays();
-				porder = porderService.save(calPlan_Linerequired(porder,productiondays));
+				porder = porderService.save(calPlan_Linerequired(orgrootid_link, porder,productiondays));
 				response.data = porder;
 
 				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -233,14 +235,20 @@ public class POrderAPI {
 			return new ResponseEntity<POrder_Create_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
-	private POrder calPlan_Linerequired(POrder porder, Float productiondays){
+	private POrder calPlan_Linerequired(long orgrootid_link, POrder porder, Float productiondays){
 		if (null != productiondays && 0 != productiondays &&
 				null != porder.getTotalorder() && 0 != porder.getTotalorder() && 
 				null != porder.getPlan_productivity() && 0 != porder.getPlan_productivity()){
 			//Tinh toan SL chuyen yeu cau
 			Float totalorder = (float)porder.getTotalorder();
-			Float plan_productivity = (float)porder.getPlan_productivity();			
-			porder.setPlan_linerequired(totalorder/productiondays/plan_productivity);
+			Float plan_productivity = (float)porder.getPlan_productivity();		
+			
+			Integer plan_duration = Math.round(totalorder/plan_productivity);	
+			Date finishdate_plan =  commonService.Date_Add_with_holiday(porder.getProductiondate_plan(), plan_duration, orgrootid_link, Calendar.getInstance().get(Calendar.YEAR));
+			
+			porder.setFinishdate_plan(finishdate_plan);
+			porder.setPlan_duration(plan_duration);
+//			porder.setPlan_linerequired(Precision.round(iSLNgaySX/productiondays,1));
 		} else {
 			porder.setPlan_linerequired(null);				
 		}		

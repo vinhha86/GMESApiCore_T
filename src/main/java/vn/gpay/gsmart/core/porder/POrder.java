@@ -90,6 +90,7 @@ public class POrder implements Serializable {
 	private Boolean isbomdone;
 	private Boolean issewingcostdone;
 	private Integer plan_productivity;
+	private Integer plan_duration;
 	private Float plan_linerequired;
 //	private Long porder_statusid_link;
 	
@@ -685,6 +686,14 @@ public class POrder implements Serializable {
 
 	public void setPlan_linerequired(Float plan_linerequired) {
 		this.plan_linerequired = plan_linerequired;
+	}
+
+	public Integer getPlan_duration() {
+		return plan_duration;
+	}
+
+	public void setPlan_duration(Integer plan_duration) {
+		this.plan_duration = plan_duration;
 	}
 	
 	
