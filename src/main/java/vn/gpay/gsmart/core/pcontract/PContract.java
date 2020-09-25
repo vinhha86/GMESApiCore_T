@@ -180,8 +180,8 @@ public class PContract implements Serializable {/**
 	
 	@Transient
 	public String getcls() {
-		if(orgShow!=null )
-			return orgShow.getCls();
+		if(buyer!=null )
+			return buyer.getCls();
 		else
 			return "";
 	}
