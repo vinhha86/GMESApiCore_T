@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_DService;
+import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Service;
+import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price_D;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -23,6 +25,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 @RequestMapping("/api/v1/pcontract_price_d")
 public class PContract_Price_DAPI {
 	@Autowired IPContract_Price_DService pcontractPriceDservice;
+	@Autowired IPContract_Price_Service pcontractPriceservice;
 	@Autowired IPContract_POService pcontractPoService;
 	
 	@RequestMapping(value = "/getByPO", method = RequestMethod.POST)
@@ -39,13 +42,17 @@ public class PContract_Price_DAPI {
 					continue;
 				}else {
 					// đơn
-					Float price0 = (float) 0;
+//					Float price0 = (float) 0;
 					if(pcontractpriced.getIsfob() == false) continue;
 //					if(pcontractpriced.getSizesetname().equals("ALL")) continue;
-					if(pcontractpriced.getPrice().equals(price0) 
-							&& pcontractpriced.getUnitid_link() == null 
-							&& pcontractpriced.getUnitprice() == null
-							&& pcontractpriced.getQuota() == null) continue;
+//					if(pcontractpriced.getPrice().equals(price0) 
+//							&& pcontractpriced.getUnitid_link() == null 
+//							&& pcontractpriced.getUnitprice() == null
+//							&& pcontractpriced.getQuota() == null) continue;
+					// nếu có size != ALL thì ko lấy ALL
+//					List<PContract_Price> temp = new ArrayList<PContract_Price>();
+					List<PContract_Price> temp = pcontractPriceservice.getBySizesetNotAll(pcontractpriced.getPcontract_poid_link());
+					if(temp.size() > 0 && pcontractpriced.getSizesetname().equals("ALL")) continue;
 					response.data.add(pcontractpriced);
 				}
 			}
