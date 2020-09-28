@@ -98,7 +98,7 @@ public class POrder_Req implements Serializable {
     private Product product;
 	
 	@Transient
-	public int get_ProductivityPO() {
+	public Integer get_ProductivityPO() {
 		if(pcontract_po!=null)
 			return pcontract_po.getPlan_productivity();
 		return 0;
