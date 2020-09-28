@@ -100,7 +100,7 @@ public class POrder_Req implements Serializable {
 	@Transient
 	public int get_ProductivityPO() {
 		if(pcontract_po!=null)
-			return pcontract_po.getPlan_productivity();
+			return pcontract_po.getPlan_productivity() == null ? 0 : pcontract_po.getPlan_productivity();
 		return 0;
 	}
 	@Transient
