@@ -256,10 +256,10 @@ public class POrder implements Serializable {
 		DecimalFormat decimalFormat = new DecimalFormat("#,###");
 		decimalFormat.setGroupingSize(3);
 		
-		if(pcontract != null && pcontract_po!=null) {
-			String ST = pcontract.getBuyername() == null ? "" : pcontract.getBuyername();
+		if(product != null && pcontract_po!=null) {
+			String buyer = product.getBuyercode() == null ? "" : product.getBuyercode();
 			String PO = pcontract_po.getPo_buyer() == null ? "" : pcontract_po.getPo_vendor();
-			name += "#"+ST+"-PO: "+PO+"-"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
+			name += buyer+"/"+PO+"/"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
 		}
 		
 		return name;
