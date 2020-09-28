@@ -12,7 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -87,6 +86,7 @@ public class Common  {
 	@Autowired ITask_Object_Service taskobjectService;
 	@Autowired ITask_Flow_Service flowService;
 	@Autowired IPOrder_Service porderService;
+	
 	
 	@Autowired IProductService productService;
 	
@@ -755,18 +755,6 @@ public class Common  {
 		}
 	}
 	
-	public long getSizeSetid_link_by_name(String name) {
-		HashMap<String, Long> map = new HashMap<String, Long>();
-		map.put("ALL", (long)1);
-		map.put("Infant", (long)2);
-		map.put("Monthly", (long)3);
-		map.put("Toddle", (long)4);
-		map.put("Normal", (long)5);
-		map.put("Big", (long)6);
-		map.put("Plus", (long)7);
-		
-		return map.get(name);
-	}
 	
 	public String getStringValue(Cell cell) {
 		if(cell == null) return "";

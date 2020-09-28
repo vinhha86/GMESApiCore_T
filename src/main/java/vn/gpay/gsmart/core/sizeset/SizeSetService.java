@@ -31,4 +31,11 @@ public class SizeSetService extends AbstractService<SizeSet> implements ISizeSet
 		return repo.getMaxSortValue()+1;
 	}
 
+	@Override
+	public Long getbyname(String name) {
+		// TODO Auto-generated method stub
+		List<SizeSet> list = repo.getbyname(name);
+		return list.size() > 0 ? list.get(0).getId() : 0 ;
+	}
+
 }

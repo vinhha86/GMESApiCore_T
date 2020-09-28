@@ -8,5 +8,6 @@ import vn.gpay.gsmart.core.base.Operations;
 public interface ISizeSetService extends Operations<SizeSet> {
 
 	List<SizeSet> getall_byorgrootid(long orgrootid_link);
+	Long getbyname(String name);
 	Integer getMaxSortValue();
 }

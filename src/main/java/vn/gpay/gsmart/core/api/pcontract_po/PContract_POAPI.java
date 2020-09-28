@@ -51,6 +51,7 @@ import vn.gpay.gsmart.core.productattributevalue.ProductAttributeValue;
 import vn.gpay.gsmart.core.productpairing.IProductPairingService;
 import vn.gpay.gsmart.core.productpairing.ProductPairing;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.sizeset.ISizeSetService;
 import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 import vn.gpay.gsmart.core.sku.ISKU_Service;
 import vn.gpay.gsmart.core.sku.SKU;
@@ -104,6 +105,7 @@ public class PContract_POAPI {
 	IPContractProductPairingService pcontractpairService;
 	@Autowired
 	IPContract_Price_Service priceService;
+	@Autowired ISizeSetService sizesetService;
 
 	@RequestMapping(value = "/upload_template", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadTemplate(HttpServletRequest request,
@@ -149,6 +151,9 @@ public class PContract_POAPI {
 						// Kiểm tra sản phẩm có chưa thì sinh id sản phẩm
 						long productid_link = 0;
 						String product_code = row.getCell(ColumnTemplate.Style).getStringCellValue();
+						
+						if(product_code=="") break;
+						
 						int product_quantity = (int) row.getCell(ColumnTemplate.amount_po).getNumericCellValue();
 						String product_set_code = row.getCell(ColumnTemplate.Style_Set).getStringCellValue();
 						int amount = (int) row.getCell(ColumnTemplate.amount_style).getNumericCellValue() == 0 ? 1 : (int) row.getCell(ColumnTemplate.amount_style).getNumericCellValue();
@@ -315,7 +320,9 @@ public class PContract_POAPI {
 
 						// Kiem tra chao gia da ton tai hay chua
 						String PO_No = commonService.getStringValue(row.getCell(1));
-						PO_No = PO_No == "" ? "TBD" : PO_No;
+						if (PO_No == "" || PO_No.equals("0")) {
+							PO_No = "TBD";
+						}
 						Date ShipDate = row.getCell(ColumnTemplate.shipdate).getDateCellValue();
 						long po_productid_link = product_set_id_link > 0 ? product_set_id_link : productid_link;
 						long pcontractpo_id_link = 0;
@@ -324,19 +331,10 @@ public class PContract_POAPI {
 						float price_fob = (float) row.getCell(ColumnTemplate.fob).getNumericCellValue();
 						float vendor_target = (float) row.getCell(ColumnTemplate.vendor_target).getNumericCellValue();
 
-						// Neu la hang bo thi khong can check gia
-						if (product_set_id_link > 0) {
-							List<PContract_PO> listpo = pcontract_POService.getone_by_template_set(PO_No, ShipDate,
-									po_productid_link, shipmodeid_link, pcontractid_link);
-							if (listpo.size() > 0) {
-								pcontractpo_id_link = listpo.get(0).getId();
-							}
-						} else {
-							List<PContract_PO> listpo = pcontract_POService.getone_by_template(PO_No, ShipDate,
-									po_productid_link, shipmodeid_link, pcontractid_link, vendor_target);
-							if (listpo.size() > 0) {
-								pcontractpo_id_link = listpo.get(0).getId();
-							}
+						List<PContract_PO> listpo = pcontract_POService.getone_by_template(PO_No, ShipDate,
+								po_productid_link, shipmodeid_link, pcontractid_link, vendor_target);
+						if (listpo.size() > 0) {
+							pcontractpo_id_link = listpo.get(0).getId();
 						}
 
 						if (pcontractpo_id_link == 0) {
@@ -376,7 +374,7 @@ public class PContract_POAPI {
 							price_all.setPrice_fob(price_fob);
 							price_all.setProductid_link(productid_link);
 							price_all.setQuantity(product_quantity);
-							price_all.setSizesetid_link(commonService.getSizeSetid_link_by_name("ALL"));
+							price_all.setSizesetid_link(sizesetService.getbyname("ALL"));
 							price_all.setDate_importdata(current_time);
 							priceService.save(price_all);
 
@@ -384,6 +382,7 @@ public class PContract_POAPI {
 								Row row_header = sheet.getRow(0);
 								String sizesetname = row_header.getCell(i).getStringCellValue();
 								int amount_sizeset = (int) row.getCell(i).getNumericCellValue();
+								Long sizesetid_link = sizesetService.getbyname(sizesetname);
 								if (amount_sizeset > 0) {
 									PContract_Price price = new PContract_Price();
 									price.setId(null);
@@ -393,7 +392,7 @@ public class PContract_POAPI {
 									price.setPcontractid_link(pcontractid_link);
 									price.setQuantity(amount_sizeset);
 									price.setProductid_link(productid_link);
-									price.setSizesetid_link(commonService.getSizeSetid_link_by_name(sizesetname));
+									price.setSizesetid_link(sizesetid_link == null ? 0 : sizesetid_link);
 									price.setDate_importdata(current_time);
 									priceService.save(price);
 								}
@@ -412,7 +411,7 @@ public class PContract_POAPI {
 								price_all_set.setPrice_fob(price_fob);
 								price_all_set.setProductid_link(product_set_id_link);
 								price_all_set.setQuantity(po_quantity);
-								price_all_set.setSizesetid_link(commonService.getSizeSetid_link_by_name("ALL"));
+								price_all_set.setSizesetid_link(sizesetService.getbyname("ALL"));
 								price_all_set.setDate_importdata(current_time);
 								priceService.save(price_all_set);
 
@@ -420,6 +419,7 @@ public class PContract_POAPI {
 								for (int i = ColumnTemplate.infant; i <= ColumnTemplate.plus; i++) {
 									Row row_header = sheet.getRow(0);
 									String sizesetname = row_header.getCell(i).getStringCellValue();
+									Long sizesetid_link = sizesetService.getbyname(sizesetname);
 									int amount_sizeset = (int) row.getCell(i).getNumericCellValue();
 									if (amount_sizeset > 0) {
 										PContract_Price price = new PContract_Price();
@@ -430,7 +430,7 @@ public class PContract_POAPI {
 										price.setPcontractid_link(pcontractid_link);
 										price.setQuantity(amount_sizeset / amount);
 										price.setProductid_link(product_set_id_link);
-										price.setSizesetid_link(commonService.getSizeSetid_link_by_name(sizesetname));
+										price.setSizesetid_link(sizesetid_link == null ? 0 : sizesetid_link);
 										price.setDate_importdata(current_time);
 										priceService.save(price);
 									}
@@ -438,25 +438,30 @@ public class PContract_POAPI {
 							}
 
 						}
-						// truong hop hang bo p oda co roi
+						// truong hop hang bo po da co roi
 						else {
 							//  neu la hang bo thi them khong thi thoi trung coi nhu bo qua khong xu ly
 							if (product_set_id_link > 0) {
+								//Kiem tra san pham con da co hay chua
+								List<PContract_Price> list_price = priceService.getPrice_by_product(pcontractpo_id_link, productid_link);
 								// them dai co vao san pham con
-								PContract_Price price_all_set = new PContract_Price();
-								price_all_set.setId(null);
-								price_all_set.setIs_fix(false);
-								price_all_set.setOrgrootid_link(orgrootid_link);
-								price_all_set.setPcontract_poid_link(pcontractpo_id_link);
-								price_all_set.setPcontractid_link(pcontractid_link);
-								price_all_set.setPrice_vendortarget(vendor_target);
-								price_all_set.setPrice_cmp(price_cmp);
-								price_all_set.setPrice_fob(price_fob);
-								price_all_set.setProductid_link(productid_link);
-								price_all_set.setQuantity(product_quantity);
-								price_all_set.setSizesetid_link(commonService.getSizeSetid_link_by_name("ALL"));
-								price_all_set.setDate_importdata(current_time);
-								priceService.save(price_all_set);
+								if(list_price.size() == 0) {
+									PContract_Price price_all_set = new PContract_Price();
+									price_all_set.setId(null);
+									price_all_set.setIs_fix(false);
+									price_all_set.setOrgrootid_link(orgrootid_link);
+									price_all_set.setPcontract_poid_link(pcontractpo_id_link);
+									price_all_set.setPcontractid_link(pcontractid_link);
+									price_all_set.setPrice_vendortarget(vendor_target);
+									price_all_set.setPrice_cmp(price_cmp);
+									price_all_set.setPrice_fob(price_fob);
+									price_all_set.setProductid_link(productid_link);
+									price_all_set.setQuantity(product_quantity);
+									price_all_set.setSizesetid_link(sizesetService.getbyname("ALL"));
+									price_all_set.setDate_importdata(current_time);
+									priceService.save(price_all_set);
+								}
+								
 
 								//
 								for (int i = ColumnTemplate.infant; i <= ColumnTemplate.plus; i++) {
@@ -472,10 +477,14 @@ public class PContract_POAPI {
 										price.setPcontractid_link(pcontractid_link);
 										price.setQuantity(amount_sizeset);
 										price.setProductid_link(productid_link);
-										price.setSizesetid_link(commonService.getSizeSetid_link_by_name(sizesetname));
+										price.setSizesetid_link(sizesetService.getbyname(sizesetname));
 										price.setDate_importdata(current_time);
 										price.setProductid_link(productid_link);
 										priceService.save(price);
+										
+										PContract_PO po = pcontract_POService.findOne(pcontractpo_id_link);
+										po.setPo_quantity(po.getPo_quantity() + (int)amount_sizeset/amount);
+										pcontract_POService.save(po);
 									}
 								}
 							}
