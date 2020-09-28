@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Table(name="shipmode")
@@ -15,7 +16,8 @@ public class ShipMode implements Serializable {
 private static final long serialVersionUID = 1L;
 	
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "shipmode_generator")
+	@SequenceGenerator(name="shipmode_generator", sequenceName = "shipmode_id_seq", allocationSize=1)
 	protected Long id;
 	
 	@Column(name ="name")

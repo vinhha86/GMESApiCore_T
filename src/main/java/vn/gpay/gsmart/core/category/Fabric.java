@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 
@@ -15,7 +16,8 @@ public class Fabric implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "fabric_generator")
+	@SequenceGenerator(name="fabric_generator", sequenceName = "fabric_id_seq", allocationSize=1)
 	protected Long id;
 	
 	@Column(name ="code",length=50)
