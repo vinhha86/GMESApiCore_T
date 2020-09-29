@@ -152,7 +152,7 @@ public class UserAPI {
 			String result = "";
 			String line;
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			String urlPush = "http://gpay.vn:8181/o2admin/changepass";
+			String urlPush = AtributeFixValues.url_authen+"/o2admin/changepass";
 			String token = request.getHeader("Authorization");
 						
 			URL url = new URL(urlPush);
@@ -347,14 +347,62 @@ public class UserAPI {
 			appuser.setOrg_grant_id_link(entity.user.getOrg_grant_id_link());
 			
 			userDetailsService.save(appuser);
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<UserResponse>(response,HttpStatus.OK);
-		}catch (Exception e) {
+			
+			//Cap nhat sang authen ve nhom quyen cua user co phai admin nua khong
+			String result = "";
+			String line;
+			String urlPush = AtributeFixValues.url_authen+"/o2admin/enabled";
+			String token = request.getHeader("Authorization");
+						
+			URL url = new URL(urlPush);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.setRequestProperty("authorization", token);
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setRequestMethod("POST");
+            
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode appParNode = objectMapper.createObjectNode();
+            boolean enabled = false;
+            if(entity.user.getStatus() == 1) {
+            	enabled = true;
+            }
+            appParNode.put("userid", entity.user.getId());
+            appParNode.put("enable", enabled);
+            String jsonReq = objectMapper.writeValueAsString(appParNode);
+            
+            OutputStream os = conn.getOutputStream();
+            os.write(jsonReq.getBytes());
+            os.flush();
+                     
+            BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            while ((line = rd.readLine()) != null) {
+                result += line;
+            }
+            rd.close();
+            
+            conn.disconnect();
+            
+            JsonParser springParser = JsonParserFactory.getJsonParser();
+            Map<String, Object> map = springParser.parseMap(result);
+            
+            String status = map.get("status").toString();
+            if(!status.equals("0")) {
+            	response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+    			response.setMessage(map.get("msg").toString());
+            }
+            else {
+            	response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+    			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+            }
+		}
+		catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-		    return new ResponseEntity<UserResponse>(response,HttpStatus.OK);
 		}
+	    return new ResponseEntity<UserResponse>(response,HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/user_updaterole",method = RequestMethod.POST)
@@ -420,8 +468,56 @@ public class UserAPI {
 				}
 				
 			}
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			
+			//Cap nhat sang authen ve nhom quyen cua user co phai admin nua khong
+			String result = "";
+			String line;
+			String urlPush = AtributeFixValues.url_authen+"/o2admin/update_useradmin";
+			String token = request.getHeader("Authorization");
+						
+			URL url = new URL(urlPush);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.setRequestProperty("authorization", token);
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setRequestMethod("POST");
+            
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode appParNode = objectMapper.createObjectNode();
+            boolean isadmin = false;
+            if(AtributeFixValues.role_id_admin == roleid_link && entity.checked) {
+            	isadmin = true;
+            }
+            appParNode.put("isadmin", isadmin);
+            appParNode.put("userid", userid);
+            String jsonReq = objectMapper.writeValueAsString(appParNode);
+            
+            OutputStream os = conn.getOutputStream();
+            os.write(jsonReq.getBytes());
+            os.flush();
+                     
+            BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            while ((line = rd.readLine()) != null) {
+                result += line;
+            }
+            rd.close();
+            
+            conn.disconnect();
+            
+            JsonParser springParser = JsonParserFactory.getJsonParser();
+            Map<String, Object> map = springParser.parseMap(result);
+            
+            String status = map.get("status").toString();
+            if(!status.equals("0")) {
+            	response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+    			response.setMessage(map.get("msg").toString());
+            }
+            else {
+            	response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+    			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+            }
 			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
 		}catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
