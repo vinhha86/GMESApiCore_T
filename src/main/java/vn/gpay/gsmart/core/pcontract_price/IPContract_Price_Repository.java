@@ -34,6 +34,16 @@ public interface IPContract_Price_Repository extends JpaRepository<PContract_Pri
 			);
 	
 	@Query(value = "select c from PContract_Price c "
+			+ "where pcontract_poid_link = :pcontract_poid_link and "
+			+ "productid_link = :productid_link "
+			+ "and :sizesetid_link = sizesetid_link")
+	public List<PContract_Price> getPrice_by_product_and_sizeset(
+			@Param ("pcontract_poid_link")final  Long pcontract_poid_link,
+			@Param ("productid_link")final  Long productid_link,
+			@Param ("sizesetid_link")final  Long sizesetid_link
+			);
+	
+	@Query(value = "select c from PContract_Price c "
 			+ "where sizesetid_link != 1 and "
 			+ "pcontract_poid_link = :pcontract_poid_link")
 	public List<PContract_Price> getBySizesetNotAll(

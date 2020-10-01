@@ -5,12 +5,11 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-
 import vn.gpay.gsmart.core.base.AbstractService;
+import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 
 @Service
 public class PContract_POService extends AbstractService<PContract_PO> implements IPContract_POService {
@@ -103,9 +102,25 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		return repo.getone_by_template_set(PO_No, shipmode, productid_link, ShipDate, pcontractid_link);
 	}
 	@Override
-	public List<PContract_PO> getone_by_template(String PO_No, Date ShipDate, long productid_link, long shipmodeid_link,
+	public List<PContract_PO> check_exist_po(String PO_No, Date ShipDate, long productid_link, long shipmodeid_link,
 			long pcontractid_link, float vendor_targer) {
-		Float target = vendor_targer == 0 ? null : vendor_targer;
-		return repo.getone_by_template(PO_No, shipmodeid_link, productid_link, ShipDate, pcontractid_link);
+		
+		List<PContract_PO> list_po = repo.getone_by_template(PO_No, shipmodeid_link, productid_link, ShipDate, pcontractid_link);
+		for (PContract_PO pContract_PO : list_po) {
+			List<PContract_Price> list_price = pContract_PO.getPcontract_price();
+			boolean check = false;
+			for (PContract_Price price : list_price) {
+				if(price.getPrice_vendortarget().equals(vendor_targer)) {
+					check = true;
+					break;
+				}
+			}
+			
+			if(!check) {
+				list_po.remove(pContract_PO);
+			}
+		}
+		
+		return list_po;
 	}
 }

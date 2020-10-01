@@ -331,7 +331,7 @@ public class PContract_POAPI {
 						float price_fob = (float) row.getCell(ColumnTemplate.fob).getNumericCellValue();
 						float vendor_target = (float) row.getCell(ColumnTemplate.vendor_target).getNumericCellValue();
 
-						List<PContract_PO> listpo = pcontract_POService.getone_by_template(PO_No, ShipDate,
+						List<PContract_PO> listpo = pcontract_POService.check_exist_po(PO_No, ShipDate,
 								productid_link, shipmodeid_link, pcontractid_link, vendor_target);
 						if (listpo.size() > 0) {
 							pcontractpo_id_link = listpo.get(0).getId();
@@ -525,6 +525,33 @@ public class PContract_POAPI {
 												priceService.save(price_set);
 											}
 										}
+									}
+								}
+							}
+							else {
+								//Hàng đơn chiếc thì cập nhật dải cỡ
+								for (int i = ColumnTemplate.infant; i <= ColumnTemplate.plus; i++) {
+									Row row_header = sheet.getRow(0);
+									int amount_sizeset = (int) row.getCell(i).getNumericCellValue();
+									if (amount_sizeset > 0) {
+										String sizesetname = row_header.getCell(i).getStringCellValue();
+										Long sizesetid_link = sizesetService.getbyname(sizesetname);
+										List<PContract_Price> list_price = priceService.getPrice_by_product_and_sizeset(pcontractpo_id_link, productid_link, sizesetid_link);
+										for (PContract_Price pContract_Price : list_price) {
+											priceService.delete(pContract_Price);
+										}
+										
+										PContract_Price price = new PContract_Price();
+										price.setDate_importdata(current_time);
+										price.setId(null);
+										price.setIs_fix(false);
+										price.setOrgrootid_link(orgrootid_link);
+										price.setPcontract_poid_link(pcontractpo_id_link);
+										price.setPcontractid_link(pcontractid_link);
+										price.setProductid_link(productid_link);
+										price.setQuantity(amount_sizeset);
+										price.setSizesetid_link(sizesetid_link);
+										priceService.save(price);
 									}
 								}
 							}
