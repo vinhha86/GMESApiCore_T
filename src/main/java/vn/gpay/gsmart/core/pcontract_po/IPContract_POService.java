@@ -27,4 +27,5 @@ public interface IPContract_POService extends Operations<PContract_PO> {
 	
 	List<PContract_PO> getone_by_template_set(String PO_No, Date ShipDate, long productid_link, long shipmodeid_link, long pcontractid_link);
 	List<PContract_PO> check_exist_po(String PO_No, Date ShipDate, long productid_link, long shipmodeid_link, long pcontractid_link, float vendor_targer);
+	List<PContract_PO> get_by_parentid(Long pcontractpo_parentid_link);
 }

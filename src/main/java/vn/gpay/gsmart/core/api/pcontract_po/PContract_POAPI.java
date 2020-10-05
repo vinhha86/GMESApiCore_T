@@ -1197,6 +1197,15 @@ public class PContract_POAPI {
 							"Hiện vẫn đang có Lệnh SX của đơn hàng! Cần xóa hết Lệnh SX trước khi xóa đơn hàng");
 					return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 				}
+				
+				//Kiem tra danh sach po cua chao gia neu khong co thi cho xoa
+				List<PContract_PO> list_po = pcontract_POService.get_by_parentid(thePO.getId());
+				if(list_po.size() > 0) {
+					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+					response.setMessage(
+							"Bạn không thể xóa chào giá đã phát sinh PO!");
+					return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+				}
 
 				// Delete POrder_Req
 				for (POrder_Req thePOrder_Req : porder_req_Service.getByPO(thePO.getId())) {

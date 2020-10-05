@@ -123,4 +123,9 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		
 		return list_po;
 	}
+	@Override
+	public List<PContract_PO> get_by_parentid(Long pcontractpo_parentid_link) {
+		// TODO Auto-generated method stub
+		return repo.getby_parentid_link(pcontractpo_parentid_link);
+	}
 }
