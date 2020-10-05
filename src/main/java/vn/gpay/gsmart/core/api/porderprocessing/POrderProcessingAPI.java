@@ -1498,4 +1498,110 @@ public class POrderProcessingAPI {
         return response;
     }
     
+    @RequestMapping(value = "/getByPOrderAndPOrderGrant",method = RequestMethod.POST)
+	public ResponseEntity<POrderProcessingResponse> getByPOrderAndPOrderGrant(@RequestBody POrderProcess_getByPOrderAndPOrderGrant_request entity, HttpServletRequest request) {
+		POrderProcessingResponse response = new POrderProcessingResponse();
+		try {
+			response.data = pprocessRepository.getByPOrderAndPOrderGrant(entity.porderid_link, entity.pordergrantid_link);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
+			return new ResponseEntity<POrderProcessingResponse>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());			
+		    return new ResponseEntity<POrderProcessingResponse>(HttpStatus.OK);
+		}    			
+	}
+    
+    @RequestMapping(value = "/createPProcess",method = RequestMethod.POST)
+	public ResponseEntity<POrderProcessingResponse> createPProcess(@RequestBody POrderProcessing_createPProcess_request entity, HttpServletRequest request) {
+		POrderProcessingResponse response = new POrderProcessingResponse();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long rootorgid_link = user.getRootorgid_link();
+			////
+			Long porderid_link = entity.porderid_link;
+			Long pordergrantid_link = entity.pordergrantid_link;
+			Date processingdate = entity.processingdate;
+			////
+			POrder porder = pordersRepository.findOne(porderid_link);
+			POrderGrant porderGrant = pordergrantRepository.findOne(pordergrantid_link);
+			//// date tồn tại ? return
+			List<POrderProcessing> list1 = pprocessRepository.findByIdAndPDate(porderid_link, pordergrantid_link, processingdate);
+			if(list1.size() > 0) {
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage("Ngày đã tồn tại");
+				return new ResponseEntity<POrderProcessingResponse>(response,HttpStatus.OK);
+			}
+			//// date không tồn tại ? lưu
+			POrderProcessing porderProcessing = new POrderProcessing();
+			porderProcessing.setId(0L);
+			porderProcessing.setProcessingdate(processingdate);
+			porderProcessing.setPorderid_link(porderid_link);
+			porderProcessing.setPordergrantid_link(pordergrantid_link);
+			//
+			porderProcessing.setOrgrootid_link(rootorgid_link);
+			porderProcessing.setOrderdate(porder.getOrderdate());
+			porderProcessing.setGranttoorgid_link(porderGrant.getGranttoorgid_link());
+			porderProcessing.setTotalorder(porderGrant.getGrantamount());
+			porderProcessing.setStatus(1);
+			porderProcessing.setUsercreatedid_link(user.getId());
+			porderProcessing.setTimecreated(new Date());
+			//// set các trường amount
+			// previous processing date gần nhất
+			List<POrderProcessing> list2 = pprocessRepository.getBeforeDate(porderid_link, pordergrantid_link, processingdate);
+			if(list2.size() > 0) {
+				POrderProcessing temp2 = list2.get(0);
+				porderProcessing.setAmountcut(0); // lấy theo value processingdate gần nhất
+				porderProcessing.setAmountcutsum(temp2.getAmountcutsum());
+				porderProcessing.setAmountcutsumprev(temp2.getAmountcutsum());
+				porderProcessing.setAmountinput(0);
+				porderProcessing.setAmountinputsum(temp2.getAmountinputsum());
+				porderProcessing.setAmountinputsumprev(temp2.getAmountinputsum());
+				porderProcessing.setAmountoutput(0);
+				porderProcessing.setAmountoutputsum(temp2.getAmountoutputsum());
+				porderProcessing.setAmountoutputsumprev(temp2.getAmountoutputsum());
+				porderProcessing.setAmounterror(0);
+				porderProcessing.setAmounterrorsum(temp2.getAmounterrorsum());
+				porderProcessing.setAmounterrorsumprev(temp2.getAmounterrorsum());
+				porderProcessing.setAmounttarget(0);
+				porderProcessing.setAmounttargetprev(temp2.getAmounttarget());
+				porderProcessing.setAmountkcsreg(0);
+				porderProcessing.setAmountkcsregprev(temp2.getAmountkcsreg());
+				porderProcessing.setAmountkcs(0);
+				porderProcessing.setAmountkcssum(temp2.getAmountkcssum());
+				porderProcessing.setAmountkcssumprev(temp2.getAmountkcssum());
+				porderProcessing.setAmountpackstocked(0);
+				porderProcessing.setAmountpackstockedsum(temp2.getAmountpackstockedsum());
+				porderProcessing.setAmountpackstockedsumprev(temp2.getAmountpackstockedsum());
+				porderProcessing.setAmountpacked(0);
+				porderProcessing.setAmountpackedsum(temp2.getAmountpackedsum());
+				porderProcessing.setAmountpackedsumprev(temp2.getAmountpackedsum());
+				porderProcessing.setAmountstocked(0);
+				porderProcessing.setAmountstockedsum(temp2.getAmountstockedsum());
+				porderProcessing.setAmountstockedsumprev(temp2.getAmountstockedsum());
+				porderProcessing.setTotalstocked(temp2.getTotalstocked());
+			}
+			// next processingdate gần nhất
+			List<POrderProcessing> list3 = pprocessRepository.getAfterDate(porderid_link, pordergrantid_link, processingdate);
+			if(list3.size() > 0) {
+				POrderProcessing temp3 = list3.get(0);
+				temp3.setAmounttargetprev(0); // new processingdate có value = 0
+				temp3.setAmountkcsregprev(0);
+				pprocessRepository.save(temp3);
+			}
+			//
+			porderProcessing = pprocessRepository.save(porderProcessing);
+			response.data = new ArrayList<POrderProcessing>();
+			response.data.add(porderProcessing);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
+			return new ResponseEntity<POrderProcessingResponse>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());			
+		    return new ResponseEntity<POrderProcessingResponse>(HttpStatus.OK);
+		}    			
+	}
 }

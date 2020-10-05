@@ -131,7 +131,16 @@ public interface IPOrderProcessing_Repository extends JpaRepository<POrderProces
 	@Query(value = "select a from POrderProcessing a where a.porderid_link = :porderid_link and a.pordergrantid_link = :pordergrantid_link and a.processingdate > :processingdate_to order by a.processingdate ASC")
 	public List<POrderProcessing>getAfterDate(@Param ("porderid_link")final Long porderid_link, @Param ("pordergrantid_link")final Long pordergrantid_link, @Param ("processingdate_to")final Date processingdate_to);
 	
+	//get all processing of an order after the given date
+	@Query(value = "select a from POrderProcessing a where a.porderid_link = :porderid_link and a.pordergrantid_link = :pordergrantid_link and a.processingdate < :processingdate order by a.processingdate DESC")
+	public List<POrderProcessing>getBeforeDate(@Param ("porderid_link")final Long porderid_link, @Param ("pordergrantid_link")final Long pordergrantid_link, @Param ("processingdate")final Date processingdate);
+	
 	@Query(value = "select a from POrderProcessing a where a.granttoorgid_link = :granttoorgid_link")
 	public List<POrderProcessing>getByOrgId(@Param ("granttoorgid_link")final Long granttoorgid_link);
+	
+	@Query(value = "select a from POrderProcessing a where a.porderid_link = :porderid_link and a.pordergrantid_link = :pordergrantid_link order by a.processingdate desc")
+	public List<POrderProcessing>getByPOrderAndPOrderGrant(
+			@Param ("porderid_link")final Long porderid_link,
+			@Param ("pordergrantid_link")final Long pordergrantid_link);	
 
 }

@@ -176,4 +176,21 @@ public class POrder_GrantAPI {
 			return new ResponseEntity<POrder_GrantCreate_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	@RequestMapping(value = "/getByOrderId",method = RequestMethod.POST)
+	public ResponseEntity<POrder_Grant_findByPorderId_response> getByOrderId(@RequestBody POrder_Grant_findByPorderId_request entity,HttpServletRequest request ) {
+		POrder_Grant_findByPorderId_response response = new POrder_Grant_findByPorderId_response();
+		try {
+			
+			response.data = porderGrantService.getByOrderId(entity.porderid_link);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<POrder_Grant_findByPorderId_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<POrder_Grant_findByPorderId_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 }

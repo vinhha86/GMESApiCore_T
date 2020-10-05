@@ -102,6 +102,11 @@ public class POrderProcessing_Service extends AbstractService<POrderProcessing> 
 	}
 	
 	@Override
+	public List<POrderProcessing>getBeforeDate(Long porderid_link, Long pordergrantid_link, Date processingdate){
+		return repo.getBeforeDate(porderid_link, pordergrantid_link, processingdate);
+	}
+	
+	@Override
 	public void deleteByOrderID(final Long porderid_link){
 		for(POrderProcessing porder: repo.getByOrderId(porderid_link)){
 			repo.delete(porder);
@@ -140,5 +145,11 @@ public class POrderProcessing_Service extends AbstractService<POrderProcessing> 
 	public List<POrderProcessing> getByOrgId(Long granttoorgid_link) {
 		// TODO Auto-generated method stub
 		return repo.getByOrgId(granttoorgid_link);
+	}
+
+	@Override
+	public List<POrderProcessing> getByPOrderAndPOrderGrant(Long porderid_link, Long pordergrantid_link) {
+		// TODO Auto-generated method stub
+		return repo.getByPOrderAndPOrderGrant(porderid_link, pordergrantid_link);
 	}
 }

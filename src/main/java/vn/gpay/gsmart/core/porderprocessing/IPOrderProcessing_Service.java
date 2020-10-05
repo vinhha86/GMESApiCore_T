@@ -10,6 +10,8 @@ public interface IPOrderProcessing_Service extends Operations<POrderProcessing>{
 	public List<POrderProcessing> getLatest_All();
 
 	public List<POrderProcessing> getAfterDate(Long porderid_link, Long pordergrantid_link, Date processingdate_to);
+	
+	public List<POrderProcessing> getBeforeDate(Long porderid_link, Long pordergrantid_link, Date processingdate);
 
 	public List<POrderProcessing> findByCodeAndPDate(String ordercode, Date processingdate);
 
@@ -46,5 +48,7 @@ public interface IPOrderProcessing_Service extends Operations<POrderProcessing>{
 	POrderGrant get_processing_bygolivedate(Long porderid_link, Long pordergrantid_link);
 	
 	List<POrderProcessing>getByOrgId(Long granttoorgid_link);
+	
+	public List<POrderProcessing>getByPOrderAndPOrderGrant(Long porderid_link,Long pordergrantid_link);	
 
 }
