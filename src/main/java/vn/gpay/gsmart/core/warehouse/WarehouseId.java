@@ -17,9 +17,9 @@ public class WarehouseId implements Serializable {
 	@Column(name ="epc",length=50)
     private String epc;
 	
-	@Column(name ="orgid_link")
-    private Long orgid_link;
-
+	@Column(name ="orgrootid_link")
+    private Long orgrootid_link;
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -34,10 +34,10 @@ public class WarehouseId implements Serializable {
 				return false;
 		} else if (!epc.equals(other.epc))
 			return false;
-		if (orgid_link == null) {
-			if (other.orgid_link != null)
+		if (orgrootid_link == null) {
+			if (other.orgrootid_link != null)
 				return false;
-		} else if (!orgid_link.equals(other.orgid_link))
+		} else if (!orgrootid_link.equals(other.orgrootid_link))
 			return false;
 		return true;
 	}
@@ -47,7 +47,7 @@ public class WarehouseId implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((epc == null) ? 0 : epc.hashCode());
-		result = prime * result + ((orgid_link == null) ? 0 : orgid_link.hashCode());
+		result = prime * result + ((orgrootid_link == null) ? 0 : orgrootid_link.hashCode());
 		return result;
 	}
 
@@ -59,12 +59,12 @@ public class WarehouseId implements Serializable {
 		this.epc = epc;
 	}
 
-	public Long getOrgid_link() {
-		return orgid_link;
+	public Long getOrgrootid_link() {
+		return orgrootid_link;
 	}
 
-	public void setOrgid_link(Long orgid_link) {
-		this.orgid_link = orgid_link;
+	public void setOrgrootid_link(Long orgrootid_link) {
+		this.orgrootid_link = orgrootid_link;
 	}
 	
 	

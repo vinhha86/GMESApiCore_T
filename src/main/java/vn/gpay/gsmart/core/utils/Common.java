@@ -44,8 +44,8 @@ import vn.gpay.gsmart.core.product.IProductService;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
-import vn.gpay.gsmart.core.stockingunique.IStockingUniqueService;
-import vn.gpay.gsmart.core.stockingunique.StockingUniqueCode;
+import vn.gpay.gsmart.core.stocking_uniquecode.IStocking_UniqueCode_Service;
+import vn.gpay.gsmart.core.stocking_uniquecode.Stocking_UniqueCode;
 import vn.gpay.gsmart.core.task.ITask_Service;
 import vn.gpay.gsmart.core.task.Task;
 import vn.gpay.gsmart.core.task_checklist.ITask_CheckList_Service;
@@ -86,11 +86,12 @@ public class Common  {
 	@Autowired ITask_Object_Service taskobjectService;
 	@Autowired ITask_Flow_Service flowService;
 	@Autowired IPOrder_Service porderService;
+
+	@Autowired IStocking_UniqueCode_Service stockingService;
 	
 	
 	@Autowired IProductService productService;
 	
-	@Autowired IStockingUniqueService stockService;
 	
 	public Long CreateTask(Long orgrootid_link, Long orgid_link, Long userid_link, long tasktypeid_link, List<Task_Object> list_object, Long userinchargeid_link) {
 		int year = Calendar.getInstance().get(Calendar.YEAR);
@@ -483,7 +484,7 @@ public class Common  {
 	
 	public String getInvoiceNumber() {
 		String invoice_number = "";
-		StockingUniqueCode stocking = stockService.getby_type(1);
+		Stocking_UniqueCode stocking = stockingService.getby_type(3);
 		String prefix = stocking.getStocking_prefix();
 		Integer max = stocking.getStocking_max() + 1;
 		String STT = max.toString();
@@ -766,5 +767,48 @@ public class Common  {
 		catch (Exception e) {
 			return cell.getStringCellValue();
 		}
+	}
+	
+	
+	public String GetStockinCode() {
+		String code = "";
+		Stocking_UniqueCode stocking = stockingService.getby_type(1);
+		String prefix = stocking.getStocking_prefix();
+		Integer max = stocking.getStocking_max() + 1;
+		String STT = max.toString();
+		
+		while(STT.toString().length() < 5) {
+			STT = "0"+STT;
+		}
+		code = prefix + "_" + STT;
+		return code;
+	}
+	
+	public String GetStockoutCode() {
+		String code = "";
+		Stocking_UniqueCode stocking = stockingService.getby_type(2);
+		String prefix = stocking.getStocking_prefix();
+		Integer max = stocking.getStocking_max() + 1;
+		String STT = max.toString();
+		
+		while(STT.toString().length() < 5) {
+			STT = "0"+STT;
+		}
+		code = prefix + "_" + STT;
+		return code;
+	}
+	
+	public String GetSessionCode() {
+		String code = "";
+		Stocking_UniqueCode stocking = stockingService.getby_type(4);
+		String prefix = stocking.getStocking_prefix();
+		Integer max = stocking.getStocking_max() + 1;
+		String STT = max.toString();
+		
+		while(STT.toString().length() < 5) {
+			STT = "0"+STT;
+		}
+		code = prefix + "_" + STT;
+		return code;
 	}
 }

@@ -429,4 +429,27 @@ public class OrgAPI {
 		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@RequestMapping(value = "/getallbyroot_notuser",method = RequestMethod.POST)
+	public ResponseEntity<?> GetAllOrgByRoot_notUser( HttpServletRequest request, @RequestBody Org_getbyroot_andtypeid_request entity ) {//@RequestParam("type") 
+		OrgResponse response = new OrgResponse();
+		try {
+			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
+			String[] listtype = entity.listid.split(",");
+			List<String> list = new ArrayList<String>();
+			for (String string : listtype) {
+				list.add(string);
+			}
+			
+			response.data = orgService.findOrgAllByRoot(user.getRootorgid_link(), user.getOrgId(), list, false);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<OrgResponse>(response,HttpStatus.OK);
+		}catch (RuntimeException e) {
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(e.getMessage());
+		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

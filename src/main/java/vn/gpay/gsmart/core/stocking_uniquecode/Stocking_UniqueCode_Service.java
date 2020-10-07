@@ -1,4 +1,4 @@
-package vn.gpay.gsmart.core.stockingunique;
+package vn.gpay.gsmart.core.stocking_uniquecode;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -7,15 +7,15 @@ import org.springframework.stereotype.Service;
 import vn.gpay.gsmart.core.base.AbstractService;
 
 @Service
-public class StockingUniqueService extends AbstractService<StockingUniqueCode> implements IStockingUniqueService {
-	@Autowired StockingUniqueRepository repo;
+public class Stocking_UniqueCode_Service extends AbstractService<Stocking_UniqueCode> implements IStocking_UniqueCode_Service {
+	@Autowired IStocking_Unique_Repository repo;
 	@Override
-	protected JpaRepository<StockingUniqueCode, Long> getRepository() {
+	protected JpaRepository<Stocking_UniqueCode, Long> getRepository() {
 		// TODO Auto-generated method stub
 		return repo;
 	}
 	@Override
-	public StockingUniqueCode getby_type(Integer type) {
+	public Stocking_UniqueCode getby_type(Integer type) {
 		// TODO Auto-generated method stub
 		return repo.getby_type(type).get(0);
 	}

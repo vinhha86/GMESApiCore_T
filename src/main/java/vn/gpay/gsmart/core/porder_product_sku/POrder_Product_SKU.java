@@ -57,11 +57,44 @@ public class POrder_Product_SKU implements Serializable {
 	}
 	
 	@Transient
+	public String getSkuname() {
+		if (sku!= null)
+			return sku.getName();
+		return "";
+	}
+	
+	@Transient
+	public Integer getPorder_year() {
+		return porder.getProductionyear();
+	}
+	
+	@Transient
+	public String getSku_product_code() {
+		if (sku!= null)
+			return sku.getProduct_code();
+		return "";
+	}
+	
+	@Transient
 	public Long getColor_id() {
 		if(sku!=null) {
 			return sku.getColor_id();
 		}
 		return (long)0;
+	}
+	
+	@Transient
+	public String getColor_name() {
+		if(sku!=null)
+			return sku.getColor_name();
+		return "";
+	}
+	
+	@Transient
+	public String getSize_name() {
+		if(sku!=null)
+			return sku.getSize_name();
+		return "";
 	}
 	
 	@Transient

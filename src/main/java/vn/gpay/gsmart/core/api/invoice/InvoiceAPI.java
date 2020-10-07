@@ -26,8 +26,8 @@ import vn.gpay.gsmart.core.packinglist.PackingList;
 import vn.gpay.gsmart.core.security.GpayAuthentication;
 import vn.gpay.gsmart.core.sku.ISKU_Service;
 import vn.gpay.gsmart.core.sku.SKU;
-import vn.gpay.gsmart.core.stockingunique.IStockingUniqueService;
-import vn.gpay.gsmart.core.stockingunique.StockingUniqueCode;
+import vn.gpay.gsmart.core.stocking_uniquecode.IStocking_UniqueCode_Service;
+import vn.gpay.gsmart.core.stocking_uniquecode.Stocking_UniqueCode;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -40,7 +40,7 @@ public class InvoiceAPI {
 	@Autowired IPackingListService packingListService;
 	@Autowired ISKU_Service skuService;
 	@Autowired Common commonService;
-	@Autowired IStockingUniqueService stockingService;
+	@Autowired IStocking_UniqueCode_Service stockingService;
 	
 	@RequestMapping(value = "/invoice_create",method = RequestMethod.POST)
 	public ResponseEntity<?> InvoiceCreate(@RequestBody InvoiceCreateRequest entity,HttpServletRequest request ) {
@@ -105,7 +105,7 @@ public class InvoiceAPI {
 			 
 			 //update lai stocking 
 			if(isNew) {
-				StockingUniqueCode unique = stockingService.getby_type(1);
+				Stocking_UniqueCode unique = stockingService.getby_type(1);
 				unique.setStocking_max(unique.getStocking_max()+ 1);
 				stockingService.save(unique);
 			}

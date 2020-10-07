@@ -22,7 +22,9 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, String>{
 	public List<Warehouse> findByLotNumber(@Param ("lotnumber")final String lotnumber);	
 	
 	@Query(value = "select c from Warehouse c where epc =:epc and stockid_link =:stockid_link")
-	public List<Warehouse> findMaterialByEPC(@Param ("epc")final String epc, @Param ("stockid_link")final long stockid_link);
+	public List<Warehouse> findMaterialByEPC(
+			@Param ("epc")final String epc, 
+			@Param ("stockid_link")final long stockid_link);
 	
 	//@Query(value = "select a from Warehouse a inner join EpcWarehouseCheck b on a.epc = b.epc   where b.token =:token")
 	@Query(value = "select a from Warehouse a")
@@ -40,8 +42,10 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, String>{
 	public List<Object[]> invcheck_epc(@Param ("orgfrom_code")final Long orgfrom_code);
 	//public List<Object[]> invcheck_epc(@Param ("bossid")final String bossid,@Param ("orgfrom_code")final String orgfrom_code,@Param ("productcode")final String productcode);
 	
-	@Query(value = "select a from Warehouse a inner join StockInD b on a.stockindid_link = b.id where b.stockinid_link =:stockid_link")
-	List<Warehouse> inv_getbyid(@Param ("stockid_link")final long stockid_link) ;
+	@Query(value = "select a from Warehouse a "
+			+ "inner join StockInD b on a.stockindid_link = b.id "
+			+ "where b.stockinid_link =:stockid_link")
+	List<Warehouse> inv_getby_stockinid_link(@Param ("stockid_link")final long stockid_link) ;
 	
 	@Modifying
 	@Query(value = "delete from Warehouse c where stockid_link =:stockid_link and epc=:epc")

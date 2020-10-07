@@ -5,10 +5,13 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
+//import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -21,19 +24,20 @@ import vn.gpay.gsmart.core.sku.SKU;
 
 @Table(name="Warehouse")
 @Entity
-@IdClass(WarehouseId.class)
+//@IdClass(WarehouseId.class)
 public class Warehouse implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	//@EmbeddedId
-   // private WarehouseId warehouse_pk;
 	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "warehouse_generator")
+	@SequenceGenerator(name="warehouse_generator", sequenceName = "warehouse_id_seq", allocationSize=1)
+	protected Long id;
+	
 	@Column(name ="epc",length=50)
     private String epc;
 	
-	@Id
-	@Column(name ="orgid_link")
-    private Long orgid_link;
+	@Column(name ="orgrootid_link")
+    private Long orgrootid_link;
 	
 	@Column(name ="encryptdatetime")
     private Date encryptdatetime;
@@ -44,8 +48,14 @@ public class Warehouse implements Serializable {
 	@Column(name ="stockindid_link")
     private Long stockindid_link;
 	
+	@Column(name ="skucode")
+	private String skucode;
+	
 	@Column(name ="skuid_link")
     private Long skuid_link ;
+	
+	@Column(name ="skutypeid_link")
+    private Integer skutypeid_link ;	
 	
 	@Column(name ="unitid_link")
     private Integer unitid_link;	
@@ -98,14 +108,24 @@ public class Warehouse implements Serializable {
 	@Column(name ="lasttimeupdate")
 	private Date lasttimeupdate;
 	
-	//mo rong
+	private long sizeid_link;
+
 	public String getSkucode() {
-		if(sku!=null) {
-			return sku.getCode();
-		}
-		return "";
-		
+		return skucode;
 	}
+
+	public void setSkucode(String skucode) {
+		this.skucode = skucode;
+	}
+
+	//	//mo rong
+//	public String getSkucode() {
+//		if(sku!=null) {
+//			return sku.getCode();
+//		}
+//		return "";
+//		
+//	}
 	public String getPSkuname() {
 		if(psku!=null) {
 			return psku.getName();
@@ -199,12 +219,7 @@ public class Warehouse implements Serializable {
 	public void setEpc(String epc) {
 		this.epc = epc;
 	}
-	public Long getOrgid_link() {
-		return orgid_link;
-	}
-	public void setOrgid_link(Long orgid_link) {
-		this.orgid_link = orgid_link;
-	}
+
 	public Date getEncryptdatetime() {
 		return encryptdatetime;
 	}
@@ -355,4 +370,38 @@ public class Warehouse implements Serializable {
 	public void setUnit(Unit unit) {
 		this.unit = unit;
 	}
+
+	public Long getOrgrootid_link() {
+		return orgrootid_link;
+	}
+
+	public void setOrgrootid_link(Long orgrootid_link) {
+		this.orgrootid_link = orgrootid_link;
+	}
+
+	public Integer getSkutypeid_link() {
+		return skutypeid_link;
+	}
+
+	public void setSkutypeid_link(Integer skutypeid_link) {
+		this.skutypeid_link = skutypeid_link;
+	}
+
+	public long getSizeid_link() {
+		return sizeid_link;
+	}
+
+	public void setSizeid_link(long sizeid_link) {
+		this.sizeid_link = sizeid_link;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
+	
 }

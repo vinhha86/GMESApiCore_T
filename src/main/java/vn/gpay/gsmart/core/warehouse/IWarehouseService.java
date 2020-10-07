@@ -11,6 +11,7 @@ public interface IWarehouseService extends StringOperations<Warehouse>{
 	public List<Warehouse> findBySpaceepc(String spaceepc);
 	public List<Warehouse> findByLotNumber(String lotnumber);
 	public List<Warehouse> findMaterialByEPC(String epc, long stockid_link);
+	public boolean epcExistedInStock(String epc, long stockid_link);
 	public List<Warehouse> findCheckedEPC(String token);
 	
 	public void deleteByEpc(String Epc,long stockid_link);

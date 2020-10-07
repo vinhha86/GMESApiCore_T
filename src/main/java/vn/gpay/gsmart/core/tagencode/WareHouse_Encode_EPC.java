@@ -19,18 +19,18 @@ import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.sku.SKU;
 
-@Table(name="warehouse_encode")
+@Table(name="warehouse_encode_epc")
 @Entity
-public class TagEncode implements Serializable {
+public class WareHouse_Encode_EPC implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "warehouse_encode_generator")
-	@SequenceGenerator(name="warehouse_encode_generator", sequenceName = "warehouse_encode_id_seq", allocationSize=1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "warehouse_encode_epc_generator")
+	@SequenceGenerator(name="warehouse_encode_epc_generator", sequenceName = "warehouse_encode_epc_id_seq", allocationSize=1)
 	protected Long id;
 
-	@Column(name = "orgid_link")
-	private Long orgid_link;
+	@Column(name = "orgrootid_link")
+	private Long orgrootid_link;
 	
 	@Column(name = "orgencodeid_link")
 	private Long orgencodeid_link;
@@ -65,14 +65,16 @@ public class TagEncode implements Serializable {
 	@Column(name ="lasttimeupdate")
 	private Date lasttimeupdate;
 	
-
+	private Long warehouse_encodeid_link;
+	private Long warehouse_encodedid_link;
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="skuid_link",insertable=false,updatable =false)
     private SKU sku;
 	
 	@Transient
-	public String getSku() {
+	public String getSkucode() {
 		if(sku!=null) {
 			return sku.getCode();
 		}
@@ -85,17 +87,18 @@ public class TagEncode implements Serializable {
 		}
 		return "";
 	}
+	@Transient
+	public String getProduct_code() {
+		if(sku!=null) {
+			return sku.getProduct_code();
+		}
+		return "";
+	}
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
-	}
-	public Long getOrgid_link() {
-		return orgid_link;
-	}
-	public void setOrgid_link(Long orgid_link) {
-		this.orgid_link = orgid_link;
 	}
 	public Long getOrgencodeid_link() {
 		return orgencodeid_link;
@@ -123,6 +126,9 @@ public class TagEncode implements Serializable {
 	}
 	public Long getSkuid_link() {
 		return skuid_link;
+	}
+	public void setSku(SKU sku) {
+		this.sku = sku;
 	}
 	public void setSkuid_link(Long skuid_link) {
 		this.skuid_link = skuid_link;
@@ -163,7 +169,24 @@ public class TagEncode implements Serializable {
 	public void setLasttimeupdate(Date lasttimeupdate) {
 		this.lasttimeupdate = lasttimeupdate;
 	}
-	public void setSku(SKU sku) {
-		this.sku = sku;
+	public Long getOrgrootid_link() {
+		return orgrootid_link;
 	}
+	public void setOrgrootid_link(Long orgrootid_link) {
+		this.orgrootid_link = orgrootid_link;
+	}
+	public Long getWarehouse_encodeid_link() {
+		return warehouse_encodeid_link;
+	}
+	public void setWarehouse_encodeid_link(Long warehouse_encodeid_link) {
+		this.warehouse_encodeid_link = warehouse_encodeid_link;
+	}
+	public Long getWarehouse_encodedid_link() {
+		return warehouse_encodedid_link;
+	}
+	public void setWarehouse_encodedid_link(Long warehouse_encodedid_link) {
+		this.warehouse_encodedid_link = warehouse_encodedid_link;
+	}
+	
+	
 }

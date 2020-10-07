@@ -18,6 +18,8 @@ public class ResponseMessage {
     public static int KEY_RC_ACTIVE_FAIL            = 904;
     public static int KEY_RC_KEY_DUPLICATION        = 905;
     
+    public static int KEY_RC_SKU_INVALID            = 700;
+    
     //POrder_Req Messages (1000-1010)
     public static int KEY_POREQ_DELETE_PORDEREXISTED 		= 1000;
     public static String MES_POREQ_DELETE_PORDEREXISTED   	= "Đang tồn tại lệnh sản xuất liên quan, không thể xóa";

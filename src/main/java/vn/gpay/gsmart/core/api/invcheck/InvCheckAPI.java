@@ -95,7 +95,7 @@ public class InvCheckAPI {
 						if(sku!=null) {
 							epc.setUnitprice(sku.getSaleprice());
 							if(epc.getUnitid_link()==null) {
-								epc.setUnitid_link(sku.getUnitid_link());
+								epc.setUnitid_link(sku.getUnitid_link().intValue());
 							}
 						}
 					}
@@ -114,7 +114,6 @@ public class InvCheckAPI {
 					}
 					else {
 						skuFound = new InvcheckSku();
-						skuFound.setOrgid_link(invcheck.getOrgid_link());
 						skuFound.setInvcheckid_link(invcheck1.getId());
 						skuFound.setSkuid_link(epc.getSkuid_link());
 						skuFound.setYdsorigin(epc.getYdsorigin());
@@ -151,33 +150,33 @@ public class InvCheckAPI {
 		}
 	}
 	
-	@RequestMapping(value = "/invcheck_post",method = RequestMethod.POST)
-	public ResponseEntity<?> InvcheckPost( @RequestBody InvcheckPostRequest entity,HttpServletRequest request ) {
-		ResponseBase responseBase = new ResponseBase();
-		List<Invcheck> data =invcheckService.invcheck_getbycode(entity.invcheckcode);
-		if (data.size() > 0){
-			try {
-				//find and update epc on the invcheck_epc
-				for (InvcheckEpc epc: entity.data){
-					invcheckEpcService.update(epc);
-					invcheckSkuService.updateTotalCheck(epc.getInvcheckid_link(), epc.getSkuid_link());
-				}
-				responseBase.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-				responseBase.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-				return new ResponseEntity<ResponseBase>(responseBase,HttpStatus.OK);
-			}catch (RuntimeException e) {
-				ResponseError errorBase = new ResponseError();
-				errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
-				errorBase.setMessage(e.getMessage());
-			    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
-			}
-		}
-		else {
-			responseBase.setRespcode(ResponseMessage.KEY_RC_RS_NOT_FOUND);
-			responseBase.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_RS_NOT_FOUND));
-		    return new ResponseEntity<ResponseBase>(responseBase,HttpStatus.OK);			
-		}
-	}
+//	@RequestMapping(value = "/invcheck_post",method = RequestMethod.POST)
+//	public ResponseEntity<?> InvcheckPost( @RequestBody InvcheckPostRequest entity,HttpServletRequest request ) {
+//		ResponseBase responseBase = new ResponseBase();
+//		List<Invcheck> data =invcheckService.invcheck_getbycode(entity.invcheckcode);
+//		if (data.size() > 0){
+//			try {
+//				//find and update epc on the invcheck_epc
+//				for (InvcheckEpc epc: entity.data){
+//					invcheckEpcService.update(epc);
+//					invcheckSkuService.updateTotalCheck(epc.getInvcheckid_link(), epc.getSkuid_link());
+//				}
+//				responseBase.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+//				responseBase.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+//				return new ResponseEntity<ResponseBase>(responseBase,HttpStatus.OK);
+//			}catch (RuntimeException e) {
+//				ResponseError errorBase = new ResponseError();
+//				errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+//				errorBase.setMessage(e.getMessage());
+//			    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+//			}
+//		}
+//		else {
+//			responseBase.setRespcode(ResponseMessage.KEY_RC_RS_NOT_FOUND);
+//			responseBase.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_RS_NOT_FOUND));
+//		    return new ResponseEntity<ResponseBase>(responseBase,HttpStatus.OK);			
+//		}
+//	}
 	@RequestMapping(value = "/invcheck_list",method = RequestMethod.POST)
 	public ResponseEntity<?> InvcheckList( @RequestBody InvcheckListRequest entity,HttpServletRequest request ) {
 		InvcheckResponse responseBase = new InvcheckResponse();

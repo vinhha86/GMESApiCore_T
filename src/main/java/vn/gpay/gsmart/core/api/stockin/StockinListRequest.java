@@ -6,10 +6,12 @@ import vn.gpay.gsmart.core.base.RequestBase;
 
 public class StockinListRequest extends RequestBase{
 
-	public Long stockcode;
-	public String stockincode;
+	public String stockcode;
+	public Long orgid_to_link;
+	public Long orgid_from_link;
 	public Date stockindate_from;
 	public Date stockindate_to;
 	public Long stockintypeid_link;
-	public int status;
+	public int limit;
+	public int page;
 }

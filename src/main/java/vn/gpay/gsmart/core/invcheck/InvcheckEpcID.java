@@ -14,8 +14,8 @@ public class InvcheckEpcID implements Serializable {
 	 */
 	private static final long serialVersionUID = 3395630602705643728L;
 
-	@Column(name = "orgid_link")
-    private Long orgid_link;
+	@Column(name = "orgrootid_link")
+    private Long orgrootid_link;
     
     @Column(name = "invcheckid_link")
     private Long invcheckid_link;
@@ -29,7 +29,7 @@ public class InvcheckEpcID implements Serializable {
 		int result = 1;
 		result = prime * result + ((epc == null) ? 0 : epc.hashCode());
 		result = prime * result + ((invcheckid_link == null) ? 0 : invcheckid_link.hashCode());
-		result = prime * result + ((orgid_link == null) ? 0 : orgid_link.hashCode());
+		result = prime * result + ((orgrootid_link == null) ? 0 : orgrootid_link.hashCode());
 		return result;
 	}
 
@@ -52,20 +52,21 @@ public class InvcheckEpcID implements Serializable {
 				return false;
 		} else if (!invcheckid_link.equals(other.invcheckid_link))
 			return false;
-		if (orgid_link == null) {
-			if (other.orgid_link != null)
+		if (orgrootid_link == null) {
+			if (other.orgrootid_link != null)
 				return false;
-		} else if (!orgid_link.equals(other.orgid_link))
+		} else if (!orgrootid_link.equals(other.orgrootid_link))
 			return false;
 		return true;
 	}
 
-	public Long getOrgid_link() {
-		return orgid_link;
+
+	public Long getOrgrootid_link() {
+		return orgrootid_link;
 	}
 
-	public void setOrgid_link(Long orgid_link) {
-		this.orgid_link = orgid_link;
+	public void setOrgrootid_link(Long orgrootid_link) {
+		this.orgrootid_link = orgrootid_link;
 	}
 
 	public Long getInvcheckid_link() {

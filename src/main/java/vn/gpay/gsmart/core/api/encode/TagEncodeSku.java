@@ -1,6 +1,5 @@
 package vn.gpay.gsmart.core.api.encode;
 
-
 public class TagEncodeSku {
 
 	private String epc;
@@ -52,4 +51,6 @@ public class TagEncodeSku {
 	public void setDeviceid_link(Long deviceid_link) {
 		this.deviceid_link = deviceid_link;
 	}
+	
+	
 }

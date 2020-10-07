@@ -43,13 +43,23 @@ public class WarehouseRepositoryImpl extends StringAbstractService<Warehouse> im
 	}
 
 	@Override
+	public boolean epcExistedInStock(String epc, long stockid_link) {
+		// TODO Auto-generated method stub
+		List<Warehouse> lstEpc = repositoty.findMaterialByEPC(epc, stockid_link);
+		if (null != lstEpc && lstEpc.size() > 0)
+			return true;
+		else
+			return false;
+	}
+	
+	@Override
 	public List<Warehouse> findCheckedEPC(String token) {
 		// TODO Auto-generated method stub
 		return repositoty.findCheckedEPC(UUID.fromString(token));
 	}
 
 	@Override
-	public List<InvcheckSku> invcheck_sku(long invcheckid_link,long orgid_link,Long bossid,Long orgfrom_code,Long productcode) {
+	public List<InvcheckSku> invcheck_sku(long invcheckid_link,long orgrootid_link,Long bossid,Long orgfrom_code,Long productcode) {
 		// TODO Auto-generated method stub
 		List<InvcheckSku> listdata = new ArrayList<InvcheckSku>();
 		try {
@@ -58,12 +68,12 @@ public class WarehouseRepositoryImpl extends StringAbstractService<Warehouse> im
 				InvcheckSku entity = new InvcheckSku();
 				//InvcheckSkuID id = new InvcheckSkuID();
 				entity.setInvcheckid_link(invcheckid_link);
-				entity.setOrgid_link(orgid_link);
+				entity.setOrgrootid_link(orgrootid_link);
 				entity.setSkuid_link((Long) row[0]);
 				entity.setYdsorigin((Float) row[1]);
 		        entity.setUnitprice((Float)row[2]);
 		        entity.setTotalamount((Float)row[3]);
-		        entity.setUnitid_link((Long)row[4]);
+		        entity.setUnitid_link((Integer)row[4]);
 		       // entity.setInvchecksku_pk(id);;
 				listdata.add(entity);
 	        }
@@ -72,7 +82,7 @@ public class WarehouseRepositoryImpl extends StringAbstractService<Warehouse> im
 	}
 
 	@Override
-	public List<InvcheckEpc> invcheck_epc(long invcheckid_link, long orgid_link, Long bossid, Long orgfrom_code,
+	public List<InvcheckEpc> invcheck_epc(long invcheckid_link, long orgrootid_link, Long bossid, Long orgfrom_code,
 			Long productcode) {
 		// TODO Auto-generated method stub
 		List<InvcheckEpc> listdata = new ArrayList<InvcheckEpc>();
@@ -82,7 +92,7 @@ public class WarehouseRepositoryImpl extends StringAbstractService<Warehouse> im
 				//InvcheckEpcID id = new InvcheckEpcID();
 				InvcheckEpc entity = new InvcheckEpc();
 				entity.setInvcheckid_link(invcheckid_link);
-				entity.setOrgid_link(orgid_link);
+				entity.setOrgrootid_link(orgrootid_link);
 				entity.setEpc((String) row[0]);
 		        //entity.setInvcheckepc_pk(id);
 		        entity.setSkuid_link((Long)row[1]);
@@ -103,7 +113,7 @@ public class WarehouseRepositoryImpl extends StringAbstractService<Warehouse> im
 	@Override
 	public List<Warehouse> inv_getbyid(long stockid_link) {
 		// TODO Auto-generated method stub
-		return repositoty.inv_getbyid(stockid_link);
+		return repositoty.inv_getby_stockinid_link(stockid_link);
 	}
 
 }

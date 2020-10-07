@@ -31,8 +31,8 @@ public class StockInPklist implements Serializable {
 	@SequenceGenerator(name="stockout_pklist_generator", sequenceName = "stock_out_pklist_id_seq", allocationSize=1)
 	protected Long id;
 	
-	@Column(name ="orgid_link")
-    private Long orgid_link;
+	@Column(name ="orgrootid_link")
+    private Long orgrootid_link;
 	
 	@Column(name ="stockinid_link")
     private Long stockinid_link;
@@ -44,7 +44,9 @@ public class StockInPklist implements Serializable {
     private Long skuid_link;
 
 	@Column(name ="colorid_link")
-    private Integer colorid_link;
+    private Long colorid_link;
+	
+	private Long sizeid_link;
 	
 	@Column(name ="unitid_link")
     private Integer unitid_link;
@@ -72,10 +74,7 @@ public class StockInPklist implements Serializable {
 	
 	@Column(name ="epc",length =50)
     private String epc;
-	
-	@Column(name ="rssi")
-	private Integer rssi;	
-	
+		
 	@Column(name ="skutypeid_link")
 	private Integer skutypeid_link;	
 	
@@ -93,6 +92,9 @@ public class StockInPklist implements Serializable {
 	
 	@Column(name ="lasttimeupdate")
 	private Date lasttimeupdate;
+	
+	@Column(name = "status")
+    private Integer status;
 	
 	//mo rong
 	public String getSkucode() {
@@ -176,11 +178,11 @@ public class StockInPklist implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public Long getOrgid_link() {
-		return orgid_link;
+	public Long getOrgrootid_link() {
+		return orgrootid_link;
 	}
-	public void setOrgid_link(Long orgid_link) {
-		this.orgid_link = orgid_link;
+	public void setOrgrootid_link(Long orgrootid_link) {
+		this.orgrootid_link = orgrootid_link;
 	}
 	public Long getStockinid_link() {
 		return stockinid_link;
@@ -200,10 +202,10 @@ public class StockInPklist implements Serializable {
 	public void setSkuid_link(Long skuid_link) {
 		this.skuid_link = skuid_link;
 	}
-	public Integer getColorid_link() {
+	public Long getColorid_link() {
 		return colorid_link;
 	}
-	public void setColorid_link(Integer colorid_link) {
+	public void setColorid_link(Long colorid_link) {
 		this.colorid_link = colorid_link;
 	}
 	public Integer getUnitid_link() {
@@ -260,12 +262,6 @@ public class StockInPklist implements Serializable {
 	public void setEpc(String epc) {
 		this.epc = epc;
 	}
-	public Integer getRssi() {
-		return rssi;
-	}
-	public void setRssi(Integer rssi) {
-		this.rssi = rssi;
-	}
 	public Integer getSkutypeid_link() {
 		return skutypeid_link;
 	}
@@ -302,9 +298,7 @@ public class StockInPklist implements Serializable {
 	public void setLasttimeupdate(Date lasttimeupdate) {
 		this.lasttimeupdate = lasttimeupdate;
 	}
-	public SKU getSku() {
-		return sku;
-	}
+	
 	public void setSku(SKU sku) {
 		this.sku = sku;
 	}
@@ -320,7 +314,16 @@ public class StockInPklist implements Serializable {
 	public void setUnit(Unit unit) {
 		this.unit = unit;
 	}
-	
-
-	
+	public Long getSizeid_link() {
+		return sizeid_link;
+	}
+	public void setSizeid_link(Long sizeid_link) {
+		this.sizeid_link = sizeid_link;
+	}
+	public Integer getStatus() {
+		return status;
+	}
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
 }

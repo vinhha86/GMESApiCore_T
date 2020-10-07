@@ -5,10 +5,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -22,12 +20,12 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.attributevalue.Attributevalue;
 import vn.gpay.gsmart.core.category.Color;
 import vn.gpay.gsmart.core.category.Unit;
 import vn.gpay.gsmart.core.sku.SKU;
-import vn.gpay.gsmart.core.warehouse.Warehouse;
 
-@Table(name="Stockin_d")
+@Table(name="stockin_d")
 @Entity
 public class StockInD implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -38,17 +36,30 @@ public class StockInD implements Serializable {
 	@SequenceGenerator(name="stockind_generator", sequenceName = "stock_in_d_id_seq", allocationSize=1)
 	protected Long id;
 	
-	@Column(name ="orgid_link")
-    private Long orgid_link;
+	@Column(name ="orgrootid_link")
+    private Long orgrootid_link;
 	
 	@Column(name ="stockinid_link")
     private Long stockinid_link;
 	
+	@Column(name ="skucode")
+	private String skucode;
+	
+	public void setAttCo(Attributevalue attCo) {
+		this.attCo = attCo;
+	}
+
 	@Column(name ="skuid_link")
     private Long skuid_link;
 	
+	private Integer skutypeid_link;
+	
+	private Integer porder_year;
+	
 	@Column(name ="colorid_link")
-    private Integer colorid_link;
+    private Long colorid_link;
+	
+	private Long sizeid_link;
 	
 	@Column(name ="unitid_link")
     private Integer unitid_link;
@@ -86,26 +97,22 @@ public class StockInD implements Serializable {
 	@Column(name ="lasttimeupdate")
 	private Date lasttimeupdate;
 	
+	@Column(name = "status")
+    private Integer status;
+	
+	private Integer totalpackage_order;
+	
 	
 	@NotFound(action = NotFoundAction.IGNORE)
-	@OneToMany(fetch = FetchType.EAGER, cascade =  CascadeType.ALL , orphanRemoval=true )//fetch = FetchType.LAZY load tu tu
+	@OneToMany//fetch = FetchType.LAZY load tu tu
 	@JoinColumn( name="stockindid_link", referencedColumnName="id")
-	private List<Warehouse>  packinglist  = new ArrayList<>();
-	//public List<PackingList> getPackinglist(){
-	//	return new ArrayList<PackingList>();
-	//}
+	private List<StockInPklist>  stockin_packinglist  = new ArrayList<StockInPklist>();
 	
+//	@NotFound(action = NotFoundAction.IGNORE)
+//	@OneToMany(cascade =  CascadeType.ALL , orphanRemoval=true )//fetch = FetchType.LAZY load tu tu
+//	@JoinColumn( name="stockindid_link", referencedColumnName="id")
+//	private List<Warehouse>  stockin_warehouse  = new ArrayList<Warehouse>();
 	
-
-
-	
-	@Transient
-	public String getSkucode() {
-		if(sku!=null) {
-			return sku.getCode();
-		}
-		return "";
-	}
 	@Transient
 	public String getSkuname() {
 		if(sku!=null) {
@@ -129,7 +136,7 @@ public class StockInD implements Serializable {
 	}
 	
 	@Transient
-	public String getUnitname() {
+	public String getUnit_name() {
 		if(unit!=null) {
 			return unit.getName();
 		}
@@ -166,27 +173,57 @@ public class StockInD implements Serializable {
 	@ManyToOne
     @JoinColumn(name="colorid_link",insertable=false,updatable =false)
     private Color color;
-		
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="colorid_link",insertable=false,updatable =false)
+    private Attributevalue attMau;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="sizeid_link",insertable=false,updatable =false)
+    private Attributevalue attCo;
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="unitid_link",insertable=false,updatable =false)
     private Unit unit;
-
-
-
-
-
+	
+	@Transient
+	public String getColor_name() {
+		if(attMau != null) {
+			return attMau.getValue();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getSku_product_code() {
+		if(sku != null) {
+			return sku.getProduct_code();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getSize_name() {
+		if(attCo != null) {
+			return attCo.getValue();
+		}
+		return "";
+	}
+	
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public Long getOrgid_link() {
-		return orgid_link;
+	public Long getOrgrootid_link() {
+		return orgrootid_link;
 	}
-	public void setOrgid_link(Long orgid_link) {
-		this.orgid_link = orgid_link;
+	public void setOrgrootid_link(Long orgrootid_link) {
+		this.orgrootid_link = orgrootid_link;
 	}
 	public Long getStockinid_link() {
 		return stockinid_link;
@@ -200,10 +237,10 @@ public class StockInD implements Serializable {
 	public void setSkuid_link(Long skuid_link) {
 		this.skuid_link = skuid_link;
 	}
-	public Integer getColorid_link() {
+	public Long getColorid_link() {
 		return colorid_link;
 	}
-	public void setColorid_link(Integer colorid_link) {
+	public void setColorid_link(Long colorid_link) {
 		this.colorid_link = colorid_link;
 	}
 	public Integer getUnitid_link() {
@@ -278,14 +315,11 @@ public class StockInD implements Serializable {
 	public void setLasttimeupdate(Date lasttimeupdate) {
 		this.lasttimeupdate = lasttimeupdate;
 	}
-	public List<Warehouse> getPackinglist() {
-		return packinglist;
+	public List<StockInPklist> getStockin_packinglist() {
+		return stockin_packinglist;
 	}
-	public void setPackinglist(List<Warehouse> packinglist) {
-		this.packinglist = packinglist;
-	}
-	public SKU getSku() {
-		return sku;
+	public void setStockin_packinglist(List<StockInPklist> stockin_packinglist) {
+		this.stockin_packinglist = stockin_packinglist;
 	}
 	public void setSku(SKU sku) {
 		this.sku = sku;
@@ -301,6 +335,54 @@ public class StockInD implements Serializable {
 	}
 	public void setUnit(Unit unit) {
 		this.unit = unit;
+	}
+	public String getSkucode() {
+		return skucode;
+	}
+	public void setSkucode(String skucode) {
+		this.skucode = skucode;
+	}
+	public Integer getTotalpackage_order() {
+		return totalpackage_order;
+	}
+	public void setTotalpackage_order(Integer totalpackage_order) {
+		this.totalpackage_order = totalpackage_order;
+	}
+	public Integer getSkutypeid_link() {
+		return skutypeid_link;
+	}
+	public void setSkutypeid_link(Integer skutypeid_link) {
+		this.skutypeid_link = skutypeid_link;
+	}
+//	public List<Warehouse> getStockin_warehouse() {
+//		return stockin_warehouse;
+//	}
+//	public void setStockin_warehouse(List<Warehouse> stockin_warehouse) {
+//		this.stockin_warehouse = stockin_warehouse;
+//	}
+	public Long getSizeid_link() {
+		return sizeid_link == null ? 0: sizeid_link;
+	}
+	public void setSizeid_link(Long sizeid_link) {
+		this.sizeid_link = sizeid_link;
+	}
+	public Integer getPorder_year() {
+		return porder_year;
+	}
+	public void setPorder_year(Integer porder_year) {
+		this.porder_year = porder_year;
+	}
+	public Attributevalue getAttMau() {
+		return attMau;
+	}
+	public void setAttMau(Attributevalue attMau) {
+		this.attMau = attMau;
+	}
+	public Integer getStatus() {
+		return status;
+	}
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
 	
 	

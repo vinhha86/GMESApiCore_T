@@ -10,6 +10,8 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -79,6 +81,25 @@ public class StockInServiceImpl extends AbstractService<StockIn> implements ISto
 		        .build();
 	    return repository.findAll(specification,sort);
 		//return repository.stockin_list(orgid_link,stockouttypeid_link,stockincode, orgid_from_link,orgid_to_link, stockindate_from, stockindate_to);
+	}
+	@Override
+	public Page<StockIn> stockin_page(Long orgrootid_link, Long stockintypeid_link, Long orgid_from_link,
+			Long orgid_to_link, Date stockindate_from, Date stockindate_to, int limit, int page) {
+		// TODO Auto-generated method stub
+		Specification<StockIn> specification = Specifications.<StockIn>and()
+	            .eq( "orgrootid_link", orgrootid_link)
+	            .eq(stockintypeid_link != null, "stockintypeid_link", stockintypeid_link)
+	            .eq(orgid_from_link != null, "orgid_from_link", orgid_from_link)
+	            .eq(orgid_to_link != null, "orgid_to_link", orgid_to_link)
+//	            .ge((stockindate_from!=null && stockindate_to==null),"stockindate",DateFormat.atStartOfDay(stockindate_from))
+//                .le((stockindate_from==null && stockindate_to!=null),"stockindate",DateFormat.atEndOfDay(stockindate_to))
+                .between((stockindate_from!=null && stockindate_to!=null),"stockindate", GPAYDateFormat.atStartOfDay(stockindate_from), GPAYDateFormat.atEndOfDay(stockindate_to))
+                .ne("status", -1)
+	            .build();
+		Sort sort = Sorts.builder()
+		        .desc("stockindate")
+		        .build();
+	    return repository.findAll(specification,PageRequest.of(page - 1, limit, sort));
 	}
 	
 }

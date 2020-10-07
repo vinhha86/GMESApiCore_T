@@ -22,7 +22,10 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.org.Org;
+import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.SKU;
+import vn.gpay.gsmart.core.stockin_type.StockinType;
 
 @Table(name="Stockin")
 @Entity
@@ -35,8 +38,8 @@ public class StockIn implements Serializable {
 	@SequenceGenerator(name="stockin_generator", sequenceName = "stock_in_id_seq", allocationSize=1)
 	protected Long id;
 	
-	@Column(name = "orgid_link")
-	private Long orgid_link;
+	@Column(name = "orgrootid_link")
+	private Long orgrootid_link;
 	
 	@Column(name = "stockincode",length=50)
     private String stockincode;
@@ -47,6 +50,13 @@ public class StockIn implements Serializable {
 	
 	@Column(name = "stockintypeid_link")
     private Integer stockintypeid_link;
+	
+	private Long porderid_link;
+	
+	private String pordercode;
+	
+	@Column(name = "p_skuid_link")
+    private Long p_skuid_link;
 	
 	@Column(name = "orgid_from_link")
     private Long orgid_from_link;
@@ -60,11 +70,35 @@ public class StockIn implements Serializable {
 	//@Column(name = "invoiceid_link")
    // private Long invoiceid_link;	
 	
-	@Column(name = "invoicenumber",length=50)
-    private String invoicenumber;
+    private String invoice_number;
 	
-	@Column(name = "customsnumber",length =50)
-    private String customsnumber;
+	private String invoice_paymentype;
+	
+	private Date invoice_date;
+	
+	private Integer invoice_paymentdue;
+	
+	private Long vat_typeid_link;
+	
+	private String vat_sample;
+	
+	private String vat_symbol;
+	
+	private String vat_number;
+	
+	private Date vat_date;
+	
+	private Long vat_currencyid_link;
+	
+	private Float vat_exchangerate;
+	
+	private Date vat_paymentduedate;
+			
+    private String customs_number;
+	
+	private Date customs_date;
+	
+	private String contract_number;
 	
 	@Column(name = "shipperson",length =100)
     private String shipperson;
@@ -81,8 +115,7 @@ public class StockIn implements Serializable {
 	@Column(name ="totalgrossweight")
     private Double totalgrossweight;	
 	
-	@Column(name = "p_skuid_link")
-    private Long p_skuid_link;
+	private String reason;
 	
 	@Column(name ="extrainfo",length=200)
     private String extrainfo;	
@@ -101,12 +134,65 @@ public class StockIn implements Serializable {
 	
 	@Column(name ="lasttimeupdate")
 	private Date lasttimeupdate;
+	
 
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
 	//@BatchSize(size=10)
 	@JoinColumn( name="stockinid_link", referencedColumnName="id")
-	private List<StockInD>  stockind  = new ArrayList<>();
+	private List<StockInD>  stockin_d  = new ArrayList<StockInD>();
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="stockintypeid_link",insertable=false,updatable =false)
+    private StockinType type;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="porderid_link",insertable=false,updatable =false)
+    private POrder porder;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="p_skuid_link",insertable=false,updatable =false)
+    private SKU sku;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="orgid_from_link",insertable=false,updatable =false)
+    private Org org ;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="orgid_to_link",insertable=false,updatable =false)
+    private Org org_to ;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+	@JoinColumn( name="usercreateid_link", referencedColumnName="id",insertable=false,updatable =false)
+	private GpayUser  user;
+	
+	@Transient
+	public String getUsercreate_name() {
+		if(user != null)
+			return user.getFullname();
+		return "";
+	}
+	
+	@Transient
+	public String getOrdercode() {
+		if(porder != null)
+			return porder.getOrdercode();
+		return "";
+	}
+	
+	@Transient
+	public String getStockintype_name() {
+		if(type!=null) {
+			return type.getName();
+		}
+		return "";
+	}
 	
 	@Transient
 	public String getProductcode() {
@@ -152,27 +238,25 @@ public class StockIn implements Serializable {
 		return "";
 	}
 	
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne
-    @JoinColumn(name="p_skuid_link",insertable=false,updatable =false)
-    private SKU sku;
+	@Transient
+	public String getOrgto_name() {
+		if(org_to!=null) {
+			return org_to.getName();
+		}
+		return "";
+	}
 	
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne
-    @JoinColumn(name="orgid_from_link",insertable=false,updatable =false)
-    private Org org ;
-
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public Long getOrgid_link() {
-		return orgid_link;
+	public Long getOrgrootid_link() {
+		return orgrootid_link;
 	}
-	public void setOrgid_link(Long orgid_link) {
-		this.orgid_link = orgid_link;
+	public void setOrgrootid_link(Long orgrootid_link) {
+		this.orgrootid_link = orgrootid_link;
 	}
 	public String getStockincode() {
 		return stockincode;
@@ -210,17 +294,11 @@ public class StockIn implements Serializable {
 	public void setStockoutid_link(Long stockoutid_link) {
 		this.stockoutid_link = stockoutid_link;
 	}
-	public String getInvoicenumber() {
-		return invoicenumber;
+	public String getCustoms_number() {
+		return customs_number;
 	}
-	public void setInvoicenumber(String invoicenumber) {
-		this.invoicenumber = invoicenumber;
-	}
-	public String getCustomsnumber() {
-		return customsnumber;
-	}
-	public void setCustomsnumber(String customsnumber) {
-		this.customsnumber = customsnumber;
+	public void setCustoms_number(String customs_number) {
+		this.customs_number = customs_number;
 	}
 	public String getShipperson() {
 		return shipperson;
@@ -294,15 +372,13 @@ public class StockIn implements Serializable {
 	public void setLasttimeupdate(Date lasttimeupdate) {
 		this.lasttimeupdate = lasttimeupdate;
 	}
-	public List<StockInD> getStockind() {
-		return stockind;
+	public List<StockInD> getStockin_d() {
+		return stockin_d;
 	}
-	public void setStockind(List<StockInD> stockind) {
-		this.stockind = stockind;
+	public void setStockin_d(List<StockInD> stockind) {
+		this.stockin_d = stockind;
 	}
-	public SKU getSku() {
-		return sku;
-	}
+	
 	public void setSku(SKU sku) {
 		this.sku = sku;
 	}
@@ -312,7 +388,109 @@ public class StockIn implements Serializable {
 	public void setOrg(Org org) {
 		this.org = org;
 	}
+	public Long getPorderid_link() {
+		return porderid_link;
+	}
+	public void setPorderid_link(Long porderid_link) {
+		this.porderid_link = porderid_link;
+	}
+	public String getPordercode() {
+		return pordercode;
+	}
+	public void setPordercode(String pordercode) {
+		this.pordercode = pordercode;
+	}
+	public String getInvoice_number() {
+		return invoice_number;
+	}
+	public void setInvoice_number(String invoice_number) {
+		this.invoice_number = invoice_number;
+	}
+	public String getInvoice_paymentype() {
+		return invoice_paymentype;
+	}
+	public void setInvoice_paymentype(String invoice_paymentype) {
+		this.invoice_paymentype = invoice_paymentype;
+	}
+	public Date getInvoice_date() {
+		return invoice_date;
+	}
+	public void setInvoice_date(Date invoice_date) {
+		this.invoice_date = invoice_date;
+	}
+	public Integer getInvoice_paymentdue() {
+		return invoice_paymentdue;
+	}
+	public void setInvoice_paymentdue(Integer invoice_paymentdue) {
+		this.invoice_paymentdue = invoice_paymentdue;
+	}
+	public Long getVat_typeid_link() {
+		return vat_typeid_link;
+	}
+	public void setVat_typeid_link(Long vat_typeid_link) {
+		this.vat_typeid_link = vat_typeid_link;
+	}
+	public String getVat_sample() {
+		return vat_sample;
+	}
+	public void setVat_sample(String vat_sample) {
+		this.vat_sample = vat_sample;
+	}
+	public String getVat_symbol() {
+		return vat_symbol;
+	}
+	public void setVat_symbol(String vat_symbol) {
+		this.vat_symbol = vat_symbol;
+	}
+	public String getVat_number() {
+		return vat_number;
+	}
+	public void setVat_number(String vat_number) {
+		this.vat_number = vat_number;
+	}
+	public Long getVat_currencyid_link() {
+		return vat_currencyid_link;
+	}
+	public void setVat_currencyid_link(Long vat_currencyid_link) {
+		this.vat_currencyid_link = vat_currencyid_link;
+	}
+	public Float getVat_exchangerate() {
+		return vat_exchangerate;
+	}
+	public void setVat_exchangerate(Float vat_exchangerate) {
+		this.vat_exchangerate = vat_exchangerate;
+	}
+	public Date getVat_paymentduedate() {
+		return vat_paymentduedate;
+	}
+	public void setVat_paymentduedate(Date vat_paymentduedate) {
+		this.vat_paymentduedate = vat_paymentduedate;
+	}
+	public Date getCustoms_date() {
+		return customs_date;
+	}
+	public void setCustoms_date(Date customs_date) {
+		this.customs_date = customs_date;
+	}
+	public String getContract_number() {
+		return contract_number;
+	}
+	public void setContract_number(String contract_number) {
+		this.contract_number = contract_number;
+	}
+	public String getReason() {
+		return reason;
+	}
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
+	public Date getVat_date() {
+		return vat_date;
+	}
+	public void setVat_date(Date vat_date) {
+		this.vat_date = vat_date;
+	}
 	
-
+	
 	
 }

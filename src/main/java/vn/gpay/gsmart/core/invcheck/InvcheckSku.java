@@ -26,8 +26,8 @@ public class InvcheckSku implements Serializable {
 	//@EmbeddedId
    // private InvcheckSkuID invchecksku_pk;
 	@Id
-	@Column(name = "orgid_link")
-    private Long orgid_link;
+	@Column(name = "orgrootid_link")
+    private Long orgrootid_link;
 	@Id
     @Column(name = "invcheckid_link")
     private Long invcheckid_link;
@@ -36,7 +36,7 @@ public class InvcheckSku implements Serializable {
     private Long skuid_link;
 	
 	@Column(name = "unitid_link")
-    private Long unitid_link;
+    private Integer unitid_link;
 	
 	@Column(name ="ydsorigin")
     private Float ydsorigin;
@@ -127,11 +127,11 @@ public class InvcheckSku implements Serializable {
     @JoinColumn(name="skuid_link",insertable=false,updatable =false)
     private SKU sku;
 
-	public Long getOrgid_link() {
-		return orgid_link;
+	public Long getOrgrootid_link() {
+		return orgrootid_link;
 	}
-	public void setOrgid_link(Long orgid_link) {
-		this.orgid_link = orgid_link;
+	public void setOrgrootid_link(Long orgrootid_link) {
+		this.orgrootid_link = orgrootid_link;
 	}
 	public Long getInvcheckid_link() {
 		return invcheckid_link;
@@ -145,10 +145,10 @@ public class InvcheckSku implements Serializable {
 	public void setSkuid_link(Long skuid_link) {
 		this.skuid_link = skuid_link;
 	}
-	public Long getUnitid_link() {
+	public Integer getUnitid_link() {
 		return unitid_link;
 	}
-	public void setUnitid_link(Long unitid_link) {
+	public void setUnitid_link(Integer unitid_link) {
 		this.unitid_link = unitid_link;
 	}
 	public Float getYdsorigin() {

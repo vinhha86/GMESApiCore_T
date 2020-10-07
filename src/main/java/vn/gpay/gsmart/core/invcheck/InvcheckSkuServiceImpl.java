@@ -21,9 +21,9 @@ public class InvcheckSkuServiceImpl extends AbstractService<InvcheckSku> impleme
 		// TODO Auto-generated method stub
 		return repository.invcheckSkuGetByInvcheckid_link(invcheckid_link);
 	}
-	@Override
-	public void updateTotalCheck(Long invcheckid_link, Long skuid_link) {
-		// TODO Auto-generated method stub
-		repository.updateTotalCheck(invcheckid_link, skuid_link);
-	}
+//	@Override
+//	public void updateTotalCheck(Long invcheckid_link, Long skuid_link) {
+//		// TODO Auto-generated method stub
+//		repository.updateTotalCheck(invcheckid_link, skuid_link);
+//	}
 }

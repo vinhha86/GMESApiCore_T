@@ -125,6 +125,23 @@ public class SKU implements Serializable {
 		}
     	return name;
     }
+    
+    @Transient
+	public Long getColorid_link() {
+		long ID_Mau =0;
+		for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
+			if(sku_Attribute_Value.getAttributeid_link() == 4) {
+				ID_Mau = sku_Attribute_Value.getAttributevalueid_link();
+				break;
+			}
+			else if(sku_Attribute_Value.getAttributeid_link() == 36) {
+				ID_Mau = sku_Attribute_Value.getAttributevalueid_link();
+				break;
+			}
+		}
+		return ID_Mau;
+	}
+    
     @Transient
     public String getColor_name() {
     	String name ="";
@@ -216,7 +233,7 @@ public class SKU implements Serializable {
 	@Transient
 	public String getProduct_code() {
 		if(product != null) {
-			return product.getCode();
+			return product.getBuyercode();
 		}
 		return null;
 	}
