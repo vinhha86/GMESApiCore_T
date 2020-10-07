@@ -45,4 +45,11 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 	
 	@Query(value = "select MAX(a.priority) from POrder a where a.status = 2")
 	public Integer getMaxPriority();
+	
+	@Query(value = "select c from POrder c "
+			+ "where c.orgrootid_link = :orgrootid_link "
+			+ "and ordercode = :ordercode "
+			+ "and status <> -1")
+	public List<POrder> get_by_code(@Param ("orgrootid_link")final  Long orgrootid_link,
+			@Param ("ordercode")final  String ordercode);
 }

@@ -24,7 +24,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import vn.gpay.gsmart.core.actionlog.ActionLogs;
 import vn.gpay.gsmart.core.actionlog.IActionLogs_Service;
 import vn.gpay.gsmart.core.api.stockout.StockoutDFilterResponse;
+import vn.gpay.gsmart.core.attributevalue.Attributevalue;
+import vn.gpay.gsmart.core.attributevalue.IAttributeValueService;
 import vn.gpay.gsmart.core.base.ResponseBase;
+import vn.gpay.gsmart.core.category.IUnitService;
+import vn.gpay.gsmart.core.category.Unit;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
@@ -35,6 +39,8 @@ import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder.POrderFilter;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
+import vn.gpay.gsmart.core.porder_product.IPOrder_Product_Service;
+import vn.gpay.gsmart.core.porder_product.POrder_Product;
 import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
@@ -42,6 +48,9 @@ import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.sku.ISKU_Service;
+import vn.gpay.gsmart.core.sku.SKU;
+import vn.gpay.gsmart.core.stockin.StockInD;
 import vn.gpay.gsmart.core.task.ITask_Service;
 import vn.gpay.gsmart.core.task.Task;
 import vn.gpay.gsmart.core.task_checklist.ITask_CheckList_Service;
@@ -74,7 +83,15 @@ public class POrderAPI {
 	@Autowired private ITask_Object_Service taskobjectService;
 	@Autowired private ITask_CheckList_Service checklistService;
 	@Autowired private ITask_Service taskService;
-	@Autowired private ITask_Flow_Service commentService;   
+	@Autowired private ITask_Flow_Service commentService;
+	@Autowired
+	IPOrder_Product_Service porderproductService;
+	@Autowired
+	ISKU_Service skuService;
+	@Autowired
+	IUnitService unitService;
+	@Autowired
+	IAttributeValueService attValService;
 	@Autowired private Common commonService;
     ObjectMapper mapper = new ObjectMapper();
 	
@@ -844,6 +861,73 @@ public class POrderAPI {
 			response.setMessage(e.getMessage());			
 		    return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
 		}    			
+	}
+	
+	@RequestMapping(value = "/get_porder_stockin", method = RequestMethod.POST)
+	public ResponseEntity<porder_get_stockin_response> Get_Porder_Stockin(HttpServletRequest request,
+			@RequestBody porder_get_stockin_request entity) {
+		porder_get_stockin_response response = new porder_get_stockin_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			String ordercode = entity.ordercode;
+			List<StockInD> list = new ArrayList<StockInD>();
+
+			POrder porder = porderService.get_by_code(ordercode, orgrootid_link).get(0);
+			Long porderid_link = porder.getId();
+
+			// get SKU within porder
+			List<POrder_Product_SKU> list_sku = porderskuService.getlist_sku_in_porder(orgrootid_link, porderid_link);
+			// get product within porder
+			List<POrder_Product> list_product = porderproductService.get_product_inporder(orgrootid_link,
+					porderid_link);
+
+			for (POrder_Product_SKU porder_sku : list_sku) {
+				Float unitprice = (float) 0;
+				SKU sku = skuService.findOne(porder_sku.getSkuid_link());
+				Unit unit = unitService.findOne(porder_sku.getUnitid_link());
+				Attributevalue attMau = attValService.findOne(porder_sku.getColorid_link());
+				Attributevalue attCo = attValService.findOne(porder_sku.getSizeid_link());
+
+				for (POrder_Product obj : list_product) {
+					if (obj.getProductid_link().equals(porder_sku.getProductid_link())) {
+						unitprice = Float.parseFloat("0"+obj.getEmt());
+					}
+				}
+
+				StockInD stockind = new StockInD();
+				stockind.setColorid_link(porder_sku.getColorid_link());
+				stockind.setId(null);
+				stockind.setOrgrootid_link(orgrootid_link);
+				stockind.setSizeid_link(porder_sku.getSizeid_link());
+				stockind.setSkucode(porder_sku.getSkucode());
+				stockind.setSkuid_link(porder_sku.getSkuid_link());
+				stockind.setSkutypeid_link(porder_sku.getSkutypeid_link());
+				stockind.setStockinid_link(null);
+				stockind.setTimecreate(new Date());
+				stockind.setTotalpackage(0);
+				stockind.setTotalpackage_order(porder_sku.getPquantity_total());
+				stockind.setUnitid_link(porder_sku.getUnitid_link());
+				stockind.setUsercreateid_link(user.getId());
+				stockind.setUnitprice(unitprice);
+				stockind.setSku(sku);
+				stockind.setUnit(unit);
+				stockind.setPorder_year(porder_sku.getPorder_year());
+				stockind.setAttMau(attMau);
+				stockind.setAttCo(attCo);
+
+				list.add(stockind);
+			}
+
+			response.data = list;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+
+		return new ResponseEntity<porder_get_stockin_response>(response, HttpStatus.OK);
 	}
 	
 	//Sau khi tao lenh sx --> yeu cau phan chuyen va lap dinh muc sx

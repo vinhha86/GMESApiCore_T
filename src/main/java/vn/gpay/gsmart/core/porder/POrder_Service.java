@@ -236,4 +236,10 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 		
 		return repo.findAll(specification);
 	}
+
+	@Override
+	public List<POrder> get_by_code(String ordercode, long orgrootid_link) {
+		// TODO Auto-generated method stub
+		return repo.get_by_code(orgrootid_link, ordercode);
+	}
 }
