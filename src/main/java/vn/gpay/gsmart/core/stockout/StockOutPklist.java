@@ -17,6 +17,8 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.category.Color;
+import vn.gpay.gsmart.core.category.Unit;
 import vn.gpay.gsmart.core.sku.SKU;
 
 @Table(name="stockout_pklist")
@@ -41,44 +43,47 @@ public class StockOutPklist implements Serializable {
 	@Column(name ="skuid_link")
     private Long skuid_link;
 	
+	@Column(name ="skutypeid_link")
+    private Integer skutypeid_link ;	
+
+	@Column(name ="colorid_link")
+    private Long colorid_link;
+	
+	@Column(name ="unitid_link")
+    private Long unitid_link;
+	
 	@Column(name ="lotnumber",length=100)
     private String lotnumber ;
 	
 	@Column(name ="packageid")
     private Integer packageid;
 	
-	@Column(name ="ydsorigin")
-    private Float ydsorigin;
+	@Column(name="ydsorigin")
+	private Float ydsorigin;
 	@Transient
     private Float ydsoriginold;		
-
-	@Column(name ="ydscheck")
-    private Float ydscheck;
-	@Transient
-    private Float ydscheckold;		
 	
-	@Column(name ="ydsprocessed")
-    private Float ydsprocessed;	
-	@Transient
-    private Float ydsprocessedold;			
+	@Column(name="ydscheck")
+	private Float ydscheck;
 	
-	@Column(name ="widthorigin")
-    private Float widthorigin;
+	@Column(name="width")
+	private Float width;
+	
+	@Transient
+    private Float ydscheckold;	
+	
+	@Transient
+    private Float ydsprocessedold;		
+	
 	@Transient
     private Float widthoriginold;	
 
-	@Column(name ="widthcheck")
-    private Float widthcheck;
 	@Transient
     private Float widthcheckold;	
 	
-	@Column(name ="widthprocessed")
-    private Float widthprocessed;
 	@Transient
     private Float widthprocessedold;		
 	
-	@Column(name ="totalerror")
-    private Float totalerror;
 	@Transient
     private Float totalerrorold;	
 	
@@ -97,23 +102,8 @@ public class StockOutPklist implements Serializable {
 	@Column(name ="status")
 	private Integer status;				
 	
-	@Column(name ="extrainfo", length=1000)
-    private String extrainfo;	
-	
 	@Column(name ="encryptdatetime")
     private Date encryptdatetime;
-	
-	@Column(name ="usercheckid_link")
-    private Long usercheckid_link;	
-	
-	@Column(name ="timecheck")
-    private Date timecheck;
-	
-	@Column(name ="userprocessedkid_link")
-    private Long userprocessedkid_link;	
-	
-	@Column(name ="timeprocessed")
-    private Date timeprocessed;	
 	
 	@Column(name="usercreateid_link")
 	private Long usercreateid_link;
@@ -157,30 +147,51 @@ public class StockOutPklist implements Serializable {
 		return "";
 	}
 	
-	public String getProducttype_name() {
-		if(sku!=null) {
-			return sku.getProducttype_name();
+	
+	public String getColorcode() {
+		if(color!=null) {
+			return color.getCode();
+		}
+		return "";
+		
+	}
+	public String getColorname() {
+		if(color!=null) {
+			return color.getName();
+		}
+		return "";
+		
+	}
+	public String getColorRGB() {
+		if(color!=null) {
+			return color.getRgbvalue();
+		}
+		return "";
+		
+	}
+	
+	@Transient
+	public String getUnitname() {
+		if(unit!=null) {
+			return unit.getName();
 		}
 		return "";
 	}
 	
-	public Integer getProducttypeid_link() {
-		if(sku!=null) {
-			return sku.getProducttypeid_link();
-		}
-		return null;
-	}
-	
-	public String getMauSanPham() {
-		if(sku!=null) {
-			return sku.getMauSanPham();
-		}
-		return "";
-	}
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="skuid_link",updatable =false,insertable =false)
     private SKU sku;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="colorid_link",updatable =false,insertable =false)
+    private Color color;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="unitid_link",insertable=false,updatable =false)
+    private Unit unit;
 
 	public Long getId() {
 		return id;
@@ -212,7 +223,18 @@ public class StockOutPklist implements Serializable {
 	public void setSkuid_link(Long skuid_link) {
 		this.skuid_link = skuid_link;
 	}
-
+	public Long getColorid_link() {
+		return colorid_link;
+	}
+	public void setColorid_link(Long colorid_link) {
+		this.colorid_link = colorid_link;
+	}
+	public Long getUnitid_link() {
+		return unitid_link;
+	}
+	public void setUnitid_link(Long unitid_link) {
+		this.unitid_link = unitid_link;
+	}
 	public String getLotnumber() {
 		return lotnumber;
 	}
@@ -333,73 +355,43 @@ public class StockOutPklist implements Serializable {
 	public void setLasttimeupdate(Date lasttimeupdate) {
 		this.lasttimeupdate = lasttimeupdate;
 	}
-
+	public SKU getSku() {
+		return sku;
+	}
+	public void setSku(SKU sku) {
+		this.sku = sku;
+	}
+	public Color getColor() {
+		return color;
+	}
+	public void setColor(Color color) {
+		this.color = color;
+	}
+	public Unit getUnit() {
+		return unit;
+	}
+	public void setUnit(Unit unit) {
+		this.unit = unit;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
 	public Integer getStatus() {
 		return status;
 	}
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
-
-	public Float getYdsprocessed() {
-		return ydsprocessed;
+	public Float getWidth() {
+		return width;
 	}
-	public void setYdsprocessed(Float ydsprocessed) {
-		this.ydsprocessed = ydsprocessed;
+	public void setWidth(Float width) {
+		this.width = width;
 	}
-	public Float getWidthorigin() {
-		return widthorigin;
+	public Integer getSkutypeid_link() {
+		return skutypeid_link;
 	}
-	public void setWidthorigin(Float widthorigin) {
-		this.widthorigin = widthorigin;
+	public void setSkutypeid_link(Integer skutypeid_link) {
+		this.skutypeid_link = skutypeid_link;
 	}
-	public Float getWidthcheck() {
-		return widthcheck;
-	}
-	public void setWidthcheck(Float widthcheck) {
-		this.widthcheck = widthcheck;
-	}
-	public Float getWidthprocessed() {
-		return widthprocessed;
-	}
-	public void setWidthprocessed(Float widthprocessed) {
-		this.widthprocessed = widthprocessed;
-	}
-	public Float getTotalerror() {
-		return totalerror;
-	}
-	public void setTotalerror(Float totalerror) {
-		this.totalerror = totalerror;
-	}
-	public String getExtrainfo() {
-		return extrainfo;
-	}
-	public void setExtrainfo(String extrainfo) {
-		this.extrainfo = extrainfo;
-	}
-	public Long getUsercheckid_link() {
-		return usercheckid_link;
-	}
-	public void setUsercheckid_link(Long usercheckid_link) {
-		this.usercheckid_link = usercheckid_link;
-	}
-	public Date getTimecheck() {
-		return timecheck;
-	}
-	public void setTimecheck(Date timecheck) {
-		this.timecheck = timecheck;
-	}
-	public Long getUserprocessedkid_link() {
-		return userprocessedkid_link;
-	}
-	public void setUserprocessedkid_link(Long userprocessedkid_link) {
-		this.userprocessedkid_link = userprocessedkid_link;
-	}
-	public Date getTimeprocessed() {
-		return timeprocessed;
-	}
-	public void setTimeprocessed(Date timeprocessed) {
-		this.timeprocessed = timeprocessed;
-	}
-	
 }

@@ -19,6 +19,8 @@ public class ResponseMessage {
     public static int KEY_RC_KEY_DUPLICATION        = 905;
     
     public static int KEY_RC_SKU_INVALID            = 700;
+    public static int KEY_RC_EPC_INVALID            = 800;
+    public static String MES_RC_EPC_INVALID         = "EPC Invalid";
     
     //POrder_Req Messages (1000-1010)
     public static int KEY_POREQ_DELETE_PORDEREXISTED 		= 1000;
@@ -68,7 +70,7 @@ public class ResponseMessage {
         hMes.put(KEY_RC_APPROVE_FAIL, MES_RC_APPROVE_FAIL);
         hMes.put(KEY_RC_ACTIVE_FAIL, MES_RC_ACTIVE_FAIL);
         hMes.put(KEY_RC_CREATE_INVCHECK_FAIL, MES_RC_CREATE_INVCHECK_FAIL);
-        
+        hMes.put(KEY_RC_EPC_INVALID, MES_RC_EPC_INVALID);
         hMes.put(KEY_POREQ_DELETE_PORDEREXISTED, MES_POREQ_DELETE_PORDEREXISTED);
         return hMes.get(code);
     }

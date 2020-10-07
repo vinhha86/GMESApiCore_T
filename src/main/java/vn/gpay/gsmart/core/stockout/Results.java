@@ -1,6 +1,5 @@
 package vn.gpay.gsmart.core.stockout;
 
-
 public class Results {
 
 	public Results(Object[] columns) {
@@ -21,4 +20,6 @@ public class Results {
 	public void setInvoicenumber(String invoicenumber) {
 		this.invoicenumber = invoicenumber;
 	}
+	
+	
 }

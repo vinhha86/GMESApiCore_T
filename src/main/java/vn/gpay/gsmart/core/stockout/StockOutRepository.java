@@ -47,26 +47,5 @@ public interface StockOutRepository extends JpaRepository<StockOut, Long>,JpaSpe
 	
 	@Modifying
 	@Query(value = "update StockOut set status = 1 where id=:id")
-	public void updateStatusById(@Param ("id")final long id);
-	
-	@Query(value = "select a from StockOut a where a.stockouttypeid_link = :stockouttypeid_link and a.pordercode = :ordercode")
-	public List<StockOut>getByTypeAndOrderCode(@Param ("stockouttypeid_link")final Integer stockouttypeid_link, @Param ("ordercode")final String ordercode);
-	
-	@Query(value = "select a from StockOut a where a.stockouttypeid_link = :stockouttypeid_link and a.stockoutorderid_link = :stockoutorderid_link")
-	public List<StockOut>getByTypeAndOrderID(@Param ("stockouttypeid_link")final Integer stockouttypeid_link, @Param ("stockoutorderid_link")final Long stockoutorderid_link);
-
-	@Query(value = "select a from StockOut a where a.stockouttypeid_link = :stockouttypeid_link and a.stockoutdate >= :stockoutdate_from and a.stockoutdate <= :stockoutdate_to")
-	public List<StockOut>getByDate(@Param ("stockouttypeid_link")final Integer stockouttypeid_link, @Param ("stockoutdate_from")final Date timecreate_from, @Param ("stockoutdate_to")final Date timecreate_to);	
-
-	@Query(value = "select a from StockOut a where cast(a.stockoutdate as date) = cast(:stockoutdate as date) and a.stockouttypeid_link = :stockouttypeid_link and a.p_skucode = :p_skucode")
-	public List<StockOut>getByDateAndSkucode(@Param ("stockoutdate")final Date stockoutdate, @Param ("stockouttypeid_link")final Integer stockouttypeid_link, @Param ("p_skucode")final String p_skucode);	
-	
-	@Query(value = "select a from StockOut a where cast(a.stockoutdate as date) = cast(:stockoutdate as date) and a.stockouttypeid_link = :stockouttypeid_link and a.p_skuid_link = :p_skuid_link")
-	public List<StockOut>getByDateAndSkuID(@Param ("stockoutdate")final Date stockoutdate, @Param ("stockouttypeid_link")final Integer stockouttypeid_link, @Param ("p_skuid_link")final Long p_skuid_link);	
-
-	@Query(value = "select a from StockOut a where a.stockouttypeid_link = :stockouttypeid_link and a.p_skucode = :p_skucode")
-	public List<StockOut>getBySkucode(@Param ("stockouttypeid_link")final Integer stockouttypeid_link, @Param ("p_skucode")final String p_skucode);	
-
-	@Query(value = "select a from StockOut a")
-	public List<StockOut>getAll();	
+	public void updateStatusById(@Param ("id")final long id);	
 }

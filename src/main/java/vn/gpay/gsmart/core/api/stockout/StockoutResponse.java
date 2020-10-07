@@ -7,4 +7,5 @@ import vn.gpay.gsmart.core.stockout.StockOut;
 
 public class StockoutResponse extends ResponseBase{
 	public List<StockOut> data;
+	public long totalCount;
 }

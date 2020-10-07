@@ -3,6 +3,8 @@ package vn.gpay.gsmart.core.stockout;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+
 import vn.gpay.gsmart.core.base.Operations;
 
 
@@ -21,20 +23,6 @@ public interface IStockOutService extends Operations<StockOut>{
 	
 	public void updateStatusById(long id);
 	
-	 List<StockOut> stockout_list_test(Long orgid_link,Integer stockouttypeid_link,String stockoutcode, Long orgid_from_link,Long orgid_to_link, Date stockoutdate_from,
-				Date stockoutdate_to,int status);
-
-	List<StockOut> getAll();
-
-	List<StockOut> getBySkucode(Integer stockouttypeid_link, String p_skucode);
-
-	List<StockOut> getByDateAndSkucode(Date stockoutdate, Integer stockouttypeid_link, String p_skucode);
-
-	List<StockOut> getByDate(Integer stockouttypeid_link, Date timecreate_from, Date timecreate_to);
-
-	List<StockOut> getByTypeAndOrderCode(Integer stockouttypeid_link, String ordercode);
-
-	List<StockOut> getByDateAndSkuID(Date stockoutdate, Integer stockouttypeid_link, Long p_skuid_link);
-
-	List<StockOut> getByTypeAndOrderID(Integer stockouttypeid_link, Long stockoutorderid_link);
+	public  Page<StockOut> stockout_list_page(Long orgrootid_link,Integer stockouttypeid_link,String stockoutcode, Long orgid_from_link,Long orgid_to_link, Date stockoutdate_from,
+				Date stockoutdate_to,int page, int limit);
 }

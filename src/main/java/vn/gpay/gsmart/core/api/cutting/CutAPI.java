@@ -1,9 +1,9 @@
 package vn.gpay.gsmart.core.api.cutting;
 
-import javax.servlet.http.HttpServletRequest;
-
 import java.util.Date;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,29 +16,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.actionlog.ActionLogs;
 import vn.gpay.gsmart.core.actionlog.IActionLogs_Service;
-import vn.gpay.gsmart.core.api.porderprocessing.POrderProcessingResponse;
 import vn.gpay.gsmart.core.api.porderprocessing.POrderSetReadyRequest;
-import vn.gpay.gsmart.core.api.porderprocessing.PProcessByDateRequest;
 import vn.gpay.gsmart.core.api.porderprocessing.PProcessUpdateRequest;
 import vn.gpay.gsmart.core.api.porderprocessing.PProcessUpdateResponse;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.porder.POrderSetReady;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.security.GpayUser;
-import vn.gpay.gsmart.core.stockout.IStockOutService;
 import vn.gpay.gsmart.core.utils.POrderStatus;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
-import vn.gpay.gsmart.core.utils.StockoutTypes;
-import vn.gpay.gsmart.core.porder.POrderSetReady;
 @RestController
 @RequestMapping("/api/v1/cutting")
 public class CutAPI {
     @Autowired private IPOrderProcessing_Service pprocessService;
     @Autowired private IPOrder_Service pordersService;
-    @Autowired private IActionLogs_Service actionLogsService;    
-    @Autowired private IStockOutService stockoutService;
+    @Autowired private IActionLogs_Service actionLogsService;  
 
 	@RequestMapping(value = "/startcutting",method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> startCutting(@RequestBody POrderSetReadyRequest entity, HttpServletRequest request) {
@@ -100,33 +95,6 @@ public class CutAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());			
 		    return new ResponseEntity<ResponseBase>(response,HttpStatus.BAD_REQUEST);
-		}    			
-	}    
-	
-	@RequestMapping(value = "/getbydate",method = RequestMethod.POST)
-	public ResponseEntity<POrderProcessingResponse> getByDate(@RequestBody PProcessByDateRequest entity, HttpServletRequest request) {
-		POrderProcessingResponse response = new POrderProcessingResponse();
-		try {
-			List<POrderProcessing> pprocessList = pprocessService.getByDate_Cutting(entity.processingdate_to);
-			
-			//If processingdate <> entity.processingdate_to --> Calcucate Amount's value of provided date
-			for(POrderProcessing pprocess: pprocessList){
-				//Kiem tra xem da co phieu xuat vai sang to cat chua
-				if (stockoutService.getByTypeAndOrderID(StockoutTypes.STOCKOUT_TYPE_FORCUT, pprocess.getPorderid_link()).size() > 0)
-					pprocess.setIsstockouttocut(true);
-				else
-					pprocess.setIsstockouttocut(false);
-			}
-			
-			response.data=pprocessList;
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
-			return new ResponseEntity<POrderProcessingResponse>(response,HttpStatus.OK);
-		}catch (Exception e) {
-		
-			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-			response.setMessage(e.getMessage());			
-		    return new ResponseEntity<POrderProcessingResponse>(HttpStatus.OK);
 		}    			
 	}
 	

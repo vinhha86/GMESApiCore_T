@@ -1,4 +1,5 @@
 package vn.gpay.gsmart.core.stockout;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -209,7 +210,7 @@ public class StockOut implements Serializable {
 	@Transient
 	public String getUsercreate_name() {
 		if(user != null)
-			return user.getFullName();
+			return user.getFullname();
 		return "";
 	}
 	@Transient 
@@ -575,7 +576,24 @@ public class StockOut implements Serializable {
 	public void setStockoutd(List<StockOutD> stockoutd) {
 		this.stockoutd = stockoutd;
 	}
-
+	public SKU getSku() {
+		return sku;
+	}
+	public void setSku(SKU sku) {
+		this.sku = sku;
+	}
+	public Org getOrgFrom() {
+		return orgFrom;
+	}
+	public void setOrgFrom(Org orgFrom) {
+		this.orgFrom = orgFrom;
+	}
+	public Org getOrgTo() {
+		return orgTo;
+	}
+	public void setOrgTo(Org orgTo) {
+		this.orgTo = orgTo;
+	}
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
@@ -645,4 +663,5 @@ public class StockOut implements Serializable {
 	public void setVat_exchangerate(Float vat_exchangerate) {
 		this.vat_exchangerate = vat_exchangerate;
 	}
+	
 }

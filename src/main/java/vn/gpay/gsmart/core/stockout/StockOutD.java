@@ -21,6 +21,8 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.category.Color;
+import vn.gpay.gsmart.core.category.Unit;
 import vn.gpay.gsmart.core.sku.SKU;
 
 @Table(name="stockout_d")
@@ -40,17 +42,14 @@ public class StockOutD implements Serializable {
 	@Column(name ="stockoutid_link")
     private Long stockoutid_link;
 	
-	@Column(name ="porderid_link")
-    private Long porderid_link;
-	
 	@Column(name ="pordercode", length=10)
     private String pordercode;
 	
 	@Column(name ="stockoutdate")
     private Date stockoutdate;	
 	
-	@Column(name ="productcolor_name")
-    private String productcolor_name;
+	@Column(name ="mainskucode", length=50)
+    private String mainskucode;
 	
 	@Column(name ="skuid_link")
     private Long skuid_link;
@@ -125,58 +124,31 @@ public class StockOutD implements Serializable {
 	private Date lasttimeupdate;
 	
 	private Long sizeid_link;
-
+	
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
 	@JoinColumn( name="stockoutdid_link", referencedColumnName="id")
 	private List<StockOutPklist>  stockoutpklist  = new ArrayList<>();
 	
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne
-    @JoinColumn(name="skuid_link",insertable=false,updatable =false)
-    private SKU sku;
-	
-	
 	@Transient
-	public String getSkutype() {
+	public String getProduct_code() {
 		if(sku!=null)
-			return sku.getProducttype_name();
-		return "";
-	}
-	
-	@Transient
-	public Integer getSkutypeid_link() {
-		if(sku!=null)
-			return sku.getProducttypeid_link();
-		return null;
-	}
-	
-	@Transient
-	public String getSku_code() {
-		if(sku!=null)
-			return sku.getCode();
-		return "";
-	}
-	
-	@Transient
-	public String getSku_name() {
-		if(sku!=null)
-			return sku.getName();
+			return sku.getProduct_code();
 		return "";
 	}
 	
 	@Transient
 	public String getColor_name() {
 		if(sku!=null)
-			return sku.getMauSanPham();
+			return sku.getColor_name();
 		return "";
 	}
 	
 	@Transient
 	public String getSize_name() {
 		if(sku!=null)
-			return sku.getCoSanPham();
+			return sku.getSize_name();
 		return "";
 	}
 	
@@ -216,8 +188,44 @@ public class StockOutD implements Serializable {
 		}
 		return "";
 	}
-
+	@Transient
+	public String getColorcode() {
+		if(color!=null) {
+			return color.getCode();
+		}
+		return "";
+	}
+	@Transient
+	public String getColorname() {
+		if(color!=null) {
+			return color.getName();
+		}
+		return "";
+	}
+	@Transient
+	public String getColorRGB() {
+		if(color!=null) {
+			return color.getRgbvalue();
+		}
+		return "";
+	}
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="skuid_link",insertable=false,updatable =false)
+    private SKU sku;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="colorid_link",insertable=false,updatable =false)
+    private Color color;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="unitid_link",insertable=false,updatable =false)
+    private Unit unit;
+
+
 	public Long getId() {
 		return id;
 	}
@@ -248,7 +256,12 @@ public class StockOutD implements Serializable {
 	public void setStockoutdate(Date stockoutdate) {
 		this.stockoutdate = stockoutdate;
 	}
-	
+	public String getMainskucode() {
+		return mainskucode;
+	}
+	public void setMainskucode(String mainskucode) {
+		this.mainskucode = mainskucode;
+	}
 	public Long getSkuid_link() {
 		return skuid_link;
 	}
@@ -400,28 +413,28 @@ public class StockOutD implements Serializable {
 	public void setStockoutpklist(List<StockOutPklist> stockoutpklist) {
 		this.stockoutpklist = stockoutpklist;
 	}
-
+	public void setSku(SKU sku) {
+		this.sku = sku;
+	}
+	public Color getColor() {
+		return color;
+	}
+	public void setColor(Color color) {
+		this.color = color;
+	}
+	public Unit getUnit() {
+		return unit;
+	}
+	public void setUnit(Unit unit) {
+		this.unit = unit;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
 	public Long getSizeid_link() {
 		return sizeid_link;
 	}
 	public void setSizeid_link(Long sizeid_link) {
 		this.sizeid_link = sizeid_link;
 	}
-
-	public Long getPorderid_link() {
-		return porderid_link;
-	}
-
-	public void setPorderid_link(Long porderid_link) {
-		this.porderid_link = porderid_link;
-	}
-
-	public String getProductcolor_name() {
-		return productcolor_name;
-	}
-
-	public void setProductcolor_name(String productcolor_name) {
-		this.productcolor_name = productcolor_name;
-	}
-	
 }

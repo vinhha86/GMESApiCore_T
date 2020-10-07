@@ -10,6 +10,8 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -79,23 +81,23 @@ public class StockOutServiceImpl extends AbstractService<StockOut> implements IS
 		repository.updateStatusById(id);
 	}	
 	@Override
-	public List<StockOut> stockout_list_test(Long orgid_link,Integer stockouttypeid_link,String stockoutcode,Long orgid_from_link, Long orgid_to_link, Date stockoutdate_from,
-			Date stockoutdate_to,int status) {
+	public Page<StockOut> stockout_list_page(Long orgrootid_link,Integer stockouttypeid_link,String stockoutcode,Long orgid_from_link, Long orgid_to_link, Date stockoutdate_from,
+			Date stockoutdate_to,int page, int limit) {
 		Specification<StockOut> specification = Specifications.<StockOut>and()
-	            .eq( "orgid_link", orgid_link)
-	            .eq(Objects.nonNull(stockouttypeid_link), "stockouttypeid_link", stockouttypeid_link)
+	            .eq( "orgrootid_link", orgrootid_link)
+	            .eq(stockouttypeid_link != null, "stockouttypeid_link", stockouttypeid_link)
 	            .like(Objects.nonNull(stockoutcode), "stockoutcode", "%"+stockoutcode+"%")
-	            .eq(Objects.nonNull(orgid_from_link), "orgid_from_link", orgid_from_link)
-	            .eq(Objects.nonNull(orgid_to_link), "orgid_to_link", orgid_to_link)
+	            .eq(orgid_from_link != null, "orgid_from_link", orgid_from_link)
+	            .eq(orgid_to_link != null, "orgid_to_link", orgid_to_link)
 	            .ge(this.check1(stockoutdate_from,stockoutdate_to),"stockoutdate",GPAYDateFormat.atStartOfDay(stockoutdate_from))
                 .le(this.check2(stockoutdate_from,stockoutdate_to),"stockoutdate",GPAYDateFormat.atEndOfDay(stockoutdate_to))
                 .between(this.check3(stockoutdate_from,stockoutdate_to),"stockoutdate", GPAYDateFormat.atStartOfDay(stockoutdate_from), GPAYDateFormat.atEndOfDay(stockoutdate_to))
-                .eq(status!=-1, "status", status)
+                .ne("status", -1)
 	            .build();
 		Sort sort = Sorts.builder()
 		        .desc("stockoutdate")
 		        .build();
-	    return repository.findAll(specification,sort);
+	    return repository.findAll(specification, PageRequest.of(page - 1, limit, sort));
 	}
 	public boolean check1(Date stockoutdate_from,Date stockoutdate_to) {
 		if(stockoutdate_from!=null && stockoutdate_to==null) return true;
@@ -110,39 +112,4 @@ public class StockOutServiceImpl extends AbstractService<StockOut> implements IS
 		return false;
 	}
 	
-	@Override
-	public List<StockOut>getByTypeAndOrderCode(Integer stockouttypeid_link, String ordercode){
-		return repository.getByTypeAndOrderCode(stockouttypeid_link,ordercode);
-	}
-	
-	@Override
-	public List<StockOut>getByTypeAndOrderID(Integer stockouttypeid_link, Long stockoutorderid_link){
-		return repository.getByTypeAndOrderID(stockouttypeid_link,stockoutorderid_link);
-	}
-	
-	@Override
-	public List<StockOut>getByDate(Integer stockouttypeid_link, Date timecreate_from, Date timecreate_to){
-		return repository.getByDate(stockouttypeid_link,timecreate_from, timecreate_to);
-	}
-
-	@Override
-	public List<StockOut>getByDateAndSkucode(Date stockoutdate, Integer stockouttypeid_link, String p_skucode){
-		return repository.getByDateAndSkucode(stockoutdate,stockouttypeid_link, p_skucode);
-	}
-	
-	@Override
-	public List<StockOut>getByDateAndSkuID(Date stockoutdate, Integer stockouttypeid_link, Long p_skuid_link){
-		List<StockOut> a = repository.getByDateAndSkuID(stockoutdate,stockouttypeid_link, p_skuid_link);
-		return a;
-	}
-	
-	@Override
-	public List<StockOut>getBySkucode(Integer stockouttypeid_link, String p_skucode){
-		return repository.getBySkucode(stockouttypeid_link,p_skucode);
-	}
-
-	@Override
-	public List<StockOut>getAll(){
-		return repository.getAll();
-	}
 }
