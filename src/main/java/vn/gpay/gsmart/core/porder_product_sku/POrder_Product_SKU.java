@@ -84,8 +84,10 @@ public class POrder_Product_SKU implements Serializable {
 	
 	@Transient
 	public Integer getUnitid_link() {
-		if (sku!= null)
-			return sku.getUnitid_link().intValue();
+		if (sku!= null) {
+			if(sku.getUnitid_link() != null)
+				return sku.getUnitid_link().intValue();
+		}
 		return (Integer)0;
 	}
 	
