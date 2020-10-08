@@ -312,6 +312,7 @@ public class Org implements Serializable {
 		this.costpersec = costpersec;
 	}
 	public Integer getIs_manufacturer() {
+		if(is_manufacturer == null) return 0;
 		return is_manufacturer;
 	}
 	public void setIs_manufacturer(Integer is_manufacturer) {

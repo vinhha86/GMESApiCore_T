@@ -37,7 +37,8 @@ public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecification
 	public List<Org> findAllOrgbyType(@Param ("orgrootid")final long orgrootid,
 			@Param ("orgtypeid_link")final Integer orgtypeid_link);
 	
-	@Query(value = "select c from Org c where c.orgtypeid_link in(1,13,14) order by c.id asc")
+	@Query(value = "select c from Org c where c.orgtypeid_link in(1,8,9,13,14,21) order by c.id asc")
+//	@Query(value = "select c from Org c where c.orgtypeid_link in(1,8,9,13,14,21) order by c.orgtypeid_link, c.is_manufacturer, c.code asc")
 	public List<Org> findOrgByTypeForMenuOrg();
 	
 	@Query(value = "select c from Org c where c.parentid_link =:orgid_link")
