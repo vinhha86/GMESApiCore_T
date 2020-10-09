@@ -8,8 +8,17 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.category.Unit;
+import vn.gpay.gsmart.core.product.Product;
 
 @Table(name="handover_product")
 @Entity
@@ -53,6 +62,43 @@ public class HandoverProduct  implements Serializable{
 	
 	@Column(name ="lasttimeupdate")
 	private Date lasttimeupdate;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="productid_link",insertable=false,updatable =false)
+    private Product product;
+	
+	@Transient
+	public String getBuyercode() {
+		if(product!=null) {
+			if(product.getBuyercode() != null)
+				return product.getBuyercode();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getBuyername() {
+		if(product!=null) {
+			if(product.getBuyername() != null)
+				return product.getBuyername();
+		}
+		return "";
+	}
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="unitid_link",insertable=false,updatable =false)
+	private Unit unit;
+	
+	@Transient
+	public String getUnitName() {
+		if(unit!=null) {
+			if(unit.getName() != null)
+				return unit.getName();
+		}
+		return "";
+	}
 
 	public Long getId() {
 		return id;

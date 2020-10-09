@@ -87,4 +87,20 @@ public class HandoverAPI {
 		    return new ResponseEntity<Handover_getone_response>(response,HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/getbytype",method = RequestMethod.POST)
+	public ResponseEntity<Handover_getall_response> Getbytype(@RequestBody Handover_getone_request entity,HttpServletRequest request ) {
+		Handover_getall_response response = new Handover_getall_response();
+		try {
+			
+			response.data = handoverService.getByType(entity.id);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
+		}
+	}
 }
