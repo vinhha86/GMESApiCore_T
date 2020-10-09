@@ -199,4 +199,6 @@ public class InvcheckSku implements Serializable {
 	public void setSku(SKU sku) {
 		this.sku = sku;
 	}
+	
+	
 }

@@ -7,7 +7,7 @@ import vn.gpay.gsmart.core.base.Operations;
 
 public interface IInvcheckService extends Operations<Invcheck>{
 
-	public List<Invcheck> invcheck_list(Long orgid_link,String stockcode,String orgfrom_code,Date invdateto_from,Date invdateto_to,Integer status);
+	public List<Invcheck> invcheck_list(Long orgrootid_link,String stockcode,String orgfrom_code,Date invdateto_from,Date invdateto_to,Integer status);
 	
 	public List<Invcheck> invcheck_getactive(Long orgcheckid_link);
 	

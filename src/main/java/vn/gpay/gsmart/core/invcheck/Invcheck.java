@@ -32,8 +32,8 @@ public class Invcheck implements Serializable {
 	@SequenceGenerator(name="invcheck_generator", sequenceName = "invcheck_id_seq", allocationSize=1)
 	protected Long id;
 	
-	@Column(name ="orgid_link")
-    private Long orgid_link;
+	@Column(name ="orgrootid_link")
+    private Long orgrootid_link;
 	
 	@Column(name ="invcheckcode",length=50)
     private String invcheckcode;
@@ -113,12 +113,12 @@ public class Invcheck implements Serializable {
 		this.id = id;
 	}
 
-	public Long getOrgid_link() {
-		return orgid_link;
+	public Long getOrgrootid_link() {
+		return orgrootid_link;
 	}
 
-	public void setOrgid_link(Long orgid_link) {
-		this.orgid_link = orgid_link;
+	public void setOrgrootid_link(Long orgrootid_link) {
+		this.orgrootid_link = orgrootid_link;
 	}
 
 	public String getInvcheckcode() {
@@ -232,4 +232,6 @@ public class Invcheck implements Serializable {
 	public void setOrg(Org org) {
 		this.org = org;
 	}
+	
+	
 }

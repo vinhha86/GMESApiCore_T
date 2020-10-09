@@ -22,6 +22,35 @@ public class InvcheckEpcID implements Serializable {
     
     @Column(name = "epc",length=50)
     private String epc;
+    
+    
+	public Long getOrgrootid_link() {
+		return orgrootid_link;
+	}
+
+	public void setOrgrootid_link(Long orgrootid_link) {
+		this.orgrootid_link = orgrootid_link;
+	}
+
+	public Long getInvcheckid_link() {
+		return invcheckid_link;
+	}
+
+	public void setInvcheckid_link(Long invcheckid_link) {
+		this.invcheckid_link = invcheckid_link;
+	}
+
+	public String getEpc() {
+		return epc;
+	}
+
+	public void setEpc(String epc) {
+		this.epc = epc;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
 
 	@Override
 	public int hashCode() {
@@ -58,31 +87,6 @@ public class InvcheckEpcID implements Serializable {
 		} else if (!orgrootid_link.equals(other.orgrootid_link))
 			return false;
 		return true;
-	}
-
-
-	public Long getOrgrootid_link() {
-		return orgrootid_link;
-	}
-
-	public void setOrgrootid_link(Long orgrootid_link) {
-		this.orgrootid_link = orgrootid_link;
-	}
-
-	public Long getInvcheckid_link() {
-		return invcheckid_link;
-	}
-
-	public void setInvcheckid_link(Long invcheckid_link) {
-		this.invcheckid_link = invcheckid_link;
-	}
-
-	public String getEpc() {
-		return epc;
-	}
-
-	public void setEpc(String epc) {
-		this.epc = epc;
 	}
     
     

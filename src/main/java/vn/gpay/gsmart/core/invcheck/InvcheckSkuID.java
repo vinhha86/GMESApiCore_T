@@ -5,7 +5,6 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
-
 @Embeddable
 public class InvcheckSkuID implements Serializable {
  
@@ -22,6 +21,31 @@ public class InvcheckSkuID implements Serializable {
     
     @Column(name = "skuid_link")
     private Long skuid_link;
+    
+    
+	public Long getOrgrootid_link() {
+		return orgrootid_link;
+	}
+
+	public void setOrgrootid_link(Long orgrootid_link) {
+		this.orgrootid_link = orgrootid_link;
+	}
+
+	public Long getInvcheckid_link() {
+		return invcheckid_link;
+	}
+
+	public void setInvcheckid_link(Long invcheckid_link) {
+		this.invcheckid_link = invcheckid_link;
+	}
+
+	public Long getSkuid_link() {
+		return skuid_link;
+	}
+
+	public void setSkuid_link(Long skuid_link) {
+		this.skuid_link = skuid_link;
+	}
 
 	@Override
 	public int hashCode() {
@@ -58,32 +82,6 @@ public class InvcheckSkuID implements Serializable {
 		} else if (!skuid_link.equals(other.skuid_link))
 			return false;
 		return true;
-	}
-
-	
-
-	public Long getOrgrootid_link() {
-		return orgrootid_link;
-	}
-
-	public void setOrgrootid_link(Long orgrootid_link) {
-		this.orgrootid_link = orgrootid_link;
-	}
-
-	public Long getInvcheckid_link() {
-		return invcheckid_link;
-	}
-
-	public void setInvcheckid_link(Long invcheckid_link) {
-		this.invcheckid_link = invcheckid_link;
-	}
-
-	public Long getSkuid_link() {
-		return skuid_link;
-	}
-
-	public void setSkuid_link(Long skuid_link) {
-		this.skuid_link = skuid_link;
 	}
 
     

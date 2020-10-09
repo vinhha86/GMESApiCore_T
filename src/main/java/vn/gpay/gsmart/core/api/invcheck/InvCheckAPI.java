@@ -59,7 +59,7 @@ public class InvCheckAPI {
 			UUID uuid = UUID.randomUUID();
 		    String invcheckcode = uuid.toString();
 			Invcheck invcheck = new Invcheck();
-			invcheck.setOrgid_link(user.getRootorgid_link());
+			invcheck.setOrgrootid_link(user.getRootorgid_link());
 			invcheck.setUsercreateid_link(user.getUserId());
 			invcheck.setLastuserupdateid_link(user.getUserId());
 			invcheck.setBossid_link(entity.bossid);
@@ -114,6 +114,7 @@ public class InvCheckAPI {
 					}
 					else {
 						skuFound = new InvcheckSku();
+						skuFound.setOrgrootid_link(invcheck.getOrgrootid_link());
 						skuFound.setInvcheckid_link(invcheck1.getId());
 						skuFound.setSkuid_link(epc.getSkuid_link());
 						skuFound.setYdsorigin(epc.getYdsorigin());
@@ -150,33 +151,33 @@ public class InvCheckAPI {
 		}
 	}
 	
-//	@RequestMapping(value = "/invcheck_post",method = RequestMethod.POST)
-//	public ResponseEntity<?> InvcheckPost( @RequestBody InvcheckPostRequest entity,HttpServletRequest request ) {
-//		ResponseBase responseBase = new ResponseBase();
-//		List<Invcheck> data =invcheckService.invcheck_getbycode(entity.invcheckcode);
-//		if (data.size() > 0){
-//			try {
-//				//find and update epc on the invcheck_epc
-//				for (InvcheckEpc epc: entity.data){
-//					invcheckEpcService.update(epc);
-//					invcheckSkuService.updateTotalCheck(epc.getInvcheckid_link(), epc.getSkuid_link());
-//				}
-//				responseBase.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-//				responseBase.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-//				return new ResponseEntity<ResponseBase>(responseBase,HttpStatus.OK);
-//			}catch (RuntimeException e) {
-//				ResponseError errorBase = new ResponseError();
-//				errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
-//				errorBase.setMessage(e.getMessage());
-//			    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
-//			}
-//		}
-//		else {
-//			responseBase.setRespcode(ResponseMessage.KEY_RC_RS_NOT_FOUND);
-//			responseBase.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_RS_NOT_FOUND));
-//		    return new ResponseEntity<ResponseBase>(responseBase,HttpStatus.OK);			
-//		}
-//	}
+	@RequestMapping(value = "/invcheck_post",method = RequestMethod.POST)
+	public ResponseEntity<?> InvcheckPost( @RequestBody InvcheckPostRequest entity,HttpServletRequest request ) {
+		ResponseBase responseBase = new ResponseBase();
+		List<Invcheck> data =invcheckService.invcheck_getbycode(entity.invcheckcode);
+		if (data.size() > 0){
+			try {
+				//find and update epc on the invcheck_epc
+				for (InvcheckEpc epc: entity.data){
+					invcheckEpcService.update(epc);
+					invcheckSkuService.updateTotalCheck(epc.getInvcheckid_link(), epc.getSkuid_link());
+				}
+				responseBase.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				responseBase.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<ResponseBase>(responseBase,HttpStatus.OK);
+			}catch (RuntimeException e) {
+				ResponseError errorBase = new ResponseError();
+				errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+				errorBase.setMessage(e.getMessage());
+			    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		else {
+			responseBase.setRespcode(ResponseMessage.KEY_RC_RS_NOT_FOUND);
+			responseBase.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_RS_NOT_FOUND));
+		    return new ResponseEntity<ResponseBase>(responseBase,HttpStatus.OK);			
+		}
+	}
 	@RequestMapping(value = "/invcheck_list",method = RequestMethod.POST)
 	public ResponseEntity<?> InvcheckList( @RequestBody InvcheckListRequest entity,HttpServletRequest request ) {
 		InvcheckResponse responseBase = new InvcheckResponse();
@@ -190,7 +191,7 @@ public class InvCheckAPI {
 			}else {
 				orgfrom_code =user.getOrgid_link().toString();
 			}
-			responseBase.data=invcheckService.invcheck_list(user.getRootorgid_link(),entity.stockcode, orgfrom_code, entity.invdateto_from, entity.invdateto_to,entity.status);
+			responseBase.data=invcheckService.invcheck_list(user.getRootorgid_link(),entity.stockcode, orgfrom_code,entity.invdateto_from, entity.invdateto_to,entity.status);
 			responseBase.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			responseBase.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<InvcheckResponse>(responseBase,HttpStatus.OK);
@@ -241,6 +242,7 @@ public class InvCheckAPI {
 		GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
 		InvcheckResponse responseBase = new InvcheckResponse();
 		try {
+			//Lay phien kiem ke cua don vi noi nguoi dung login truc thuoc
 			List<Invcheck> data =invcheckService.invcheck_getactive(user.getOrgId());
 			if(data==null) data = new ArrayList<>();
 			responseBase.data=data;

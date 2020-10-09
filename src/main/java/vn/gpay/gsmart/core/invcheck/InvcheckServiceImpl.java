@@ -26,17 +26,17 @@ public class InvcheckServiceImpl extends AbstractService<Invcheck> implements II
 		return repository;
 	}
 	@Override
-	public List<Invcheck> invcheck_list(Long orgid_link,String stockcode, String orgfrom_code, Date invdateto_from, Date invdateto_to,Integer status) {
+	public List<Invcheck> invcheck_list(Long orgrootid_link,String stockcode, String orgfrom_code, Date invdateto_from, Date invdateto_to,Integer status) {
 		// TODO Auto-generated method stub
 		
 		Specification<Invcheck> specification = Specifications.<Invcheck>and()
-	            .eq( "orgid_link", orgid_link)
+	            .eq( "orgrootid_link", orgrootid_link)
 	            .like(Objects.nonNull(stockcode), "invcheckcode", "%"+stockcode+"%")
 //	            .eq(Objects.nonNull(orgfrom_code), "orgcheckid_link", orgfrom_code)
 	            .ge((invdateto_from!=null && invdateto_to==null),"invcheckdatetime",GPAYDateFormat.atStartOfDay(invdateto_from))
                 .le((invdateto_from==null && invdateto_to!=null),"invcheckdatetime",GPAYDateFormat.atEndOfDay(invdateto_to) )
                 .between((invdateto_from!=null && invdateto_to!=null),"invcheckdatetime", GPAYDateFormat.atStartOfDay(invdateto_from), GPAYDateFormat.atEndOfDay(invdateto_to))
-                .eq( status!=-1,"status", status)
+                .eq( status!=null,"status", status)
 	            .build();
 		Sort sort = Sorts.builder()
 		        .desc("invcheckdatetime")
