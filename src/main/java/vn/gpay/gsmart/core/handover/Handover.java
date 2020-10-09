@@ -8,8 +8,18 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.org.Org;
+import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.security.GpayUser;
 
 @Table(name="handover")
 @Entity
@@ -32,9 +42,6 @@ public class Handover implements Serializable {
 	
 	@Column(name ="handover_date")
 	private Date handover_date;
-	
-	@Column(name ="handoverintypeid_link")
-	private Long handoverintypeid_link;
 	
 	@Column(name ="porderid_link")
 	private Long porderid_link;
@@ -83,6 +90,72 @@ public class Handover implements Serializable {
 	
 	@Column(name ="lasttimeupdate")
 	private Date lasttimeupdate;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="porderid_link",insertable=false,updatable =false)
+    private POrder porder;
+	
+	@Transient
+	public String getOrdercode() {
+		if(porder!=null) {
+			if(porder.getOrdercode() != null)
+				return porder.getOrdercode();
+		}
+		return "";
+	}
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="handover_userid_link",insertable=false,updatable =false)
+    private GpayUser handoverUser;
+	
+	@Transient
+	public String getHandoverUserName() {
+		if(handoverUser!=null) {
+			return handoverUser.getFullName();
+		}
+		return "";
+	}
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="receiver_userid_link",insertable=false,updatable =false)
+    private GpayUser receiverUser;
+	
+	@Transient
+	public String getReceiverUserName() {
+		if(receiverUser!=null) {
+			return receiverUser.getFullName();
+		}
+		return "";
+	}
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="orgid_from_link",insertable=false,updatable =false)
+    private Org orgFrom;
+	
+	@Transient
+	public String getOrgFromName() {
+		if(orgFrom!=null) {
+			return orgFrom.getName();
+		}
+		return "";
+	}
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="orgid_to_link",insertable=false,updatable =false)
+    private Org orgTo;
+	
+	@Transient
+	public String getOrgToName() {
+		if(orgTo!=null) {
+			return orgTo.getName();
+		}
+		return "";
+	}
 
 	public Long getId() {
 		return id;
@@ -122,14 +195,6 @@ public class Handover implements Serializable {
 
 	public void setHandover_date(Date handover_date) {
 		this.handover_date = handover_date;
-	}
-
-	public Long getHandoverintypeid_link() {
-		return handoverintypeid_link;
-	}
-
-	public void setHandoverintypeid_link(Long handoverintypeid_link) {
-		this.handoverintypeid_link = handoverintypeid_link;
 	}
 
 	public Long getPorderid_link() {
