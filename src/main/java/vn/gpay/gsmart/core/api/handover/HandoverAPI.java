@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.api.handover;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -15,6 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.handover.Handover;
 import vn.gpay.gsmart.core.handover.IHandoverService;
+import vn.gpay.gsmart.core.handover_product.HandoverProduct;
+import vn.gpay.gsmart.core.handover_product.IHandoverProductService;
+import vn.gpay.gsmart.core.handover_sku.HandoverSKU;
+import vn.gpay.gsmart.core.handover_sku.IHandoverSKUService;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -22,6 +27,8 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 @RequestMapping("/api/v1/handover")
 public class HandoverAPI {
 	@Autowired IHandoverService handoverService;
+	@Autowired IHandoverProductService handoverProductService;
+	@Autowired IHandoverSKUService handoverSkuService;
 	
 	@RequestMapping(value = "/getall",method = RequestMethod.POST)
 	public ResponseEntity<Handover_getall_response> GetAll(HttpServletRequest request ) {
@@ -45,6 +52,7 @@ public class HandoverAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Handover handover = entity.data;
 			if(handover.getId()==null || handover.getId()==0) {
+				// new
 				Date date = new Date();
 				handover.setOrgrootid_link(user.getRootorgid_link());
 				handover.setUsercreateid_link(user.getId());
@@ -52,6 +60,7 @@ public class HandoverAPI {
 				handover.setLastuserupdateid_link(user.getId());
 				handover.setLasttimeupdate(date);
 			}else {
+				// update
 				Date date = new Date();
 				Handover _handover =  handoverService.findOne(handover.getId());
 				handover.setOrgrootid_link(_handover.getOrgrootid_link());
@@ -59,6 +68,20 @@ public class HandoverAPI {
 				handover.setTimecreate(_handover.getTimecreate());
 				handover.setLastuserupdateid_link(user.getId());
 				handover.setLasttimeupdate(date);
+				// nếu porder thay đổi
+				if(!handover.getPorderid_link().equals(_handover.getPorderid_link())) {
+					// Xoá HandoverProduct
+					List<HandoverProduct> handoverProducts = handoverProductService.getByHandoverId(handover.getId());
+					for(HandoverProduct handoverProduct : handoverProducts) {
+						handoverProductService.deleteById(handoverProduct.getId());
+					}
+					// Xoá HandoverSKU
+					List<HandoverSKU> handoverSKUs = handoverSkuService.getByHandoverId(handover.getId());
+					for(HandoverSKU handoverSKU : handoverSKUs) {
+						handoverSkuService.deleteById(handoverSKU.getId());
+					}
+				}
+				
 			}
 			handover = handoverService.save(handover);
 			response.data = handover;

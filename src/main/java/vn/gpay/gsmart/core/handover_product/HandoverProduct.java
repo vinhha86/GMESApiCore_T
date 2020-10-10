@@ -71,7 +71,7 @@ public class HandoverProduct  implements Serializable{
 	@Transient
 	public String getBuyercode() {
 		if(product!=null) {
-			if(product.getBuyercode() != null)
+//			if(product.getBuyercode() != null)
 				return product.getBuyercode();
 		}
 		return "";
@@ -80,7 +80,7 @@ public class HandoverProduct  implements Serializable{
 	@Transient
 	public String getBuyername() {
 		if(product!=null) {
-			if(product.getBuyername() != null)
+//			if(product.getBuyername() != null)
 				return product.getBuyername();
 		}
 		return "";
@@ -94,7 +94,7 @@ public class HandoverProduct  implements Serializable{
 	@Transient
 	public String getUnitName() {
 		if(unit!=null) {
-			if(unit.getName() != null)
+//			if(unit.getName() != null)
 				return unit.getName();
 		}
 		return "";

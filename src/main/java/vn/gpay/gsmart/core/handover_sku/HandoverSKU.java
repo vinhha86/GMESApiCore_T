@@ -8,8 +8,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.sku.SKU;
 
 @Table(name="handover_sku")
 @Entity
@@ -57,6 +65,46 @@ public class HandoverSKU implements Serializable{
 	@Column(name ="lasttimeupdate")
 	private Date lasttimeupdate;
 
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="skuid_link",insertable=false,updatable =false)
+	private SKU sku;
+	
+	@Transient
+	public String getSkuCode() {
+		if(sku!=null) {
+			if(sku.getCode() != null)
+				return sku.getCode();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getSkuColor() {
+		if(sku!=null) {
+			if(sku.getColor_name() != null)
+				return sku.getColor_name();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getSkuSize() {
+		if(sku!=null) {
+			if(sku.getSize_name() != null)
+				return sku.getSize_name();
+		}
+		return "";
+	}
+	
+	@Transient
+	public Integer getSkuSizeSortVal() {
+		if(sku!=null) {
+				return sku.getSort_size();
+		}
+		return 0;
+	}
+	
 	public Long getId() {
 		return id;
 	}

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.handover.Handover;
 import vn.gpay.gsmart.core.handover.IHandoverService;
 import vn.gpay.gsmart.core.handover_product.HandoverProduct;
@@ -82,6 +83,27 @@ public class HandoverProductAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<HandoverProduct_getall_response>(response,HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/updateHandoverProduct",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> updateHandoverProduct(@RequestBody HandoverProduct_update_request entity,HttpServletRequest request ) {
+		ResponseBase response = new ResponseBase();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Date date = new Date();
+			HandoverProduct handoverProduct = entity.data;
+			handoverProduct.setLasttimeupdate(date);
+			handoverProduct.setLastuserupdateid_link(user.getId());
+			handoverProductService.save(handoverProduct);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
 		}
 	}
 }
