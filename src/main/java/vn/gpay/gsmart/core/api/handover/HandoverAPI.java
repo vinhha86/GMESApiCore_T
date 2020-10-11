@@ -95,6 +95,35 @@ public class HandoverAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/delete",method = RequestMethod.POST)
+	public ResponseEntity<Handover_create_response> delete(@RequestBody Handover_delete_request entity,HttpServletRequest request ) {
+		Handover_create_response response = new Handover_create_response();
+		try {
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long id = entity.id;
+			// Xoá sku
+			List<HandoverSKU> listSku = handoverSkuService.getByHandoverId(id);
+			for(HandoverSKU sku : listSku) {
+				handoverSkuService.deleteById(sku.getId());
+			}
+			// Xoá product
+			List<HandoverProduct> listProduct = handoverProductService.getByHandoverId(id);
+			for(HandoverProduct product : listProduct) {
+				handoverProductService.deleteById(product.getId());
+			}
+			// Xoá handover
+			handoverService.deleteById(id);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<Handover_create_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<Handover_create_response>(response,HttpStatus.OK);
+		}
+	}
+	
 	@RequestMapping(value = "/getone",method = RequestMethod.POST)
 	public ResponseEntity<Handover_getone_response> Getone(@RequestBody Handover_getone_request entity,HttpServletRequest request ) {
 		Handover_getone_response response = new Handover_getone_response();
@@ -117,6 +146,42 @@ public class HandoverAPI {
 		try {
 			
 			response.data = handoverService.getByType(entity.id);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/setstatus",method = RequestMethod.POST)
+	public ResponseEntity<Handover_getall_response> setStatus(@RequestBody Handover_setstatus_request entity,HttpServletRequest request ) {
+		Handover_getall_response response = new Handover_getall_response();
+		try {
+			Handover handover = handoverService.findOne(entity.handoverid_link);
+			handover.setStatus(entity.status);
+			handoverService.save(handover);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/userconfirm",method = RequestMethod.POST)
+	public ResponseEntity<Handover_getall_response> userConfirm(@RequestBody Handover_userconfirm_request entity,HttpServletRequest request ) {
+		Handover_getall_response response = new Handover_getall_response();
+		try {
+			
+			
+//			Handover handover = handoverService.findOne(entity.handoverid_link);
+//			handover.setStatus(2);
+//			handoverService.save(handover);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
