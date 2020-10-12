@@ -44,4 +44,6 @@ public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecification
 	@Query(value = "select c from Org c where c.parentid_link =:orgid_link")
 	public List<Org> findOrgAllByParent(@Param ("orgid_link")final long orgid_link);
 	
+	@Query(value = "select c from Org c where c.orgtypeid_link in(:orgtypestring) order by c.name asc")
+	public List<Org> findOrgByOrgTypeString(@Param ("orgtypestring")final String orgtypestring);
 }

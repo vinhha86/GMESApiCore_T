@@ -503,4 +503,44 @@ public class POrderListAPI {
 		    return new ResponseEntity<addskutogrant_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	@RequestMapping(value = "/getbypordercode",method = RequestMethod.POST)
+	public ResponseEntity<POrderList_getlist_response> getByPOrderCode(@RequestBody POrderList_getbypordercode_request entity,HttpServletRequest request ) {
+		POrderList_getlist_response response = new POrderList_getlist_response();
+		try {
+			response.data = porderService.getPOrderByOrdercode(entity.pordercode);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<POrderList_getlist_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<POrderList_getlist_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/getbyexactpordercode",method = RequestMethod.POST)
+	public ResponseEntity<POrderList_getlist_response> getByExactPOrderCode(@RequestBody POrderList_getbypordercode_request entity,HttpServletRequest request ) {
+		POrderList_getlist_response response = new POrderList_getlist_response();
+		try {
+			List<POrder> list = porderService.getPOrderByExactOrdercode(entity.pordercode);
+			if(list.size() == 0) {
+				response.data = list;
+//				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+//				response.setMessage("Mã lệnh không tồn tại");
+//			    return new ResponseEntity<POrderList_getlist_response>(response, HttpStatus.OK);
+			    response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage("Mã lệnh không tồn tại");
+				return new ResponseEntity<POrderList_getlist_response>(response,HttpStatus.OK);
+			}
+			response.data = list;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<POrderList_getlist_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<POrderList_getlist_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 }

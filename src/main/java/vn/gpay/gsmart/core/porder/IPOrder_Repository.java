@@ -12,7 +12,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-
 @Repository
 @Transactional
 public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpecificationExecutor<POrder> {
@@ -52,4 +51,16 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 			+ "and status <> -1")
 	public List<POrder> get_by_code(@Param ("orgrootid_link")final  Long orgrootid_link,
 			@Param ("ordercode")final  String ordercode);
+	
+	@Query(value = "select c from POrder c "
+			+ "where lower(c.ordercode) like lower(concat('%',:ordercode,'%')) "
+			)
+	public List<POrder> getPOrderByOrdercode(
+			@Param ("ordercode")final String ordercode);
+	
+	@Query(value = "select c from POrder c "
+			+ "where lower(c.ordercode) = lower(:ordercode) "
+			)
+	public List<POrder> getPOrderByExactOrdercode(
+			@Param ("ordercode")final String ordercode);
 }

@@ -28,4 +28,6 @@ public interface IPOrder_Service extends Operations<POrder> {
 	List<POrder> getByPOAndProduct(Long pcontract_poid_link, Long productid_link);
 	POrder getById(Long id);
 	public List<POrder> get_by_code(String ordercode, long orgrootid_link);
+	public List<POrder> getPOrderByOrdercode(String ordercode);
+	public List<POrder> getPOrderByExactOrdercode(String ordercode);
 }
