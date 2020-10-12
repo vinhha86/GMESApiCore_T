@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.base.ResponseError;
-import vn.gpay.gsmart.core.devices.DeviceGroup;
 import vn.gpay.gsmart.core.devices.Devices;
-import vn.gpay.gsmart.core.devices.IDeviceGroupService;
 import vn.gpay.gsmart.core.devices.IDevicesService;
 import vn.gpay.gsmart.core.security.GpayAuthentication;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
@@ -28,14 +26,13 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 public class DevicesAPI {
    
 	@Autowired IDevicesService devicesService;
-	@Autowired IDeviceGroupService deviceGroupService;
 	
 	@RequestMapping(value = "/device_listtree",method = RequestMethod.POST)
 	public ResponseEntity<?> DeviceListtree(@RequestBody DeviceTreeRequest entity,HttpServletRequest request ) {
 		DevicesResponse response = new DevicesResponse();
 		try {
 			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
-			response.data = devicesService.device_listtree(user.getRootorgid_link(),entity.org_governid_link,entity.search);
+			response.data = devicesService.device_list(user.getRootorgid_link(),entity.org_governid_link,entity.search, entity.disable);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<DevicesResponse>(response,HttpStatus.OK);
@@ -47,8 +44,46 @@ public class DevicesAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/deviceGetByOrg",method = RequestMethod.POST)
+	public ResponseEntity<?> DeviceGetByOrg(@RequestBody Devices_getByOrg_request entity, HttpServletRequest request ) {
+		DevicesResponse response = new DevicesResponse();
+		try {
+			
+			List<Devices> listdata = devicesService.findByOrg(entity.org_governid_link);
+			
+			response.data = listdata;//listdevice;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<DevicesResponse>(response,HttpStatus.OK);
+		}catch (RuntimeException e) {
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(e.getMessage());
+		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@RequestMapping(value = "/deviceGetByOrgEPC",method = RequestMethod.POST)
+	public ResponseEntity<?> DeviceGetByOrgEPC(@RequestBody Devices_getByOrgEPC_Request entity, HttpServletRequest request ) {
+		Devices_GetByOrgEPC_Response response = new Devices_GetByOrgEPC_Response();
+		try {
+			
+			Devices devicedata = devicesService.finByOrgEPC(entity.org_governid_link, entity.epc);
+			
+			response.data = devicedata;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<Devices_GetByOrgEPC_Response>(response,HttpStatus.OK);
+		}catch (RuntimeException e) {
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(e.getMessage());
+		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 	@RequestMapping(value = "/device_getactivate",method = RequestMethod.POST)
-	public ResponseEntity<?> DeviceAactivate(@RequestBody DevicesTypeRequest entity, HttpServletRequest request ) {
+	public ResponseEntity<?> DeviceGetaActivate(@RequestBody DevicesTypeRequest entity, HttpServletRequest request ) {
 		DevicesResponse response = new DevicesResponse();
 		try {
 			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
@@ -99,27 +134,30 @@ public class DevicesAPI {
 	
 	@RequestMapping(value = "/device_create",method = RequestMethod.POST)
 	public ResponseEntity<?> DeviceCreate(@RequestBody DevicesRequest entity,HttpServletRequest request ) {
-		ResponseBase response = new ResponseBase();
+		Device_create_response response = new Device_create_response();
 		try {
 			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
 			Devices devices = entity.data.get(0);
 			if(devices.getId()==null || devices.getId()==0) {
-				devices.setOrgid_link(user.getOrgId());
+				devices.setOrgrootid_link(user.getRootorgid_link());
+				devices.setType(devices.getDevicegroupid_link());
 				devices.setUsercreateid_link(user.getUserId());
 				devices.setTimecreate(new Date());
 			}else {
 				Devices devices_old =  devicesService.findOne(devices.getId());
-				devices.setOrgid_link(devices_old.getOrgid_link());
+				devices.setType(entity.data.get(0).getDevicegroupid_link());
+				devices.setOrgrootid_link(user.getRootorgid_link());
 				devices.setUsercreateid_link(devices_old.getUsercreateid_link());
 				devices.setTimecreate(devices_old.getTimecreate());
 				devices.setLastuserupdateid_link(user.getOrgId());
 				devices.setStatus(devices_old.getStatus());
 				devices.setLasttimeupdate(new Date());
 			}
-			devicesService.save(devices);
+			devices = devicesService.save(devices);
+			response.id = devices.getId();
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+			return new ResponseEntity<Device_create_response>(response,HttpStatus.OK);
 		}catch (RuntimeException e) {
 			ResponseError errorBase = new ResponseError();
 			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
@@ -127,13 +165,14 @@ public class DevicesAPI {
 		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	@RequestMapping(value = "/device_look",method = RequestMethod.POST)
+	@RequestMapping(value = "/device_lock",method = RequestMethod.POST)
 	public ResponseEntity<?> DeviceLook(@RequestBody DevicesByIDRequest entity,HttpServletRequest request ) {
 		ResponseBase response = new ResponseBase();
 		try {
 			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
 			Devices devices =  devicesService.findOne(entity.id);
 			devices.setStatus(3);//trang thai khoa
+			devices.setDisable(true);
 			devices.setLastuserupdateid_link(user.getOrgId());
 			devices.setLasttimeupdate(new Date());
 			devicesService.save(devices);
@@ -147,13 +186,37 @@ public class DevicesAPI {
 		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	@RequestMapping(value = "/device_unlook",method = RequestMethod.POST)
+	
+	@RequestMapping(value = "/device_delete",method = RequestMethod.POST)
+	public ResponseEntity<?> DeviceDelete(@RequestBody DevicesByIDRequest entity,HttpServletRequest request ) {
+		ResponseBase response = new ResponseBase();
+		try {
+			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
+			Devices devices =  devicesService.findOne(entity.id);
+			devices.setStatus(-1);//trang thai khoa
+			devices.setDisable(true);
+			devices.setLastuserupdateid_link(user.getOrgId());
+			devices.setLasttimeupdate(new Date());
+			devicesService.save(devices);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (RuntimeException e) {
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(e.getMessage());
+		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@RequestMapping(value = "/device_unlock",method = RequestMethod.POST)
 	public ResponseEntity<?> DeviceUnLook(@RequestBody DevicesByIDRequest entity,HttpServletRequest request ) {
 		ResponseBase response = new ResponseBase();
 		try {
 			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
 			Devices devices =  devicesService.findOne(entity.id);
-			devices.setStatus(1);//trang thai mo khoa
+			devices.setDisable(false);//trang thai mo khoa
+			devices.setStatus(0); // Mở khóa trạng thái mặc định là O : Offline
 			devices.setLastuserupdateid_link(user.getOrgId());
 			devices.setLasttimeupdate(new Date());
 			devicesService.save(devices);
@@ -168,49 +231,20 @@ public class DevicesAPI {
 		}
 	}
 	
-	@RequestMapping(value = "/getalldevicegroup",method = RequestMethod.POST)
-	public ResponseEntity<DeviceGroupResponse> GetAllDeviceGroup(HttpServletRequest request ) {
-		DeviceGroupResponse response = new DeviceGroupResponse();
+	@RequestMapping(value = "/deviceGetById",method = RequestMethod.POST)
+	public ResponseEntity<?> DeviceGetById(@RequestBody DevicesByIDRequest entity,HttpServletRequest request ) {
+		DevicesByIDResponse response = new DevicesByIDResponse();
 		try {
-			response.data = deviceGroupService.findAllByOrderByIdAsc();
+			
+			response.data = devicesService.findOne(entity.id);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<DeviceGroupResponse>(response,HttpStatus.OK);
-		}catch (Exception e) {
-			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-			response.setMessage(e.getMessage());
-		    return new ResponseEntity<DeviceGroupResponse>(response,HttpStatus.BAD_REQUEST);
-		}
-	}
-	
-	@RequestMapping(value = "/createDeviceGroup",method = RequestMethod.POST)
-	public ResponseEntity<ResponseBase> CreateDeviceGroup(@RequestBody DeviceGroupRequest entity, HttpServletRequest request ) {//@RequestParam("type") 
-		ResponseBase response = new ResponseBase();
-		try {
-			DeviceGroup dg = entity.data;
-			deviceGroupService.save(dg);
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
-		}catch (Exception e) {
-			response.setRespcode(ResponseMessage.KEY_RC_SERVER_ERROR);
-			response.setMessage(e.getMessage());
-		    return new ResponseEntity<ResponseBase>(response,HttpStatus.BAD_REQUEST);
-		}
-	}
-	
-	@RequestMapping(value = "/deleteDeviceGroup",method = RequestMethod.POST)
-	public ResponseEntity<ResponseBase> DeleteDeviceGroup(@RequestBody DeviceGroupRequest entity, HttpServletRequest request ) {//@RequestParam("type") 
-		ResponseBase response = new ResponseBase();
-		try {
-			deviceGroupService.deleteById(entity.id);
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
-		}catch (Exception e) {
-			response.setRespcode(ResponseMessage.KEY_RC_SERVER_ERROR);
-			response.setMessage(e.getMessage());
-		    return new ResponseEntity<ResponseBase>(response,HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<DevicesByIDResponse>(response,HttpStatus.OK);
+		}catch (RuntimeException e) {
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(e.getMessage());
+		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

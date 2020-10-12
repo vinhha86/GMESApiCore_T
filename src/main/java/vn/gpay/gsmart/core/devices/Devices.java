@@ -27,8 +27,8 @@ public class Devices implements Serializable {
 	@SequenceGenerator(name="devices_generator", sequenceName = "devices_id_seq", allocationSize=1)
 	protected Long id;
 	
-	@Column(name ="orgid_link")
-    private Long orgid_link;
+	@Column(name ="orgrootid_link")
+    private Long orgrootid_link;
 	
 	@Column(name ="org_governid_link")
     private Long org_governid_link;
@@ -40,7 +40,7 @@ public class Devices implements Serializable {
     private String name;
 	
 	@Column(name ="type")
-    private Integer type;
+    private Long type;
 	
 	@Column(name ="extrainfo",length=200)
     private String extrainfo;
@@ -60,18 +60,61 @@ public class Devices implements Serializable {
 	@Column(name ="lasttimeupdate")
 	private Date lasttimeupdate;
 	
-	@Column(name ="group_id")
-    private Integer group_id;
+	@Column(name ="devicegroupid_link")
+    private Long devicegroupid_link;
 	
+	private Boolean disable;
+	
+	private String epc;
+	
+	@Column(name ="serialno",length=20)
+    private String serialno;
+	
+	@Column(name ="fixassetno",length=20)
+    private String fixassetno;
+	
+	public Boolean getDisable() {
+		return disable;
+	}
+
+	public void setDisable(Boolean disable) {
+		this.disable = disable;
+	}
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="group_id",insertable=false,updatable =false)
+    @JoinColumn(name="devicegroupid_link",insertable=false,updatable =false)
     private DeviceGroup devicegroup;
 	
 	@Transient
 	public String getDeviceGroupName() {
 		if(devicegroup!=null) {
 			return devicegroup.getName();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getDeviceType() {
+		if(devicegroup!=null) {
+			if(devicegroup.getParentid_link() == null) return "";
+			if(devicegroup.getParentid_link().equals((long)-1)) {
+				return devicegroup.getName();
+			}else {
+				return devicegroup.getParentname();
+			}
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getDeviceModel() {
+		if(devicegroup!=null) {
+			if(devicegroup.getParentid_link().equals((long)-1)) {
+				return "";
+			}else {
+				return devicegroup.getName();
+			}
 		}
 		return "";
 	}
@@ -84,12 +127,12 @@ public class Devices implements Serializable {
 		this.id = id;
 	}
 
-	public Long getOrgid_link() {
-		return orgid_link;
+	public Long getOrgrootid_link() {
+		return orgrootid_link;
 	}
 
-	public void setOrgid_link(Long orgid_link) {
-		this.orgid_link = orgid_link;
+	public void setOrgrootid_link(Long orgrootid_link) {
+		this.orgrootid_link = orgrootid_link;
 	}
 
 	public Long getOrg_governid_link() {
@@ -116,11 +159,11 @@ public class Devices implements Serializable {
 		this.name = name;
 	}
 
-	public Integer getType() {
+	public Long getType() {
 		return type;
 	}
 
-	public void setType(Integer type) {
+	public void setType(Long type) {
 		this.type = type;
 	}
 
@@ -172,35 +215,35 @@ public class Devices implements Serializable {
 		this.lasttimeupdate = lasttimeupdate;
 	}
 
-	public Integer getGroup_id() {
-		return group_id;
+	public Long getDevicegroupid_link() {
+		return devicegroupid_link;
 	}
 
-	public void setGroup_id(Integer group_id) {
-		this.group_id = group_id;
+	public void setDevicegroupid_link(Long devicegroupid_link) {
+		this.devicegroupid_link = devicegroupid_link;
 	}
 
-	public DeviceGroup getDevicegroup() {
-		return devicegroup;
+	public String getEpc() {
+		return epc;
 	}
 
-	public void setDevicegroup(DeviceGroup devicegroup) {
-		this.devicegroup = devicegroup;
+	public void setEpc(String epc) {
+		this.epc = epc;
 	}
-	
-	/*
-	@OneToMany 
-	@JoinColumn(name = "parent_id") 
-	private List<Devices> children = new LinkedList<Devices>();
-	
-	public String getText() {
-		return this.name;
+
+	public String getSerialno() {
+		return serialno;
 	}
-	public boolean getLeaf() {
-		if(children.size()>0) {
-			return false;
-		}
-		return true;
+
+	public void setSerialno(String serialno) {
+		this.serialno = serialno;
 	}
-	*/
+
+	public String getFixassetno() {
+		return fixassetno;
+	}
+
+	public void setFixassetno(String fixassetno) {
+		this.fixassetno = fixassetno;
+	}
 }

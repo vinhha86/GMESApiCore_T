@@ -20,7 +20,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.category.LaborLevel;
-import vn.gpay.gsmart.core.devices.Devices;
+import vn.gpay.gsmart.core.devices.DeviceGroup;
 
 @Table(name="workingprocess")
 @Entity
@@ -81,7 +81,7 @@ public class WorkingProcess implements Serializable {
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="devicerequiredid_link",insertable=false,updatable =false)
-    private Devices device;	
+    private DeviceGroup device;	
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne

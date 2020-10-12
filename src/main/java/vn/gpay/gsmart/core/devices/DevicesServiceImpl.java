@@ -23,12 +23,14 @@ public class DevicesServiceImpl extends AbstractService<Devices> implements IDev
 		return repository;
 	}
 	@Override
-	public List<Devices> device_listtree(Long orgid_link,Long org_governid_link,String search) {
+	public List<Devices> device_list(Long orgrootid_link,Long org_governid_link,String search, boolean disable) {
 		// TODO Auto-generated method stub
 		
 		Specification<Devices> specification = Specifications.<Devices>and()
-	            .eq( "orgid_link", orgid_link)
+	            .eq( "orgrootid_link", orgrootid_link)
 	            .eq(org_governid_link!=0, "org_governid_link", org_governid_link)
+	            .eq("disable", disable)
+	            .ne("status", -1)
 	            .predicate(Specifications.or()
 	            		.like( "code", "%"+search+"%")
 	            		.like("name", "%"+search+"%")
@@ -40,9 +42,15 @@ public class DevicesServiceImpl extends AbstractService<Devices> implements IDev
 	    return repository.findAll(specification,sort);
 	}
 	@Override
-	public List<Devices> device_govern(Long orgid_link,int type) {
+	public List<Devices> device_govern(Long orgid_link,Long type) {
 		// TODO Auto-generated method stub
-		return repository.device_govern(orgid_link,type);
+		try {
+			List<Devices> a= repository.device_govern(orgid_link, type);
+		return a;
+		} catch (Exception ex){
+			ex.printStackTrace();
+			return null;
+		}
 	}
 	@Override
 	public Devices finByCode(String code) {
@@ -52,5 +60,32 @@ public class DevicesServiceImpl extends AbstractService<Devices> implements IDev
 			return list.get(0);
 		}
 		return null;
+	}
+	
+	@Override
+	public Devices finByEPC(String epc) {
+		List<Devices>  list = repository.finByEPC(epc);
+		if(list!=null && list.size()>0) {
+			return list.get(0);
+		} else
+			return null;
+	}
+	
+	@Override
+	public Devices finByOrgEPC(Long org_governid_link, String epc) {
+		List<Devices>  list = repository.finByOrgEPC(org_governid_link, epc);
+		if(list!=null && list.size()>0) {
+			return list.get(0);
+		} else
+			return null;
+	}
+	
+	@Override
+	public List<Devices> findByOrg(long org_governid_link) {
+		return repository.findByOrg(org_governid_link);
+	}
+	@Override
+	public List<Devices> findByDeviceGroup(long devicegroupid_link) {
+		return repository.findByDeviceGroup(devicegroupid_link);
 	}
 }

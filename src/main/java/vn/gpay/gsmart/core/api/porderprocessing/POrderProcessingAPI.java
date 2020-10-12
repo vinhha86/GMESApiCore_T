@@ -1150,6 +1150,15 @@ public class POrderProcessingAPI {
 				        }
 				        
 			        	pprocessRepository.save(pprocessAfter);
+			        	
+				        iAmountCutSum = null==pprocessAfter.getAmountcutsum()?0:pprocessAfter.getAmountcutsum();
+				        iAmountInputSum = null==pprocessAfter.getAmountinputsum()?0:pprocessAfter.getAmountinputsum();
+				        iAmountOuputSum = null==pprocessAfter.getAmountoutputsum()?0:pprocessAfter.getAmountoutputsum();
+				        iAmountErrorSum = null==pprocessAfter.getAmounterrorsum()?0:pprocessAfter.getAmounterrorsum();
+				        iAmountKcsSum = null==pprocessAfter.getAmountkcssum()?0:pprocessAfter.getAmountkcssum();
+				        iAmountPackedSum = null==pprocessAfter.getAmountpackedsum()?0:pprocessAfter.getAmountpackedsum();
+				        iAmountStockedSum = null==pprocessAfter.getAmountstockedsum()?0:pprocessAfter.getAmountstockedsum();
+			        	
 				        iLastStatus = pprocessAfter.getStatus();
 			        }
 			        
