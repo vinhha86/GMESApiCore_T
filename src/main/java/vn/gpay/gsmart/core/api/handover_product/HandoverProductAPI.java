@@ -15,12 +15,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
+import vn.gpay.gsmart.core.category.IUnitService;
+import vn.gpay.gsmart.core.category.Unit;
 import vn.gpay.gsmart.core.handover.Handover;
 import vn.gpay.gsmart.core.handover.IHandoverService;
 import vn.gpay.gsmart.core.handover_product.HandoverProduct;
 import vn.gpay.gsmart.core.handover_product.IHandoverProductService;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.product.IProductService;
+import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -30,6 +34,8 @@ public class HandoverProductAPI {
 	@Autowired IHandoverProductService handoverProductService;
 	@Autowired IHandoverService handoverService;
 	@Autowired IPOrder_Service porderService;
+	@Autowired IProductService productService;
+	@Autowired IUnitService unitService;
 	
 	@RequestMapping(value = "/getall",method = RequestMethod.POST)
 	public ResponseEntity<HandoverProduct_getall_response> GetAll(HttpServletRequest request ) {
@@ -104,6 +110,43 @@ public class HandoverProductAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/getByPorderId",method = RequestMethod.POST)
+	public ResponseEntity<HandoverProduct_GetByPorderId_response> GetByPorderId(@RequestBody HandoverProduct_GetByPorderId_request entity,HttpServletRequest request ) {
+		HandoverProduct_GetByPorderId_response response = new HandoverProduct_GetByPorderId_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			POrder porder = porderService.findOne(entity.porderid_link);
+			Product product = productService.findOne(porder.getProductid_link());
+			Unit unit = unitService.findOne(2);
+//			Date date = new Date();
+
+			HandoverProduct handoverProduct = new HandoverProduct();
+			handoverProduct.setId(0L);
+			handoverProduct.setOrgrootid_link(user.getRootorgid_link());
+//			handoverProduct.setHandoverid_link(handover.getId());
+			handoverProduct.setProductid_link(porder.getProductid_link());
+			handoverProduct.setUnitid_link(2L);
+//			handoverProduct.setUsercreateid_link(user.getId());
+//			handoverProduct.setTimecreate(date);
+//			handoverProduct.setLasttimeupdate(date);
+//			handoverProduct.setLastuserupdateid_link(user.getId());
+			handoverProduct.setTotalpackage(0);
+
+			response.data = handoverProduct;
+			response.buyername = product.getBuyername();
+			response.buyercode = product.getBuyercode();
+			response.unitName = unit.getName();
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<HandoverProduct_GetByPorderId_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<HandoverProduct_GetByPorderId_response>(response,HttpStatus.OK);
 		}
 	}
 }

@@ -59,6 +59,15 @@ public class HandoverAPI {
 				handover.setTimecreate(date);
 				handover.setLastuserupdateid_link(user.getId());
 				handover.setLasttimeupdate(date);
+				handover = handoverService.save(handover);
+				
+				HandoverProduct handoverProduct = entity.handoverProduct;
+				handoverProduct.setHandoverid_link(handover.getId());
+				handoverProduct.setUsercreateid_link(user.getId());
+				handoverProduct.setLastuserupdateid_link(user.getId());
+				handoverProduct.setTimecreate(date);
+				handoverProduct.setLasttimeupdate(date);
+				handoverProductService.save(handoverProduct);
 			}else {
 				// update
 				Date date = new Date();
@@ -81,9 +90,9 @@ public class HandoverAPI {
 						handoverSkuService.deleteById(handoverSKU.getId());
 					}
 				}
-				
+				handover = handoverService.save(handover);
 			}
-			handover = handoverService.save(handover);
+			
 			response.data = handover;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

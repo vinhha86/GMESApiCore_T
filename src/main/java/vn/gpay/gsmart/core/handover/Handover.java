@@ -1,7 +1,9 @@
 package vn.gpay.gsmart.core.handover;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -17,6 +20,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.handover_product.HandoverProduct;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -90,6 +94,11 @@ public class Handover implements Serializable {
 	
 	@Column(name ="lasttimeupdate")
 	private Date lasttimeupdate;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+    @JoinColumn(name="handoverid_link",insertable=false,updatable =false)
+	private List<HandoverProduct> handoverProducts = new ArrayList<>();
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -324,6 +333,13 @@ public class Handover implements Serializable {
 	public void setLasttimeupdate(Date lasttimeupdate) {
 		this.lasttimeupdate = lasttimeupdate;
 	}
-	
+
+	public List<HandoverProduct> getHandoverProducts() {
+		return handoverProducts;
+	}
+
+	public void setHandoverProducts(List<HandoverProduct> handoverProducts) {
+		this.handoverProducts = handoverProducts;
+	}
 	
 }
