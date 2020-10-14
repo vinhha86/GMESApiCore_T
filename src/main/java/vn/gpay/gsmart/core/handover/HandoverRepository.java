@@ -15,4 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 public interface HandoverRepository  extends JpaRepository<Handover, Long>,JpaSpecificationExecutor<Handover>{
 	@Query(value = "select c from Handover c where c.handovertypeid_link = :handovertypeid_link ")
 	public List<Handover> getByType(@Param ("handovertypeid_link")final Long handovertypeid_link);
+	
+	@Query(value = "select c from Handover c where c.handovertypeid_link = :handovertypeid_link "
+			+"and c.status = :status ")
+	public List<Handover> getByType(
+			@Param ("handovertypeid_link")final Long handovertypeid_link, 
+			@Param ("status")final Integer status);
+	
+	@Query(value = "select c from Handover c where c.handover_code = :handover_code ")
+	public List<Handover> getByHandoverCode(@Param ("handover_code")final String handover_code);
 }

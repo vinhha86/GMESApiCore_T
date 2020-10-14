@@ -24,5 +24,19 @@ public class HandoverService  extends AbstractService<Handover> implements IHand
 		// TODO Auto-generated method stub
 		return repo.getByType(handovertypeid_link);
 	}
+	
+	@Override
+	public List<Handover> getByType(Long handovertypeid_link, Integer status) {
+		// TODO Auto-generated method stub
+		return repo.getByType(handovertypeid_link, status);
+	}
+
+	@Override
+	public List<Handover> getByHandoverCode(String handover_code) {
+		// TODO Auto-generated method stub
+		return repo.getByHandoverCode(handover_code);
+	}
+
+	
 
 }

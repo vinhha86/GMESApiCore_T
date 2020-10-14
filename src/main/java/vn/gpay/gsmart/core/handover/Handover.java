@@ -95,10 +95,21 @@ public class Handover implements Serializable {
 	@Column(name ="lasttimeupdate")
 	private Date lasttimeupdate;
 	
+	@Column(name ="totalpackagecheck")
+	private Integer totalpackagecheck;
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
     @JoinColumn(name="handoverid_link",insertable=false,updatable =false)
 	private List<HandoverProduct> handoverProducts = new ArrayList<>();
+	
+	@Transient
+	public Integer getHandoverTotal() {
+		Integer total = 0;
+		if(this.getTotalpackage() != null) total+=this.getTotalpackage();
+		if(this.getTotalpackagecheck() != null) total+=this.getTotalpackagecheck();
+		return total;
+	}
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -340,6 +351,14 @@ public class Handover implements Serializable {
 
 	public void setHandoverProducts(List<HandoverProduct> handoverProducts) {
 		this.handoverProducts = handoverProducts;
+	}
+
+	public Integer getTotalpackagecheck() {
+		return totalpackagecheck;
+	}
+
+	public void setTotalpackagecheck(Integer totalpackagecheck) {
+		this.totalpackagecheck = totalpackagecheck;
 	}
 	
 }

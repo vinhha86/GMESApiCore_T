@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.gpay.gsmart.core.handover.Handover;
+import vn.gpay.gsmart.core.handover.IHandoverService;
 import vn.gpay.gsmart.core.handover_product.HandoverProduct;
 import vn.gpay.gsmart.core.handover_product.IHandoverProductService;
 import vn.gpay.gsmart.core.handover_sku.HandoverSKU;
@@ -26,6 +28,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 @RestController
 @RequestMapping("/api/v1/handoversku")
 public class HandoverSKUAPI {
+	@Autowired IHandoverService handoverService;
 	@Autowired IHandoverSKUService handoverSkuService;
 	@Autowired IHandoverProductService handoverProductService;
 	@Autowired IPOrder_Product_SKU_Service porderskuService;
@@ -99,15 +102,27 @@ public class HandoverSKUAPI {
 			
 			// update handoverProduct totalpackage
 			Integer totalpackage = 0;
+			Integer totalpackagecheck = 0;
 			List<HandoverSKU> list = handoverSkuService.getByHandoverId(handoverSku.getHandoverid_link());
 			for(HandoverSKU h : list) {
-				totalpackage+=h.getTotalpackage();
+				if(h.getTotalpackage() != null)
+					totalpackage+=h.getTotalpackage();
+				if(h.getTotalpackagecheck() != null)
+					totalpackagecheck+=h.getTotalpackagecheck();
 			}
 			HandoverProduct handoverProduct = handoverProductService.findOne(handoverSku.getHandoverproductid_link());
 			handoverProduct.setTotalpackage(totalpackage);
+			handoverProduct.setTotalpackagecheck(totalpackagecheck);
 			handoverProduct.setLasttimeupdate(date);
 			handoverProduct.setLastuserupdateid_link(user.getId());
 			handoverProductService.save(handoverProduct);
+			
+			Handover handover = handoverService.findOne(handoverProduct.getHandoverid_link());
+			handover.setTotalpackage(totalpackage);
+			handover.setTotalpackagecheck(totalpackagecheck);
+			handover.setLasttimeupdate(date);
+			handover.setLastuserupdateid_link(user.getId());
+			handoverService.save(handover);
 			
 			response.totalpackage = totalpackage;
 			
