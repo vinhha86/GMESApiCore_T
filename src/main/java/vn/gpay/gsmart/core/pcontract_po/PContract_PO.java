@@ -160,12 +160,13 @@ public class PContract_PO implements Serializable {/**
 	
 	@Transient
 	public Float getTotalprice() {
-		Float price = null;
+		Float price = (float) 0;
 		if(pcontract_price!=null){
 			for(PContract_Price thePrice:pcontract_price){
 				if (thePrice.getProductid_link().compareTo(productid_link) == 0)
-					if(thePrice.getSizesetid_link() == 1){
-						price = thePrice.getTotalprice();
+					if(thePrice.getSizesetid_link() != null && thePrice.getSizesetid_link() == 1){
+						if(thePrice.getTotalprice() != null)
+							price = thePrice.getTotalprice();
 					}
 			}
 		} 
