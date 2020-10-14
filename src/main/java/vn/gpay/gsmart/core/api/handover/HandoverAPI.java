@@ -201,9 +201,9 @@ public class HandoverAPI {
 		Handover_getall_response response = new Handover_getall_response();
 		try {
 			Handover handover = handoverService.findOne(entity.handoverid_link);
-			if(entity.handover_userid_link != 0) {
+			if(entity.approver_userid_link != 0) {
 				System.out.println("handover != 0");
-				handover.setHandover_userid_link(entity.handover_userid_link);
+				handover.setApprover_userid_link(entity.approver_userid_link);
 			}
 			if(entity.receiver_userid_link != 0) {
 				System.out.println("receiver != 0");
