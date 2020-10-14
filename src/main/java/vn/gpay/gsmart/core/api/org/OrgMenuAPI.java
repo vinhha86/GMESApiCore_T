@@ -44,6 +44,8 @@ public class OrgMenuAPI {
 			List<OrgTree> children = orgService.createTree(menu);
 //			System.out.println(menu.size());
 			response.children=children;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<OrgMenuTreeResponse>(response,HttpStatus.OK);
 		}catch (RuntimeException e) {
 			ResponseError errorBase = new ResponseError();
