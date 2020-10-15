@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.utils;
 
 public class POrderStatus {
+	public static int PORDER_STATUS_CANCEL  	= -3; //Hủy đơn
 	public static int PORDER_STATUS_UNCONFIRM  = -1; //Chưa chốt
 	public static int PORDER_STATUS_FREE       = 0; //Đã chốt, chưa phân chuyền
     public static int PORDER_STATUS_GRANTED    = 1; //Đã phân chuyền, chưa yêu cầu sx
