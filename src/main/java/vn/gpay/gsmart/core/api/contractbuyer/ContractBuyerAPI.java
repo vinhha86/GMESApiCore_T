@@ -108,8 +108,8 @@ public class ContractBuyerAPI {
 				
 				if(cblist.size() == 0) {
 					// chưa tồn tại
-					int year = Calendar.getInstance().get(Calendar.YEAR);
-					cb.setContract_year(year);
+//					int year = Calendar.getInstance().get(Calendar.YEAR);
+//					cb.setContract_year(year);
 					ContractBuyer temp = contractBuyerService.save(cb);
 					response.id = temp.getId();
 					response.setMessage("Lưu thành công");
