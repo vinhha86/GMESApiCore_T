@@ -1,7 +1,6 @@
 package vn.gpay.gsmart.core.api.contractbuyer;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -108,8 +107,8 @@ public class ContractBuyerAPI {
 				
 				if(cblist.size() == 0) {
 					// chưa tồn tại
-					int year = Calendar.getInstance().get(Calendar.YEAR);
-					cb.setContract_year(year);
+//					int year = Calendar.getInstance().get(Calendar.YEAR);
+//					cb.setContract_year(year);
 					ContractBuyer temp = contractBuyerService.save(cb);
 					response.id = temp.getId();
 					response.setMessage("Lưu thành công");
