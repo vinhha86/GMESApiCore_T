@@ -98,6 +98,9 @@ public class Handover implements Serializable {
 	@Column(name ="totalpackagecheck")
 	private Integer totalpackagecheck;
 	
+	@Column(name ="receive_date")
+	private Date receive_date;
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
     @JoinColumn(name="handoverid_link",insertable=false,updatable =false)
@@ -359,6 +362,14 @@ public class Handover implements Serializable {
 
 	public void setTotalpackagecheck(Integer totalpackagecheck) {
 		this.totalpackagecheck = totalpackagecheck;
+	}
+
+	public Date getReceive_date() {
+		return receive_date;
+	}
+
+	public void setReceive_date(Date receive_date) {
+		this.receive_date = receive_date;
 	}
 	
 }

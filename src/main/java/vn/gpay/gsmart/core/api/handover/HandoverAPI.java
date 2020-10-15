@@ -202,12 +202,12 @@ public class HandoverAPI {
 		try {
 			Handover handover = handoverService.findOne(entity.handoverid_link);
 			if(entity.approver_userid_link != 0) {
-				System.out.println("handover != 0");
 				handover.setApprover_userid_link(entity.approver_userid_link);
 			}
 			if(entity.receiver_userid_link != 0) {
-				System.out.println("receiver != 0");
+				Date date = new Date();
 				handover.setReceiver_userid_link(entity.receiver_userid_link);
+				handover.setReceive_date(date);
 			}
 			handover.setStatus(entity.status);
 			handoverService.save(handover);
