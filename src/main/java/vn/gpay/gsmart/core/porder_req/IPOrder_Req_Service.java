@@ -14,6 +14,7 @@ public interface IPOrder_Req_Service extends Operations<POrder_Req> {
 			Integer salaryyear, Integer salarymonth, Date processingdate_from, Date processingdate_to);
 	
 	List<POrder_Req> get_by_org(long orgid_link);
+	List<POrder_Req> get_req_granted(long orgid_link);
 	List<POrder_Req> getByContractAndPO(Long pcontractid_link, Long pcontract_poid_link);
 	List<POrder_Req> get_free_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link);
 	Long savePOrder_Req(POrder_Req porder_req);

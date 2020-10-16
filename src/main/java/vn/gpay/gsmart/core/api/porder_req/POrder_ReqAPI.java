@@ -27,6 +27,8 @@ import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
@@ -57,6 +59,7 @@ public class POrder_ReqAPI {
 	@Autowired private IPOrder_Req_Service porder_req_Service;
 	@Autowired IPContract_POService pcontract_POService;
 	@Autowired IPOrder_Service porderService;
+	@Autowired IPOrderGrant_Service porderGrantService;
 	@Autowired IOrgService orgService;
 	@Autowired IPOrder_Req_Service reqService;
 	@Autowired IPContractProductSKUService pcontract_ProductSKUService;
@@ -271,7 +274,86 @@ public class POrder_ReqAPI {
 		
 	}
 	
+	@RequestMapping(value = "/get_req_granted", method = RequestMethod.POST)
+	public ResponseEntity<POrder_Req_getbyorg_response> GetReqGranted(HttpServletRequest request){
+		POrder_Req_getbyorg_response response = new POrder_Req_getbyorg_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgid_link = user.getOrgid_link();
+//			long orgid_link = 2;
+			List<String> orgTypes = new ArrayList<String>();
+			orgTypes.add("13");
+			orgTypes.add("14");
+			List<Org> lsOrgChild = orgService.getorgChildrenbyOrg(orgid_link,orgTypes);
+			
+			if(orgid_link == 1) {
+				for(Org theOrg:lsOrgChild){
+					List<POrder_Req> a = reqService.get_req_granted(theOrg.getId());
+					
+					List<POrder_Req> result = new ArrayList<POrder_Req>();
+					for(POrder_Req pr : a) {
+						if(pr.getPorderlist().size() > 0)
+							result.add(pr);
+					}
+					
+					if(result.size()>0)
+						response.data.addAll(result);
+				}
+			}else {
+				List<POrder_Req> a = reqService.get_req_granted(orgid_link);
+				
+				List<POrder_Req> result = new ArrayList<POrder_Req>();
+				for(POrder_Req pr : a) {
+					if(pr.getPorderlist().size() > 0)
+						result.add(pr);
+				}
+				
+				if(result.size()>0)
+					response.data.addAll(result);
+			}
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<POrder_Req_getbyorg_response>(response, HttpStatus.OK);
+		}
+		catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<POrder_Req_getbyorg_response>(response, HttpStatus.BAD_REQUEST);
+		}
+		
+	}
 	
+	@RequestMapping(value = "/deleteReqGranted", method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> deleteReqGranted(HttpServletRequest request,
+			@RequestBody POrder_Req_Granted_delete_Request entity) {
+		ResponseBase response = new ResponseBase();
+		try {
+			for(POrder_Req porderReq : entity.data) {
+				POrder_Req temp = porder_req_Service.findOne(porderReq.getId());
+				temp.setStatus(0);
+				
+				List<POrder> porderList = porderService.getByPOrder_Req(temp.getPcontract_poid_link(), temp.getId());
+				for(POrder porder : porderList) {
+					List<POrderGrant> porderGrantList = porderGrantService.getByOrderId(porder.getId());
+					for(POrderGrant porderGrant : porderGrantList) {
+						porderGrantService.deleteById(porderGrant.getId());
+					}
+					porderService.deleteById(porder.getId());
+				}
+				
+				porder_req_Service.save(temp);
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 
 	@RequestMapping(value = "/gen_porder", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> GenPOrder(HttpServletRequest request,

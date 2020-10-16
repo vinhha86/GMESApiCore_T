@@ -140,6 +140,21 @@ public class POrder_Req_Service extends AbstractService<POrder_Req> implements I
 	}
 	
 	@Override
+	public List<POrder_Req> get_req_granted(long orgid_link) {
+		// TODO Auto-generated method stub
+		Specification<POrder_Req> specification = Specifications.<POrder_Req>and()
+				.eq("granttoorgid_link", orgid_link)
+				.eq("status", 1)
+				.le("pcontract_po.status", 0)
+	            .build();
+		Sort sort = Sorts.builder()
+		        .desc("id")
+		        .build();
+		List<POrder_Req> a = repo.findAll(specification,sort);
+		return a.size() > 0 ? a : new ArrayList<POrder_Req>();
+	}
+	
+	@Override
 	//Danh sach cac lenh duoc phan cho Phan xuong nhung chua duoc phan chuyen
 	public List<POrder_Req> get_free_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link){
 		Specification<POrder_Req> specification = Specifications.<POrder_Req>and()
