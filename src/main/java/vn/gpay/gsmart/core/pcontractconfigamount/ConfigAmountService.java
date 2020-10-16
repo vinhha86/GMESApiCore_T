@@ -23,8 +23,8 @@ public class ConfigAmountService extends AbstractService<ConfigAmount> implement
 	public ConfigAmount getby_amount(int amount) {
 		// TODO Auto-generated method stub
 		Specification<ConfigAmount> specification = Specifications.<ConfigAmount>and()
-	            .le(amount > 0, "amount_from",amount)
-	            .ge(amount > 0,"amount_to" , amount)
+	            .le(amount >= 0, "amount_from",amount)
+	            .ge(amount >= 0,"amount_to" , amount)
 	            .build();
 		
 		List<ConfigAmount> lst = repo.findAll(specification);
