@@ -31,6 +31,8 @@ import vn.gpay.gsmart.core.category.IShipModeService;
 import vn.gpay.gsmart.core.category.ShipMode;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
+import vn.gpay.gsmart.core.pcontract_po_productivity.IPContract_PO_Productivity_Service;
+import vn.gpay.gsmart.core.pcontract_po_productivity.PContract_PO_Productivity;
 import vn.gpay.gsmart.core.pcontract_po_shipping.IPContract_PO_ShippingService;
 import vn.gpay.gsmart.core.pcontract_po_shipping.PContract_PO_Shipping;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_DService;
@@ -106,6 +108,7 @@ public class PContract_POAPI {
 	@Autowired
 	IPContract_Price_Service priceService;
 	@Autowired ISizeSetService sizesetService;
+	@Autowired IPContract_PO_Productivity_Service productivityService;
 
 	@RequestMapping(value = "/upload_template", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadTemplate(HttpServletRequest request,
@@ -635,6 +638,16 @@ public class PContract_POAPI {
 				pcontract_POService.save(thePO_Latershipdate);
 				updatePriceList(usercreatedid_link, orgrootid_link, pcontractid_link, thePO_Latershipdate.getId(),
 						entity.data.getPcontract_price());
+			}
+			
+			//Cap nhat productivity
+			List<PContract_PO_Productivity> list_productivity = entity.data.getPcontract_po_productivity();
+			for (PContract_PO_Productivity pContract_PO_Productivity : list_productivity) {
+				if(pContract_PO_Productivity.getId() == null) {
+					pContract_PO_Productivity.setOrgrootid_link(orgrootid_link);
+					pContract_PO_Productivity.setPcontract_poid_link(pcontract_poid_link);
+				}
+				productivityService.save(pContract_PO_Productivity);
 			}
 
 			// Update POrder_Req

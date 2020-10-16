@@ -23,6 +23,7 @@ import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.currency.Currency;
 import vn.gpay.gsmart.core.org.Org;
+import vn.gpay.gsmart.core.pcontract_po_productivity.PContract_PO_Productivity;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.product.Product;
@@ -137,6 +138,11 @@ public class PContract_PO implements Serializable {/**
 	@OneToMany
     @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
     private List<PContract_Price> pcontract_price = new ArrayList<PContract_Price>();
+    
+    @NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
+    private List<PContract_PO_Productivity> pcontract_po_productivity = new ArrayList<PContract_PO_Productivity>();
     
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
@@ -626,6 +632,14 @@ public class PContract_PO implements Serializable {/**
 
 	public void setDate_importdata(Date date_importdata) {
 		this.date_importdata = date_importdata;
+	}
+
+	public List<PContract_PO_Productivity> getPcontract_po_productivity() {
+		return pcontract_po_productivity;
+	}
+
+	public void setPcontract_po_productivity(List<PContract_PO_Productivity> pcontract_po_productivity) {
+		this.pcontract_po_productivity = pcontract_po_productivity;
 	}
 	
 }
