@@ -341,7 +341,11 @@ public class POrder_ReqAPI {
 					porderService.deleteById(porder.getId());
 				}
 				
-				porder_req_Service.save(temp);
+				if(entity.isDeleteReq) {
+					porder_req_Service.deleteById(temp.getId());
+				}else {
+					porder_req_Service.save(temp);
+				}
 			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

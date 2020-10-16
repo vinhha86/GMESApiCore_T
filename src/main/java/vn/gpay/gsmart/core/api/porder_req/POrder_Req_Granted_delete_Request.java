@@ -7,4 +7,5 @@ import vn.gpay.gsmart.core.porder_req.POrder_Req;
 
 public class POrder_Req_Granted_delete_Request extends RequestBase{
 	public List<POrder_Req> data;
+	public boolean isDeleteReq;
 }
