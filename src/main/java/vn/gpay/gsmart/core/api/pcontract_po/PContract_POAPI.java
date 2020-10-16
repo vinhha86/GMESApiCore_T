@@ -44,8 +44,11 @@ import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproductpairing.IPContractProductPairingService;
 import vn.gpay.gsmart.core.pcontractproductpairing.PContractProductPairing;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
+import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
+import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
+import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.product.IProductService;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.productattributevalue.IProductAttributeService;
@@ -65,6 +68,7 @@ import vn.gpay.gsmart.core.utils.ColumnTemplate;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.POStatus;
 import vn.gpay.gsmart.core.utils.POrderReqStatus;
+import vn.gpay.gsmart.core.utils.POrderStatus;
 import vn.gpay.gsmart.core.utils.ProductType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
@@ -109,6 +113,7 @@ public class PContract_POAPI {
 	IPContract_Price_Service priceService;
 	@Autowired ISizeSetService sizesetService;
 	@Autowired IPContract_PO_Productivity_Service productivityService;
+	@Autowired IPOrderProcessing_Service processService;
 
 	@RequestMapping(value = "/upload_template", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadTemplate(HttpServletRequest request,
@@ -1198,6 +1203,69 @@ public class PContract_POAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<PContract_pogetone_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/check_cancel", method = RequestMethod.POST)
+	public ResponseEntity<check_cancel_po_response> CheckCancel(@RequestBody cancel_po_request entity,
+			HttpServletRequest request) {
+		check_cancel_po_response response = new check_cancel_po_response();
+		try {
+			String mes = "";
+			Long pcontract_poid_link = entity.pcontract_poid_link;
+			
+			List<POrderProcessing> list = processService.getby_pcontratpo(pcontract_poid_link);
+			if(list.size() > 0) {
+				mes = "PO đã tồn tại lệnh sản xuất đã vào chuyển! Bạn có chắc chắn muốn hủy PO?";
+			}
+			
+			response.mes = mes;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<check_cancel_po_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<check_cancel_po_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/cancel_po", method = RequestMethod.POST)
+	public ResponseEntity<cancel_po_response> Cancel(@RequestBody cancel_po_request entity,
+			HttpServletRequest request) {
+		cancel_po_response response = new cancel_po_response();
+		try {
+			Long pcontract_poid_link = entity.pcontract_poid_link;
+			
+			//Cap nhat trang thai PO
+			PContract_PO po = pcontract_POService.findOne(pcontract_poid_link);
+			po.setStatus(POStatus.PO_STATUS_CANCEL);
+			pcontract_POService.save(po);
+			
+			//Cap nhat trang thai lenh
+			Long pcontractid_link = po.getPcontractid_link();
+			List<POrder> list_porder = porderService.getByContractAndPO(pcontractid_link, pcontract_poid_link);
+			for (POrder pOrder : list_porder) {
+				pOrder.setStatus(POrderStatus.PORDER_STATUS_CANCEL);
+				porderService.save(pOrder);
+			}
+			
+			//Cap nhat trang thai yeu cau xep KH
+			List<POrder_Req> list_req = porder_req_Service.getByContractAndPO(pcontractid_link, pcontract_poid_link);
+			for (POrder_Req pOrder_Req : list_req) {
+				pOrder_Req.setStatus(POrderReqStatus.STATUS_CANCEL);
+				porder_req_Service.save(pOrder_Req);
+			}
+			
+			
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<cancel_po_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<cancel_po_response>(response, HttpStatus.OK);
 		}
 	}
 

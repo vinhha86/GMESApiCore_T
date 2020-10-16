@@ -152,4 +152,10 @@ public class POrderProcessing_Service extends AbstractService<POrderProcessing> 
 		// TODO Auto-generated method stub
 		return repo.getByPOrderAndPOrderGrant(porderid_link, pordergrantid_link);
 	}
+
+	@Override
+	public List<POrderProcessing> getby_pcontratpo(Long pcontract_poid_link) {
+		// TODO Auto-generated method stub
+		return repo.getby_pcontractpo(pcontract_poid_link);
+	}
 }

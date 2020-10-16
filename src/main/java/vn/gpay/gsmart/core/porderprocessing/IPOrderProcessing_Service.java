@@ -50,5 +50,7 @@ public interface IPOrderProcessing_Service extends Operations<POrderProcessing>{
 	List<POrderProcessing>getByOrgId(Long granttoorgid_link);
 	
 	public List<POrderProcessing>getByPOrderAndPOrderGrant(Long porderid_link,Long pordergrantid_link);	
+	
+	List<POrderProcessing> getby_pcontratpo(Long pcontract_poid_link);
 
 }

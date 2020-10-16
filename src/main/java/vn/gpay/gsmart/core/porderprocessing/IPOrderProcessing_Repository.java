@@ -142,5 +142,11 @@ public interface IPOrderProcessing_Repository extends JpaRepository<POrderProces
 	public List<POrderProcessing>getByPOrderAndPOrderGrant(
 			@Param ("porderid_link")final Long porderid_link,
 			@Param ("pordergrantid_link")final Long pordergrantid_link);	
+	
+	@Query(value = "select a from POrderProcessing a "
+			+ "inner join POrder b on a.porderid_link = b.id "
+			+ "where b.pcontract_poid_link = :pcontract_poid_link and a.amountinput > 0")
+	public List<POrderProcessing>getby_pcontractpo(
+			@Param ("pcontract_poid_link")final Long pcontract_poid_link);	
 
 }
