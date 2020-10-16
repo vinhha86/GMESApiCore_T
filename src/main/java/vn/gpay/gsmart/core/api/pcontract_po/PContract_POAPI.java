@@ -659,7 +659,13 @@ public class PContract_POAPI {
 					porder_req.setStatus(POrderReqStatus.STATUS_FREE);
 					porder_req.setTimecreated(new Date());
 					porder_req.setIs_calculate(porder.getIs_calculate());
-
+					
+					//Them ngay yeu cau phan xuong phai hoan thanh xep ke hoach (2 ngay sau ngay hien tai)
+					Calendar c = Calendar.getInstance();
+			        c.setTime(new Date());
+			        c.add(Calendar.DATE, 2);
+			        porder_req.setPlandate_required(c.getTime());
+			        
 					// Save to DB
 					long porder_req_id_link = porder_req_Service.savePOrder_Req(porder_req);
 

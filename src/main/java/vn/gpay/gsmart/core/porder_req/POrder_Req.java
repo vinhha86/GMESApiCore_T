@@ -56,6 +56,7 @@ public class POrder_Req implements Serializable {
 	private Integer status;
 	private Boolean is_calculate;
 	private Integer amount_inset;
+	private Date plandate_required;
 	
 
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -374,6 +375,14 @@ public class POrder_Req implements Serializable {
 
 	public void setAmount_inset(Integer amount_inset) {
 		this.amount_inset = amount_inset;
+	}
+
+	public Date getPlandate_required() {
+		return plandate_required;
+	}
+
+	public void setPlandate_required(Date plandate_required) {
+		this.plandate_required = plandate_required;
 	}
 	
 }
