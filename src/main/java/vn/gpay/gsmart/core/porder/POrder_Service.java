@@ -212,6 +212,7 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
                 .like(Objects.nonNull(PO_code), "pcontract_po.po_buyer", "%"+PO_code+"%")
                 .eq(orgbuyerid_link != 0, "pcontract.orgbuyerid_link",orgbuyerid_link)
                 .eq(orgvendorid_link!=0, "pcontract.orgvendorid_link", orgvendorid_link)
+                .ne("status", -3)
 	            .build();
 //		Sort sort = Sorts.builder()
 //		        .desc("ordercode")
@@ -231,6 +232,7 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
                 .le(Objects.nonNull(orderdateto),"orderdate",GPAYDateFormat.atEndOfDay(orderdateto))
                 .eq(Objects.nonNull(status), "porderstatus.id", status)
                 .ne("porderstatus.id", -1)
+                .ne("porderstatus.id", -3)
                 .eq(Objects.nonNull(granttoorgid_link), "granttoorgid_link", granttoorgid_link)
 				.build();
 		
