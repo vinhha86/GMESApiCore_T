@@ -45,6 +45,10 @@ public class POrder_Req_Service extends AbstractService<POrder_Req> implements I
 	public List<POrder_Req> getByContractAndProduct(Long pcontractid_link, Long productid_link){
 		return repo.getByContractAndProduct(pcontractid_link,productid_link);
 	}
+	@Override
+	public List<POrder_Req> getByPOAndProduct(Long pcontract_poid_link, Long productid_link){
+		return repo.getByPOAndProduct(pcontract_poid_link,productid_link);
+	}
 	
 	@Override
 	public List<POrder_Req> getByContractAndPO(Long pcontractid_link, Long pcontract_poid_link){

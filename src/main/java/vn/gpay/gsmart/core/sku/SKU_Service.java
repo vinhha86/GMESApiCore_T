@@ -26,7 +26,8 @@ public class SKU_Service extends AbstractService<SKU> implements ISKU_Service {
 	@Override
 	public List<SKU> getlist_byProduct(Long productid_link) {
 		// TODO Auto-generated method stub
-		return repo.getlist_byproduct(productid_link);
+		List<SKU> a = repo.getlist_byproduct(productid_link);
+		return a;
 	}
 
 	@Override

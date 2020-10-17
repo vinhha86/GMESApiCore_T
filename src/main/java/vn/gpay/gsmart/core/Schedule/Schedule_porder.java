@@ -39,9 +39,9 @@ public class Schedule_porder {
 	private long id_origin;
 	
 	private int duration;
-	private int productivity;
-	private int productivity_po;
-	private int productivity_porder;
+	private int productivity;//NS xưởng
+	private int productivity_po;//NS Target
+	private int productivity_porder;//NS tổ (tính trung bình tiến độ ra chuyền)
 	
 	
 		

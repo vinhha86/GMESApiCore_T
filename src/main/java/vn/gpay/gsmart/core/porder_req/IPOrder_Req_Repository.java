@@ -19,6 +19,9 @@ public interface IPOrder_Req_Repository extends JpaRepository<POrder_Req, Long>,
 	@Query("SELECT c FROM POrder_Req c where c.pcontractid_link = :pcontractid_link and c.productid_link = :productid_link")
 	public List<POrder_Req> getByContractAndProduct(@Param ("pcontractid_link")final Long pcontractid_link, @Param ("productid_link")final Long productid_link);
 
+	@Query("SELECT c FROM POrder_Req c where c.pcontract_poid_link = :pcontract_poid_link and c.productid_link = :productid_link")
+	public List<POrder_Req> getByPOAndProduct(@Param ("pcontract_poid_link")final Long pcontract_poid_link, @Param ("productid_link")final Long productid_link);
+
 	@Query("SELECT c FROM POrder_Req c where c.pcontractid_link = :pcontractid_link and c.pcontract_poid_link = :pcontract_poid_link")
 	public List<POrder_Req> getByContractAndPO(@Param ("pcontractid_link")final Long pcontractid_link, @Param ("pcontract_poid_link")final Long pcontract_poid_link);
 

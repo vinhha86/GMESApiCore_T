@@ -33,6 +33,7 @@ import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
+import vn.gpay.gsmart.core.pcontract_po_productivity.IPContract_PO_Productivity_Service;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
@@ -71,6 +72,7 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 @RequestMapping("/api/v1/porder")
 public class POrderAPI {
 	@Autowired private IPOrder_Service porderService;
+	@Autowired private IPContract_PO_Productivity_Service poProductivityService;
 	@Autowired private IPContract_POService pcontract_POService;
 	@Autowired private IPOrder_Product_SKU_Service porderskuService;
 	@Autowired private IPContractProductSKUService pskuservice;
@@ -155,13 +157,31 @@ public class POrderAPI {
 							porder.setStatus(thePO.getStatus() == POStatus.PO_STATUS_UNCONFIRM?POrderStatus.PORDER_STATUS_UNCONFIRM:POrderStatus.PORDER_STATUS_FREE);
 							porder.setTimecreated(new Date());
 							
-							porder.setPlan_productivity(thePO.getPlan_productivity());
+							//Lay thong tin NS target tu chao gia 
+							porder.setPlan_productivity(poProductivityService.getProductivityByPOAndProduct(thePO.getParentpoid_link(), porder.getProductid_link()));
 						} 
 //						Float productiondays = (float)thePO.getProductiondays();
 						porder = porderService.savePOrder(calPlan_FinishDate(orgrootid_link, porder), po_code);
 						
+						//Neu chi co duy nhat 1 Porder_req cho san pham (chi phan lenh cho 1 xuong) --> Tu lay toan bo danh sach SKU
+						List<POrder_Req> lsPOrder_Req_product = porder_reqService.getByPOAndProduct(porder.getPcontract_poid_link(), porder.getProductid_link());
+						if (lsPOrder_Req_product.size()==1){
+							for (PContractProductSKU theProductSKU: pskuservice.getbypo_and_product(porder.getPcontract_poid_link(), porder.getProductid_link())){
+								POrder_Product_SKU thePorderSKU = new POrder_Product_SKU();
+								thePorderSKU.setOrgrootid_link(orgrootid_link);
+								thePorderSKU.setPorderid_link(porder.getId());
+								thePorderSKU.setProductid_link(porder.getProductid_link());
+								thePorderSKU.setSkuid_link(theProductSKU.getSkuid_link());
+								thePorderSKU.setPquantity_porder(theProductSKU.getPquantity_porder());
+								thePorderSKU.setPquantity_production(theProductSKU.getPquantity_production());
+								thePorderSKU.setPquantity_sample(theProductSKU.getPquantity_sample());
+								thePorderSKU.setPquantity_total(theProductSKU.getPquantity_total());
+								porderskuService.save(thePorderSKU);
+							}
+						}
+						
 						response.id = porder.getId();
-						response.data = porder;
+//						response.data = porderService.findOne(porder.getId());
 						
 						//Update lai trng thai cua Porder_req ve da tao lenh
 						List<POrder_Req> lsPOrder_Req = porder_reqService.getByOrg_PO_Product(porder.getPcontract_poid_link(), porder.getProductid_link(), porder.getGranttoorgid_link());
