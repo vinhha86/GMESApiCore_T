@@ -709,7 +709,6 @@ public class ScheduleAPI {
 			
 			processService.save(pp);
 			
-			
 			Schedule_porder sch = new Schedule_porder();
 			sch.setDuration(duration);
 			sch.setProductivity(productivity);
@@ -728,9 +727,8 @@ public class ScheduleAPI {
 			sch.setTotalpackage(porder.getTotalorder());
 			sch.setVendorname(porder.getVendorname());
 			sch.setPorder_grantid_link(pg.getId());
-			sch.setProductivity_po(pg.getProductivity_po());
-			sch.setProductivity_porder(porder.getPlan_productivity());
 			sch.setProductivity_po(porder.getProductivity_po());
+			sch.setProductivity_porder(0);
 			
 			response.data = sch;
 			

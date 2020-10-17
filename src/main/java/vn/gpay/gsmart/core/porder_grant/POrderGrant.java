@@ -110,9 +110,6 @@ public class POrderGrant implements Serializable {
 	
 	@Transient
 	public int getProductivity_porder() {
-		if(porder!=null) {
-			return porder.getPlan_productivity() == null ? 0 : porder.getPlan_productivity();
-		}
 		return 0;
 	}
 	

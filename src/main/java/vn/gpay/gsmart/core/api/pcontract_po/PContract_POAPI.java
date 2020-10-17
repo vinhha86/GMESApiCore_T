@@ -1047,6 +1047,20 @@ public class PContract_POAPI {
 				ponew.setPlan_productivity(po.getPlan_productivity());
 				ponew.setPlan_linerequired(po.getPlan_linerequired());
 				ponew = pcontract_POService.save(ponew);
+				
+//				//Cap nhat ns target tu po cha sang
+//				List<PContract_PO_Productivity> list_productivity = productivityService.getbypo(entity.pcontract_poid_link);
+//				for (PContract_PO_Productivity pContract_PO_Productivity : list_productivity) {
+//					PContract_PO_Productivity productivitynew = new PContract_PO_Productivity();
+//					productivitynew.setId(null);
+//					productivitynew.setOrgrootid_link(orgrootid_link);
+//					productivitynew.setPcontract_poid_link(ponew.getId());
+//					productivitynew.setPlan_linerequired(pContract_PO_Productivity.getPlan_linerequired());
+//					productivitynew.setPlan_productivity(pContract_PO_Productivity.getPlan_productivity());
+//					productivitynew.setProductid_link(pContract_PO_Productivity.getProductid_link());
+//					
+//					productivityService.save(productivitynew);
+//				}
 
 				List<POrder_Req> list_req = porder_req_Service.getByPO(po.getId());
 
@@ -1072,6 +1086,8 @@ public class PContract_POAPI {
 					porder_req_Service.savePOrder_Req(porder_req);
 				}
 			}
+			
+			
 
 			// Sinh Cong viec
 			long pcontractid_link = po.getPcontractid_link();
