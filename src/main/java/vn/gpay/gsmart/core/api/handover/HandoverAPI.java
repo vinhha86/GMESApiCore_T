@@ -1,11 +1,15 @@
 package vn.gpay.gsmart.core.api.handover;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +25,7 @@ import vn.gpay.gsmart.core.handover_product.HandoverProduct;
 import vn.gpay.gsmart.core.handover_product.IHandoverProductService;
 import vn.gpay.gsmart.core.handover_sku.HandoverSKU;
 import vn.gpay.gsmart.core.handover_sku.IHandoverSKUService;
+import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -34,6 +39,7 @@ public class HandoverAPI {
 	@Autowired IHandoverSKUService handoverSkuService;
 	@Autowired IHandover_AutoID_Service handoverAutoIdService;
 	@Autowired IPOrder_Service porderService;
+	@Autowired IOrgService orgService;
 	
 	@RequestMapping(value = "/getall",method = RequestMethod.POST)
 	public ResponseEntity<Handover_getall_response> GetAll(HttpServletRequest request ) {
@@ -135,6 +141,14 @@ public class HandoverAPI {
 		Handover_create_response response = new Handover_create_response();
 		try {
 //			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			// check status
+			Handover handover = handoverService.findOne(entity.id);
+			if(handover.getStatus() == 2) {
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage("Phiếu đã được bên nhận xác nhận");
+				return new ResponseEntity<Handover_create_response>(response,HttpStatus.OK);
+			}
+			
 			Long id = entity.id;
 			// Xoá sku
 			List<HandoverSKU> listSku = handoverSkuService.getByHandoverId(id);
@@ -196,6 +210,71 @@ public class HandoverAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/getbysearch",method = RequestMethod.POST)
+	public ResponseEntity<Handover_getall_response> Getbysearch(@RequestBody Handover_getbysearch_request entity,HttpServletRequest request ) {
+		Handover_getall_response response = new Handover_getall_response();
+		try {
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//			Long orgid_link = user.getOrgid_link();
+//			Org org = orgService.findOne(orgid_link);
+			//
+			Long handovertypeid_link = entity.handovertypeid_link;
+			Date handover_datefrom = entity.handover_datefrom;
+			Date handover_dateto = entity.handover_dateto;
+			Long orgid_from_link = entity.orgid_from_link;
+			Long orgid_to_link = entity.orgid_to_link;
+			List<Integer> status = entity.status;
+			//
+			response.data = new ArrayList<>();
+			List<Handover> result = new ArrayList<>();
+			//
+//			if(org.getOrgtypeid_link() == 1) { // trụ sở
+//			}
+//			if(org.getOrgtypeid_link() == 13) { // xưởng
+//			}
+			if(status.size() == 0) {
+				result = handoverService.getHandOverBySearch(
+						handovertypeid_link, handover_datefrom, handover_dateto,
+						orgid_from_link, orgid_to_link, null);
+			}else {
+				for(Integer num : status) {
+					List<Handover> temp = handoverService.getHandOverBySearch(
+							handovertypeid_link, handover_datefrom, handover_dateto,
+							orgid_from_link, orgid_to_link, num);
+					result.addAll(temp);
+				}
+			}
+			
+			if(entity.ordercode == null) entity.ordercode = "";
+			
+			for(Handover handover : result) {
+				String ordercode = handover.getOrdercode().toLowerCase();
+				String ordercode_req = entity.ordercode.toLowerCase();
+				if(!ordercode.contains(ordercode_req)) {
+					continue;
+				}
+				response.data.add(handover);
+			}
+			
+			response.totalCount = response.data.size();
+			
+			PageRequest page = PageRequest.of(entity.page - 1, entity.limit);
+			int start = (int) page.getOffset();
+			int end = (start + page.getPageSize()) > response.data.size() ? response.data.size() : (start + page.getPageSize());
+			Page<Handover> pageToReturn = new PageImpl<Handover>(response.data.subList(start, end), page, response.data.size()); 
+			
+			response.data = pageToReturn.getContent();
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
+		}
+	}
+	
 	@RequestMapping(value = "/setstatus",method = RequestMethod.POST)
 	public ResponseEntity<Handover_getall_response> setStatus(@RequestBody Handover_setstatus_request entity,HttpServletRequest request ) {
 		Handover_getall_response response = new Handover_getall_response();
@@ -221,15 +300,25 @@ public class HandoverAPI {
 		}
 	}
 	
-	@RequestMapping(value = "/userconfirm",method = RequestMethod.POST)
-	public ResponseEntity<Handover_getall_response> userConfirm(@RequestBody Handover_userconfirm_request entity,HttpServletRequest request ) {
+	@RequestMapping(value = "/cancelconfirm",method = RequestMethod.POST)
+	public ResponseEntity<Handover_getall_response> cancelConfirm(@RequestBody Handover_getone_request entity,HttpServletRequest request ) {
 		Handover_getall_response response = new Handover_getall_response();
 		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Handover handover = handoverService.findOne(entity.id);
+			if(handover.getStatus() != 2) {
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage("Phiếu chưa được xác nhận");
+				return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
+			}
+			Date date = new Date();
+			handover.setStatus(1);
+			handover.setReceiver_userid_link(null);
+			handover.setReceive_date(null);
+			handover.setLasttimeupdate(date);
+			handover.setLastuserupdateid_link(user.getId());
+			handoverService.save(handover);
 			
-			
-//			Handover handover = handoverService.findOne(entity.handoverid_link);
-//			handover.setStatus(2);
-//			handoverService.save(handover);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);

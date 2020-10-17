@@ -267,11 +267,12 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 	}
 
 	@Override
-	public List<Org> findOrgByOrgTypeString(List<String> list_typeid) {
+	public List<Org> findOrgByOrgTypeString(List<String> list_typeid, Long parentid_link) {
 		// TODO Auto-generated method stub
 		Specification<Org> specification = Specifications.<Org>and()
 	            .ge("status", 0)
 	            .in(list_typeid.size() > 0,"orgtypeid_link", list_typeid.toArray())
+	            .eq(Objects.nonNull(parentid_link), "parentid_link", parentid_link)
 	            .build();
 		Sort sort = Sorts.builder()
 		        .asc("name")

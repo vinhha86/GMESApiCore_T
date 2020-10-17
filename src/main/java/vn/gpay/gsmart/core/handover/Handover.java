@@ -167,6 +167,14 @@ public class Handover implements Serializable {
 		return "";
 	}
 	
+	@Transient
+	public String getOrgFromParentcode() {
+		if(orgFrom!=null) {
+			return orgFrom.getParentcode();
+		}
+		return "";
+	}
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="orgid_to_link",insertable=false,updatable =false)
@@ -176,6 +184,14 @@ public class Handover implements Serializable {
 	public String getOrgToName() {
 		if(orgTo!=null) {
 			return orgTo.getName();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getOrgToParentcode() {
+		if(orgTo!=null) {
+			return orgTo.getParentcode();
 		}
 		return "";
 	}

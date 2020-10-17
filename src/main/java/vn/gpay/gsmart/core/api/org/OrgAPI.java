@@ -473,12 +473,24 @@ public class OrgAPI {
 	public ResponseEntity<?> findOrgByOrgTypeString(@RequestBody Org_getByOrgTypeString_request entity, HttpServletRequest request) {//@RequestParam("type") 
 		OrgResponse response = new OrgResponse();
 		try {
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//			Long orgid_link = user.getOrgid_link();
+//			Org org = orgService.findOne(orgid_link);
+			
 			String[] listtype = entity.orgtypestring.split(",");
 			List<String> list = new ArrayList<String>();
 			for (String string : listtype) {
 				list.add(string.trim());
 			}
-			response.data = orgService.findOrgByOrgTypeString(list);
+			
+			response.data = orgService.findOrgByOrgTypeString(list, null);
+//			if(org.getOrgtypeid_link() == 1) { // trụ sở
+//				response.data = orgService.findOrgByOrgTypeString(list, null);
+//			}
+//			if(org.getOrgtypeid_link() == 13){ // xưởng
+//				response.data = orgService.findOrgByOrgTypeString(list, org.getId());
+//			}
+			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<OrgResponse>(response,HttpStatus.OK);
