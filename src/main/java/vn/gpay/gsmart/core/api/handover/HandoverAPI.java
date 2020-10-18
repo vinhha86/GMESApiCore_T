@@ -63,6 +63,7 @@ public class HandoverAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Handover handover = entity.data;
 			HandoverProduct handoverProduct = entity.handoverProduct;
+			Long type = handover.getHandovertypeid_link();
 			
 			if(handover.getId()==null || handover.getId()==0) {
 				// new
@@ -70,7 +71,12 @@ public class HandoverAPI {
 					POrder porder = porderService.findOne(handover.getPorderid_link());
 					if(porder != null) {
 						// Xuất từ cắt lên chuyền cho lệnh : CL
-						handover.setHandover_code(handoverAutoIdService.getLastID("CL_" + porder.getOrdercode()));
+						if(type.equals(1L)) {
+							handover.setHandover_code(handoverAutoIdService.getLastID("CL_" + porder.getOrdercode()));
+						}
+						if(type.equals(2L)) {
+							handover.setHandover_code(handoverAutoIdService.getLastID("CP_" + porder.getOrdercode()));
+						}
 					}else {
 						handover.setHandover_code(handoverAutoIdService.getLastID("UNKNOWN"));
 					}
