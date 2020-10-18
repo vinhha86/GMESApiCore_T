@@ -40,9 +40,9 @@ public class Schedule_porder {
 	
 	private int duration;
 	private int productivity;//NS xưởng
-	private int productivity_po;//NS Target
-	private int productivity_porder;//NS tổ (tính trung bình tiến độ ra chuyền)
-	
+	private int productivity_po;//NS cua PO
+	private int productivity_porder;//NS Target (Khi tao lenh sx, lay tu NS Target tai chao gia vao)
+	private int productivity_line;//NS tổ (tính trung bình tiến độ ra chuyền)
 	
 		
 	public int getProductivity_po() {
@@ -183,6 +183,12 @@ public class Schedule_porder {
 	}
 	public void setProductbuyercode(String productbuyercode) {
 		this.productbuyercode = productbuyercode;
+	}
+	public int getProductivity_line() {
+		return productivity_line;
+	}
+	public void setProductivity_line(int productivity_line) {
+		this.productivity_line = productivity_line;
 	}
 	
 	
