@@ -18,4 +18,9 @@ public interface PContract_PO_Productivity_Repository extends JpaRepository<PCon
 	public List<PContract_PO_Productivity> getByPOAndProduct(
 			@Param ("pcontract_poid_link")final  Long pcontract_poid_link,
 			@Param ("productid_link")final  Long productid_link);
+	
+	@Query(value = "select c from PContract_PO_Productivity c "
+			+ "where c.pcontract_poid_link = :pcontract_poid_link ")
+	public List<PContract_PO_Productivity> getByPO(
+			@Param ("pcontract_poid_link")final  Long pcontract_poid_link);
 }

@@ -133,6 +133,11 @@ public class PContract_PO implements Serializable {/**
 	@ManyToOne
     @JoinColumn(name="productid_link",insertable=false,updatable =false)
     private Product product;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="parentpoid_link",insertable=false,updatable =false)
+    private PContract_PO parent;
     
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
@@ -177,6 +182,25 @@ public class PContract_PO implements Serializable {/**
 			}
 		} 
 		return price;
+	}
+	
+	@Transient
+	public Integer getProductivity_byproduct(Long productid_link) {
+		if(parent!=null) {
+			for (PContract_PO_Productivity productivity : parent.getPcontract_po_productivity()) {
+				if(productivity.getProductid_link().equals(productid_link)) {
+					return productivity.getPlan_productivity();
+				}
+			}
+		}
+		else if(pcontract_po_productivity!=null) {
+			for (PContract_PO_Productivity pContract_PO_Productivity2 : pcontract_po_productivity) {
+				if(pContract_PO_Productivity2.getProductid_link().equals(productid_link)) {
+					return pContract_PO_Productivity2.getPlan_productivity();
+				}
+			}
+		}
+		return 0;
 	}
 	
 	@Transient

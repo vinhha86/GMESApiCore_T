@@ -22,23 +22,24 @@ public class Personel implements Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "personnel_generator")
 	@SequenceGenerator(name="personnel_generator", sequenceName = "personnel_id_seq", allocationSize=1)
 	protected Long id;
-	private String code;
+	private String code; //Ma NV
 	private Long orgrootid_link;
-	private Long orgid_link;
-	private String fullname;
-	private Long personnel_typeid_link;
-	private Long personnel_positionid_link;
-	private Integer gender;
-	private String tel;
-	private Long countryid_link;
-	private Long provinceid_link;
-	private Long districtid_link;
-	private Long communeid_link;
-	private String address;
-	private String idnumber;
-	private Date birthdate;
-	private Integer status;
-	private String email;
+	private Long orgid_link; //don vi, phong ban truc thuoc
+	private String fullname; // ho ten
+	private Long personnel_typeid_link; //Loai nhan vien
+	private Integer gender; // Gioi tinh
+	private String tel; // Dien thoai
+	private Long countryid_link; // Quoc tinh
+	private Long provinceid_link; // tinh, thanh pho
+	private Long districtid_link; // Quan huyen
+	private Long communeid_link; // Xa Phuong
+	private String address; // Dia chi
+	private String idnumber; // CMT
+	private Date birthdate; // Ngay sinh
+	private Integer status; // Trang tHai
+	private String email; // Email
+	
+	
 	public Long getId() {
 		return id;
 	}
@@ -56,9 +57,6 @@ public class Personel implements Serializable {
 	}
 	public Long getPersonnel_typeid_link() {
 		return personnel_typeid_link;
-	}
-	public Long getPersonnel_positionid_link() {
-		return personnel_positionid_link;
 	}
 	public Integer getGender() {
 		return gender;
@@ -110,9 +108,6 @@ public class Personel implements Serializable {
 	}
 	public void setPersonnel_typeid_link(Long personnel_typeid_link) {
 		this.personnel_typeid_link = personnel_typeid_link;
-	}
-	public void setPersonnel_positionid_link(Long personnel_positionid_link) {
-		this.personnel_positionid_link = personnel_positionid_link;
 	}
 	public void setGender(Integer gender) {
 		this.gender = gender;

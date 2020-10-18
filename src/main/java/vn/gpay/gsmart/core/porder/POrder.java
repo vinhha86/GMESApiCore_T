@@ -133,10 +133,11 @@ public class POrder implements Serializable {
 	@OneToMany
     @JoinColumn(name="porderid_link",insertable=false,updatable =false)
     private List<POrderGrant> list_pordergrant = new ArrayList<POrderGrant>();
+	
 	@Transient
 	public int getProductivity_po() {
 		if(pcontract_po!=null)
-			return pcontract_po.getPlan_productivity() == null ? 0 : pcontract_po.getPlan_productivity();
+			return pcontract_po.getProductivity_byproduct(productid_link);
 		return 0;
 	}
 	@Transient
