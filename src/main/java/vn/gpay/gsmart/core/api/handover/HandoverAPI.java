@@ -77,6 +77,9 @@ public class HandoverAPI {
 						if(type.equals(2L)) {
 							handover.setHandover_code(handoverAutoIdService.getLastID("CP_" + porder.getOrdercode()));
 						}
+						if(type.equals(4L)) {
+							handover.setHandover_code(handoverAutoIdService.getLastID("LP_" + porder.getOrdercode()));
+						}
 					}else {
 						handover.setHandover_code(handoverAutoIdService.getLastID("UNKNOWN"));
 					}
