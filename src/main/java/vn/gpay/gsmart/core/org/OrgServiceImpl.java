@@ -275,7 +275,8 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 	            .eq(Objects.nonNull(parentid_link), "parentid_link", parentid_link)
 	            .build();
 		Sort sort = Sorts.builder()
-		        .asc("name")
+//		        .asc("orgtypeid_link")
+		        .asc("id")
 		        .build();
 		List<Org> list =  repositoty.findAll(specification,sort);
 		
