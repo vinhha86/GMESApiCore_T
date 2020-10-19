@@ -68,7 +68,32 @@ public class OrgAPI {
 			errorBase.setMessage(e.getMessage());
 		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}   
+	
+	@RequestMapping(value = "/getchilbytype",method = RequestMethod.POST)
+	public ResponseEntity<?> getChilbyType(@RequestBody getchil_bytype_request entity, HttpServletRequest request ) {//@RequestParam("type") 
+		OrgResponse response = new OrgResponse();
+		try {
+			String[] listtype = entity.listtype.split(",");
+			List<String> list = new ArrayList<String>();
+			for (String string : listtype) {
+				list.add(string);
+			}
+			
+			List<Org> ls_tosx = orgService.findOrgByOrgTypeString(list, entity.parentid_link);
+	    	
+	    	response.data = ls_tosx;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<OrgResponse>(response,HttpStatus.OK);
+		}catch (RuntimeException e) {
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(e.getMessage());
+		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}    
+	
 	@RequestMapping(value = "/getbyparent",method = RequestMethod.POST)
 	public ResponseEntity<?> getByParent(@RequestBody GetOrgById_request entity, HttpServletRequest request ) {//@RequestParam("type") 
 		OrgResponse response = new OrgResponse();

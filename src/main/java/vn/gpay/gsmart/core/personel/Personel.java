@@ -38,6 +38,10 @@ public class Personel implements Serializable {
 	private Date birthdate; // Ngay sinh
 	private Integer status; // Trang tHai
 	private String email; // Email
+	private Long orgmanagerid_link;
+	private String register_code;
+	
+	
 	
 	
 	public Long getId() {
@@ -141,6 +145,18 @@ public class Personel implements Serializable {
 	}
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	public Long getOrgmanagerid_link() {
+		return orgmanagerid_link;
+	}
+	public void setOrgmanagerid_link(Long orgmanagerid_link) {
+		this.orgmanagerid_link = orgmanagerid_link;
+	}
+	public String getRegister_code() {
+		return register_code;
+	}
+	public void setRegister_code(String register_code) {
+		this.register_code = register_code;
 	}
 	
 	
