@@ -7,8 +7,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.org.Org;
 
 @Table(name="personnel")
 @Entity
@@ -40,7 +48,25 @@ public class Personel implements Serializable {
 	private String email; // Email
 	private Long orgmanagerid_link;
 	private String register_code;
+	private String image_name;
+	private Long positionid_link;
+	private Long levelid_link;
 	
+	
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="orgid_link",insertable=false,updatable =false)
+    private Org org;
+	
+	
+	@Transient
+	public String getOrgname() {
+		if(org!=null) {
+			return org.getName();
+		}
+		return "";
+	}
 	
 	
 	
@@ -157,6 +183,42 @@ public class Personel implements Serializable {
 	}
 	public void setRegister_code(String register_code) {
 		this.register_code = register_code;
+	}
+
+
+
+	public String getImage_name() {
+		return image_name;
+	}
+
+
+
+	public void setImage_name(String image_name) {
+		this.image_name = image_name;
+	}
+
+
+
+	public Long getPositionid_link() {
+		return positionid_link;
+	}
+
+
+
+	public Long getLevelid_link() {
+		return levelid_link;
+	}
+
+
+
+	public void setPositionid_link(Long positionid_link) {
+		this.positionid_link = positionid_link;
+	}
+
+
+
+	public void setLevelid_link(Long levelid_link) {
+		this.levelid_link = levelid_link;
 	}
 	
 	

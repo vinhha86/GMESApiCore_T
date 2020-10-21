@@ -80,7 +80,11 @@ public class OrgAPI {
 				list.add(string);
 			}
 			
-			List<Org> ls_tosx = orgService.findOrgByOrgTypeString(list, entity.parentid_link);
+			List<Org> ls_tosx = new ArrayList<Org>();
+			if(entity.parentid_link != 1)
+				ls_tosx = orgService.findOrgByOrgTypeString(list, entity.parentid_link);
+			else
+				ls_tosx.add(orgService.findOne(1));
 	    	
 	    	response.data = ls_tosx;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
