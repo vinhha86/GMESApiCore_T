@@ -29,4 +29,6 @@ public interface IOrgService extends Operations<Org>{
 	List<Org> findChildByType(long orgrootid_link, long parentid_link, long type);
 		
 	public List<Org> findOrgByOrgTypeString(List<String> list_typeid, Long parentid_link);
+	
+	public List<Org> getOrgByPorderIdLink(Long porderid_link);
 }

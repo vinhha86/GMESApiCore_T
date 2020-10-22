@@ -70,18 +70,29 @@ public class HandoverAPI {
 				if(handover.getHandover_code() == null || handover.getHandover_code().length() == 0) {
 					POrder porder = porderService.findOne(handover.getPorderid_link());
 					if(porder != null) {
-						// Xuất từ cắt lên chuyền cho lệnh : CL
+						// Xuất từ cắt lên chuyền : CL
 						if(type.equals(1L)) {
 							handover.setHandover_code(handoverAutoIdService.getLastID("CL_" + porder.getOrdercode()));
 						}
+						// Xuất từ cắt lên in thêu : CPR
 						if(type.equals(2L)) {
-							handover.setHandover_code(handoverAutoIdService.getLastID("CP_" + porder.getOrdercode()));
+							handover.setHandover_code(handoverAutoIdService.getLastID("CPR_" + porder.getOrdercode()));
 						}
+						// Xuất từ chuyền lên hoàn thiện : LP
 						if(type.equals(4L)) {
 							handover.setHandover_code(handoverAutoIdService.getLastID("LP_" + porder.getOrdercode()));
 						}
+						// Xuất từ chuyền lên in thêu : LPR
+						if(type.equals(5L)) {
+							handover.setHandover_code(handoverAutoIdService.getLastID("LPR_" + porder.getOrdercode()));
+						}
 					}else {
-						handover.setHandover_code(handoverAutoIdService.getLastID("UNKNOWN"));
+						// Xuất từ hoàn thiện lên kho TP : PS
+						if(type.equals(9L)) {
+							handover.setHandover_code(handoverAutoIdService.getLastID("PS_" + porder.getOrdercode()));
+						}else {
+							handover.setHandover_code(handoverAutoIdService.getLastID("UNKNOWN"));
+						}
 					}
 				}else {
 					// check existed
@@ -287,16 +298,19 @@ public class HandoverAPI {
 	@RequestMapping(value = "/setstatus",method = RequestMethod.POST)
 	public ResponseEntity<Handover_getall_response> setStatus(@RequestBody Handover_setstatus_request entity,HttpServletRequest request ) {
 		Handover_getall_response response = new Handover_getall_response();
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Date date = new Date();
 		try {
 			Handover handover = handoverService.findOne(entity.handoverid_link);
 			if(entity.approver_userid_link != 0) {
 				handover.setApprover_userid_link(entity.approver_userid_link);
 			}
 			if(entity.receiver_userid_link != 0) {
-				Date date = new Date();
 				handover.setReceiver_userid_link(entity.receiver_userid_link);
 				handover.setReceive_date(date);
 			}
+			handover.setLasttimeupdate(date);
+			handover.setLastuserupdateid_link(user.getId());
 			handover.setStatus(entity.status);
 			handoverService.save(handover);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

@@ -9,8 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-
-
 @Repository
 @Transactional
 public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecificationExecutor<Org>{
@@ -46,4 +44,10 @@ public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecification
 	
 	@Query(value = "select c from Org c where c.orgtypeid_link in(:orgtypestring) order by c.name asc")
 	public List<Org> findOrgByOrgTypeString(@Param ("orgtypestring")final String orgtypestring);
+	
+	@Query(value = "select c from Org c "
+			+ "inner join POrderGrant a on c.id = a.granttoorgid_link "
+			+ "inner join POrder b on a.porderid_link = b.id "
+			+ "where a.porderid_link = :porderid_link order by c.id")
+	public List<Org> getOrgByPorderIdLink(@Param ("porderid_link")final Long porderid_link);
 }

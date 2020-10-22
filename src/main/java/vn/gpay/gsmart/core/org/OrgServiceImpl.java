@@ -283,4 +283,10 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 		
 		return list;
 	}
+
+	@Override
+	public List<Org> getOrgByPorderIdLink(Long porderid_link) {
+		// TODO Auto-generated method stub
+		return repositoty.getOrgByPorderIdLink(porderid_link);
+	}
 }
