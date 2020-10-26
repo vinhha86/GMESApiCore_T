@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.api.org;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,6 +42,33 @@ public class OrgMenuAPI {
 		try {
 			OrgMenuTreeResponse response = new OrgMenuTreeResponse();
 			List<Org> menu = orgService.findOrgByTypeForMenuOrg();
+			List<OrgTree> children = orgService.createTree(menu);
+//			System.out.println(menu.size());
+			response.children=children;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<OrgMenuTreeResponse>(response,HttpStatus.OK);
+		}catch (RuntimeException e) {
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(e.getMessage());
+		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@RequestMapping(value = "/orgmenu_tree_bytype",method = RequestMethod.POST)
+	public ResponseEntity<?> OrgMenuTree(@RequestBody Org_getByOrgTypeString_request entity,HttpServletRequest request ) {
+		try {
+			GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			String[] listtype = entity.orgtypestring.split(",");
+			List<String> list = new ArrayList<String>();
+			for (String string : listtype) {
+				list.add(string.trim());
+			}
+			
+			OrgMenuTreeResponse response = new OrgMenuTreeResponse();
+			List<Org> menu = orgService.findOrgByOrgTypeString(list,user.getRootorgid_link());
+			menu.add(orgService.findOne(user.getRootorgid_link()));
 			List<OrgTree> children = orgService.createTree(menu);
 //			System.out.println(menu.size());
 			response.children=children;
