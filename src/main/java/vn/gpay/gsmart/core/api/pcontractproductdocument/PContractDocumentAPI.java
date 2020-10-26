@@ -53,7 +53,7 @@ public class PContractDocumentAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
 					.getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
-			String FolderPath = String.format("upload/pcontract/%s/%s", pcontract.getContractcode(), product.getCode());
+			String FolderPath = String.format("upload/pcontract/%s/%s", pcontract.getContractcode(), product.getBuyercode());
 			
 			// Thư mục gốc upload file.			
 			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
@@ -198,9 +198,6 @@ public class PContractDocumentAPI {
 	public ResponseEntity<ResponseBase> Delete(HttpServletRequest request,@RequestBody PContractDocument_delete_request entity){
 		ResponseBase response = new ResponseBase();
 		try {
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
-					.getPrincipal();
-			long orgrootid_link = user.getRootorgid_link();
 			long pcontractid_link = entity.pcontractid_link;
 			long productid_link = entity.productid_link;
 			String filename = entity.filename;
@@ -208,12 +205,9 @@ public class PContractDocumentAPI {
 			Product product = productService.findOne(productid_link);
 			PContract pcontract = pcontractService.findOne(pcontractid_link);
 			
-			List<PContractProductDocument> pContractProductDocuments = pcdService.getlist_byproduct(orgrootid_link, pcontractid_link, productid_link);
-			for (PContractProductDocument pContractProductDocument : pContractProductDocuments) {
-				pcdService.delete(pContractProductDocument);
-			}
+			pcdService.deleteById(entity.id);
 			
-			String FolderPath = String.format("upload/pcontract/%s/%s", pcontract.getContractcode(), product.getCode());
+			String FolderPath = String.format("upload/pcontract/%s/%s", pcontract.getContractcode(), product.getBuyercode());
 			
 			// Thư mục gốc upload file.			
 			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
