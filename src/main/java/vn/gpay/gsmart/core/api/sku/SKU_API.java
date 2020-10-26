@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.api.sku;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -91,4 +92,30 @@ public class SKU_API {
     public List<SKU> getSKU_ByType(@RequestBody SkuByCodeRequest entity, HttpServletRequest request) {
     	return skuService.getSKU_ByType(entity.skucode, entity.skutypeid_link);
     }
+    
+    @RequestMapping(value = "/getProductSKU_ByCode",method = RequestMethod.POST)
+	public ResponseEntity<SKU_getbyproduct_response> getProductSKU_ByCode(HttpServletRequest request, @RequestBody SkuByCodeRequest entity ) {
+		SKU_getbyproduct_response response = new SKU_getbyproduct_response();
+		
+		try {
+//			System.out.println(entity.skutypeid_link + " " + entity.skucode);
+			List<SKU> skus = skuService.getProductSKU_ByCode(entity.skutypeid_link, entity.skucode);
+			response.data = new ArrayList<SKU>();
+			if(skus.size() > 0) {
+				response.data.addAll(skus);
+			}else {
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage("Mã vạch không tồn tại");
+				return new ResponseEntity<SKU_getbyproduct_response>(response,HttpStatus.OK);
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<SKU_getbyproduct_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<SKU_getbyproduct_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 }

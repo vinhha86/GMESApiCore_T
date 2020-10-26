@@ -54,7 +54,7 @@ public class HandoverSKUAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			
-			List<HandoverSKU> list = handoverSkuService.getByHandoverId(entity.handoverid_link);
+			List<HandoverSKU> list = handoverSkuService.getByHandoverId(entity.handoverid_link, entity.productid_link);
 			
 			if(list.size() == 0) {
 				// create
@@ -75,7 +75,7 @@ public class HandoverSKUAPI {
 					newHandoverSKU.setLasttimeupdate(date);
 					handoverSkuService.save(newHandoverSKU);
 				}
-				list = handoverSkuService.getByHandoverId(entity.handoverid_link);
+				list = handoverSkuService.getByHandoverId(entity.handoverid_link, entity.productid_link);
 			}
 			
 			response.data = list;
@@ -111,8 +111,19 @@ public class HandoverSKUAPI {
 					totalpackagecheck+=h.getTotalpackagecheck();
 			}
 			HandoverProduct handoverProduct = handoverProductService.findOne(handoverSku.getHandoverproductid_link());
-			handoverProduct.setTotalpackage(totalpackage);
-			handoverProduct.setTotalpackagecheck(totalpackagecheck);
+			
+			List<HandoverSKU> list2 = handoverSkuService.getByHandoverIdAndProductId(handoverSku.getHandoverid_link(), handoverProduct.getId());
+			Integer productTotal = 0;
+			Integer productTotalCheck = 0;
+			for(HandoverSKU sku : list2) {
+				if(sku.getTotalpackage() != null)
+					productTotal+=sku.getTotalpackage();
+				if(sku.getTotalpackagecheck() != null)
+					productTotalCheck+=sku.getTotalpackagecheck();
+			}
+			
+			handoverProduct.setTotalpackage(productTotal);
+			handoverProduct.setTotalpackagecheck(productTotalCheck);
 			handoverProduct.setLasttimeupdate(date);
 			handoverProduct.setLastuserupdateid_link(user.getId());
 			handoverProductService.save(handoverProduct);

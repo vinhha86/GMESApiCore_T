@@ -157,4 +157,57 @@ public class HandoverProductAPI {
 		    return new ResponseEntity<HandoverProduct_GetByPorderId_response>(response,HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/getNewHandoverProductByProductId",method = RequestMethod.POST)
+	public ResponseEntity<HandoverProduct_GetByPorderId_response> getNewHandoverProductByProductId(@RequestBody HandoverProduct_GetByPorderId_request entity,HttpServletRequest request ) {
+		HandoverProduct_GetByPorderId_response response = new HandoverProduct_GetByPorderId_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Product product = productService.findOne(entity.productid_link);
+			Unit unit = unitService.findOne(2);
+//			Date date = new Date();
+
+			HandoverProduct handoverProduct = new HandoverProduct();
+			handoverProduct.setId(0L);
+			handoverProduct.setOrgrootid_link(user.getRootorgid_link());
+//			handoverProduct.setHandoverid_link(handover.getId());
+			handoverProduct.setProductid_link(entity.productid_link);
+			handoverProduct.setUnitid_link(2L);
+//			handoverProduct.setUsercreateid_link(user.getId());
+//			handoverProduct.setTimecreate(date);
+//			handoverProduct.setLasttimeupdate(date);
+//			handoverProduct.setLastuserupdateid_link(user.getId());
+			handoverProduct.setTotalpackage(entity.product_quantity);
+
+			response.data = handoverProduct;
+			response.buyername = product.getBuyername();
+			response.buyercode = product.getBuyercode();
+			response.unitName = unit.getName();
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<HandoverProduct_GetByPorderId_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<HandoverProduct_GetByPorderId_response>(response,HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/create",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> create(@RequestBody HandoverProduct_update_request entity,HttpServletRequest request ) {
+		ResponseBase response = new ResponseBase();
+		try {
+			HandoverProduct hp = entity.data;
+			handoverProductService.save(hp);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}
+	}
 }

@@ -59,4 +59,10 @@ public class SKU_Service extends AbstractService<SKU> implements ISKU_Service {
 		} else
 			return repo.getSKU_ByType(producttypeid_link);
 	}
+
+	@Override
+	public List<SKU> getProductSKU_ByCode(Integer skutypeid_link, String code) {
+		// TODO Auto-generated method stub
+		return repo.getProductSKU_ByCode(skutypeid_link, code);
+	}
 }

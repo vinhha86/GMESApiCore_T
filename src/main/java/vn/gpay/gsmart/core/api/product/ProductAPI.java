@@ -1195,4 +1195,29 @@ public class ProductAPI {
 				return new ResponseEntity<getlistproduct_bypairingid_response>(response, HttpStatus.BAD_REQUEST);
 			}
 		}
+		
+		@RequestMapping(value = "/getProductByExactBuyercode", method = RequestMethod.POST)
+		public ResponseEntity<Product_getOne_Response> getProductByExactBuyercode(HttpServletRequest request,
+				@RequestBody Product_getProductByBuyercode_request entity) {
+			Product_getOne_Response response = new Product_getOne_Response();
+			try {
+				
+				List<Product> list = productService.getProductByExactBuyercode(entity.buyercode);
+				if(list.size() > 0) {
+					response.data = list.get(0);
+				}else {
+					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+					response.setMessage("Mã SP(buyer) không tồn tại");
+					return new ResponseEntity<Product_getOne_Response>(response, HttpStatus.OK);
+				}
+				
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<Product_getOne_Response>(response, HttpStatus.OK);
+			} catch (Exception e) {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage(e.getMessage());
+				return new ResponseEntity<Product_getOne_Response>(response, HttpStatus.OK);
+			}
+		}
 }

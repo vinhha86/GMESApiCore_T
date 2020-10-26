@@ -26,6 +26,7 @@ import vn.gpay.gsmart.core.handover_product.IHandoverProductService;
 import vn.gpay.gsmart.core.handover_sku.HandoverSKU;
 import vn.gpay.gsmart.core.handover_sku.IHandoverSKUService;
 import vn.gpay.gsmart.core.org.IOrgService;
+import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -62,14 +63,16 @@ public class HandoverAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Handover handover = entity.data;
-			HandoverProduct handoverProduct = entity.handoverProduct;
+//			HandoverProduct handoverProduct = entity.handoverProduct;
+			List<HandoverProduct> handoverProducts = handover.getHandoverProducts(); //
 			Long type = handover.getHandovertypeid_link();
 			
 			if(handover.getId()==null || handover.getId()==0) {
 				// new
 				if(handover.getHandover_code() == null || handover.getHandover_code().length() == 0) {
-					POrder porder = porderService.findOne(handover.getPorderid_link());
-					if(porder != null) {
+//					POrder porder = porderService.findOne(handover.getPorderid_link());
+					if(handover.getPorderid_link() != null) {
+						POrder porder = porderService.findOne(handover.getPorderid_link());
 						// Xuất từ cắt lên chuyền : CL
 						if(type.equals(1L)) {
 							handover.setHandover_code(handoverAutoIdService.getLastID("CL_" + porder.getOrdercode()));
@@ -89,7 +92,7 @@ public class HandoverAPI {
 					}else {
 						// Xuất từ hoàn thiện lên kho TP : PS
 						if(type.equals(9L)) {
-							handover.setHandover_code(handoverAutoIdService.getLastID("PS_" + porder.getOrdercode()));
+							handover.setHandover_code(handoverAutoIdService.getLastID("PS"));
 						}else {
 							handover.setHandover_code(handoverAutoIdService.getLastID("UNKNOWN"));
 						}
@@ -111,35 +114,94 @@ public class HandoverAPI {
 				handover.setTimecreate(date);
 				handover.setLastuserupdateid_link(user.getId());
 				handover.setLasttimeupdate(date);
-				handover.setTotalpackage(handoverProduct.getTotalpackage());
+//				handover.setTotalpackage(handoverProduct.getTotalpackage());
 				handover = handoverService.save(handover);
 				
-				handoverProduct.setHandoverid_link(handover.getId());
-				handoverProduct.setUsercreateid_link(user.getId());
-				handoverProduct.setLastuserupdateid_link(user.getId());
-				handoverProduct.setTimecreate(date);
-				handoverProduct.setLasttimeupdate(date);
-				handoverProductService.save(handoverProduct);
+				// products
+				for(HandoverProduct handoverProduct : handoverProducts) {
+					List<HandoverSKU> handoverSKUs = handoverProduct.getHandoverSKUs();
+					
+					handoverProduct.setOrgrootid_link(user.getRootorgid_link());
+					handoverProduct.setHandoverid_link(handover.getId());
+					handoverProduct.setUsercreateid_link(user.getId());
+					handoverProduct.setLastuserupdateid_link(user.getId());
+					handoverProduct.setTimecreate(date);
+					handoverProduct.setLasttimeupdate(date);
+					handoverProduct = handoverProductService.save(handoverProduct);
+					
+					// skus
+					for(HandoverSKU handoverSKU : handoverSKUs) {
+						handoverSKU.setOrgrootid_link(user.getRootorgid_link());
+						handoverSKU.setHandoverid_link(handover.getId());
+						handoverSKU.setHandoverproductid_link(handoverProduct.getId());
+						handoverSKU.setUsercreateid_link(user.getId());
+						handoverSKU.setLastuserupdateid_link(user.getId());
+						handoverSKU.setTimecreate(date);
+						handoverSKU.setLasttimeupdate(date);
+						handoverSkuService.save(handoverSKU);
+					}
+				}
 			}else {
 				// update
 				Date date = new Date();
-				Handover _handover =  handoverService.findOne(handover.getId());
-				handover.setOrgrootid_link(_handover.getOrgrootid_link());
-				handover.setUsercreateid_link(_handover.getUsercreateid_link());
-				handover.setTimecreate(_handover.getTimecreate());
-				handover.setLastuserupdateid_link(user.getId());
-				handover.setLasttimeupdate(date);
-				// nếu porder thay đổi
-				if(!handover.getPorderid_link().equals(_handover.getPorderid_link())) {
-					// Xoá HandoverProduct
-					List<HandoverProduct> handoverProducts = handoverProductService.getByHandoverId(handover.getId());
-					for(HandoverProduct product : handoverProducts) {
-						handoverProductService.deleteById(product.getId());
+				
+				if(handover.getHandovertypeid_link().equals(9L)) { // nếu type là pack to stock
+					// chia điều kiện vì pack to stock không có porderid_link
+					handover.setOrgrootid_link(user.getRootorgid_link());
+					handover.setUsercreateid_link(user.getId());
+					handover.setTimecreate(date);
+					handover.setLastuserupdateid_link(user.getId());
+					handover.setLasttimeupdate(date);
+//					handover.setTotalpackage(handoverProduct.getTotalpackage());
+					handover = handoverService.save(handover);
+					
+					for(HandoverProduct handoverProduct : handoverProducts) {
+						List<HandoverSKU> handoverSKUs = handoverProduct.getHandoverSKUs();
+						if(handoverProduct.getId() == null || handoverProduct.getId() == 0) {
+							handoverProduct.setOrgrootid_link(user.getRootorgid_link());
+							handoverProduct.setHandoverid_link(handover.getId());
+							handoverProduct.setUsercreateid_link(user.getId());
+							handoverProduct.setTimecreate(date);
+						}else {
+							handoverProduct.setLastuserupdateid_link(user.getId());
+							handoverProduct.setLasttimeupdate(date);
+						}
+						handoverProduct = handoverProductService.save(handoverProduct);
+						
+						// skus
+						for(HandoverSKU handoverSKU : handoverSKUs) {
+							if(handoverSKU.getId() == null || handoverSKU.getId() == 0) {
+								handoverSKU.setOrgrootid_link(user.getRootorgid_link());
+								handoverSKU.setHandoverid_link(handover.getId());
+								handoverSKU.setHandoverproductid_link(handoverProduct.getId());
+								handoverSKU.setUsercreateid_link(user.getId());
+								handoverSKU.setTimecreate(date);
+							}else {
+								handoverSKU.setLastuserupdateid_link(user.getId());
+								handoverSKU.setLasttimeupdate(date);
+							}
+							handoverSkuService.save(handoverSKU);
+						}
 					}
-					// Xoá HandoverSKU
-					List<HandoverSKU> handoverSKUs = handoverSkuService.getByHandoverId(handover.getId());
-					for(HandoverSKU handoverSKU : handoverSKUs) {
-						handoverSkuService.deleteById(handoverSKU.getId());
+				}else { // type còn lại
+					Handover _handover =  handoverService.findOne(handover.getId());
+					handover.setOrgrootid_link(_handover.getOrgrootid_link());
+					handover.setUsercreateid_link(_handover.getUsercreateid_link());
+					handover.setTimecreate(_handover.getTimecreate());
+					handover.setLastuserupdateid_link(user.getId());
+					handover.setLasttimeupdate(date);
+					// nếu porder thay đổi
+					if(!handover.getPorderid_link().equals(_handover.getPorderid_link())) {
+						// Xoá HandoverProduct
+						List<HandoverProduct> listHandoverProducts = handoverProductService.getByHandoverId(handover.getId());
+						for(HandoverProduct product : listHandoverProducts) {
+							handoverProductService.deleteById(product.getId());
+						}
+						// Xoá HandoverSKU
+						List<HandoverSKU> handoverSKUs = handoverSkuService.getByHandoverId(handover.getId());
+						for(HandoverSKU handoverSKU : handoverSKUs) {
+							handoverSkuService.deleteById(handoverSKU.getId());
+						}
 					}
 				}
 				handover = handoverService.save(handover);
@@ -234,9 +296,9 @@ public class HandoverAPI {
 	public ResponseEntity<Handover_getall_response> Getbysearch(@RequestBody Handover_getbysearch_request entity,HttpServletRequest request ) {
 		Handover_getall_response response = new Handover_getall_response();
 		try {
-//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//			Long orgid_link = user.getOrgid_link();
-//			Org org = orgService.findOne(orgid_link);
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long org_grant_id_link = user.getOrg_grant_id_link();
+//			Org org = orgService.findOne(org_grant_id_link);
 			//
 			Long handovertypeid_link = entity.handovertypeid_link;
 			Date handover_datefrom = entity.handover_datefrom;

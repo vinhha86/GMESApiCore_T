@@ -6,5 +6,5 @@ import vn.gpay.gsmart.core.handover_product.HandoverProduct;
 
 public class Handover_create_request extends RequestBase{
 	public Handover data;
-	public HandoverProduct handoverProduct;
+//	public HandoverProduct handoverProduct;
 }

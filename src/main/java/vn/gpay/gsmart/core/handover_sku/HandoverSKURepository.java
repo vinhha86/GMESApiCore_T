@@ -12,6 +12,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 public interface HandoverSKURepository extends JpaRepository<HandoverSKU, Long>,JpaSpecificationExecutor<HandoverSKU>{
+	@Query(value = "select c from HandoverSKU c where c.handoverid_link = :handoverid_link "
+			+ "and c.productid_link = :productid_link ")
+	public List<HandoverSKU> getByHandoverId(@Param ("handoverid_link")final Long handoverid_link, @Param ("productid_link")final Long productid_link);
+	
 	@Query(value = "select c from HandoverSKU c where c.handoverid_link = :handoverid_link ")
 	public List<HandoverSKU> getByHandoverId(@Param ("handoverid_link")final Long handoverid_link);
+	
+	@Query(value = "select c from HandoverSKU c where c.handoverid_link = :handoverid_link "
+			+ "and c.handoverproductid_link = :handoverproductid_link ")
+	public List<HandoverSKU> getByHandoverIdAndProductId(@Param ("handoverid_link")final Long handoverid_link, @Param ("handoverproductid_link")final Long handoverproductid_link);
 }

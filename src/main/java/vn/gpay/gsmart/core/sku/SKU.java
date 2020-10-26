@@ -239,6 +239,15 @@ public class SKU implements Serializable {
 	}
 	
 	@Transient
+	public String getProduct_name() {
+		if(product!=null) {
+//			if(product.getBuyername() != null)
+				return product.getBuyername();
+		}
+		return "";
+	}
+	
+	@Transient
 	public Integer getProducttypeid_link() {
 		if(product != null) {
 			return product.getProducttypeid_link();

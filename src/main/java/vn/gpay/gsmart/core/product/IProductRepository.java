@@ -62,5 +62,8 @@ public interface IProductRepository extends JpaRepository<Product, Long>, JpaSpe
 	
 //	@Query(value = "select c from Product c")
 //	public List<Product> findAllIgnoreCase(@Nullable Specification<Product> spec);
+	
+	@Query(value = "select c from Product c where c.buyercode = :buyercode")
+	public List<Product> getProductByExactBuyercode(@Param ("buyercode")final  String buyercode);
 
 }

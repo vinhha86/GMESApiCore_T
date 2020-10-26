@@ -20,9 +20,21 @@ public class HandoverSKUService extends AbstractService<HandoverSKU> implements 
 	}
 
 	@Override
+	public List<HandoverSKU> getByHandoverId(Long handoverid_link, Long productid_link) {
+		// TODO Auto-generated method stub
+		return repo.getByHandoverId(handoverid_link, productid_link);
+	}
+	
+	@Override
 	public List<HandoverSKU> getByHandoverId(Long handoverid_link) {
 		// TODO Auto-generated method stub
 		return repo.getByHandoverId(handoverid_link);
+	}
+
+	@Override
+	public List<HandoverSKU> getByHandoverIdAndProductId(Long handoverid_link, Long handoverproductid_link) {
+		// TODO Auto-generated method stub
+		return repo.getByHandoverIdAndProductId(handoverid_link, handoverproductid_link);
 	}
 
 }

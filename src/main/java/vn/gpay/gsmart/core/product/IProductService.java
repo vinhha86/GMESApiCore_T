@@ -26,4 +26,5 @@ public interface IProductService extends Operations<Product> {
 	public List<ProductTree> createTree(final List<PContractProductBinding> nodes, Long pcontractid_link);
 	public List<Product> getby_pairid(long productpairid_link);
 	Page<Product> getall_sewingthread(Long orgrootid_link, Product_getall_request request);
+	public List<Product> getProductByExactBuyercode(String buyercode);
 }
