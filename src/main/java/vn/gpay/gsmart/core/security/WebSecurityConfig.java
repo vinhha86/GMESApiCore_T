@@ -40,6 +40,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         
     	http.authorizeRequests()
         .antMatchers("/api/v1/test/**").permitAll()
+        .antMatchers("/api/v1/timesheet/**").permitAll()
         .anyRequest().authenticated()
         .and()
     	.exceptionHandling().accessDeniedHandler(new AccessDeniedExceptionHandler());
@@ -60,6 +61,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers("/swagger-ui.html")//
         .antMatchers("/configuration/**")//
         .antMatchers("/webjars/**")//
+//        .antMatchers("/timesheet/**")//
         .antMatchers("/public");
 
     }
