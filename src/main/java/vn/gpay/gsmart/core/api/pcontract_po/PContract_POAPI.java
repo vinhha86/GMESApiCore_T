@@ -114,6 +114,7 @@ public class PContract_POAPI {
 	@Autowired ISizeSetService sizesetService;
 	@Autowired IPContract_PO_Productivity_Service productivityService;
 	@Autowired IPOrderProcessing_Service processService;
+	@Autowired IPContract_Price_DService pricedetailService;
 
 	@RequestMapping(value = "/upload_template", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadTemplate(HttpServletRequest request,
@@ -367,7 +368,7 @@ public class PContract_POAPI {
 							po_new.setDate_importdata(current_time);
 
 							po_new = pcontract_POService.save(po_new);
-
+							pcontractpo_id_link = po_new.getId();
 							// Them co All vao chao gia
 
 							// Them cho san pham con
@@ -384,7 +385,22 @@ public class PContract_POAPI {
 							price_all.setQuantity(product_quantity);
 							price_all.setSizesetid_link(sizesetService.getbyname("ALL"));
 							price_all.setDate_importdata(current_time);
-							priceService.save(price_all);
+							price_all = priceService.save(price_all);
+							
+							//Them detail cho dai co All
+							PContract_Price_D price_detail_all = new PContract_Price_D();
+							price_detail_all.setOrgrootid_link(orgrootid_link);
+							price_detail_all.setFobpriceid_link((long)1);
+							price_detail_all.setPrice(price_cmp);
+							price_detail_all.setIsfob(false);
+							price_detail_all.setDatecreated(current_time);
+							price_detail_all.setId(null);
+							price_detail_all.setSizesetid_link((long)1);
+							price_detail_all.setPcontract_poid_link(pcontractpo_id_link);
+							price_detail_all.setPcontractid_link(pcontractid_link);
+							price_detail_all.setPcontractpriceid_link(price_all.getId());
+							price_detail_all.setProductid_link(productid_link);
+							pricedetailService.save(price_detail_all);
 
 							for (int i = ColumnTemplate.infant; i <= ColumnTemplate.plus; i++) {
 								Row row_header = sheet.getRow(0);
@@ -403,7 +419,22 @@ public class PContract_POAPI {
 									price.setSizesetid_link(sizesetid_link == null ? 0 : sizesetid_link);
 									price.setDate_importdata(current_time);
 									price.setPrice_cmp(price_cmp);
-									priceService.save(price);
+									price = priceService.save(price);
+									
+									//Them detail cho dai co 
+									PContract_Price_D price_detail_sizeset = new PContract_Price_D();
+									price_detail_sizeset.setOrgrootid_link(orgrootid_link);
+									price_detail_sizeset.setFobpriceid_link((long)1);
+									price_detail_sizeset.setPrice(price_cmp);
+									price_detail_sizeset.setIsfob(false);
+									price_detail_sizeset.setDatecreated(current_time);
+									price_detail_sizeset.setId(null);
+									price_detail_sizeset.setSizesetid_link((long)1);
+									price_detail_sizeset.setPcontract_poid_link(pcontractpo_id_link);
+									price_detail_sizeset.setPcontractid_link(pcontractid_link);
+									price_detail_sizeset.setPcontractpriceid_link(price.getId());
+									price_detail_sizeset.setProductid_link(productid_link);
+									pricedetailService.save(price_detail_sizeset);
 								}
 							}
 
@@ -422,7 +453,22 @@ public class PContract_POAPI {
 								price_all_set.setQuantity(po_quantity);
 								price_all_set.setSizesetid_link(sizesetService.getbyname("ALL"));
 								price_all_set.setDate_importdata(current_time);
-								priceService.save(price_all_set);
+								price_all_set = priceService.save(price_all_set);
+								
+								//Them detai price cho dai co All
+								PContract_Price_D price_detail = new PContract_Price_D();
+								price_detail.setOrgrootid_link(orgrootid_link);
+								price_detail.setFobpriceid_link((long)1);
+								price_detail.setPrice(price_cmp);
+								price_detail.setIsfob(false);
+								price_detail.setDatecreated(current_time);
+								price_detail.setId(null);
+								price_detail.setSizesetid_link((long)1);
+								price_detail.setPcontract_poid_link(pcontractpo_id_link);
+								price_detail.setPcontractid_link(pcontractid_link);
+								price_detail.setPcontractpriceid_link(price_all_set.getId());
+								price_detail.setProductid_link(product_set_id_link);
+								pricedetailService.save(price_detail);
 
 								//
 								for (int i = ColumnTemplate.infant; i <= ColumnTemplate.plus; i++) {
@@ -442,7 +488,21 @@ public class PContract_POAPI {
 										price.setSizesetid_link(sizesetid_link == null ? 0 : sizesetid_link);
 										price.setDate_importdata(current_time);
 										price.setPrice_cmp(price_cmp);
-										priceService.save(price);
+										price = priceService.save(price);
+										
+										//Them detail
+										PContract_Price_D price_sizeset = new PContract_Price_D();
+										price_sizeset.setOrgrootid_link(orgrootid_link);
+										price_sizeset.setFobpriceid_link((long)1);
+										price_sizeset.setPrice(price_cmp);
+										price_sizeset.setIsfob(false);
+										price_sizeset.setId(null);
+										price_sizeset.setSizesetid_link(sizesetid_link == null ? 0 : sizesetid_link);
+										price_sizeset.setPcontract_poid_link(pcontractpo_id_link);
+										price_sizeset.setPcontractid_link(pcontractid_link);
+										price_sizeset.setPcontractpriceid_link(price.getId());
+										price_sizeset.setProductid_link(product_set_id_link);
+										pricedetailService.save(price_sizeset);
 									}
 								}
 							}
@@ -469,7 +529,21 @@ public class PContract_POAPI {
 									price_all_set.setQuantity(product_quantity);
 									price_all_set.setSizesetid_link(sizesetService.getbyname("ALL"));
 									price_all_set.setDate_importdata(current_time);
-									priceService.save(price_all_set);
+									price_all_set = priceService.save(price_all_set);
+									
+									//Them detail
+									PContract_Price_D price_detail = new PContract_Price_D();
+									price_detail.setOrgrootid_link(orgrootid_link);
+									price_detail.setFobpriceid_link((long)1);
+									price_detail.setPrice(price_cmp);
+									price_detail.setIsfob(false);
+									price_detail.setId(null);
+									price_detail.setSizesetid_link(sizesetService.getbyname("ALL"));
+									price_detail.setPcontract_poid_link(pcontractpo_id_link);
+									price_detail.setPcontractid_link(pcontractid_link);
+									price_detail.setPcontractpriceid_link(price_all_set.getId());
+									price_all_set.setProductid_link(productid_link);
+									pricedetailService.save(price_detail);
 								}
 								
 
@@ -493,7 +567,21 @@ public class PContract_POAPI {
 											price.setSizesetid_link(sizesetid_link);
 											price.setDate_importdata(current_time);
 											price.setPrice_cmp(price_cmp);
-											priceService.save(price);
+											price = priceService.save(price);
+											
+											//Them detail
+											PContract_Price_D price_detail = new PContract_Price_D();
+											price_detail.setOrgrootid_link(orgrootid_link);
+											price_detail.setFobpriceid_link((long)1);
+											price_detail.setPrice(price_cmp);
+											price_detail.setIsfob(false);
+											price_detail.setId(null);
+											price_detail.setSizesetid_link(sizesetid_link);
+											price_detail.setPcontract_poid_link(pcontractpo_id_link);
+											price_detail.setPcontractid_link(pcontractid_link);
+											price_detail.setPcontractpriceid_link(price.getId());
+											price_detail.setProductid_link(productid_link);
+											pricedetailService.save(price_detail);
 											
 											PContract_Price price_set = new PContract_Price();
 											price.setId(null);
@@ -506,7 +594,21 @@ public class PContract_POAPI {
 											price.setDate_importdata(current_time);
 											price.setProductid_link(product_set_id_link);
 											price.setPrice_cmp(price_cmp);
-											priceService.save(price_set);
+											price_set = priceService.save(price_set);
+											
+											//Them detail
+											PContract_Price_D price_detail_set = new PContract_Price_D();
+											price_detail_set.setOrgrootid_link(orgrootid_link);
+											price_detail_set.setFobpriceid_link((long)1);
+											price_detail_set.setPrice(price_cmp);
+											price_detail_set.setIsfob(false);
+											price_detail_set.setId(null);
+											price_detail_set.setSizesetid_link(sizesetid_link);
+											price_detail_set.setPcontract_poid_link(pcontractpo_id_link);
+											price_detail_set.setPcontractid_link(pcontractid_link);
+											price_detail_set.setPcontractpriceid_link(price_set.getId());
+											price_detail_set.setProductid_link(productid_link);
+											pricedetailService.save(price_detail_set);
 										}
 										else {
 											List<PContract_Price> list_price_old = new ArrayList<PContract_Price>(list_price);
@@ -523,7 +625,22 @@ public class PContract_POAPI {
 												price.setSizesetid_link(sizesetid_link);
 												price.setDate_importdata(current_time);
 												price.setPrice_cmp(price_cmp);
-												priceService.save(price);
+												price = priceService.save(price);
+												
+												//Them detail
+												PContract_Price_D price_detail = new PContract_Price_D();
+												price_detail.setOrgrootid_link(orgrootid_link);
+												price_detail.setFobpriceid_link((long)1);
+												price_detail.setPrice(price_cmp);
+												price_detail.setIsfob(false);
+												price_detail.setId(null);
+												price_detail.setSizesetid_link(sizesetid_link);
+												price_detail.setPcontract_poid_link(pcontractpo_id_link);
+												price_detail.setPcontractid_link(pcontractid_link);
+												price_detail.setPcontractpriceid_link(price.getId());
+												price_detail.setProductid_link(productid_link);
+												pricedetailService.save(price_detail);
+												
 												
 												PContract_Price price_set = new PContract_Price();
 												price_set.setId(null);
@@ -536,7 +653,22 @@ public class PContract_POAPI {
 												price_set.setSizesetid_link(sizesetid_link);
 												price_set.setDate_importdata(current_time);
 												price_set.setPrice_cmp(price_cmp);
-												priceService.save(price_set);
+												price_set = priceService.save(price_set);
+												
+												//Them detail
+												PContract_Price_D price_detail_set = new PContract_Price_D();
+												price_detail_set.setOrgrootid_link(orgrootid_link);
+												price_detail_set.setFobpriceid_link((long)1);
+												price_detail_set.setPrice(price_cmp);
+												price_detail_set.setIsfob(false);
+												price_detail_set.setId(null);
+												price_detail_set.setSizesetid_link(sizesetid_link);
+												price_detail_set.setPcontract_poid_link(pcontractpo_id_link);
+												price_detail_set.setPcontractid_link(pcontractid_link);
+												price_detail_set.setPcontractpriceid_link(price_set.getId());
+												price_detail_set.setProductid_link(productid_link);
+												pricedetailService.save(price_detail_set);
+												
 											}
 										}
 									}
