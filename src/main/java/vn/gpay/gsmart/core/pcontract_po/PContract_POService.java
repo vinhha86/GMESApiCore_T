@@ -106,6 +106,8 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 			long pcontractid_link, float vendor_targer) {
 		
 		List<PContract_PO> list_po = repo.getone_by_template(PO_No, shipmodeid_link, productid_link, ShipDate, pcontractid_link);
+		List<PContract_PO> list_remove = new ArrayList<PContract_PO>();
+		
 		for (PContract_PO pContract_PO : list_po) {
 			List<PContract_Price> list_price = pContract_PO.getPcontract_price();
 			boolean check = false;
@@ -117,8 +119,12 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 			}
 			
 			if(!check) {
-				list_po.remove(pContract_PO);
+				list_remove.add(pContract_PO);
 			}
+		}
+		
+		for (PContract_PO pContract_PO : list_remove) {
+			list_po.remove(pContract_PO);
 		}
 		
 		return list_po;
