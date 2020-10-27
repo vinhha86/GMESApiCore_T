@@ -402,6 +402,7 @@ public class PContract_POAPI {
 									price.setProductid_link(productid_link);
 									price.setSizesetid_link(sizesetid_link == null ? 0 : sizesetid_link);
 									price.setDate_importdata(current_time);
+									price.setPrice_cmp(price_cmp);
 									priceService.save(price);
 								}
 							}
@@ -440,6 +441,7 @@ public class PContract_POAPI {
 										price.setProductid_link(product_set_id_link);
 										price.setSizesetid_link(sizesetid_link == null ? 0 : sizesetid_link);
 										price.setDate_importdata(current_time);
+										price.setPrice_cmp(price_cmp);
 										priceService.save(price);
 									}
 								}
@@ -490,6 +492,7 @@ public class PContract_POAPI {
 											price.setProductid_link(productid_link);
 											price.setSizesetid_link(sizesetid_link);
 											price.setDate_importdata(current_time);
+											price.setPrice_cmp(price_cmp);
 											priceService.save(price);
 											
 											PContract_Price price_set = new PContract_Price();
@@ -502,6 +505,7 @@ public class PContract_POAPI {
 											price.setSizesetid_link(sizesetid_link);
 											price.setDate_importdata(current_time);
 											price.setProductid_link(product_set_id_link);
+											price.setPrice_cmp(price_cmp);
 											priceService.save(price_set);
 										}
 										else {
@@ -518,6 +522,7 @@ public class PContract_POAPI {
 												price.setProductid_link(productid_link);
 												price.setSizesetid_link(sizesetid_link);
 												price.setDate_importdata(current_time);
+												price.setPrice_cmp(price_cmp);
 												priceService.save(price);
 												
 												PContract_Price price_set = new PContract_Price();
@@ -530,6 +535,7 @@ public class PContract_POAPI {
 												price_set.setProductid_link(product_set_id_link);
 												price_set.setSizesetid_link(sizesetid_link);
 												price_set.setDate_importdata(current_time);
+												price_set.setPrice_cmp(price_cmp);
 												priceService.save(price_set);
 											}
 										}
@@ -559,6 +565,7 @@ public class PContract_POAPI {
 										price.setProductid_link(productid_link);
 										price.setQuantity(amount_sizeset);
 										price.setSizesetid_link(sizesetid_link);
+										price.setPrice_cmp(price_cmp);
 										priceService.save(price);
 									}
 								}
