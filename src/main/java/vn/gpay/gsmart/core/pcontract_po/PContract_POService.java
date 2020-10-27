@@ -112,6 +112,7 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 			List<PContract_Price> list_price = pContract_PO.getPcontract_price();
 			boolean check = false;
 			for (PContract_Price price : list_price) {
+				if(price.getSizesetid_link() != 1) continue;
 				if(price.getPrice_vendortarget().equals(vendor_targer)) {
 					check = true;
 					break;

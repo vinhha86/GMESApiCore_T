@@ -730,6 +730,7 @@ public class ScheduleAPI {
 			sch.setProductivity_po(porder.getProductivity_po());
 			sch.setProductivity_porder(0);
 			sch.setPcontract_poid_link(porder.getPcontract_poid_link());
+			sch.setPcontractid_link(porder.getPcontractid_link());
 			
 			response.data = sch;
 			

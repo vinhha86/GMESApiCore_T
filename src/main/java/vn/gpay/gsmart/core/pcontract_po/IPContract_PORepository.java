@@ -95,6 +95,7 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			+ "and d.productid_link = :productid_link "
 			+ "and (c.shipdate = :shipdate) "
 			+ "and c.pcontractid_link = :pcontractid_link "
+			+ "and d.sizesetid_link = 1"
 			)
 	public List<PContract_PO> getone_by_template(
 			@Param ("po_buyer")final  String po_buyer,

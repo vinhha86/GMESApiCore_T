@@ -451,7 +451,7 @@ public class PContract_POAPI {
 						// truong hop hang bo po da co roi
 						else {
 							//  neu la hang bo thi them khong thi thoi trung coi nhu bo qua khong xu ly
-							if (product_set_id_link > 0) {
+							if (product_set_id_link > 0) 	{
 								//Kiem tra dai co san pham con da co hay chua
 								List<PContract_Price> list_price = priceService.getPrice_by_product(pcontractpo_id_link, productid_link);
 								// them dai co vao san pham con
