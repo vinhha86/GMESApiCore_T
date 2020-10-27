@@ -47,7 +47,8 @@ public interface ISKU_Repository extends JpaRepository<SKU, Long>, JpaSpecificat
 	@Query(value = "select a from SKU a inner join Product b "
 			+ "on b.id = a.productid_link "
 			+ "where a.skutypeid_link = :skutypeid_link "
-			+ "and lower(a.barcode) like lower(concat('%',:barcode,'%')) "
+//			+ "and lower(a.barcode) like lower(concat('%',:barcode,'%')) "
+			+ "and a.barcode=:barcode "
 			)
 	public List<SKU> getProductSKU_ByBarCode(
 			@Param ("skutypeid_link")final Integer skutypeid_link,
