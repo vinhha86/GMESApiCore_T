@@ -109,6 +109,8 @@ public class HandoverAPI {
 				}
 				
 				Date date = new Date();
+				Integer total = 0;
+				Integer totalCheck = 0;
 				handover.setOrgrootid_link(user.getRootorgid_link());
 				handover.setUsercreateid_link(user.getId());
 				handover.setTimecreate(date);
@@ -129,6 +131,11 @@ public class HandoverAPI {
 					handoverProduct.setLasttimeupdate(date);
 					handoverProduct = handoverProductService.save(handoverProduct);
 					
+					if(handoverProduct.getTotalpackage() != null)
+						total+=handoverProduct.getTotalpackage();
+					if(handoverProduct.getTotalpackagecheck() != null)
+						totalCheck+=handoverProduct.getTotalpackagecheck();
+					
 					// skus
 					for(HandoverSKU handoverSKU : handoverSKUs) {
 						handoverSKU.setOrgrootid_link(user.getRootorgid_link());
@@ -141,9 +148,14 @@ public class HandoverAPI {
 						handoverSkuService.save(handoverSKU);
 					}
 				}
+				handover.setTotalpackage(total);
+				handover.setTotalpackagecheck(totalCheck);
+				handover = handoverService.save(handover);
 			}else {
 				// update
 				Date date = new Date();
+				Integer total = 0;
+				Integer totalCheck = 0;
 				
 				if(handover.getHandovertypeid_link().equals(9L)) { // nếu type là pack to stock
 					// chia điều kiện vì pack to stock không có porderid_link
@@ -168,6 +180,11 @@ public class HandoverAPI {
 						}
 						handoverProduct = handoverProductService.save(handoverProduct);
 						
+						if(handoverProduct.getTotalpackage() != null)
+							total+=handoverProduct.getTotalpackage();
+						if(handoverProduct.getTotalpackagecheck() != null)
+							totalCheck+=handoverProduct.getTotalpackagecheck();
+						
 						// skus
 						for(HandoverSKU handoverSKU : handoverSKUs) {
 							if(handoverSKU.getId() == null || handoverSKU.getId() == 0) {
@@ -183,6 +200,9 @@ public class HandoverAPI {
 							handoverSkuService.save(handoverSKU);
 						}
 					}
+					handover.setTotalpackage(total);
+					handover.setTotalpackagecheck(totalCheck);
+					handover = handoverService.save(handover);
 				}else { // type còn lại
 					Handover _handover =  handoverService.findOne(handover.getId());
 					handover.setOrgrootid_link(_handover.getOrgrootid_link());

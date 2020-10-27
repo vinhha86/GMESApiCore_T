@@ -97,7 +97,6 @@ public class HandoverProductAPI {
 		ResponseBase response = new ResponseBase();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			Handover handover = handoverService.findOne(entity.data.getHandoverid_link());
 			
 			Date date = new Date();
 			HandoverProduct handoverProduct = entity.data;
@@ -105,8 +104,20 @@ public class HandoverProductAPI {
 			handoverProduct.setLastuserupdateid_link(user.getId());
 			handoverProductService.save(handoverProduct);
 			
-			handover.setTotalpackage(handoverProduct.getTotalpackage());
-			handover.setTotalpackagecheck(handoverProduct.getTotalpackagecheck());
+			Handover handover = handoverService.findOne(entity.data.getHandoverid_link());
+			
+			List<HandoverProduct> handoverProducts = handover.getHandoverProducts();
+			Integer total = 0;
+			Integer totalCheck = 0;
+			for(HandoverProduct hp : handoverProducts) {
+				if(hp.getTotalpackage() != null)
+					total += hp.getTotalpackage();
+				if(hp.getTotalpackagecheck() != null)
+					totalCheck += hp.getTotalpackagecheck();
+			}
+			
+			handover.setTotalpackage(total);
+			handover.setTotalpackagecheck(totalCheck);
 			handover.setLasttimeupdate(date);
 			handover.setLastuserupdateid_link(user.getId());
 			handoverService.save(handover);

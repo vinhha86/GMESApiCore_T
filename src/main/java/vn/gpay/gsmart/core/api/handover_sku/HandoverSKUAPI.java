@@ -98,44 +98,44 @@ public class HandoverSKUAPI {
 			HandoverSKU handoverSku = entity.data;
 			handoverSku.setLasttimeupdate(date);
 			handoverSku.setLastuserupdateid_link(user.getId());
-			handoverSkuService.save(handoverSku);
+			handoverSku = handoverSkuService.save(handoverSku);
 			
 			// update handoverProduct totalpackage
-			Integer totalpackage = 0;
-			Integer totalpackagecheck = 0;
-			List<HandoverSKU> list = handoverSkuService.getByHandoverId(handoverSku.getHandoverid_link());
-			for(HandoverSKU h : list) {
-				if(h.getTotalpackage() != null)
-					totalpackage+=h.getTotalpackage();
-				if(h.getTotalpackagecheck() != null)
-					totalpackagecheck+=h.getTotalpackagecheck();
-			}
 			HandoverProduct handoverProduct = handoverProductService.findOne(handoverSku.getHandoverproductid_link());
+			List<HandoverSKU> skus = handoverProduct.getHandoverSKUs();
+			Integer total = 0;
+			Integer totalCheck = 0;
 			
-			List<HandoverSKU> list2 = handoverSkuService.getByHandoverIdAndProductId(handoverSku.getHandoverid_link(), handoverProduct.getId());
-			Integer productTotal = 0;
-			Integer productTotalCheck = 0;
-			for(HandoverSKU sku : list2) {
+			for(HandoverSKU sku : skus) {
 				if(sku.getTotalpackage() != null)
-					productTotal+=sku.getTotalpackage();
+					total += sku.getTotalpackage();
 				if(sku.getTotalpackagecheck() != null)
-					productTotalCheck+=sku.getTotalpackagecheck();
+					totalCheck += sku.getTotalpackagecheck();
 			}
 			
-			handoverProduct.setTotalpackage(productTotal);
-			handoverProduct.setTotalpackagecheck(productTotalCheck);
-			handoverProduct.setLasttimeupdate(date);
+			handoverProduct.setTotalpackage(total);
+			handoverProduct.setTotalpackagecheck(totalCheck);
 			handoverProduct.setLastuserupdateid_link(user.getId());
+			handoverProduct.setLasttimeupdate(date);
 			handoverProductService.save(handoverProduct);
 			
-			Handover handover = handoverService.findOne(handoverProduct.getHandoverid_link());
-			handover.setTotalpackage(totalpackage);
-			handover.setTotalpackagecheck(totalpackagecheck);
-			handover.setLasttimeupdate(date);
-			handover.setLastuserupdateid_link(user.getId());
-			handoverService.save(handover);
+			Handover handover = handoverService.findOne(handoverSku.getHandoverid_link());
+			List<HandoverProduct> products = handover.getHandoverProducts();
+			total = 0;
+			totalCheck = 0;
 			
-			response.totalpackage = totalpackage;
+			for(HandoverProduct product : products) {
+				if(product.getTotalpackage() != null)
+					total += product.getTotalpackage();
+				if(product.getTotalpackagecheck() != null)
+					totalCheck += product.getTotalpackagecheck();
+			}
+			
+			handover.setTotalpackage(total);
+			handover.setTotalpackagecheck(totalCheck);
+			handover.setLastuserupdateid_link(user.getId());
+			handover.setLasttimeupdate(date);
+			handoverService.save(handover);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
