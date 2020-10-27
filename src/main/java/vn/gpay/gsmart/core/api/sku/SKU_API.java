@@ -55,9 +55,16 @@ public class SKU_API {
 			long orgrootid_link = user.getRootorgid_link();
 			
 			SKU sku_check = skuService.getSKU_byCode(entity.data.getCode(), orgrootid_link);
-			
 			if(sku_check != null) {
-				response.mesErr = "Sku đã trùng trong hệ thống";
+				SKU sku_old =  skuService.findOne(entity.data.getId());
+				if (sku_old.getCode() != sku_check.getCode()){
+					response.mesErr = "SKU đã bị trùng trong hệ thống! Liên hệ quản trị hệ thống để kiểm tra lại";
+				} else {
+					sku_old.setBarcode(entity.data.getBarcode());
+					sku_old.setPartnercode(entity.data.getPartnercode());
+					skuService.save(sku_old);
+					response.mesErr = "";
+				}
 			}
 			else {
 				SKU sku = entity.data;
