@@ -99,7 +99,7 @@ public class SKU_API {
 		
 		try {
 //			System.out.println(entity.skutypeid_link + " " + entity.skucode);
-			List<SKU> skus = skuService.getProductSKU_ByCode(entity.skutypeid_link, entity.skucode);
+			List<SKU> skus = skuService.getProductSKU_ByBarCode(entity.skutypeid_link, entity.skucode);
 			response.data = new ArrayList<SKU>();
 			if(skus.size() > 0) {
 				response.data.addAll(skus);
