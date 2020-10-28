@@ -105,6 +105,15 @@ public class HandoverSKU implements Serializable{
 		return 0;
 	}
 	
+	@Transient
+	public String getBarcode() {
+		if(sku!=null) {
+			if(sku.getBarcode() != null)
+				return sku.getBarcode();
+		}
+		return "";
+	}
+	
 	public Long getId() {
 		return id;
 	}
