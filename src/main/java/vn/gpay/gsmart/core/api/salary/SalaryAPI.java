@@ -17,11 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.salary.IOrgSal_BasicService;
+import vn.gpay.gsmart.core.salary.IOrgSal_ComService;
+import vn.gpay.gsmart.core.salary.IOrgSal_Com_LaborLevelService;
+import vn.gpay.gsmart.core.salary.IOrgSal_Com_PositionService;
 import vn.gpay.gsmart.core.salary.IOrgSal_LevelService;
 import vn.gpay.gsmart.core.salary.IOrgSal_TypeService;
 import vn.gpay.gsmart.core.salary.IOrgSal_Type_LaborLevelService;
 import vn.gpay.gsmart.core.salary.IOrgSal_Type_LevelService;
 import vn.gpay.gsmart.core.salary.OrgSal_Basic;
+import vn.gpay.gsmart.core.salary.OrgSal_Com;
+import vn.gpay.gsmart.core.salary.OrgSal_Com_LaborLevel;
+import vn.gpay.gsmart.core.salary.OrgSal_Com_Position;
 import vn.gpay.gsmart.core.salary.OrgSal_Level;
 import vn.gpay.gsmart.core.salary.OrgSal_Type;
 import vn.gpay.gsmart.core.salary.OrgSal_Type_LaborLevel;
@@ -37,6 +43,9 @@ public class SalaryAPI {
 	@Autowired IOrgSal_Type_LaborLevelService saltype_laborlevelService;
 	@Autowired IOrgSal_BasicService salbasicService;
 	@Autowired IOrgSal_LevelService sallevelService;
+	@Autowired IOrgSal_ComService salcomService;
+	@Autowired IOrgSal_Com_LaborLevelService salcom_laborService;
+	@Autowired IOrgSal_Com_PositionService salcom_positionService;
 	
 	@RequestMapping(value = "/saltype_level_byorg", method = RequestMethod.POST)
 	public ResponseEntity<saltype_level_response> saltype_byorg(HttpServletRequest request,
@@ -262,5 +271,221 @@ public class SalaryAPI {
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 		}
-	}	
+	}
+	@RequestMapping(value = "/salcom_byorg", method = RequestMethod.POST)
+	public ResponseEntity<salcom_response> salcom_byorg(HttpServletRequest request,
+			@RequestBody salcom_request entity) {
+//		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		salcom_response response = new salcom_response();
+		try {
+			response.data = salcomService.getall_byorg(entity.orgid_link,entity.typeid_link);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<salcom_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<salcom_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	@RequestMapping(value = "/salcom_create", method = RequestMethod.POST)
+	@Transactional(rollbackFor = RuntimeException.class)
+	public ResponseEntity<ResponseBase> salcom_create(HttpServletRequest request,
+			@RequestBody salcom_create_request entity) {
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Long orgrootid_link = user.getRootorgid_link();
+		ResponseBase response = new ResponseBase();
+		try {
+			//Them moi newSalCom
+			OrgSal_Com newSalCom =  new OrgSal_Com();
+			newSalCom.setOrgrootid_link(orgrootid_link);
+			newSalCom.setOrgid_link(entity.orgid_link);
+			newSalCom.setCode(entity.code);
+			newSalCom.setName(entity.name);
+			newSalCom.setType(entity.typeid_link);
+			newSalCom.setComratio(entity.comratio);
+			newSalCom.setComamount(entity.comamount);
+			newSalCom.setIsforindividual(entity.isforindividual);
+			newSalCom.setIsinsurance(entity.isinsurance);
+			
+			salcomService.save(newSalCom);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		} catch (RuntimeException e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	@RequestMapping(value = "/salcom_update", method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> salcom_update(HttpServletRequest request,
+			@RequestBody salcom_create_request entity) {
+//		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		ResponseBase response = new ResponseBase();
+		try {
+			OrgSal_Com salcom = salcomService.findOne(entity.id);
+			if (null != salcom){
+				salcom.setComratio(entity.comratio);
+				salcom.setComamount(entity.comamount);
+				salcom.setIsforindividual(entity.isforindividual);
+				salcom.setIsinsurance(entity.isinsurance);
+				salcomService.save(salcom);
+				
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+			} else {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage("Không tồn tại trợ cấp");
+				return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+			}
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	@RequestMapping(value = "/salcom_laborlevel", method = RequestMethod.POST)
+	public ResponseEntity<salcom_laborlevel_response> salcom_laborlevel(HttpServletRequest request,
+			@RequestBody salcom_laborlevel_request entity) {
+//		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		salcom_laborlevel_response response = new salcom_laborlevel_response();
+		try {
+			response.data = salcom_laborService.getall_bysalcom(entity.salcomid_link);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<salcom_laborlevel_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<salcom_laborlevel_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	@RequestMapping(value = "/salcom_position", method = RequestMethod.POST)
+	public ResponseEntity<salcom_position_response> salcom_position(HttpServletRequest request,
+			@RequestBody salcom_laborlevel_request entity) {
+//		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		salcom_position_response response = new salcom_position_response();
+		try {
+			response.data = salcom_positionService.getall_bysalcom(entity.salcomid_link);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<salcom_position_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<salcom_position_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	@RequestMapping(value = "/salcom_laborlevel_create", method = RequestMethod.POST)
+	@Transactional(rollbackFor = RuntimeException.class)
+	public ResponseEntity<ResponseBase> salcom_laborlevel_create(HttpServletRequest request,
+			@RequestBody salcom_laborlevel_create_request entity) {
+//		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//		Long orgrootid_link = user.getRootorgid_link();
+		ResponseBase response = new ResponseBase();
+		try {
+			for (Long laborlevelid_link:entity.listId){
+				//Neu chua ton tai --> Inserrt
+				if (salcom_laborService.getall_bysalcom_laborlevel(entity.salcomid_link,laborlevelid_link).size() == 0){
+					OrgSal_Com_LaborLevel newLaborLevel = new OrgSal_Com_LaborLevel();
+					newLaborLevel.setSalcomid_link(entity.salcomid_link);
+					newLaborLevel.setLaborlevelid_link(laborlevelid_link);
+					salcom_laborService.save(newLaborLevel);
+				}
+			}
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		} catch (RuntimeException e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	@RequestMapping(value = "/salcom_position_create", method = RequestMethod.POST)
+	@Transactional(rollbackFor = RuntimeException.class)
+	public ResponseEntity<ResponseBase> salcom_position_create(HttpServletRequest request,
+			@RequestBody salcom_laborlevel_create_request entity) {
+//		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//		Long orgrootid_link = user.getRootorgid_link();
+		ResponseBase response = new ResponseBase();
+		try {
+			for (Long positionid_link:entity.listId){
+				//Neu chua ton tai --> Inserrt
+				if (salcom_positionService.getall_bysalcom_position(entity.salcomid_link,positionid_link).size() == 0){
+					OrgSal_Com_Position newLaborLevel = new OrgSal_Com_Position();
+					newLaborLevel.setSalcomid_link(entity.salcomid_link);
+					newLaborLevel.setPositionid_link(positionid_link);
+					salcom_positionService.save(newLaborLevel);
+				}
+			}
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		} catch (RuntimeException e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	@RequestMapping(value = "/salcom_laborlevel_delete", method = RequestMethod.POST)
+	@Transactional(rollbackFor = RuntimeException.class)
+	public ResponseEntity<ResponseBase> salcom_laborlevel_delete(HttpServletRequest request,
+			@RequestBody salcom_laborlevel_delete_request entity) {
+//		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//		Long orgrootid_link = user.getRootorgid_link();
+		ResponseBase response = new ResponseBase();
+		try {
+			OrgSal_Com_LaborLevel theSal_Laborlevel = salcom_laborService.findOne(entity.id);
+			if (null != theSal_Laborlevel){
+				salcom_laborService.delete(theSal_Laborlevel);
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+			} else {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage("Mã vị trí không tồn tại");
+				return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+			}
+
+		} catch (RuntimeException e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	@RequestMapping(value = "/salcom_position_delete", method = RequestMethod.POST)
+	@Transactional(rollbackFor = RuntimeException.class)
+	public ResponseEntity<ResponseBase> salcom_position_delete(HttpServletRequest request,
+			@RequestBody salcom_laborlevel_delete_request entity) {
+//		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//		Long orgrootid_link = user.getRootorgid_link();
+		ResponseBase response = new ResponseBase();
+		try {
+			OrgSal_Com_Position theSal_Pos = salcom_positionService.findOne(entity.id);
+			if (null != theSal_Pos){
+				salcom_positionService.delete(theSal_Pos);
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+			} else {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage("Mã chức vụ không tồn tại");
+				return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+			}
+
+		} catch (RuntimeException e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 }

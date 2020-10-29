@@ -29,6 +29,7 @@ public class OrgSal_Com implements Serializable {/**
 	private Integer comamount;
 	private Boolean isforindividual;
 	private Boolean isinsurance;
+	private Integer type;
 	public Long getId() {
 		return id;
 	}
@@ -83,6 +84,12 @@ public class OrgSal_Com implements Serializable {/**
 	}
 	public void setIsinsurance(Boolean isinsurance) {
 		this.isinsurance = isinsurance;
+	}
+	public Integer getType() {
+		return type;
+	}
+	public void setType(Integer type) {
+		this.type = type;
 	}
 	
 }

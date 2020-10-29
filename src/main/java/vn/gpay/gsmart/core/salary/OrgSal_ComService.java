@@ -14,9 +14,9 @@ public class OrgSal_ComService extends AbstractService<OrgSal_Com> implements IO
 	@Autowired IOrgSal_ComRepository repo;
 	
 	@Override
-	public List<OrgSal_Com> getall_byorg(long orgid_link) {
+	public List<OrgSal_Com> getall_byorg(long orgid_link, Integer typeid_link) {
 		// TODO Auto-generated method stub
-		return repo.getall_byorg(orgid_link);
+		return repo.getall_byorg(orgid_link, typeid_link);
 	}
 
 	@Override

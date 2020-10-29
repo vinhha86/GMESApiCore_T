@@ -6,8 +6,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.position.Position;
 
 
 @Table(name="org_sal_com_position")
@@ -23,6 +31,20 @@ public class OrgSal_Com_Position implements Serializable {/**
 
 	private Long salcomid_link;
 	private Long positionid_link;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="positionid_link",insertable=false,updatable =false)
+    private Position position;
+	
+	@Transient
+	public String getPosition_name() {
+		if(position!=null) {
+			return position.getName();
+		}
+		return "";
+	}
+	
 	public Long getId() {
 		return id;
 	}
