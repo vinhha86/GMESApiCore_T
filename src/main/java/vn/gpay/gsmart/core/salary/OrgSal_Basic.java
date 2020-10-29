@@ -26,6 +26,7 @@ public class OrgSal_Basic implements Serializable {/**
 	private Integer sal_basic;
 	private Integer sal_min;
 	private Integer workingdays;
+	private Integer costpersecond;
 	private Float overtime_normal;
 	private Float overtime_weekend;
 	private Float overtime_holiday;
@@ -89,6 +90,12 @@ public class OrgSal_Basic implements Serializable {/**
 	}
 	public void setOvertime_night(Float overtime_night) {
 		this.overtime_night = overtime_night;
+	}
+	public Integer getCostpersecond() {
+		return costpersecond;
+	}
+	public void setCostpersecond(Integer costpersecond) {
+		this.costpersecond = costpersecond;
 	}
 	
 }

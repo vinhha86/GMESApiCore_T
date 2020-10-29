@@ -6,8 +6,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.category.LaborLevel;
 
 
 @Table(name="org_sal_type_laborlevel")
@@ -23,7 +31,28 @@ public class OrgSal_Type_LaborLevel implements Serializable {/**
 	
 	private Long saltypeid_link;
 	private Long laborlevelid_link;
-	private Long salgroupid_link;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="laborlevelid_link",insertable=false,updatable =false)
+    private LaborLevel laborlevel;
+	
+	@Transient
+	public String getLaborlevel_code() {
+		if(laborlevel!=null) {
+			return laborlevel.getCode();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getLaborlevel_name() {
+		if(laborlevel!=null) {
+			return laborlevel.getName();
+		}
+		return "";
+	}
+	
 	public Long getId() {
 		return id;
 	}
@@ -41,12 +70,6 @@ public class OrgSal_Type_LaborLevel implements Serializable {/**
 	}
 	public void setLaborlevelid_link(Long laborlevelid_link) {
 		this.laborlevelid_link = laborlevelid_link;
-	}
-	public Long getSalgroupid_link() {
-		return salgroupid_link;
-	}
-	public void setSalgroupid_link(Long salgroupid_link) {
-		this.salgroupid_link = salgroupid_link;
 	}
 
 }
