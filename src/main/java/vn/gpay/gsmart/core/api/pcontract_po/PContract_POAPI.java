@@ -353,7 +353,7 @@ public class PContract_POAPI {
 							po_new.setCode(PO_No);
 							po_new.setCurrencyid_link((long) 1);
 							po_new.setDatecreated(current_time);
-							po_new.setIs_tbd(true);
+							po_new.setIs_tbd(PO_No == "TBD" ? true : false);
 							po_new.setIsauto_calculate(true);
 							po_new.setOrgrootid_link(orgrootid_link);
 							po_new.setPcontractid_link(pcontractid_link);
