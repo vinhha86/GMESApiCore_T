@@ -619,7 +619,7 @@ public class PContractProductAPI {
 	
 	
 	private byte[] getimg(String filename, String uploadRootPath) {
-		String filePath = uploadRootPath+"\\"+ filename;
+		String filePath = uploadRootPath+"/"+ filename;
 		Path path = Paths.get(filePath);
 		byte[] data;
 		try {
