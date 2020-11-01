@@ -112,10 +112,11 @@ public class POrderGrantBalanceAPI {
 									pordergrantid_link, 
 									porderbalanceid_link);
 					if(listPOrderGrantTimesheet.size() > 0) {
-						System.out.println("here yet");
 						POrderGrantTimesheet porderGrantTimesheet = listPOrderGrantTimesheet.get(0);
-						porderGrantTimesheet.setTime_out(date);
-						porderGrantTimesheetService.save(porderGrantTimesheet);
+						if(porderGrantTimesheet.getTime_out() == null) {
+							porderGrantTimesheet.setTime_out(date);
+							porderGrantTimesheetService.save(porderGrantTimesheet);
+						}
 					}
 					POrderGrantTimesheet newPOrderGrantTimesheet = new POrderGrantTimesheet();
 					newPOrderGrantTimesheet.setId(0L);
@@ -128,6 +129,50 @@ public class POrderGrantBalanceAPI {
 				}
 			}
 			
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/delete", method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> delete(@RequestBody POrderGrantBalance_create_request entity,
+			HttpServletRequest request) {
+		ResponseBase response = new ResponseBase();
+		try {
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//			Long orgrootid_link = user.getRootorgid_link();
+			
+			Date date = new Date();
+			
+			// personnelid_link, porderbalanceid_link, pordergrantid_link
+//			Long personnelid_link = entity.personnelid_link;
+			Long porderbalanceid_link = entity.porderbalanceid_link;
+			Long pordergrantid_link = entity.pordergrantid_link;
+			
+			List<POrderGrantTimesheet> listPOrderGrantTimesheet = 
+					porderGrantTimesheetService.getByPorderGrantAndPorderBalance(
+							pordergrantid_link, 
+							porderbalanceid_link);
+			if(listPOrderGrantTimesheet.size() > 0) {
+				POrderGrantTimesheet porderGrantTimesheet = listPOrderGrantTimesheet.get(0);
+				if(porderGrantTimesheet.getTime_out() == null) {
+					porderGrantTimesheet.setTime_out(date);
+					porderGrantTimesheetService.save(porderGrantTimesheet);
+				}
+			}
+			
+			List<POrderGrantBalance> listPOrderGrantBalance = 
+					porderGrantBalanceService.getByPorderGrantAndPorderBalance(pordergrantid_link, porderbalanceid_link);
+			if(listPOrderGrantBalance.size() > 0) {
+				POrderGrantBalance porderGrantBalance = listPOrderGrantBalance.get(0);
+				porderGrantBalanceService.deleteById(porderGrantBalance.getId());
+			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
