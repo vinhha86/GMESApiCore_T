@@ -26,7 +26,6 @@ import vn.gpay.gsmart.core.handover_product.IHandoverProductService;
 import vn.gpay.gsmart.core.handover_sku.HandoverSKU;
 import vn.gpay.gsmart.core.handover_sku.IHandoverSKUService;
 import vn.gpay.gsmart.core.org.IOrgService;
-import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -316,8 +315,8 @@ public class HandoverAPI {
 	public ResponseEntity<Handover_getall_response> Getbysearch(@RequestBody Handover_getbysearch_request entity,HttpServletRequest request ) {
 		Handover_getall_response response = new Handover_getall_response();
 		try {
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			Long org_grant_id_link = user.getOrg_grant_id_link();
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//			Long org_grant_id_link = user.getOrg_grant_id_link();
 //			Org org = orgService.findOne(org_grant_id_link);
 			//
 			Long handovertypeid_link = entity.handovertypeid_link;

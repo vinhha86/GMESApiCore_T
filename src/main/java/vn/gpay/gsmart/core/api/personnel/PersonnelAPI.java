@@ -28,6 +28,10 @@ import vn.gpay.gsmart.core.personel.Personel;
 import vn.gpay.gsmart.core.personnel_history.IPersonnel_His_Service;
 import vn.gpay.gsmart.core.personnel_history.Personnel_His;
 import vn.gpay.gsmart.core.personnel_type.IPersonnelType_Service;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant;
+import vn.gpay.gsmart.core.porder_grant_balance.IPOrderGrantBalanceService;
+import vn.gpay.gsmart.core.porder_grant_balance.POrderGrantBalance;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -37,6 +41,8 @@ public class PersonnelAPI {
 	@Autowired IPersonnelType_Service personneltypeService;
 	@Autowired IPersonnel_Service personService;
 	@Autowired IPersonnel_His_Service hispersonService;
+	@Autowired IPOrderGrant_Service pordergrantService;
+	@Autowired IPOrderGrantBalanceService pordergrantBalanceService;
 	
 	@RequestMapping(value = "/gettype",method = RequestMethod.POST)
 	public ResponseEntity<gettype_response> getType(HttpServletRequest request ) {
@@ -293,6 +299,39 @@ public class PersonnelAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<create_personnel_response>(response,HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/getby_pordergrant",method = RequestMethod.POST)
+	public ResponseEntity<getperson_byorg_response> getby_pordergrant(HttpServletRequest request, @RequestBody getperson_bypordergrant_request entity ) {
+		getperson_byorg_response response = new getperson_byorg_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long orgrootid_link = user.getRootorgid_link();
+			
+			Long pordergrantid_link = entity.pordergrantid_link;
+			POrderGrant porderGrant = pordergrantService.findOne(pordergrantid_link);
+			Long orgid_link = porderGrant.getGranttoorgid_link();
+			
+			response.data = new ArrayList<Personel>();
+					
+			List<Personel> listPersonel = personService.getby_org(orgid_link, orgrootid_link);
+			for(Personel personel : listPersonel) {
+				Long personelId = personel.getId();
+				List<POrderGrantBalance> listPOrderGrantBalance = 
+						pordergrantBalanceService.getByPorderGrantAndPersonnel(pordergrantid_link, personelId);
+				if(listPOrderGrantBalance.size() == 0) {
+					response.data.add(personel);
+				}
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getperson_byorg_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<getperson_byorg_response>(response,HttpStatus.OK);
 		}
 	}
 }

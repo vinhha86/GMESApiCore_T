@@ -16,6 +16,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.category.LaborLevel;
 import vn.gpay.gsmart.core.org.Org;
 
 @Table(name="personnel")
@@ -52,7 +53,19 @@ public class Personel implements Serializable {
 	private Long positionid_link;
 	private Long levelid_link;
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="levelid_link",insertable=false,updatable =false)
+    private LaborLevel laborLevel;
 	
+	
+	@Transient
+	public String getLaborlevel_name() {
+		if(laborLevel!=null) {
+			return laborLevel.getName();
+		}
+		return "";
+	}
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne

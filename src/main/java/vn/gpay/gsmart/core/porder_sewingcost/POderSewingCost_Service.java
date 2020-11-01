@@ -23,5 +23,14 @@ public class POderSewingCost_Service extends AbstractService<POrderSewingCost> i
 		
 		return repo.getby_porder_and_workingprocess(porderid_link, workingprocessid_link);
 	}
+	@Override
+	public List<POrderSewingCost> getByPorderUnused(Long porderid_link, List<Long> listPorderBalanceProcessId) {
+		return repo.getByPorderUnused(porderid_link, listPorderBalanceProcessId);
+	}
+	@Override
+	public List<POrderSewingCost> getByPorderUnused(Long porderid_link) {
+		// TODO Auto-generated method stub
+		return repo.getByPorderUnused(porderid_link);
+	}
 
 }

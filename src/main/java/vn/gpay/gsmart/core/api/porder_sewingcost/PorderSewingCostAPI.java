@@ -18,6 +18,8 @@ import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Service;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.porder_balance.IPOrderBalanceService;
+import vn.gpay.gsmart.core.porder_balance_process.IPOrderBalanceProcessService;
 import vn.gpay.gsmart.core.porder_sewingcost.IPorderSewingCost_Service;
 import vn.gpay.gsmart.core.porder_sewingcost.POrderSewingCost;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -32,6 +34,8 @@ public class PorderSewingCostAPI {
 	@Autowired IWorkingProcess_Service workingprocessService;
 	@Autowired IPOrder_Service porderService;
 	@Autowired IPContract_Price_Service pcontractpriceService;
+	@Autowired IPOrderBalanceService porderBalanceService;
+	@Autowired IPOrderBalanceProcessService porderBalanceProcessService;
 	
 	 @RequestMapping(value = "/create",method = RequestMethod.POST)
 		public ResponseEntity<create_pordersewingcost_response> Create(HttpServletRequest request, @RequestBody create_pordersewingcost_request entity ) {
@@ -150,6 +154,30 @@ public class PorderSewingCostAPI {
 				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 				response.setMessage(e.getMessage());
 			    return new ResponseEntity<delete_porersewingcost_response>(response, HttpStatus.OK);
+			}
+		}
+		
+		@RequestMapping(value = "/getby_porder_notin_porder_balance",method = RequestMethod.POST)
+		public ResponseEntity<getby_porder_response> getByPorderNotInPorderBalance(HttpServletRequest request, @RequestBody getby_porder_request entity ) {
+			getby_porder_response response = new getby_porder_response();
+			try {
+				Long porderid_link = entity.porderid_link;
+//				porderid_link = 268L;
+				
+				List<Long> listPorderBalanceProcessId = porderBalanceProcessService.getPOrderBalanceProcessIdByPorder(porderid_link);
+//				System.out.println(listPorderBalanceProcessId);
+				if(listPorderBalanceProcessId.size() > 0)
+					response.data = pordersewingService.getByPorderUnused(porderid_link, listPorderBalanceProcessId);
+				else
+					response.data = pordersewingService.getByPorderUnused(porderid_link);
+				
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<getby_porder_response>(response,HttpStatus.OK);
+			}catch (Exception e) {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage(e.getMessage());
+			    return new ResponseEntity<getby_porder_response>(response, HttpStatus.OK);
 			}
 		}
 		
