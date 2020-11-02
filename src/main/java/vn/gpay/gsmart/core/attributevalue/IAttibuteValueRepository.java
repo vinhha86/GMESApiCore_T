@@ -24,7 +24,7 @@ public interface IAttibuteValueRepository extends JpaRepository<Attributevalue, 
 	
 	@Query(value = "select a from Attributevalue a "
 			+ "where a.attributeid_link = :attributeid_link "
-			+ "and lower(a.value) = lower(:value) "
+			+ "and trim(lower(replace(a.value,' ',''))) = trim(lower(replace(:value, ' ',''))) "
 			)
 	public List<Attributevalue> getByValue(
 			@Param ("value")final String value,
