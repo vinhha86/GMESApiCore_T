@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.api.attributevalue;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -128,6 +129,42 @@ public class AttributeValueAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_EXCEPTION));
 		    return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/attributevalue_create_quick",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> AttributeValueCreateQuick(@RequestBody Attributevalue_create_request entity,HttpServletRequest request ) {
+		ResponseBase response = new ResponseBase();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Attributevalue attvalue = entity.data;
+			
+			String value = attvalue.getValue().trim();
+			Long attributeid_link = attvalue.getAttributeid_link();
+			List<Attributevalue> listAttributevalue = attValueService.getByValue(value, attributeid_link);
+			if(listAttributevalue.size() > 0) {
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage("Giá trị thuộc tính đã tồn tại");
+				return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+			}
+			
+			attvalue.setValue(value);
+			attvalue.setOrgrootid_link(user.getRootorgid_link());
+			attvalue.setUsercreateid_link(user.getId());
+			attvalue.setIsdefault(false);
+			attvalue.setTimecreate(new Date());
+			attvalue.setSortvalue(attValueService.getMaxSortValue(attvalue.getAttributeid_link()));
+			attvalue.setDatatype(0);
+			
+			attValueService.save(attvalue);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_EXCEPTION));
+		    return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 		}
 	}
 }

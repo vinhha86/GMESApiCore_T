@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @Repository
 @Transactional
 public interface IAttibuteValueRepository extends JpaRepository<Attributevalue, Long>, JpaSpecificationExecutor<Attributevalue> {
@@ -20,4 +21,12 @@ public interface IAttibuteValueRepository extends JpaRepository<Attributevalue, 
 	@Query(value = "select max(sortvalue) from Attributevalue c "
 			+ "where c.attributeid_link =:attributeid_link ")	
 	public int getMaxSortValue(@Param ("attributeid_link")final long attributeid_link);
+	
+	@Query(value = "select a from Attributevalue a "
+			+ "where a.attributeid_link = :attributeid_link "
+			+ "and lower(a.value) = lower(:value) "
+			)
+	public List<Attributevalue> getByValue(
+			@Param ("value")final String value,
+			@Param ("attributeid_link")final Long attributeid_link);
 }

@@ -58,5 +58,11 @@ public class AttributeValueService extends AbstractService<Attributevalue> imple
 		return lst;
 	}
 
+	@Override
+	public List<Attributevalue> getByValue(String value, Long attributeid_link) {
+		// TODO Auto-generated method stub
+		return repo.getByValue(value, attributeid_link);
+	}
+
 
 }
