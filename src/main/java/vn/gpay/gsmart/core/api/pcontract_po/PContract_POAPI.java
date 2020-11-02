@@ -956,6 +956,7 @@ public class PContract_POAPI {
 //			int total = 0;
 			List<POrder_Req> lst_porders = entity.po_orders;
 //			String po_code = pcontract_po.getPo_vendor().length() > 0?pcontract_po.getPo_vendor():pcontract_po.getPo_buyer();
+			if (null != lst_porders)
 			for (POrder_Req porder : lst_porders) {
 //				total += porder.getTotalorder();
 				if (null == porder.getId() || 0 == porder.getId()) {
