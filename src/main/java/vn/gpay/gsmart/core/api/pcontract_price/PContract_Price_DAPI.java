@@ -34,7 +34,7 @@ public class PContract_Price_DAPI {
 		get_byPo_response response = new get_byPo_response();
 		try {
 			PContract_PO pcontractpo = pcontractPoService.findOne(entity.pcontract_poid_link);
-			List<PContract_Price_D> list = pcontractPriceDservice.getPrice_D_ByPO(pcontractpo.getParentpoid_link());
+			List<PContract_Price_D> list = pcontractPriceDservice.getPrice_D_ByPO(pcontractpo.getParentpoid_link() == null ? entity.pcontract_poid_link : pcontractpo.getParentpoid_link());
 			response.data = new ArrayList<PContract_Price_D>();
 			for(PContract_Price_D pcontractpriced : list) {
 				if(pcontractpriced.getProductType() == 5) {

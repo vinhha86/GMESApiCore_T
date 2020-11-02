@@ -83,7 +83,6 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	public List<PContract_PO> getPO_Offer_Accept_ByPContract(Long pcontractid_link, Long productid_link) {
 		// TODO Auto-generated method stub
 		try {
-			System.out.println(productid_link);
 			return repo.getPO_Offer_Accept_ByPContract(pcontractid_link, productid_link == 0 ? null : productid_link);
 		} catch(Exception ex){
 			ex.printStackTrace();
