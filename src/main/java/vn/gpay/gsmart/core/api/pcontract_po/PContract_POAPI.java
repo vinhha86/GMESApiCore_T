@@ -29,6 +29,8 @@ import vn.gpay.gsmart.core.attribute.IAttributeService;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.category.IShipModeService;
 import vn.gpay.gsmart.core.category.ShipMode;
+import vn.gpay.gsmart.core.org.IOrgService;
+import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontract_po_productivity.IPContract_PO_Productivity_Service;
@@ -56,6 +58,8 @@ import vn.gpay.gsmart.core.productattributevalue.ProductAttributeValue;
 import vn.gpay.gsmart.core.productpairing.IProductPairingService;
 import vn.gpay.gsmart.core.productpairing.ProductPairing;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.security.GpayUserOrg;
+import vn.gpay.gsmart.core.security.IGpayUserOrgService;
 import vn.gpay.gsmart.core.sizeset.ISizeSetService;
 import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 import vn.gpay.gsmart.core.sku.ISKU_Service;
@@ -116,6 +120,8 @@ public class PContract_POAPI {
 	@Autowired IPContract_PO_Productivity_Service productivityService;
 	@Autowired IPOrderProcessing_Service processService;
 	@Autowired IPContract_Price_DService pricedetailService;
+	@Autowired IOrgService orgService;
+	@Autowired IGpayUserOrgService userOrgService;
 
 	@RequestMapping(value = "/upload_template", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadTemplate(HttpServletRequest request,
@@ -1605,15 +1611,53 @@ public class PContract_POAPI {
 	public ResponseEntity<PContract_getbycontractproduct_response> getByContractAndProductBuyerCodeAndPOBuyer(
 			@RequestBody PContract_getbycontractproductbuyercodepobuyer_request entity, HttpServletRequest request) {
 		PContract_getbycontractproduct_response response = new PContract_getbycontractproduct_response();
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		try {
-			List<PContract_PO> pcontractpo = pcontract_POService
+			List<Org> listorg = new ArrayList<Org>();
+			for(GpayUserOrg userorg:userOrgService.getall_byuser(user.getId())){
+				listorg.add(orgService.findOne(userorg.getOrgid_link()));
+			}
+			
+			Long orgid_link = user.getOrgid_link();
+			Org userOrg = null;
+			if(orgid_link != 0 && orgid_link != 1 && orgid_link != null) {
+				userOrg = orgService.findOne(orgid_link);
+			}
+			
+			List<PContract_PO> pcontractpoList = pcontract_POService
 					.getPcontractPoByPContractAndPOBuyer(entity.pcontractid_link, entity.po_buyer, entity.buyercode);
 			response.data = new ArrayList<PContract_PO>();
 
 			// chỉ lấy pcontract_po con
-			for (PContract_PO ppo : pcontractpo) {
-				if (ppo.getParentpoid_link() != null) {
-					response.data.add(ppo);
+			for (PContract_PO pcontractpo : pcontractpoList) {
+				if(userOrg != null) {
+					boolean flag = true;
+					List<POrder_Req> porderReqList = porder_req_Service.getByPO(pcontractpo.getId());
+					for(POrder_Req porderReq : porderReqList) {
+						Long granttoorgid_link = porderReq.getGranttoorgid_link();
+						
+						// nếu user được xem nhiều org (GpayUserOrg)
+						if(listorg.size() > 0) {
+							if(!flag) break;
+							for(Org org : listorg) {
+								if(user.getOrgid_link() == granttoorgid_link || org.getId() == granttoorgid_link) {
+									flag = false;
+									break;
+								}
+							}
+						}else {
+							if(user.getOrgid_link() == granttoorgid_link) {
+								flag = false;
+								break;
+							}
+						}
+					}
+					
+					if(flag) continue;
+				}
+				
+				if (pcontractpo.getParentpoid_link() != null) {
+					response.data.add(pcontractpo);
 				}
 			}
 
