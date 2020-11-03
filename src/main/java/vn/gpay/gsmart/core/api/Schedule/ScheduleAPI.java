@@ -45,6 +45,8 @@ import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.security.GpayUserOrg;
+import vn.gpay.gsmart.core.security.IGpayUserOrgService;
 import vn.gpay.gsmart.core.task.ITask_Service;
 import vn.gpay.gsmart.core.task.Task;
 import vn.gpay.gsmart.core.task_checklist.ITask_CheckList_Service;
@@ -71,6 +73,8 @@ public class ScheduleAPI {
 	@Autowired ITask_CheckList_Service checklistService;
 	@Autowired ITask_Service taskService;
 	@Autowired IPOrderGrant_SKUService grantskuService;
+	
+	@Autowired IGpayUserOrgService userOrgService;
 	
 	@RequestMapping(value = "/getplan",method = RequestMethod.POST)
 	public ResponseEntity<get_schedule_porder_response> GetAll(HttpServletRequest request,
@@ -130,6 +134,12 @@ public class ScheduleAPI {
 				listorg = orgService.getorgChildrenbyOrg(orgid_link, list);
 			else 
 				listorg.add(orgroot);
+			//Them vao danh sach cac don vi trong danh sach don vi duoc phan quyen cho nguoi dung
+			for(GpayUserOrg userorg:userOrgService.getall_byuser(user.getId())){
+				if (userorg.getOrgid_link() != user.getOrgid_link() && userorg.getOrgid_link() != user.getRootorgid_link()){
+					listorg.add(orgService.findOne(userorg.getOrgid_link()));
+				}
+			}
 			
 			long id = 1;
 			for(Org org_factory : listorg) {

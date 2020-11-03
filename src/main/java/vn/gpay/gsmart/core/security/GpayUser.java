@@ -107,6 +107,7 @@ public class GpayUser implements UserDetails {
 		return list;
 	}
 	
+
 	@Transient
 	public String getUsergroup_name() {
 		String listmenu = "";
@@ -350,6 +351,4 @@ public class GpayUser implements UserDetails {
 	public void setOrg_grant_id_link(Long org_grant_id_link) {
 		this.org_grant_id_link = org_grant_id_link;
 	}
-	
-	
 }

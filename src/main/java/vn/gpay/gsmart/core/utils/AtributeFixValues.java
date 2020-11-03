@@ -13,6 +13,7 @@ public class AtributeFixValues {
     public static long value_size_all = 152;
     public static long value_sizewidth_all = 155;
     public static long role_id_admin = 4;
-    public static String url_authen = "http://localhost:8081";//DHA
+//    public static String url_authen = "http://localhost:8081";//DHA
+    public static String url_authen = "http://gpay.vn:8181";//GSmart
 //    public static String url_authen = "http://localhost:8181";//GSmart
 }
