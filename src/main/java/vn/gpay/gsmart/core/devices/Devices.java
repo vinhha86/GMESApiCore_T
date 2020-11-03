@@ -73,6 +73,11 @@ public class Devices implements Serializable {
 	@Column(name ="fixassetno",length=20)
     private String fixassetno;
 	
+	private String ip;
+	private Integer port;
+	
+	
+	
 	public Boolean getDisable() {
 		return disable;
 	}
@@ -110,6 +115,8 @@ public class Devices implements Serializable {
 	@Transient
 	public String getDeviceModel() {
 		if(devicegroup!=null) {
+			if (devicegroup.getParentid_link() == null) return "";
+			
 			if(devicegroup.getParentid_link().equals((long)-1)) {
 				return "";
 			}else {
@@ -245,5 +252,21 @@ public class Devices implements Serializable {
 
 	public void setFixassetno(String fixassetno) {
 		this.fixassetno = fixassetno;
+	}
+
+	public String getIp() {
+		return ip;
+	}
+
+	public Integer getPort() {
+		return port;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+	public void setPort(Integer port) {
+		this.port = port;
 	}
 }

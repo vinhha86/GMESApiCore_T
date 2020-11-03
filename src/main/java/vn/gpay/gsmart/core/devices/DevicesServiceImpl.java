@@ -88,4 +88,18 @@ public class DevicesServiceImpl extends AbstractService<Devices> implements IDev
 	public List<Devices> findByDeviceGroup(long devicegroupid_link) {
 		return repository.findByDeviceGroup(devicegroupid_link);
 	}
+	@Override
+	public List<Devices> getdevice_bygroup_and_orgroot(Long orgrootid_link, Long devicegroupid_link) {
+		// TODO Auto-generated method stub
+		Specification<Devices> specification = Specifications.<Devices>and()
+	            .eq( "orgrootid_link", orgrootid_link)
+	            .eq(devicegroupid_link!=0, "devicegroupid_link", devicegroupid_link)
+	            .eq("status", 1)
+	            .build();
+		Sort sort = Sorts.builder()
+		        .desc("id")
+		        .build();
+		List<Devices> list = repository.findAll(specification,sort);
+	    return list;
+	}
 }

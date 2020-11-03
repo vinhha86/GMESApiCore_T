@@ -19,4 +19,6 @@ public interface IDevicesService extends Operations<Devices>{
 	public List<Devices> findByDeviceGroup(long devicegroupid_link);
 
 	Devices finByOrgEPC(Long org_governid_link, String epc);
+	
+	List<Devices> getdevice_bygroup_and_orgroot(Long orgrootid_link, Long devicegroupid_link);
 }
