@@ -880,9 +880,6 @@ public class PContract_POAPI {
 									for (int i = ColumnPO.XS; i <= ColumnPO.XXXXXL; i++) {
 										Double amount = row.getCell(i).getNumericCellValue();
 										if(amount>0) {
-											if(i== ColumnPO.XXXXXL) {
-												String a = "";
-											}
 											List<Attributevalue> list_size = attributevalueService.getByValue(rowheader.getCell(i).getStringCellValue(), AtributeFixValues.ATTR_SIZE);
 											if(list_size.size() > 0) {
 												Long skuid_link = skuattService.getsku_byproduct_and_valuemau_valueco(parent.getProductid_link(), colorid_link, list_size.get(0).getId());
