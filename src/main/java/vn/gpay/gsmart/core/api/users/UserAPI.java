@@ -44,9 +44,12 @@ import vn.gpay.gsmart.core.menu.UserMenu;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract.IPContractService;
+import vn.gpay.gsmart.core.salary.OrgSal_Com_LaborLevel;
 import vn.gpay.gsmart.core.security.GpayAuthentication;
 import vn.gpay.gsmart.core.security.GpayRole;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.security.GpayUserOrg;
+import vn.gpay.gsmart.core.security.IGpayUserOrgService;
 import vn.gpay.gsmart.core.security.IGpayUserService;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
@@ -67,6 +70,7 @@ public class UserAPI {
 	@Autowired AppRole_User_Service roleuserService;
 	@Autowired IAppFunctionService appfuncService;
 	@Autowired IPContractService pcontractService;
+	@Autowired IGpayUserOrgService userOrgService;
 	
 	@RequestMapping(value = "/user_create",method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> GetSkuByCode( @RequestBody UserCreateRequest entity,HttpServletRequest request ) {
@@ -574,6 +578,68 @@ public class UserAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_EXCEPTION));
 		    return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/user_orgview_getall",method = RequestMethod.POST)
+	public ResponseEntity<User_OrgView_Response> user_orgview_getall(HttpServletRequest request, @RequestBody User_getinfo_request entity) {
+		User_OrgView_Response response = new User_OrgView_Response();
+		try {
+			response.data=userOrgService.getall_byuser(entity.id);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<User_OrgView_Response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_EXCEPTION));
+		    return new ResponseEntity<User_OrgView_Response>(response,HttpStatus.BAD_REQUEST);
+		}
+	}
+	@RequestMapping(value = "/user_orgview_add",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> user_orgview_add(HttpServletRequest request, @RequestBody User_OrgView_Add_Request entity) {
+		User_OrgView_Response response = new User_OrgView_Response();
+		try {
+			for (Long orgid_link:entity.listId){
+				//Neu chua ton tai --> Inserrt
+				if (userOrgService.getby_user_org(entity.userid_link, orgid_link).size() == 0){
+					GpayUserOrg theGpayUserOrg =  new GpayUserOrg();
+					theGpayUserOrg.setOrgid_link(orgid_link);
+					theGpayUserOrg.setUserid_link(entity.userid_link);
+					userOrgService.save(theGpayUserOrg);
+				}
+			}
+
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_EXCEPTION));
+		    return new ResponseEntity<ResponseBase>(response,HttpStatus.BAD_REQUEST);
+		}
+	}
+	@RequestMapping(value = "/user_orgview_delete",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> user_orgview_delete(HttpServletRequest request, @RequestBody User_getinfo_request entity) {
+		User_OrgView_Response response = new User_OrgView_Response();
+		try {
+			GpayUserOrg theGpayUserOrg =  userOrgService.findOne(entity.id);
+			if (null != theGpayUserOrg){
+				userOrgService.delete(theGpayUserOrg);
+			
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+			} else {
+				response.setRespcode(ResponseMessage.KEY_RC_KEY_NOTEXIST);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_KEY_NOTEXIST));
+			    return new ResponseEntity<ResponseBase>(response,HttpStatus.BAD_REQUEST);
+			}
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_EXCEPTION));
+		    return new ResponseEntity<ResponseBase>(response,HttpStatus.BAD_REQUEST);
 		}
 	}
 }

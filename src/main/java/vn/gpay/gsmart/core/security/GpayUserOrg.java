@@ -6,8 +6,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.org.Org;
 
 
 @Entity
@@ -26,6 +34,25 @@ public class GpayUserOrg implements Serializable  {
 	
 	private Long userid_link;
 	private Long orgid_link;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+	//@BatchSize(size=10)
+	@JoinColumn( name="orgid_link",insertable=false,updatable =false)
+	private Org org ;
+	
+	@Transient
+	public String getOrgcode() {
+		if(org!=null)
+			return org.getCode();
+		return "";
+	}
+	@Transient
+	public String getOrgname() {
+		if(org!=null)
+			return org.getName();
+		return "";
+	}
 	public Long getId() {
 		return id;
 	}

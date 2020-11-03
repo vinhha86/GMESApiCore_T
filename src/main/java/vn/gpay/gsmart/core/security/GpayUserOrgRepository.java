@@ -15,4 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public interface GpayUserOrgRepository extends JpaRepository<GpayUserOrg, Long>,JpaSpecificationExecutor<GpayUserOrg> {
 	@Query(value = "select c from GpayUserOrg c where c.userid_link = :userid_link ")
 	public List<GpayUserOrg> getall_byuser(@Param ("userid_link")final  Long userid_link);
+	
+	@Query(value = "select c from GpayUserOrg c where c.userid_link = :userid_link and c.orgid_link = :orgid_link")
+	public List<GpayUserOrg> getby_user_org(@Param ("userid_link")final  Long userid_link, @Param ("orgid_link")final  Long orgid_link);
 }

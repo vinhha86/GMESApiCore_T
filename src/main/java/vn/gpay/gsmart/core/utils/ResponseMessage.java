@@ -17,6 +17,7 @@ public class ResponseMessage {
     public static int KEY_RC_APPROVE_FAIL           = 903;
     public static int KEY_RC_ACTIVE_FAIL            = 904;
     public static int KEY_RC_KEY_DUPLICATION        = 905;
+    public static int KEY_RC_KEY_NOTEXIST        	= 906;
     
     public static int KEY_RC_SKU_INVALID            = 700;
     public static int KEY_RC_EPC_INVALID            = 800;
@@ -47,6 +48,7 @@ public class ResponseMessage {
     public static String MES_RC_IMEI_NOT_PERMISSION     = "Imei not permission";
     public static String MES_RC_CREATE_INVCHECK_FAIL    = "Create invcheck fail";
     public static String MES_RC_KEY_DUPLICATION    		= "Key duplication";
+    public static String MES_RC_KEY_NOTEXIST    		= "Key Not Exist";
     
     public static String MES_RC_APPROVE_FAIL      = "Approve Fail !";
     public static String MES_RC_ACTIVE_FAIL     = "ACTIVE Fail !";
@@ -72,6 +74,7 @@ public class ResponseMessage {
         hMes.put(KEY_RC_CREATE_INVCHECK_FAIL, MES_RC_CREATE_INVCHECK_FAIL);
         hMes.put(KEY_RC_EPC_INVALID, MES_RC_EPC_INVALID);
         hMes.put(KEY_POREQ_DELETE_PORDEREXISTED, MES_POREQ_DELETE_PORDEREXISTED);
+        hMes.put(KEY_RC_KEY_NOTEXIST, MES_RC_KEY_NOTEXIST);
         return hMes.get(code);
     }
 }
