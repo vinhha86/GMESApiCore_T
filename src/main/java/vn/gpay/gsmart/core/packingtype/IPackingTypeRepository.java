@@ -14,4 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 public interface IPackingTypeRepository extends JpaRepository<PackingType, Long>, JpaSpecificationExecutor<PackingType> {
 	@Query(value = "select c from PackingType c where c.orgrootid_link = :orgrootid_link")
 	public List<PackingType> getall_byorgrootid(@Param ("orgrootid_link")final  Long orgrootid_link);
+	
+	@Query(value = "select c from PackingType c where c.orgrootid_link = :orgrootid_link "
+			+ "and trim(lower(replace(c.name,' ',''))) = trim(lower(replace(:name, ' ','')))")
+	public List<PackingType> getbyname(
+			@Param ("orgrootid_link")final  Long orgrootid_link,
+			@Param ("name")final  String name);
 }

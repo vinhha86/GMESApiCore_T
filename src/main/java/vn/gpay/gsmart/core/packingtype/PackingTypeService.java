@@ -24,4 +24,10 @@ public class PackingTypeService extends AbstractService<PackingType> implements 
 		// TODO Auto-generated method stub
 		return repo.getall_byorgrootid(orgrootid_link);
 	}
+
+	@Override
+	public List<PackingType> getbyname(String name, long orgrootid_link) {
+		// TODO Auto-generated method stub
+		return repo.getbyname(orgrootid_link, name);
+	}
 }

@@ -106,13 +106,13 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			);
 	
 	@Query(value = "select c from PContract_PO c "
-			+ "where c.po_buyer = :po_buyer "
+			+ "where trim(lower(replace(c.po_buyer,' ',''))) = trim(lower(replace(:po_buyer, ' ',''))) "
 			+ "and c.shipmodeid_link = :shipmodeid_link "
 			+ "and c.shipdate = :shipdate "
 			+ "and c.pcontractid_link = :pcontractid_link "
 			)
 	public List<PContract_PO> getone_po_upload(
-			@Param ("po")final  String po_buyer,
+			@Param ("po_buyer")final  String po_buyer,
 			@Param ("shipmodeid_link")final  Long shipmodeid_link,
 			@Param ("shipdate")final  Date shipdate,
 			@Param ("pcontractid_link")final  Long pcontractid_link
@@ -121,12 +121,10 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 	@Query(value = "select c from PContract_PO c "
 			+ "where trim(lower(replace(c.po_buyer,' ',''))) = trim(lower(replace(:po_no, ' ',''))) "
 			+ "and c.pcontractid_link = :pcontractid_link "
-			+ "and c.parentpoid_link = :parentid_link"
 			)
 	public List<PContract_PO> getone_po_byPO_no(
 			@Param ("po_no")final  String po_no,
-			@Param ("pcontractid_link")final  Long pcontractid_link,
-			@Param ("parentid_link")final  Long parentid_link
+			@Param ("pcontractid_link")final  Long pcontractid_link
 			);
 	
 	@Query(value = "select c from PContract_PO c "

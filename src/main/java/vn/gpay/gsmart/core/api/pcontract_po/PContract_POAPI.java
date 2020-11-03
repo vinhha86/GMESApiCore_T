@@ -26,11 +26,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import vn.gpay.gsmart.core.attribute.Attribute;
 import vn.gpay.gsmart.core.attribute.IAttributeService;
+import vn.gpay.gsmart.core.attributevalue.Attributevalue;
+import vn.gpay.gsmart.core.attributevalue.IAttributeValueService;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.category.IShipModeService;
 import vn.gpay.gsmart.core.category.ShipMode;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
+import vn.gpay.gsmart.core.packingtype.IPackingTypeService;
+import vn.gpay.gsmart.core.packingtype.PackingType;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontract_po_productivity.IPContract_PO_Productivity_Service;
@@ -45,6 +49,8 @@ import vn.gpay.gsmart.core.pcontractproduct.IPContractProductService;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproductpairing.IPContractProductPairingService;
 import vn.gpay.gsmart.core.pcontractproductpairing.PContractProductPairing;
+import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
+import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
@@ -122,6 +128,9 @@ public class PContract_POAPI {
 	@Autowired IPContract_Price_DService pricedetailService;
 	@Autowired IOrgService orgService;
 	@Autowired IGpayUserOrgService userOrgService;
+	@Autowired IPackingTypeService packingService;
+	@Autowired IAttributeValueService attributevalueService;
+	@Autowired IPContractProductSKUService ppskuService;
 
 	@RequestMapping(value = "/upload_template", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadTemplate(HttpServletRequest request,
@@ -775,6 +784,7 @@ public class PContract_POAPI {
 				// Kiem tra header
 				int rowNum = 1;
 				String mes_err = "";
+				Row rowheader = sheet.getRow(0);
 				Row row = sheet.getRow(rowNum);
 				try {
 					while (commonService.getStringValue(row.getCell(ColumnPO.STT)) != "") {
@@ -801,15 +811,34 @@ public class PContract_POAPI {
 							shipmodeid_link = shipmodes.get(0).getId();
 						}
 						
+						//Kiem tra PackingMethod
+						Long packingmethođi_link = null;
+						List<PackingType> list_packing = packingService.getbyname(PackingMethod, orgrootid_link);
+						if(list_packing.size() == 0) {
+							PackingType pk = new PackingType();
+							pk.setCode(PackingMethod);
+							pk.setId(null);
+							pk.setName(PackingMethod);
+							pk.setOrgrootid_link(orgrootid_link);
+							pk = packingService.save(pk);
+							
+							packingmethođi_link = pk.getId();
+						}
+						else {
+							packingmethođi_link = list_packing.get(0).getId();
+						}
+						
 						//Kiem tra PO co dung voi PO dang chon de them moi khong
 						if(PO_No != "TBD") {
 							Long pcontractpoid_link = null;
 							//Kiem tra so PO va so PO cha
-							List<PContract_PO> list_po_parent = pcontract_POService.check_exist_PONo(pcontractid_link, PO_No, parentid_link);
+							List<PContract_PO> list_po_parent = pcontract_POService.check_exist_PONo(PO_No, pcontractid_link);
 							if(list_po_parent.size() > 0) {
 								//Kiem tra xem PO con da ton tai hay chua
 								List<PContract_PO> list_po = pcontract_POService.check_exist_po_children(PO_No+"-"+Line, ShipDate, shipmodeid_link, pcontractid_link);
 								if(list_po.size() == 0) {
+									PContract_PO parent = pcontract_POService.findOne(parentid_link);
+									
 									PContract_PO po_new = new PContract_PO();
 									po_new.setId(null);
 									po_new.setPo_buyer(PO_No+"-"+Line);
@@ -818,8 +847,62 @@ public class PContract_POAPI {
 									po_new.setPcontractid_link(pcontractid_link);
 									po_new.setParentpoid_link(parentid_link);
 									po_new.setOrgrootid_link(orgrootid_link);
+									po_new.setPackingnotice(packingmethođi_link+"");
+									po_new.setProductid_link(parent.getProductid_link());
 									
 									po_new = pcontract_POService.save(po_new);
+									
+									pcontractpoid_link = po_new.getId();
+									
+									//Thêm màu cỡ vào PO
+									//Kiem tra mau 
+									Long colorid_link = null;
+									List<Attributevalue> listAttributevalue = attributevalueService.getByValue(ColorName+"("+ColorCode+")", AtributeFixValues.ATTR_COLOR);
+									if(listAttributevalue.size() == 0) {
+										Attributevalue av = new Attributevalue();
+										av.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
+										av.setId(null);
+										av.setIsdefault(false);
+										av.setOrgrootid_link(orgrootid_link);
+										av.setSortvalue(attributevalueService.getMaxSortValue(AtributeFixValues.ATTR_COLOR));
+										av.setTimecreate(new Date());
+										av.setUsercreateid_link(user.getId());
+										av.setValue(ColorName+"("+ColorCode+")");
+										
+										av = attributevalueService.save(av);
+										colorid_link = av.getId();
+									}
+									else {
+										colorid_link = listAttributevalue.get(0).getId();
+									}
+									
+									//check tung cot co
+									for (int i = ColumnPO.XS; i <= ColumnPO.XXXXXL; i++) {
+										Double amount = row.getCell(i).getNumericCellValue();
+										if(amount>0) {
+											if(i== ColumnPO.XXXXXL) {
+												String a = "";
+											}
+											List<Attributevalue> list_size = attributevalueService.getByValue(rowheader.getCell(i).getStringCellValue(), AtributeFixValues.ATTR_SIZE);
+											if(list_size.size() > 0) {
+												Long skuid_link = skuattService.getsku_byproduct_and_valuemau_valueco(parent.getProductid_link(), colorid_link, list_size.get(0).getId());
+												int amount_plus = commonService.Calculate_pquantity_production(amount.intValue());
+												
+												PContractProductSKU ppsku = new PContractProductSKU();
+												ppsku.setId(null);
+												ppsku.setOrgrootid_link(orgrootid_link);
+												ppsku.setPcontract_poid_link(pcontractpoid_link);
+												ppsku.setPcontractid_link(pcontractid_link);
+												ppsku.setPquantity_porder(amount.intValue());
+												ppsku.setPquantity_production(amount_plus);
+												ppsku.setPquantity_total(amount_plus);
+												ppsku.setProductid_link(parent.getProductid_link());
+												ppsku.setSkuid_link(skuid_link);
+												ppskuService.save(ppsku);
+											}
+											
+										}
+									}
 								}
 							}
 						}
