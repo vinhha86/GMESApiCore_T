@@ -286,7 +286,7 @@ public class PContractAPI {
 				listorg.add(orgService.findOne(userorg.getOrgid_link()));
 			}
 			
-			Long orgrootid_link = user.getRootorgid_link();
+//			Long orgrootid_link = user.getRootorgid_link();
 			Long orgid_link = user.getOrgid_link();
 			Org userOrg = null;
 			if(orgid_link != 0 && orgid_link != 1 && orgid_link != null) {
@@ -319,29 +319,22 @@ public class PContractAPI {
 				
 				// Lọc để User phân xưởng chỉ nhìn được các đơn hàng phân cho phân xưởng mình
 				if(userOrg != null) {
+					List<POrder_Req> porderReqList = porderReqService.getByContract(pcontract.getId());
 					boolean flag = true;
-					
-					List<PContract_PO> pcontractpoList = poService.getPOByContract(orgrootid_link, pcontract.getId());
-					for(PContract_PO pcontractpo : pcontractpoList) {
-						if(!flag) break;
-						List<POrder_Req> porderReqList = porderReqService.getByPO(pcontractpo.getId());
-						for(POrder_Req porderReq : porderReqList) {
-							Long granttoorgid_link = porderReq.getGranttoorgid_link();
-							
-							// nếu user được xem nhiều org (GpayUserOrg)
-							if(listorg.size() > 0) {
-								if(!flag) break;
-								for(Org org : listorg) {
-									if(user.getOrgid_link() == granttoorgid_link || org.getId() == granttoorgid_link) {
-										flag = false;
-										break;
-									}
-								}
-							}else {
-								if(user.getOrgid_link() == granttoorgid_link) {
+					for(POrder_Req porderReq : porderReqList) {
+						Long granttoorgid_link = porderReq.getGranttoorgid_link();
+						if(listorg.size() > 0) {
+							if(!flag) break;
+							for(Org org : listorg) {
+								if(user.getOrgid_link() == granttoorgid_link || org.getId() == granttoorgid_link) {
 									flag = false;
 									break;
 								}
+							}
+						}else {
+							if(user.getOrgid_link() == granttoorgid_link) {
+								flag = false;
+								break;
 							}
 						}
 					}
