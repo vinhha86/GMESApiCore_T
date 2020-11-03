@@ -823,7 +823,8 @@ public class PContract_POAPI {
 								}
 							}
 						}
-						
+						rowNum++;
+						row = sheet.getRow(rowNum);
 					}
 				} catch (Exception e) {
 					mes_err = e.getMessage();

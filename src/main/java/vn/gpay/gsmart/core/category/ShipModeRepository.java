@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public interface ShipModeRepository extends JpaRepository<ShipMode, Long> {
 	@Query(value = "select c from ShipMode c "
-			+ "where c.name = :name")
+			+ "where trim(lower(replace(c.name,' ',''))) = trim(lower(replace(:name, ' ','')))")
 	public List<ShipMode> getby_name(
 			@Param ("name")final  String name);
 }
