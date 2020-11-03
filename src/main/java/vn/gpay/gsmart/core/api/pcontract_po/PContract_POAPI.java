@@ -64,6 +64,7 @@ import vn.gpay.gsmart.core.sku.SKU_Attribute_Value;
 import vn.gpay.gsmart.core.task_object.ITask_Object_Service;
 import vn.gpay.gsmart.core.task_object.Task_Object;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
+import vn.gpay.gsmart.core.utils.ColumnPO;
 import vn.gpay.gsmart.core.utils.ColumnTemplate;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.POStatus;
@@ -729,6 +730,119 @@ public class PContract_POAPI {
 		}
 		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/upload_po", method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> UploadPO(HttpServletRequest request,
+			@RequestParam("file") MultipartFile file, @RequestParam("parentid_link") long parentid_link, @RequestParam("pcontractid_link") long pcontractid_link) {
+		ResponseBase response = new ResponseBase();
+
+		Date current_time = new Date();
+		String name = "";
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			String FolderPath = "upload/pcontract_po";
+
+			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+
+			File uploadRootDir = new File(uploadRootPath);
+			// Tạo thư mục gốc upload nếu nó không tồn tại.
+			if (!uploadRootDir.exists()) {
+				uploadRootDir.mkdirs();
+			}
+
+			name = file.getOriginalFilename();
+			if (name != null && name.length() > 0) {
+				String[] str = name.split("\\.");
+				String extend = str[str.length - 1];
+				name = current_time.getTime() + "." + extend;
+				File serverFile = new File(uploadRootDir.getAbsolutePath() + File.separator + name);
+
+				BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+				stream.write(file.getBytes());
+				stream.close();
+
+				// doc file upload
+				XSSFWorkbook workbook = new XSSFWorkbook(serverFile);
+				XSSFSheet sheet = workbook.getSheetAt(0);
+
+				// Kiem tra header
+				int rowNum = 1;
+				String mes_err = "";
+				Row row = sheet.getRow(rowNum);
+				try {
+					while (commonService.getStringValue(row.getCell(ColumnPO.STT)) != "") {
+						String PO_No = commonService.getStringValue(row.getCell(ColumnPO.PO));
+						String Line = commonService.getStringValue(row.getCell(ColumnPO.Line));
+						Date ShipDate = row.getCell(ColumnPO.Shipdate).getDateCellValue(); 
+						String Shipmode = row.getCell(ColumnPO.Shipmode).getStringCellValue();
+						String PackingMethod = row.getCell(ColumnPO.PackingMethod).getStringCellValue();
+						String ColorName = commonService.getStringValue(row.getCell(ColumnPO.Colorname));
+						String ColorCode = commonService.getStringValue(row.getCell(ColumnPO.Colorcode));
+						
+						//Kiem tra Shipmode da ton tai hay chua
+						Long shipmodeid_link = null;
+						List<ShipMode> shipmodes = shipmodeService.getbyname(Shipmode);
+						if(shipmodes.size() == 0) {
+							ShipMode shipmode_new = new ShipMode();
+							shipmode_new.setId(null);
+							shipmode_new.setName(Shipmode);
+							shipmode_new = shipmodeService.save(shipmode_new);
+							
+							shipmodeid_link = shipmode_new.getId();
+						}
+						else {
+							shipmodeid_link = shipmodes.get(0).getId();
+						}
+						
+						//Kiem tra PO co dung voi PO dang chon de them moi khong
+						if(PO_No != "TBD") {
+							Long pcontractpoid_link = null;
+							//Kiem tra so PO va so PO cha
+							List<PContract_PO> list_po_parent = pcontract_POService.check_exist_PONo(pcontractid_link, PO_No, parentid_link);
+							if(list_po_parent.size() > 0) {
+								//Kiem tra xem PO con da ton tai hay chua
+								List<PContract_PO> list_po = pcontract_POService.check_exist_po_children(PO_No+"-"+Line, ShipDate, shipmodeid_link, pcontractid_link);
+								if(list_po.size() == 0) {
+									PContract_PO po_new = new PContract_PO();
+									po_new.setId(null);
+									po_new.setPo_buyer(PO_No+"-"+Line);
+									po_new.setShipdate(ShipDate);
+									po_new.setShipmodeid_link(shipmodeid_link);
+									po_new.setPcontractid_link(pcontractid_link);
+									po_new.setParentpoid_link(parentid_link);
+									po_new.setOrgrootid_link(orgrootid_link);
+									
+									po_new = pcontract_POService.save(po_new);
+								}
+							}
+						}
+						
+					}
+				} catch (Exception e) {
+					mes_err = e.getMessage();
+				}
+
+				workbook.close();
+				serverFile.delete();
+				if (mes_err == "") {
+					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				} else {
+					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+					response.setMessage(mes_err);
+				}
+			} else {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage("Có lỗi trong quá trình upload! Bạn hãy thử lại");
+			}
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+	}
+	
 	
 	private String genCodeSKU(Product product) {
 		List<SKU> lstSKU = skuService.getlist_byProduct(product.getId());
