@@ -756,6 +756,7 @@ public class PContract_POAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
+			PContract_PO parent = pcontract_POService.findOne(parentid_link);
 			String FolderPath = "upload/pcontract_po";
 
 			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
@@ -837,7 +838,6 @@ public class PContract_POAPI {
 								//Kiem tra xem PO con da ton tai hay chua
 								List<PContract_PO> list_po = pcontract_POService.check_exist_po_children(PO_No+"-"+Line, ShipDate, shipmodeid_link, pcontractid_link);
 								if(list_po.size() == 0) {
-									PContract_PO parent = pcontract_POService.findOne(parentid_link);
 									
 									PContract_PO po_new = new PContract_PO();
 									po_new.setId(null);
@@ -856,50 +856,144 @@ public class PContract_POAPI {
 									
 									//Thêm màu cỡ vào PO
 									//Kiem tra mau 
-									Long colorid_link = null;
-									List<Attributevalue> listAttributevalue = attributevalueService.getByValue(ColorName+"("+ColorCode+")", AtributeFixValues.ATTR_COLOR);
-									if(listAttributevalue.size() == 0) {
+									
+								}
+								else {
+									pcontractpoid_link = list_po.get(0).getId();
+
+								}
+								
+								Long colorid_link = null;
+								List<Attributevalue> listAttributevalue = attributevalueService.getByValue(ColorName+"("+ColorCode+")", AtributeFixValues.ATTR_COLOR);
+								if(listAttributevalue.size() == 0) {
+									Attributevalue av = new Attributevalue();
+									av.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
+									av.setId(null);
+									av.setIsdefault(false);
+									av.setOrgrootid_link(orgrootid_link);
+									av.setSortvalue(attributevalueService.getMaxSortValue(AtributeFixValues.ATTR_COLOR));
+									av.setTimecreate(new Date());
+									av.setUsercreateid_link(user.getId());
+									av.setValue(ColorName+"("+ColorCode+")");
+									
+									av = attributevalueService.save(av);
+									colorid_link = av.getId();
+								}
+								else {
+									colorid_link = listAttributevalue.get(0).getId();
+								}
+								
+								int columnsize = ColumnPO.Colorcode + 1;
+								while (commonService.getStringValue(rowheader.getCell(columnsize)) != "") {
+									Long sizeid_link = null;
+									String sizename = commonService.getStringValue(rowheader.getCell(columnsize));
+									List<Attributevalue> list_size = attributevalueService.getByValue(sizename, AtributeFixValues.ATTR_SIZE);
+									if(list_size.size() == 0) {
 										Attributevalue av = new Attributevalue();
-										av.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
+										av.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
 										av.setId(null);
 										av.setIsdefault(false);
 										av.setOrgrootid_link(orgrootid_link);
-										av.setSortvalue(attributevalueService.getMaxSortValue(AtributeFixValues.ATTR_COLOR));
+										av.setSortvalue(attributevalueService.getMaxSortValue(AtributeFixValues.ATTR_SIZE));
 										av.setTimecreate(new Date());
 										av.setUsercreateid_link(user.getId());
-										av.setValue(ColorName+"("+ColorCode+")");
+										av.setValue(sizename);
 										
 										av = attributevalueService.save(av);
-										colorid_link = av.getId();
+										sizeid_link = av.getId();
 									}
 									else {
-										colorid_link = listAttributevalue.get(0).getId();
+										sizeid_link = list_size.get(0).getId();
 									}
 									
-									//check tung cot co
-									for (int i = ColumnPO.XS; i <= ColumnPO.XXXXXL; i++) {
-										Double amount = row.getCell(i).getNumericCellValue();
-										if(amount>0) {
-											List<Attributevalue> list_size = attributevalueService.getByValue(rowheader.getCell(i).getStringCellValue(), AtributeFixValues.ATTR_SIZE);
-											if(list_size.size() > 0) {
-												Long skuid_link = skuattService.getsku_byproduct_and_valuemau_valueco(parent.getProductid_link(), colorid_link, list_size.get(0).getId());
-												int amount_plus = commonService.Calculate_pquantity_production(amount.intValue());
-												
-												PContractProductSKU ppsku = new PContractProductSKU();
-												ppsku.setId(null);
-												ppsku.setOrgrootid_link(orgrootid_link);
-												ppsku.setPcontract_poid_link(pcontractpoid_link);
-												ppsku.setPcontractid_link(pcontractid_link);
-												ppsku.setPquantity_porder(amount.intValue());
-												ppsku.setPquantity_production(amount_plus);
-												ppsku.setPquantity_total(amount_plus);
-												ppsku.setProductid_link(parent.getProductid_link());
-												ppsku.setSkuid_link(skuid_link);
-												ppskuService.save(ppsku);
-											}
+									Double amount = row.getCell(columnsize).getNumericCellValue();
+									if(amount>0) {
+										Long skuid_link = skuattService.getsku_byproduct_and_valuemau_valueco(parent.getProductid_link(), colorid_link, sizeid_link);
+										
+										if(skuid_link == 0) {
+
+											Product product = productService.findOne(parent.getProductid_link());
+											SKU sku = new SKU();
+											sku.setCode(genCodeSKU(product));
+											sku.setId(null);
+											sku.setUnitid_link(product.getUnitid_link());
+											sku.setName(genCodeSKU(product));
+											sku.setOrgrootid_link(orgrootid_link);
+											sku.setProductid_link(parent.getProductid_link());
+											sku.setSkutypeid_link(10);
+											sku = skuService.save(sku);
 											
+											skuid_link = sku.getId();
+											
+											// Them vao bang sku_attribute_value
+											SKU_Attribute_Value savMau = new SKU_Attribute_Value();
+											savMau.setId((long) 0);
+											savMau.setAttributevalueid_link(colorid_link);
+											savMau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
+											savMau.setOrgrootid_link(orgrootid_link);
+											savMau.setSkuid_link(skuid_link);
+											savMau.setUsercreateid_link(user.getId());
+											savMau.setTimecreate(new Date());
+
+											skuattService.save(savMau);
+
+											SKU_Attribute_Value savCo = new SKU_Attribute_Value();
+											savCo.setId((long) 0);
+											savCo.setAttributevalueid_link(sizeid_link);
+											savCo.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
+											savCo.setOrgrootid_link(orgrootid_link);
+											savCo.setSkuid_link(skuid_link);
+											savCo.setUsercreateid_link(user.getId());
+											savCo.setTimecreate(new Date());
+
+											skuattService.save(savCo);
+											
+											//Them vao trong product_attribute_value
+											ProductAttributeValue pav_mau = new ProductAttributeValue();
+											pav_mau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
+											pav_mau.setAttributevalueid_link(colorid_link);
+											pav_mau.setId(null);
+											pav_mau.setIsDefault(false);
+											pav_mau.setOrgrootid_link(orgrootid_link);
+											pav_mau.setProductid_link(parent.getProductid_link());
+											pavService.save(pav_mau);
+											
+											ProductAttributeValue pav_co = new ProductAttributeValue();
+											pav_co.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
+											pav_co.setAttributevalueid_link(sizeid_link);
+											pav_co.setId(null);
+											pav_co.setIsDefault(false);
+											pav_co.setOrgrootid_link(orgrootid_link);
+											pav_co.setProductid_link(parent.getProductid_link());
+											pavService.save(pav_co);
 										}
+										int amount_plus = commonService.Calculate_pquantity_production(amount.intValue());
+										List<PContractProductSKU> ppskus = ppskuService.getlistsku_bysku_and_product_PO(skuid_link, pcontractpoid_link, parent.getProductid_link());
+										if(ppskus.size() == 0) {
+											PContractProductSKU ppsku = new PContractProductSKU();
+											ppsku.setId(null);
+											ppsku.setOrgrootid_link(orgrootid_link);
+											ppsku.setPcontract_poid_link(pcontractpoid_link);
+											ppsku.setPcontractid_link(pcontractid_link);
+											ppsku.setPquantity_porder(amount.intValue());
+											ppsku.setPquantity_production(amount_plus);
+											ppsku.setPquantity_total(amount_plus);
+											ppsku.setProductid_link(parent.getProductid_link());
+											ppsku.setSkuid_link(skuid_link);
+											ppskuService.save(ppsku);
+										}
+										else {
+											PContractProductSKU ppsku = ppskus.get(0);
+											ppsku.setPquantity_porder(amount.intValue());
+											ppsku.setPquantity_production(amount_plus);
+											ppsku.setPquantity_total(amount_plus);
+											ppskuService.save(ppsku);
+										}
+										
 									}
+									
+									
+									columnsize++;
 								}
 							}
 						}
@@ -934,12 +1028,13 @@ public class PContract_POAPI {
 	private String genCodeSKU(Product product) {
 		List<SKU> lstSKU = skuService.getlist_byProduct(product.getId());
 		if (lstSKU.size() == 0) {
-			return product.getBuyercode() + "_" + "1";
+			return product.getBuyercode().trim() + "_" + "1";
 		}
-		String old_code = lstSKU.get(0).getCode();
+		String old_code = lstSKU.get(0).getCode().trim();
 		String[] obj = old_code.split("_");
 		int a = Integer.parseInt(obj[obj.length-1]);
-		return product.getBuyercode() + "_" + (a + 1);
+		String code = product.getBuyercode() + "_" + (a + 1);
+		return code;
 	}
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
