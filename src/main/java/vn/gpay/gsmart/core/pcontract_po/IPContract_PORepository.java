@@ -138,4 +138,40 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			@Param ("pcontractid_link")final Long pcontractid_link,
 			@Param ("po_buyer")final String po_buyer,
 			@Param ("buyercode")final String buyercode);
+	
+	@Query(value = "select c from PContract_PO c "
+			+ "inner join POrder_Req b on b.pcontract_poid_link = c.id "
+			+ "where lower(c.po_buyer) like lower(concat('%',:po_code,'%')) "
+			+ "and b.granttoorgid_link in :orgs "
+			+ "and c.productid_link in :products"
+			)
+	public List<PContract_PO> getBySearch(
+			@Param ("po_code")final String po_code,
+			@Param ("products")final List<Long> products,
+			@Param ("orgs")final List<Long> orgs);
+	
+	@Query(value = "select c from PContract_PO c "
+			+ "inner join POrder_Req b on b.pcontract_poid_link = c.id "
+			+ "where lower(c.po_buyer) like lower(concat('%',:po_code,'%')) "
+			+ "and c.productid_link in :products"
+			)
+	public List<PContract_PO> getBySearch_ProductOnly(
+			@Param ("po_code")final String po_code,
+			@Param ("products")final List<Long> products);
+	
+	@Query(value = "select c from PContract_PO c "
+			+ "inner join POrder_Req b on b.pcontract_poid_link = c.id "
+			+ "where lower(c.po_buyer) like lower(concat('%',:po_code,'%')) "
+			+ "and b.granttoorgid_link in :orgs "
+			)
+	public List<PContract_PO> getBySearch_OrgOnly(
+			@Param ("po_code")final String po_code,
+			@Param ("orgs")final List<Long> orgs);
+	
+	@Query(value = "select c from PContract_PO c "
+			+ "inner join POrder_Req b on b.pcontract_poid_link = c.id "
+			+ "where lower(c.po_buyer) like lower(concat('%',:po_code,'%')) "
+			)
+	public List<PContract_PO> getBySearch_CodeOnly(
+			@Param ("po_code")final String po_code);
 }

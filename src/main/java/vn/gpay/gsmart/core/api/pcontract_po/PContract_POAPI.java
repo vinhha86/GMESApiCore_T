@@ -1708,7 +1708,9 @@ public class PContract_POAPI {
 			List<PContract_PO> pcontractpoList = pcontract_POService
 					.getPcontractPoByPContractAndPOBuyer(entity.pcontractid_link, entity.po_buyer, entity.buyercode);
 			response.data = new ArrayList<PContract_PO>();
-
+			
+//			List<PContract_PO> pcontractpoList = pcontract_POService.getPOByContract(user.getRootorgid_link(), entity.pcontractid_link);
+//			response.data = pcontractpoList;
 			// chỉ lấy pcontract_po con
 			for (PContract_PO pcontractpo : pcontractpoList) {
 				if(userOrg != null) {

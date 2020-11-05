@@ -30,4 +30,6 @@ public interface IPContract_POService extends Operations<PContract_PO> {
 	List<PContract_PO> get_by_parentid(Long pcontractpo_parentid_link);
 	List<PContract_PO> check_exist_po_children(String PO_No, Date Shipdate, long shipmodeid_link, long pcontractid_link);
 	List<PContract_PO> check_exist_PONo(String PO_No,Long pcontractid_link);
+
+	List<PContract_PO> getBySearch(String po_code, List<Long> products, List<Long> orgs);
 }

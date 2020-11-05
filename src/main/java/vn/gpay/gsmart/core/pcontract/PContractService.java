@@ -1,7 +1,15 @@
 package vn.gpay.gsmart.core.pcontract;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.CriteriaBuilder.In;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,6 +29,8 @@ import vn.gpay.gsmart.core.base.AbstractService;
 @Service
 public class PContractService extends AbstractService<PContract> implements IPContractService {
 	@Autowired IPContractRepository repo;
+	@Autowired
+	EntityManager em;
 	@Override
 	protected JpaRepository<PContract, Long> getRepository() {
 		// TODO Auto-generated method stub
@@ -93,6 +103,9 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 //	            .eq(Objects.nonNull(entity.contractbuyer_year), "contractbuyer.contract_year", entity.contractbuyer_year)
 	            .ge(Objects.nonNull(entity.contractbuyer_yearfrom), "contractbuyer.contract_year", entity.contractbuyer_yearfrom)
 	            .le(Objects.nonNull(entity.contractbuyer_yearto), "contractbuyer.contract_year", entity.contractbuyer_yearto)
+				.predicate(Objects.nonNull(entity.po_code)&&entity.po_code.length()>0,
+						Specifications.or().like("pos.po_buyer", "%" + entity.po_code.toUpperCase() + "%")
+						.like("pos.po_buyer", "%" + entity.po_code.toLowerCase() + "%").build())
 	            .build();
 		
 		Sort sort = Sorts.builder()
@@ -102,5 +115,47 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 		List<PContract> lst = repo.findAll(specification, sort);
 		return lst;
 	}
+	@Override
+	public List<PContract> getBySearch_PosList(PContract_getbysearch_request entity,List<Long> pos) {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
 
+		CriteriaQuery<PContract> cq_po = cb.createQuery(PContract.class);
+		Root<PContract> rootPcontract = cq_po.from(PContract.class);
+		List<Predicate> thePredicates = new ArrayList<>();
+		
+		//orgbuyerid_link
+		if (entity.orgbuyerid_link > 0){
+			thePredicates.add(cb.equal(rootPcontract.get("orgbuyerid_link"), entity.orgbuyerid_link));
+		}
+		//orgvendorid_link
+		if (entity.orgvendorid_link > 0){
+			thePredicates.add(cb.equal(rootPcontract.get("orgvendorid_link"), entity.orgvendorid_link));
+		}
+		//contractbuyer_code
+		if (entity.contractbuyer_code.length() > 0){
+			thePredicates.add(cb.equal(rootPcontract.get("contractbuyer").get("contract_code"), entity.contractbuyer_code));
+		}
+		//contractbuyer_yearfrom
+		if (Objects.nonNull(entity.contractbuyer_yearfrom)){
+			thePredicates.add(cb.ge(rootPcontract.get("contractbuyer").get("contract_year"), entity.contractbuyer_yearfrom));
+		}
+		//contractbuyer_yearto
+		if (Objects.nonNull(entity.contractbuyer_yearto)){
+			thePredicates.add(cb.le(rootPcontract.get("contractbuyer").get("contract_year"), entity.contractbuyer_yearto));
+		}
+		//pos
+		if (pos.size() > 0){
+			In<Long> inContractClause = cb.in(rootPcontract.get("id"));
+			for (Long thePContract : pos) {
+				inContractClause.value(thePContract);
+			}
+			thePredicates.add(cb.and(inContractClause));
+		}
+		
+		Predicate p = cb.and(thePredicates.toArray(new Predicate[0]));
+		cq_po.where(p);
+
+		List<PContract> lst = em.createQuery(cq_po).getResultList();
+		return lst;
+	}
 }

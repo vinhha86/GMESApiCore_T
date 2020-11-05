@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,9 @@ import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 @Service
 public class PContract_POService extends AbstractService<PContract_PO> implements IPContract_POService {
 	@Autowired IPContract_PORepository repo;
+	@Autowired
+	EntityManager em;
+	
 	@Override
 	protected JpaRepository<PContract_PO, Long> getRepository() {
 		// TODO Auto-generated method stub
@@ -144,5 +149,22 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	public List<PContract_PO> check_exist_PONo(String PO_No,Long pcontractid_link) {
 		// TODO Auto-generated method stub
 		return repo.getone_po_byPO_no(PO_No, pcontractid_link);
+	}
+	
+	@Override
+	public List<PContract_PO> getBySearch(String po_code,List<Long> products, List<Long> orgs) {
+		List<PContract_PO> lst = new ArrayList<PContract_PO>();
+		if (products.size() > 0)
+			if (orgs.size() > 0)
+				lst = repo.getBySearch(po_code, products,orgs);
+			else
+				lst = repo.getBySearch_ProductOnly(po_code, products);
+		else 
+			if (orgs.size() > 0)
+				lst = repo.getBySearch_OrgOnly(po_code, orgs);
+			else
+				lst = repo.getBySearch_CodeOnly(po_code);
+		
+		return lst;
 	}
 }

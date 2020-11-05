@@ -15,4 +15,5 @@ public interface IPContractService extends Operations<PContract> {
 	public List<PContract> getby_code(long orgrootid_link, String contractcode, long pcontractid_link);
 	public long getby_buyer_merchandiser(long orgrootid_link, long orgbuyerid_link, long merchandiserid_link);
 	List<PContract> getBySearch(PContract_getbysearch_request entity);
+	List<PContract> getBySearch_PosList(PContract_getbysearch_request entity, List<Long> pos);
 }

@@ -27,4 +27,5 @@ public interface IProductService extends Operations<Product> {
 	public List<Product> getby_pairid(long productpairid_link);
 	Page<Product> getall_sewingthread(Long orgrootid_link, Product_getall_request request);
 	public List<Product> getProductByExactBuyercode(String buyercode);
+	List<Product> getProductByLikeBuyercode(String buyercode);
 }

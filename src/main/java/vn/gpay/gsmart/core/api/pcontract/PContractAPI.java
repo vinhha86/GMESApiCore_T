@@ -46,7 +46,8 @@ import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
-import vn.gpay.gsmart.core.porder_req.POrder_Req;
+import vn.gpay.gsmart.core.product.IProductService;
+import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.security.GpayUserOrg;
 import vn.gpay.gsmart.core.security.IGpayUserOrgService;
@@ -73,6 +74,7 @@ public class PContractAPI {
 	@Autowired IPContractBOM2SKUService pcontract_bom2_sku_Service;
 	@Autowired IPOrder_Req_Service porderReqService;
 	@Autowired IGpayUserOrgService userOrgService;
+	@Autowired IProductService productService;
 	
 	@RequestMapping(value = "/create",method = RequestMethod.POST)
 	public ResponseEntity<PContract_create_response> PContractCreate(@RequestBody PContract_create_request entity,HttpServletRequest request ) {
@@ -281,68 +283,32 @@ public class PContractAPI {
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		try {
 			
-			List<Org> listorg = new ArrayList<Org>();
-			for(GpayUserOrg userorg:userOrgService.getall_byuser(user.getId())){
-				listorg.add(orgService.findOne(userorg.getOrgid_link()));
-			}
-			
-//			Long orgrootid_link = user.getRootorgid_link();
+			List<Long> orgs = new ArrayList<Long>();
 			Long orgid_link = user.getOrgid_link();
-			Org userOrg = null;
 			if(orgid_link != 0 && orgid_link != 1 && orgid_link != null) {
-				userOrg = orgService.findOne(orgid_link);
-			}
-			
-			List<PContract> list = pcontractService.getBySearch(entity);
-			response.data = new ArrayList<PContract>();
-			
-			for(PContract pcontract : list) {
-				// check contractbuyer_code @Transient ContractBuyer
-				String contractBuyerCode = pcontract.getContractBuyerCode().toLowerCase();
-				if(!contractBuyerCode.contains(entity.contractbuyer_code.toLowerCase())) continue;
-				
-				// check PO Buyer, 
-				// check Mã SP(Buyer)
-				if(entity.po_code == "" && entity.productbuyer_code == "") {
-					
-				}else {
-					List<PContract_PO> pcontractpoList = poService.getPcontractPoByPContractAndPOBuyer(pcontract.getId(), entity.po_code, entity.productbuyer_code);
-					List<PContract_PO> temp = new ArrayList<PContract_PO>();
-					
-					for(PContract_PO pcontractpo : pcontractpoList) {
-						if(pcontractpo.getParentpoid_link() != null) {
-							temp.add(pcontractpo);
-						}
-					}
-					if(temp.size() == 0) continue;
+				for(GpayUserOrg userorg:userOrgService.getall_byuser(user.getId())){
+					orgs.add(userorg.getOrgid_link());
 				}
 				
-				// Lọc để User phân xưởng chỉ nhìn được các đơn hàng phân cho phân xưởng mình
-				if(userOrg != null) {
-					List<POrder_Req> porderReqList = porderReqService.getByContract(pcontract.getId());
-					boolean flag = true;
-					for(POrder_Req porderReq : porderReqList) {
-						Long granttoorgid_link = porderReq.getGranttoorgid_link();
-						if(listorg.size() > 0) {
-							if(!flag) break;
-							for(Org org : listorg) {
-								if(user.getOrgid_link() == granttoorgid_link || org.getId() == granttoorgid_link) {
-									flag = false;
-									break;
-								}
-							}
-						}else {
-							if(user.getOrgid_link() == granttoorgid_link) {
-								flag = false;
-								break;
-							}
-						}
-					}
-					if(flag) continue;
-				}
-				
-				response.data.add(pcontract);
+				//Them chinh don vi cua user
+				orgs.add(orgid_link);
 			}
+			
+			//Lay danh sach product thoa man dieu kien
+			List<Long> products = new ArrayList<Long>();
+			if (entity.productbuyer_code.length() > 0){
+				List<Product> product_lst = productService.getProductByLikeBuyercode(entity.productbuyer_code);
+				for (Product theProduct:product_lst)products.add(theProduct.getId());
+			}
+			
+			List<Long> pos = new ArrayList<Long>();
+			//Lay danh sach PO thoa man dieu kien
+			List<PContract_PO> lstPO = poService.getBySearch(entity.po_code, products, orgs);
+			for(PContract_PO thePO:lstPO)pos.add(thePO.getPcontractid_link());
+			
+			List<PContract> list = pcontractService.getBySearch_PosList(entity, pos);
+			response.data = list;
+			
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
