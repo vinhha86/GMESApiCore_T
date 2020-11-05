@@ -126,4 +126,24 @@ public class PContract_Price_DAPI {
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	@RequestMapping(value = "/updatePContractPriceD", method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> updatePContractPriceD(@RequestBody PContractPriceD_updatePContractPriceD_request entity,
+			HttpServletRequest request) {
+		ResponseBase response = new ResponseBase();
+		try {
+			PContract_Price_D pcontractPriceD = entity.data;
+			pcontractPriceDservice.save(pcontractPriceD);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 }
