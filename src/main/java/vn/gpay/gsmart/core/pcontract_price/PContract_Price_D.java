@@ -73,6 +73,14 @@ public class PContract_Price_D implements Serializable {/**
 		return "";
 	}
 	
+	@Transient
+	public Integer getSizesetSortValue() {
+		if(pcontractPrice != null) {
+			return pcontractPrice.getSortvalue();
+		}
+		return 0;
+	}
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)

@@ -21,5 +21,11 @@ public class PContract_Price_DService extends AbstractService<PContract_Price_D>
 		// TODO Auto-generated method stub
 		return repo.getPrice_D_ByPO(pcontract_poid_link);
 	}
+	@Override
+	public List<PContract_Price_D> getPrice_D_ByFobPriceAndPContractPrice(Long pcontractpriceid_link,
+			Long fobpriceid_link) {
+		// TODO Auto-generated method stub
+		return repo.getPrice_D_ByFobPriceAndPContractPrice(pcontractpriceid_link, fobpriceid_link);
+	}
 
 }
