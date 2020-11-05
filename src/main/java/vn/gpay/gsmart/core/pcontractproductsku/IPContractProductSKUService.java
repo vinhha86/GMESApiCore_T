@@ -29,5 +29,4 @@ public interface IPContractProductSKUService extends Operations<PContractProduct
 	List<PContractProductSKU> getlistsku_bypcontract(long orgrootid_link, long pcontractid_link);
 
 	List<PContractProductSKU> getPOSKU_Free_ByProduct(long productid_link, long pcontract_poid_link);
-	
 }

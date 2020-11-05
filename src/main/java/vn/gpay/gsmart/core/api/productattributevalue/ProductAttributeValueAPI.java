@@ -425,9 +425,9 @@ public class ProductAttributeValueAPI {
 	private String genCodeSKU(Product product) {
 		List<SKU> lstSKU = skuService.getlist_byProduct(product.getId());
 		if (lstSKU.size() == 0) {
-			return product.getBuyercode() + "_" + "1";
+			return product.getBuyercode().trim() + "_" + "1";
 		}
-		String old_code = lstSKU.get(0).getCode();
+		String old_code = lstSKU.get(0).getCode().trim();
 		String[] obj = old_code.split("_");
 		int a = Integer.parseInt(obj[obj.length-1]);
 		return product.getBuyercode() + "_" + (a + 1);
