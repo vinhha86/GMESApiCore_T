@@ -111,6 +111,14 @@ public class PContract_Price_D implements Serializable {/**
 	}
 	
 	@Transient
+	public String getProductBuyerCode() {
+		if(product != null) {
+			return product.getBuyercode();
+		}
+		return "";
+	}
+	
+	@Transient
 	public Integer getProductType() {
 		if(product != null) {
 			return product.getProducttypeid_link();
