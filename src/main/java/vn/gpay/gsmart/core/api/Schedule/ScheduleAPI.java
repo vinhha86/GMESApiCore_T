@@ -665,11 +665,12 @@ public class ScheduleAPI {
 		long orgrootid_link = user.getRootorgid_link();
 		
 		try {
+			int year = Calendar.getInstance().get(Calendar.YEAR);
 			POrder porder = porderService.findOne(entity.porderid_link);
 
 			Date startDate = commonService.getBeginOfDate(porder.getProductiondate_plan());
 			Date endDate = commonService.getEndOfDate(porder.getFinishdate_plan());
-			int duration = porder.getPlan_duration();
+			int duration = commonService.getDuration(startDate, endDate, orgrootid_link, year);
 			int productivity = porder.getPlan_productivity();
 			
 			if(productivity == 0) {
