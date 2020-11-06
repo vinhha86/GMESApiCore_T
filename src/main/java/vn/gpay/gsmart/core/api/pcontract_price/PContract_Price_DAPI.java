@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
+import vn.gpay.gsmart.core.currency.ICurrencyService;
 import vn.gpay.gsmart.core.fob_price.FOBPrice;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
@@ -32,6 +33,7 @@ public class PContract_Price_DAPI {
 	@Autowired IPContract_Price_DService pcontractPriceDservice;
 	@Autowired IPContract_Price_Service pcontractPriceservice;
 	@Autowired IPContract_POService pcontractPoService;
+	@Autowired ICurrencyService currencyService;
 	
 	@RequestMapping(value = "/getByPO", method = RequestMethod.POST)
 	public ResponseEntity<get_byPo_response> GetByPO(@RequestBody get_byPo_request entity,
@@ -135,9 +137,50 @@ public class PContract_Price_DAPI {
 			PContract_Price_D pcontractPriceD = entity.data;
 			pcontractPriceDservice.save(pcontractPriceD);
 			
+			// Tính lại fobprice sizeset
+			Long pcontractpriceid_link = pcontractPriceD.getPcontractpriceid_link();
+			Long pcontract_poid_link = pcontractPriceD.getPcontract_poid_link();
+			PContract_Price pcontractPrice = pcontractPriceservice.findOne(pcontractpriceid_link);
+			
+			List<PContract_Price_D> listPcontractPriceD = 
+					pcontractPriceDservice.getPrice_D_ByPContractPrice(pcontractpriceid_link);
+			
+			Float price_fob = 0F;
+			Float price_cmp = 0F;
+			for(PContract_Price_D temp : listPcontractPriceD) {
+				if(!temp.getIsfob()) {
+					price_cmp += temp.getPrice();
+				}else {
+					price_fob += temp.getPrice();
+				}
+			}
+			
+			pcontractPrice.setPrice_fob(price_fob);
+			pcontractPrice.setPrice_cmp(price_cmp);
+			pcontractPrice.setTotalprice(price_fob + price_cmp);
+			
+			pcontractPriceservice.save(pcontractPrice);
+			
+			// Tính lại fobprice sizeset ALL
+			
+			List<PContract_Price> listPContractPrice = pcontractPriceservice.getPrice_ByPO(pcontract_poid_link);
+			PContract_Price pcontractPriceAll = new PContract_Price();
+			Float price_fobAll = 0F;
+			
+			for(PContract_Price temp : listPContractPrice) {
+				if(temp.getSizesetid_link().equals(1L)) {
+					pcontractPriceAll = temp;
+				}else {
+					price_fobAll += temp.getPrice_fob() * temp.getQuantity();
+				}
+			}
+			price_fobAll = price_fobAll / pcontractPriceAll.getQuantity();
+			pcontractPriceAll.setPrice_fob(price_fobAll);
+			pcontractPriceAll.setTotalprice(pcontractPriceAll.getPrice_cmp() + pcontractPriceAll.getPrice_fob());
+			pcontractPriceservice.save(pcontractPriceAll);
+			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 
 		} catch (Exception e) {
