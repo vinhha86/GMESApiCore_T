@@ -150,6 +150,7 @@ public class POrderAPI {
 							
 							if (porder.getId() == null || porder.getId() == 0) {
 						
+								porder.setPcontract_poid_link(thePO.getId());
 								porder.setGolivedate(thePO.getShipdate());
 								porder.setProductiondate(thePO.getProductiondate());
 								
