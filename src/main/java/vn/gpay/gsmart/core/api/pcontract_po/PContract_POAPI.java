@@ -790,7 +790,7 @@ public class PContract_POAPI {
 				Row row = sheet.getRow(rowNum);
 				try {
 					while (commonService.getStringValue(row.getCell(ColumnPO.STT)) != "") {
-						String a  = commonService.getStringValue(row.getCell(ColumnPO.STT));
+//						String a  = commonService.getStringValue(row.getCell(ColumnPO.STT));
 						colNum++;
 						String PO_No = commonService.getStringValue(row.getCell(ColumnPO.PO));
 						colNum++;
@@ -858,6 +858,8 @@ public class PContract_POAPI {
 									po_new.setOrgrootid_link(orgrootid_link);
 									po_new.setPackingnotice(packingmethođi_link+"");
 									po_new.setProductid_link(parent.getProductid_link());
+									po_new.setPlan_productivity(parent.getPlan_productivity());
+									po_new.setPlan_linerequired(parent.getPlan_linerequired());
 									
 									po_new = pcontract_POService.save(po_new);
 									
