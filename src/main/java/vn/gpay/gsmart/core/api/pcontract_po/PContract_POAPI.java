@@ -1150,7 +1150,7 @@ public class PContract_POAPI {
 											req.setProductid_link(productPairing.getProductid_link());
 											req.setSizesetid_link((long)1);
 											req.setUsercreatedid_link(user.getId());
-											req.setStatus(POrderReqStatus.STATUS_FREE);
+											req.setStatus(POrderReqStatus.STATUS_POCONFFIRMED);
 											req.setTimecreated(new Date());
 											req.setTotalorder(amount_po*productPairing.getAmount());
 											reqService.save(req);
