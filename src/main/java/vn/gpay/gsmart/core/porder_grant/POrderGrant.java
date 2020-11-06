@@ -190,7 +190,7 @@ public class POrderGrant implements Serializable {
 	public String getMaHang(POrder porder) {
 		String name = "";
 		int total = grantamount == null ? 0 : grantamount;
-		String code = getProductcode();
+		String code = porder.getProductcode();
 		
 		DecimalFormat decimalFormat = new DecimalFormat("#,###");
 		decimalFormat.setGroupingSize(3);
