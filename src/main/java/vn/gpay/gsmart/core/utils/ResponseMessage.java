@@ -36,7 +36,9 @@ public class ResponseMessage {
     public static String MES_RC_PORDER_NOPO   		= "PO không tồn tại";    
     public static int KEY_RC_PORDER_CALCULATION		= 1014;
     public static String MES_RC_PORDER_CALCULATION  = "Năng suất xưởng hoặc Số lượng yêu cầu sản xuất không hợp lệ";    
-    
+    public static int KEY_RC_PORDER_NOPRODUCTIONDATE= 1015;
+    public static String MES_RC_PORDER_NOPRODUCTIONDATE  = "Ngày vào chuyền (Ngày VC) của PO không được để trắng";    
+
     public static String MES_RC_SUCCESS   = "OK - Everything Worked";
     public static String MES_RC_BAD_REQUEST   = "Bad Request - Invalid Parameter or Data Integrity Issue";
     public static String MES_RC_AUTHEN_ERROR = "Authentication Error";
