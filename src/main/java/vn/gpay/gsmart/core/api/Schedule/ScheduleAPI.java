@@ -672,6 +672,10 @@ public class ScheduleAPI {
 			int duration = porder.getPlan_duration();
 			int productivity = porder.getPlan_productivity();
 			
+			if(productivity == 0) {
+				productivity = commonService.getProductivity(porder.getTotalorder(), duration);
+			}
+			
 			porder.setStatus(POrderStatus.PORDER_STATUS_GRANTED);
 			porderService.save(porder);
 			
@@ -774,10 +778,12 @@ public class ScheduleAPI {
 			Date endDate = req.getShipdate();
 			int duration = commonService.getDuration(startDate, endDate, orgrootid_link, year);
 			
-			if(productivity > 0) {
-				duration = commonService.getDuration_byProductivity(req.getTotalorder(), productivity);
-				endDate = commonService.Date_Add_with_holiday(startDate, (duration-1), orgrootid_link, year);
+			if(productivity == 0) {
+				productivity = commonService.getProductivity(req.getTotalorder(), duration);
 			}
+			
+			duration = commonService.getDuration_byProductivity(req.getTotalorder(), productivity);
+			endDate = commonService.Date_Add_with_holiday(startDate, (duration-1), orgrootid_link, year);
 			
 			String po_code = req.getPo_buyer().length() > 0?req.getPo_vendor():req.getPo_buyer();
 			POrder porder = new POrder();
