@@ -746,6 +746,8 @@ public class ScheduleAPI {
 			sch.setProductivity_porder(0);
 			sch.setPcontract_poid_link(porder.getPcontract_poid_link());
 			sch.setPcontractid_link(porder.getPcontractid_link());
+			sch.setProductbuyercode(porder.getProductcode());
+			sch.setPorderid_link(porder.getId());
 			
 			response.data = sch;
 			
@@ -1289,6 +1291,7 @@ public class ScheduleAPI {
 				new_data.setPcontractid_link(grant_old.getPcontractid_link());
 				new_data.setProductivity_po(grant_old.getProductivity_po());
 				new_data.setProductivity_porder(grant_old.getProductivity_porder());
+				new_data.setProductbuyercode(porder.getProductcode());
 				response.new_data = new_data;
 				 
 				//gan sku vao grant moi sinh ra va tru sku o grant tach
