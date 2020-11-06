@@ -759,13 +759,19 @@ public class Common  {
 	
 	public String getStringValue(Cell cell) {
 		if(cell == null) return "";
-		
 		try {
 			int valua = (int)cell.getNumericCellValue();
 			return valua+"";
 		}
 		catch (Exception e) {
+			
+		}
+		
+		try {
 			return cell.getStringCellValue();
+		}
+		catch (Exception e) {
+			return "";
 		}
 	}
 	

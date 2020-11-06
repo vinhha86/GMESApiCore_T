@@ -141,9 +141,9 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	}
 	@Override
 	public List<PContract_PO> check_exist_po_children(String PO_No, Date Shipdate, long shipmodeid_link,
-			long pcontractid_link) {
+			long pcontractid_link, long parentid_link) {
 		// TODO Auto-generated method stub
-		return repo.getone_po_upload(PO_No, shipmodeid_link, Shipdate, pcontractid_link);
+		return repo.getone_po_upload(PO_No, shipmodeid_link, Shipdate, pcontractid_link, parentid_link);
 	}
 	@Override
 	public List<PContract_PO> check_exist_PONo(String PO_No,Long pcontractid_link) {

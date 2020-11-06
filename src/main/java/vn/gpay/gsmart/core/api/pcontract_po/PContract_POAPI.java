@@ -784,17 +784,26 @@ public class PContract_POAPI {
 
 				// Kiem tra header
 				int rowNum = 1;
+				int colNum = 0;
 				String mes_err = "";
 				Row rowheader = sheet.getRow(0);
 				Row row = sheet.getRow(rowNum);
 				try {
 					while (commonService.getStringValue(row.getCell(ColumnPO.STT)) != "") {
+						String a  = commonService.getStringValue(row.getCell(ColumnPO.STT));
+						colNum++;
 						String PO_No = commonService.getStringValue(row.getCell(ColumnPO.PO));
+						colNum++;
 						String Line = commonService.getStringValue(row.getCell(ColumnPO.Line));
+						colNum++;
 						Date ShipDate = row.getCell(ColumnPO.Shipdate).getDateCellValue(); 
+						colNum++;
 						String Shipmode = row.getCell(ColumnPO.Shipmode).getStringCellValue();
+						colNum++;
 						String PackingMethod = row.getCell(ColumnPO.PackingMethod).getStringCellValue();
+						colNum++;
 						String ColorName = commonService.getStringValue(row.getCell(ColumnPO.Colorname));
+						colNum++;
 						String ColorCode = commonService.getStringValue(row.getCell(ColumnPO.Colorcode));
 						
 						//Kiem tra Shipmode da ton tai hay chua
@@ -836,7 +845,7 @@ public class PContract_POAPI {
 							List<PContract_PO> list_po_parent = pcontract_POService.check_exist_PONo(PO_No, pcontractid_link);
 							if(list_po_parent.size() > 0) {
 								//Kiem tra xem PO con da ton tai hay chua
-								List<PContract_PO> list_po = pcontract_POService.check_exist_po_children(PO_No+"-"+Line, ShipDate, shipmodeid_link, pcontractid_link);
+								List<PContract_PO> list_po = pcontract_POService.check_exist_po_children(PO_No+"-"+Line, ShipDate, shipmodeid_link, pcontractid_link, parentid_link);
 								if(list_po.size() == 0) {
 									
 									PContract_PO po_new = new PContract_PO();
@@ -885,6 +894,7 @@ public class PContract_POAPI {
 								
 								int columnsize = ColumnPO.Colorcode + 1;
 								while (commonService.getStringValue(rowheader.getCell(columnsize)) != "") {
+									colNum = columnsize;
 									Long sizeid_link = null;
 									String sizename = commonService.getStringValue(rowheader.getCell(columnsize));
 									List<Attributevalue> list_size = attributevalueService.getByValue(sizename, AtributeFixValues.ATTR_SIZE);
@@ -905,8 +915,9 @@ public class PContract_POAPI {
 									else {
 										sizeid_link = list_size.get(0).getId();
 									}
-									
-									Double amount = row.getCell(columnsize).getNumericCellValue();
+									String s_amount = commonService.getStringValue(row.getCell(columnsize)) == "" ? "0" : commonService.getStringValue(row.getCell(columnsize));
+									s_amount = s_amount.replace(",","");
+									Double amount = Double.parseDouble(s_amount);
 									if(amount>0) {
 										Long skuid_link = skuattService.getsku_byproduct_and_valuemau_valueco(parent.getProductid_link(), colorid_link, sizeid_link);
 										
@@ -999,9 +1010,10 @@ public class PContract_POAPI {
 						}
 						rowNum++;
 						row = sheet.getRow(rowNum);
+						if(row == null) break;
 					}
 				} catch (Exception e) {
-					mes_err = e.getMessage();
+					mes_err = "Có lỗi ở dòng "+(rowNum+1)+" và cột "+ (colNum+1); 
 				}
 
 				workbook.close();
