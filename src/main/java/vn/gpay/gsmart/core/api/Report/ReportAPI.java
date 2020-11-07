@@ -6,6 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -331,6 +334,57 @@ public class ReportAPI {
 		return new ResponseEntity<report_quotation_response>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/download_temp_chaogia", method = RequestMethod.POST)
+	public ResponseEntity<download_template_chaogia_response> DownloadChaoGia(HttpServletRequest request)
+	{
+
+		download_template_chaogia_response response = new download_template_chaogia_response();
+		try {
+			String FolderPath = "TemplateUpload";
+			
+			// Thư mục gốc upload file.			
+			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+			
+			String filePath = uploadRootPath+"/"+ "Template_ChaoGia.xlsx";
+			Path path = Paths.get(filePath);
+			byte[] data = Files.readAllBytes(path);
+			response.data = data;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<download_template_chaogia_response>(response, HttpStatus.OK);			
+		}
+		catch(Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<download_template_chaogia_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/download_temp_po", method = RequestMethod.POST)
+	public ResponseEntity<download_template_chaogia_response> DownloadPO(HttpServletRequest request)
+	{
+
+		download_template_chaogia_response response = new download_template_chaogia_response();
+		try {
+			String FolderPath = "TemplateUpload";
+			
+			// Thư mục gốc upload file.			
+			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+			
+			String filePath = uploadRootPath+"/"+ "Template_Upload_PO_Line.xlsx";
+			Path path = Paths.get(filePath);
+			byte[] data = Files.readAllBytes(path);
+			response.data = data;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<download_template_chaogia_response>(response, HttpStatus.OK);			
+		}
+		catch(Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<download_template_chaogia_response>(response, HttpStatus.OK);
+		}
+	}
 	
 	@RequestMapping(value = "/test", method = RequestMethod.POST)
 	public ResponseEntity<report_test_response> Product_GetOne(HttpServletRequest request, @RequestBody report_test_request entity) throws IOException, InvalidFormatException {
