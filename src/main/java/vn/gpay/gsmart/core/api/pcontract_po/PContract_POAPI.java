@@ -860,6 +860,7 @@ public class PContract_POAPI {
 									po_new.setProductid_link(parent.getProductid_link());
 									po_new.setPlan_productivity(parent.getPlan_productivity());
 									po_new.setPlan_linerequired(parent.getPlan_linerequired());
+									po_new.setStatus(POStatus.PO_STATUS_CONFIRMED);
 									
 									po_new = pcontract_POService.save(po_new);
 									
@@ -871,7 +872,8 @@ public class PContract_POAPI {
 								}
 								else {
 									pcontractpoid_link = list_po.get(0).getId();
-
+									PContract_PO po = list_po.get(0);
+									po.setStatus(POStatus.PO_STATUS_CONFIRMED);
 								}
 								
 								Long colorid_link = null;
