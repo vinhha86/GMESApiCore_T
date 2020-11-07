@@ -720,10 +720,10 @@ public class POrderAPI {
 				totalFree += (null != theSKU.getPquantity_total()?theSKU.getPquantity_total():0) - (null !=theSKU.getPquantity_lenhsx()?theSKU.getPquantity_lenhsx():0);
 			}
 			if (totalFree == 0){
-				if (thePO.getStatus() == POStatus.PO_STATUS_CONFIRMED) thePO.setStatus(POStatus.PO_STATUS_PORDER_ALL);
+				if (null!=thePO.getStatus()&&thePO.getStatus() == POStatus.PO_STATUS_CONFIRMED) thePO.setStatus(POStatus.PO_STATUS_PORDER_ALL);
 				
 			} else {
-				if (thePO.getStatus() == POStatus.PO_STATUS_PORDER_ALL) thePO.setStatus(POStatus.PO_STATUS_CONFIRMED);
+				if (null!=thePO.getStatus()&&thePO.getStatus() == POStatus.PO_STATUS_PORDER_ALL) thePO.setStatus(POStatus.PO_STATUS_CONFIRMED);
 			}
 			pcontract_POService.save(thePO);
 		}
