@@ -228,14 +228,14 @@ public class PContract_PO implements Serializable {/**
 	@Transient
 	public String getCurrencyCode() {
 		if(currency!=null)
-			currency.getCode();
+			return currency.getCode();
 		return "$";
 	}
 	
 	@Transient
 	public String getCurrencyName() {
 		if(currency!=null)
-			currency.getName();
+			return currency.getName();
 		return "US Dollar";
 	}
 	
