@@ -202,14 +202,16 @@ public class POrder implements Serializable {
 	@Transient
 	public String getStylebuyer() {
 		if(product != null) {
-			return product.getBuyercode();
+			if(product.getBuyercode() != null)
+				return product.getBuyercode();
 		}
 		return "";
 	}	
 	@Transient
 	public String getStylevendor() {
 		if(product != null) {
-			return product.getVendorcode();
+			if(product.getVendorcode() != null)
+				return product.getVendorcode();
 		}
 		return "";
 	}	
@@ -286,7 +288,8 @@ public class POrder implements Serializable {
 	@Transient
 	public String getPo_buyer() {
 		if(pcontract_po != null) {
-			return pcontract_po.getPo_buyer();
+			if(pcontract_po.getPo_buyer() != null)
+				return pcontract_po.getPo_buyer();
 		}
 		return "";
 	}
@@ -294,7 +297,8 @@ public class POrder implements Serializable {
 	@Transient
 	public String getPo_vendor() {
 		if(pcontract_po != null) {
-			return pcontract_po.getPo_vendor();
+			if(pcontract_po.getPo_vendor() != null)
+				return pcontract_po.getPo_vendor();
 		}
 		return "";
 	}
