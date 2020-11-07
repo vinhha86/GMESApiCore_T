@@ -134,7 +134,7 @@ public class POrder_Req_Service extends AbstractService<POrder_Req> implements I
 		Specification<POrder_Req> specification = Specifications.<POrder_Req>and()
 				.eq("granttoorgid_link", orgid_link)
 				.eq("status", 0)
-				.le("pcontract_po.status", 0)
+				.le("pcontract_po.status", -1)
 	            .build();
 		Sort sort = Sorts.builder()
 		        .desc("id")
@@ -149,7 +149,7 @@ public class POrder_Req_Service extends AbstractService<POrder_Req> implements I
 		Specification<POrder_Req> specification = Specifications.<POrder_Req>and()
 				.eq("granttoorgid_link", orgid_link)
 				.eq("status", 1)
-				.le("pcontract_po.status", 0)
+				.le("pcontract_po.status", -1)
 	            .build();
 		Sort sort = Sorts.builder()
 		        .desc("id")
