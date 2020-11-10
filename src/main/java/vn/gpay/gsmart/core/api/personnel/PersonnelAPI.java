@@ -27,6 +27,8 @@ import vn.gpay.gsmart.core.personel.IPersonnel_Service;
 import vn.gpay.gsmart.core.personel.Personel;
 import vn.gpay.gsmart.core.personnel_history.IPersonnel_His_Service;
 import vn.gpay.gsmart.core.personnel_history.Personnel_His;
+import vn.gpay.gsmart.core.personnel_notmap.IPersonnel_notmap_Service;
+import vn.gpay.gsmart.core.personnel_notmap.Personnel_notmap;
 import vn.gpay.gsmart.core.personnel_type.IPersonnelType_Service;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
@@ -43,6 +45,7 @@ public class PersonnelAPI {
 	@Autowired IPersonnel_His_Service hispersonService;
 	@Autowired IPOrderGrant_Service pordergrantService;
 	@Autowired IPOrderGrantBalanceService pordergrantBalanceService;
+	@Autowired IPersonnel_notmap_Service personnelNotmapService;
 	
 	@RequestMapping(value = "/gettype",method = RequestMethod.POST)
 	public ResponseEntity<gettype_response> getType(HttpServletRequest request ) {
@@ -334,4 +337,59 @@ public class PersonnelAPI {
 		    return new ResponseEntity<getperson_byorg_response>(response,HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/getPersonnelNotmap",method = RequestMethod.POST)
+	public ResponseEntity<personnel_notmap_response> getPersonnelNotmap(HttpServletRequest request) {
+		personnel_notmap_response response = new personnel_notmap_response();
+		try {
+			response.data = personnelNotmapService.findAll();
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<personnel_notmap_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<personnel_notmap_response>(response,HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/getByNotRegister",method = RequestMethod.POST)
+	public ResponseEntity<getperson_byorg_response> getByNotRegister(HttpServletRequest request) {
+		getperson_byorg_response response = new getperson_byorg_response();
+		try {
+			response.data = personService.getByNotRegister();
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getperson_byorg_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<getperson_byorg_response>(response,HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/updatePersonnelNotmap",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> updatePersonnelNotmap(@RequestBody personnel_notmap_update_request entity,HttpServletRequest request) {
+		ResponseBase response = new ResponseBase();
+		try {
+			Personnel_notmap data = entity.data;
+			Personel personnel = personService.findOne(entity.personnelid_link);
+			
+			personnel.setRegister_code(data.getRegister_code());
+			personService.save(personnel);
+			
+			personnelNotmapService.deleteById(data.getId());
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}
+	}
+	
 }

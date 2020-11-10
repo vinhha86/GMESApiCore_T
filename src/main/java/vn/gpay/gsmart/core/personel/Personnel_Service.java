@@ -45,5 +45,10 @@ public class Personnel_Service extends AbstractService<Personel> implements IPer
 		List<Personel> lst = repo.findAll(specification, sort);
 		return lst;
 	}
+	@Override
+	public List<Personel> getByNotRegister() {
+		// TODO Auto-generated method stub
+		return repo.getByNotRegister();
+	}
 
 }
