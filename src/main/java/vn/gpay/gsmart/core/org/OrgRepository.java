@@ -9,6 +9,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import vn.gpay.gsmart.core.org.Org;
+
 @Repository
 @Transactional
 public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecificationExecutor<Org>{
@@ -50,4 +52,7 @@ public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecification
 			+ "inner join POrder b on a.porderid_link = b.id "
 			+ "where a.porderid_link = :porderid_link order by c.id")
 	public List<Org> getOrgByPorderIdLink(@Param ("porderid_link")final Long porderid_link);
+	
+	@Query(value = "select c from Org c where c.orgtypeid_link in(1,13,14,17) order by c.orgtypeid_link, c.name asc")
+	public List<Org> findOrgByTypeForInvCheckDeviceMenuOrg();
 }

@@ -3,6 +3,7 @@ package vn.gpay.gsmart.core.org;
 import java.util.List;
 
 import vn.gpay.gsmart.core.base.Operations;
+import vn.gpay.gsmart.core.org.Org;
 
 public interface IOrgService extends Operations<Org>{
 
@@ -31,4 +32,6 @@ public interface IOrgService extends Operations<Org>{
 	public List<Org> findOrgByOrgTypeString(List<String> list_typeid, Long parentid_link);
 	
 	public List<Org> getOrgByPorderIdLink(Long porderid_link);
+	
+	public List<Org> findOrgByTypeForInvCheckDeviceMenuOrg();
 }

@@ -83,6 +83,23 @@ public class OrgMenuAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/invcheckdevice_orgmenu_tree",method = RequestMethod.POST)
+	public ResponseEntity<?> InvCheckDeviceOrgMenuTree(HttpServletRequest request ) {
+		try {
+			OrgMenuTreeResponse response = new OrgMenuTreeResponse();
+			List<Org> menu = orgService.findOrgByTypeForInvCheckDeviceMenuOrg();
+			List<OrgTree> children = orgService.createTree(menu);
+//			System.out.println(menu.size());
+			response.children=children;
+			return new ResponseEntity<OrgMenuTreeResponse>(response,HttpStatus.OK);
+		}catch (RuntimeException e) {
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(e.getMessage());
+		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 	@RequestMapping(value = "/orgall",method = RequestMethod.POST)
 	public ResponseEntity<?> OrgAll(HttpServletRequest request ) {
 		try {

@@ -16,6 +16,7 @@ import com.github.wenhao.jpa.Sorts;
 import com.github.wenhao.jpa.Specifications;
 
 import vn.gpay.gsmart.core.base.AbstractService;
+import vn.gpay.gsmart.core.org.Org;
 
 @Service
 public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
@@ -288,5 +289,10 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 	public List<Org> getOrgByPorderIdLink(Long porderid_link) {
 		// TODO Auto-generated method stub
 		return repositoty.getOrgByPorderIdLink(porderid_link);
+	}
+	
+	@Override
+	public List<Org> findOrgByTypeForInvCheckDeviceMenuOrg() {
+		return repositoty.findOrgByTypeForInvCheckDeviceMenuOrg();
 	}
 }
