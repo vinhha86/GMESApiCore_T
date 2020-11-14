@@ -23,10 +23,25 @@ public class TimeSheet implements Serializable{
 	@SequenceGenerator(name="timesheet_inout_generator", sequenceName = "timesheet_inout_id_seq", allocationSize=1)
 	private Long id;
 	private Long orgrootid_link;
-	private Long personnelid_link;
+	private String register_code;
 	private Long deviceid_link;
 	private Date timerecorded;
 	private Boolean ishand_record;
+	private Long zoneid_link;
+	
+		
+	public Long getZoneid_link() {
+		return zoneid_link;
+	}
+	public void setZoneid_link(Long zoneid_link) {
+		this.zoneid_link = zoneid_link;
+	}
+	public String getRegister_code() {
+		return register_code;
+	}
+	public void setRegister_code(String register_code) {
+		this.register_code = register_code;
+	}
 	public Long getId() {
 		return id;
 	}
@@ -38,12 +53,6 @@ public class TimeSheet implements Serializable{
 	}
 	public void setOrgrootid_link(Long orgrootid_link) {
 		this.orgrootid_link = orgrootid_link;
-	}
-	public Long getPersonnelid_link() {
-		return personnelid_link;
-	}
-	public void setPersonnelid_link(Long personnelid_link) {
-		this.personnelid_link = personnelid_link;
 	}
 	public Long getDeviceid_link() {
 		return deviceid_link;
