@@ -4,10 +4,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,6 +40,7 @@ import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
+import vn.gpay.gsmart.core.porderprocessing.POrderProcessingBinding;
 import vn.gpay.gsmart.core.porderprocessing.TVSOrgStatusShow;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.GPAYDateFormat;
@@ -1611,6 +1615,62 @@ public class POrderProcessingAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());			
 		    return new ResponseEntity<POrderProcessingResponse>(HttpStatus.OK);
+		}    			
+	}
+    
+    @RequestMapping(value = "/getAmountOutputForChart",method = RequestMethod.POST)
+	public ResponseEntity<POrderProcess_getForChart_response> getForChart(HttpServletRequest request) {
+		POrderProcess_getForChart_response response = new POrderProcess_getForChart_response();
+		try {
+			Calendar calendar = Calendar.getInstance();
+			// 7/1 > 6/2
+			Integer day = calendar.get(Calendar.DATE);
+			Integer month = calendar.get(Calendar.MONTH);
+			Integer year = calendar.get(Calendar.YEAR);
+			
+//			day = 6;
+//			month = 11;
+//			year = 2020;
+			
+			Date dateFrom = new Date();
+			Date dateTo = new Date();
+			Date now = new GregorianCalendar(year, month, day).getTime();
+			
+			if(day >= 7) {
+				if(month == 11) {
+					dateFrom = new GregorianCalendar(year, 11, 7).getTime();
+					dateTo = new GregorianCalendar(year + 1, 0, 6).getTime();
+				}else {
+					dateFrom = new GregorianCalendar(year, month, 7).getTime();
+					dateTo = new GregorianCalendar(year, month + 1, 6).getTime();
+				}
+			}else {
+				if(month == 0) {
+					dateFrom = new GregorianCalendar(year - 1, 11, 7).getTime();
+					dateTo = new GregorianCalendar(year, 0, 6).getTime();
+				}else {
+					dateFrom = new GregorianCalendar(year, month - 1, 7).getTime();
+					dateTo = new GregorianCalendar(year, month, 6).getTime();
+				}
+			}
+			System.out.println(dateFrom);
+			System.out.println(dateTo);
+			System.out.println(now);
+			
+			Long diffInMillies = Math.abs(now.getTime() - dateFrom.getTime());
+			Long dayDifference = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS) + 1; // +1 de tinh them nay hien tai
+			
+			System.out.println(dayDifference);
+			
+			response.data = pprocessRepository.getAmountOutputForChart(dateFrom, dateTo, dayDifference);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
+			return new ResponseEntity<POrderProcess_getForChart_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());			
+		    return new ResponseEntity<POrderProcess_getForChart_response>(HttpStatus.OK);
 		}    			
 	}
 }
