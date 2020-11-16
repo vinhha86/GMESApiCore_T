@@ -147,6 +147,21 @@ public interface IPOrderProcessing_Repository extends JpaRepository<POrderProces
 			+ "inner join POrder b on a.porderid_link = b.id "
 			+ "where b.pcontract_poid_link = :pcontract_poid_link and a.amountinput > 0")
 	public List<POrderProcessing>getby_pcontractpo(
-			@Param ("pcontract_poid_link")final Long pcontract_poid_link);	
+			@Param ("pcontract_poid_link")final Long pcontract_poid_link);
+	
+	@Query(value = "select sum(a.amountoutput)/:dayDifference, sum(a.amounterror)/:dayDifference, sum(a.amountstocked)/:dayDifference, " 
+	+ "b.parentid_link, c.name from POrderProcessing a "
+			+ "inner join Org b on a.granttoorgid_link = b.id "
+			+ "inner join Org c on b.parentid_link = c.id " 
+			+ "where a.processingdate >= :dateFrom "
+			+ "and a.processingdate <= :dateTo "
+			+ "group by b.parentid_link, c.name "
+			+ "order by b.parentid_link "
+			)
+	public List<Object[]>getAmountOutputForChart(
+			@Param ("dateFrom")final Date dateFrom, // 7-11-2020
+			@Param ("dateTo")final Date dateTo, // 6-12-2020
+			@Param ("dayDifference")final Long dayDifference // ngay hien tai - dateFrom
+			);
 
 }

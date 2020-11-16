@@ -50,5 +50,10 @@ public class Personnel_Service extends AbstractService<Personel> implements IPer
 		// TODO Auto-generated method stub
 		return repo.getByNotRegister();
 	}
+	@Override
+	public List<Personel> getPerson_by_register_code(Long orgrootid_link, String register_code) {
+		// TODO Auto-generated method stub
+		return repo.getby_registercode(register_code, orgrootid_link);
+	}
 
 }

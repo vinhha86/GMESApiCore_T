@@ -1,4 +1,4 @@
-package vn.gpay.gsmart.core.personnel_notmap;
+package vn.gpay.gsmart.core.timesheet_shift_type;
 
 import java.util.List;
 
@@ -9,11 +9,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @Repository
 @Transactional
-public interface Personnel_notmap_repository extends JpaRepository<Personnel_notmap, Long>,JpaSpecificationExecutor<Personnel_notmap> {
-	@Query("SELECT c FROM Personnel_notmap c "
-			+ "where c.register_code = :register_code  ")
-	public List<Personnel_notmap> getby_registercode(
-			@Param ("register_code")final String register_code);
+public interface TimesheetShiftTypeRepository extends JpaRepository<TimesheetShiftType, Long>, JpaSpecificationExecutor<TimesheetShiftType>{
+	@Query(value = "select c from TimesheetShiftType c where c.name = :name ")
+	public List<TimesheetShiftType> getByName(@Param ("name")final  String name);
 }

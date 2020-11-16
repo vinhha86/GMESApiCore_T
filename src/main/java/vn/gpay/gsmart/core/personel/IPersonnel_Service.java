@@ -8,4 +8,5 @@ public interface IPersonnel_Service extends Operations<Personel> {
 	List<Personel> getby_orgmanager(Long orgmanagerid_link, long orgrootid_link);
 	List<Personel> getby_org(Long orgid_link, long orgrootid_link);
 	List<Personel> getByNotRegister();
+	List<Personel> getPerson_by_register_code(Long orgrootid_link, String register_code);
 }

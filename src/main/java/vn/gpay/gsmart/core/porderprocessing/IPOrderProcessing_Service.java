@@ -53,4 +53,5 @@ public interface IPOrderProcessing_Service extends Operations<POrderProcessing>{
 	
 	List<POrderProcessing> getby_pcontratpo(Long pcontract_poid_link);
 
+	public List<POrderProcessingBinding>getAmountOutputForChart(Date dateFrom, Date dateTo, Long dayDifference);
 }

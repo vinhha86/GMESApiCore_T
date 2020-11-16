@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.porderprocessing;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -157,5 +158,24 @@ public class POrderProcessing_Service extends AbstractService<POrderProcessing> 
 	public List<POrderProcessing> getby_pcontratpo(Long pcontract_poid_link) {
 		// TODO Auto-generated method stub
 		return repo.getby_pcontractpo(pcontract_poid_link);
+	}
+
+	@Override
+	public List<POrderProcessingBinding> getAmountOutputForChart(Date dateFrom, Date dateTo, Long dayDifference) {
+		// TODO Auto-generated method stub
+		List<POrderProcessingBinding> data = new ArrayList<POrderProcessingBinding>();
+		List<Object[]> objects = repo.getAmountOutputForChart(dateFrom, dateTo, dayDifference);
+		
+		for(Object[] row : objects) {
+			POrderProcessingBinding temp = new POrderProcessingBinding();
+			temp.setSum((Long) row[0]);
+			temp.setSumError((Long) row[1]);
+			temp.setSumStocked((Long) row[2]);
+			temp.setParentid_link((Long) row[3]);
+			temp.setName((String) row[4]);
+			data.add(temp);
+		}
+		
+		return data;
 	}
 }

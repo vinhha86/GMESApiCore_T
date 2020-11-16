@@ -75,9 +75,27 @@ public class Devices implements Serializable {
 	
 	private String ip;
 	private Integer port;
+	private Date lasttime_download;
+	private Long zoneid_link;
 	
 	
 	
+	public Date getLasttime_download() {
+		return lasttime_download;
+	}
+
+	public void setLasttime_download(Date lasttime_download) {
+		this.lasttime_download = lasttime_download;
+	}
+
+	public Long getZoneid_link() {
+		return zoneid_link;
+	}
+
+	public void setZoneid_link(Long zoneid_link) {
+		this.zoneid_link = zoneid_link;
+	}
+
 	public Boolean getDisable() {
 		return disable;
 	}
