@@ -67,4 +67,13 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 			)
 	public List<POrder> getPOrderByExactOrdercode(
 			@Param ("ordercode")final String ordercode);
+	
+	@Query(value = "select sum(a.totalorder), b.name, a.status, b.id, b.code "
+			+ "from POrder a "
+			+ "inner join Org b on a.granttoorgid_link = b.id "
+			+ "where a.status = 0 or a.status = 1 "
+			+ "group by b.id, b.name, b.code, a.status "
+			+ "order by b.id "
+			)
+	public List<Object[]> getForNotInProductionChart();
 }

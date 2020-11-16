@@ -1619,7 +1619,7 @@ public class POrderProcessingAPI {
 	}
     
     @RequestMapping(value = "/getAmountOutputForChart",method = RequestMethod.POST)
-	public ResponseEntity<POrderProcess_getForChart_response> getForChart(HttpServletRequest request) {
+	public ResponseEntity<POrderProcess_getForChart_response> getAmountOutputForChart(HttpServletRequest request) {
 		POrderProcess_getForChart_response response = new POrderProcess_getForChart_response();
 		try {
 			Calendar calendar = Calendar.getInstance();
@@ -1653,9 +1653,9 @@ public class POrderProcessingAPI {
 					dateTo = new GregorianCalendar(year, month, 6).getTime();
 				}
 			}
-			System.out.println(dateFrom);
-			System.out.println(dateTo);
-			System.out.println(now);
+//			System.out.println(dateFrom);
+//			System.out.println(dateTo);
+//			System.out.println(now);
 			
 			Long diffInMillies = Math.abs(now.getTime() - dateFrom.getTime());
 			Long dayDifference = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS) + 1; // +1 de tinh them nay hien tai
@@ -1663,6 +1663,33 @@ public class POrderProcessingAPI {
 			System.out.println(dayDifference);
 			
 			response.data = pprocessRepository.getAmountOutputForChart(dateFrom, dateTo, dayDifference);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
+			return new ResponseEntity<POrderProcess_getForChart_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());			
+		    return new ResponseEntity<POrderProcess_getForChart_response>(HttpStatus.OK);
+		}    			
+	}
+	
+	@RequestMapping(value = "/getAmountPackStockedForChart",method = RequestMethod.POST)
+	public ResponseEntity<POrderProcess_getForChart_response> getAmountStockedForChart(HttpServletRequest request) {
+		POrderProcess_getForChart_response response = new POrderProcess_getForChart_response();
+		try {
+			Calendar cal = new GregorianCalendar();
+			cal.add(Calendar.DAY_OF_MONTH, -20);
+			Date twentyDaysAgo = cal.getTime();
+			Date today = new Date();
+			
+//			System.out.println(twentyDaysAgo);
+//			System.out.println(today);
+			
+			List<POrderProcessingBinding> list = pprocessRepository.getAmountPackStockedForChart(twentyDaysAgo, today);
+//			System.out.println(list.size());
+			
+			response.data = list;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				

@@ -1,8 +1,12 @@
 package vn.gpay.gsmart.core.porderprocessing;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -168,7 +172,7 @@ public class POrderProcessing_Service extends AbstractService<POrderProcessing> 
 		
 		for(Object[] row : objects) {
 			POrderProcessingBinding temp = new POrderProcessingBinding();
-			temp.setSum((Long) row[0]);
+			temp.setSumOutput((Long) row[0]);
 			temp.setSumError((Long) row[1]);
 			temp.setSumStocked((Long) row[2]);
 			temp.setParentid_link((Long) row[3]);
@@ -176,6 +180,78 @@ public class POrderProcessing_Service extends AbstractService<POrderProcessing> 
 			data.add(temp);
 		}
 		
+		return data;
+	}
+
+	@Override
+	public List<POrderProcessingBinding> getAmountPackStockedForChart(Date twentyDaysAgo, Date today) {
+		
+		List<POrderProcessingBinding> data = new ArrayList<POrderProcessingBinding>();
+		Map<Date, POrderProcessingBinding> mapTmp = new HashMap<>();
+		List<Object[]> objects = repo.getAmountPackStockedForChart(twentyDaysAgo, today);
+		
+		for(Object[] row : objects) {
+//			System.out.println("---");
+//			System.out.println((Long) row[0]);
+//			System.out.println((String) row[1]);
+//			System.out.println((Date) row[2]);
+			Long sum = (Long) row[0];
+			String name = (String) row[1];
+			Date date = (Date) row[2];
+			if(mapTmp.containsKey(date)) {
+				POrderProcessingBinding temp = mapTmp.get(date);
+				switch(name) {
+					case "DHA":
+						temp.setDataDHA(sum);
+						break;
+					case "NV":
+						temp.setDataNV(sum);
+						break;
+					case "Bắc Ninh 1":
+						temp.setDataBN1(sum);
+						break;
+					case "Bắc Ninh 2":
+						temp.setDataBN2(sum);
+						break;
+					case "Bắc Ninh 3":
+						temp.setDataBN3(sum);
+						break;
+				}
+				mapTmp.put(date, temp);
+			}else {
+				POrderProcessingBinding temp = new POrderProcessingBinding();
+				temp.setProcessingDate(date);
+				temp.setDataDHA(0L);
+				temp.setDataNV(0L);
+				temp.setDataBN1(0L);
+				temp.setDataBN2(0L);
+				temp.setDataBN3(0L);
+				switch(name) {
+					case "DHA":
+						temp.setDataDHA(sum);
+						break;
+					case "NV":
+						temp.setDataNV(sum);
+						break;
+					case "Bắc Ninh 1":
+						temp.setDataBN1(sum);
+						break;
+					case "Bắc Ninh 2":
+						temp.setDataBN2(sum);
+						break;
+					case "Bắc Ninh 3":
+						temp.setDataBN3(sum);
+						break;
+				}
+				mapTmp.put(date, temp);
+			}
+		}
+		data = new ArrayList<POrderProcessingBinding>(mapTmp.values());
+		Collections.sort(data, new Comparator<POrderProcessingBinding>() {
+			  public int compare(POrderProcessingBinding o1, POrderProcessingBinding o2) {
+			      return o1.getProcessingDate().compareTo(o2.getProcessingDate());
+			  }
+			});
 		return data;
 	}
 }

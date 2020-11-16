@@ -38,6 +38,7 @@ import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.porder.POrderBinding;
 import vn.gpay.gsmart.core.porder.POrderFilter;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_product.IPOrder_Product_Service;
@@ -1048,5 +1049,23 @@ public class POrderAPI {
 		} catch (Exception ex){
 			ex.printStackTrace();
 		}
+	}
+	
+	@RequestMapping(value = "/getForNotInProductionChart",method = RequestMethod.POST)
+	public ResponseEntity<POrder_getForChart_response> getForNotInProductionChart(HttpServletRequest request) {
+		POrder_getForChart_response response = new POrder_getForChart_response();
+		try {
+			List<POrderBinding> list = porderService.getForNotInProductionChart();
+			
+			response.data = list;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
+			return new ResponseEntity<POrder_getForChart_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());			
+		    return new ResponseEntity<POrder_getForChart_response>(HttpStatus.OK);
+		}    			
 	}
 }

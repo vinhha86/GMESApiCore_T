@@ -30,4 +30,6 @@ public interface IPOrder_Service extends Operations<POrder> {
 	public List<POrder> get_by_code(String ordercode, long orgrootid_link);
 	public List<POrder> getPOrderByOrdercode(String ordercode);
 	public List<POrder> getPOrderByExactOrdercode(String ordercode);
+	
+	public List<POrderBinding> getForNotInProductionChart();
 }

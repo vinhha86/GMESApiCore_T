@@ -163,5 +163,18 @@ public interface IPOrderProcessing_Repository extends JpaRepository<POrderProces
 			@Param ("dateTo")final Date dateTo, // 6-12-2020
 			@Param ("dayDifference")final Long dayDifference // ngay hien tai - dateFrom
 			);
-
+	
+	@Query(value = "select sum(a.amountstocked), c.name, a.processingdate "
+			+ "from POrderProcessing a "
+			+ "inner join Org b on a.granttoorgid_link = b.id "
+			+ "inner join Org c on b.parentid_link = c.id "
+			+ "where a.processingdate >= :twentyDaysAgo "
+			+ "and a.processingdate <= :today "
+			+ "group by c.name,a.processingdate "
+			+ "order by a.processingdate, c.name "
+			)
+	public List<Object[]>getAmountPackStockedForChart(
+			@Param ("twentyDaysAgo")final Date twentyDaysAgo, 
+			@Param ("today")final Date today
+			);
 }

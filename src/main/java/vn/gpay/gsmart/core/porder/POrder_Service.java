@@ -1,7 +1,12 @@
 package vn.gpay.gsmart.core.porder;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -255,5 +260,61 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 	public List<POrder> getPOrderByExactOrdercode(String ordercode) {
 		// TODO Auto-generated method stub
 		return repo.getPOrderByExactOrdercode(ordercode);
+	}
+
+	@Override
+	public List<POrderBinding> getForNotInProductionChart() {
+		
+		List<POrderBinding> data = new ArrayList<POrderBinding>();
+		Map<String, POrderBinding> mapTmp = new HashMap<>();
+		List<Object[]> objects = repo.getForNotInProductionChart();
+		
+		for(Object[] row : objects) {
+//			System.out.println("---");
+//			System.out.println((Long) row[0]);
+//			System.out.println((String) row[1]);
+//			System.out.println((Integer) row[2]);
+			Long sum = (Long) row[0];
+			String name = (String) row[1];
+			Integer status = (Integer) row[2];
+			Long id = (Long) row[3];
+			String code = (String) row[4];
+			
+			if(mapTmp.containsKey(name)) {
+				POrderBinding temp = mapTmp.get(name);
+				switch(status) {
+					case 0:
+						temp.setSumChuaPhanChuyen(sum);
+						break;
+					case 1:
+						temp.setSumChuaSanXuat(sum);
+						break;
+				}
+				mapTmp.put(name, temp);
+			}else {
+				POrderBinding temp = new POrderBinding();
+				temp.setOrgName(name);
+				temp.setOrgId(id);
+				temp.setOrgCode(code);
+				temp.setSumChuaPhanChuyen(0L);
+				temp.setSumChuaSanXuat(0L);
+				switch(status) {
+					case 0:
+						temp.setSumChuaPhanChuyen(sum);
+						break;
+					case 1:
+						temp.setSumChuaSanXuat(sum);
+						break;
+				}
+				mapTmp.put(name, temp);
+			}
+		}
+		data = new ArrayList<POrderBinding>(mapTmp.values());
+		Collections.sort(data, new Comparator<POrderBinding>() {
+			  public int compare(POrderBinding o1, POrderBinding o2) {
+			      return o1.getOrgId().compareTo(o2.getOrgId());
+			  }
+			});
+		return data;
 	}
 }
