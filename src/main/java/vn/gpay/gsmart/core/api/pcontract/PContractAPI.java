@@ -289,10 +289,10 @@ public class PContractAPI {
 				for(GpayUserOrg userorg:userOrgService.getall_byuser(user.getId())){
 					orgs.add(userorg.getOrgid_link());
 				}
-				
+				//Them chinh don vi cua user
+				orgs.add(orgid_link);
 			}
-			//Them chinh don vi cua user
-			orgs.add(orgid_link);
+			
 			
 			//Lay danh sach product thoa man dieu kien
 			List<Long> products = new ArrayList<Long>();
