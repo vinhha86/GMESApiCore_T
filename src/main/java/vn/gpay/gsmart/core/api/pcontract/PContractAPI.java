@@ -303,8 +303,10 @@ public class PContractAPI {
 			
 			List<Long> pos = new ArrayList<Long>();
 			//Lay danh sach PO thoa man dieu kien
-			List<PContract_PO> lstPO = poService.getBySearch(entity.po_code, products, orgs);
-			for(PContract_PO thePO:lstPO)pos.add(thePO.getPcontractid_link());
+			if (entity.po_code.length() > 0 || entity.productbuyer_code.length() > 0){
+				List<PContract_PO> lstPO = poService.getBySearch(entity.po_code, products, orgs);
+				for(PContract_PO thePO:lstPO)pos.add(thePO.getPcontractid_link());
+			}
 			
 			List<PContract> list = pcontractService.getBySearch_PosList(entity, pos);
 			response.data = list;

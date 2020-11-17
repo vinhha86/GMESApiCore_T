@@ -27,6 +27,7 @@ public class Personnel_Service extends AbstractService<Personel> implements IPer
 		Specification<Personel> specification = Specifications.<Personel>and()
 				.eq("orgmanagerid_link", orgmanagerid_link)
 				.eq("orgrootid_link", orgrootid_link)
+				.ge("status", 0)
 				.build();
 
 		Sort sort = Sorts.builder().asc("code").build();

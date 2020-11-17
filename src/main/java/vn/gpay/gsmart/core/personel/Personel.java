@@ -52,6 +52,8 @@ public class Personel implements Serializable {
 	private String image_name;
 	private Long positionid_link;
 	private Long levelid_link;
+	private Long saltypeid_link;
+	private Long sallevelid_link;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -232,6 +234,30 @@ public class Personel implements Serializable {
 
 	public void setLevelid_link(Long levelid_link) {
 		this.levelid_link = levelid_link;
+	}
+
+
+
+	public Long getSaltypeid_link() {
+		return saltypeid_link;
+	}
+
+
+
+	public void setSaltypeid_link(Long saltypeid_link) {
+		this.saltypeid_link = saltypeid_link;
+	}
+
+
+
+	public Long getSallevelid_link() {
+		return sallevelid_link;
+	}
+
+
+
+	public void setSallevelid_link(Long sallevelid_link) {
+		this.sallevelid_link = sallevelid_link;
 	}
 	
 	

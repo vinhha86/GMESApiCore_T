@@ -290,6 +290,7 @@ public class PersonnelAPI {
 			Personel person = entity.data;
 			if(person.getId() == null) {
 				person.setOrgrootid_link(orgrootid_link);
+				person.setStatus(0);//0-dang hoat dong;-1-da nghi viec
 			}
 			person = personService.save(person);
 			
