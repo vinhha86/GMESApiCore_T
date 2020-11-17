@@ -2072,4 +2072,21 @@ public class PContract_POAPI {
 			return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	@RequestMapping(value = "/getForMarketTypeChart", method = RequestMethod.POST)
+	public ResponseEntity<PContract_PO_getForMarketTypeChart_response> getForMarketTypeChart(HttpServletRequest request) {
+		PContract_PO_getForMarketTypeChart_response response = new PContract_PO_getForMarketTypeChart_response();
+		try {
+			response.data = pcontract_POService.getForMarketTypeChart();
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<PContract_PO_getForMarketTypeChart_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<PContract_PO_getForMarketTypeChart_response>(response, HttpStatus.BAD_REQUEST);
+		}
+
+	}
 }

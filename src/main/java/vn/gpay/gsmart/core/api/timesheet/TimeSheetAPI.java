@@ -3,6 +3,9 @@ package vn.gpay.gsmart.core.api.timesheet;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -100,5 +103,29 @@ public class TimeSheetAPI {
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<get_device_timesheet_response>(response, HttpStatus.OK);
 		}
+	}
+	
+	@RequestMapping(value = "/getForRegisterCodeCountChart", method = RequestMethod.POST)
+	public ResponseEntity<getForRegisterCodeCountChart_response> getForRegisterCodeCountChart(HttpServletRequest request) {
+		getForRegisterCodeCountChart_response response = new getForRegisterCodeCountChart_response();
+		try {
+//			Calendar cal = new GregorianCalendar();
+			Calendar cal = new GregorianCalendar(2020, 10, 27);
+			Date today = cal.getTime();
+			cal.add(Calendar.DAY_OF_MONTH, -10);
+			Date tenDaysAgo = cal.getTime();
+//			Date today = new Date();
+			
+			response.data = timesheetService.getForRegisterCodeCountChart(tenDaysAgo, today);
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getForRegisterCodeCountChart_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<getForRegisterCodeCountChart_response>(response, HttpStatus.BAD_REQUEST);
+		}
+
 	}
 }
