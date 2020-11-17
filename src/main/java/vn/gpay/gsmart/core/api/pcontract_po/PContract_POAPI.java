@@ -169,21 +169,37 @@ public class PContract_POAPI {
 
 				// Kiem tra header
 				int rowNum = 1;
+				int colNum = 1;
+				
 				String mes_err = "";
 				Row row = sheet.getRow(rowNum);
 				try {
 					while (commonService.getStringValue(row.getCell(ColumnTemplate.STT)) != "") {
 						// Kiểm tra sản phẩm có chưa thì sinh id sản phẩm
 						long productid_link = 0;
-						String product_code = row.getCell(ColumnTemplate.Style).getStringCellValue();
+						colNum = 4;
+						String product_code = commonService.getStringValue(row.getCell(ColumnTemplate.Style));
 						
 						if(product_code=="") break;
 						
-						int product_quantity = (int) row.getCell(ColumnTemplate.amount_po).getNumericCellValue();
-						String product_set_code = row.getCell(ColumnTemplate.Style_Set).getStringCellValue();
+						colNum = 7;
+						String s_product_quantity = commonService.getStringValue(row.getCell(ColumnTemplate.amount_po));
+						s_product_quantity = s_product_quantity.replace(",", "");
+						int product_quantity = s_product_quantity == "" ? 0 : Integer.parseInt(s_product_quantity);
+						
+						colNum = 3;
+						String product_set_code = commonService.getStringValue(row.getCell(ColumnTemplate.Style_Set));
+						
+						colNum = 6;
+						String s_amount = commonService.getStringValue(row.getCell(ColumnTemplate.amount_style));
+						s_amount = s_amount.replace(",", "");
 						int amount = (int) row.getCell(ColumnTemplate.amount_style).getNumericCellValue() == 0 ? 1 : (int) row.getCell(ColumnTemplate.amount_style).getNumericCellValue();
-						int po_quantity = (int) row.getCell(ColumnTemplate.amount_po).getNumericCellValue() / amount;
-						String stylename = row.getCell(ColumnTemplate.Style_name).getStringCellValue();
+						
+						int po_quantity = product_quantity / amount;
+						
+						colNum = 5;
+						String stylename = commonService.getStringValue(row.getCell(ColumnTemplate.Style_name));
+						
 						List<Product> products = productService.getone_by_code(orgrootid_link, product_code, (long) 0,
 								ProductType.SKU_TYPE_COMPLETEPRODUCT);
 						if (products.size() == 0) {
@@ -337,6 +353,7 @@ public class PContract_POAPI {
 						}
 
 						long shipmodeid_link = 0;
+						colNum = 9;
 						String shipmode_name = row.getCell(ColumnTemplate.shipmode).getStringCellValue();
 						List<ShipMode> shipmode = shipmodeService.getbyname(shipmode_name);
 						if (shipmode.size() > 0) {
@@ -344,17 +361,32 @@ public class PContract_POAPI {
 						}
 
 						// Kiem tra chao gia da ton tai hay chua
+						colNum = 2;
 						String PO_No = commonService.getStringValue(row.getCell(1));
 						if (PO_No == "" || PO_No.equals("0")) {
 							PO_No = "TBD";
 						}
+						
+						colNum = 8;
 						Date ShipDate = row.getCell(ColumnTemplate.shipdate).getDateCellValue();
+						
 						long po_productid_link = product_set_id_link > 0 ? product_set_id_link : productid_link;
 						long pcontractpo_id_link = 0;
-
-						float price_cmp = (float) row.getCell(ColumnTemplate.cmp).getNumericCellValue();
-						float price_fob = (float) row.getCell(ColumnTemplate.fob).getNumericCellValue();
-						float vendor_target = (float) row.getCell(ColumnTemplate.vendor_target).getNumericCellValue();
+						
+						colNum = 12;
+						String s_price_cmp = commonService.getStringValue(row.getCell(ColumnTemplate.cmp));
+						s_price_cmp = s_price_cmp.replace(",", "");
+						float price_cmp = s_price_cmp == "" ? 0 : Float.parseFloat(s_price_cmp);
+						
+						colNum = 11;
+						String s_price_fob = commonService.getStringValue(row.getCell(ColumnTemplate.fob));
+						s_price_fob = s_price_fob.replace(",", "");
+						float price_fob = s_price_fob == "" ? 0 : Float.parseFloat(s_price_fob);
+						
+						colNum = 10;
+						String s_vendor_target = commonService.getStringValue(row.getCell(ColumnTemplate.vendor_target));
+						s_vendor_target = s_vendor_target.replace(",", "");
+						float vendor_target = s_vendor_target == "" ? 0 : Float.parseFloat(s_vendor_target);
 
 						List<PContract_PO> listpo = pcontract_POService.check_exist_po(PO_No, ShipDate,
 								productid_link, shipmodeid_link, pcontractid_link, vendor_target);
@@ -419,9 +451,13 @@ public class PContract_POAPI {
 							pricedetailService.save(price_detail_all);
 
 							for (int i = ColumnTemplate.infant; i <= ColumnTemplate.plus; i++) {
+								colNum = i+ 1;
 								Row row_header = sheet.getRow(0);
-								String sizesetname = row_header.getCell(i).getStringCellValue();
-								int amount_sizeset = (int) row.getCell(i).getNumericCellValue();
+								String sizesetname = commonService.getStringValue(row_header.getCell(i));
+								String s_amount_sizeset = commonService.getStringValue(row.getCell(i));
+								s_amount_sizeset = s_amount_sizeset.replace(",", "");
+								int amount_sizeset = s_amount_sizeset == "" ? 0 : Integer.parseInt(s_amount_sizeset);
+								
 								Long sizesetid_link = sizesetService.getbyname(sizesetname);
 								if (amount_sizeset > 0) {
 									PContract_Price price = new PContract_Price();
@@ -488,10 +524,14 @@ public class PContract_POAPI {
 
 								//
 								for (int i = ColumnTemplate.infant; i <= ColumnTemplate.plus; i++) {
+									colNum = i+1;
 									Row row_header = sheet.getRow(0);
-									String sizesetname = row_header.getCell(i).getStringCellValue();
+									String sizesetname = commonService.getStringValue(row_header.getCell(i));
+									String s_amount_sizeset = commonService.getStringValue(row.getCell(i));
+									s_amount_sizeset = s_amount_sizeset.replace(",", "");
+									int amount_sizeset = s_amount_sizeset == "" ? 0 : Integer.parseInt(s_amount_sizeset);
 									Long sizesetid_link = sizesetService.getbyname(sizesetname);
-									int amount_sizeset = (int) row.getCell(i).getNumericCellValue();
+									
 									if (amount_sizeset > 0) {
 										PContract_Price price = new PContract_Price();
 										price.setId(null);
@@ -565,10 +605,17 @@ public class PContract_POAPI {
 
 								//
 								for (int i = ColumnTemplate.infant; i <= ColumnTemplate.plus; i++) {
+									colNum = i+1;
 									Row row_header = sheet.getRow(0);
-									String sizesetname = row_header.getCell(i).getStringCellValue();
+//									String sizesetname = row_header.getCell(i).getStringCellValue();
+//									int amount_sizeset = (int) row.getCell(i).getNumericCellValue();
+									
+									String sizesetname = commonService.getStringValue(row_header.getCell(i));
+									String s_amount_sizeset = commonService.getStringValue(row.getCell(i));
+									s_amount_sizeset = s_amount_sizeset.replace(",", "");
+									int amount_sizeset = s_amount_sizeset == "" ? 0 : Integer.parseInt(s_amount_sizeset);
 									Long sizesetid_link = sizesetService.getbyname(sizesetname);
-									int amount_sizeset = (int) row.getCell(i).getNumericCellValue();
+									
 									if (amount_sizeset > 0) {
 										//kiem tra xem dai co co du lieu chua! 
 										if(list_price.size() == 0) {
@@ -693,10 +740,14 @@ public class PContract_POAPI {
 							else {
 								//Hàng đơn chiếc thì cập nhật dải cỡ
 								for (int i = ColumnTemplate.infant; i <= ColumnTemplate.plus; i++) {
+									colNum = i+1;
 									Row row_header = sheet.getRow(0);
-									int amount_sizeset = (int) row.getCell(i).getNumericCellValue();
+									String s_amount_sizeset = commonService.getStringValue(row.getCell(i));
+									s_amount_sizeset = s_amount_sizeset.replace(",", "");
+									int amount_sizeset = s_amount_sizeset == "" ? 0 : Integer.parseInt(s_amount_sizeset);
+//									int amount_sizeset = (int) row.getCell(i).getNumericCellValue();
 									if (amount_sizeset > 0) {
-										String sizesetname = row_header.getCell(i).getStringCellValue();
+										String sizesetname = commonService.getStringValue(row_header.getCell(i));
 										Long sizesetid_link = sizesetService.getbyname(sizesetname);
 										List<PContract_Price> list_price = priceService.getPrice_by_product_and_sizeset(pcontractpo_id_link, productid_link, sizesetid_link);
 										for (PContract_Price pContract_Price : list_price) {
@@ -723,7 +774,7 @@ public class PContract_POAPI {
 						row = sheet.getRow(rowNum);
 					}
 				} catch (Exception e) {
-					mes_err = e.getMessage();
+					mes_err = "Có lỗi ở dòng " +(rowNum+1)+" và cột "+ colNum; 
 				}
 
 				workbook.close();

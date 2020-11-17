@@ -45,20 +45,20 @@ public class TimeSheetAPI {
 				timeSheet.setZoneid_link(device.getZoneid_link());
 				timesheetService.save(timeSheet);
 				
-				if(timeSheet.getTimerecorded().after(device.getLasttime_download()))
-					device.setLasttime_download(timeSheet.getTimerecorded());
-				
-				//Kiem tra user co trong db chua ko thi them vao
-				List<Personel> person = personService.getPerson_by_register_code((long)1, timeSheet.getRegister_code());
-				if(person.size() == 0) {
-					List<Personnel_notmap> persons_notmap = person_notmap_Service.getby_registercode(timeSheet.getRegister_code());
-					if(persons_notmap.size() == 0) {
-						Personnel_notmap person_notmap = new Personnel_notmap();
-						person_notmap.setId(null);
-						person_notmap.setRegister_code(timeSheet.getRegister_code());
-						person_notmap_Service.save(person_notmap);
-					}
-				}
+//				if(timeSheet.getTimerecorded().after(device.getLasttime_download()))
+//					device.setLasttime_download(timeSheet.getTimerecorded());
+//				
+//				//Kiem tra user co trong db chua ko thi them vao
+//				List<Personel> person = personService.getPerson_by_register_code((long)1, timeSheet.getRegister_code());
+//				if(person.size() == 0) {
+//					List<Personnel_notmap> persons_notmap = person_notmap_Service.getby_registercode(timeSheet.getRegister_code());
+//					if(persons_notmap.size() == 0) {
+//						Personnel_notmap person_notmap = new Personnel_notmap();
+//						person_notmap.setId(null);
+//						person_notmap.setRegister_code(timeSheet.getRegister_code());
+//						person_notmap_Service.save(person_notmap);
+//					}
+//				}
 			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
