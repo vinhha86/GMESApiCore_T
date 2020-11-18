@@ -54,6 +54,22 @@ public class Salary_Sum implements Serializable {/**
     private Personel personnel;
 	
 	@Transient
+	public String getSumcol_code() {
+		if(sumcol != null) {
+			return sumcol.getCode();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getSumcoltype_name() {
+		if(sumcoltype != null) {
+			return sumcoltype.getName();
+		}
+		return "";
+	}
+	
+	@Transient
 	public String getPersonel_fullname() {
 		if(personnel != null) {
 			return personnel.getFullname();

@@ -1,6 +1,5 @@
 package vn.gpay.gsmart.core.api.salary;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -9,14 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.personel.IPersonnel_Service;
 import vn.gpay.gsmart.core.personel.Personel;
 import vn.gpay.gsmart.core.salary.IOrgSal_BasicService;
@@ -29,17 +25,8 @@ import vn.gpay.gsmart.core.salary.IOrgSal_Type_LaborLevelService;
 import vn.gpay.gsmart.core.salary.IOrgSal_Type_LevelService;
 import vn.gpay.gsmart.core.salary.ISalary_SumService;
 import vn.gpay.gsmart.core.salary.OrgSal_Basic;
-import vn.gpay.gsmart.core.salary.OrgSal_Com;
-import vn.gpay.gsmart.core.salary.OrgSal_Com_LaborLevel;
-import vn.gpay.gsmart.core.salary.OrgSal_Com_Position;
-import vn.gpay.gsmart.core.salary.OrgSal_Level;
-import vn.gpay.gsmart.core.salary.OrgSal_Type;
-import vn.gpay.gsmart.core.salary.OrgSal_Type_LaborLevel;
-import vn.gpay.gsmart.core.salary.OrgSal_Type_Level;
-import vn.gpay.gsmart.core.salary.Salary_Sum;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
-import vn.gpay.gsmart.core.utils.SalaryType;
 
 @RestController
 @RequestMapping("/api/v1/salarysum")
@@ -77,52 +64,26 @@ public class Salary_SumAPI {
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Long orgrootid_link = user.getRootorgid_link();
 		salary_sum_response response = new salary_sum_response();
-		List<Salary_Sum> data_Response =  new ArrayList<Salary_Sum>();
 		try {
 			//1. Lay danh sach nhan su cua don vi quan ly (orgmanagerid_link)
 			List<Personel> ls_Personnel = personnelService.getby_orgmanager(entity.orgid_link, orgrootid_link);
 			//2. Lay thong tin luong Basic cua don vi quan ly
 			OrgSal_Basic theSalBasic = salbasicService.getone_byorg(entity.orgid_link);
 			
-			ArrayList<Thread> arrThreads = new ArrayList<Thread>();
 			for(Personel personnel:ls_Personnel){
-				Thread thread = new Thread(new Runnable(){
-					public void run(){
-						Salary_Sum sal_sum = new Salary_Sum();
-						sal_sum.setPersonnelid_link(personnel.getId());
-						
-						//2.Lay thong tin thang luong, bac luong cua nhan su
-						Long saltypeidlink = personnel.getSaltypeid_link(); //thang luong
-						Long sallevelid_link = personnel.getSallevelid_link();//bac luong
-						OrgSal_Type theSal_Type = saltypeService.findOne(saltypeidlink);
-						if (null!=theSal_Type){
-							//Neu la luong thoi gian
-							if (theSal_Type.getType() == 0){
-								//Tinh gia tri luong gio theo thang luong, bac luong va so ngay lam viec
-								OrgSal_Type_Level theSal_Type_Level = saltype_levelService.get_bysaltype_and_level(saltypeidlink, sallevelid_link);
-								if (null != theSal_Type_Level.getSalamount() && null != theSalBasic.getWorkingdays()){
-									//Tinh luong gio cua nhan su
-									int salary_hour = theSal_Type_Level.getSalamount()/theSalBasic.getWorkingdays();
-									//
-								}
-							}
-							//Neu la luong nang suat
-							if (theSal_Type.getType() == 1){
-								
-							}
-						}
-						
-						data_Response.add(sal_sum);
-				    }
-				});
-				thread.start();
-				arrThreads.add(thread);			
+				Salary_Personnel sal_personnel =  new Salary_Personnel(
+						personnel,
+						entity.year,
+						entity.month,
+						theSalBasic,
+						entity.orgid_link,
+						saltypeService,
+						saltype_levelService,
+						salcomService,
+						salarysumService);
+				sal_personnel.start();
 			}
-            for (int i = 0; i < arrThreads.size(); i++) 
-            {
-                arrThreads.get(i).join(); 
-            }
-			response.data = data_Response;
+            response.data = salarysumService.getall_byorg(entity.orgid_link);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<salary_sum_response>(response, HttpStatus.OK);

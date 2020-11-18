@@ -25,4 +25,15 @@ public class Salary_SumService extends AbstractService<Salary_Sum> implements IS
 		return repo;
 	}
 
+	@Override
+	public void saveWithCheck(Salary_Sum entity){
+		List<Salary_Sum> a = repo.getby_key(entity.getPersonnelid_link(), entity.getYear(), entity.getMonth(), entity.getSumcolid_link());
+		if (a.size() > 0){
+			Salary_Sum theSalSum = a.get(0);
+			theSalSum.setSumvalue(entity.getSumvalue());
+			repo.save(theSalSum);
+		} else {
+			repo.save(entity);
+		}
+	}
 }
