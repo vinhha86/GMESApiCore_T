@@ -53,6 +53,12 @@ public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecification
 			+ "where a.porderid_link = :porderid_link order by c.id")
 	public List<Org> getOrgByPorderIdLink(@Param ("porderid_link")final Long porderid_link);
 	
+	@Query(value = "select c from Org c "
+			+ "where c.orgrootid_link = :orgrootid_link and c.code = :code")
+	public List<Org> getbycode(
+			@Param ("orgrootid_link")final Long orgrootid_link,
+			@Param ("code")final String code);
+	
 	@Query(value = "select c from Org c where c.orgtypeid_link in(1,13,14,17) order by c.orgtypeid_link, c.name asc")
 	public List<Org> findOrgByTypeForInvCheckDeviceMenuOrg();
 }

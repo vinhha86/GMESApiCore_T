@@ -373,12 +373,12 @@ public class PContract_POAPI {
 						long po_productid_link = product_set_id_link > 0 ? product_set_id_link : productid_link;
 						long pcontractpo_id_link = 0;
 						
-						colNum = 12;
+						colNum = 11;
 						String s_price_cmp = commonService.getStringValue(row.getCell(ColumnTemplate.cmp));
 						s_price_cmp = s_price_cmp.replace(",", "");
 						float price_cmp = s_price_cmp == "" ? 0 : Float.parseFloat(s_price_cmp);
 						
-						colNum = 11;
+						colNum = 12;
 						String s_price_fob = commonService.getStringValue(row.getCell(ColumnTemplate.fob));
 						s_price_fob = s_price_fob.replace(",", "");
 						float price_fob = s_price_fob == "" ? 0 : Float.parseFloat(s_price_fob);
@@ -387,6 +387,15 @@ public class PContract_POAPI {
 						String s_vendor_target = commonService.getStringValue(row.getCell(ColumnTemplate.vendor_target));
 						s_vendor_target = s_vendor_target.replace(",", "");
 						float vendor_target = s_vendor_target == "" ? 0 : Float.parseFloat(s_vendor_target);
+						
+						colNum = 13;
+						String s_org_code = commonService.getStringValue(row.getCell(ColumnTemplate.org));
+						s_org_code = s_org_code.replace(",", "");
+						Long orgid_link = null;
+						List<Org> list_org = orgService.getbycode(s_org_code, orgrootid_link);
+						if(list_org.size() > 0) {
+							orgid_link = list_org.get(0).getId();
+						}
 
 						List<PContract_PO> listpo = pcontract_POService.check_exist_po(PO_No, ShipDate,
 								productid_link, shipmodeid_link, pcontractid_link, vendor_target);
@@ -417,6 +426,27 @@ public class PContract_POAPI {
 
 							po_new = pcontract_POService.save(po_new);
 							pcontractpo_id_link = po_new.getId();
+							
+							//kiem tra porder_req ton tai chua thi them vao
+							if(orgid_link != null) {
+								List<POrder_Req> list_req = reqService.getByOrg_PO_Product(pcontractpo_id_link, productid_link, orgid_link);
+								if(list_req.size() == 0) {
+									POrder_Req porder_req = new POrder_Req();
+									porder_req.setAmount_inset(amount);
+									porder_req.setGranttoorgid_link(orgid_link);
+									porder_req.setId(null);
+									porder_req.setIs_calculate(true);
+									porder_req.setOrgrootid_link(orgrootid_link);
+									porder_req.setPcontract_poid_link(pcontractpo_id_link);
+									porder_req.setPcontractid_link(pcontractid_link);
+									porder_req.setProductid_link(productid_link);
+									porder_req.setStatus(POrderReqStatus.STATUS_FREE);
+									porder_req.setTotalorder(po_quantity);
+									reqService.save(porder_req);
+								}
+								
+							}
+							
 							// Them co All vao chao gia
 
 							// Them cho san pham con
@@ -738,6 +768,24 @@ public class PContract_POAPI {
 								}
 							}
 							else {
+								if(orgid_link != null) {
+									List<POrder_Req> list_req = reqService.getByOrg_PO_Product(pcontractpo_id_link, productid_link, orgid_link);
+									if(list_req.size() == 0) {
+										POrder_Req porder_req = new POrder_Req();
+										porder_req.setAmount_inset(amount);
+										porder_req.setGranttoorgid_link(orgid_link);
+										porder_req.setId(null);
+										porder_req.setIs_calculate(true);
+										porder_req.setOrgrootid_link(orgrootid_link);
+										porder_req.setPcontract_poid_link(pcontractpo_id_link);
+										porder_req.setPcontractid_link(pcontractid_link);
+										porder_req.setProductid_link(productid_link);
+										porder_req.setStatus(POrderReqStatus.STATUS_FREE);
+										porder_req.setTotalorder(po_quantity);
+										reqService.save(porder_req);
+									}
+									
+								}
 								//Hàng đơn chiếc thì cập nhật dải cỡ
 								for (int i = ColumnTemplate.infant; i <= ColumnTemplate.plus; i++) {
 									colNum = i+1;

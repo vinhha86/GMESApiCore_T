@@ -295,4 +295,10 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 	public List<Org> findOrgByTypeForInvCheckDeviceMenuOrg() {
 		return repositoty.findOrgByTypeForInvCheckDeviceMenuOrg();
 	}
+
+	@Override
+	public List<Org> getbycode(String orgcode, Long orgrootid_link) {
+		// TODO Auto-generated method stub
+		return repositoty.getbycode(orgrootid_link, orgcode);
+	}
 }
