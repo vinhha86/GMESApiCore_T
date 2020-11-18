@@ -27,6 +27,7 @@ public interface IContractBuyerRepository extends JpaRepository<ContractBuyer, L
 	public List<Integer> getAllYears();
 	
 	@Query(value = "select c from ContractBuyer c "
-			+ "where c.buyerid_link = :buyerid_link order by c.contract_code")
+			+ "inner join ContractBuyerD b on b.contractbuyerid_link = c.id "
+			+ "where b.buyerid_link = :buyerid_link order by c.contract_code")
 	public List<ContractBuyer> getByBuyer(@Param ("buyerid_link")final long buyerid_link);
 }

@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.contractbuyer.ContractBuyer;
+import vn.gpay.gsmart.core.contractbuyer.ContractBuyerD;
+import vn.gpay.gsmart.core.contractbuyer.IContractBuyerDService;
 import vn.gpay.gsmart.core.contractbuyer.IContractBuyerService;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -25,6 +27,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 @RequestMapping("/api/v1/contractbuyer")
 public class ContractBuyerAPI {
 	@Autowired IContractBuyerService contractBuyerService;
+	@Autowired IContractBuyerDService contractBuyerDService;
 	
 	@RequestMapping(value = "/getbypaging",method = RequestMethod.POST)
 	public ResponseEntity<ContractBuyer_getbypaging_response> ContractBuyerGetpage(@RequestBody ContractBuyer_getbypaging_request entity,HttpServletRequest request ) {
@@ -100,36 +103,57 @@ public class ContractBuyerAPI {
 		ContractBuyer_create_response response = new ContractBuyer_create_response();
 		try {
 			ContractBuyer cb = entity.data;
+			List<ContractBuyerD> listContractBuyerD = cb.getContractBuyerDs();
+			
+//			for(ContractBuyerD c : listContractBuyerD) {
+//				System.out.println
+//			}
+			
 			// check nếu mã đã tồn tại 
+			List<ContractBuyer> cblist = new ArrayList<ContractBuyer>();
 			if(cb.getId() == 0) {
-				// create
-				List<ContractBuyer> cblist = contractBuyerService.getByContractCode(cb.getContract_code());
+				// create 
+				cblist = contractBuyerService.getByContractCode(cb.getContract_code());
 				
-				if(cblist.size() == 0) {
-					// chưa tồn tại
-//					int year = Calendar.getInstance().get(Calendar.YEAR);
-//					cb.setContract_year(year);
-					ContractBuyer temp = contractBuyerService.save(cb);
-					response.id = temp.getId();
-					response.setMessage("Lưu thành công");
-				}else {
-					// đã tồn tại
-					response.setMessage("Mã hợp đồng đã tồn tại");
-				}
 			}else {
 				// update
-				List<ContractBuyer> cblist = contractBuyerService.getOtherContractBuyerByContractCode(cb.getContract_code(), cb.getId());
+				cblist = contractBuyerService.getOtherContractBuyerByContractCode(cb.getContract_code(), cb.getId());
 				
-				if(cblist.size() == 0) {
-					// chưa tồn tại
-					ContractBuyer temp = contractBuyerService.save(cb);
-					response.id = temp.getId();
-					response.setMessage("Lưu thành công");
-				}else {
-					// đã tồn tại
-					response.setMessage("Mã hợp đồng đã tồn tại");
-				}
 			}
+			if(cblist.size() == 0) {
+					// chưa tồn tại
+				List<Long> buyerIds = new ArrayList<Long>();
+				ContractBuyer temp = contractBuyerService.save(cb);
+				Long contractBuyerId = temp.getId();
+				
+				for(ContractBuyerD contractBuyerD : listContractBuyerD) {
+					Long buyerid_link = contractBuyerD.getBuyerid_link();
+					contractBuyerD.setContractbuyerid_link(contractBuyerId);
+					buyerIds.add(buyerid_link);
+					
+					List<ContractBuyerD> contractBuyerDByContractBuyerIdAndBuyerId = 
+							contractBuyerDService.getByContractBuyerIdAndBuyerId(contractBuyerId, buyerid_link);
+					if(contractBuyerDByContractBuyerIdAndBuyerId.size() == 0) {
+						
+						contractBuyerDService.save(contractBuyerD);
+					}
+				}
+				
+				List<ContractBuyerD> contractBuyerDByContractBuyerId =
+						contractBuyerDService.getByContractBuyerId(contractBuyerId);
+				for(ContractBuyerD contractBuyerD : contractBuyerDByContractBuyerId) {
+					if(!buyerIds.contains(contractBuyerD.getBuyerid_link())) {
+						contractBuyerDService.deleteById(contractBuyerD.getId());
+					}
+				}
+				
+				response.id = contractBuyerId;
+				response.setMessage("Lưu thành công");
+			}else {
+				// đã tồn tại
+				response.setMessage("Mã hợp đồng đã tồn tại");
+			}
+			 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			return new ResponseEntity<ContractBuyer_create_response>(response, HttpStatus.OK);
 			

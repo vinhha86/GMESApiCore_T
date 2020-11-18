@@ -552,4 +552,28 @@ public class OrgAPI {
 		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@RequestMapping(value = "/getOrgForContractBuyerBuyerList",method = RequestMethod.POST)
+	public ResponseEntity<?> getOrgForContractBuyerBuyerList(@RequestBody getOrgForContractBuyerBuyerList_request entity, HttpServletRequest request) {//@RequestParam("type") 
+		OrgResponse response = new OrgResponse();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			List<Long> buyerIds = entity.buyerIds;
+//			System.out.println(buyerIds.size());
+			if(buyerIds.size() > 0) {
+				response.data = orgService.getOrgForContractBuyerBuyerList(buyerIds);
+			}else {
+				response.data = orgService.findAllorgByTypeId(12, user.getRootorgid_link());
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<OrgResponse>(response,HttpStatus.OK);
+		}catch (RuntimeException e) {
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(e.getMessage());
+		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

@@ -1,7 +1,11 @@
 package vn.gpay.gsmart.core.contractbuyer;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -34,6 +39,24 @@ public class ContractBuyer implements Serializable{
 	private Long vendorid_link;
 	private Date contract_date_finish;
 	private String comment;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+    @JoinColumn(name="contractbuyerid_link",insertable=false,updatable =false)
+	private List<ContractBuyerD> contractBuyerDs = new ArrayList<ContractBuyerD>();
+	
+	@Transient
+	public String getBuyerCodes() {
+		String result = "";
+		for(ContractBuyerD cbd : contractBuyerDs) {
+			if(result.equals("")) {
+				result+=cbd.getBuyerCode();
+			}else {
+				result+="; "+cbd.getBuyerCode();
+			}
+		}
+		return result;
+	}
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -122,6 +145,17 @@ public class ContractBuyer implements Serializable{
 	}
 	public void setContract_date_finish(Date contract_date_finish) {
 		this.contract_date_finish = contract_date_finish;
+	}
+	public List<ContractBuyerD> getContractBuyerDs() {
+		Collections.sort(contractBuyerDs, new Comparator<ContractBuyerD>() {
+			  public int compare(ContractBuyerD o1, ContractBuyerD o2) {
+			      return o1.getBuyerCode().compareTo(o2.getBuyerCode());
+			  }
+			});
+		return contractBuyerDs;
+	}
+	public void setContractBuyerDs(List<ContractBuyerD> contractBuyerDs) {
+		this.contractBuyerDs = contractBuyerDs;
 	}
 	
 	

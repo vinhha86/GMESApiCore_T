@@ -61,4 +61,7 @@ public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecification
 	
 	@Query(value = "select c from Org c where c.orgtypeid_link in(1,13,14,17) order by c.orgtypeid_link, c.name asc")
 	public List<Org> findOrgByTypeForInvCheckDeviceMenuOrg();
+	
+	@Query(value = "select c from Org c where c.orgtypeid_link =12 and c.id not in :buyerIds and c.status = 1 order by c.code asc")
+	public List<Org> getOrgForContractBuyerBuyerList(@Param ("buyerIds")final List<Long> buyerIds);
 }

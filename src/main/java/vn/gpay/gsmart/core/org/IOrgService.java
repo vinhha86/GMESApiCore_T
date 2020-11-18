@@ -36,4 +36,6 @@ public interface IOrgService extends Operations<Org>{
 	public List<Org> findOrgByTypeForInvCheckDeviceMenuOrg();
 	
 	public List<Org> getbycode(String orgcode, Long orgrootid_link);
+	
+	List<Org> getOrgForContractBuyerBuyerList(List<Long> buyerIds);
 }
