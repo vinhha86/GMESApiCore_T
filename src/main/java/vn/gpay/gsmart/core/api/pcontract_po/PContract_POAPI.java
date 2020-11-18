@@ -396,9 +396,8 @@ public class PContract_POAPI {
 						if(list_org.size() > 0) {
 							orgid_link = list_org.get(0).getId();
 						}
-
 						List<PContract_PO> listpo = pcontract_POService.check_exist_po(PO_No, ShipDate,
-								productid_link, shipmodeid_link, pcontractid_link, vendor_target);
+								po_productid_link, shipmodeid_link, pcontractid_link, vendor_target);
 						if (listpo.size() > 0) {
 							pcontractpo_id_link = listpo.get(0).getId();
 						}
@@ -454,7 +453,7 @@ public class PContract_POAPI {
 							price_all.setId(null);
 							price_all.setIs_fix(true);
 							price_all.setOrgrootid_link(orgrootid_link);
-							price_all.setPcontract_poid_link(po_new.getId());
+							price_all.setPcontract_poid_link(pcontractpo_id_link);
 							price_all.setPcontractid_link(pcontractid_link);
 							price_all.setPrice_vendortarget(vendor_target);
 							price_all.setPrice_cmp(price_cmp);
@@ -676,32 +675,32 @@ public class PContract_POAPI {
 											price_detail.setProductid_link(productid_link);
 											pricedetailService.save(price_detail);
 											
-											PContract_Price price_set = new PContract_Price();
-											price.setId(null);
-											price.setIs_fix(false);
-											price.setOrgrootid_link(orgrootid_link);
-											price.setPcontract_poid_link(pcontractpo_id_link);
-											price.setPcontractid_link(pcontractid_link);
-											price.setQuantity(amount_sizeset);
-											price.setSizesetid_link(sizesetid_link);
-											price.setDate_importdata(current_time);
-											price.setProductid_link(product_set_id_link);
-											price.setPrice_cmp(price_cmp);
-											price_set = priceService.save(price_set);
-											
-											//Them detail
-											PContract_Price_D price_detail_set = new PContract_Price_D();
-											price_detail_set.setOrgrootid_link(orgrootid_link);
-											price_detail_set.setFobpriceid_link((long)1);
-											price_detail_set.setPrice(price_cmp);
-											price_detail_set.setIsfob(false);
-											price_detail_set.setId(null);
-											price_detail_set.setSizesetid_link(sizesetid_link);
-											price_detail_set.setPcontract_poid_link(pcontractpo_id_link);
-											price_detail_set.setPcontractid_link(pcontractid_link);
-											price_detail_set.setPcontractpriceid_link(price_set.getId());
-											price_detail_set.setProductid_link(productid_link);
-											pricedetailService.save(price_detail_set);
+//											PContract_Price _price_set = new PContract_Price();
+//											_price_set.setId(null);
+//											_price_set.setIs_fix(false);
+//											_price_set.setOrgrootid_link(orgrootid_link);
+//											_price_set.setPcontract_poid_link(pcontractpo_id_link);
+//											_price_set.setPcontractid_link(pcontractid_link);
+//											_price_set.setQuantity(amount_sizeset);
+//											_price_set.setSizesetid_link(sizesetid_link);
+//											_price_set.setDate_importdata(current_time);
+//											_price_set.setProductid_link(product_set_id_link);
+//											_price_set.setPrice_cmp(price_cmp);
+//											_price_set = priceService.save(_price_set);
+//											
+//											//Them detail
+//											PContract_Price_D price_detail_set = new PContract_Price_D();
+//											price_detail_set.setOrgrootid_link(orgrootid_link);
+//											price_detail_set.setFobpriceid_link((long)1);
+//											price_detail_set.setPrice(price_cmp);
+//											price_detail_set.setIsfob(false);
+//											price_detail_set.setId(null);
+//											price_detail_set.setSizesetid_link(sizesetid_link);
+//											price_detail_set.setPcontract_poid_link(pcontractpo_id_link);
+//											price_detail_set.setPcontractid_link(pcontractid_link);
+//											price_detail_set.setPcontractpriceid_link(_price_set.getId());
+//											price_detail_set.setProductid_link(productid_link);
+//											pricedetailService.save(price_detail_set);
 										}
 										else {
 											List<PContract_Price> list_price_old = new ArrayList<PContract_Price>(list_price);

@@ -11,11 +11,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import vn.gpay.gsmart.core.base.AbstractService;
+import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Repository;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 
 @Service
 public class PContract_POService extends AbstractService<PContract_PO> implements IPContract_POService {
 	@Autowired IPContract_PORepository repo;
+	@Autowired IPContract_Price_Repository price_repo;
 	@Autowired
 	EntityManager em;
 	
@@ -113,7 +115,8 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		List<PContract_PO> list_remove = new ArrayList<PContract_PO>();
 		
 		for (PContract_PO pContract_PO : list_po) {
-			List<PContract_Price> list_price = pContract_PO.getPcontract_price();
+//			List<PContract_Price> list_price = pContract_PO.getPcontract_price();
+			List<PContract_Price> list_price = price_repo.getPrice_by_product_and_sizeset(pContract_PO.getId(), productid_link, (long)1);
 			boolean check = false;
 			for (PContract_Price price : list_price) {
 				if(price.getSizesetid_link() != 1) continue;
