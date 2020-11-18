@@ -167,4 +167,21 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		
 		return lst;
 	}
+	@Override
+	public List<PContract_POBinding> getForMarketTypeChart() {
+
+		List<PContract_POBinding> data = new ArrayList<PContract_POBinding>();
+		List<Object[]> objects = repo.getForMarketTypeChart();
+		
+		for(Object[] row : objects) {
+			Long sum = (Long) row[0];
+			String name = (String) row[1] == null ? "Khác" : (String) row[1];
+			PContract_POBinding temp = new PContract_POBinding();
+			temp.setSum(sum);
+			temp.setMarketName(name);
+			data.add(temp);
+		}
+		
+		return data;
+	}
 }

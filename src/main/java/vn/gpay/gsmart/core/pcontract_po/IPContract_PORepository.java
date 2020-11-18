@@ -176,4 +176,14 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			)
 	public List<PContract_PO> getBySearch_CodeOnly(
 			@Param ("po_code")final String po_code);
+	
+	@Query(value = "select  sum(a.po_quantity), c.name "
+			+ "from PContract_PO a "
+			+ "inner join PContract b on a.pcontractid_link = b.id "
+			+ "full join MarketType c on b.marketypeid_link = c.id "
+			+ "where a.parentpoid_link is not null "
+			+ "group by c.name "
+			+ "order by c.name "
+			)
+	public List<Object[]> getForMarketTypeChart();
 }
