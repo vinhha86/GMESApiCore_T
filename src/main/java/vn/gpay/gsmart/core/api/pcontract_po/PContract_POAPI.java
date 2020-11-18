@@ -485,7 +485,7 @@ public class PContract_POAPI {
 								String sizesetname = commonService.getStringValue(row_header.getCell(i));
 								String s_amount_sizeset = commonService.getStringValue(row.getCell(i));
 								s_amount_sizeset = s_amount_sizeset.replace(",", "");
-								int amount_sizeset = s_amount_sizeset == "" ? 0 : Integer.parseInt(s_amount_sizeset);
+								Float amount_sizeset = s_amount_sizeset == "" ? 0 : Float.parseFloat(s_amount_sizeset);
 								
 								Long sizesetid_link = sizesetService.getbyname(sizesetname);
 								if (amount_sizeset > 0) {
@@ -495,18 +495,17 @@ public class PContract_POAPI {
 									price.setOrgrootid_link(orgrootid_link);
 									price.setPcontract_poid_link(po_new.getId());
 									price.setPcontractid_link(pcontractid_link);
-									price.setQuantity(amount_sizeset);
 									price.setProductid_link(productid_link);
 									price.setSizesetid_link(sizesetid_link == null ? 0 : sizesetid_link);
 									price.setDate_importdata(current_time);
-									price.setPrice_cmp(price_cmp);
+									price.setPrice_cmp(amount_sizeset);
 									price = priceService.save(price);
 									
 									//Them detail cho dai co 
 									PContract_Price_D price_detail_sizeset = new PContract_Price_D();
 									price_detail_sizeset.setOrgrootid_link(orgrootid_link);
 									price_detail_sizeset.setFobpriceid_link((long)1);
-									price_detail_sizeset.setPrice(price_cmp);
+									price_detail_sizeset.setPrice(amount_sizeset);
 									price_detail_sizeset.setIsfob(false);
 									price_detail_sizeset.setDatecreated(current_time);
 									price_detail_sizeset.setId(null);
@@ -558,7 +557,7 @@ public class PContract_POAPI {
 									String sizesetname = commonService.getStringValue(row_header.getCell(i));
 									String s_amount_sizeset = commonService.getStringValue(row.getCell(i));
 									s_amount_sizeset = s_amount_sizeset.replace(",", "");
-									int amount_sizeset = s_amount_sizeset == "" ? 0 : Integer.parseInt(s_amount_sizeset);
+									Float amount_sizeset = s_amount_sizeset == "" ? 0 : Float.parseFloat(s_amount_sizeset);
 									Long sizesetid_link = sizesetService.getbyname(sizesetname);
 									
 									if (amount_sizeset > 0) {
@@ -568,7 +567,6 @@ public class PContract_POAPI {
 										price.setOrgrootid_link(orgrootid_link);
 										price.setPcontract_poid_link(po_new.getId());
 										price.setPcontractid_link(pcontractid_link);
-										price.setQuantity(amount_sizeset / amount);
 										price.setProductid_link(product_set_id_link);
 										price.setSizesetid_link(sizesetid_link == null ? 0 : sizesetid_link);
 										price.setDate_importdata(current_time);
@@ -642,7 +640,7 @@ public class PContract_POAPI {
 									String sizesetname = commonService.getStringValue(row_header.getCell(i));
 									String s_amount_sizeset = commonService.getStringValue(row.getCell(i));
 									s_amount_sizeset = s_amount_sizeset.replace(",", "");
-									int amount_sizeset = s_amount_sizeset == "" ? 0 : Integer.parseInt(s_amount_sizeset);
+									Float amount_sizeset = s_amount_sizeset == "" ? 0 : Float.parseFloat(s_amount_sizeset);
 									Long sizesetid_link = sizesetService.getbyname(sizesetname);
 									
 									if (amount_sizeset > 0) {
@@ -654,18 +652,17 @@ public class PContract_POAPI {
 											price.setOrgrootid_link(orgrootid_link);
 											price.setPcontract_poid_link(pcontractpo_id_link);
 											price.setPcontractid_link(pcontractid_link);
-											price.setQuantity(amount_sizeset);
 											price.setProductid_link(productid_link);
 											price.setSizesetid_link(sizesetid_link);
 											price.setDate_importdata(current_time);
-											price.setPrice_cmp(price_cmp);
+											price.setPrice_cmp(amount_sizeset);
 											price = priceService.save(price);
 											
 											//Them detail
 											PContract_Price_D price_detail = new PContract_Price_D();
 											price_detail.setOrgrootid_link(orgrootid_link);
 											price_detail.setFobpriceid_link((long)1);
-											price_detail.setPrice(price_cmp);
+											price_detail.setPrice(amount_sizeset);
 											price_detail.setIsfob(false);
 											price_detail.setId(null);
 											price_detail.setSizesetid_link(sizesetid_link);
@@ -712,18 +709,17 @@ public class PContract_POAPI {
 												price.setOrgrootid_link(orgrootid_link);
 												price.setPcontract_poid_link(pcontractpo_id_link);
 												price.setPcontractid_link(pcontractid_link);
-												price.setQuantity(amount_sizeset);
 												price.setProductid_link(productid_link);
 												price.setSizesetid_link(sizesetid_link);
 												price.setDate_importdata(current_time);
-												price.setPrice_cmp(price_cmp);
+												price.setPrice_cmp(amount_sizeset);
 												price = priceService.save(price);
 												
 												//Them detail
 												PContract_Price_D price_detail = new PContract_Price_D();
 												price_detail.setOrgrootid_link(orgrootid_link);
 												price_detail.setFobpriceid_link((long)1);
-												price_detail.setPrice(price_cmp);
+												price_detail.setPrice(amount_sizeset);
 												price_detail.setIsfob(false);
 												price_detail.setId(null);
 												price_detail.setSizesetid_link(sizesetid_link);
@@ -740,7 +736,6 @@ public class PContract_POAPI {
 												price_set.setOrgrootid_link(orgrootid_link);
 												price_set.setPcontract_poid_link(pcontractpo_id_link);
 												price_set.setPcontractid_link(pcontractid_link);
-												price_set.setQuantity(amount_sizeset);
 												price_set.setProductid_link(product_set_id_link);
 												price_set.setSizesetid_link(sizesetid_link);
 												price_set.setDate_importdata(current_time);
@@ -791,7 +786,7 @@ public class PContract_POAPI {
 									Row row_header = sheet.getRow(0);
 									String s_amount_sizeset = commonService.getStringValue(row.getCell(i));
 									s_amount_sizeset = s_amount_sizeset.replace(",", "");
-									int amount_sizeset = s_amount_sizeset == "" ? 0 : Integer.parseInt(s_amount_sizeset);
+									Float amount_sizeset = s_amount_sizeset == "" ? 0 : Float.parseFloat(s_amount_sizeset);
 //									int amount_sizeset = (int) row.getCell(i).getNumericCellValue();
 									if (amount_sizeset > 0) {
 										String sizesetname = commonService.getStringValue(row_header.getCell(i));
@@ -809,10 +804,22 @@ public class PContract_POAPI {
 										price.setPcontract_poid_link(pcontractpo_id_link);
 										price.setPcontractid_link(pcontractid_link);
 										price.setProductid_link(productid_link);
-										price.setQuantity(amount_sizeset);
 										price.setSizesetid_link(sizesetid_link);
-										price.setPrice_cmp(price_cmp);
+										price.setPrice_cmp(amount_sizeset);
 										priceService.save(price);
+										
+										PContract_Price_D price_detail = new PContract_Price_D();
+										price_detail.setOrgrootid_link(orgrootid_link);
+										price_detail.setFobpriceid_link((long)1);
+										price_detail.setPrice(amount_sizeset);
+										price_detail.setIsfob(false);
+										price_detail.setId(null);
+										price_detail.setSizesetid_link(sizesetid_link);
+										price_detail.setPcontract_poid_link(pcontractpo_id_link);
+										price_detail.setPcontractid_link(pcontractid_link);
+										price_detail.setPcontractpriceid_link(price.getId());
+										price_detail.setProductid_link(productid_link);
+										pricedetailService.save(price_detail);
 									}
 								}
 							}
