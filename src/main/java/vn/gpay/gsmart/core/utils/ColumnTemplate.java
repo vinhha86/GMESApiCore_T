@@ -13,10 +13,11 @@ public class ColumnTemplate {
 	public static int vendor_target  	= 9;
 	public static int cmp  				= 10;
 	public static int fob  				= 11;
-	public static int infant  			= 12;
-	public static int monthly  			= 13;
-	public static int toddle  			= 14;
-	public static int normal  			= 15;
-	public static int big  				= 16;
-	public static int plus  			= 17;
+	public static int org				= 12;
+	public static int infant  			= 13;
+	public static int monthly  			= 14;
+	public static int toddle  			= 15;
+	public static int normal  			= 16;
+	public static int big  				= 17;
+	public static int plus  			= 18;
 }

@@ -44,6 +44,11 @@ public interface IPOrder_Req_Repository extends JpaRepository<POrder_Req, Long>,
 	
 	@Query("SELECT c FROM POrder_Req c where c.pcontract_poid_link = :pcontract_poid_link and is_calculate = 'False'")
 	public List<POrder_Req> getByPO_calculate( @Param ("pcontract_poid_link")final Long pcontract_poid_link);
+	
+	@Query("SELECT c FROM POrder_Req c where c.pcontract_poid_link = :pcontract_poid_link and c.granttoorgid_link = :orgid_link")
+	public List<POrder_Req> getByPO_AndOrg( 
+			@Param ("pcontract_poid_link")final Long pcontract_poid_link,
+			@Param ("orgid_link")final Long orgid_link);
 
 	@Query("SELECT c FROM POrder_Req c where c.status = :status")
 	public List<POrder_Req> getByStatus(@Param ("status")final Integer status);
