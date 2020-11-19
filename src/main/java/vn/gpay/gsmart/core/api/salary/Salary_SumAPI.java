@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.api.salary;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -69,7 +70,7 @@ public class Salary_SumAPI {
 			List<Personel> ls_Personnel = personnelService.getby_orgmanager(entity.orgid_link, orgrootid_link);
 			//2. Lay thong tin luong Basic cua don vi quan ly
 			OrgSal_Basic theSalBasic = salbasicService.getone_byorg(entity.orgid_link);
-			
+			CountDownLatch latch = new CountDownLatch(ls_Personnel.size());
 			for(Personel personnel:ls_Personnel){
 				Salary_Personnel sal_personnel =  new Salary_Personnel(
 						personnel,
@@ -80,9 +81,11 @@ public class Salary_SumAPI {
 						saltypeService,
 						saltype_levelService,
 						salcomService,
-						salarysumService);
+						salarysumService,
+						latch);
 				sal_personnel.start();
 			}
+			latch.await();
             response.data = salarysumService.getall_byorg(entity.orgid_link);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

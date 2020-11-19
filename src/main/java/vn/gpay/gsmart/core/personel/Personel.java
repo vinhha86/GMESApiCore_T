@@ -18,6 +18,8 @@ import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.category.LaborLevel;
 import vn.gpay.gsmart.core.org.Org;
+import vn.gpay.gsmart.core.salary.OrgSal_Level;
+import vn.gpay.gsmart.core.salary.OrgSal_Type;
 
 @Table(name="personnel")
 @Entity
@@ -60,6 +62,30 @@ public class Personel implements Serializable {
     @JoinColumn(name="levelid_link",insertable=false,updatable =false)
     private LaborLevel laborLevel;
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="saltypeid_link",insertable=false,updatable =false)
+    private OrgSal_Type saltype;
+
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="sallevelid_link",insertable=false,updatable =false)
+    private OrgSal_Level sallevel;
+
+	@Transient
+	public String getSaltype_code() {
+		if(saltype!=null) {
+			return saltype.getCode();
+		}
+		return "";
+	}
+	@Transient
+	public String getSallevel_code() {
+		if(sallevel!=null) {
+			return sallevel.getCode();
+		}
+		return "";
+	}
 	
 	@Transient
 	public String getLaborlevel_name() {

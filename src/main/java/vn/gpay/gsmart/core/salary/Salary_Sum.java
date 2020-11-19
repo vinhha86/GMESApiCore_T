@@ -37,6 +37,22 @@ public class Salary_Sum implements Serializable {/**
 	private Integer sumcolid_link;
 	private Integer sumcoltypeid_link;
 	private Float sumvalue;
+	private Integer luongsp_sl;
+	private Integer luongsp_tien;
+	private Integer luongtg_sl;
+	private Integer luongtg_tien;
+	private Integer nghi_sl;
+	private Integer nghi_tien;
+	private Integer phucap_chucvu;
+	private Integer phucap_khac;
+	private Integer tongluong;
+	private Integer ky1_tien;
+	private Integer ky2_tien;
+	private Integer giamtru_bhxh;
+	private Integer giamtru_bhyt;
+	private Integer giamtru_bhtn;
+	private Integer giamtru_kpcd;
+	private Integer giamtru_tong;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -76,7 +92,20 @@ public class Salary_Sum implements Serializable {/**
 		}
 		return "";
 	}
-	
+	@Transient
+	public String getPersonel_saltypecode() {
+		if(personnel != null) {
+			return personnel.getSaltype_code();
+		}
+		return "";
+	}
+	@Transient
+	public String getPersonel_sallevelcode() {
+		if(personnel != null) {
+			return personnel.getSallevel_code();
+		}
+		return "";
+	}	
 	public Long getId() {
 		return id;
 	}
@@ -130,6 +159,158 @@ public class Salary_Sum implements Serializable {/**
 	}
 	public void setSumvalue(Float sumvalue) {
 		this.sumvalue = sumvalue;
+	}
+
+	public Integer getLuongsp_sl() {
+		return luongsp_sl;
+	}
+
+	public void setLuongsp_sl(Integer luongsp_sl) {
+		this.luongsp_sl = luongsp_sl;
+	}
+
+	public Integer getLuongsp_tien() {
+		return luongsp_tien;
+	}
+
+	public void setLuongsp_tien(Integer luongsp_tien) {
+		this.luongsp_tien = luongsp_tien;
+	}
+
+	public Integer getLuongtg_sl() {
+		return luongtg_sl;
+	}
+
+	public void setLuongtg_sl(Integer luongtg_sl) {
+		this.luongtg_sl = luongtg_sl;
+	}
+
+	public Integer getLuongtg_tien() {
+		return luongtg_tien;
+	}
+
+	public void setLuongtg_tien(Integer luongtg_tien) {
+		this.luongtg_tien = luongtg_tien;
+	}
+
+	public Integer getNghi_sl() {
+		return nghi_sl;
+	}
+
+	public void setNghi_sl(Integer nghi_sl) {
+		this.nghi_sl = nghi_sl;
+	}
+
+	public Integer getNghi_tien() {
+		return nghi_tien;
+	}
+
+	public void setNghi_tien(Integer nghi_tien) {
+		this.nghi_tien = nghi_tien;
+	}
+
+	public Integer getPhucap_chucvu() {
+		return phucap_chucvu;
+	}
+
+	public void setPhucap_chucvu(Integer phucap_chucvu) {
+		this.phucap_chucvu = phucap_chucvu;
+	}
+
+	public Integer getPhucap_khac() {
+		return phucap_khac;
+	}
+
+	public void setPhucap_khac(Integer phucap_khac) {
+		this.phucap_khac = phucap_khac;
+	}
+
+	public Integer getTongluong() {
+		return tongluong;
+	}
+
+	public void setTongluong(Integer tongluong) {
+		this.tongluong = tongluong;
+	}
+
+	public Integer getKy1_tien() {
+		return ky1_tien;
+	}
+
+	public void setKy1_tien(Integer ky1_tien) {
+		this.ky1_tien = ky1_tien;
+	}
+
+	public Integer getKy2_tien() {
+		return ky2_tien;
+	}
+
+	public void setKy2_tien(Integer ky2_tien) {
+		this.ky2_tien = ky2_tien;
+	}
+
+	public Integer getGiamtru_bhxh() {
+		return giamtru_bhxh;
+	}
+
+	public void setGiamtru_bhxh(Integer giamtru_bhxh) {
+		this.giamtru_bhxh = giamtru_bhxh;
+	}
+
+	public Integer getGiamtru_bhyt() {
+		return giamtru_bhyt;
+	}
+
+	public void setGiamtru_bhyt(Integer giamtru_bhyt) {
+		this.giamtru_bhyt = giamtru_bhyt;
+	}
+
+	public Integer getGiamtru_bhtn() {
+		return giamtru_bhtn;
+	}
+
+	public void setGiamtru_bhtn(Integer giamtru_bhtn) {
+		this.giamtru_bhtn = giamtru_bhtn;
+	}
+
+	public Integer getGiamtru_kpcd() {
+		return giamtru_kpcd;
+	}
+
+	public void setGiamtru_kpcd(Integer giamtru_kpcd) {
+		this.giamtru_kpcd = giamtru_kpcd;
+	}
+
+	public Integer getGiamtru_tong() {
+		return giamtru_tong;
+	}
+
+	public void setGiamtru_tong(Integer giamtru_tong) {
+		this.giamtru_tong = giamtru_tong;
+	}
+
+	public Salary_Sum_Col getSumcol() {
+		return sumcol;
+	}
+
+	public void setSumcol(Salary_Sum_Col sumcol) {
+		this.sumcol = sumcol;
+	}
+
+	public Salary_Sum_Col_Type getSumcoltype() {
+		return sumcoltype;
+	}
+
+	public void setSumcoltype(Salary_Sum_Col_Type sumcoltype) {
+		this.sumcoltype = sumcoltype;
+	}
+
+	public Personel getPersonnel() {
+		return personnel;
+	}
+
+	public void setPersonnel(Personel personnel) {
+		this.personnel = personnel;
 	}
 	
 }

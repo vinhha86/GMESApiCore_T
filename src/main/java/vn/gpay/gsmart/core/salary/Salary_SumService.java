@@ -27,11 +27,11 @@ public class Salary_SumService extends AbstractService<Salary_Sum> implements IS
 
 	@Override
 	public void saveWithCheck(Salary_Sum entity){
-		List<Salary_Sum> a = repo.getby_key(entity.getPersonnelid_link(), entity.getYear(), entity.getMonth(), entity.getSumcolid_link());
+		List<Salary_Sum> a = repo.getby_key(entity.getPersonnelid_link(), entity.getYear(), entity.getMonth());
 		if (a.size() > 0){
 			Salary_Sum theSalSum = a.get(0);
-			theSalSum.setSumvalue(entity.getSumvalue());
-			repo.save(theSalSum);
+			entity.setId(theSalSum.getId());
+			repo.save(entity);
 		} else {
 			repo.save(entity);
 		}
