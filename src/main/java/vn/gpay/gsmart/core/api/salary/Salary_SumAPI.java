@@ -49,7 +49,7 @@ public class Salary_SumAPI {
 //		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		salary_sum_response response = new salary_sum_response();
 		try {
-			response.data = salarysumService.getall_byorg(entity.orgid_link);
+			response.data = salarysumService.getall_byorg(entity.orgid_link, entity.year, entity.month);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<salary_sum_response>(response, HttpStatus.OK);
@@ -86,7 +86,7 @@ public class Salary_SumAPI {
 				sal_personnel.start();
 			}
 			latch.await();
-            response.data = salarysumService.getall_byorg(entity.orgid_link);
+            response.data = salarysumService.getall_byorg(entity.orgid_link, entity.year, entity.month);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<salary_sum_response>(response, HttpStatus.OK);

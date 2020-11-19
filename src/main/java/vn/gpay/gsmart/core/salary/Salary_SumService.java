@@ -14,9 +14,9 @@ public class Salary_SumService extends AbstractService<Salary_Sum> implements IS
 	@Autowired ISalary_SumRepository repo;
 	
 	@Override
-	public List<Salary_Sum> getall_byorg(long orgid_link) {
+	public List<Salary_Sum> getall_byorg(long orgid_link, int year, int month) {
 		// TODO Auto-generated method stub
-		return repo.getall_byorg(orgid_link);
+		return repo.getall_byorg(orgid_link, year, month);
 	}
 
 	@Override

@@ -61,7 +61,7 @@ public class Salary_Personnel implements Runnable{
 				Long saltypeidlink = personnel.getSaltypeid_link(); //thang luong
 				Long sallevelid_link = personnel.getSallevelid_link();//bac luong
 				if (null != saltypeidlink && null != sallevelid_link){
-					System.out.println(personnel.getFullname());
+//					System.out.println(personnel.getFullname());
 					OrgSal_Type theSal_Type = saltypeService.findOne(saltypeidlink);
 					if (null!=theSal_Type){
 						//Neu la luong thoi gian
@@ -98,6 +98,11 @@ public class Salary_Personnel implements Runnable{
 			t = new Thread (this, personnel.getCode());
 			t.start ();
 		}
+	}
+	private void cal_luong_sp_grid(){
+		//1.Lay danh sach lenh tinh luong trong thang cua don vi quan ly personnel
+		//2.Lay danh sach cac lenh ma personnel tham gia trong danh sach lenh tinh luong
+		//3.
 	}
 	private void cal_luong_tg_grid(int value_tg_sl, int cost_per_hour){
 		int value_tg_sotien = cost_per_hour * value_tg_sl;
