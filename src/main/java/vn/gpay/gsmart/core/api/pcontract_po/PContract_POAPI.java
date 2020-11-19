@@ -177,27 +177,27 @@ public class PContract_POAPI {
 					while (commonService.getStringValue(row.getCell(ColumnTemplate.STT)) != "") {
 						// Kiểm tra sản phẩm có chưa thì sinh id sản phẩm
 						long productid_link = 0;
-						colNum = 4;
+						colNum = ColumnTemplate.Style + 1;
 						String product_code = commonService.getStringValue(row.getCell(ColumnTemplate.Style));
 						
 						if(product_code=="") break;
 						
-						colNum = 7;
+						colNum = ColumnTemplate.amount_po + 1;
 						String s_product_quantity = commonService.getStringValue(row.getCell(ColumnTemplate.amount_po));
 						s_product_quantity = s_product_quantity.replace(",", "");
-						int product_quantity = s_product_quantity == "" ? 0 : Integer.parseInt(s_product_quantity);
+						Float product_quantity = s_product_quantity == "" ? 0 : Float.parseFloat(s_product_quantity);
 						
-						colNum = 3;
+						colNum = ColumnTemplate.Style_Set + 1;
 						String product_set_code = commonService.getStringValue(row.getCell(ColumnTemplate.Style_Set));
 						
-						colNum = 6;
+						colNum = ColumnTemplate.amount_style + 1;
 						String s_amount = commonService.getStringValue(row.getCell(ColumnTemplate.amount_style));
 						s_amount = s_amount.replace(",", "");
 						int amount = (int) row.getCell(ColumnTemplate.amount_style).getNumericCellValue() == 0 ? 1 : (int) row.getCell(ColumnTemplate.amount_style).getNumericCellValue();
 						
-						int po_quantity = product_quantity / amount;
+						int po_quantity = product_quantity.intValue() / amount;
 						
-						colNum = 5;
+						colNum = ColumnTemplate.Style_name + 1;
 						String stylename = commonService.getStringValue(row.getCell(ColumnTemplate.Style_name));
 						
 						List<Product> products = productService.getone_by_code(orgrootid_link, product_code, (long) 0,
@@ -353,7 +353,7 @@ public class PContract_POAPI {
 						}
 
 						long shipmodeid_link = 0;
-						colNum = 9;
+						colNum = ColumnTemplate.shipmode + 1;
 						String shipmode_name = row.getCell(ColumnTemplate.shipmode).getStringCellValue();
 						List<ShipMode> shipmode = shipmodeService.getbyname(shipmode_name);
 						if (shipmode.size() > 0) {
@@ -361,34 +361,34 @@ public class PContract_POAPI {
 						}
 
 						// Kiem tra chao gia da ton tai hay chua
-						colNum = 2;
-						String PO_No = commonService.getStringValue(row.getCell(1));
+						colNum = ColumnTemplate.PO + 1;
+						String PO_No = commonService.getStringValue(row.getCell(ColumnTemplate.PO));
 						if (PO_No == "" || PO_No.equals("0")) {
 							PO_No = "TBD";
 						}
 						
-						colNum = 8;
+						colNum = ColumnTemplate.shipdate + 1;
 						Date ShipDate = row.getCell(ColumnTemplate.shipdate).getDateCellValue();
 						
 						long po_productid_link = product_set_id_link > 0 ? product_set_id_link : productid_link;
 						long pcontractpo_id_link = 0;
 						
-						colNum = 11;
+						colNum = ColumnTemplate.cmp + 1;
 						String s_price_cmp = commonService.getStringValue(row.getCell(ColumnTemplate.cmp));
 						s_price_cmp = s_price_cmp.replace(",", "");
 						float price_cmp = s_price_cmp == "" ? 0 : Float.parseFloat(s_price_cmp);
 						
-						colNum = 12;
+						colNum = ColumnTemplate.fob + 1;
 						String s_price_fob = commonService.getStringValue(row.getCell(ColumnTemplate.fob));
 						s_price_fob = s_price_fob.replace(",", "");
 						float price_fob = s_price_fob == "" ? 0 : Float.parseFloat(s_price_fob);
 						
-						colNum = 10;
+						colNum = ColumnTemplate.vendor_target + 1;
 						String s_vendor_target = commonService.getStringValue(row.getCell(ColumnTemplate.vendor_target));
 						s_vendor_target = s_vendor_target.replace(",", "");
 						float vendor_target = s_vendor_target == "" ? 0 : Float.parseFloat(s_vendor_target);
 						
-						colNum = 13;
+						colNum = ColumnTemplate.org + 1;
 						String s_org_code = commonService.getStringValue(row.getCell(ColumnTemplate.org));
 						s_org_code = s_org_code.replace(",", "");
 						Long orgid_link = null;
@@ -396,10 +396,23 @@ public class PContract_POAPI {
 						if(list_org.size() > 0) {
 							orgid_link = list_org.get(0).getId();
 						}
+						
+						colNum = ColumnTemplate.matdate + 1;
+						Date matdate = row.getCell(ColumnTemplate.matdate).getDateCellValue();
+						
+						int year = Calendar.getInstance().get(Calendar.YEAR);
+						Date production_date = commonService.Date_Add(matdate, 7);
+						int production_day = commonService.getDuration(production_date, ShipDate, orgrootid_link, year);
+						
 						List<PContract_PO> listpo = pcontract_POService.check_exist_po(PO_No, ShipDate,
 								po_productid_link, shipmodeid_link, pcontractid_link, vendor_target);
 						if (listpo.size() > 0) {
 							pcontractpo_id_link = listpo.get(0).getId();
+							PContract_PO po = listpo.get(0);
+							po.setProductiondate(production_date);
+							po.setProductiondays(production_day);
+							po.setMatdate(matdate);
+							pcontract_POService.save(po);
 						}
 
 						if (pcontractpo_id_link == 0) {
@@ -422,6 +435,9 @@ public class PContract_POAPI {
 							po_new.setStatus(POStatus.PO_STATUS_PROBLEM);
 							po_new.setUsercreatedid_link(user.getId());
 							po_new.setDate_importdata(current_time);
+							po_new.setProductiondate(production_date);
+							po_new.setProductiondays(production_day);
+							po_new.setMatdate(matdate);
 
 							po_new = pcontract_POService.save(po_new);
 							pcontractpo_id_link = po_new.getId();
@@ -459,7 +475,7 @@ public class PContract_POAPI {
 							price_all.setPrice_cmp(price_cmp);
 							price_all.setPrice_fob(price_fob);
 							price_all.setProductid_link(productid_link);
-							price_all.setQuantity(product_quantity);
+							price_all.setQuantity(product_quantity.intValue());
 							price_all.setSizesetid_link(sizesetService.getbyname("ALL"));
 							price_all.setDate_importdata(current_time);
 							price_all = priceService.save(price_all);
@@ -609,7 +625,7 @@ public class PContract_POAPI {
 									price_all_set.setPrice_cmp(price_cmp);
 									price_all_set.setPrice_fob(price_fob);
 									price_all_set.setProductid_link(productid_link);
-									price_all_set.setQuantity(product_quantity);
+									price_all_set.setQuantity(product_quantity.intValue());
 									price_all_set.setSizesetid_link(sizesetService.getbyname("ALL"));
 									price_all_set.setDate_importdata(current_time);
 									price_all_set = priceService.save(price_all_set);
@@ -824,6 +840,41 @@ public class PContract_POAPI {
 								}
 							}
 						}
+						
+						//Tu sinh PO con neu po da xac nhan 
+						colNum = ColumnTemplate.status + 1;
+						String s_status = commonService.getStringValue(row.getCell(ColumnTemplate.status));
+						if(s_status != "") {
+							PContract_PO po = pcontract_POService.findOne(pcontractpo_id_link);
+							po.setStatus(POStatus.PO_STATUS_CONFIRMED);
+							po.setOrgmerchandiseid_link(orgid_link);
+							pcontract_POService.save(po);
+							
+							List<PContract_PO> list_po_chil = pcontract_POService.get_by_parentid(pcontractpo_id_link);
+							if(list_po_chil.size() == 0) {
+								PContract_PO po_chil = new PContract_PO();
+								po_chil.setCode(PO_No);
+								po_chil.setDate_importdata(current_time);
+								po_chil.setId(null);
+								po_chil.setIs_tbd(false);
+								po_chil.setMatdate(matdate);
+								po_chil.setOrgmerchandiseid_link(orgid_link);
+								po_chil.setOrgrootid_link(orgrootid_link);
+								po_chil.setParentpoid_link(pcontractpo_id_link);
+								po_chil.setPcontractid_link(pcontractid_link);
+								po_chil.setPo_buyer(PO_No);
+								po_chil.setPo_vendor(PO_No);
+								po_chil.setPo_quantity(po.getPo_quantity());
+								po_chil.setProductid_link(po.getProductid_link());
+								po_chil.setProductiondate(production_date);
+								po_chil.setProductiondays(production_day);
+								po_chil.setShipdate(ShipDate);
+								po_chil.setShipmodeid_link(shipmodeid_link);
+								po_chil.setStatus(POStatus.PO_STATUS_CONFIRMED);
+								pcontract_POService.save(po_chil);
+							}
+						}
+						
 						rowNum++;
 						row = sheet.getRow(rowNum);
 					}
@@ -1202,9 +1253,6 @@ public class PContract_POAPI {
 												}
 											}
 										}
-										
-										
-										
 									}
 									
 									

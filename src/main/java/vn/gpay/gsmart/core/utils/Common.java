@@ -760,8 +760,20 @@ public class Common  {
 	public String getStringValue(Cell cell) {
 		if(cell == null) return "";
 		try {
-			int valua = (int)cell.getNumericCellValue();
-			return valua+"";
+			Double value = cell.getNumericCellValue();
+			int i_value = value.intValue();
+			if(value == i_value) {
+				return i_value+"";
+			}
+			return value+"";
+		}
+		catch (Exception e) {
+			
+		}
+		
+		try {
+			int value = (int)cell.getNumericCellValue();
+			return value+"";
 		}
 		catch (Exception e) {
 			
