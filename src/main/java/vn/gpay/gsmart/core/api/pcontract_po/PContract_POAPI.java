@@ -854,6 +854,8 @@ public class PContract_POAPI {
 							po.setOrgmerchandiseid_link(orgid_link);
 							pcontract_POService.save(po);
 							
+							Long pcontractpo_chil_id_link = null;
+							
 							List<PContract_PO> list_po_chil = pcontract_POService.get_by_parentid(pcontractpo_id_link);
 							if(list_po_chil.size() == 0) {
 								PContract_PO po_chil = new PContract_PO();
@@ -875,7 +877,29 @@ public class PContract_POAPI {
 								po_chil.setShipdate(ShipDate);
 								po_chil.setShipmodeid_link(shipmodeid_link);
 								po_chil.setStatus(POStatus.PO_STATUS_CONFIRMED);
-								pcontract_POService.save(po_chil);
+								po_chil = pcontract_POService.save(po_chil);
+								
+								pcontractpo_chil_id_link = po_chil.getId();
+							}
+							else {
+								pcontractpo_chil_id_link = list_po_chil.get(0).getId();
+							}
+							
+							//Kiem tra porder_req cua po chil co chua
+							List<POrder_Req> list_req_chil = reqService.getByOrg_PO_Product(pcontractpo_chil_id_link, po.getProductid_link(), orgid_link);
+							if(list_req_chil.size() == 0) {
+								POrder_Req porder_req = new POrder_Req();
+								porder_req.setAmount_inset(amount);
+								porder_req.setGranttoorgid_link(orgid_link);
+								porder_req.setId(null);
+								porder_req.setIs_calculate(true);
+								porder_req.setOrgrootid_link(orgrootid_link);
+								porder_req.setPcontract_poid_link(pcontractpo_chil_id_link);
+								porder_req.setPcontractid_link(pcontractid_link);
+								porder_req.setProductid_link(productid_link);
+								porder_req.setStatus(POrderReqStatus.STATUS_FREE);
+								porder_req.setTotalorder(po_quantity);
+								reqService.save(porder_req);
 							}
 						}
 						
