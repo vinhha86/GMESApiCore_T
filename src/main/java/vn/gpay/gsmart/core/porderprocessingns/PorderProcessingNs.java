@@ -31,6 +31,7 @@ private static final long serialVersionUID = 1L;
 	private Long pordersewingcostid_link;
 	private Integer amount_complete;
 	private Integer amount_money;
+	private Integer amount_timespent;
 	private Long userupdateid_link;
 	private Date date_updated;
 	private Long userapproveid_link;
@@ -131,4 +132,11 @@ private static final long serialVersionUID = 1L;
 	public void setDate_approved(Date date_approved) {
 		this.date_approved = date_approved;
 	}
+	public Integer getAmount_timespent() {
+		return amount_timespent;
+	}
+	public void setAmount_timespent(Integer amount_timespent) {
+		this.amount_timespent = amount_timespent;
+	}
+	
 }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.personel.IPersonnel_Service;
 import vn.gpay.gsmart.core.personel.Personel;
+import vn.gpay.gsmart.core.porderprocessingns.IPorderProcessingNsService;
 import vn.gpay.gsmart.core.salary.IOrgSal_BasicService;
 import vn.gpay.gsmart.core.salary.IOrgSal_ComService;
 import vn.gpay.gsmart.core.salary.IOrgSal_Com_LaborLevelService;
@@ -25,6 +26,7 @@ import vn.gpay.gsmart.core.salary.IOrgSal_TypeService;
 import vn.gpay.gsmart.core.salary.IOrgSal_Type_LaborLevelService;
 import vn.gpay.gsmart.core.salary.IOrgSal_Type_LevelService;
 import vn.gpay.gsmart.core.salary.ISalary_SumService;
+import vn.gpay.gsmart.core.salary.ISalary_Sum_POrdersService;
 import vn.gpay.gsmart.core.salary.OrgSal_Basic;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
@@ -42,6 +44,8 @@ public class Salary_SumAPI {
 	@Autowired IOrgSal_Com_PositionService salcom_positionService;
 	@Autowired ISalary_SumService salarysumService;
 	@Autowired IPersonnel_Service personnelService;
+	@Autowired ISalary_Sum_POrdersService salarysum_pordersService;
+	@Autowired IPorderProcessingNsService porderprocessing_nsService;
 	
 	@RequestMapping(value = "/salary_sum_byorg", method = RequestMethod.POST)
 	public ResponseEntity<salary_sum_response> salary_sum_byorg(HttpServletRequest request,
@@ -82,6 +86,8 @@ public class Salary_SumAPI {
 						saltype_levelService,
 						salcomService,
 						salarysumService,
+						salarysum_pordersService,
+						porderprocessing_nsService,
 						latch);
 				sal_personnel.start();
 			}
