@@ -15,7 +15,7 @@ public interface ISizeSetRepository extends JpaRepository<SizeSet, Long>, JpaSpe
 	@Query(value = "select c from SizeSet c where c.orgrootid_link = :orgrootid_link order by c.sortvalue asc")
 	public List<SizeSet> getall_byorgrootid(@Param ("orgrootid_link")final  Long orgrootid_link);
 	
-	@Query(value = "select c from SizeSet c where c.name = :name")
+	@Query(value = "select c from SizeSet c where lower(c.name) = lower(:name)")
 	public List<SizeSet> getbyname(@Param ("name")final  String name);
 	
 	@Query(value = "select max(sortvalue) from SizeSet c")	

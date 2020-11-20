@@ -404,8 +404,12 @@ public class PContract_POAPI {
 						Date production_date = commonService.Date_Add(matdate, 7);
 						int production_day = commonService.getDuration(production_date, ShipDate, orgrootid_link, year);
 						
-						List<PContract_PO> listpo = pcontract_POService.check_exist_po(PO_No, ShipDate,
-								po_productid_link, shipmodeid_link, pcontractid_link, vendor_target);
+						List<PContract_PO> listpo = new ArrayList<PContract_PO>();
+						if(PO_No != "TBD") {
+							listpo = pcontract_POService.check_exist_po(PO_No, ShipDate,
+									po_productid_link, shipmodeid_link, pcontractid_link, vendor_target);
+						}
+						
 						if (listpo.size() > 0) {
 							pcontractpo_id_link = listpo.get(0).getId();
 							PContract_PO po = listpo.get(0);
