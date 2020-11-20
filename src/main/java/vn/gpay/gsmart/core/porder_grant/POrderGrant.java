@@ -119,7 +119,12 @@ public class POrderGrant implements Serializable {
 			return porder.getOrdercode();
 		return "";
 	}
-	
+	@Transient
+	public String getPo_buyer() {
+		if(porder!=null)
+			return porder.getPo_buyer();
+		return "";
+	}	
 	@Transient
 	public String getProductcode() {
 		if(porder!=null)

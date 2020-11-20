@@ -19,4 +19,6 @@ public interface IPOrderGrant_Service extends Operations<POrderGrant>{
 	
 	List<POrderGrant>getByOrderId(Long porderid_link);
 	List<POrderGrant>getByOrgId(Long granttoorgid_link);
+
+	List<POrderGrant> getProcessingByOrgId(Long granttoorgid_link);
 }

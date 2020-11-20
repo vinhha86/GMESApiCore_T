@@ -75,4 +75,10 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 		// TODO Auto-generated method stub
 		return repo.getByOrgId(granttoorgid_link);
 	}
+	
+	@Override
+	public List<POrderGrant> getProcessingByOrgId(Long granttoorgid_link) {
+		// TODO Auto-generated method stub
+		return repo.getProcessingByOrgId(granttoorgid_link);
+	}
 }

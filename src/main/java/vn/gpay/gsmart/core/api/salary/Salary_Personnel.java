@@ -101,8 +101,8 @@ public class Salary_Personnel implements Runnable{
 	}
 	private void cal_luong_sp_grid(){
 		//1.Lay danh sach lenh tinh luong trong thang cua don vi quan ly personnel (salary_sum_porders)
-		//2.Lay danh sach cac lenh ma personnel tham gia trong danh sach lenh tinh luong (porder_grant_timesheet)
-		//3.Lấy tổng số lượng nhập kho từ ngày - đến ngày
+		//2.Lay danh sach cong doan, so luong, so tien cua cac lenh ma nhan su tham gia trong khoang tgian tinh luong
+		//+ porder_processing_ns
 	}
 	private void cal_luong_tg_grid(int value_tg_sl, int cost_per_hour){
 		int value_tg_sotien = cost_per_hour * value_tg_sl;
