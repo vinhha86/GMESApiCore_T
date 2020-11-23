@@ -175,7 +175,10 @@ public class PContract_POAPI {
 				String mes_err = "";
 				Row row = sheet.getRow(rowNum);
 				try {
-					while (commonService.getStringValue(row.getCell(ColumnTemplate.STT)) != "") {
+					String STT = "";
+					STT = commonService.getStringValue(row.getCell(ColumnTemplate.STT));
+					STT = STT.equals("0") ? "" : STT;
+					while (!STT.equals("")) {
 						// Kiểm tra sản phẩm có chưa thì sinh id sản phẩm
 						long productid_link = 0;
 						colNum = ColumnTemplate.Style + 1;
@@ -424,6 +427,7 @@ public class PContract_POAPI {
 						if (pcontractpo_id_link == 0) {
 							Float price_cmp = null;
 							Float price_cmp_total = (float)0;
+							int count = 0;
 
 							PContract_PO po_new = new PContract_PO();
 							po_new.setId(null);
@@ -477,10 +481,11 @@ public class PContract_POAPI {
 								String s_amount_sizeset = commonService.getStringValue(row.getCell(i));
 								s_amount_sizeset = s_amount_sizeset.replace(",", "");
 								Float amount_sizeset = s_amount_sizeset.equals("") ? 0 : Float.parseFloat(s_amount_sizeset);
-								price_cmp_total += amount_sizeset;
 								
 								Long sizesetid_link = sizesetService.getbyname(sizesetname);
 								if (amount_sizeset > 0) {
+									count++;
+									price_cmp_total += amount_sizeset;
 									PContract_Price price = new PContract_Price();
 									price.setId(null);
 									price.setIs_fix(false);
@@ -512,10 +517,13 @@ public class PContract_POAPI {
 							}
 							
 							//Tinh gia cmp = trung binh gia cua cac dai co
-							price_cmp = price_cmp_total / (ColumnTemplate.plus - ColumnTemplate.infant + 1);
-							DecimalFormat df = new DecimalFormat("#.###"); 
-							String formatted = df.format(price_cmp);
-							price_cmp = Float.parseFloat(formatted);
+							if(count == 0) price_cmp = (float)0;
+							else {
+								price_cmp = price_cmp_total / count;
+								DecimalFormat df = new DecimalFormat("#.###"); 
+								String formatted = df.format(price_cmp);
+								price_cmp = Float.parseFloat(formatted);
+							}
 
 							// Them cho san pham con
 							PContract_Price price_all = new PContract_Price();
@@ -628,6 +636,7 @@ public class PContract_POAPI {
 						else {
 							Float price_cmp = null;
 							Float price_cmp_total = (float)0;
+							int count = 0;
 							
 							//  neu la hang bo thi them khong thi thoi trung coi nhu bo qua khong xu ly
 							if (product_set_id_link > 0) 	{
@@ -646,9 +655,10 @@ public class PContract_POAPI {
 									s_amount_sizeset = s_amount_sizeset.replace(",", "");
 									Float amount_sizeset = s_amount_sizeset.equals("") ? 0 : Float.parseFloat(s_amount_sizeset);
 									Long sizesetid_link = sizesetService.getbyname(sizesetname);
-									price_cmp_total += amount_sizeset;
 									
 									if (amount_sizeset > 0) {
+										price_cmp_total += amount_sizeset;
+										count++;
 										//kiem tra xem dai co co du lieu chua! 
 										if(list_price.size() == 0) {
 											PContract_Price price = new PContract_Price();
@@ -768,11 +778,14 @@ public class PContract_POAPI {
 										}
 									}
 								}
+								if(count == 0) price_cmp = (float)0;
+								else {
+									price_cmp = price_cmp_total / count;
+									DecimalFormat df = new DecimalFormat("#.###"); 
+									String formatted = df.format(price_cmp);
+									price_cmp = Float.parseFloat(formatted);
+								}
 								
-								price_cmp = price_cmp_total / (ColumnTemplate.plus - ColumnTemplate.infant + 1);
-								DecimalFormat df = new DecimalFormat("#.###"); 
-								String formatted = df.format(price_cmp);
-								price_cmp = Float.parseFloat(formatted);
 
 								// them dai co vao san pham con
 								if(list_price.size() == 0) {
@@ -840,9 +853,10 @@ public class PContract_POAPI {
 									String s_amount_sizeset = commonService.getStringValue(row.getCell(i));
 									s_amount_sizeset = s_amount_sizeset.replace(",", "");
 									Float amount_sizeset = s_amount_sizeset.equals("") ? 0 : Float.parseFloat(s_amount_sizeset);
-									price_cmp_total += amount_sizeset;
 //									int amount_sizeset = (int) row.getCell(i).getNumericCellValue();
 									if (amount_sizeset > 0) {
+										price_cmp_total += amount_sizeset;
+										count++;
 										String sizesetname = commonService.getStringValue(row_header.getCell(i));
 										Long sizesetid_link = sizesetService.getbyname(sizesetname);
 										List<PContract_Price> list_price = priceService.getPrice_by_product_and_sizeset(pcontractpo_id_link, productid_link, sizesetid_link);
@@ -879,10 +893,13 @@ public class PContract_POAPI {
 								}
 								
 								//tinh gia cmp theo trung binh cua cac dai co
-								price_cmp = price_cmp_total / (ColumnTemplate.plus - ColumnTemplate.infant + 1);
-								DecimalFormat df = new DecimalFormat("#.###"); 
-								String formatted = df.format(price_cmp);
-								price_cmp = Float.parseFloat(formatted);
+								if(count == 0) price_cmp = (float)0;
+								else {
+									price_cmp = price_cmp_total / count;
+									DecimalFormat df = new DecimalFormat("#.###"); 
+									String formatted = df.format(price_cmp);
+									price_cmp = Float.parseFloat(formatted);
+								}
 								
 								//cap nhat lai gia cmp cua san pham ( dai co all)
 								PContract_Price price = new PContract_Price();
@@ -973,6 +990,10 @@ public class PContract_POAPI {
 						
 						rowNum++;
 						row = sheet.getRow(rowNum);
+						if(row == null) break;
+						
+						STT = commonService.getStringValue(row.getCell(ColumnTemplate.STT));
+						STT = STT.equals("0") ? "" : STT;
 					}
 				} catch (Exception e) {
 					mes_err = "Có lỗi ở dòng " +(rowNum+1)+" và cột "+ colNum; 
