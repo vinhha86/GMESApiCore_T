@@ -3,6 +3,7 @@ package vn.gpay.gsmart.core.api.pcontract_po;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -512,8 +513,9 @@ public class PContract_POAPI {
 							
 							//Tinh gia cmp = trung binh gia cua cac dai co
 							price_cmp = price_cmp_total / (ColumnTemplate.plus - ColumnTemplate.infant + 1);
-							Math.round((price_cmp * 1000) / 1000);
-							// Them co All vao chao gia
+							DecimalFormat df = new DecimalFormat("#.###"); 
+							String formatted = df.format(price_cmp);
+							price_cmp = Float.parseFloat(formatted);
 
 							// Them cho san pham con
 							PContract_Price price_all = new PContract_Price();
@@ -768,7 +770,9 @@ public class PContract_POAPI {
 								}
 								
 								price_cmp = price_cmp_total / (ColumnTemplate.plus - ColumnTemplate.infant + 1);
-								Math.round((price_cmp * 1000) / 1000);
+								DecimalFormat df = new DecimalFormat("#.###"); 
+								String formatted = df.format(price_cmp);
+								price_cmp = Float.parseFloat(formatted);
 
 								// them dai co vao san pham con
 								if(list_price.size() == 0) {
@@ -876,7 +880,9 @@ public class PContract_POAPI {
 								
 								//tinh gia cmp theo trung binh cua cac dai co
 								price_cmp = price_cmp_total / (ColumnTemplate.plus - ColumnTemplate.infant + 1);
-								Math.round((price_cmp * 1000) / 1000);
+								DecimalFormat df = new DecimalFormat("#.###"); 
+								String formatted = df.format(price_cmp);
+								price_cmp = Float.parseFloat(formatted);
 								
 								//cap nhat lai gia cmp cua san pham ( dai co all)
 								PContract_Price price = new PContract_Price();
@@ -906,9 +912,7 @@ public class PContract_POAPI {
 								pricedetailService.save(price_detail);
 							}
 						}
-						if(rowNum == 11) {
-							int iii = 0;
-						}
+						
 						//Tu sinh PO con neu po da xac nhan 
 						colNum = ColumnTemplate.status + 1;
 						String s_status = commonService.getStringValue(row.getCell(ColumnTemplate.status));
