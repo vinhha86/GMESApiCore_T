@@ -3,6 +3,7 @@ package vn.gpay.gsmart.core.api.pcontract_po;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -189,6 +190,7 @@ public class PContract_POAPI {
 						
 						colNum = ColumnTemplate.Style_Set + 1;
 						String product_set_code = commonService.getStringValue(row.getCell(ColumnTemplate.Style_Set));
+						product_set_code = product_set_code.equals("0") ? "" : product_set_code;
 						
 						colNum = ColumnTemplate.amount_style + 1;
 						String s_amount = commonService.getStringValue(row.getCell(ColumnTemplate.amount_style));
@@ -283,7 +285,7 @@ public class PContract_POAPI {
 
 						// Kiem tra xem co phai PO cua hang bo hay khong
 						long product_set_id_link = 0;
-						if (product_set_code != null && product_set_code != "") {
+						if (!product_set_code.equals(null) && !product_set_code.equals("")) {
 							List<Product> product_set = productService.getone_by_code(orgrootid_link, product_set_code,
 									(long) 0, ProductType.SKU_TYPE_PRODUCT_PAIR);
 							if (product_set.size() == 0) {
@@ -373,15 +375,15 @@ public class PContract_POAPI {
 						long po_productid_link = product_set_id_link > 0 ? product_set_id_link : productid_link;
 						long pcontractpo_id_link = 0;
 						
-						colNum = ColumnTemplate.cmp + 1;
-						String s_price_cmp = commonService.getStringValue(row.getCell(ColumnTemplate.cmp));
-						s_price_cmp = s_price_cmp.replace(",", "");
-						float price_cmp = s_price_cmp == "" ? 0 : Float.parseFloat(s_price_cmp);
+//						colNum = ColumnTemplate.cmp + 1;
+//						String s_price_cmp = commonService.getStringValue(row.getCell(ColumnTemplate.cmp));
+//						s_price_cmp = s_price_cmp.replace(",", "");
+//						float price_cmp = s_price_cmp.equals("") ? 0 : Float.parseFloat(s_price_cmp);
 						
 						colNum = ColumnTemplate.fob + 1;
 						String s_price_fob = commonService.getStringValue(row.getCell(ColumnTemplate.fob));
 						s_price_fob = s_price_fob.replace(",", "");
-						float price_fob = s_price_fob == "" ? 0 : Float.parseFloat(s_price_fob);
+						float price_fob = s_price_fob.equals("") ? 0 : Float.parseFloat(s_price_fob);
 						
 						colNum = ColumnTemplate.vendor_target + 1;
 						String s_vendor_target = commonService.getStringValue(row.getCell(ColumnTemplate.vendor_target));
@@ -420,6 +422,8 @@ public class PContract_POAPI {
 						}
 
 						if (pcontractpo_id_link == 0) {
+							Float price_cmp = null;
+							Float price_cmp_total = (float)0;
 
 							PContract_PO po_new = new PContract_PO();
 							po_new.setId(null);
@@ -466,7 +470,52 @@ public class PContract_POAPI {
 								
 							}
 							
-							// Them co All vao chao gia
+							for (int i = ColumnTemplate.infant; i <= ColumnTemplate.plus; i++) {
+								colNum = i+ 1;
+								Row row_header = sheet.getRow(0);
+								String sizesetname = commonService.getStringValue(row_header.getCell(i));
+								String s_amount_sizeset = commonService.getStringValue(row.getCell(i));
+								s_amount_sizeset = s_amount_sizeset.replace(",", "");
+								Float amount_sizeset = s_amount_sizeset.equals("") ? 0 : Float.parseFloat(s_amount_sizeset);
+								price_cmp_total += amount_sizeset;
+								
+								Long sizesetid_link = sizesetService.getbyname(sizesetname);
+								if (amount_sizeset > 0) {
+									PContract_Price price = new PContract_Price();
+									price.setId(null);
+									price.setIs_fix(false);
+									price.setOrgrootid_link(orgrootid_link);
+									price.setPcontract_poid_link(po_new.getId());
+									price.setPcontractid_link(pcontractid_link);
+									price.setProductid_link(productid_link);
+									price.setSizesetid_link(sizesetid_link == null ? 0 : sizesetid_link);
+									price.setDate_importdata(current_time);
+									price.setPrice_cmp(amount_sizeset);
+									price.setTotalprice(amount_sizeset);
+									price = priceService.save(price);
+									
+									//Them detail cho dai co 
+									PContract_Price_D price_detail_sizeset = new PContract_Price_D();
+									price_detail_sizeset.setOrgrootid_link(orgrootid_link);
+									price_detail_sizeset.setFobpriceid_link((long)1);
+									price_detail_sizeset.setPrice(amount_sizeset);
+									price_detail_sizeset.setIsfob(false);
+									price_detail_sizeset.setDatecreated(current_time);
+									price_detail_sizeset.setId(null);
+									price_detail_sizeset.setSizesetid_link((long)1);
+									price_detail_sizeset.setPcontract_poid_link(pcontractpo_id_link);
+									price_detail_sizeset.setPcontractid_link(pcontractid_link);
+									price_detail_sizeset.setPcontractpriceid_link(price.getId());
+									price_detail_sizeset.setProductid_link(productid_link);
+									pricedetailService.save(price_detail_sizeset);
+								}
+							}
+							
+							//Tinh gia cmp = trung binh gia cua cac dai co
+							price_cmp = price_cmp_total / (ColumnTemplate.plus - ColumnTemplate.infant + 1);
+							DecimalFormat df = new DecimalFormat("#.###"); 
+							String formatted = df.format(price_cmp);
+							price_cmp = Float.parseFloat(formatted);
 
 							// Them cho san pham con
 							PContract_Price price_all = new PContract_Price();
@@ -478,6 +527,7 @@ public class PContract_POAPI {
 							price_all.setPrice_vendortarget(vendor_target);
 							price_all.setPrice_cmp(price_cmp);
 							price_all.setPrice_fob(price_fob);
+							price_all.setTotalprice(price_cmp + price_fob);
 							price_all.setProductid_link(productid_link);
 							price_all.setQuantity(product_quantity.intValue());
 							price_all.setSizesetid_link(sizesetService.getbyname("ALL"));
@@ -499,45 +549,6 @@ public class PContract_POAPI {
 							price_detail_all.setProductid_link(productid_link);
 							pricedetailService.save(price_detail_all);
 
-							for (int i = ColumnTemplate.infant; i <= ColumnTemplate.plus; i++) {
-								colNum = i+ 1;
-								Row row_header = sheet.getRow(0);
-								String sizesetname = commonService.getStringValue(row_header.getCell(i));
-								String s_amount_sizeset = commonService.getStringValue(row.getCell(i));
-								s_amount_sizeset = s_amount_sizeset.replace(",", "");
-								Float amount_sizeset = s_amount_sizeset == "" ? 0 : Float.parseFloat(s_amount_sizeset);
-								
-								Long sizesetid_link = sizesetService.getbyname(sizesetname);
-								if (amount_sizeset > 0) {
-									PContract_Price price = new PContract_Price();
-									price.setId(null);
-									price.setIs_fix(false);
-									price.setOrgrootid_link(orgrootid_link);
-									price.setPcontract_poid_link(po_new.getId());
-									price.setPcontractid_link(pcontractid_link);
-									price.setProductid_link(productid_link);
-									price.setSizesetid_link(sizesetid_link == null ? 0 : sizesetid_link);
-									price.setDate_importdata(current_time);
-									price.setPrice_cmp(amount_sizeset);
-									price = priceService.save(price);
-									
-									//Them detail cho dai co 
-									PContract_Price_D price_detail_sizeset = new PContract_Price_D();
-									price_detail_sizeset.setOrgrootid_link(orgrootid_link);
-									price_detail_sizeset.setFobpriceid_link((long)1);
-									price_detail_sizeset.setPrice(amount_sizeset);
-									price_detail_sizeset.setIsfob(false);
-									price_detail_sizeset.setDatecreated(current_time);
-									price_detail_sizeset.setId(null);
-									price_detail_sizeset.setSizesetid_link((long)1);
-									price_detail_sizeset.setPcontract_poid_link(pcontractpo_id_link);
-									price_detail_sizeset.setPcontractid_link(pcontractid_link);
-									price_detail_sizeset.setPcontractpriceid_link(price.getId());
-									price_detail_sizeset.setProductid_link(productid_link);
-									pricedetailService.save(price_detail_sizeset);
-								}
-							}
-
 							// Them all cho bo
 							if (product_set_id_link > 0) {
 								PContract_Price price_all_set = new PContract_Price();
@@ -549,6 +560,7 @@ public class PContract_POAPI {
 								price_all_set.setPrice_vendortarget(vendor_target);
 								price_all_set.setPrice_cmp(price_cmp);
 								price_all_set.setPrice_fob(price_fob);
+								price_all_set.setTotalprice(price_fob + price_cmp);
 								price_all_set.setProductid_link(product_set_id_link);
 								price_all_set.setQuantity(po_quantity);
 								price_all_set.setSizesetid_link(sizesetService.getbyname("ALL"));
@@ -577,7 +589,7 @@ public class PContract_POAPI {
 									String sizesetname = commonService.getStringValue(row_header.getCell(i));
 									String s_amount_sizeset = commonService.getStringValue(row.getCell(i));
 									s_amount_sizeset = s_amount_sizeset.replace(",", "");
-									Float amount_sizeset = s_amount_sizeset == "" ? 0 : Float.parseFloat(s_amount_sizeset);
+									Float amount_sizeset = s_amount_sizeset.equals("") ? 0 : Float.parseFloat(s_amount_sizeset);
 									Long sizesetid_link = sizesetService.getbyname(sizesetname);
 									
 									if (amount_sizeset > 0) {
@@ -590,14 +602,15 @@ public class PContract_POAPI {
 										price.setProductid_link(product_set_id_link);
 										price.setSizesetid_link(sizesetid_link == null ? 0 : sizesetid_link);
 										price.setDate_importdata(current_time);
-										price.setPrice_cmp(price_cmp);
+										price.setPrice_cmp(amount_sizeset);
+										price.setTotalprice(amount_sizeset);
 										price = priceService.save(price);
 										
 										//Them detail
 										PContract_Price_D price_sizeset = new PContract_Price_D();
 										price_sizeset.setOrgrootid_link(orgrootid_link);
 										price_sizeset.setFobpriceid_link((long)1);
-										price_sizeset.setPrice(price_cmp);
+										price_sizeset.setPrice(amount_sizeset);
 										price_sizeset.setIsfob(false);
 										price_sizeset.setId(null);
 										price_sizeset.setSizesetid_link(sizesetid_link == null ? 0 : sizesetid_link);
@@ -613,42 +626,13 @@ public class PContract_POAPI {
 						}
 						// truong hop hang bo po da co roi
 						else {
+							Float price_cmp = null;
+							Float price_cmp_total = (float)0;
+							
 							//  neu la hang bo thi them khong thi thoi trung coi nhu bo qua khong xu ly
 							if (product_set_id_link > 0) 	{
 								//Kiem tra dai co san pham con da co hay chua
 								List<PContract_Price> list_price = priceService.getPrice_by_product(pcontractpo_id_link, productid_link);
-								// them dai co vao san pham con
-								if(list_price.size() == 0) {
-									PContract_Price price_all_set = new PContract_Price();
-									price_all_set.setId(null);
-									price_all_set.setIs_fix(false);
-									price_all_set.setOrgrootid_link(orgrootid_link);
-									price_all_set.setPcontract_poid_link(pcontractpo_id_link);
-									price_all_set.setPcontractid_link(pcontractid_link);
-									price_all_set.setPrice_vendortarget(vendor_target);
-									price_all_set.setPrice_cmp(price_cmp);
-									price_all_set.setPrice_fob(price_fob);
-									price_all_set.setProductid_link(productid_link);
-									price_all_set.setQuantity(product_quantity.intValue());
-									price_all_set.setSizesetid_link(sizesetService.getbyname("ALL"));
-									price_all_set.setDate_importdata(current_time);
-									price_all_set = priceService.save(price_all_set);
-									
-									//Them detail
-									PContract_Price_D price_detail = new PContract_Price_D();
-									price_detail.setOrgrootid_link(orgrootid_link);
-									price_detail.setFobpriceid_link((long)1);
-									price_detail.setPrice(price_cmp);
-									price_detail.setIsfob(false);
-									price_detail.setId(null);
-									price_detail.setSizesetid_link(sizesetService.getbyname("ALL"));
-									price_detail.setPcontract_poid_link(pcontractpo_id_link);
-									price_detail.setPcontractid_link(pcontractid_link);
-									price_detail.setPcontractpriceid_link(price_all_set.getId());
-									price_all_set.setProductid_link(productid_link);
-									pricedetailService.save(price_detail);
-								}
-								
 
 								//
 								for (int i = ColumnTemplate.infant; i <= ColumnTemplate.plus; i++) {
@@ -660,8 +644,9 @@ public class PContract_POAPI {
 									String sizesetname = commonService.getStringValue(row_header.getCell(i));
 									String s_amount_sizeset = commonService.getStringValue(row.getCell(i));
 									s_amount_sizeset = s_amount_sizeset.replace(",", "");
-									Float amount_sizeset = s_amount_sizeset == "" ? 0 : Float.parseFloat(s_amount_sizeset);
+									Float amount_sizeset = s_amount_sizeset.equals("") ? 0 : Float.parseFloat(s_amount_sizeset);
 									Long sizesetid_link = sizesetService.getbyname(sizesetname);
+									price_cmp_total += amount_sizeset;
 									
 									if (amount_sizeset > 0) {
 										//kiem tra xem dai co co du lieu chua! 
@@ -676,6 +661,7 @@ public class PContract_POAPI {
 											price.setSizesetid_link(sizesetid_link);
 											price.setDate_importdata(current_time);
 											price.setPrice_cmp(amount_sizeset);
+											price.setTotalprice(amount_sizeset);
 											price = priceService.save(price);
 											
 											//Them detail
@@ -733,6 +719,7 @@ public class PContract_POAPI {
 												price.setSizesetid_link(sizesetid_link);
 												price.setDate_importdata(current_time);
 												price.setPrice_cmp(amount_sizeset);
+												price.setTotalprice(price_cmp);
 												price = priceService.save(price);
 												
 												//Them detail
@@ -760,6 +747,7 @@ public class PContract_POAPI {
 												price_set.setSizesetid_link(sizesetid_link);
 												price_set.setDate_importdata(current_time);
 												price_set.setPrice_cmp(price_cmp);
+												price_set.setTotalprice(price_cmp);
 												price_set = priceService.save(price_set);
 												
 												//Them detail
@@ -779,6 +767,51 @@ public class PContract_POAPI {
 											}
 										}
 									}
+								}
+								
+								price_cmp = price_cmp_total / (ColumnTemplate.plus - ColumnTemplate.infant + 1);
+								DecimalFormat df = new DecimalFormat("#.###"); 
+								String formatted = df.format(price_cmp);
+								price_cmp = Float.parseFloat(formatted);
+
+								// them dai co vao san pham con
+								if(list_price.size() == 0) {
+									PContract_Price price_all_set = new PContract_Price();
+									price_all_set.setId(null);
+									price_all_set.setIs_fix(false);
+									price_all_set.setOrgrootid_link(orgrootid_link);
+									price_all_set.setPcontract_poid_link(pcontractpo_id_link);
+									price_all_set.setPcontractid_link(pcontractid_link);
+									price_all_set.setPrice_vendortarget(vendor_target);
+									price_all_set.setPrice_cmp(price_cmp);
+									price_all_set.setPrice_fob(price_fob);
+									price_all_set.setTotalprice(price_cmp + price_fob);
+									price_all_set.setProductid_link(productid_link);
+									price_all_set.setQuantity(product_quantity.intValue());
+									price_all_set.setSizesetid_link(sizesetService.getbyname("ALL"));
+									price_all_set.setDate_importdata(current_time);
+									price_all_set = priceService.save(price_all_set);
+									
+									//Them detail
+									PContract_Price_D price_detail = new PContract_Price_D();
+									price_detail.setOrgrootid_link(orgrootid_link);
+									price_detail.setFobpriceid_link((long)1);
+									price_detail.setPrice(price_cmp);
+									price_detail.setIsfob(false);
+									price_detail.setId(null);
+									price_detail.setSizesetid_link(sizesetService.getbyname("ALL"));
+									price_detail.setPcontract_poid_link(pcontractpo_id_link);
+									price_detail.setPcontractid_link(pcontractid_link);
+									price_detail.setPcontractpriceid_link(price_all_set.getId());
+									price_all_set.setProductid_link(productid_link);
+									pricedetailService.save(price_detail);
+								}
+								
+								//Cap nhat gia len san pham cha
+								List<PContract_Price> list_price_set = priceService.getPrice_by_product(pcontractpo_id_link, product_set_id_link);
+								if(list_price_set.size() > 0) {
+									PContract_Price price_parent = list_price_set.get(0);
+									price_parent.setPrice_cmp(price_parent.getPrice_cmp() + price_cmp);
 								}
 							}
 							else {
@@ -806,7 +839,8 @@ public class PContract_POAPI {
 									Row row_header = sheet.getRow(0);
 									String s_amount_sizeset = commonService.getStringValue(row.getCell(i));
 									s_amount_sizeset = s_amount_sizeset.replace(",", "");
-									Float amount_sizeset = s_amount_sizeset == "" ? 0 : Float.parseFloat(s_amount_sizeset);
+									Float amount_sizeset = s_amount_sizeset.equals("") ? 0 : Float.parseFloat(s_amount_sizeset);
+									price_cmp_total += amount_sizeset;
 //									int amount_sizeset = (int) row.getCell(i).getNumericCellValue();
 									if (amount_sizeset > 0) {
 										String sizesetname = commonService.getStringValue(row_header.getCell(i));
@@ -826,6 +860,7 @@ public class PContract_POAPI {
 										price.setProductid_link(productid_link);
 										price.setSizesetid_link(sizesetid_link);
 										price.setPrice_cmp(amount_sizeset);
+										price.setTotalprice(amount_sizeset);
 										priceService.save(price);
 										
 										PContract_Price_D price_detail = new PContract_Price_D();
@@ -842,13 +877,46 @@ public class PContract_POAPI {
 										pricedetailService.save(price_detail);
 									}
 								}
+								
+								//tinh gia cmp theo trung binh cua cac dai co
+								price_cmp = price_cmp_total / (ColumnTemplate.plus - ColumnTemplate.infant + 1);
+								DecimalFormat df = new DecimalFormat("#.###"); 
+								String formatted = df.format(price_cmp);
+								price_cmp = Float.parseFloat(formatted);
+								
+								//cap nhat lai gia cmp cua san pham ( dai co all)
+								PContract_Price price = new PContract_Price();
+								price.setDate_importdata(current_time);
+								price.setId(null);
+								price.setIs_fix(false);
+								price.setOrgrootid_link(orgrootid_link);
+								price.setPcontract_poid_link(pcontractpo_id_link);
+								price.setPcontractid_link(pcontractid_link);
+								price.setProductid_link(productid_link);
+								price.setSizesetid_link((long)1);
+								price.setPrice_cmp(price_cmp);
+								price.setTotalprice(price_cmp);
+								priceService.save(price);
+								
+								PContract_Price_D price_detail = new PContract_Price_D();
+								price_detail.setOrgrootid_link(orgrootid_link);
+								price_detail.setFobpriceid_link((long)1);
+								price_detail.setPrice(price_cmp);
+								price_detail.setIsfob(false);
+								price_detail.setId(null);
+								price_detail.setSizesetid_link((long)1);
+								price_detail.setPcontract_poid_link(pcontractpo_id_link);
+								price_detail.setPcontractid_link(pcontractid_link);
+								price_detail.setPcontractpriceid_link(price.getId());
+								price_detail.setProductid_link(productid_link);
+								pricedetailService.save(price_detail);
 							}
 						}
 						
 						//Tu sinh PO con neu po da xac nhan 
 						colNum = ColumnTemplate.status + 1;
 						String s_status = commonService.getStringValue(row.getCell(ColumnTemplate.status));
-						if(s_status != "") {
+						if(!s_status.equals("")) {
 							PContract_PO po = pcontract_POService.findOne(pcontractpo_id_link);
 							po.setStatus(POStatus.PO_STATUS_CONFIRMED);
 							po.setOrgmerchandiseid_link(orgid_link);
