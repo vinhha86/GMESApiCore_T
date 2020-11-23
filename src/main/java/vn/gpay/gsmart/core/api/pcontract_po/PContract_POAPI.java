@@ -512,7 +512,7 @@ public class PContract_POAPI {
 							
 							//Tinh gia cmp = trung binh gia cua cac dai co
 							price_cmp = price_cmp_total / (ColumnTemplate.plus - ColumnTemplate.infant + 1);
-							
+							Math.round((price_cmp * 1000) / 1000);
 							// Them co All vao chao gia
 
 							// Them cho san pham con
@@ -768,6 +768,7 @@ public class PContract_POAPI {
 								}
 								
 								price_cmp = price_cmp_total / (ColumnTemplate.plus - ColumnTemplate.infant + 1);
+								Math.round((price_cmp * 1000) / 1000);
 
 								// them dai co vao san pham con
 								if(list_price.size() == 0) {
@@ -875,6 +876,7 @@ public class PContract_POAPI {
 								
 								//tinh gia cmp theo trung binh cua cac dai co
 								price_cmp = price_cmp_total / (ColumnTemplate.plus - ColumnTemplate.infant + 1);
+								Math.round((price_cmp * 1000) / 1000);
 								
 								//cap nhat lai gia cmp cua san pham ( dai co all)
 								PContract_Price price = new PContract_Price();
