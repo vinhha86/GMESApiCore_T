@@ -7,6 +7,7 @@ import java.util.concurrent.CountDownLatch;
 
 import vn.gpay.gsmart.core.personel.Personel;
 import vn.gpay.gsmart.core.porderprocessingns.IPorderProcessingNsService;
+import vn.gpay.gsmart.core.salary.IOrgSal_BasicService;
 import vn.gpay.gsmart.core.salary.IOrgSal_ComService;
 import vn.gpay.gsmart.core.salary.IOrgSal_TypeService;
 import vn.gpay.gsmart.core.salary.IOrgSal_Type_LevelService;
@@ -24,6 +25,7 @@ public class Salary_Personnel implements Runnable{
 	private IOrgSal_TypeService saltypeService;
 	private IOrgSal_Type_LevelService saltype_levelService;
 	private IOrgSal_ComService salcomService;
+	private IOrgSal_BasicService salbasicService;
 	private ISalary_SumService salarysumService;
 	private ISalary_Sum_POrdersService salarysum_pordersService;
 	private IPorderProcessingNsService porderprocessing_nsService;
@@ -42,6 +44,7 @@ public class Salary_Personnel implements Runnable{
 			IOrgSal_TypeService my_saltypeService,
 			IOrgSal_Type_LevelService my_saltype_levelService,
 			IOrgSal_ComService my_salcomService,
+			IOrgSal_BasicService salbasicService,
 			ISalary_SumService my_salarysumService,
 			ISalary_Sum_POrdersService salarysum_pordersService,
 			IPorderProcessingNsService porderprocessing_nsService,
@@ -54,6 +57,7 @@ public class Salary_Personnel implements Runnable{
 		this.saltypeService = my_saltypeService;
 		this.saltype_levelService = my_saltype_levelService;
 		this.salcomService = my_salcomService;
+		this.salbasicService = salbasicService;
 		this.salarysumService = my_salarysumService;
 		this.salarysum_pordersService = salarysum_pordersService;
 		this.porderprocessing_nsService = porderprocessing_nsService;
@@ -121,6 +125,12 @@ public class Salary_Personnel implements Runnable{
 			Date dateStart = sdf.parse(dateStartString);
 			Date dateEnd = sdf.parse(dateEndString);
 			
+			//Lay luong nang suat co ban theo s cua don vi
+			OrgSal_Basic thesalBasic = salbasicService.getone_byorg(orgid_link);
+			Integer costpersecond = thesalBasic.getCostpersecond();
+			Integer total_wtime = 0;
+			Integer total_sal_porder = 0;
+			if (null!=costpersecond)
 			for(Salary_Sum_POrders thePOrder:POrder_ls){
 				//2.Lay danh sach cong doan, so luong, so tien cua cac lenh ma nhan su tham gia trong khoang tgian tinh luong
 				//+ porder_processing_ns
@@ -129,7 +139,54 @@ public class Salary_Personnel implements Runnable{
 						personnel.getId(), 
 						dateStart, 
 						dateEnd);
+				if (null!=wtime){
+					Integer sal_porder = costpersecond * wtime;
+					total_wtime += wtime;
+					total_sal_porder += sal_porder;
+				}
 			}
+			
+			//Ghi nhan luong cho nhan su
+			Salary_Sum salary_sum = new Salary_Sum();
+			salary_sum.setPersonnelid_link(personnel.getId());
+			salary_sum.setYear(year);
+			salary_sum.setMonth(month);
+			
+			salary_sum.setLuongsp_sl(total_wtime);
+			salary_sum.setLuongsp_tien(total_sal_porder);
+			
+//			//Tinh nghi huong 100% luong
+//			int value_nghi_sl = 0;
+//			//Query bang timesheet_sum với sumcolid_link=34 de lay ra sumvalue
+//			
+//			//Tinh so tien tra nghi huong luong
+//			int value_nghi_sotien = cost_per_hour * value_nghi_sl;
+//			salary_sum.setNghi_sl(value_nghi_sl);
+//			salary_sum.setNghi_tien(value_nghi_sotien);
+			
+			//Tinh phu cap chuc vu
+			//1.Lay danh sach cac phu cap cua chuc vu - nhan su
+			int value_phucap_chucvu = 0;
+			if (null!=personnel.getPositionid_link()){
+				List<OrgSal_Com> ls_com_chucvu = salcomService.getall_byposition(orgid_link, 0, personnel.getPositionid_link());
+				for(OrgSal_Com com_chucvu:ls_com_chucvu) value_phucap_chucvu += null!=com_chucvu.getComamount()?com_chucvu.getComamount():0;
+			}
+			salary_sum.setPhucap_chucvu(value_phucap_chucvu);
+			
+			//Tinh phu cap khac
+			//1.Lay danh sach cac phu cap khac - nhan su
+			int value_phucap_khac = 0;
+			if(null!=personnel.getLevelid_link()){
+				List<OrgSal_Com> ls_com_khac = salcomService.getall_bylaborlevel(orgid_link, 0, personnel.getLevelid_link());
+				for(OrgSal_Com com_khac:ls_com_khac) value_phucap_khac += null!=com_khac.getComamount()?com_khac.getComamount():0;
+			}
+			salary_sum.setPhucap_khac(value_phucap_khac);
+			
+			//Tong so
+			int value_tongluong = total_sal_porder + value_phucap_chucvu + value_phucap_khac;
+			salary_sum.setTongluong(value_tongluong);
+			salarysumService.saveWithCheck(salary_sum);			
+			
 		} catch (Exception e){
 			e.printStackTrace();
 		}

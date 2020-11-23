@@ -48,7 +48,7 @@ public class SalaryAPI {
 	@Autowired IOrgSal_Com_PositionService salcom_positionService;
 	
 	@RequestMapping(value = "/saltype_level_byorg", method = RequestMethod.POST)
-	public ResponseEntity<saltype_level_response> saltype_byorg(HttpServletRequest request,
+	public ResponseEntity<saltype_level_response> saltype_level_byorg(HttpServletRequest request,
 			@RequestBody saltype_level_request entity) {
 //		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		saltype_level_response response = new saltype_level_response();
@@ -161,6 +161,22 @@ public class SalaryAPI {
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+	@RequestMapping(value = "/saltype_byorg", method = RequestMethod.POST)
+	public ResponseEntity<saltype_response> saltype_byorg(HttpServletRequest request,
+			@RequestBody saltype_level_request entity) {
+//		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		saltype_response response = new saltype_response();
+		try {
+			response.data = saltypeService.getall_byorg(entity.orgid_link, entity.typeid_link);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<saltype_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<saltype_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}	
 	@RequestMapping(value = "/saltype_laborlevel_create", method = RequestMethod.POST)
 	@Transactional(rollbackFor = RuntimeException.class)
 	public ResponseEntity<ResponseBase> saltype_laborlevel_create(HttpServletRequest request,

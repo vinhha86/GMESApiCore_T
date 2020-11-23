@@ -85,6 +85,7 @@ public class Salary_SumAPI {
 						saltypeService,
 						saltype_levelService,
 						salcomService,
+						salbasicService,
 						salarysumService,
 						salarysum_pordersService,
 						porderprocessing_nsService,
