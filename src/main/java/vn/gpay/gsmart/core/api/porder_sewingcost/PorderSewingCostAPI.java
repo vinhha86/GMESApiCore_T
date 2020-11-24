@@ -1,7 +1,10 @@
 package vn.gpay.gsmart.core.api.porder_sewingcost;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -22,6 +25,9 @@ import vn.gpay.gsmart.core.porder_balance.IPOrderBalanceService;
 import vn.gpay.gsmart.core.porder_balance_process.IPOrderBalanceProcessService;
 import vn.gpay.gsmart.core.porder_sewingcost.IPorderSewingCost_Service;
 import vn.gpay.gsmart.core.porder_sewingcost.POrderSewingCost;
+import vn.gpay.gsmart.core.porder_sewingcost.POrderSewingCostBinding;
+import vn.gpay.gsmart.core.porderprocessingns.IPorderProcessingNsService;
+import vn.gpay.gsmart.core.porderprocessingns.PorderProcessingNs;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 import vn.gpay.gsmart.core.workingprocess.IWorkingProcess_Service;
@@ -36,6 +42,7 @@ public class PorderSewingCostAPI {
 	@Autowired IPContract_Price_Service pcontractpriceService;
 	@Autowired IPOrderBalanceService porderBalanceService;
 	@Autowired IPOrderBalanceProcessService porderBalanceProcessService;
+	@Autowired IPorderProcessingNsService porderProcessingNsService;
 	
 	 @RequestMapping(value = "/create",method = RequestMethod.POST)
 		public ResponseEntity<create_pordersewingcost_response> Create(HttpServletRequest request, @RequestBody create_pordersewingcost_request entity ) {
@@ -178,6 +185,50 @@ public class PorderSewingCostAPI {
 				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 				response.setMessage(e.getMessage());
 			    return new ResponseEntity<getby_porder_response>(response, HttpStatus.OK);
+			}
+		}
+		
+		@RequestMapping(value = "/getForPProcessProductivity",method = RequestMethod.POST)
+		public ResponseEntity<getForPProcessProductivity_response> getForPProcessProductivity(HttpServletRequest request, @RequestBody getForPProcessProductivity_request entity ) {
+			getForPProcessProductivity_response response = new getForPProcessProductivity_response();
+			try {
+				Long personnelid_link = entity.personnelid_link;
+				Long porderid_link = entity.porderid_link;
+				Long pordergrantid_link = entity.pordergrantid_link;
+				Integer shifttypeid_link = entity.shifttypeid_link;
+				Date processingdate = entity.processingdate;
+				
+				List<POrderSewingCost> listPOrderSewingCost = pordersewingService.getForPProcessProductivity(personnelid_link);
+				Map<Long, POrderSewingCostBinding> mapTmp = new HashMap<Long, POrderSewingCostBinding>();
+				List<PorderProcessingNs> listPorderProcessingNs = porderProcessingNsService.getByPersonnelDateAndShift(
+						porderid_link, pordergrantid_link, personnelid_link, processingdate, shifttypeid_link
+						);
+				
+				for(POrderSewingCost porderSewingCost : listPOrderSewingCost) {
+					POrderSewingCostBinding temp = new POrderSewingCostBinding();
+					temp.setId(porderSewingCost.getId());
+					temp.setWorkingprocess_name(porderSewingCost.getWorkingprocess_name());
+					temp.setAmount_complete(0);
+					mapTmp.put(temp.getId(), temp);
+				}
+				
+				for(PorderProcessingNs porderProcessingNs : listPorderProcessingNs) {
+					Long pordersewingcostid_link = porderProcessingNs.getPordersewingcostid_link();
+					POrderSewingCostBinding temp = mapTmp.get(pordersewingcostid_link);
+					temp.setAmount_complete(porderProcessingNs.getAmount_complete());
+					mapTmp.put(temp.getId(), temp);
+				}
+				
+				
+				response.data = new ArrayList<>(mapTmp.values());
+				
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<getForPProcessProductivity_response>(response,HttpStatus.OK);
+			}catch (Exception e) {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage(e.getMessage());
+			    return new ResponseEntity<getForPProcessProductivity_response>(response, HttpStatus.OK);
 			}
 		}
 		

@@ -32,5 +32,10 @@ public class POderSewingCost_Service extends AbstractService<POrderSewingCost> i
 		// TODO Auto-generated method stub
 		return repo.getByPorderUnused(porderid_link);
 	}
+	@Override
+	public List<POrderSewingCost> getForPProcessProductivity(Long personnelid_link) {
+		// TODO Auto-generated method stub
+		return repo.getForPProcessProductivity(personnelid_link);
+	}
 
 }

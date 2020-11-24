@@ -24,4 +24,10 @@ public class POrderBalanceService extends AbstractService<POrderBalance> impleme
 		// TODO Auto-generated method stub
 		return repo.getByPorder(porderid_link);
 	}
+
+	@Override
+	public List<POrderBalance> getByPOrderAndPOrderSewingCost(Long porderid_link, Long pordersewingcostid_link) {
+		// TODO Auto-generated method stub
+		return repo.getByPOrderAndPOrderSewingCost(porderid_link, pordersewingcostid_link);
+	}
 }

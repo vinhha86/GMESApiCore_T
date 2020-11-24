@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.personel;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,10 @@ public class Personnel_Service extends AbstractService<Personel> implements IPer
 	public List<Personel> getPerson_by_register_code(Long orgrootid_link, String register_code) {
 		// TODO Auto-generated method stub
 		return repo.getby_registercode(register_code, orgrootid_link);
+	}
+	@Override
+	public List<Personel> getForPProcessingProductivity(Long orgid_link, Integer shifttypeid_link, Date workingdate) {
+		return repo.getForPProcessingProductivity(orgid_link, shifttypeid_link, workingdate);
 	}
 
 }
