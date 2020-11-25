@@ -168,7 +168,7 @@ public class PContract_PO implements Serializable {/**
 	@ManyToOne
     @JoinColumn(name="orgmerchandiseid_link",insertable=false,updatable =false)
     private Org org_factory;
-	
+		
 	@Transient
 	public Float getTotalprice() {
 		Float price = (float) 0;

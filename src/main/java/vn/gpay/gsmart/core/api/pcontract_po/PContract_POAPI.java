@@ -1064,7 +1064,10 @@ public class PContract_POAPI {
 				Row rowheader = sheet.getRow(0);
 				Row row = sheet.getRow(rowNum);
 				try {
-					while (!commonService.getStringValue(row.getCell(ColumnPO.STT)).equals("")) {
+					String STT = "";
+					STT = commonService.getStringValue(row.getCell(ColumnTemplate.STT));
+					STT = STT.equals("0") ? "" : STT;
+					while (!STT.equals("")) {
 //						String a  = commonService.getStringValue(row.getCell(ColumnPO.STT));
 						colNum++;
 						String PO_No = commonService.getStringValue(row.getCell(ColumnPO.PO));
@@ -1174,8 +1177,12 @@ public class PContract_POAPI {
 								
 								int columnsize = ColumnPO.Colorcode + 1;
 								int amount_po = 0;
-								while (!commonService.getStringValue(rowheader.getCell(columnsize)).equals("")) {
+								String s_sizename = commonService.getStringValue(rowheader.getCell(columnsize));
+								s_sizename = s_sizename.equals("0") ? "" : s_sizename;
+								while (!s_sizename.equals("")) {
 									colNum = columnsize;
+									if(colNum == 50) break;
+									
 									Long sizeid_link = null;
 									String sizename = commonService.getStringValue(rowheader.getCell(columnsize));
 									List<Attributevalue> list_size = attributevalueService.getByValue(sizename, AtributeFixValues.ATTR_SIZE);
@@ -1445,6 +1452,9 @@ public class PContract_POAPI {
 						rowNum++;
 						row = sheet.getRow(rowNum);
 						if(row == null) break;
+						
+						STT = commonService.getStringValue(row.getCell(ColumnTemplate.STT));
+						STT = STT.equals("0") ? "" : STT;
 					}
 				} catch (Exception e) {
 					mes_err = "Có lỗi ở dòng "+(rowNum+1)+" và cột "+ (colNum+1); 
@@ -1847,8 +1857,11 @@ public class PContract_POAPI {
 			@RequestBody getoffer_accept_request entity, HttpServletRequest request) {
 		PContract_getbycontractproduct_response response = new PContract_getbycontractproduct_response();
 		try {
-//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//			long orgrootid_link = user.getRootorgid_link();
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgid_link = user.getOrgid_link();
+			if(orgid_link == 1) {
+				
+			}
 
 			List<PContract_PO> pcontract = pcontract_POService.getPO_Offer_Accept_ByPContract(entity.pcontractid_link,
 					entity.productid_link);

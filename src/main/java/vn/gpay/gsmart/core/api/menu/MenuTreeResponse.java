@@ -9,5 +9,6 @@ import vn.gpay.gsmart.core.security.GpayUser;
 public class MenuTreeResponse extends ResponseBase{
 	public List<MenuTree> children;
 	public GpayUser data;
+	public String listorg;
 //	public MenuTree data;
 }
