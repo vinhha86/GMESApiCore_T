@@ -34,6 +34,7 @@ public class OrgSal_BasicService extends AbstractService<OrgSal_Basic> implement
 					result = a.get(0);
 					iscontinue = false;
 				} else {
+					//Neu khong co thong tin --> Lay thang luong dinh nghia cua don vị cha
 					if (null != theOrg.getParentid_link()){
 						orgid_link = theOrg.getParentid_link();
 						iscontinue = true;

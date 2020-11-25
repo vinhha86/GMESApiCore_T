@@ -93,6 +93,7 @@ public class Salary_Personnel implements Runnable{
 						}
 						//Neu la luong nang suat
 						if (theSal_Type.getType() == 1){
+							System.out.println(personnel.getFullname());
 							cal_luong_sp_grid();
 						}
 					}
@@ -111,7 +112,7 @@ public class Salary_Personnel implements Runnable{
 	}
 	private void cal_luong_sp_grid(){
 		System.out.println("Tinh luong san pham");
-		//1.Lay danh sach lenh tinh luong trong thang cua don vi quan ly personnel (salary_sum_porders)
+		//1.Lay danh sach lenh tinh luong trong thang ma nhan su co tham gia
 		List<Salary_Sum_POrders> POrder_ls = salarysum_pordersService.getall_byorg(orgid_link, year, month);
 		System.out.println(orgid_link);
 		System.out.println(POrder_ls);

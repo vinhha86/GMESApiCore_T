@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -1071,7 +1072,7 @@ public class PContract_POAPI {
 						String Line = commonService.getStringValue(row.getCell(ColumnPO.Line));
 						colNum++;
 						String s_shipdate = commonService.getStringValue(row.getCell(ColumnPO.Shipdate));
-						Date ShipDate = new SimpleDateFormat("dd/MM/yyyy").parse(s_shipdate); //row.getCell(ColumnPO.Shipdate).getDateCellValue(); 
+						Date ShipDate = new SimpleDateFormat("dd/MM/yyyy").parse(s_shipdate); //row.getCell(ColumnPO.Shipdate).getDateCellValue();
 						colNum++;
 						String Shipmode = row.getCell(ColumnPO.Shipmode).getStringCellValue();
 						colNum++;
