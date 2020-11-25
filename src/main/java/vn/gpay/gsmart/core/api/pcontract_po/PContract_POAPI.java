@@ -1885,12 +1885,34 @@ public class PContract_POAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgid_link = user.getOrgid_link();
-			if(orgid_link == 1) {
-				
+			String orgcode = user.getOrgcode();
+			
+			List<PContract_PO> pcontract = pcontract_POService.getPO_Offer_Accept_ByPContract_AndOrg(entity.pcontractid_link,
+					entity.productid_link, orgid_link);
+			
+			List<String> orgs = new ArrayList<String>();
+			if(orgid_link != 0 && orgid_link != 1) {
+				for(GpayUserOrg userorg:userOrgService.getall_byuser(user.getId())){
+					orgs.add(userorg.getOrgcode());
+				}
+				//Them chinh don vi cua user
+				orgs.add(orgcode);
 			}
 
-			List<PContract_PO> pcontract = pcontract_POService.getPO_Offer_Accept_ByPContract(entity.pcontractid_link,
-					entity.productid_link);
+			
+			if(orgs.size() > 0 ) {
+				for(PContract_PO parent: pcontract) {
+					List<PContract_PO> list_remove = new ArrayList<PContract_PO>(parent.getSub_po());
+					for(String code : orgs) {
+						list_remove.removeIf(c-> c.getFactories().contains(code));
+					}
+					
+					for(PContract_PO po_remove: list_remove) {
+						parent.getSub_po().remove(po_remove);
+					}
+				}
+			}
+			
 			response.data = pcontract;
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

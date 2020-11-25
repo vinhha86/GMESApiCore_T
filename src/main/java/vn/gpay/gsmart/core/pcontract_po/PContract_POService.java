@@ -7,13 +7,8 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
-
-import com.github.wenhao.jpa.Sorts;
-import com.github.wenhao.jpa.Specifications;
 
 import vn.gpay.gsmart.core.base.AbstractService;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Repository;
@@ -196,14 +191,7 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	public List<PContract_PO> getPO_Offer_Accept_ByPContract_AndOrg(Long pcontractid_link, Long productid_link,
 			Long orgid_link) {
 		// TODO Auto-generated method stub
-		Specification<PContract_PO> specification = Specifications.<PContract_PO>and()
-				.eq(pcontractid_link != 0 && pcontractid_link != null, "pcontractid_link", pcontractid_link)
-				.eq(orgid_link != 0 && productid_link != null && orgid_link != 1, "orgmerchandiseid_link", orgid_link)
-				.eq(productid_link != 0 && productid_link != null, "productid_link", productid_link)
-				.eq("status", 0)
-				.build();
-		Sort sort = Sorts.builder().asc("name").build();
-		List<PContract_PO> list = repo.findAll(specification, sort);
-		return list;
+		productid_link = productid_link == 0 ? null : productid_link;
+		return repo.getPO_Offer_Accept_ByPContract_AndOrg(pcontractid_link, productid_link, orgid_link);
 	}
 }

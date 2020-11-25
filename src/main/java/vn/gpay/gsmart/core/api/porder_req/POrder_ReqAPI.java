@@ -38,6 +38,8 @@ import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.productpairing.IProductPairingService;
 import vn.gpay.gsmart.core.productpairing.ProductPairing;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.security.GpayUserOrg;
+import vn.gpay.gsmart.core.security.IGpayUserOrgService;
 import vn.gpay.gsmart.core.task.ITask_Service;
 import vn.gpay.gsmart.core.task.Task;
 import vn.gpay.gsmart.core.task_checklist.ITask_CheckList_Service;
@@ -71,6 +73,7 @@ public class POrder_ReqAPI {
 	@Autowired Common commonService;
 	@Autowired IProductPairingService pairService;
 	@Autowired IProductService productService;
+	@Autowired IGpayUserOrgService userOrgService; 
 	
     ObjectMapper mapper = new ObjectMapper();
 	
@@ -209,7 +212,24 @@ public class POrder_ReqAPI {
 			@RequestBody POrder_Req_GetByPO_Request entity) {
 		POrder_Req_GetByPO_Response response = new POrder_Req_GetByPO_Response();
 		try {
-			response.data = porder_req_Service.getByPO(entity.pcontract_poid_link);
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgid_link = user.getOrgid_link();
+			
+			List<Long> orgs = new ArrayList<Long>();
+			if(orgid_link != 0 && orgid_link != 1) {
+				for(GpayUserOrg userorg:userOrgService.getall_byuser(user.getId())){
+					orgs.add(userorg.getOrgid_link());
+				}
+				//Them chinh don vi cua user
+				orgs.add(orgid_link);
+				
+				response.data = new ArrayList<POrder_Req>();
+				for(Long orgid : orgs) {
+					response.data.addAll(porder_req_Service.getByPO_and_org(entity.pcontract_poid_link, orgid));
+				}
+			}
+			else
+				response.data = porder_req_Service.getByPO_and_org(entity.pcontract_poid_link, orgid_link);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
