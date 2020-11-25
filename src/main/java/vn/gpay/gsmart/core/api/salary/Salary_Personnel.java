@@ -78,7 +78,7 @@ public class Salary_Personnel implements Runnable{
 						if (theSal_Type.getType() == 0){
 							//Tinh gia tri luong gio theo thang luong, bac luong va so ngay lam viec
 							OrgSal_Type_Level theSal_Type_Level = saltype_levelService.get_bysaltype_and_level(saltypeidlink, sallevelid_link);
-							if (null != theSal_Type_Level.getSalamount() && null != theSalBasic.getWorkingdays()){
+							if (null != theSal_Type_Level.getSalamount() && null != theSalBasic.getWorkingdays() && 0 != theSalBasic.getWorkingdays()){
 								//Tinh luong co ban theo gio cua nhan su
 								int cost_per_hour = theSal_Type_Level.getSalamount()/theSalBasic.getWorkingdays()/8;
 								//Lay so cong lam trong thang cua nhan su
@@ -110,8 +110,11 @@ public class Salary_Personnel implements Runnable{
 		}
 	}
 	private void cal_luong_sp_grid(){
+		System.out.println("Tinh luong san pham");
 		//1.Lay danh sach lenh tinh luong trong thang cua don vi quan ly personnel (salary_sum_porders)
 		List<Salary_Sum_POrders> POrder_ls = salarysum_pordersService.getall_byorg(orgid_link, year, month);
+		System.out.println(orgid_link);
+		System.out.println(POrder_ls);
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
 		String dateStartString = "07-" + month.toString() + "-" + year.toString() + " 00:00:00";
 		Integer month_next = month + 1;

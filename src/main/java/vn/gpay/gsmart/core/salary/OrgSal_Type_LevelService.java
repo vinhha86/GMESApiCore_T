@@ -32,6 +32,12 @@ public class OrgSal_Type_LevelService extends AbstractService<OrgSal_Type_Level>
 	}
 	
 	@Override
+	public List<OrgSal_Type_Level> get_bysaltype(Long saltypeid_link) {
+		// TODO Auto-generated method stub
+		return repo.get_bysaltype(saltypeid_link);
+	}
+	
+	@Override
 	public OrgSal_Type_Level get_bysaltype_and_level(Long saltypeid_link, Long sallevelid_link) {
 		// TODO Auto-generated method stub
 		List<OrgSal_Type_Level> a= repo.get_bysaltype_and_level(saltypeid_link, sallevelid_link);

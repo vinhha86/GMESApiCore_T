@@ -20,6 +20,9 @@ public interface IOrgSal_Type_LevelRepository extends JpaRepository<OrgSal_Type_
 			+ " and c.sallevelid_link = :sallevelid_link")
 	public List<OrgSal_Type_Level> get_bysaltype_and_level(@Param ("saltypeid_link")final  Long saltypeid_link, @Param ("sallevelid_link")final  Long sallevelid_link);
 	
+	@Query(value = "select c from OrgSal_Type_Level c where c.saltypeid_link = :saltypeid_link")
+	public List<OrgSal_Type_Level> get_bysaltype(@Param ("saltypeid_link")final  Long saltypeid_link);
+
 	@Query(value = "select c from OrgSal_Type_Level c "
 			+ "inner join OrgSal_Type d on c.saltypeid_link = d.id"
 			+ " where d.orgid_link = :orgid_link and d.type = :type")

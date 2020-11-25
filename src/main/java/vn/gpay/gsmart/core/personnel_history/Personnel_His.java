@@ -19,6 +19,8 @@ import org.hibernate.annotations.NotFoundAction;
 import vn.gpay.gsmart.core.category.LaborLevel;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.position.Position;
+import vn.gpay.gsmart.core.salary.OrgSal_Level;
+import vn.gpay.gsmart.core.salary.OrgSal_Type;
 
 @Table(name="personnel_history")
 @Entity
@@ -39,6 +41,8 @@ public class Personnel_His implements Serializable {
 	private Date decision_date;
 	private Integer type;
 	private Long personnelid_link;
+	private Long saltypeid_link;
+	private Long sallevelid_link;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -54,6 +58,30 @@ public class Personnel_His implements Serializable {
 	@ManyToOne
     @JoinColumn(name="levelid_link",insertable=false,updatable =false)
     private LaborLevel level;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="saltypeid_link",insertable=false,updatable =false)
+    private OrgSal_Type orgsaltype;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="sallevelid_link",insertable=false,updatable =false)
+    private OrgSal_Level orgsallevel;
+	
+	@Transient
+	public String getSaltype_name() {
+		if(orgsaltype!=null)
+			return orgsaltype.getName();
+		return "";
+	}
+	
+	@Transient
+	public String getSallevel_name() {
+		if(orgsallevel!=null)
+			return orgsallevel.getName();
+		return "";
+	}
 	
 	@Transient
 	public String getPosition_name() {
@@ -124,6 +152,20 @@ public class Personnel_His implements Serializable {
 	public void setPersonnelid_link(Long personnelid_link) {
 		this.personnelid_link = personnelid_link;
 	}
-	
-	
+
+	public Long getSaltypeid_link() {
+		return saltypeid_link;
+	}
+
+	public void setSaltypeid_link(Long saltypeid_link) {
+		this.saltypeid_link = saltypeid_link;
+	}
+
+	public Long getSallevelid_link() {
+		return sallevelid_link;
+	}
+
+	public void setSallevelid_link(Long sallevelid_link) {
+		this.sallevelid_link = sallevelid_link;
+	}
 }

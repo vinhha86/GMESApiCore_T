@@ -134,7 +134,10 @@ public class PersonnelAPI {
 				else if(person_his.getType() == 3) {
 					person.setOrgid_link(person_his.getOrgid_link());
 				}
-				
+				else if(person_his.getType() == 4) {
+					person.setSaltypeid_link(person_his.getSaltypeid_link());
+					person.setSallevelid_link(person_his.getSallevelid_link());
+				}
 				personService.save(person);
 			}
 			else {
@@ -150,7 +153,10 @@ public class PersonnelAPI {
 					else if(person_his.getType() == 3) {
 						person.setOrgid_link(person_his.getOrgid_link());
 					}
-					
+					else if(person_his.getType() == 4) {
+						person.setSaltypeid_link(person_his.getSaltypeid_link());
+						person.setSallevelid_link(person_his.getSallevelid_link());
+					}
 					personService.save(person);
 				}
 			}

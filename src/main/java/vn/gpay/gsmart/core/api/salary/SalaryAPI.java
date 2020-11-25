@@ -63,6 +63,22 @@ public class SalaryAPI {
 			return new ResponseEntity<saltype_level_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+	@RequestMapping(value = "/saltype_level_bysaltypeid", method = RequestMethod.POST)
+	public ResponseEntity<saltype_level_response> saltype_level_bysaltypeid(HttpServletRequest request,
+			@RequestBody saltype_level_request entity) {
+//		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		saltype_level_response response = new saltype_level_response();
+		try {
+			response.data = saltype_levelService.get_bysaltype(entity.saltypeid_link);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<saltype_level_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<saltype_level_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 	@RequestMapping(value = "/saltype_level_update", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> saltype_level_update(HttpServletRequest request,
 			@RequestBody saltype_level_update_request entity) {
