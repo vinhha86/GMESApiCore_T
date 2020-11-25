@@ -12,7 +12,11 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+<<<<<<< HEAD
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+=======
+import org.apache.poi.ss.usermodel.DateUtil;
+>>>>>>> e62aa2a7e240d2476fb694ab5697d594aa58b673
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -1074,6 +1078,7 @@ public class PContract_POAPI {
 						colNum++;
 						String Line = commonService.getStringValue(row.getCell(ColumnPO.Line));
 						colNum++;
+<<<<<<< HEAD
 						Date ShipDate = null;
 						try {
 							if(HSSFDateUtil.isCellDateFormatted(row.getCell(ColumnPO.Shipdate))) {
@@ -1089,6 +1094,10 @@ public class PContract_POAPI {
 							throw new Exception();
 						}
 						
+=======
+						String s_shipdate = commonService.getStringValue(row.getCell(ColumnPO.Shipdate));
+						Date ShipDate = new SimpleDateFormat("dd/MM/yyyy").parse(s_shipdate); //row.getCell(ColumnPO.Shipdate).getDateCellValue();
+>>>>>>> e62aa2a7e240d2476fb694ab5697d594aa58b673
 						colNum++;
 						String Shipmode = row.getCell(ColumnPO.Shipmode).getStringCellValue();
 						colNum++;
