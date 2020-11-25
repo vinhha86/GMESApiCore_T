@@ -1051,6 +1051,28 @@ public class POrderAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> updateStatus(HttpServletRequest request,
+			@RequestBody POrder_updateStatus_request entity) {
+		ResponseBase response = new ResponseBase();
+		try {
+			Long id = entity.porderid_link;
+			Integer status = entity.status;
+			
+			POrder porder = porderService.findOne(id);
+			porder.setStatus(status);
+			porderService.save(porder);
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@RequestMapping(value = "/getForNotInProductionChart",method = RequestMethod.POST)
 	public ResponseEntity<POrder_getForChart_response> getForNotInProductionChart(HttpServletRequest request) {
 		POrder_getForChart_response response = new POrder_getForChart_response();
