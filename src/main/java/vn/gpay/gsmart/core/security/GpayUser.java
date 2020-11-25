@@ -99,6 +99,13 @@ public class GpayUser implements UserDetails {
 	}
 	
 	@Transient
+	public String getOrgcode() {
+		if(org!=null)
+			return org.getCode();
+		return "";
+	}
+	
+	@Transient
 	public List<AppRoleFunction> getList_function(){
 		List<AppRoleFunction> list = new ArrayList<AppRoleFunction>();
 		for(AppRole_User role: list_menu) {

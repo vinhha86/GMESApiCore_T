@@ -2,6 +2,7 @@ package vn.gpay.gsmart.core.api.menu;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +23,9 @@ import vn.gpay.gsmart.core.menu.IMenuService;
 import vn.gpay.gsmart.core.menu.Menu;
 import vn.gpay.gsmart.core.menu.MenuTree;
 import vn.gpay.gsmart.core.security.GpayAuthentication;
+import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.security.GpayUserOrg;
+import vn.gpay.gsmart.core.security.IGpayUserOrgService;
 import vn.gpay.gsmart.core.security.IGpayUserService;
 
 @RestController
@@ -31,6 +35,7 @@ public class MenuAPI {
 	@Autowired IMenuService menuService;
 	@Autowired IAppRoleMenuService rolemenuService;
 	@Autowired IGpayUserService  userDetailsService ;
+	@Autowired IGpayUserOrgService userOrgService;
 	
 	@RequestMapping(value = "/menu_data",method = RequestMethod.POST)
 	//@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -66,13 +71,30 @@ public class MenuAPI {
 	public ResponseEntity<?> MenuTree(HttpServletRequest request ) {
 		try {
 			MenuTreeResponse response = new MenuTreeResponse();
-			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
-			List<Menu> menu = menuService.findByUserid(user.getUserId());
+			GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			List<Menu> menu = menuService.findByUserid(user.getId());
 			List<MenuTree> children = menuService.createTree(menu);
 			response.children=children;
 			
-			response.data=userDetailsService.findById(user.getUserId());
+			response.data=userDetailsService.findById(user.getId());
 			response.data.setPassword("");
+			
+			//Lay danh sach org quan ly cua user
+			List<String> orgs = new ArrayList<String>();
+			Long orgid_link = user.getOrgid_link();
+			String orgcode = user.getOrgcode();
+			
+			if(orgid_link != 0 && orgid_link != 1 && orgid_link != null) {
+				for(GpayUserOrg userorg:userOrgService.getall_byuser(user.getId())){
+					orgs.add(userorg.getOrgcode());
+				}
+				//Them chinh don vi cua user
+				orgs.add(orgcode);
+			}
+			
+			for(String code : orgs ) {
+				response.listorg += code+";";
+			}
 			
 			return new ResponseEntity<MenuTreeResponse>(response,HttpStatus.OK);
 		}catch (RuntimeException e) {

@@ -1173,8 +1173,12 @@ public class PContract_POAPI {
 								
 								int columnsize = ColumnPO.Colorcode + 1;
 								int amount_po = 0;
-								while (!commonService.getStringValue(rowheader.getCell(columnsize)).equals("")) {
+								String s_sizename = commonService.getStringValue(rowheader.getCell(columnsize));
+								s_sizename = s_sizename.equals("0") ? "" : s_sizename;
+								while (!s_sizename.equals("")) {
 									colNum = columnsize;
+									if(colNum == 50) break;
+									
 									Long sizeid_link = null;
 									String sizename = commonService.getStringValue(rowheader.getCell(columnsize));
 									List<Attributevalue> list_size = attributevalueService.getByValue(sizename, AtributeFixValues.ATTR_SIZE);
@@ -1846,8 +1850,11 @@ public class PContract_POAPI {
 			@RequestBody getoffer_accept_request entity, HttpServletRequest request) {
 		PContract_getbycontractproduct_response response = new PContract_getbycontractproduct_response();
 		try {
-//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//			long orgrootid_link = user.getRootorgid_link();
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgid_link = user.getOrgid_link();
+			if(orgid_link == 1) {
+				
+			}
 
 			List<PContract_PO> pcontract = pcontract_POService.getPO_Offer_Accept_ByPContract(entity.pcontractid_link,
 					entity.productid_link);
