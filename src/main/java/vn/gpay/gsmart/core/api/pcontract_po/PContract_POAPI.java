@@ -1063,7 +1063,10 @@ public class PContract_POAPI {
 				Row rowheader = sheet.getRow(0);
 				Row row = sheet.getRow(rowNum);
 				try {
-					while (!commonService.getStringValue(row.getCell(ColumnPO.STT)).equals("")) {
+					String STT = "";
+					STT = commonService.getStringValue(row.getCell(ColumnTemplate.STT));
+					STT = STT.equals("0") ? "" : STT;
+					while (!STT.equals("")) {
 //						String a  = commonService.getStringValue(row.getCell(ColumnPO.STT));
 						colNum++;
 						String PO_No = commonService.getStringValue(row.getCell(ColumnPO.PO));
@@ -1448,6 +1451,9 @@ public class PContract_POAPI {
 						rowNum++;
 						row = sheet.getRow(rowNum);
 						if(row == null) break;
+						
+						STT = commonService.getStringValue(row.getCell(ColumnTemplate.STT));
+						STT = STT.equals("0") ? "" : STT;
 					}
 				} catch (Exception e) {
 					mes_err = "Có lỗi ở dòng "+(rowNum+1)+" và cột "+ (colNum+1); 
