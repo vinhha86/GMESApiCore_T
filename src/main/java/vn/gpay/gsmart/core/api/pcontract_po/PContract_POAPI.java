@@ -12,11 +12,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-<<<<<<< HEAD
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
-=======
-import org.apache.poi.ss.usermodel.DateUtil;
->>>>>>> e62aa2a7e240d2476fb694ab5697d594aa58b673
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -1078,26 +1074,31 @@ public class PContract_POAPI {
 						colNum++;
 						String Line = commonService.getStringValue(row.getCell(ColumnPO.Line));
 						colNum++;
-<<<<<<< HEAD
 						Date ShipDate = null;
 						try {
+							String s_shipdate = commonService.getStringValue(row.getCell(ColumnPO.Shipdate));
+							if(s_shipdate.contains("/")) {
+								String[] s_date = s_shipdate.split("/");
+								if(Integer.parseInt(s_date[1].toString()) < 13 && Integer.parseInt(s_date[0].toString()) < 32) {
+									ShipDate = new SimpleDateFormat("dd/MM/yyyy").parse(s_shipdate);
+								}
+								else {
+									mes_err = "Định dạng ngày không đúng dd/MM/yyyy! ";
+								}
+								
+							}
+							
+						}
+						catch (Exception e) {
 							if(HSSFDateUtil.isCellDateFormatted(row.getCell(ColumnPO.Shipdate))) {
 								ShipDate = row.getCell(ColumnPO.Shipdate).getDateCellValue();
 							}
-						}
-						catch (Exception e) {
-							String s_shipdate = commonService.getStringValue(row.getCell(ColumnPO.Shipdate));							
-							ShipDate = new SimpleDateFormat("dd/MM/yyyy").parse(s_shipdate);
 						}
 						
 						if(ShipDate == null) {
 							throw new Exception();
 						}
 						
-=======
-						String s_shipdate = commonService.getStringValue(row.getCell(ColumnPO.Shipdate));
-						Date ShipDate = new SimpleDateFormat("dd/MM/yyyy").parse(s_shipdate); //row.getCell(ColumnPO.Shipdate).getDateCellValue();
->>>>>>> e62aa2a7e240d2476fb694ab5697d594aa58b673
 						colNum++;
 						String Shipmode = row.getCell(ColumnPO.Shipmode).getStringCellValue();
 						colNum++;
@@ -1479,11 +1480,14 @@ public class PContract_POAPI {
 						STT = STT.equals("0") ? "" : STT;
 					}
 				} catch (Exception e) {
-					mes_err = "Có lỗi ở dòng "+(rowNum+1)+" và cột "+ (colNum+1); 
+					mes_err += "Có lỗi ở dòng "+(rowNum+1)+" và cột "+ (colNum+1); 
+				}
+				finally {
+					workbook.close();
+					serverFile.delete();
 				}
 
-				workbook.close();
-				serverFile.delete();
+				
 				if (mes_err == "") {
 					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
