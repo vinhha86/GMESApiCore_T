@@ -1062,7 +1062,7 @@ public class PContract_POAPI {
 				Row rowheader = sheet.getRow(0);
 				Row row = sheet.getRow(rowNum);
 				try {
-					while (commonService.getStringValue(row.getCell(ColumnPO.STT)) != "") {
+					while (!commonService.getStringValue(row.getCell(ColumnPO.STT)).equals("")) {
 //						String a  = commonService.getStringValue(row.getCell(ColumnPO.STT));
 						colNum++;
 						String PO_No = commonService.getStringValue(row.getCell(ColumnPO.PO));
@@ -1112,7 +1112,7 @@ public class PContract_POAPI {
 						}
 						
 						//Kiem tra PO co dung voi PO dang chon de them moi khong
-						if(PO_No != "TBD") {
+						if(!PO_No.equals("TBD")) {
 							Long pcontractpoid_link = null;
 							//Kiem tra so PO va so PO cha
 							List<PContract_PO> list_po_parent = pcontract_POService.check_exist_PONo(PO_No, pcontractid_link);
@@ -1171,7 +1171,7 @@ public class PContract_POAPI {
 								
 								int columnsize = ColumnPO.Colorcode + 1;
 								int amount_po = 0;
-								while (commonService.getStringValue(rowheader.getCell(columnsize)) != "") {
+								while (!commonService.getStringValue(rowheader.getCell(columnsize)).equals("")) {
 									colNum = columnsize;
 									Long sizeid_link = null;
 									String sizename = commonService.getStringValue(rowheader.getCell(columnsize));
@@ -1193,7 +1193,7 @@ public class PContract_POAPI {
 									else {
 										sizeid_link = list_size.get(0).getId();
 									}
-									String s_amount = commonService.getStringValue(row.getCell(columnsize)) == "" ? "0" : commonService.getStringValue(row.getCell(columnsize));
+									String s_amount = commonService.getStringValue(row.getCell(columnsize)).equals("") ? "0" : commonService.getStringValue(row.getCell(columnsize));
 									s_amount = s_amount.replace(",","");
 									Double amount = Double.parseDouble(s_amount);
 									if(amount>0) {
@@ -1289,7 +1289,7 @@ public class PContract_POAPI {
 												
 												Long skuid_link = skuattService.getsku_byproduct_and_valuemau_valueco(productPairing.getProductid_link(), colorid_link, sizeid_link);
 												
-												if(skuid_link == 0) {
+												if(skuid_link.equals(0)) {
 
 													SKU sku = new SKU();
 													sku.setCode(genCodeSKU(product_children));
