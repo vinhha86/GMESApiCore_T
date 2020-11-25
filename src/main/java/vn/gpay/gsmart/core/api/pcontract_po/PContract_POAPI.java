@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -1069,7 +1070,8 @@ public class PContract_POAPI {
 						colNum++;
 						String Line = commonService.getStringValue(row.getCell(ColumnPO.Line));
 						colNum++;
-						Date ShipDate = row.getCell(ColumnPO.Shipdate).getDateCellValue(); 
+						String s_shipdate = commonService.getStringValue(row.getCell(ColumnPO.Shipdate));
+						Date ShipDate = new SimpleDateFormat("dd/MM/yyyy").parse(s_shipdate); //row.getCell(ColumnPO.Shipdate).getDateCellValue(); 
 						colNum++;
 						String Shipmode = row.getCell(ColumnPO.Shipmode).getStringCellValue();
 						colNum++;
