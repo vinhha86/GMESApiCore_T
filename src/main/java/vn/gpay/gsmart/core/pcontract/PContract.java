@@ -455,4 +455,13 @@ public class PContract implements Serializable {/**
 		}
 		return a;
 	}
+
+	@Transient
+	public Boolean getIsHavingPO() {
+		if(pos!=null && pos.size() > 0){
+			return true;
+		} else
+			return false;
+	}
+	
 }
