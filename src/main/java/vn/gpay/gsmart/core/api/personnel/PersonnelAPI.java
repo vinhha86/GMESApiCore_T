@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -396,6 +397,30 @@ public class PersonnelAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/getForPProcessingProductivity",method = RequestMethod.POST)
+	public ResponseEntity<getperson_byorg_response> getForPProcessingProductivity(@RequestBody personnel_getForPProcessingProductivity_request entity,HttpServletRequest request) {
+		getperson_byorg_response response = new getperson_byorg_response();
+		try {
+			Long orgid_link = entity.orgid_link;
+			Integer shifttypeid_link = entity.shifttypeid_link;
+			Date workingdate = entity.workingdate;
+			
+//			System.out.println(orgid_link);
+//			System.out.println(shifttypeid_link);
+//			System.out.println(workingdate);
+			
+			response.data = personService.getForPProcessingProductivity(orgid_link, shifttypeid_link, workingdate);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getperson_byorg_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<getperson_byorg_response>(response,HttpStatus.OK);
 		}
 	}
 	
