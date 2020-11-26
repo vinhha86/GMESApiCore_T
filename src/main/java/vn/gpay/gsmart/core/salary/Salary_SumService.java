@@ -20,6 +20,12 @@ public class Salary_SumService extends AbstractService<Salary_Sum> implements IS
 	}
 
 	@Override
+	public List<Salary_Sum> getall_bymanageorg(long orgid_link, int year, int month) {
+		// TODO Auto-generated method stub
+		return repo.getall_bymanageorg(orgid_link, year, month);
+	}
+	
+	@Override
 	protected JpaRepository<Salary_Sum, Long> getRepository() {
 		// TODO Auto-generated method stub
 		return repo;

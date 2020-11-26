@@ -20,6 +20,12 @@ public class Salary_Sum_Porders_Service extends AbstractService<Salary_Sum_POrde
 	}
 
 	@Override
+	public List<Salary_Sum_POrders> getall_bypersonnel(long personnelid_link, int year, int month) {
+		// TODO Auto-generated method stub
+		return repo.getall_bypersonnel(personnelid_link, year, month);
+	}
+	
+	@Override
 	protected JpaRepository<Salary_Sum_POrders, Long> getRepository() {
 		// TODO Auto-generated method stub
 		return repo;

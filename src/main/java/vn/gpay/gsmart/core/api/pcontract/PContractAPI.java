@@ -281,6 +281,11 @@ public class PContractAPI {
 	public ResponseEntity<PContract_getbypaging_response> PContractGetBySearch(@RequestBody PContract_getbysearch_request entity,HttpServletRequest request ) {
 		PContract_getbypaging_response response = new PContract_getbypaging_response();
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		//fix dieu kien tim kiem cho vendor cua DHA
+		if (user.getUsername().equals("hansoll")) entity.orgvendorid_link = 197;
+		if (user.getUsername().equals("paroman")) entity.orgvendorid_link = 200;
+		
 		try {
 			
 			List<Long> orgs = new ArrayList<Long>();

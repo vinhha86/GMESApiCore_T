@@ -20,6 +20,14 @@ public interface ISalary_Sum_POrdersRepository extends JpaRepository<Salary_Sum_
 			@Param ("year")final  Integer year,
 			@Param ("month")final  Integer month);
 	
+	@Query(value = "select distinct c from Salary_Sum_POrders c"
+			+ " inner join PorderProcessingNs d on c.porderid_link = d.porderid_link"
+			+ " where d.personnelid_link = :personnelid_link"
+			+ " and c.year = :year and c.month = :month")
+	public List<Salary_Sum_POrders> getall_bypersonnel(@Param ("personnelid_link")final  Long personnelid_link,
+			@Param ("year")final  Integer year,
+			@Param ("month")final  Integer month);	
+	
 	@Query(value = "select c from Salary_Sum_POrders c"
 			+ " where c.pordergrantid_link = :pordergrantid_link"
 			+ " and c.year = :year"
