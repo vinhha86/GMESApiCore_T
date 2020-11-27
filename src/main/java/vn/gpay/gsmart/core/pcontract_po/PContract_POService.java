@@ -188,9 +188,12 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		return data;
 	}
 	@Override
-	public List<PContract_PO> getPO_Offer_Accept_ByPContract_AndOrg(Long pcontractid_link, Long productid_link, String  list_orgid_link) {
+	public List<PContract_PO> getPO_Offer_Accept_ByPContract_AndOrg(Long pcontractid_link, Long productid_link, List<Long>  list_orgid_link) {
 		// TODO Auto-generated method stub
 		productid_link = productid_link == 0 ? null : productid_link;
+		if(list_orgid_link.size() == 0)
+			return repo.getPO_Offer_Accept_ByPContract(pcontractid_link, productid_link);
+		
 		return repo.getPO_Offer_Accept_ByPContract_AndOrg(pcontractid_link, productid_link, list_orgid_link);
 	}
 }

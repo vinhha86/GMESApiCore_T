@@ -34,5 +34,5 @@ public interface IPContract_POService extends Operations<PContract_PO> {
 	List<PContract_PO> getBySearch(String po_code, List<Long> products, List<Long> orgs);
 	List<PContract_POBinding> getForMarketTypeChart();
 	
-	List<PContract_PO> getPO_Offer_Accept_ByPContract_AndOrg(Long pcontractid_link, Long productid_link, String  list_orgid_link);
+	List<PContract_PO> getPO_Offer_Accept_ByPContract_AndOrg(Long pcontractid_link, Long productid_link, List<Long>  list_orgid_link);
 }
