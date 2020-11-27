@@ -1898,11 +1898,11 @@ public class PContract_POAPI {
 				}
 				//Them chinh don vi cua user
 				orgs.add(orgcode);
-				list_org += orgid_link+",";
+				list_org += orgid_link+"";
 			}
 			
 			List<PContract_PO> pcontract = pcontract_POService.getPO_Offer_Accept_ByPContract_AndOrg(entity.pcontractid_link,
-					entity.productid_link, orgid_link);
+					entity.productid_link, list_org);
 			
 			if(orgs.size() > 0 ) {
 				for(PContract_PO parent: pcontract) {
