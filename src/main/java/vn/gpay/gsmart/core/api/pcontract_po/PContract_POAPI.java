@@ -1887,18 +1887,22 @@ public class PContract_POAPI {
 			long orgid_link = user.getOrgid_link();
 			String orgcode = user.getOrgcode();
 			
-			List<PContract_PO> pcontract = pcontract_POService.getPO_Offer_Accept_ByPContract_AndOrg(entity.pcontractid_link,
-					entity.productid_link, orgid_link);
+			
 			
 			List<String> orgs = new ArrayList<String>();
+			String list_org = "";
 			if(orgid_link != 0 && orgid_link != 1) {
 				for(GpayUserOrg userorg:userOrgService.getall_byuser(user.getId())){
 					orgs.add(userorg.getOrgcode());
+					list_org += userorg.getOrgid_link()+",";
 				}
 				//Them chinh don vi cua user
 				orgs.add(orgcode);
+				list_org += orgid_link+",";
 			}
-
+			
+			List<PContract_PO> pcontract = pcontract_POService.getPO_Offer_Accept_ByPContract_AndOrg(entity.pcontractid_link,
+					entity.productid_link, orgid_link);
 			
 			if(orgs.size() > 0 ) {
 				for(PContract_PO parent: pcontract) {
