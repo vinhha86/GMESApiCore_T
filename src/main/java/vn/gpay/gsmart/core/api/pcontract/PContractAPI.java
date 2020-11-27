@@ -283,8 +283,14 @@ public class PContractAPI {
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
 		//fix dieu kien tim kiem cho vendor cua DHA
-		if (user.getUsername().equals("hansoll")) entity.orgvendorid_link = 197;
-		if (user.getUsername().equals("paroman")) entity.orgvendorid_link = 200;
+		if (user.getUsername().toLowerCase().trim().contains("hansoll")) 
+			entity.orgvendorid_link = 197;
+		else
+			if (user.getUsername().toLowerCase().trim().contains("paroman")) 
+				entity.orgvendorid_link = 200;
+		else
+			if (user.getUsername().toLowerCase().trim().contains("ekline")) 
+				entity.orgvendorid_link = 189;
 		
 		try {
 			
