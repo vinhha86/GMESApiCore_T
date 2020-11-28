@@ -1327,7 +1327,7 @@ public class PContract_POAPI {
 												
 												Long skuid_link = skuattService.getsku_byproduct_and_valuemau_valueco(productPairing.getProductid_link(), colorid_link, sizeid_link);
 												
-												if(skuid_link.equals(0)) {
+												if(skuid_link.equals(0) || skuid_link == 0) {
 
 													SKU sku = new SKU();
 													sku.setCode(genCodeSKU(product_children));
@@ -1412,6 +1412,9 @@ public class PContract_POAPI {
 									
 									
 									columnsize++;
+									
+									s_sizename = commonService.getStringValue(rowheader.getCell(columnsize));
+									s_sizename = s_sizename.equals("0") ? "" : s_sizename;
 								}
 
 								//Cap nhat lai so tong cua po
