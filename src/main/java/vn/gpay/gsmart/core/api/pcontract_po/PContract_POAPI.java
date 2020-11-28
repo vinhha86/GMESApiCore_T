@@ -1910,25 +1910,30 @@ public class PContract_POAPI {
 			}
 			
 //			list_org = "("+list_org+")";
-			
+//			System.out.println(new Date());
 			List<PContract_PO> pcontract = pcontract_POService.getPO_Offer_Accept_ByPContract_AndOrg(entity.pcontractid_link,
 					entity.productid_link, list_org);
 			
 			if(orgs.size() > 0 ) {
 				for(PContract_PO parent: pcontract) {
-					List<PContract_PO> list_remove = new ArrayList<PContract_PO>(parent.getSub_po());
-					for(String code : orgs) {
-						list_remove.removeIf(c-> c.getFactories().contains(code));
-					}
-					
-					for(PContract_PO po_remove: list_remove) {
-						parent.getSub_po().remove(po_remove);
-					}
+//				      new Thread("" + parent.getId()){
+//				          public void run(){
+				        	List<PContract_PO> list_remove = new ArrayList<PContract_PO>(parent.getSub_po());
+							for(String code : orgs) {
+								list_remove.removeIf(c-> c.getFactories().contains(code));
+							}
+							
+							for(PContract_PO po_remove: list_remove) {
+								parent.getSub_po().remove(po_remove);
+							}
+//				        	
+//				          }
+//				        }.start();
 				}
 			}
 			
 			response.data = pcontract;
-
+//			System.out.println(new Date());
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.OK);
