@@ -76,4 +76,19 @@ public class FOBPriceAPI {
 		    return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/getAllDefault",method = RequestMethod.POST)
+	public ResponseEntity<FOBPrice_getall_response> getAllDefault(HttpServletRequest request ) {
+		FOBPrice_getall_response response = new FOBPrice_getall_response();
+		try {
+			response.data = fobService.getAllDefault();
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<FOBPrice_getall_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<FOBPrice_getall_response>(response,HttpStatus.OK);
+		}
+	}
 }

@@ -28,6 +28,8 @@ public class FOBPrice implements Serializable {
 	private Long orgrootid_link;
 	@Column(name ="issystemfix")
 	private boolean issystemfix;
+	@Column(name ="isdefault")
+	private boolean isdefault;
 	 
 	public Long getOrgrootid_link() {
 		return orgrootid_link;
@@ -52,6 +54,12 @@ public class FOBPrice implements Serializable {
 	}
 	public void setIssystemfix(boolean issystemfix) {
 		this.issystemfix = issystemfix;
+	}
+	public boolean isIsdefault() {
+		return isdefault;
+	}
+	public void setIsdefault(boolean isdefault) {
+		this.isdefault = isdefault;
 	}
 	
 	

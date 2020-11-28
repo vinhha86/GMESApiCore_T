@@ -25,4 +25,10 @@ public class FOBPrice_Service extends AbstractService<FOBPrice> implements IFOBS
 		return repo.getbyorgroot(orgrootid_link);
 	}
 
+	@Override
+	public List<FOBPrice> getAllDefault() {
+		// TODO Auto-generated method stub
+		return repo.getAllDefault();
+	}
+
 }

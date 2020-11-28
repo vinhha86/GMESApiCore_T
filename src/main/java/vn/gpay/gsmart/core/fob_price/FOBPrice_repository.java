@@ -15,4 +15,7 @@ public interface FOBPrice_repository extends JpaRepository<FOBPrice, Long>,JpaSp
 	@Query(value = "select c from FOBPrice c where c.orgrootid_link =:orgrootid_link")
 	public List<FOBPrice> getbyorgroot(
 			@Param ("orgrootid_link")final  Long orgrootid_link);
+	
+	@Query(value = "select c from FOBPrice c where c.isdefault = true and c.id != 1 order by c.id")
+	public List<FOBPrice> getAllDefault();
 }
