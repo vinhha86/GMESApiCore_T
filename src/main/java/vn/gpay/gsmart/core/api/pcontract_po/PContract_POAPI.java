@@ -1087,6 +1087,11 @@ public class PContract_POAPI {
 								}
 								
 							}
+							else {
+								if(HSSFDateUtil.isCellDateFormatted(row.getCell(ColumnPO.Shipdate))) {
+									ShipDate = row.getCell(ColumnPO.Shipdate).getDateCellValue();
+								}
+							}
 							
 						}
 						catch (Exception e) {
