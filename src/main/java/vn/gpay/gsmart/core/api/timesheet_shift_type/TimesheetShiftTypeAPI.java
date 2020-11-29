@@ -2,6 +2,7 @@ package vn.gpay.gsmart.core.api.timesheet_shift_type;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -107,6 +108,48 @@ public class TimesheetShiftTypeAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/getShift1ForAbsence", method = RequestMethod.POST)
+	public ResponseEntity<TimesheetShiftType_getShift1ForAbsence_response> getShift1ForAbsence(HttpServletRequest request) {
+		TimesheetShiftType_getShift1ForAbsence_response response = new TimesheetShiftType_getShift1ForAbsence_response();
+
+		try {
+			List<TimesheetShiftType> list = timesheetShiftTypeService.getShift1ForAbsence();
+			if(list.size() > 0) {
+				TimesheetShiftType temp = list.get(0);
+				Integer fromHour = temp.getFrom_hour();
+				Integer fromMinute = temp.getFrom_minute();
+				Integer toHour = temp.getTo_hour();
+				Integer toMinute = temp.getTo_minute();
+				
+				String timeFrom = "";
+				String timeTo = "";
+				if(fromMinute < 10) {
+					timeFrom = timeFrom + fromHour + ":0" + fromMinute;
+				}else {
+					timeFrom = timeFrom + fromHour + ":" + fromMinute;
+				}
+				if(toMinute < 10) {
+					timeTo = timeTo + toHour + ":0" + toMinute;
+				}else {
+					timeTo = timeTo + toHour + ":" + toMinute;
+				}
+				
+				response.timeFrom = timeFrom;
+				response.timeTo = timeTo;
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			}else {
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage("Không tìm thấy ca 1 (id 1)");
+			}
+			return new ResponseEntity<TimesheetShiftType_getShift1ForAbsence_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<TimesheetShiftType_getShift1ForAbsence_response>(response, HttpStatus.OK);
 		}
 	}
 }

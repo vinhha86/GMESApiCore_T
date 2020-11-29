@@ -22,5 +22,10 @@ public class TimesheetShiftTypeService extends AbstractService<TimesheetShiftTyp
 		// TODO Auto-generated method stub
 		return repo.getByName(name);
 	}
+	@Override
+	public List<TimesheetShiftType> getShift1ForAbsence() {
+		// TODO Auto-generated method stub
+		return repo.getShift1ForAbsence();
+	}
 
 }

@@ -6,4 +6,5 @@ import vn.gpay.gsmart.core.base.Operations;
 
 public interface ITimesheetShiftTypeService extends Operations<TimesheetShiftType>{
 	public List<TimesheetShiftType> getByName(String name);
+	public List<TimesheetShiftType>getShift1ForAbsence();
 }

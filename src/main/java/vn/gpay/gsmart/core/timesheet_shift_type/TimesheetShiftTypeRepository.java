@@ -15,4 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public interface TimesheetShiftTypeRepository extends JpaRepository<TimesheetShiftType, Long>, JpaSpecificationExecutor<TimesheetShiftType>{
 	@Query(value = "select c from TimesheetShiftType c where c.name = :name ")
 	public List<TimesheetShiftType> getByName(@Param ("name")final  String name);
+	
+	@Query(value = "select c from TimesheetShiftType c where c.id = 1 ")
+	public List<TimesheetShiftType>getShift1ForAbsence();
 }

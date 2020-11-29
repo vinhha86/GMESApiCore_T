@@ -109,6 +109,19 @@ public class Personel implements Serializable {
 		return "";
 	}
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="orgmanagerid_link",insertable=false,updatable =false)
+    private Org orgManage;
+	
+	
+	@Transient
+	public String getOrgManageName() {
+		if(orgManage!=null) {
+			return orgManage.getName();
+		}
+		return "";
+	}
 	
 	
 	public Long getId() {
