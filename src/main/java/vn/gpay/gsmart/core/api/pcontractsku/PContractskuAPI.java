@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.api.pcontract_po.pcontractsku_getby_po_product_request;
 import vn.gpay.gsmart.core.base.ResponseBase;
+import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontractattributevalue.IPContractProductAtrributeValueService;
 import vn.gpay.gsmart.core.pcontractattributevalue.PContractAttributeValue;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
@@ -36,6 +38,7 @@ public class PContractskuAPI {
 	@Autowired ISKU_AttributeValue_Service skuavService;
 	@Autowired IPOrder_Service porder_Service;
 	@Autowired Common commonService;
+	@Autowired IPContract_POService poService;
 	
 	@RequestMapping(value = "/getbypcontract_product",method = RequestMethod.POST)
 	public ResponseEntity<PContractSKU_getbyproduct_response> SKU_GetbyProduct
@@ -159,6 +162,9 @@ public class PContractskuAPI {
 			}
 			sku = pskuservice.save(sku);
 			response.amount = sku.getPquantity_production();
+			
+			PContract_PO po = poService.findOne(sku.getPcontract_poid_link());
+			response.checkamount = po.getCheckamount();
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

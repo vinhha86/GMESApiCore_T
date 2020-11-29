@@ -18,6 +18,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.bouncycastle.pqc.asn1.PQCObjectIdentifiers;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
@@ -25,6 +26,7 @@ import vn.gpay.gsmart.core.currency.Currency;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract_po_productivity.PContract_PO_Productivity;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
+import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -149,6 +151,11 @@ public class PContract_PO implements Serializable {/**
     @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
     private List<PContract_PO_Productivity> pcontract_po_productivity = new ArrayList<PContract_PO_Productivity>();
     
+    @NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
+    private List<PContractProductSKU> pcontract_po_sku = new ArrayList<PContractProductSKU>();
+    
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
     @JoinColumn(name="parentpoid_link",insertable=false,updatable =false)
@@ -168,7 +175,18 @@ public class PContract_PO implements Serializable {/**
 	@ManyToOne
     @JoinColumn(name="orgmerchandiseid_link",insertable=false,updatable =false)
     private Org org_factory;
+	
+	@Transient
+	public Boolean getCheckamount() {
+		int amount_sku = 0;
+		for(PContractProductSKU sku : pcontract_po_sku) {
+			amount_sku += sku.getPquantity_porder();
+		}
 		
+		if(po_quantity == amount_sku) return true;
+		return false;
+	}
+	
 	@Transient
 	public Float getTotalprice() {
 		Float price = (float) 0;
