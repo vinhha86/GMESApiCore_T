@@ -2,10 +2,14 @@ package vn.gpay.gsmart.core.api.timesheet_absence;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -49,6 +53,33 @@ public class TimesheetAbsenceAPI {
 			response.setMessage(e.getMessage());			
 		    return new ResponseEntity<TimeSheetAbsence_response>(HttpStatus.OK);
 		}    			
+	}
+	
+	@RequestMapping(value = "/getbypaging",method = RequestMethod.POST)
+	public ResponseEntity<TimeSheetAbsence_response> ContractBuyerGetpage(@RequestBody TimeSheetAbsence_getbypaging_request entity,HttpServletRequest request ) {
+		TimeSheetAbsence_response response = new TimeSheetAbsence_response();
+		try {
+//			limit, page, 
+//			orgFactory, personnelCode, personnelName, datefrom, dateto, timeSheetAbsenceType
+			
+			List<TimesheetAbsence> listTimesheetAbsence = timesheetAbsenceService.getbypaging(entity);
+			response.totalCount = listTimesheetAbsence.size();
+			
+			PageRequest page = PageRequest.of(entity.page - 1, entity.limit);
+			int start = (int) page.getOffset();
+			int end = (start + page.getPageSize()) > listTimesheetAbsence.size() ? listTimesheetAbsence.size() : (start + page.getPageSize());
+			Page<TimesheetAbsence> pageToReturn = new PageImpl<TimesheetAbsence>(listTimesheetAbsence.subList(start, end), page, listTimesheetAbsence.size()); 
+			
+			response.data = pageToReturn.getContent();
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<TimeSheetAbsence_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<TimeSheetAbsence_response>(response, HttpStatus.OK);
+		}
 	}
 	
 	@RequestMapping(value = "/getAllTimeSheetAbsenceType",method = RequestMethod.POST)
@@ -209,6 +240,25 @@ public class TimesheetAbsenceAPI {
 			timesheetAbsence.setUserapproveid_link(user.getId());
 			timesheetAbsence.setTimeapprove(new Date());
 			timesheetAbsenceService.save(timesheetAbsence);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());			
+		    return new ResponseEntity<ResponseBase>(HttpStatus.OK);
+		}    			
+	}
+	
+	@RequestMapping(value = "/delete",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> delete(@RequestBody TimeSheetAbsence_getOne_request entity ,HttpServletRequest request) {
+		ResponseBase response = new ResponseBase();
+		try {
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			
+			Long id = entity.id;
+			timesheetAbsenceService.deleteById(id);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
