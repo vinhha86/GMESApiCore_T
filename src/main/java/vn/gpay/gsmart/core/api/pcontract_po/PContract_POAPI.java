@@ -1149,8 +1149,8 @@ public class PContract_POAPI {
 						if(!PO_No.equals("TBD")) {
 							Long pcontractpoid_link = null;
 							//Kiem tra so PO va so PO cha
-							List<PContract_PO> list_po_parent = pcontract_POService.check_exist_PONo(PO_No, pcontractid_link);
-							if(list_po_parent.size() > 0) {
+//							List<PContract_PO> list_po_parent = pcontract_POService.check_exist_PONo(PO_No, pcontractid_link);
+//							if(list_po_parent.size() > 0) {
 								//Kiem tra xem PO con da ton tai hay chua
 								List<PContract_PO> list_po = pcontract_POService.check_exist_po_children(PO_No+"-"+Line, ShipDate, shipmodeid_link, pcontractid_link, parentid_link);
 								if(list_po.size() == 0) {
@@ -1476,7 +1476,7 @@ public class PContract_POAPI {
 											reqService.save(req);
 										}
 									}
-								}
+//								}
 								
 							}
 						}
