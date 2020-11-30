@@ -1,9 +1,7 @@
 package vn.gpay.gsmart.core.api.timesheet_lunch;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -74,12 +72,18 @@ public class TimeSheetLunchAPI {
 			Long orgid_link = entity.orgid_link;
 			
 			List<TimeSheetLunchBinding> list = new ArrayList<TimeSheetLunchBinding>();
-			List<Personel> listPersonnel = personnelService.getby_org(orgid_link, orgrootid_link); // OK
+			List<Personel> listPersonnel = personnelService.getby_org(orgid_link, orgrootid_link);
 //			System.out.println(listPersonnel.size());
-			List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService.getForTimeSheetLunch(orgid_link, date); // OK
+			List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService.getForTimeSheetLunch(orgid_link, date);
 //			System.out.println(today);
 //			System.out.println(listTimeSheetLunch.size());
 			Map<Long, TimeSheetLunchBinding> mapTmp = new HashMap<>();
+			
+			// set status co editable hay khong
+			Integer status = 0;
+			if(listTimeSheetLunch.size() > 0) {
+				status = listTimeSheetLunch.get(0).getStatus();
+			}
 			
 			for(Personel personnel : listPersonnel) { // add personnel to map
 				TimeSheetLunchBinding temp = new TimeSheetLunchBinding();
@@ -93,10 +97,12 @@ public class TimeSheetLunchAPI {
 				temp.setWorkingShift1(false);
 				temp.setWorkingShift2(false);
 				temp.setWorkingShift3(false);
+				temp.setStatus(status);
 				mapTmp.put(personnel.getId(), temp);
 			}
 			
 			for(TimeSheetLunch timeSheetLunch : listTimeSheetLunch) {
+				
 				if(mapTmp.containsKey(timeSheetLunch.getPersonnelid_link())) {
 					TimeSheetLunchBinding temp = mapTmp.get(timeSheetLunch.getPersonnelid_link());
 					switch(timeSheetLunch.getShifttypeid_link().toString()) {
@@ -168,6 +174,7 @@ public class TimeSheetLunchAPI {
 					timeSheetLunch.setWorkingdate(workingdate);
 					timeSheetLunch.setIsworking(isWorkingShift);
 					timeSheetLunch.setIslunch(isLunchShift);
+					timeSheetLunch.setStatus(0);
 					timeSheetLunchService.save(timeSheetLunch);
 				}
 			}
@@ -194,6 +201,7 @@ public class TimeSheetLunchAPI {
 					timeSheetLunch.setWorkingdate(workingdate);
 					timeSheetLunch.setIsworking(isWorkingShift);
 					timeSheetLunch.setIslunch(isLunchShift);
+					timeSheetLunch.setStatus(0);
 					timeSheetLunchService.save(timeSheetLunch);
 				}
 			}
@@ -220,6 +228,7 @@ public class TimeSheetLunchAPI {
 					timeSheetLunch.setWorkingdate(workingdate);
 					timeSheetLunch.setIsworking(isWorkingShift);
 					timeSheetLunch.setIslunch(isLunchShift);
+					timeSheetLunch.setStatus(0);
 					timeSheetLunchService.save(timeSheetLunch);
 				}
 			}
@@ -232,6 +241,61 @@ public class TimeSheetLunchAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());			
 		    return new ResponseEntity<ResponseBase>(HttpStatus.OK);
+		}    			
+	}
+	
+	@RequestMapping(value = "/updateStatus",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> updateStatus(@RequestBody TimeSheetLunch_updateStatus_request entity ,HttpServletRequest request) {
+		ResponseBase response = new ResponseBase();
+		try {
+			Long orgid_link = entity.orgid_link;
+			Date workingdate = entity.workingdate;
+			Integer status = entity.status;
+			List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService.getForTimeSheetLunch(orgid_link, workingdate);
+			
+			for(TimeSheetLunch timeSheetLunch : listTimeSheetLunch) {
+				timeSheetLunch.setStatus(status);
+				timeSheetLunchService.save(timeSheetLunch);
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());			
+		    return new ResponseEntity<ResponseBase>(HttpStatus.OK);
+		}    			
+	}
+	
+	@RequestMapping(value = "/isconfirm",method = RequestMethod.POST)
+	public ResponseEntity<TimeSheetLunch_isconfirm_response> isconfirm(@RequestBody TimeSheetLunch_request entity ,HttpServletRequest request) {
+		TimeSheetLunch_isconfirm_response response = new TimeSheetLunch_isconfirm_response();
+		try {
+			Long orgid_link = entity.orgid_link;
+			Date date = entity.date;
+			
+			List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService.getForTimeSheetLunch(orgid_link, date);
+			
+			if(listTimeSheetLunch.size() > 0) {
+				TimeSheetLunch temp = listTimeSheetLunch.get(0);
+				if(temp.getStatus() == 0) {
+					response.isConfirm = false;
+				}
+				if(temp.getStatus() == 1) {
+					response.isConfirm = true;
+				}
+			}else {
+				response.isConfirm = false;
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
+			return new ResponseEntity<TimeSheetLunch_isconfirm_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());			
+		    return new ResponseEntity<TimeSheetLunch_isconfirm_response>(HttpStatus.OK);
 		}    			
 	}
 }
