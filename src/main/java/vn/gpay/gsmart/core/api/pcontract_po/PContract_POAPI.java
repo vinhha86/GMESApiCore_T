@@ -1073,6 +1073,7 @@ public class PContract_POAPI {
 						String PO_No = commonService.getStringValue(row.getCell(ColumnPO.PO));
 						colNum++;
 						String Line = commonService.getStringValue(row.getCell(ColumnPO.Line));
+						Line = Line.equals("0") ? "" : Line;
 						colNum++;
 						Date ShipDate = null;
 						try {
@@ -1106,44 +1107,57 @@ public class PContract_POAPI {
 						
 						colNum++;
 						String Shipmode = row.getCell(ColumnPO.Shipmode).getStringCellValue();
+						Shipmode = Shipmode.equals("0") ? "" : Shipmode;
+						
 						colNum++;
 						String PackingMethod = row.getCell(ColumnPO.PackingMethod).getStringCellValue();
+						PackingMethod = PackingMethod.equals("0") ? "" : PackingMethod;
+						
 						colNum++;
 						String ColorName = commonService.getStringValue(row.getCell(ColumnPO.Colorname));
+						ColorName = ColorName.equals("0") ? "" : ColorName;
+						
 						colNum++;
 						String ColorCode = commonService.getStringValue(row.getCell(ColumnPO.Colorcode));
+						ColorCode = ColorCode.equals("0") ? "" : ColorCode;
 						
 						//Kiem tra Shipmode da ton tai hay chua
 						Long shipmodeid_link = null;
-						List<ShipMode> shipmodes = shipmodeService.getbyname(Shipmode);
-						if(shipmodes.size() == 0) {
-							ShipMode shipmode_new = new ShipMode();
-							shipmode_new.setId(null);
-							shipmode_new.setName(Shipmode);
-							shipmode_new = shipmodeService.save(shipmode_new);
-							
-							shipmodeid_link = shipmode_new.getId();
+						if(!Shipmode.equals("")) {
+							List<ShipMode> shipmodes = shipmodeService.getbyname(Shipmode);
+							if(shipmodes.size() == 0) {
+								ShipMode shipmode_new = new ShipMode();
+								shipmode_new.setId(null);
+								shipmode_new.setName(Shipmode);
+								shipmode_new = shipmodeService.save(shipmode_new);
+								
+								shipmodeid_link = shipmode_new.getId();
+							}
+							else {
+								shipmodeid_link = shipmodes.get(0).getId();
+							}
 						}
-						else {
-							shipmodeid_link = shipmodes.get(0).getId();
-						}
+						
 						
 						//Kiem tra PackingMethod
 						Long packingmethođi_link = null;
-						List<PackingType> list_packing = packingService.getbyname(PackingMethod, orgrootid_link);
-						if(list_packing.size() == 0) {
-							PackingType pk = new PackingType();
-							pk.setCode(PackingMethod);
-							pk.setId(null);
-							pk.setName(PackingMethod);
-							pk.setOrgrootid_link(orgrootid_link);
-							pk = packingService.save(pk);
-							
-							packingmethođi_link = pk.getId();
+						if(!PackingMethod.equals("")) {
+							List<PackingType> list_packing = packingService.getbyname(PackingMethod, orgrootid_link);
+							if(list_packing.size() == 0) {
+								PackingType pk = new PackingType();
+								pk.setCode(PackingMethod);
+								pk.setId(null);
+								pk.setName(PackingMethod);
+								pk.setOrgrootid_link(orgrootid_link);
+								pk = packingService.save(pk);
+								
+								packingmethođi_link = pk.getId();
+							}
+							else {
+								packingmethođi_link = list_packing.get(0).getId();
+							}
 						}
-						else {
-							packingmethođi_link = list_packing.get(0).getId();
-						}
+						
 						
 						//Kiem tra PO co dung voi PO dang chon de them moi khong
 						if(!PO_No.equals("TBD")) {
@@ -1152,12 +1166,15 @@ public class PContract_POAPI {
 //							List<PContract_PO> list_po_parent = pcontract_POService.check_exist_PONo(PO_No, pcontractid_link);
 //							if(list_po_parent.size() > 0) {
 								//Kiem tra xem PO con da ton tai hay chua
-								List<PContract_PO> list_po = pcontract_POService.check_exist_po_children(PO_No+"-"+Line, ShipDate, shipmodeid_link, pcontractid_link, parentid_link);
+								String s_po  = Line.equals("") ? PO_No : PO_No+"-"+Line;
+								List<PContract_PO> list_po = pcontract_POService.check_exist_po_children(s_po, ShipDate, shipmodeid_link, pcontractid_link, parentid_link);
+
+								int amount_po = 0;
 								if(list_po.size() == 0) {
 									
 									PContract_PO po_new = new PContract_PO();
 									po_new.setId(null);
-									po_new.setPo_buyer(PO_No+"-"+Line);
+									po_new.setPo_buyer(s_po);
 									po_new.setShipdate(ShipDate);
 									po_new.setShipmodeid_link(shipmodeid_link);
 									po_new.setPcontractid_link(pcontractid_link);
@@ -1181,6 +1198,8 @@ public class PContract_POAPI {
 									pcontractpoid_link = list_po.get(0).getId();
 									PContract_PO po = list_po.get(0);
 									po.setStatus(POStatus.PO_STATUS_CONFIRMED);
+									
+									amount_po = po.getPo_quantity();
 								}
 								
 								Long colorid_link = null;
@@ -1204,7 +1223,6 @@ public class PContract_POAPI {
 								}
 								
 								int columnsize = ColumnPO.Colorcode + 1;
-								int amount_po = 0;
 								String s_sizename = commonService.getStringValue(rowheader.getCell(columnsize));
 								s_sizename = s_sizename.equals("0") ? "" : s_sizename;
 								while (!s_sizename.equals("")) {
@@ -1912,7 +1930,7 @@ public class PContract_POAPI {
 //			list_org = "("+list_org+")";
 //			System.out.println(new Date());
 			List<PContract_PO> pcontract = pcontract_POService.getPO_Offer_Accept_ByPContract_AndOrg(entity.pcontractid_link,
-					entity.productid_link, list_org);
+					entity.productid_link == null ? 0 : entity.productid_link, list_org);
 			
 			if(orgs.size() > 0 ) {
 				for(PContract_PO parent: pcontract) {
