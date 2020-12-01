@@ -61,11 +61,10 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			@Param ("productid_link")final  Long productid_link);
 	
 	@Query(value = "select c from PContract_PO c "
-			+ "inner join PContract_PO d on c.id = d.parentpoid_link "
-			+ "inner join POrder_Req a on d.id = a.pcontract_poid_link "
+			+ "inner join POrder_Req a on c.id = a.pcontract_poid_link "
 			+ "where c.pcontractid_link = :pcontractid_link "
 			+ "and (:productid_link is null or c.productid_link = :productid_link) "
-			+ "and c.parentpoid_link = null "
+			+ "and c.parentpoid_link is null "
 			+ "and c.status = 0 "
 			+ "and a.granttoorgid_link in :orgid_link "
 			+ "group by c")
@@ -120,7 +119,7 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 	
 	@Query(value = "select c from PContract_PO c "
 			+ "where trim(lower(replace(c.po_buyer,' ',''))) = trim(lower(replace(:po_buyer, ' ',''))) "
-			+ "and c.shipmodeid_link = :shipmodeid_link "
+			+ "and (c.shipmodeid_link = :shipmodeid_link or :shipmodeid_link is null) "
 			+ "and c.shipdate = :shipdate "
 			+ "and c.pcontractid_link = :pcontractid_link "
 			+ "and c.parentpoid_link = :parentid_link"
