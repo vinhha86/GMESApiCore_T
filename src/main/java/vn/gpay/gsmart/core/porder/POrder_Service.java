@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.porder;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -13,18 +14,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+
 import org.springframework.stereotype.Service;
+//import org.springframework.transaction.annotation.Transactional;
+//import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import com.github.wenhao.jpa.Sorts;
 import com.github.wenhao.jpa.Specifications;
 
 import vn.gpay.gsmart.core.base.AbstractService;
+import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
+import vn.gpay.gsmart.core.pcontract_po_productivity.IPContract_PO_Productivity_Service;
+import vn.gpay.gsmart.core.porder_req.POrder_Req;
+import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.GPAYDateFormat;
+import vn.gpay.gsmart.core.utils.POStatus;
+import vn.gpay.gsmart.core.utils.POrderStatus;
 
 @Service
 public class POrder_Service extends AbstractService<POrder> implements IPOrder_Service {
 	@Autowired IPOrder_Repository repo;
 	@Autowired IPOrder_AutoID_Service porder_AutoID_Service;
+	@Autowired private IPContract_POService pcontract_POService;
+	@Autowired private IPContract_PO_Productivity_Service poProductivityService;
+//	@Autowired private IPOrder_Req_Service porder_reqService;
+	@Autowired private Common commonService;
 	@Override
 	protected JpaRepository<POrder, Long> getRepository() {
 		// TODO Auto-generated method stub
@@ -45,6 +61,107 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 			return null;
 	}
 	
+	@Override
+//	@Transactional(rollbackFor = RuntimeException.class)
+	public POrder createPOrder(POrder_Req porder_req, GpayUser user){
+		Long orgrootid_link = user.getRootorgid_link();
+		try {
+			POrder porder = new POrder();
+			porder.setPorderreqid_link(porder_req.getId());
+			porder.setGranttoorgid_link(porder_req.getGranttoorgid_link());
+			porder.setPcontractid_link(porder_req.getPcontractid_link());
+			porder.setPcontract_poid_link(porder_req.getPcontract_poid_link());
+			porder.setProductid_link(porder_req.getProductid_link());
+			porder.setTotalorder_req(porder_req.getTotalorder());
+			porder.setTotalorder(porder_req.getTotalorder());
+			
+			//Kiem tra xem POrder_req da duoc tao lenhsx hay chua?
+			List<POrder> lsPOrder = getByPOrder_Req(porder.getPcontract_poid_link(), porder.getPorderreqid_link());
+			if (lsPOrder.size() > 0){
+				return lsPOrder.get(0);
+			} else {
+				//Lay thong tin PO
+				PContract_PO thePO = pcontract_POService.findOne(porder.getPcontract_poid_link());
+				
+				if (null !=thePO){
+					String po_code = null!=thePO.getPo_vendor()&&thePO.getPo_vendor().length() > 0?thePO.getPo_vendor():thePO.getPo_buyer();
+					
+					if (porder.getId() == null || porder.getId() == 0) {
+				
+						porder.setPcontract_poid_link(thePO.getId());
+						porder.setGolivedate(thePO.getShipdate());
+						porder.setProductiondate(thePO.getProductiondate());
+						
+						porder.setFinishdate_plan(thePO.getShipdate());
+						porder.setProductiondate_plan(thePO.getProductiondate());
+						
+						porder.setOrgrootid_link(orgrootid_link);
+						porder.setOrderdate(new Date());
+						porder.setUsercreatedid_link(user.getId());
+						porder.setStatus(null!=thePO.getStatus()&&thePO.getStatus() == POStatus.PO_STATUS_UNCONFIRM?POrderStatus.PORDER_STATUS_UNCONFIRM:POrderStatus.PORDER_STATUS_FREE);
+						porder.setTimecreated(new Date());
+						
+						//Lay thong tin NS target tu chao gia 
+						porder.setPlan_productivity(poProductivityService.getProductivityByPOAndProduct(thePO.getParentpoid_link(), porder.getProductid_link()));
+					} 
+//						Float productiondays = (float)thePO.getProductiondays();
+					porder = savePOrder(calPlan_FinishDate(orgrootid_link, porder), po_code);
+					
+		
+					//Update lai trng thai cua Porder_req ve da tao lenh
+//					List<POrder_Req> lsPOrder_Req = porder_reqService.getByOrg_PO_Product(porder.getPcontract_poid_link(), porder.getProductid_link(), porder.getGranttoorgid_link());
+//					for(POrder_Req thePOrder_Req: lsPOrder_Req){
+//						thePOrder_Req.setStatus(POrderReqStatus.STATUS_PORDERED);
+//						porder_reqService.save(thePOrder_Req);
+//					}
+					
+//					//Tao Task
+//					long userid_link = user.getId();
+//					long pcontractid_link = porder.getPcontractid_link();
+//					long pcontract_poid_link = porder.getPcontract_poid_link();
+//					long porder_req_id_link = porder.getPorderreqid_link();
+//					long porderid_link = porder.getId();
+//					long productid_link = porder.getProductid_link();
+//					long granttoorgid_link = porder.getGranttoorgid_link();
+//					createTask_AfterPorderCreating(
+//							orgrootid_link,
+//							userid_link,
+//							pcontractid_link,
+//							pcontract_poid_link,
+//							porder_req_id_link,
+//							porderid_link,
+//							productid_link,
+//							granttoorgid_link						
+//						);
+					return porder;	
+				} else {
+					return null;
+				}
+			}
+			
+		} catch (RuntimeException e) {
+//			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			return null;
+		}
+	}
+	private POrder calPlan_FinishDate(Long orgrootid_link, POrder porder){
+		if (null != porder.getTotalorder() && 0 != porder.getTotalorder() && 
+				null != porder.getPlan_productivity() && 0 != porder.getPlan_productivity()){
+			//Tinh toan SL chuyen yeu cau
+			Float totalorder = (float)porder.getTotalorder();
+			Float plan_productivity = (float)porder.getPlan_productivity();		
+			
+			Integer plan_duration = Math.round(totalorder/plan_productivity);	
+			Date finishdate_plan =  commonService.Date_Add_with_holiday(porder.getProductiondate_plan(), plan_duration, orgrootid_link, Calendar.getInstance().get(Calendar.YEAR));
+			
+			porder.setFinishdate_plan(finishdate_plan);
+			porder.setPlan_duration(plan_duration);
+//			porder.setPlan_linerequired(Precision.round(iSLNgaySX/productiondays,1));
+		} else {
+			porder.setPlan_linerequired(null);				
+		}		
+		return porder;
+	}
 	@Override
 	public POrder savePOrder(POrder porder, String po_code){
 		try {

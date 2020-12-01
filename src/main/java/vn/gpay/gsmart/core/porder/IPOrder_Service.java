@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.List;
 
 import vn.gpay.gsmart.core.base.Operations;
+import vn.gpay.gsmart.core.porder_req.POrder_Req;
+import vn.gpay.gsmart.core.security.GpayUser;
 
 public interface IPOrder_Service extends Operations<POrder> {
 
@@ -32,4 +34,5 @@ public interface IPOrder_Service extends Operations<POrder> {
 	public List<POrder> getPOrderByExactOrdercode(String ordercode);
 	
 	public List<POrderBinding> getForNotInProductionChart();
+	POrder createPOrder(POrder_Req porder_req, GpayUser user);
 }
