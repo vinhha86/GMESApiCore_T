@@ -2422,4 +2422,30 @@ public class PContract_POAPI {
 		}
 
 	}
+	
+	@RequestMapping(value = "/getForPOrderListPContractPO", method = RequestMethod.POST)
+	public ResponseEntity<PContract_getbycontractproduct_response> getForPOrderListPContractPO(@RequestBody PContract_PO_getByPorder_request entity,
+			HttpServletRequest request) {
+		PContract_getbycontractproduct_response response = new PContract_getbycontractproduct_response();
+		try {
+//			Long porderid_link = entity.porderid_link;
+			Long pcontract_poid_link = entity.pcontract_poid_link;
+//			POrder porder = porderService.findOne(porderid_link);
+			PContract_PO pcontractPo = pcontract_POService.findOne(pcontract_poid_link);
+			if(pcontractPo.getParentpoid_link() != null) {
+				pcontract_poid_link = pcontractPo.getParentpoid_link();
+			}
+			
+			List<PContract_PO> listPContractPO = pcontract_POService.get_by_parentid(pcontract_poid_link);
+			response.data = listPContractPO;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.OK);
+		}
+	}
 }
