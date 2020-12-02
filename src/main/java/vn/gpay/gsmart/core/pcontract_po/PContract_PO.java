@@ -18,7 +18,6 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.bouncycastle.pqc.asn1.PQCObjectIdentifiers;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
@@ -180,10 +179,10 @@ public class PContract_PO implements Serializable {/**
 	public Boolean getCheckamount() {
 		int amount_sku = 0;
 		for(PContractProductSKU sku : pcontract_po_sku) {
-			amount_sku += sku.getPquantity_porder();
+			amount_sku += sku.getPquantity_porder() == null ? 0 : sku.getPquantity_porder();
 		}
-		
-		if(po_quantity == amount_sku) return true;
+		int quantity = po_quantity == null ? 0 : po_quantity;
+		if(quantity == amount_sku) return true;
 		return false;
 	}
 	
