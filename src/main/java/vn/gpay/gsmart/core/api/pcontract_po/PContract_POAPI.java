@@ -2067,7 +2067,18 @@ public class PContract_POAPI {
 //				}
 //			}
 			
-			
+			//Kiem tra xem porder_req da keo vao uom thu hay chua? Neu keo roi thi cap nhat lai trang thai cua lenh
+			List<POrder_Req> list_req = porder_req_Service.getByPO(po.getId());
+			for (POrder_Req req : list_req) {
+				List<POrder> list_porder = porderService.getByPOrder_Req(po.getId(), req.getId());
+				if(list_porder.size() > 0) {
+					POrder porder = list_porder.get(0);
+					porder.setStatus(POrderStatus.PORDER_STATUS_GRANTED);
+				}
+				else {
+					porderService.createPOrder(req, user);
+				}
+			}
 
 			// Sinh Cong viec
 			long pcontractid_link = po.getPcontractid_link();
