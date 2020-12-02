@@ -40,6 +40,13 @@ public class POrderGrant_SKUService extends AbstractService<POrderGrant_SKU> imp
 		return repo.getPOrderGrant_SKUbySKUAndGrantAndPcontractPo(skuid_link, pordergrantid_link, pcontract_poid_link);
 	}
 
+	@Override
+	public POrderGrant_SKU getPOrderGrant_SKUbySKUid_linkAndGrantId_andPO(Long skuid_link, Long pordergrantid_link,
+			Long pcontract_poid_link) {
+		// TODO Auto-generated method stub
+		return repo.getPOrderGrant_SKUbySKUid_linkAndGrantId_AndPO(skuid_link, pordergrantid_link, pcontract_poid_link);
+	}
+
 //	@Override
 //	public POrderGrant_SKU getPOrderGrant_SKUbySKUid_link(Long skuid_link) {
 //		return repo.getPOrderGrant_SKUbySKUid_link(skuid_link);

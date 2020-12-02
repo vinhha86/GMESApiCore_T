@@ -1186,7 +1186,11 @@ public class ScheduleAPI {
 			//Kiem tra so luong tung sku xem co bi vuot qua khong
 			List<POrderGrant_SKU> list_sku = entity.data;
 			for (POrderGrant_SKU pOrderGrant_SKU : list_sku) {
-				POrderGrant_SKU sku = grantskuService.getPOrderGrant_SKUbySKUid_linkAndGrantId(pOrderGrant_SKU.getSkuid_link(), pOrderGrant_SKU.getPordergrantid_link());
+				Long skuid_link = pOrderGrant_SKU.getSkuid_link();
+				Long pordergrantid_link = pOrderGrant_SKU.getPordergrantid_link();
+				Long pcontract_poid_link = pOrderGrant_SKU.getPcontract_poid_link();
+				
+				POrderGrant_SKU sku = grantskuService.getPOrderGrant_SKUbySKUid_linkAndGrantId_andPO(skuid_link, pordergrantid_link, pcontract_poid_link);
 				if(pOrderGrant_SKU.getGrantamount() > sku.getGrantamount()) {
 					response.mes = "Bạn không được tách vượt quá số lượng đang được giao cho tổ!";
 					response.sku = grantskuService.getPOrderGrant_SKU(pOrderGrant_SKU.getPordergrantid_link());
@@ -1311,9 +1315,11 @@ public class ScheduleAPI {
 					sku.setOrgrootid_link(orgrootid_link);
 					sku.setPordergrantid_link(grant.getId());
 					sku.setSkuid_link(pOrderGrant_SKU.getSkuid_link());
+					sku.setPcontract_poid_link(pOrderGrant_SKU.getPcontract_poid_link());
 					grantskuService.save(sku);
 					
-					POrderGrant_SKU sku_old = grantskuService.getPOrderGrant_SKUbySKUid_linkAndGrantId(pOrderGrant_SKU.getSkuid_link(), pOrderGrant_SKU.getPordergrantid_link());
+					POrderGrant_SKU sku_old = grantskuService.getPOrderGrant_SKUbySKUid_linkAndGrantId_andPO(
+							pOrderGrant_SKU.getSkuid_link(), pOrderGrant_SKU.getPordergrantid_link(), pOrderGrant_SKU.getPcontract_poid_link());
 					sku_old.setGrantamount(sku_old.getGrantamount() - pOrderGrant_SKU.getGrantamount());
 					grantskuService.save(sku_old);
 				}
