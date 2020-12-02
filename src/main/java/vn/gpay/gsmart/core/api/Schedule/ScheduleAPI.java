@@ -54,6 +54,7 @@ import vn.gpay.gsmart.core.task_checklist.Task_CheckList;
 import vn.gpay.gsmart.core.task_object.ITask_Object_Service;
 import vn.gpay.gsmart.core.task_object.Task_Object;
 import vn.gpay.gsmart.core.utils.Common;
+import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.POrderStatus;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -88,6 +89,12 @@ public class ScheduleAPI {
 		long orgid_link = user.getOrgid_link();
 		long orgbuyerid_link = Buyer == "" ? (long)0 : Long.parseLong(Buyer);
 		long orgvendorid_link = Vendor == "" ? (long)0 : Long.parseLong(Vendor);
+		
+		//Lay danh sach Vendor duoc phep quan ly (overwrite dieu kien seach)
+		List<GpayUserOrg> lsVendor = userOrgService.getall_byuser_andtype(user.getId(), OrgType.ORG_TYPE_VENDOR);
+		if (lsVendor.size() > 0){
+			orgvendorid_link = lsVendor.get(0).getOrgid_link();
+		}
 		 
 	    Date startdate = commonService.getBeginOfDate(new SimpleDateFormat("yyyy-MM-dd").parse(startDate.substring(0,10))); 
 	    Date toDate = commonService.getEndOfDate(new SimpleDateFormat("yyyy-MM-dd").parse(endDate.substring(0,10)));  
@@ -135,8 +142,8 @@ public class ScheduleAPI {
 				listorg = orgService.getorgChildrenbyOrg(orgid_link, list);
 			else 
 				listorg.add(orgroot);
-			//Them vao danh sach cac don vi trong danh sach don vi duoc phan quyen cho nguoi dung
-			for(GpayUserOrg userorg:userOrgService.getall_byuser(user.getId())){
+			//Them vao danh sach cac don vi trong danh sach phan xuong duoc phan quyen cho nguoi dung
+			for(GpayUserOrg userorg:userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY)){
 				if (userorg.getOrgid_link() != user.getOrgid_link() && userorg.getOrgid_link() != user.getRootorgid_link()){
 					listorg.add(orgService.findOne(userorg.getOrgid_link()));
 				}
