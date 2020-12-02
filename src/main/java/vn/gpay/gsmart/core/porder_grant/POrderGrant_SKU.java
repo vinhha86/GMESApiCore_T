@@ -16,6 +16,7 @@ import org.hibernate.annotations.NotFoundAction;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.sku.SKU;
 
 
@@ -38,6 +39,24 @@ public class POrderGrant_SKU implements Serializable {
     
     @JsonProperty("grantamount")
     private Integer grantamount;
+    
+    @JsonProperty("pcontract_poid_link")
+    private Long pcontract_poid_link;
+    
+    @NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
+    private PContract_PO pcontractPo;
+    
+    @Transient
+	public String getPcontractPo_PoBuyer() {
+		if(pcontractPo!=null) {
+			if(pcontractPo.getPo_buyer() != null) {
+				return pcontractPo.getPo_buyer();
+			}
+		}
+		return "";
+	}
 
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -118,6 +137,14 @@ public class POrderGrant_SKU implements Serializable {
 
 	public void setGrantamount(Integer grantamount) {
 		this.grantamount = grantamount;
+	}
+
+	public Long getPcontract_poid_link() {
+		return pcontract_poid_link;
+	}
+
+	public void setPcontract_poid_link(Long pcontract_poid_link) {
+		this.pcontract_poid_link = pcontract_poid_link;
 	}	
 
 	
