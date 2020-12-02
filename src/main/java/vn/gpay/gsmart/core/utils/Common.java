@@ -527,9 +527,13 @@ public class Common  {
 	
 	public void ReCalculate(Long porder_grant_id_link, Long orgrootid_link,int year) {
 		POrderGrant grant = grantService.findOne(porder_grant_id_link);
-		grant.setDuration(getDuration_byProductivity(grant.getTotalpackage(), grant.getProductivity()));
-		grant.setFinish_date_plan(Date_Add_with_holiday(grant.getStart_date_plan(), grant.getDuration(), orgrootid_link, year));
-		grantService.save(grant);
+		int duration = getDuration_byProductivity(grant.getTotalpackage(), grant.getProductivity());
+		Date dateend = Date_Add_with_holiday(grant.getStart_date_plan(), grant.getDuration(), orgrootid_link, year);
+		
+		
+//		grant.setDuration();
+//		grant.setFinish_date_plan();
+//		grantService.save(grant);
 	}
 
 	public int getDuration(Date startdate, Date enddate, long orgrootid_link, int year) {
@@ -582,6 +586,7 @@ public class Common  {
 		if(_date.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
 			return true;
 		else {
+			year = _date.get(Calendar.YEAR);
 			List<Holiday> list_holiday = holidayService.getby_year(orgrootid_link, year);
 			for(Holiday holiday : list_holiday) {
 				Calendar c_holiday = Calendar.getInstance();
@@ -608,7 +613,6 @@ public class Common  {
 	public Date Date_Add_with_holiday(Date date, int amount, long orgrootid_link, int year) {
 		Calendar _date = Calendar.getInstance();
 		_date.setTime(date);
-		
 		if(amount == 1) {
 			_date.add(Calendar.DATE, 1);
 			while(check_dayoff(_date, orgrootid_link, year)) {
