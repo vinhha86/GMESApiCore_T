@@ -531,9 +531,9 @@ public class Common  {
 		Date dateend = Date_Add_with_holiday(grant.getStart_date_plan(), grant.getDuration(), orgrootid_link, year);
 		
 		
-//		grant.setDuration();
-//		grant.setFinish_date_plan();
-//		grantService.save(grant);
+		grant.setDuration(duration);
+		grant.setFinish_date_plan(dateend);
+		grantService.save(grant);
 	}
 
 	public int getDuration(Date startdate, Date enddate, long orgrootid_link, int year) {
