@@ -80,6 +80,7 @@ import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.ColumnPO;
 import vn.gpay.gsmart.core.utils.ColumnTemplate;
 import vn.gpay.gsmart.core.utils.Common;
+import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.POStatus;
 import vn.gpay.gsmart.core.utils.POrderReqStatus;
 import vn.gpay.gsmart.core.utils.POrderStatus;
@@ -1918,7 +1919,7 @@ public class PContract_POAPI {
 			List<String> orgs = new ArrayList<String>();
 			List<Long> list_org = new ArrayList<Long>();
 			if(orgid_link != 0 && orgid_link != 1) {
-				for(GpayUserOrg userorg:userOrgService.getall_byuser(user.getId())){
+				for(GpayUserOrg userorg:userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY)){
 					orgs.add(userorg.getOrgcode());
 					list_org.add(userorg.getOrgid_link());
 				}
@@ -2345,7 +2346,7 @@ public class PContract_POAPI {
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		try {
 			List<Org> listorg = new ArrayList<Org>();
-			for(GpayUserOrg userorg:userOrgService.getall_byuser(user.getId())){
+			for(GpayUserOrg userorg:userOrgService.getall_byuser_andtype(user.getId(), OrgType.ORG_TYPE_FACTORY)){
 				listorg.add(orgService.findOne(userorg.getOrgid_link()));
 			}
 			
@@ -2389,6 +2390,7 @@ public class PContract_POAPI {
 					if(flag) continue;
 				}
 				
+				//Chi lay cac PO Line
 				if (pcontractpo.getParentpoid_link() != null) {
 					response.data.add(pcontractpo);
 				}
