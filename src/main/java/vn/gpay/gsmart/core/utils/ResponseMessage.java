@@ -25,7 +25,7 @@ public class ResponseMessage {
     
     //POrder_Req Messages (1000-1010)
     public static int KEY_POREQ_DELETE_PORDEREXISTED 		= 1000;
-    public static String MES_POREQ_DELETE_PORDEREXISTED   	= "Đang tồn tại lệnh sản xuất liên quan, không thể xóa";
+    public static String MES_POREQ_DELETE_PORDEREXISTED   	= "Đang tồn tại lệnh sản xuất đã vào chuyền, không thể xóa";
     
     //POrder Create Messages (1011-1020)
     public static int KEY_RC_PORDER_EXISTED 		= 1011;

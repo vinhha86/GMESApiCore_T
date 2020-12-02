@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -767,6 +769,7 @@ public class POrder_ReqAPI {
 	}
 	
 	@RequestMapping(value = "/delete", method = RequestMethod.POST)
+	@Transactional(rollbackFor = RuntimeException.class)
 	public ResponseEntity<ResponseBase> delete(HttpServletRequest request,
 			@RequestBody POrder_Req_GetOne_Request entity) {
 		ResponseBase response = new ResponseBase();
@@ -774,13 +777,19 @@ public class POrder_ReqAPI {
 			 POrder_Req thePOrder_Req = porder_req_Service.findOne(entity.id);
 			 if (null != thePOrder_Req){
 				//Kiem tra xem da co lenh sx dc tao chua, neu co roi --> Bao loi
-				if(thePOrder_Req.getPorderlist().size() > 0){
+				if(thePOrder_Req.getPorderlist_running().size() > 0){
 					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_POREQ_DELETE_PORDEREXISTED));
 					return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);					
 				} else {
 					porder_req_Service.delete(thePOrder_Req);
 					
+					//Xoa các lenh sx tuong ung
+					for (POrder thePOrder: thePOrder_Req.getPorderlist()){
+						porderService.delete(thePOrder);
+					}
+					
+					//Update lai SL cho các POrder_Req con lai
 					long pcontractpo_id_link = thePOrder_Req.getPcontract_poid_link();
 					PContract_PO po = pcontract_POService.findOne(pcontractpo_id_link);
 					List<POrder_Req> list_req = porder_req_Service.getByPO_is_calculate(pcontractpo_id_link);
@@ -805,7 +814,8 @@ public class POrder_ReqAPI {
 				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_BAD_REQUEST));
 				return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 			}
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
