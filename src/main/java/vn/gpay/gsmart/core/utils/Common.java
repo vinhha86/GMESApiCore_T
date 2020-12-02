@@ -39,6 +39,8 @@ import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.product.IProductService;
 import vn.gpay.gsmart.core.product.Product;
@@ -86,6 +88,7 @@ public class Common  {
 	@Autowired ITask_Object_Service taskobjectService;
 	@Autowired ITask_Flow_Service flowService;
 	@Autowired IPOrder_Service porderService;
+	@Autowired IPOrderGrant_Service grantService;
 
 	@Autowired IStocking_UniqueCode_Service stockingService;
 	
@@ -520,6 +523,13 @@ public class Common  {
 			return true;
 		}
 		return false;
+	}
+	
+	public void ReCalculate(Long porder_grant_id_link, Long orgrootid_link,int year) {
+		POrderGrant grant = grantService.findOne(porder_grant_id_link);
+		grant.setDuration(getDuration_byProductivity(grant.getTotalpackage(), grant.getProductivity()));
+		grant.setFinish_date_plan(Date_Add_with_holiday(grant.getStart_date_plan(), grant.getDuration(), orgrootid_link, year));
+		grantService.save(grant);
 	}
 
 	public int getDuration(Date startdate, Date enddate, long orgrootid_link, int year) {

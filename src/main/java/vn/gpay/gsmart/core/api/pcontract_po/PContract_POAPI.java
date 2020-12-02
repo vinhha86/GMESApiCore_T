@@ -1546,7 +1546,7 @@ public class PContract_POAPI {
 	}
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public ResponseEntity<PContract_pocreate_response> PContractCreate(@RequestBody PContract_pocreate_request entity,
+	public ResponseEntity<PContract_pocreate_response> PContractPOCreate(@RequestBody PContract_pocreate_request entity,
 			HttpServletRequest request) {
 		PContract_pocreate_response response = new PContract_pocreate_response();
 		try {
