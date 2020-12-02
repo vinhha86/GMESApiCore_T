@@ -1112,14 +1112,15 @@ public class ScheduleAPI {
 			List<POrderGrant_SKU> list_sku_src = grantskuService.getPOrderGrant_SKU(entity.pordergrantid_link_src);
 			
 			for (POrderGrant_SKU pOrderGrant_SKU : list_sku_src) {
-				POrderGrant_SKU sku = grantskuService.getPOrderGrant_SKUbySKUid_linkAndGrantId(pOrderGrant_SKU.getSkuid_link(), entity.pordergrantid_link_des);
+				POrderGrant_SKU sku = grantskuService.getPOrderGrant_SKUbySKUid_linkAndGrantId_andPO(pOrderGrant_SKU.getSkuid_link(), entity.pordergrantid_link_des, pOrderGrant_SKU.getPcontract_poid_link());
 				if(sku == null) {
 					POrderGrant_SKU grantsku = new POrderGrant_SKU();
 					grantsku.setGrantamount(pOrderGrant_SKU.getGrantamount());
-					pOrderGrant_SKU.setId(null);
-					pOrderGrant_SKU.setOrgrootid_link(orgrootid_link);
-					pOrderGrant_SKU.setPordergrantid_link(entity.pordergrantid_link_des);
-					pOrderGrant_SKU.setSkuid_link(pOrderGrant_SKU.getSkuid_link());
+					grantsku.setId(null);
+					grantsku.setOrgrootid_link(orgrootid_link);
+					grantsku.setPordergrantid_link(entity.pordergrantid_link_des);
+					grantsku.setSkuid_link(pOrderGrant_SKU.getSkuid_link());
+					grantsku.setPcontract_poid_link(pOrderGrant_SKU.getPcontract_poid_link());
 					grantskuService.save(pOrderGrant_SKU);
 				} 
 				else {
