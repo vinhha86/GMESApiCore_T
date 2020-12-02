@@ -527,13 +527,16 @@ public class Common  {
 	
 	public void ReCalculate(Long porder_grant_id_link, Long orgrootid_link,int year) {
 		POrderGrant grant = grantService.findOne(porder_grant_id_link);
-		int duration = getDuration_byProductivity(grant.getTotalpackage(), grant.getProductivity());
-		Date dateend = Date_Add_with_holiday(grant.getStart_date_plan(), grant.getDuration(), orgrootid_link, year);
+		int amount = grant.getGrantamount();
+		int productivity = grant.getProductivity();
+		int duration = getDuration_byProductivity(amount, productivity);
+		Date startdate = getBeginOfDate(grant.getStart_date_plan());
+		Date dateend = Date_Add_with_holiday(startdate, duration - 1, orgrootid_link, year);
 		
 		
-//		grant.setDuration();
-//		grant.setFinish_date_plan();
-//		grantService.save(grant);
+		grant.setDuration(duration);
+		grant.setFinish_date_plan(dateend);
+		grantService.save(grant);
 	}
 
 	public int getDuration(Date startdate, Date enddate, long orgrootid_link, int year) {

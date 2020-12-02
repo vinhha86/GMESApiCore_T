@@ -2,8 +2,10 @@ package vn.gpay.gsmart.core.api.porder_list;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -21,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.deser.std.DateDeserializers.CalendarDeserializer;
+
 import vn.gpay.gsmart.core.pcontract.IPContractService;
 import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
@@ -34,6 +38,7 @@ import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
 import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -45,6 +50,7 @@ public class POrderListAPI {
 	@Autowired private IPOrderGrant_SKUService pordergrantskuService;
 	@Autowired private IPOrder_Product_SKU_Service porderskuService;
 	@Autowired private IPContractProductSKUService pcontractProductSkuService;
+	@Autowired private Common commonService;
 	
 	@RequestMapping(value = "/getall",method = RequestMethod.POST)
 	public ResponseEntity<POrderList_getlist_response> POrderGetAll(HttpServletRequest request ) {
@@ -299,6 +305,7 @@ public class POrderListAPI {
 		addskutogrant_response response = new addskutogrant_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long orgrootid_link = user.getRootorgid_link();
 			POrderGrant grant = pordergrantService.findOne(entity.idGrant);
 			POrder porder = porderService.findOne(entity.idPOrder);
 			Long pcontract_poid_link = entity.idPcontractPo;
@@ -379,6 +386,12 @@ public class POrderListAPI {
 				name += "#"+ST+"-PO: "+PO+"-"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
 			}
 			
+			// Common ReCalculate
+			Date startDate = grant.getStart_date_plan();
+			Calendar calDate = Calendar.getInstance();
+			calDate.setTime(startDate);
+			commonService.ReCalculate(grant.getId(), orgrootid_link, calDate.get(Calendar.YEAR));
+			
 			response.porderinfo = name;
 			response.amount = total;
 			
@@ -396,6 +409,8 @@ public class POrderListAPI {
 	public ResponseEntity<addskutogrant_response> removeSkuFromGrant(@RequestBody POrderList_addSkuToGrant_request entity, HttpServletRequest request ) {
 		addskutogrant_response response = new addskutogrant_response();
 		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long orgrootid_link = user.getRootorgid_link();
 			POrderGrant grant = pordergrantService.findOne(entity.idGrant);
 			POrder porder = porderService.findOne(entity.idPOrder);
 			// save to porder_grant_sku
@@ -432,6 +447,12 @@ public class POrderListAPI {
 				name += "#"+ST+"-PO: "+PO+"-"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
 			}
 			
+			// Common ReCalculate
+			Date startDate = grant.getStart_date_plan();
+			Calendar calDate = Calendar.getInstance();
+			calDate.setTime(startDate);
+			commonService.ReCalculate(grant.getId(), orgrootid_link, calDate.get(Calendar.YEAR));
+			
 			response.porderinfo = name;
 			response.amount = total;
 			
@@ -449,6 +470,8 @@ public class POrderListAPI {
 	public ResponseEntity<addskutogrant_response> saveGrantSkuOnChange(@RequestBody POrderList_saveGrantSkuOnChange_request entity, HttpServletRequest request ) {
 		addskutogrant_response response = new addskutogrant_response();
 		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long orgrootid_link = user.getRootorgid_link();
 			POrderGrant grant = pordergrantService.findOne(entity.idGrant);
 			POrder porder = porderService.findOne(entity.idPOrder);
 			// save to porder_grant_sku
@@ -469,9 +492,6 @@ public class POrderListAPI {
 			}
 			Integer ungranted = pcontractProductSKU.getPquantity_total() - granted;
 			
-//			List<POrder_Product_SKU> porderproductskus = porderskuService.getby_porderandsku(entity.idPOrder, pordergrantsku.getSkuid_link());
-//			POrder_Product_SKU porderproductsku = porderproductskus.get(0);
-//			int remain = porderproductsku.getRemainQuantity();
 			
 			if(pordergrantsku.getGrantamount() == 0) {
 				// delete
@@ -514,6 +534,15 @@ public class POrderListAPI {
 				String PO = porder.getPo_buyer() == null ? "" : porder.getPo_vendor();
 				name += "#"+ST+"-PO: "+PO+"-"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
 			}
+			
+			// Common ReCalculate
+			Date startDate = grant.getStart_date_plan();
+			Calendar calDate = Calendar.getInstance();
+			calDate.setTime(startDate);
+			commonService.ReCalculate(grant.getId(), orgrootid_link, calDate.get(Calendar.YEAR));
+			System.out.println(grant.getId());
+			System.out.println(orgrootid_link);
+			System.out.println(calDate.get(Calendar.YEAR));
 			
 			response.porderinfo = name;
 			response.amount = total;
