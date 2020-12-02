@@ -1,7 +1,6 @@
 package vn.gpay.gsmart.core.api.porder;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -287,7 +286,7 @@ public class POrderAPI {
 			Float plan_productivity = (float)porder.getPlan_productivity();		
 			
 			Integer plan_duration = Math.round(totalorder/plan_productivity);	
-			Date finishdate_plan =  commonService.Date_Add_with_holiday(porder.getProductiondate_plan(), plan_duration, orgrootid_link, Calendar.getInstance().get(Calendar.YEAR));
+			Date finishdate_plan =  commonService.Date_Add_with_holiday(porder.getProductiondate_plan(), plan_duration, orgrootid_link);
 			
 			porder.setFinishdate_plan(finishdate_plan);
 			porder.setPlan_duration(plan_duration);

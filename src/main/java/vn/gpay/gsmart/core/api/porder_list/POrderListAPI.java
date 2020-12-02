@@ -23,8 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.deser.std.DateDeserializers.CalendarDeserializer;
-
 import vn.gpay.gsmart.core.pcontract.IPContractService;
 import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
@@ -390,7 +388,7 @@ public class POrderListAPI {
 			Date startDate = grant.getStart_date_plan();
 			Calendar calDate = Calendar.getInstance();
 			calDate.setTime(startDate);
-			commonService.ReCalculate(grant.getId(), orgrootid_link, calDate.get(Calendar.YEAR));
+			commonService.ReCalculate(grant.getId(), orgrootid_link);
 			
 			response.porderinfo = name;
 			response.amount = total;
@@ -451,7 +449,7 @@ public class POrderListAPI {
 			Date startDate = grant.getStart_date_plan();
 			Calendar calDate = Calendar.getInstance();
 			calDate.setTime(startDate);
-			commonService.ReCalculate(grant.getId(), orgrootid_link, calDate.get(Calendar.YEAR));
+			commonService.ReCalculate(grant.getId(), orgrootid_link);
 			
 			response.porderinfo = name;
 			response.amount = total;
@@ -539,7 +537,7 @@ public class POrderListAPI {
 			Date startDate = grant.getStart_date_plan();
 			Calendar calDate = Calendar.getInstance();
 			calDate.setTime(startDate);
-			commonService.ReCalculate(grant.getId(), orgrootid_link, calDate.get(Calendar.YEAR));
+			commonService.ReCalculate(grant.getId(), orgrootid_link);
 			System.out.println(grant.getId());
 			System.out.println(orgrootid_link);
 			System.out.println(calDate.get(Calendar.YEAR));

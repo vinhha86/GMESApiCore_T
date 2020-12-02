@@ -18,6 +18,11 @@ public interface Holiday_repository extends JpaRepository<Holiday, Long>,JpaSpec
 			@Param ("orgrootid_link")final  Long orgrootid_link,
 			@Param ("year")final  Integer year);
 	
+	@Query(value = "select c from Holiday c where c.orgrootid_link =:orgrootid_link and year in :year")
+	public List<Holiday> getby_many_year(
+			@Param ("orgrootid_link")final  Long orgrootid_link,
+			@Param ("year")final  List<Integer> year);
+	
 	@Query(value = "select distinct c.year from Holiday c where c.year >= :year")
 	public List<Integer> getAllYears(@Param ("year")final  Integer year);
 	

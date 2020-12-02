@@ -408,9 +408,8 @@ public class PContract_POAPI {
 						colNum = ColumnTemplate.matdate + 1;
 						Date matdate = row.getCell(ColumnTemplate.matdate).getDateCellValue();
 						
-						int year = Calendar.getInstance().get(Calendar.YEAR);
 						Date production_date = commonService.Date_Add(matdate, 7);
-						int production_day = commonService.getDuration(production_date, ShipDate, orgrootid_link, year);
+						int production_day = commonService.getDuration(production_date, ShipDate, orgrootid_link);
 						
 						List<PContract_PO> listpo = new ArrayList<PContract_PO>();
 						if(PO_No != "TBD") {
@@ -1840,12 +1839,10 @@ public class PContract_POAPI {
 			long orgrootid_link = user.getRootorgid_link();
 			Date date = entity.date_material;
 			int amount = entity.amount_day + 1;
-			int year = Calendar.getInstance().get(Calendar.YEAR);
 
-			Date production_date = commonService.Date_Add_with_holiday(date, amount, orgrootid_link, year);
+			Date production_date = commonService.Date_Add_with_holiday(date, amount, orgrootid_link);
 			response.productiondate = commonService.getBeginOfDate(production_date);
-			response.duration = commonService.getDuration(response.productiondate, entity.shipdate, orgrootid_link,
-					year);
+			response.duration = commonService.getDuration(response.productiondate, entity.shipdate, orgrootid_link);
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

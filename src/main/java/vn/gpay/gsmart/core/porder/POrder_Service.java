@@ -1,7 +1,6 @@
 package vn.gpay.gsmart.core.porder;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -14,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
-
 import org.springframework.stereotype.Service;
 //import org.springframework.transaction.annotation.Transactional;
 //import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -152,7 +150,7 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 			Float plan_productivity = (float)porder.getPlan_productivity();		
 			
 			Integer plan_duration = Math.round(totalorder/plan_productivity);	
-			Date finishdate_plan =  commonService.Date_Add_with_holiday(porder.getProductiondate_plan(), plan_duration, orgrootid_link, Calendar.getInstance().get(Calendar.YEAR));
+			Date finishdate_plan =  commonService.Date_Add_with_holiday(porder.getProductiondate_plan(), plan_duration, orgrootid_link);
 			
 			porder.setFinishdate_plan(finishdate_plan);
 			porder.setPlan_duration(plan_duration);

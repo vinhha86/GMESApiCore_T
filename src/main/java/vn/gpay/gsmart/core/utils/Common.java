@@ -97,7 +97,6 @@ public class Common  {
 	
 	
 	public Long CreateTask(Long orgrootid_link, Long orgid_link, Long userid_link, long tasktypeid_link, List<Task_Object> list_object, Long userinchargeid_link) {
-		int year = Calendar.getInstance().get(Calendar.YEAR);
 		TaskType tasktype = tasktypeService.findOne(tasktypeid_link);
 		
 		Org org = orgService.findOne(orgid_link);
@@ -114,7 +113,7 @@ public class Common  {
 		Task task = new Task();
 		task.setDatecreated(new Date());
 		task.setDescription(description);
-		task.setDuedate(Date_Add_with_holiday(new Date(), tasktype.getDuration()/24, orgrootid_link, year));
+		task.setDuedate(Date_Add_with_holiday(new Date(), tasktype.getDuration()/24, orgrootid_link));
 		task.setDuration(tasktype.getDuration()/24);
 		task.setId(null);
 		task.setName(taskname);
@@ -525,13 +524,13 @@ public class Common  {
 		return false;
 	}
 	
-	public void ReCalculate(Long porder_grant_id_link, Long orgrootid_link,int year) {
+	public void ReCalculate(Long porder_grant_id_link, Long orgrootid_link) {
 		POrderGrant grant = grantService.findOne(porder_grant_id_link);
 		int amount = grant.getGrantamount();
 		int productivity = grant.getProductivity();
 		int duration = getDuration_byProductivity(amount, productivity);
 		Date startdate = getBeginOfDate(grant.getStart_date_plan());
-		Date dateend = Date_Add_with_holiday(startdate, duration - 1, orgrootid_link, year);
+		Date dateend = Date_Add_with_holiday(startdate, duration - 1, orgrootid_link);
 		
 		
 		grant.setDuration(duration);
@@ -539,7 +538,7 @@ public class Common  {
 		grantService.save(grant);
 	}
 
-	public int getDuration(Date startdate, Date enddate, long orgrootid_link, int year) {
+	public int getDuration(Date startdate, Date enddate, long orgrootid_link) {
 		int duration = 0;		
 		
 		Calendar start = Calendar.getInstance();
@@ -547,8 +546,11 @@ public class Common  {
 		
 		start.setTime(startdate);
 		end.setTime(enddate);
+		List<Integer> list_year = new ArrayList<Integer>();
+		list_year.add(start.get(Calendar.YEAR));
+		list_year.add(end.get(Calendar.YEAR));
 		
-		List<Holiday> list_holiday = holidayService.getby_year(orgrootid_link, year);
+		List<Holiday> list_holiday = holidayService.getby_many_year(orgrootid_link, list_year);
 		
 		while(start.before(end)) {
 			if(start.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
@@ -585,11 +587,11 @@ public class Common  {
 		return ret;
 	}
 	
-	public boolean check_dayoff(Calendar _date, long orgrootid_link ,int year) {
+	public boolean check_dayoff(Calendar _date, long orgrootid_link) {
 		if(_date.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
 			return true;
 		else {
-			year = _date.get(Calendar.YEAR);
+			int year = _date.get(Calendar.YEAR);
 			List<Holiday> list_holiday = holidayService.getby_year(orgrootid_link, year);
 			for(Holiday holiday : list_holiday) {
 				Calendar c_holiday = Calendar.getInstance();
@@ -613,19 +615,19 @@ public class Common  {
 		_date.set(Calendar.SECOND, 0);
 		return _date.getTime();
 	}
-	public Date Date_Add_with_holiday(Date date, int amount, long orgrootid_link, int year) {
+	public Date Date_Add_with_holiday(Date date, int amount, long orgrootid_link) {
 		Calendar _date = Calendar.getInstance();
 		_date.setTime(date);
 		if(amount == 1) {
 			_date.add(Calendar.DATE, 1);
-			while(check_dayoff(_date, orgrootid_link, year)) {
+			while(check_dayoff(_date, orgrootid_link)) {
 				_date.add(Calendar.DATE, 1);
 			}
 		}
 		else {
 			while(amount > 0) {
 				_date.add(Calendar.DATE, 1);
-				if(!check_dayoff(_date, orgrootid_link, year)) {
+				if(!check_dayoff(_date, orgrootid_link)) {
 					amount--;
 				}
 			}

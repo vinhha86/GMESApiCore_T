@@ -85,7 +85,7 @@ public class ScheduleAPI {
 		get_schedule_porder_response response = new get_schedule_porder_response();
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		long orgrootid_link = user.getRootorgid_link();
-		int year = Calendar.getInstance().get(Calendar.YEAR);
+		//int year = Calendar.getInstance().get(Calendar.YEAR);
 		long orgid_link = user.getOrgid_link();
 		long orgbuyerid_link = Buyer == "" ? (long)0 : Long.parseLong(Buyer);
 		long orgvendorid_link = Vendor == "" ? (long)0 : Long.parseLong(Vendor);
@@ -107,7 +107,16 @@ public class ScheduleAPI {
 		
 		try { 
 			//Lay danh sach ngày nghỉ
-			List<Holiday> list_holiday = holidayService.getby_year(orgrootid_link, year);
+			List<Integer> list_year = new ArrayList<Integer>();
+			Calendar c_startdate = Calendar.getInstance();
+			c_startdate.setTime(startdate);
+			list_year.add(c_startdate.get(Calendar.YEAR));
+			
+			Calendar c_todate = Calendar.getInstance();
+			c_todate.setTime(toDate);
+			list_year.add(c_todate.get(Calendar.YEAR));
+			
+			List<Holiday> list_holiday = holidayService.getby_many_year(orgrootid_link, list_year);
 			for(Holiday holiday : list_holiday) {
 				Schedule_holiday sch_holiday = new Schedule_holiday();
 				sch_holiday.setComment(holiday.getComment());
@@ -269,7 +278,7 @@ public class ScheduleAPI {
 						sch_porder.setProductivity_po(pordergrant.getProductivity_po());
 						sch_porder.setProductivity_porder(pordergrant.getProductivity_porder());
 						
-						int d = commonService.getDuration(start_free, end_free, orgrootid_link, year);
+						int d = commonService.getDuration(start_free, end_free, orgrootid_link);
 						day_grant += d;
 						
 						response.events.rows.add(sch_porder);
@@ -277,7 +286,7 @@ public class ScheduleAPI {
 
 					//Xac dinh so ngay lam viec trong khoang thoi gian dang xem
 					if(date_end != null  && date_start != null) {
-						int total_day = commonService.getDuration(date_start, date_end, orgrootid_link, year);
+						int total_day = commonService.getDuration(date_start, date_end, orgrootid_link);
 						
 						String cls = (total_day - day_grant) <= 0 ? "" : "free";
 						sch_org_grant.setCls(cls);
@@ -295,7 +304,7 @@ public class ScheduleAPI {
 							if (null != theProcessing){
 								Date start = commonService.getBeginOfDate(theProcessing.getStart_date_plan());
 								Date end = commonService.getEndOfDate(theProcessing.getFinish_date_plan());
-								int duration = commonService.getDuration(start, end, orgrootid_link, year);
+								int duration = commonService.getDuration(start, end, orgrootid_link);
 								
 								Schedule_porder sch_porder_process = new Schedule_porder();
 								sch_porder_process.setCls(pordergrant.getCls());
@@ -342,7 +351,7 @@ public class ScheduleAPI {
 										daystoend = 0;
 								}
 								Date end_estimation = commonService.getEndOfDate(DateUtils.addDays(start, daystoend));
-								int duration_estimation = commonService.getDuration(start, end_estimation, orgrootid_link, year);
+								int duration_estimation = commonService.getDuration(start, end_estimation, orgrootid_link);
 								
 								sch_porder_estimation.setCls(pordergrant.getCls());
 								sch_porder_estimation.setStartDate(start);
@@ -497,9 +506,8 @@ public class ScheduleAPI {
 			Date start = event.getStartDate();
 			Date end = event.getEndDate();
 			long orgrootid_link = user.getRootorgid_link();
-			int year = Calendar.getInstance().get(Calendar.YEAR);
 			
-			int duration = commonService.getDuration(start, end, orgrootid_link, year);
+			int duration = commonService.getDuration(start, end, orgrootid_link);
 			int productivity = commonService.getProductivity(event.getTotalpackage(), duration); 
 			event.setDuration(duration);
 			event.setProductivity(productivity);
@@ -533,12 +541,11 @@ public class ScheduleAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
-			int year = Calendar.getInstance().get(Calendar.YEAR);
 			
 			//update vao grantt
 			long pordergrantid_link = entity.pordergrantid_link;
 			POrderGrant grant = granttService.findOne(pordergrantid_link);
-			int duration = commonService.getDuration(entity.StartDate, entity.EndDate, orgrootid_link, year);
+			int duration = commonService.getDuration(entity.StartDate, entity.EndDate, orgrootid_link);
 			int productivity = commonService.getProductivity(grant.getGrantamount(), response.duration);
 			
 			grant.setStart_date_plan(entity.StartDate);
@@ -566,7 +573,6 @@ public class ScheduleAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
-			int year = Calendar.getInstance().get(Calendar.YEAR);
 			long porderid_link = entity.porderid_link;
 			long pordergrantid_link = entity.pordergrant_id_link;
 			
@@ -576,7 +582,7 @@ public class ScheduleAPI {
 			//Giu lai grantorg cu de update Porder_processing
 //			long granttoorgid_link_old = grant.getGranttoorgid_link();
 			int duration = entity.schedule.getDuration();
-			Date end_date = commonService.Date_Add_with_holiday(entity.startdate, duration - 1, orgrootid_link, year);
+			Date end_date = commonService.Date_Add_with_holiday(entity.startdate, duration - 1, orgrootid_link);
 			
 			grant.setGranttoorgid_link(entity.orggrant_toid_link);
 			grant.setStart_date_plan(commonService.getBeginOfDate(entity.startdate));
@@ -673,12 +679,12 @@ public class ScheduleAPI {
 		long orgrootid_link = user.getRootorgid_link();
 		
 		try {
-			int year = Calendar.getInstance().get(Calendar.YEAR);
 			POrder porder = porderService.findOne(entity.porderid_link);
 
 			Date startDate = commonService.getBeginOfDate(porder.getProductiondate_plan());
 			Date endDate = commonService.getEndOfDate(porder.getFinishdate_plan());
-			int duration = commonService.getDuration(startDate, endDate, orgrootid_link, year);
+			
+			int duration = commonService.getDuration(startDate, endDate, orgrootid_link);
 			int productivity = porder.getPlan_productivity();
 			
 			if(productivity == 0) {
@@ -775,7 +781,6 @@ public class ScheduleAPI {
 		create_pordergrant_response response = new create_pordergrant_response();
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		long orgrootid_link = user.getRootorgid_link();
-		int year = Calendar.getInstance().get(Calendar.YEAR);
 		
 		try {
 
@@ -787,14 +792,15 @@ public class ScheduleAPI {
 			int productivity = req.get_ProductivityPO();
 			Date startDate = commonService.getBeginOfDate(req.getPO_Productiondate());
 			Date endDate = req.getShipdate();
-			int duration = commonService.getDuration(startDate, endDate, orgrootid_link, year);
+			
+			int duration = commonService.getDuration(startDate, endDate, orgrootid_link);
 			
 			if(productivity == 0) {
 				productivity = commonService.getProductivity(req.getTotalorder(), duration);
 			}
 			
 			duration = commonService.getDuration_byProductivity(req.getTotalorder(), productivity);
-			endDate = commonService.Date_Add_with_holiday(startDate, (duration-1), orgrootid_link, year);
+			endDate = commonService.Date_Add_with_holiday(startDate, (duration-1), orgrootid_link);
 			
 			String po_code = req.getPo_buyer().length() > 0?req.getPo_vendor():req.getPo_buyer();
 			POrder porder = new POrder();
@@ -959,10 +965,9 @@ public class ScheduleAPI {
 		update_duration_porder_response response = new update_duration_porder_response();
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		long orgrootid_link = user.getRootorgid_link();
-		int year = Calendar.getInstance().get(Calendar.YEAR);
 		
 		try {
-			int duration = commonService.getDuration(entity.data.getStartDate(), entity.data.getEndDate(), orgrootid_link, year);
+			int duration = commonService.getDuration(entity.data.getStartDate(), entity.data.getEndDate(), orgrootid_link);
 			int productivity = commonService.getProductivity(entity.data.getTotalpackage(), duration);
 			
 			Schedule_porder sch = entity.data;
@@ -987,10 +992,9 @@ public class ScheduleAPI {
 		update_duration_porder_response response = new update_duration_porder_response();
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		long orgrootid_link = user.getRootorgid_link();
-		int year = Calendar.getInstance().get(Calendar.YEAR);
 		
 		try {
-			Date end = commonService.Date_Add_with_holiday(entity.data.getStartDate(), entity.data.getDuration(), orgrootid_link, year);
+			Date end = commonService.Date_Add_with_holiday(entity.data.getStartDate(), entity.data.getDuration(), orgrootid_link);
 			int productivity = commonService.getProductivity(entity.data.getTotalpackage(), entity.data.getDuration());
 			Schedule_porder sch = entity.data;
 			sch.setEndDate(end);
@@ -1014,11 +1018,10 @@ public class ScheduleAPI {
 		update_duration_porder_response response = new update_duration_porder_response();
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		long orgrootid_link = user.getRootorgid_link();
-		int year = Calendar.getInstance().get(Calendar.YEAR);
 		
 		try {
 			int duration = entity.data.getTotalpackage() / entity.data.getProductivity();			
-			Date end = commonService.Date_Add_with_holiday(entity.data.getStartDate(), duration, orgrootid_link, year);
+			Date end = commonService.Date_Add_with_holiday(entity.data.getStartDate(), duration, orgrootid_link);
 			
 			Schedule_porder sch = entity.data;
 			sch.setEndDate(end);
@@ -1042,10 +1045,9 @@ public class ScheduleAPI {
 		getduration_response response = new getduration_response();
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		long orgrootid_link = user.getRootorgid_link();
-		int year = Calendar.getInstance().get(Calendar.YEAR);
 		
 		try {
-			int duration = commonService.getDuration(entity.StartDate, entity.EndDate, orgrootid_link, year);
+			int duration = commonService.getDuration(entity.StartDate, entity.EndDate, orgrootid_link);
 			
 			response.duration = duration;
 			
@@ -1065,7 +1067,6 @@ public class ScheduleAPI {
 		merger_porder_response response = new merger_porder_response();
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		long orgrootid_link = user.getRootorgid_link();
-		int year = Calendar.getInstance().get(Calendar.YEAR);
 		
 		try {
 			POrderGrant grant_src = granttService.findOne(entity.pordergrantid_link_src);
@@ -1080,7 +1081,7 @@ public class ScheduleAPI {
 									
 			int duration = commonService.getDuration_byProductivity(total, productivity);
 
-			Date end = commonService.Date_Add_with_holiday(start, duration - 1, orgrootid_link, year);
+			Date end = commonService.Date_Add_with_holiday(start, duration - 1, orgrootid_link);
 			end = commonService.getEndOfDate(end);
 			
 			//Xoa grant nguon va processing nguon
@@ -1179,7 +1180,6 @@ public class ScheduleAPI {
 		break_porder_response response = new break_porder_response();
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		long orgrootid_link = user.getRootorgid_link();
-		int year = Calendar.getInstance().get(Calendar.YEAR);
 		int producttivity = entity.producttivity;
 		response.mes = "";
 		try {
@@ -1208,7 +1208,7 @@ public class ScheduleAPI {
 				start_old = commonService.getBeginOfDate(start_old);
 				int duration_old = commonService.getDuration_byProductivity(totalorder_old, producttivity);
 				
-				Date end_old = commonService.Date_Add_with_holiday(start_old, duration_old - 1, orgrootid_link, year);
+				Date end_old = commonService.Date_Add_with_holiday(start_old, duration_old - 1, orgrootid_link);
 				end_old = commonService.getEndOfDate(end_old);
 //				Date end_new = grant_old.getFinish_date_plan();
 //				int productivity_old = commonService.getProductivity(totalorder_old, duration_old);
@@ -1236,12 +1236,12 @@ public class ScheduleAPI {
 				response.old_data = old;
 				
 				//Sinh grant moi
-				Date start_new = commonService.Date_Add_with_holiday(end_old, 1, orgrootid_link, year);
+				Date start_new = commonService.Date_Add_with_holiday(end_old, 1, orgrootid_link);
 				start_new= commonService.getBeginOfDate(start_new);
 				
 				int total_new = total - totalorder_old;
 				int duration_new = commonService.getDuration_byProductivity(total_new, producttivity);
-				Date end_new = commonService.Date_Add_with_holiday(start_new, duration_new - 1, orgrootid_link, year);
+				Date end_new = commonService.Date_Add_with_holiday(start_new, duration_new - 1, orgrootid_link);
 				end_new = commonService.getEndOfDate(end_new);
 				
 				POrderGrant grant = new POrderGrant();

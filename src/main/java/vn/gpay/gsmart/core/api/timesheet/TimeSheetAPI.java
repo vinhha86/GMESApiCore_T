@@ -22,7 +22,9 @@ import vn.gpay.gsmart.core.devices.Devices;
 import vn.gpay.gsmart.core.devices.IDevicesService;
 import vn.gpay.gsmart.core.devices.device_timesheet;
 import vn.gpay.gsmart.core.personel.IPersonnel_Service;
+import vn.gpay.gsmart.core.personel.Personel;
 import vn.gpay.gsmart.core.personnel_notmap.IPersonnel_notmap_Service;
+import vn.gpay.gsmart.core.personnel_notmap.Personnel_notmap;
 import vn.gpay.gsmart.core.timesheet.ITimeSheet_Service;
 import vn.gpay.gsmart.core.timesheet.TimeSheet;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
@@ -46,20 +48,20 @@ public class TimeSheetAPI {
 				timeSheet.setZoneid_link(device.getZoneid_link());
 				timesheetService.save(timeSheet);
 				
-//				if(timeSheet.getTimerecorded().after(device.getLasttime_download()))
-//					device.setLasttime_download(timeSheet.getTimerecorded());
-//				
-//				//Kiem tra user co trong db chua ko thi them vao
-//				List<Personel> person = personService.getPerson_by_register_code((long)1, timeSheet.getRegister_code());
-//				if(person.size() == 0) {
-//					List<Personnel_notmap> persons_notmap = person_notmap_Service.getby_registercode(timeSheet.getRegister_code());
-//					if(persons_notmap.size() == 0) {
-//						Personnel_notmap person_notmap = new Personnel_notmap();
-//						person_notmap.setId(null);
-//						person_notmap.setRegister_code(timeSheet.getRegister_code());
-//						person_notmap_Service.save(person_notmap);
-//					}
-//				}
+				if(timeSheet.getTimerecorded().after(device.getLasttime_download()))
+					device.setLasttime_download(timeSheet.getTimerecorded());
+				
+				//Kiem tra user co trong db chua ko thi them vao
+				List<Personel> person = personService.getPerson_by_register_code((long)1, timeSheet.getRegister_code());
+				if(person.size() == 0) {
+					List<Personnel_notmap> persons_notmap = person_notmap_Service.getby_registercode(timeSheet.getRegister_code());
+					if(persons_notmap.size() == 0) {
+						Personnel_notmap person_notmap = new Personnel_notmap();
+						person_notmap.setId(null);
+						person_notmap.setRegister_code(timeSheet.getRegister_code());
+						person_notmap_Service.save(person_notmap);
+					}
+				}
 			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -123,6 +125,29 @@ public class TimeSheetAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<getForRegisterCodeCountChart_response>(response, HttpStatus.BAD_REQUEST);
+		}
+
+	}
+	
+	@RequestMapping(value = "/create_timesheet_sum_col", method = RequestMethod.POST)
+	public ResponseEntity<create_timesheet_sum_col_response> CreateSumCol(HttpServletRequest request, @RequestBody create_timesheet_sum_col_request entity) {
+		create_timesheet_sum_col_response response = new create_timesheet_sum_col_response();
+		try {
+//			Calendar cal = new GregorianCalendar();
+			Calendar cal = new GregorianCalendar(2020, 10, 27);
+			Date today = cal.getTime();
+			cal.add(Calendar.DAY_OF_MONTH, -10);
+			Date tenDaysAgo = cal.getTime();
+//			Date today = new Date();
+			
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<create_timesheet_sum_col_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<create_timesheet_sum_col_response>(response, HttpStatus.BAD_REQUEST);
 		}
 
 	}
