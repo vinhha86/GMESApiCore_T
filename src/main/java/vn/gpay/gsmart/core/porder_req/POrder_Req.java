@@ -27,6 +27,7 @@ import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.sizeset.SizeSet;
+import vn.gpay.gsmart.core.utils.POrderStatus;
 
 @Table(name="porder_req")
 @Entity
@@ -68,7 +69,14 @@ public class POrder_Req implements Serializable {
 	public List<POrder> getPorderlist() {
 		return porderlist;
 	}
-
+	public List<POrder> getPorderlist_running() {
+		List<POrder> porder_running = new ArrayList<POrder>();
+		for (POrder thePOrder: porderlist){
+			if (thePOrder.getStatus() < POrderStatus.PORDER_SHORTVALUE_RUNNING)
+				porder_running.add(thePOrder);
+		}
+		return porder_running;
+	}
 	public void setPorderlist(List<POrder> porderlist) {
 		this.porderlist = porderlist;
 	}
