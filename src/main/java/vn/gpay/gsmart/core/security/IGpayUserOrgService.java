@@ -10,4 +10,6 @@ public interface IGpayUserOrgService extends Operations<GpayUserOrg>{
 
 	List<GpayUserOrg> getby_user_org(Long userid_link, Long orgid_link);
 
+	List<GpayUserOrg> getall_byuser_andtype(Long userid_link, Integer orgtypeid_link);
+
 }

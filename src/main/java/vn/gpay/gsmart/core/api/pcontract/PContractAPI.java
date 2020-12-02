@@ -51,6 +51,7 @@ import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.security.GpayUserOrg;
 import vn.gpay.gsmart.core.security.IGpayUserOrgService;
+import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 
@@ -282,22 +283,29 @@ public class PContractAPI {
 		PContract_getbypaging_response response = new PContract_getbypaging_response();
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
-		//fix dieu kien tim kiem cho vendor cua DHA
-		if (user.getUsername().toLowerCase().trim().contains("hansoll")) 
-			entity.orgvendorid_link = 197;
-		else
-			if (user.getUsername().toLowerCase().trim().contains("paroman")) 
-				entity.orgvendorid_link = 200;
-		else
-			if (user.getUsername().toLowerCase().trim().contains("ekline")) 
-				entity.orgvendorid_link = 189;
+//		//fix dieu kien tim kiem cho vendor cua DHA
+//		if (user.getUsername().toLowerCase().trim().contains("hansoll")) 
+//			entity.orgvendorid_link = 197;
+//		else
+//			if (user.getUsername().toLowerCase().trim().contains("paroman")) 
+//				entity.orgvendorid_link = 200;
+//		else
+//			if (user.getUsername().toLowerCase().trim().contains("ekline")) 
+//				entity.orgvendorid_link = 189;
+		
+		//Lay danh sach Vendor duoc phep quan ly
+		List<GpayUserOrg> lsVendor = userOrgService.getall_byuser_andtype(user.getId(), OrgType.ORG_TYPE_VENDOR);
+		if (lsVendor.size() > 0){
+			entity.orgvendorid_link = lsVendor.get(0).getOrgid_link();
+		}
 		
 		try {
 			
 			List<Long> orgs = new ArrayList<Long>();
 			Long orgid_link = user.getOrgid_link();
 			if(orgid_link != 0 && orgid_link != 1 && orgid_link != null) {
-				for(GpayUserOrg userorg:userOrgService.getall_byuser(user.getId())){
+				//Lay danh sach cac phan xuong ma nguoi dung duoc phep quan ly
+				for(GpayUserOrg userorg:userOrgService.getall_byuser_andtype(user.getId(), OrgType.ORG_TYPE_FACTORY)){
 					orgs.add(userorg.getOrgid_link());
 				}
 				//Them chinh don vi cua user

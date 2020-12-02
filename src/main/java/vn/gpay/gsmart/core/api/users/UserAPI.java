@@ -585,7 +585,7 @@ public class UserAPI {
 	public ResponseEntity<User_OrgView_Response> user_orgview_getall(HttpServletRequest request, @RequestBody User_getinfo_request entity) {
 		User_OrgView_Response response = new User_OrgView_Response();
 		try {
-			response.data=userOrgService.getall_byuser(entity.id);
+			response.data=userOrgService.getall_byuser_andtype(entity.id, entity.orgtypeid_link);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
