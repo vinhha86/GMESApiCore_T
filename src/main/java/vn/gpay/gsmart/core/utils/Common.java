@@ -658,7 +658,23 @@ public class Common  {
 		Calendar start = Calendar.getInstance();
 		Calendar end = Calendar.getInstance();
 		start.set(year, 1, 1, 0,0,0);
-		end.set(year+1, 1, 1,0,0,0);
+		end.set(year+1, 12, 31,0,0,0);
+		List<Date> list = new ArrayList<Date>();
+		while(start.before(end)) {
+			if(start.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
+				list.add(start.getTime());
+			start.add(Calendar.DATE, 1);
+		}
+		
+		return list;
+	}
+	
+	public List<Date> getList_SunDay_between_time(Date startDate, Date endDate){
+		Calendar start = Calendar.getInstance();
+		start.setTime(startDate);
+		Calendar end = Calendar.getInstance();
+		end.setTime(endDate);
+		
 		List<Date> list = new ArrayList<Date>();
 		while(start.before(end)) {
 			if(start.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)

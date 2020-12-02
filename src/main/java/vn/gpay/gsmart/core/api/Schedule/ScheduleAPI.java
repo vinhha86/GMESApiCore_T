@@ -112,7 +112,8 @@ public class ScheduleAPI {
 			}
 			
 			//Lay ngay chu nhat
-			List<Date> list_sunday = commonService.getList_SunDay_byYear(year);
+//			List<Date> list_sunday = commonService.getList_SunDay_byYear(year);
+			List<Date> list_sunday = commonService.getList_SunDay_between_time(startdate, toDate);
 			for(Date date : list_sunday) {
 				Schedule_holiday sch_sunday = new Schedule_holiday();
 				sch_sunday.setComment("");
