@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.pcontract.IPContractService;
 import vn.gpay.gsmart.core.pcontract.PContract;
+import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
+import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
@@ -42,6 +44,7 @@ public class POrderListAPI {
 	@Autowired private IPOrderGrant_Service pordergrantService;
 	@Autowired private IPOrderGrant_SKUService pordergrantskuService;
 	@Autowired private IPOrder_Product_SKU_Service porderskuService;
+	@Autowired private IPContractProductSKUService pcontractProductSkuService;
 	
 	@RequestMapping(value = "/getall",method = RequestMethod.POST)
 	public ResponseEntity<POrderList_getlist_response> POrderGetAll(HttpServletRequest request ) {
@@ -298,20 +301,25 @@ public class POrderListAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			POrderGrant grant = pordergrantService.findOne(entity.idGrant);
 			POrder porder = porderService.findOne(entity.idPOrder);
-//			List<POrderGrant> listGrant = pordergrantService.getByOrderId(entity.idPOrder);
+			Long pcontract_poid_link = entity.idPcontractPo;
 			
 			// save to porder_grant_sku
-			for(Long productsku_id : entity.idSkus) {
-				POrder_Product_SKU pps = porderskuService.findOne(productsku_id);
+			for(Long pcontractProductSkuId : entity.idSkus) {
+				PContractProductSKU pps = pcontractProductSkuService.findOne(pcontractProductSkuId);
 				POrderGrant_SKU pgs = null;
 				
-//				for(POrderGrant pg : listGrant) {
-//					pgs = pordergrantskuService.getPOrderGrant_SKUbySKUid_linkAndGrantId( pps.getSkuid_link(),  pg.getId());
-//					if(pgs == null) continue;
-//					if(pgs != null) break;
-//				}
+//				pgs = pordergrantskuService.getPOrderGrant_SKUbySKUid_linkAndGrantId( pps.getSkuid_link(),  entity.idGrant);
+				pgs = pordergrantskuService.getPOrderGrant_SKUbySKUAndGrantAndPcontractPo(
+						pps.getSkuid_link(), entity.idGrant, pcontract_poid_link
+						);
 				
-				pgs = pordergrantskuService.getPOrderGrant_SKUbySKUid_linkAndGrantId( pps.getSkuid_link(),  entity.idGrant);
+				List<POrderGrant_SKU> listPorderGrantSku = pordergrantskuService.getByPContractPOAndSKU(
+						pcontract_poid_link, pps.getSkuid_link()
+						);
+				Integer granted = 0;
+				for(POrderGrant_SKU porderGrantSku : listPorderGrantSku) {
+					granted += porderGrantSku.getGrantamount();
+				}
 				
 				if(pgs == null) {
 					pgs = new POrderGrant_SKU();
@@ -319,16 +327,17 @@ public class POrderListAPI {
 					pgs.setOrgrootid_link(user.getRootorgid_link());
 					pgs.setPordergrantid_link(entity.idGrant);
 					pgs.setSkuid_link(pps.getSkuid_link());
-					pgs.setGrantamount(pps.getRemainQuantity());
+//					pgs.setGrantamount(pps.getRemainQuantity());
+					pgs.setGrantamount(pps.getPquantity_total() - granted);
+					pgs.setPcontract_poid_link(pcontract_poid_link);
 					pordergrantskuService.save(pgs);
 				}else {
-					System.out.println(pgs.getPordergrantid_link());
-					System.out.println(entity.idGrant);
 					if(pgs.getPordergrantid_link().equals(entity.idGrant)) {
 						pgs.setOrgrootid_link(user.getRootorgid_link());
 						pgs.setPordergrantid_link(entity.idGrant);
 						pgs.setSkuid_link(pps.getSkuid_link());
-						pgs.setGrantamount(pgs.getGrantamount() + pps.getRemainQuantity());
+//						pgs.setGrantamount(pgs.getGrantamount() + pps.getRemainQuantity());
+						pgs.setGrantamount(pgs.getGrantamount() + (pps.getPquantity_total() - granted));
 						pordergrantskuService.save(pgs);
 					}else {
 						pgs = new POrderGrant_SKU();
@@ -336,7 +345,7 @@ public class POrderListAPI {
 						pgs.setOrgrootid_link(user.getRootorgid_link());
 						pgs.setPordergrantid_link(entity.idGrant);
 						pgs.setSkuid_link(pps.getSkuid_link());
-						pgs.setGrantamount(pps.getRemainQuantity());
+						pgs.setGrantamount(pps.getPquantity_total() - granted);
 						pordergrantskuService.save(pgs);
 					}
 				}
@@ -445,9 +454,24 @@ public class POrderListAPI {
 			// save to porder_grant_sku
 			POrderGrant_SKU pordergrantsku = entity.data;
 			POrderGrant_SKU original = pordergrantskuService.findOne(pordergrantsku.getId());
-			List<POrder_Product_SKU> porderproductskus = porderskuService.getby_porderandsku(entity.idPOrder, pordergrantsku.getSkuid_link());
-			POrder_Product_SKU porderproductsku = porderproductskus.get(0);
-			int remain = porderproductsku.getRemainQuantity();
+			
+			Long skuid_link = pordergrantsku.getSkuid_link();
+			Long pcontract_poid_link = pordergrantsku.getPcontract_poid_link();
+			List<PContractProductSKU> pcontractProductSku = pcontractProductSkuService.getBySkuAndPcontractPo(skuid_link, pcontract_poid_link);
+			PContractProductSKU pcontractProductSKU = pcontractProductSku.get(0);
+			
+			List<POrderGrant_SKU> listPorderGrantSku = pordergrantskuService.getByPContractPOAndSKU(
+					pcontract_poid_link, pcontractProductSKU.getSkuid_link()
+					);
+			Integer granted = 0;
+			for(POrderGrant_SKU porderGrantSku : listPorderGrantSku) {
+				granted += porderGrantSku.getGrantamount();
+			}
+			Integer ungranted = pcontractProductSKU.getPquantity_total() - granted;
+			
+//			List<POrder_Product_SKU> porderproductskus = porderskuService.getby_porderandsku(entity.idPOrder, pordergrantsku.getSkuid_link());
+//			POrder_Product_SKU porderproductsku = porderproductskus.get(0);
+//			int remain = porderproductsku.getRemainQuantity();
 			
 			if(pordergrantsku.getGrantamount() == 0) {
 				// delete
@@ -455,7 +479,7 @@ public class POrderListAPI {
 				pordergrantskuService.deleteById(pordergrantsku.getId());
 				response.setMessage("Xóa thành công");
 			}else {
-				if(remain < pordergrantsku.getGrantamount() - original.getGrantamount()) {
+				if(ungranted < pordergrantsku.getGrantamount() - original.getGrantamount()) {
 					response.setMessage("Vượt quá số lượng chưa vào chuyền");
 				}else {
 					pordergrantskuService.save(pordergrantsku);

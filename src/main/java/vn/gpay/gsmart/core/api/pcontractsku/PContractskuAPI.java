@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.api.pcontractsku;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +22,10 @@ import vn.gpay.gsmart.core.pcontractattributevalue.IPContractProductAtrributeVal
 import vn.gpay.gsmart.core.pcontractattributevalue.PContractAttributeValue;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
+import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKUBinding;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 import vn.gpay.gsmart.core.sku.SKU_Attribute_Value;
@@ -39,6 +43,7 @@ public class PContractskuAPI {
 	@Autowired IPOrder_Service porder_Service;
 	@Autowired Common commonService;
 	@Autowired IPContract_POService poService;
+	@Autowired IPOrderGrant_SKUService porderGrantSkuService;
 	
 	@RequestMapping(value = "/getbypcontract_product",method = RequestMethod.POST)
 	public ResponseEntity<PContractSKU_getbyproduct_response> SKU_GetbyProduct
@@ -285,5 +290,62 @@ public class PContractskuAPI {
 		}
 		
 		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/getSkuByPcontractPoForPorderDetail",method = RequestMethod.POST)
+	public ResponseEntity<PContractSKU_binding_response> getSkuByPcontractPoForPorderDetail
+	(HttpServletRequest request, @RequestBody PContractSKU_getbypo_request entity ) {
+		PContractSKU_binding_response response = new PContractSKU_binding_response();
+		try {
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long pcontract_poid_link = entity.pcontract_poid_link;
+			
+			List<PContractProductSKU> listPContractProductSKU = pskuservice.getlistsku_bypo(pcontract_poid_link);
+			List<PContractProductSKUBinding> data = new ArrayList<PContractProductSKUBinding>();
+			
+			for(PContractProductSKU pcontractProductSKU : listPContractProductSKU) {
+				PContractProductSKUBinding temp = new PContractProductSKUBinding();
+
+				temp.setId(pcontractProductSKU.getId());
+				temp.setOrgrootid_link(pcontractProductSKU.getOrgrootid_link());
+				temp.setPcontractid_link(pcontractProductSKU.getPcontractid_link());
+				temp.setPcontract_poid_link(pcontractProductSKU.getPcontract_poid_link());
+				temp.setProductid_link(pcontractProductSKU.getProductid_link());
+				temp.setSkuid_link(pcontractProductSKU.getSkuid_link());
+				temp.setPquantity_sample(pcontractProductSKU.getPquantity_sample());
+				temp.setPquantity_porder(pcontractProductSKU.getPquantity_porder());
+				temp.setPquantity_total(pcontractProductSKU.getPquantity_total());
+				temp.setSkuName(pcontractProductSKU.getSkuName());
+				temp.setSkuCode(pcontractProductSKU.getSkuCode());
+				temp.setSortValue(pcontractProductSKU.getSort_value());
+				temp.setMauSanPham(pcontractProductSKU.getMauSanPham());
+				temp.setCoSanPham(pcontractProductSKU.getCoSanPham());
+				temp.setSizeId(pcontractProductSKU.getSizeid_link());
+				temp.setColorId(pcontractProductSKU.getColor_id());
+				
+				// tinh pquantity_granted, pquantity_ungranted
+				temp.setPquantity_granted(0);
+				temp.setPquantity_ungranted(0);
+				List<POrderGrant_SKU> listPorderGrantSku = porderGrantSkuService.getByPContractPOAndSKU(pcontract_poid_link, temp.getSkuid_link());
+				Integer granted = 0;
+				for(POrderGrant_SKU porderGrantSku : listPorderGrantSku) {
+					granted += porderGrantSku.getGrantamount();
+				}
+				temp.setPquantity_granted(granted);
+				temp.setPquantity_ungranted(temp.getPquantity_total() - granted);
+				data.add(temp);
+			}
+			
+			
+			response.data = data;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		}
+		catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		
+		return new ResponseEntity<PContractSKU_binding_response>(response, HttpStatus.OK);
 	}
 }

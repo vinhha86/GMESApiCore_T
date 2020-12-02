@@ -80,6 +80,7 @@ import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.ColumnPO;
 import vn.gpay.gsmart.core.utils.ColumnTemplate;
 import vn.gpay.gsmart.core.utils.Common;
+import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.POStatus;
 import vn.gpay.gsmart.core.utils.POrderReqStatus;
 import vn.gpay.gsmart.core.utils.POrderStatus;
@@ -1918,7 +1919,7 @@ public class PContract_POAPI {
 			List<String> orgs = new ArrayList<String>();
 			List<Long> list_org = new ArrayList<Long>();
 			if(orgid_link != 0 && orgid_link != 1) {
-				for(GpayUserOrg userorg:userOrgService.getall_byuser(user.getId())){
+				for(GpayUserOrg userorg:userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY)){
 					orgs.add(userorg.getOrgcode());
 					list_org.add(userorg.getOrgid_link());
 				}
@@ -2345,7 +2346,7 @@ public class PContract_POAPI {
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		try {
 			List<Org> listorg = new ArrayList<Org>();
-			for(GpayUserOrg userorg:userOrgService.getall_byuser(user.getId())){
+			for(GpayUserOrg userorg:userOrgService.getall_byuser_andtype(user.getId(), OrgType.ORG_TYPE_FACTORY)){
 				listorg.add(orgService.findOne(userorg.getOrgid_link()));
 			}
 			
@@ -2389,6 +2390,7 @@ public class PContract_POAPI {
 					if(flag) continue;
 				}
 				
+				//Chi lay cac PO Line
 				if (pcontractpo.getParentpoid_link() != null) {
 					response.data.add(pcontractpo);
 				}
@@ -2419,5 +2421,31 @@ public class PContract_POAPI {
 			return new ResponseEntity<PContract_PO_getForMarketTypeChart_response>(response, HttpStatus.BAD_REQUEST);
 		}
 
+	}
+	
+	@RequestMapping(value = "/getForPOrderListPContractPO", method = RequestMethod.POST)
+	public ResponseEntity<PContract_getbycontractproduct_response> getForPOrderListPContractPO(@RequestBody PContract_PO_getByPorder_request entity,
+			HttpServletRequest request) {
+		PContract_getbycontractproduct_response response = new PContract_getbycontractproduct_response();
+		try {
+//			Long porderid_link = entity.porderid_link;
+			Long pcontract_poid_link = entity.pcontract_poid_link;
+//			POrder porder = porderService.findOne(porderid_link);
+			PContract_PO pcontractPo = pcontract_POService.findOne(pcontract_poid_link);
+			if(pcontractPo.getParentpoid_link() != null) {
+				pcontract_poid_link = pcontractPo.getParentpoid_link();
+			}
+			
+			List<PContract_PO> listPContractPO = pcontract_POService.get_by_parentid(pcontract_poid_link);
+			response.data = listPContractPO;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.OK);
+		}
 	}
 }
