@@ -1345,7 +1345,7 @@ public class PContract_POAPI {
 												
 												Long skuid_link = skuattService.getsku_byproduct_and_valuemau_valueco(productPairing.getProductid_link(), colorid_link, sizeid_link);
 												
-												if(skuid_link.equals(0) || skuid_link == 0) {
+												if(skuid_link == 0 || skuid_link == null) {
 
 													SKU sku = new SKU();
 													sku.setCode(genCodeSKU(product_children));
@@ -1602,9 +1602,10 @@ public class PContract_POAPI {
 			List<POrder_Req> lst_porders = entity.po_orders;
 //			String po_code = pcontract_po.getPo_vendor().length() > 0?pcontract_po.getPo_vendor():pcontract_po.getPo_buyer();
 			for (POrder_Req porder : lst_porders) {
+				POrder_Req porder_req = new POrder_Req();
 				if (null == porder.getId() || 0 == porder.getId()) {
-					// Them moi POrder
-					POrder_Req porder_req = new POrder_Req();
+					// Them moi POrder_req
+					
 
 					porder_req.setPcontractid_link(pcontractid_link);
 					porder_req.setPcontract_poid_link(pcontract_poid_link);
@@ -1659,12 +1660,18 @@ public class PContract_POAPI {
 					commonService.CreateTask(orgrootid_link, orgid_link, usercreatedid_link, tasktypeid_link,
 							list_object, null);
 				} else {
-					POrder_Req porder_req = porder_req_Service.findOne(porder.getId());
+					porder_req = porder_req_Service.findOne(porder.getId());
 					porder_req.setTotalorder(porder.getTotalorder());
 					porder_req.setIs_calculate(porder.getIs_calculate());
 					// Save to DB
 					porder_req_Service.savePOrder_Req(porder_req);
 				}
+				
+				//Tao lenh cho Phan xuong neu chao gia được chốt 
+				if(pcontract_po.getStatus() == POStatus.PO_STATUS_CONFIRMED) {
+					porderService.createPOrder(porder_req, user);
+				}
+				
 			}
 
 			// Response to Client
@@ -2071,7 +2078,8 @@ public class PContract_POAPI {
 				List<POrder> list_porder = porderService.getByPOrder_Req(po.getId(), req.getId());
 				if(list_porder.size() > 0) {
 					POrder porder = list_porder.get(0);
-					porder.setStatus(POrderStatus.PORDER_STATUS_GRANTED);
+					if(porder.getStatus() == POrderStatus.PORDER_STATUS_UNCONFIRM)
+						porder.setStatus(POrderStatus.PORDER_STATUS_GRANTED);
 				}
 				else {
 					porderService.createPOrder(req, user);
