@@ -72,7 +72,7 @@ public class POrder_Req implements Serializable {
 	public List<POrder> getPorderlist_running() {
 		List<POrder> porder_running = new ArrayList<POrder>();
 		for (POrder thePOrder: porderlist){
-			if (thePOrder.getStatus() < POrderStatus.PORDER_SHORTVALUE_RUNNING)
+			if (thePOrder.getStatus() >= POrderStatus.PORDER_SHORTVALUE_RUNNING)
 				porder_running.add(thePOrder);
 		}
 		return porder_running;

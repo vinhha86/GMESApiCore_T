@@ -782,12 +782,13 @@ public class POrder_ReqAPI {
 					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_POREQ_DELETE_PORDEREXISTED));
 					return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);					
 				} else {
-					porder_req_Service.delete(thePOrder_Req);
-					
-					//Xoa các lenh sx tuong ung
+					//Xoa cac lenh sx tuong ung
 					for (POrder thePOrder: thePOrder_Req.getPorderlist()){
 						porderService.delete(thePOrder);
 					}
+					
+					//Xoa Porder_req
+					porder_req_Service.delete(thePOrder_Req);
 					
 					//Update lai SL cho các POrder_Req con lai
 					long pcontractpo_id_link = thePOrder_Req.getPcontract_poid_link();
