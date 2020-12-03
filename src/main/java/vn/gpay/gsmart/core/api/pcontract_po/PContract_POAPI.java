@@ -1668,7 +1668,9 @@ public class PContract_POAPI {
 				}
 				
 				//Tao lenh cho Phan xuong neu chao gia được chốt 
-				porderService.createPOrder(porder_req, user);
+				if(pcontract_po.getStatus() == POStatus.PO_STATUS_CONFIRMED) {
+					porderService.createPOrder(porder_req, user);
+				}
 				
 			}
 
@@ -1795,7 +1797,9 @@ public class PContract_POAPI {
 				}
 				
 				//Tao lenh cho Phan xuong neu chao gia được chốt 
-				porderService.createPOrder(porder_req, user);
+				if(pcontract_po.getStatus() == POStatus.PO_STATUS_CONFIRMED) {
+					porderService.createPOrder(porder_req, user);
+				}
 			}
 //			pcontract_po.setPo_quantity(total);
 //			pcontract_po = pcontract_POService.save(pcontract_po);
