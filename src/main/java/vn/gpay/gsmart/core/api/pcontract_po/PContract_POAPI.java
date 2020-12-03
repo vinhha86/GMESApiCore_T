@@ -1770,10 +1770,9 @@ public class PContract_POAPI {
 			if (null != lst_porders)
 			for (POrder_Req porder : lst_porders) {
 //				total += porder.getTotalorder();
+				POrder_Req porder_req = new POrder_Req();
 				if (null == porder.getId() || 0 == porder.getId()) {
 					// Them moi POrder
-					POrder_Req porder_req = new POrder_Req();
-
 					porder_req.setPcontractid_link(pcontract_po.getPcontractid_link());
 					porder_req.setPcontract_poid_link(pcontract_po.getId());
 
@@ -1791,10 +1790,15 @@ public class PContract_POAPI {
 					// Save to DB
 					porder_req_Service.savePOrder_Req(porder_req);
 				} else {
-					POrder_Req porder_req = porder_req_Service.findOne(porder.getId());
+					porder_req = porder_req_Service.findOne(porder.getId());
 					porder_req.setTotalorder(porder.getTotalorder());
 					// Save to DB
 					porder_req_Service.savePOrder_Req(porder_req);
+				}
+				
+				//Tao lenh cho Phan xuong neu chao gia được chốt 
+				if(pcontract_po.getStatus() == POStatus.PO_STATUS_CONFIRMED) {
+					porderService.createPOrder(porder_req, user);
 				}
 			}
 //			pcontract_po.setPo_quantity(total);
