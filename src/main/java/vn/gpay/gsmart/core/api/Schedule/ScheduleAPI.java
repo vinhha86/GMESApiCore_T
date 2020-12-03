@@ -1129,7 +1129,8 @@ public class ScheduleAPI {
 				}
 			}
 			
-			granttService.deleteById(entity.pordergrantid_link_src);
+//			granttService.deleteById(entity.pordergrantid_link_src);
+			granttService.deleteAll(grant_src);
 			
 			response.data = sch;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
