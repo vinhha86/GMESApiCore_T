@@ -31,4 +31,9 @@ public class POrderGrantTimesheetService extends AbstractService<POrderGrantTime
 		return repo.getByPorderGrantAndPorderBalance(pordergrantid_link, porderbalanceid_link);
 	}
 
+	@Override
+	public List<POrderGrantTimesheet> getByPorderGrant(Long pordergrantid_link) {
+		// TODO Auto-generated method stub
+		return repo.getByPorderGrant(pordergrantid_link);
+	}
 }

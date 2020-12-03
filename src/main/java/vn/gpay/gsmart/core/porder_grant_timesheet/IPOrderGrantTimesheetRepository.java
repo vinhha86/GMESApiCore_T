@@ -31,4 +31,11 @@ public interface IPOrderGrantTimesheetRepository extends JpaRepository<POrderGra
 			@Param ("pordergrantid_link")final Long pordergrantid_link,
 			@Param ("porderbalanceid_link")final Long porderbalanceid_link
 			);
+	
+	@Query("SELECT c FROM POrderGrantTimesheet c " 
+			+ "where c.pordergrantid_link = :pordergrantid_link"
+			)
+	public List<POrderGrantTimesheet> getByPorderGrant(
+			@Param ("pordergrantid_link")final Long pordergrantid_link
+			);
 }

@@ -14,4 +14,5 @@ public interface IPOrderGrantTimesheetService  extends Operations<POrderGrantTim
 			Long pordergrantid_link,
 			Long porderbalanceid_link
 			);
+	List<POrderGrantTimesheet> getByPorderGrant(Long pordergrantid_link);
 }

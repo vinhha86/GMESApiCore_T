@@ -6,11 +6,21 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
+
 import vn.gpay.gsmart.core.base.AbstractService;
+import vn.gpay.gsmart.core.porder_grant_balance.IPOrderGrantBalanceService;
+import vn.gpay.gsmart.core.porder_grant_balance.POrderGrantBalance;
+import vn.gpay.gsmart.core.porder_grant_timesheet.IPOrderGrantTimesheetService;
+import vn.gpay.gsmart.core.porder_grant_timesheet.POrderGrantTimesheet;
 
 @Service
 public class POrderGrant_Service extends AbstractService<POrderGrant> implements IPOrderGrant_Service {
 	@Autowired IPOrderGrant_Repository repo;
+	@Autowired IPOrderGrantBalanceService pordergrantbalanceService;
+	@Autowired IPOrderGrantTimesheetService pordergranttimesheetService;
+	@Autowired IPOrderGrant_SKUService pordergrantskuService;
 	@Override
 	protected JpaRepository<POrderGrant, Long> getRepository() {
 		// TODO Auto-generated method stub
@@ -35,6 +45,31 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 	public void deleteByOrderId(Long porderid_link){
 		for(POrderGrant pordergrant: repo.getByOrderId(porderid_link)){
 			repo.delete(pordergrant);
+		}
+	}
+	
+	@Override
+	@Transactional(rollbackFor = RuntimeException.class)
+	public void deleteAll(POrderGrant pordergrant){
+		try {
+		//Xoa porder_grant_balance
+		for(POrderGrantBalance pordergrant_balance: pordergrantbalanceService.getByPorderGrant(pordergrant.getId())){
+			pordergrantbalanceService.delete(pordergrant_balance);
+		}
+		//Xoa porder_grant_timesheet
+		for(POrderGrantTimesheet pordergrant_timesheet: pordergranttimesheetService.getByPorderGrant(pordergrant.getId())){
+			pordergranttimesheetService.delete(pordergrant_timesheet);
+		}
+		//Xoa porder_grant_po
+		//Xoa porder_grant_sku
+		for(POrderGrant_SKU pordergrant_sku: pordergrant.getPorder_grant_sku()){
+			pordergrantskuService.delete(pordergrant_sku);
+		}
+
+		repo.delete(pordergrant);
+		} catch(RuntimeException e){
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			e.printStackTrace();
 		}
 	}
 	

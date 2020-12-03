@@ -24,6 +24,12 @@ public class POrderGrantBalanceService extends AbstractService<POrderGrantBalanc
 		// TODO Auto-generated method stub
 		return repo.getByPorderGrantAndPorderBalance(pordergrantid_link, porderbalanceid_link);
 	}
+	
+	@Override
+	public List<POrderGrantBalance> getByPorderGrant(Long pordergrantid_link) {
+		// TODO Auto-generated method stub
+		return repo.getByPorderGrant(pordergrantid_link);
+	}
 
 	@Override
 	public List<POrderGrantBalance> getByPorderGrantAndPersonnel(Long pordergrantid_link, Long personnelid_link) {

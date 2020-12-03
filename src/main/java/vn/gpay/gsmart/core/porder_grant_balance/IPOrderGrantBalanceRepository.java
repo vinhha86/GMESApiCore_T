@@ -14,6 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public interface IPOrderGrantBalanceRepository extends JpaRepository<POrderGrantBalance, Long>, JpaSpecificationExecutor<POrderGrantBalance>{
 	@Query("SELECT c FROM POrderGrantBalance c " 
+			+ "where c.pordergrantid_link = :pordergrantid_link")
+	public List<POrderGrantBalance> getByPorderGrant(
+			@Param ("pordergrantid_link")final Long pordergrantid_link
+			);
+	
+	@Query("SELECT c FROM POrderGrantBalance c " 
 			+ "where c.pordergrantid_link = :pordergrantid_link "
 			+ "and c.porderbalanceid_link = :porderbalanceid_link ")
 	public List<POrderGrantBalance> getByPorderGrantAndPorderBalance(

@@ -784,6 +784,17 @@ public class POrder_ReqAPI {
 				} else {
 					//Xoa cac lenh sx tuong ung
 					for (POrder thePOrder: thePOrder_Req.getPorderlist()){
+						//Xoa cac dong sku tuong ung voi lenh
+						for (POrder_Product_SKU theProductSKU:thePOrder.getPorder_product_sku()){
+							porder_ProductSKUService.delete(theProductSKU);
+						}
+						
+						//Xoa cac Porder_grant va sku tuong ung voi lenh
+						for (POrderGrant thePorder_grant: thePOrder.getList_pordergrant()){
+							porderGrantService.deleteAll(thePorder_grant);
+						}
+						
+						//Xoa lenh
 						porderService.delete(thePOrder);
 					}
 					
