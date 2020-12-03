@@ -261,16 +261,16 @@ public class POrder_Req implements Serializable {
 	
 	@Transient
 	public String getBuyername() {
-		if(product != null) {
-			return product.getBuyername();
+		if(pcontract != null) {
+			return pcontract.getBuyername();
 		}
 		return "";
 	}
 	
 	@Transient
 	public String getVendorname() {
-		if(product != null) {
-			return product.getVendorname();
+		if(pcontract != null) {
+			return pcontract.getVendorname();
 		}
 		return "";
 	}
