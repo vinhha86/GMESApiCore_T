@@ -13,4 +13,6 @@ public interface IHolidayService extends Operations<Holiday>{
 	public List<Integer> getAllYears(int year);
 	
 	public List<Holiday> getby_date(Date day, Date dayto);
+	
+	public List<Holiday> getByDate(Date day);
 }

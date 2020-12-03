@@ -99,32 +99,76 @@ public class HolidayAPI {
 		}
 	}
 	
+//	@RequestMapping(value = "/create",method = RequestMethod.POST)
+//	public ResponseEntity<ResponseBase> Create(@RequestBody Holiday_create_request entity,HttpServletRequest request ) {
+//		ResponseBase response = new ResponseBase();
+//		try {
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//			
+//			Long startTime = entity.startTime;
+//			Long endTime = entity.endTime;
+//			String comment = entity.comment;
+//			
+//			Date date1=new Date(startTime);
+//			Date date2=new Date(endTime);
+//			
+//			LocalDate start = date1.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//			LocalDate end = date2.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//
+////			for (LocalDate date = start; date.isEqual(end) || date.isBefore(end); date = date.plusDays(1)) {
+//			    Holiday temp = new Holiday();
+//			    temp.setId(0L);
+//			    temp.setYear(start.getYear());
+//			    temp.setDay(Date.from(start.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+//			    temp.setDayto(Date.from(end.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+//			    temp.setComment(comment);
+//			    temp.setOrgrootid_link(user.getRootorgid_link());
+//			    holidayService.save(temp);
+////			}
+//			
+//			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+//			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+//			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+//		}catch (Exception e) {
+//			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+//			response.setMessage(e.getMessage());
+//		    return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+//		}
+//	}
+	
 	@RequestMapping(value = "/create",method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> Create(@RequestBody Holiday_create_request entity,HttpServletRequest request ) {
 		ResponseBase response = new ResponseBase();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			
-			Long startTime = entity.startTime;
-			Long endTime = entity.endTime;
+			Date startDate = entity.startDate;
+			Date endDate = entity.endDate;
 			String comment = entity.comment;
 			
-			Date date1=new Date(startTime);
-			Date date2=new Date(endTime);
+//			System.out.println(startDate);
+//			System.out.println(endDate);
+//			System.out.println(comment);
 			
-			LocalDate start = date1.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-			LocalDate end = date2.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+			LocalDate start = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+			LocalDate end = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-//			for (LocalDate date = start; date.isEqual(end) || date.isBefore(end); date = date.plusDays(1)) {
-			    Holiday temp = new Holiday();
-			    temp.setId(0L);
-			    temp.setYear(start.getYear());
-			    temp.setDay(Date.from(start.atStartOfDay(ZoneId.systemDefault()).toInstant()));
-			    temp.setDayto(Date.from(end.atStartOfDay(ZoneId.systemDefault()).toInstant()));
-			    temp.setComment(comment);
-			    temp.setOrgrootid_link(user.getRootorgid_link());
-			    holidayService.save(temp);
-//			}
+			for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
+			    // Do your job here with `date`.
+				Date dateObj = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+//			    System.out.println(dateObj);
+				List<Holiday> listHoliday = holidayService.getByDate(dateObj);
+				if(listHoliday.size() == 0) {
+					Holiday holiday = new Holiday();
+					holiday.setId(0L);
+					holiday.setOrgrootid_link(user.getRootorgid_link());
+					holiday.setDay(dateObj);
+					holiday.setDayto(dateObj);
+					holiday.setComment(comment);
+					holiday.setYear(date.getYear());
+					holidayService.save(holiday);
+				}
+			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

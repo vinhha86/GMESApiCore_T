@@ -40,5 +40,9 @@ public class HolidayService extends AbstractService<Holiday> implements IHoliday
 		// TODO Auto-generated method stub
 		return repo.getby_many_year(orgrootid_link, year);
 	}
+	@Override
+	public List<Holiday> getByDate(Date day) {
+		return repo.getByDate(day);
+	}
 
 }

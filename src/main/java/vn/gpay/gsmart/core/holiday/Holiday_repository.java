@@ -30,4 +30,8 @@ public interface Holiday_repository extends JpaRepository<Holiday, Long>,JpaSpec
 	public List<Holiday> getby_date(
 			@Param ("day")final  Date day,
 			@Param ("dayto")final  Date dayto);
+	
+	@Query(value = "select c from Holiday c where c.day = :day")
+	public List<Holiday> getByDate(
+			@Param ("day")final  Date day);
 }
