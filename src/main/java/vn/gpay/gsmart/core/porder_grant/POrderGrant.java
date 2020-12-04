@@ -70,9 +70,8 @@ public class POrderGrant implements Serializable {
 
 	private Integer productivity;
 	private Integer duration;
+	private Integer totalamount_tt;
 	
-	
-
 	public Integer getProductivity() {
 		return productivity;
 	}
@@ -379,6 +378,12 @@ public class POrderGrant implements Serializable {
 	}
 	public void setFinish_date_plan(Date finish_date_plan) {
 		this.finish_date_plan = finish_date_plan;
+	}
+	public Integer getTotalamount_tt() {
+		return totalamount_tt;
+	}
+	public void setTotalamount_tt(Integer totalamount_tt) {
+		this.totalamount_tt = totalamount_tt;
 	}
 
 }

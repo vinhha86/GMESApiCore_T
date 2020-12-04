@@ -367,6 +367,8 @@ public class POrderListAPI {
 					grantamountSum+=pgs.getGrantamount();
 				}
 				
+				//kiem tra xem so luong bang 0 hay khong. Neu bang = thi lay so luong ban dau
+				grantamountSum = grantamountSum == 0 ? pg.getTotalamount_tt() : grantamountSum;
 				pg.setGrantamount(grantamountSum);
 				pordergrantService.save(pg);
 			}
@@ -427,6 +429,9 @@ public class POrderListAPI {
 				for(POrderGrant_SKU pgs : pgslist) {
 					grantamountSum+=pgs.getGrantamount();
 				}
+				
+				//kiem tra xem so luong bang 0 hay khong. Neu bang = thi lay so luong ban dau
+				grantamountSum = grantamountSum == 0 ? pg.getTotalamount_tt() : grantamountSum;
 				
 				pg.setGrantamount(grantamountSum);
 				pordergrantService.save(pg);
@@ -515,6 +520,9 @@ public class POrderListAPI {
 				for(POrderGrant_SKU pgs : pgslist) {
 					grantamountSum+=pgs.getGrantamount();
 				}
+				
+				//kiem tra xem so luong bang 0 hay khong. Neu bang = thi lay so luong ban dau
+				grantamountSum = grantamountSum == 0 ? pg.getTotalamount_tt() : grantamountSum;
 				
 				pg.setGrantamount(grantamountSum);
 				pordergrantService.save(pg);

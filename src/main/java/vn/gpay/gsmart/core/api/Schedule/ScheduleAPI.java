@@ -709,6 +709,7 @@ public class ScheduleAPI {
 			pg.setStart_date_plan(porder.getProductiondate_plan());
 			pg.setFinish_date_plan(porder.getFinishdate_plan());
 			pg.setProductivity(productivity);
+			pg.setTotalamount_tt(porder.getTotalorder());
 			pg.setDuration(duration);
 			
 			pg = granttService.save(pg);
@@ -842,6 +843,7 @@ public class ScheduleAPI {
 			pg.setDuration(duration);
 			pg.setStart_date_plan(startDate);
 			pg.setFinish_date_plan(endDate);
+			pg.setTotalamount_tt(req.getTotalorder());
 			pg = granttService.save(pg);
 			
 			PContract contract = req.getPcontract();
@@ -1262,6 +1264,7 @@ public class ScheduleAPI {
 				grant.setFinish_date_plan(end_new);
 				grant.setProductivity(producttivity);
 				grant.setDuration(duration_new);
+				grant.setTotalamount_tt(entity.quantity);
 				grant = granttService.save(grant);
 				
 				POrder porder = porderService.findOne(entity.porderid_link);
