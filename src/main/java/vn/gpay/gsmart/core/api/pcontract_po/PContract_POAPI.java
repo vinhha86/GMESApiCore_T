@@ -1668,7 +1668,8 @@ public class PContract_POAPI {
 				}
 				
 				//Tao lenh cho Phan xuong neu chao gia được chốt 
-				if(pcontract_po.getStatus() == POStatus.PO_STATUS_CONFIRMED) {
+				Long parentid_link = pcontract_po.getParentpoid_link() == null ? 0 : pcontract_po.getParentpoid_link();
+				if(pcontract_po.getStatus() == POStatus.PO_STATUS_CONFIRMED && parentid_link != 0) {
 					porderService.createPOrder(porder_req, user);
 				}
 				
@@ -1797,7 +1798,8 @@ public class PContract_POAPI {
 				}
 				
 				//Tao lenh cho Phan xuong neu chao gia được chốt 
-				if(pcontract_po.getStatus() == POStatus.PO_STATUS_CONFIRMED) {
+				Long parentid_link = pcontract_po.getParentpoid_link() == null ? 0 : pcontract_po.getParentpoid_link();
+				if(pcontract_po.getStatus() == POStatus.PO_STATUS_CONFIRMED && parentid_link != 0) {
 					porderService.createPOrder(porder_req, user);
 				}
 			}
