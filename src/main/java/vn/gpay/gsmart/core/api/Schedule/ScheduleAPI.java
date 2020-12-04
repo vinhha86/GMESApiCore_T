@@ -1129,7 +1129,7 @@ public class ScheduleAPI {
 				}
 			}
 			
-//			granttService.deleteById(entity.pordergrantid_link_src);
+//			 .deleteById(entity.pordergrantid_link_src);
 			granttService.deleteAll(grant_src);
 			
 			response.data = sch;
@@ -1156,7 +1156,8 @@ public class ScheduleAPI {
 				response.mes = "Lệnh sản xuất đã vào chuyền không thể hủy!";
 			}
 			else {
-				granttService.delete(grant);
+//				granttService.delete(grant);
+				granttService.deleteAll(grant);
 				processService.deleteByOrderID(porderid_link);
 				
 				List<POrderGrant> list_grant = granttService.getByOrderId(porderid_link);
