@@ -344,13 +344,14 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 	}
 
 	@Override
-	public List<POrder> getPOrderListBySearch(String style, Long buyerid, Long vendorid, Date orderdatefrom, Date orderdateto, Long status, Long granttoorgid_link) {
+	public List<POrder> getPOrderListBySearch(String style, Long buyerid, Long vendorid, Long factoryid, Long status, Long granttoorgid_link) {
 
 		Specification<POrder> specification = Specifications.<POrder>and()
 				.eq(Objects.nonNull(buyerid), "pcontract.orgbuyerid_link", buyerid)
 				.eq(Objects.nonNull(vendorid), "pcontract.orgvendorid_link", vendorid)
-				.ge(Objects.nonNull(orderdatefrom),"orderdate",GPAYDateFormat.atStartOfDay(orderdatefrom))
-                .le(Objects.nonNull(orderdateto),"orderdate",GPAYDateFormat.atEndOfDay(orderdateto))
+				.eq(Objects.nonNull(factoryid), "org.id", factoryid)
+//				.ge(Objects.nonNull(orderdatefrom),"orderdate",GPAYDateFormat.atStartOfDay(orderdatefrom))
+//              .le(Objects.nonNull(orderdateto),"orderdate",GPAYDateFormat.atEndOfDay(orderdateto))
                 .eq(Objects.nonNull(status), "porderstatus.id", status)
                 .ne("porderstatus.id", -1)
                 .ne("porderstatus.id", -3)
@@ -432,5 +433,19 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 			  }
 			});
 		return data;
+	}
+
+	@Override
+	public List<POrder> getPOrderBySearch(Long buyerid, Long vendorid, Long factoryid, String pobuyer,
+			String stylebuyer, List<Integer> statuses, Long granttoorgid_link) {
+		// TODO Auto-generated method stub
+		return repo.getPOrderBySearch(buyerid, vendorid, factoryid, pobuyer, stylebuyer, statuses, granttoorgid_link);
+	}
+	
+	@Override
+	public List<POrder> getPOrderBySearch(Long buyerid, Long vendorid, Long factoryid, String pobuyer,
+			String stylebuyer, Long granttoorgid_link) {
+		// TODO Auto-generated method stub
+		return repo.getPOrderBySearch(buyerid, vendorid, factoryid, pobuyer, stylebuyer, granttoorgid_link);
 	}
 }

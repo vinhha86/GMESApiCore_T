@@ -68,6 +68,53 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 	public List<POrder> getPOrderByExactOrdercode(
 			@Param ("ordercode")final String ordercode);
 	
+	@Query(value = "select a from POrder a "
+			+ "inner join PContract b on a.pcontractid_link = b.id "
+			+ "inner join PContract_PO c on a.pcontract_poid_link = c.id "
+			+ "inner join Product d on a.productid_link = d.id "
+			+ "where  (b.orgbuyerid_link = :buyerid or :buyerid is null) "
+			+ "and (b.orgvendorid_link = :vendorid or :vendorid is null) "
+			+ "and (a.granttoorgid_link = :factoryid or :factoryid is null) "
+			+ "and (a.granttoorgid_link = :granttoorgid_link or :granttoorgid_link is null) "
+			+ "and lower(c.po_buyer) like lower(concat('%',:pobuyer,'%')) "
+			+ "and lower(d.buyercode) like lower(concat('%',:stylebuyer,'%')) "
+//			+ "and (:statuses is null or a.status in :statuses) "
+			+ "and a.status in :statuses "
+			+ "order by a.granttoorgid_link, d.buyercode, a.golivedate "
+			)
+	public List<POrder> getPOrderBySearch(
+			@Param ("buyerid")final Long buyerid,
+			@Param ("vendorid")final Long vendorid,
+			@Param ("factoryid")final Long factoryid,
+			@Param ("pobuyer")final String pobuyer,
+			@Param ("stylebuyer")final String stylebuyer,
+			@Param ("statuses")final List<Integer> statuses,
+			@Param ("granttoorgid_link")final Long granttoorgid_link
+			);
+	
+	@Query(value = "select a from POrder a "
+			+ "inner join PContract b on a.pcontractid_link = b.id "
+			+ "inner join PContract_PO c on a.pcontract_poid_link = c.id "
+			+ "inner join Product d on a.productid_link = d.id "
+			+ "where  (b.orgbuyerid_link = :buyerid or :buyerid is null) "
+			+ "and (b.orgvendorid_link = :vendorid or :vendorid is null) "
+			+ "and (a.granttoorgid_link = :factoryid or :factoryid is null) "
+			+ "and (a.granttoorgid_link = :granttoorgid_link or :granttoorgid_link is null) "
+			+ "and lower(c.po_buyer) like lower(concat('%',:pobuyer,'%')) "
+			+ "and lower(d.buyercode) like lower(concat('%',:stylebuyer,'%')) "
+			+ "order by a.granttoorgid_link, d.buyercode, a.golivedate "
+			)
+	public List<POrder> getPOrderBySearch(
+			@Param ("buyerid")final Long buyerid,
+			@Param ("vendorid")final Long vendorid,
+			@Param ("factoryid")final Long factoryid,
+			@Param ("pobuyer")final String pobuyer,
+			@Param ("stylebuyer")final String stylebuyer,
+			@Param ("granttoorgid_link")final Long granttoorgid_link
+			);
+	
+	
+	
 	@Query(value = "select sum(a.totalorder), b.name, a.status, b.id, b.code "
 			+ "from POrder a "
 			+ "inner join Org b on a.granttoorgid_link = b.id "

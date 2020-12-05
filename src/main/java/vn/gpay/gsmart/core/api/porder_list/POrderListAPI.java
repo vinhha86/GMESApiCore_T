@@ -3,8 +3,6 @@ package vn.gpay.gsmart.core.api.porder_list;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -67,6 +65,91 @@ public class POrderListAPI {
 		}
 	}
 	
+//	@RequestMapping(value = "/getallbysearch",method = RequestMethod.POST)
+//	public ResponseEntity<POrderList_getlist_response> POrderGetAllBySearch(@RequestBody POrderList_getlist_request entity, HttpServletRequest request ) {
+//		POrderList_getlist_response response = new POrderList_getlist_response();
+//		try {
+//			GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//			Long user_orgid_link = user.getOrgid_link();
+//			Long granttoorgid_link = (long)0;
+//			if(user_orgid_link == (long)1) granttoorgid_link = null;
+//			else granttoorgid_link = user_orgid_link;
+//			
+//			List<Long> status = entity.status;
+//			response.data = new ArrayList<>();
+//			List<POrder> result = new ArrayList<>();
+//			
+//			if(status.size() == 0) {
+//				result = porderService.getPOrderListBySearch(
+//							entity.style, // style
+//							entity.buyerid, // buyerid
+//							entity.vendorid, // vendorid
+//							entity.factoryid, // factoryid
+////							entity.orderdatefrom, // orderdatefrom
+////							entity.orderdateto, // orderdateto
+//							null,
+//							granttoorgid_link
+//							);
+//			}else {
+//				for(Long num : status) {
+//					List<POrder> temp = porderService.getPOrderListBySearch(
+//							entity.style, // style
+//							entity.buyerid, // buyerid
+//							entity.vendorid, // vendorid
+//							entity.factoryid, // factoryid
+////							entity.orderdatefrom, // orderdatefrom
+////							entity.orderdateto, // orderdateto
+//							num,
+//							granttoorgid_link
+//							);
+//					result.addAll(temp);
+//				}
+//			}
+//			if(entity.pobuyer == null) entity.pobuyer="";
+//			if(entity.povendor == null) entity.povendor="";
+//			if(entity.style == null) entity.style="";
+//			
+//			for(POrder porder : result) {
+//				String po_buyer = porder.getPo_buyer().toLowerCase();
+//				String po_buyer_req = entity.pobuyer.toLowerCase();
+//				String po_vendor = porder.getPo_vendor().toLowerCase();
+//				String po_vendor_req = entity.povendor.toLowerCase();
+//				String stylebuyer = porder.getStylebuyer().toLowerCase();
+//				String style = entity.style.toLowerCase();
+//				if(!po_buyer.contains(po_buyer_req)) {
+//					continue;
+//				}
+//				if(!po_vendor.contains(po_vendor_req)) {
+//					continue;
+//				}
+//				if(!stylebuyer.contains(style)) {
+//					continue;
+//				}
+//				response.data.add(porder);
+//			}
+//			
+//			Comparator<POrder> compareByGrantToOrgName = (POrder p1, POrder p2) -> p1.getGranttoorgname().compareTo( p2.getGranttoorgname());
+//			Collections.sort(response.data, compareByGrantToOrgName);
+//			
+//			response.totalCount = response.data.size();
+//			
+//			PageRequest page = PageRequest.of(entity.page - 1, entity.limit);
+//			int start = (int) page.getOffset();
+//			int end = (start + page.getPageSize()) > response.data.size() ? response.data.size() : (start + page.getPageSize());
+//			Page<POrder> pageToReturn = new PageImpl<POrder>(response.data.subList(start, end), page, response.data.size()); 
+//			
+//			response.data = pageToReturn.getContent();
+//			
+//			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+//			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+//			return new ResponseEntity<POrderList_getlist_response>(response,HttpStatus.OK);
+//		}catch (Exception e) {
+//			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+//			response.setMessage(e.getMessage());
+//		    return new ResponseEntity<POrderList_getlist_response>(response, HttpStatus.BAD_REQUEST);
+//		}
+//	}
+	
 	@RequestMapping(value = "/getallbysearch",method = RequestMethod.POST)
 	public ResponseEntity<POrderList_getlist_response> POrderGetAllBySearch(@RequestBody POrderList_getlist_request entity, HttpServletRequest request ) {
 		POrderList_getlist_response response = new POrderList_getlist_response();
@@ -77,59 +160,37 @@ public class POrderListAPI {
 			if(user_orgid_link == (long)1) granttoorgid_link = null;
 			else granttoorgid_link = user_orgid_link;
 			
-			List<Long> status = entity.status;
 			response.data = new ArrayList<>();
-			List<POrder> result = new ArrayList<>();
 			
-			if(status.size() == 0) {
-				result = porderService.getPOrderListBySearch(
-							entity.style, // style
-							entity.buyerid, // buyerid
-							entity.vendorid, // vendorid
-							entity.orderdatefrom, // orderdatefrom
-							entity.orderdateto, // orderdateto
-							null,
+			String pobuyer = entity.pobuyer;
+			String stylebuyer = entity.style;
+			Long buyerid = entity.buyerid;
+			Long vendorid = entity.vendorid;
+			Long factoryid = entity.factoryid;
+			List<Integer> statuses = entity.status;
+			
+			if(statuses.size() == 0) {
+				response.data = porderService.getPOrderBySearch(
+							buyerid,
+							vendorid,
+							factoryid,
+							pobuyer,
+							stylebuyer,
 							granttoorgid_link
 							);
 			}else {
-				for(Long num : status) {
-					List<POrder> temp = porderService.getPOrderListBySearch(
-							entity.style, // style
-							entity.buyerid, // buyerid
-							entity.vendorid, // vendorid
-							entity.orderdatefrom, // orderdatefrom
-							entity.orderdateto, // orderdateto
-							num,
+				response.data = porderService.getPOrderBySearch(
+							buyerid,
+							vendorid,
+							factoryid,
+							pobuyer,
+							stylebuyer,
+							statuses,
 							granttoorgid_link
 							);
-					result.addAll(temp);
-				}
-			}
-			if(entity.pobuyer == null) entity.pobuyer="";
-			if(entity.povendor == null) entity.povendor="";
-			if(entity.style == null) entity.style="";
-			
-			for(POrder porder : result) {
-				String po_buyer = porder.getPo_buyer().toLowerCase();
-				String po_buyer_req = entity.pobuyer.toLowerCase();
-				String po_vendor = porder.getPo_vendor().toLowerCase();
-				String po_vendor_req = entity.povendor.toLowerCase();
-				String stylebuyer = porder.getStylebuyer().toLowerCase();
-				String style = entity.style.toLowerCase();
-				if(!po_buyer.contains(po_buyer_req)) {
-					continue;
-				}
-				if(!po_vendor.contains(po_vendor_req)) {
-					continue;
-				}
-				if(!stylebuyer.contains(style)) {
-					continue;
-				}
-				response.data.add(porder);
 			}
 			
-			Comparator<POrder> compareByGrantToOrgName = (POrder p1, POrder p2) -> p1.getGranttoorgname().compareTo( p2.getGranttoorgname());
-			Collections.sort(response.data, compareByGrantToOrgName);
+//			response.data = result;
 			
 			response.totalCount = response.data.size();
 			
@@ -546,9 +607,9 @@ public class POrderListAPI {
 			Calendar calDate = Calendar.getInstance();
 			calDate.setTime(startDate);
 			commonService.ReCalculate(grant.getId(), orgrootid_link);
-			System.out.println(grant.getId());
-			System.out.println(orgrootid_link);
-			System.out.println(calDate.get(Calendar.YEAR));
+//			System.out.println(grant.getId());
+//			System.out.println(orgrootid_link);
+//			System.out.println(calDate.get(Calendar.YEAR));
 			
 			response.porderinfo = name;
 			response.amount = total;
