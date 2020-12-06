@@ -19,7 +19,6 @@ import vn.gpay.gsmart.core.salary.OrgSal_Type;
 import vn.gpay.gsmart.core.salary.OrgSal_Type_Level;
 import vn.gpay.gsmart.core.salary.Salary_Sum;
 import vn.gpay.gsmart.core.salary.Salary_Sum_POrders;
-import vn.gpay.gsmart.core.utils.CONST_SALARY_SUM_COL;
 
 public class Salary_Personnel implements Runnable{
 	private IOrgSal_TypeService saltypeService;

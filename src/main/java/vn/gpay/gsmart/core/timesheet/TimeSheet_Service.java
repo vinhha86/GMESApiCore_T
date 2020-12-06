@@ -12,7 +12,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import vn.gpay.gsmart.core.base.AbstractService;
-import vn.gpay.gsmart.core.porderprocessing.POrderProcessingBinding;
 
 @Service
 public class TimeSheet_Service extends AbstractService<TimeSheet> implements ITimeSheet_Service{
@@ -45,4 +44,8 @@ public class TimeSheet_Service extends AbstractService<TimeSheet> implements ITi
 		return data;
 	}
 
+	@Override
+	public List<TimeSheet> getByTime(String register_code, Date datefrom, Date dateto){
+		return repo.getByTime(register_code, datefrom, dateto);
+	}
 }

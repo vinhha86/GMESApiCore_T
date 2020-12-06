@@ -28,4 +28,13 @@ public interface TimeSheet_repository extends JpaRepository<TimeSheet, Long>, Jp
 			@Param ("today")final Date today);
 	
 	
+	@Query(value = "SELECT c from timesheet_inout c where"
+			+ " c.timerecorded >= :datefrom"
+			+ " c.timerecorded <= :dateto"
+			+ " order by c.timerecorded asc")
+	public List<TimeSheet> getByTime(
+			@Param ("register_code")final String register_code, 
+			@Param ("datefrom")final Date datefrom,
+			@Param ("dateto")final Date dateto);
+	
 }
