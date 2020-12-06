@@ -168,13 +168,13 @@ public interface IPOrderProcessing_Repository extends JpaRepository<POrderProces
 			+ "from POrderProcessing a "
 			+ "inner join Org b on a.granttoorgid_link = b.id "
 			+ "inner join Org c on b.parentid_link = c.id "
-			+ "where a.processingdate >= :twentyDaysAgo "
-			+ "and a.processingdate <= :today "
+			+ "where a.processingdate > :tenDaysAgo "
+			+ "and a.processingdate < :today "
 			+ "group by c.name,a.processingdate "
 			+ "order by a.processingdate, c.name "
 			)
 	public List<Object[]>getAmountPackStockedForChart(
-			@Param ("twentyDaysAgo")final Date twentyDaysAgo, 
+			@Param ("tenDaysAgo")final Date tenDaysAgo, 
 			@Param ("today")final Date today
 			);
 }

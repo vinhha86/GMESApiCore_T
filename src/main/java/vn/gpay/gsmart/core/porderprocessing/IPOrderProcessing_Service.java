@@ -55,5 +55,5 @@ public interface IPOrderProcessing_Service extends Operations<POrderProcessing>{
 
 	public List<POrderProcessingBinding>getAmountOutputForChart(Date dateFrom, Date dateTo, Long dayDifference);
 	
-	public List<POrderProcessingBinding>getAmountPackStockedForChart(Date twentyDaysAgo, Date today);
+	public List<POrderProcessingBinding>getAmountPackStockedForChart(Date tenDaysAgo, Date today);
 }

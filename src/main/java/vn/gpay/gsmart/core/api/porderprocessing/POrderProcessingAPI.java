@@ -1678,15 +1678,16 @@ public class POrderProcessingAPI {
 	public ResponseEntity<POrderProcess_getForChart_response> getAmountStockedForChart(HttpServletRequest request) {
 		POrderProcess_getForChart_response response = new POrderProcess_getForChart_response();
 		try {
-			Calendar cal = new GregorianCalendar();
-			cal.add(Calendar.DAY_OF_MONTH, -20);
-			Date twentyDaysAgo = cal.getTime();
-			Date today = new Date();
+			Calendar cal = Calendar.getInstance();
+			cal.set(2020, 10, 19); // month begin at 0, AAAAAAHHHHHHHHHH
+			Date today = cal.getTime();
+			cal.add(Calendar.DAY_OF_MONTH, -10);
+			Date tenDaysAgo = cal.getTime();
 			
 //			System.out.println(twentyDaysAgo);
 //			System.out.println(today);
 			
-			List<POrderProcessingBinding> list = pprocessRepository.getAmountPackStockedForChart(twentyDaysAgo, today);
+			List<POrderProcessingBinding> list = pprocessRepository.getAmountPackStockedForChart(tenDaysAgo, today);
 //			System.out.println(list.size());
 			
 			response.data = list;

@@ -1,6 +1,9 @@
 package vn.gpay.gsmart.core.porderprocessing;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -184,20 +187,50 @@ public class POrderProcessing_Service extends AbstractService<POrderProcessing> 
 	}
 
 	@Override
-	public List<POrderProcessingBinding> getAmountPackStockedForChart(Date twentyDaysAgo, Date today) {
+	public List<POrderProcessingBinding> getAmountPackStockedForChart(Date tenDaysAgo, Date today) {
 		
 		List<POrderProcessingBinding> data = new ArrayList<POrderProcessingBinding>();
 		Map<Date, POrderProcessingBinding> mapTmp = new HashMap<>();
-		List<Object[]> objects = repo.getAmountPackStockedForChart(twentyDaysAgo, today);
+		List<Object[]> objects = repo.getAmountPackStockedForChart(tenDaysAgo, today);
+		
+		LocalDate start = tenDaysAgo.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		LocalDate end = today.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+		for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
+		    // Do your job here with `date`.
+			Date dateObj = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+			
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(dateObj);
+			cal.set(Calendar.HOUR_OF_DAY, 0);
+			cal.set(Calendar.MINUTE, 0);
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MILLISECOND, 0);
+			dateObj = cal.getTime();
+			
+			POrderProcessingBinding temp = new POrderProcessingBinding();
+			temp.setProcessingDate(dateObj);
+			temp.setDataDHA(0L);
+			temp.setDataNV(0L);
+			temp.setDataBN1(0L);
+			temp.setDataBN2(0L);
+			temp.setDataBN3(0L);
+			mapTmp.put(dateObj, temp);
+		}
 		
 		for(Object[] row : objects) {
-//			System.out.println("---");
-//			System.out.println((Long) row[0]);
-//			System.out.println((String) row[1]);
-//			System.out.println((Date) row[2]);
 			Long sum = (Long) row[0];
 			String name = (String) row[1];
 			Date date = (Date) row[2];
+			
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(date);
+			cal.set(Calendar.HOUR_OF_DAY, 0);
+			cal.set(Calendar.MINUTE, 0);
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MILLISECOND, 0);
+			date = cal.getTime();
+			
 			if(mapTmp.containsKey(date)) {
 				POrderProcessingBinding temp = mapTmp.get(date);
 				switch(name) {
@@ -218,33 +251,34 @@ public class POrderProcessing_Service extends AbstractService<POrderProcessing> 
 						break;
 				}
 				mapTmp.put(date, temp);
-			}else {
-				POrderProcessingBinding temp = new POrderProcessingBinding();
-				temp.setProcessingDate(date);
-				temp.setDataDHA(0L);
-				temp.setDataNV(0L);
-				temp.setDataBN1(0L);
-				temp.setDataBN2(0L);
-				temp.setDataBN3(0L);
-				switch(name) {
-					case "DHA":
-						temp.setDataDHA(sum);
-						break;
-					case "NV":
-						temp.setDataNV(sum);
-						break;
-					case "Bắc Ninh 1":
-						temp.setDataBN1(sum);
-						break;
-					case "Bắc Ninh 2":
-						temp.setDataBN2(sum);
-						break;
-					case "Bắc Ninh 3":
-						temp.setDataBN3(sum);
-						break;
-				}
-				mapTmp.put(date, temp);
 			}
+//			else {
+//				POrderProcessingBinding temp = new POrderProcessingBinding();
+//				temp.setProcessingDate(date);
+//				temp.setDataDHA(0L);
+//				temp.setDataNV(0L);
+//				temp.setDataBN1(0L);
+//				temp.setDataBN2(0L);
+//				temp.setDataBN3(0L);
+//				switch(name) {
+//					case "DHA":
+//						temp.setDataDHA(sum);
+//						break;
+//					case "NV":
+//						temp.setDataNV(sum);
+//						break;
+//					case "Bắc Ninh 1":
+//						temp.setDataBN1(sum);
+//						break;
+//					case "Bắc Ninh 2":
+//						temp.setDataBN2(sum);
+//						break;
+//					case "Bắc Ninh 3":
+//						temp.setDataBN3(sum);
+//						break;
+//				}
+//				mapTmp.put(date, temp);
+//			}
 		}
 		data = new ArrayList<POrderProcessingBinding>(mapTmp.values());
 		Collections.sort(data, new Comparator<POrderProcessingBinding>() {

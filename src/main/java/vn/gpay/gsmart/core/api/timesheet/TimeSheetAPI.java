@@ -109,14 +109,18 @@ public class TimeSheetAPI {
 	public ResponseEntity<getForRegisterCodeCountChart_response> getForRegisterCodeCountChart(HttpServletRequest request) {
 		getForRegisterCodeCountChart_response response = new getForRegisterCodeCountChart_response();
 		try {
-//			Calendar cal = new GregorianCalendar();
-			Calendar cal = new GregorianCalendar(2020, 10, 27);
+			Calendar cal = Calendar.getInstance();
+			cal.set(2020, 9, 27); // month begin at 0, AAAAAAHHHHHHHHHH
 			Date today = cal.getTime();
 			cal.add(Calendar.DAY_OF_MONTH, -10);
 			Date tenDaysAgo = cal.getTime();
-//			Date today = new Date();
 			
-			response.data = timesheetService.getForRegisterCodeCountChart(tenDaysAgo, today);
+//			System.out.println(today);
+//			System.out.println(tenDaysAgo);
+			
+			response.data = timesheetService.getForRegisterCodeCountChart(
+					tenDaysAgo, today
+					);
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
