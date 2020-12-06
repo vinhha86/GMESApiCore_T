@@ -1099,6 +1099,7 @@ public class ScheduleAPI {
 			grant_des.setFinish_date_plan(end);
 			grant_des.setGranttoorgid_link(grant_des.getGranttoorgid_link());
 			grant_des.setDuration(duration);
+			grant_des.setTotalamount_tt(grant_des.getTotalamount_tt() + grant_src.getTotalamount_tt());
 			grant_des = granttService.save(grant_des);
 			
 			Schedule_porder sch = entity.sch;
