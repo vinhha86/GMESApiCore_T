@@ -10,5 +10,7 @@ public interface ITimeSheet_Service extends Operations<TimeSheet> {
 	List<TimeSheetBinding> getForRegisterCodeCountChart(
 			Date tenDaysAgo, Date today
 			);
+
+	List<TimeSheet> getByTime(String register_code, Date datefrom, Date dateto);
 	
 }
