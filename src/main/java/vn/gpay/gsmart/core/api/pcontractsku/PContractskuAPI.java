@@ -24,6 +24,7 @@ import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKUBinding;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
+import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -298,9 +299,15 @@ public class PContractskuAPI {
 		PContractSKU_binding_response response = new PContractSKU_binding_response();
 		try {
 //			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			long pcontract_poid_link = entity.pcontract_poid_link;
+			Long pcontract_poid_link = entity.pcontract_poid_link;
+			Long porderid_link = entity.porderid_link;
 			
-			List<PContractProductSKU> listPContractProductSKU = pskuservice.getlistsku_bypo(pcontract_poid_link);
+			POrder porder = porder_Service.findOne(porderid_link);
+			Long productid_link = porder.getProductid_link();
+			
+			List<PContractProductSKU> listPContractProductSKU = pskuservice.getbypo_and_product(
+					pcontract_poid_link, productid_link
+					);
 			List<PContractProductSKUBinding> data = new ArrayList<PContractProductSKUBinding>();
 			
 			for(PContractProductSKU pcontractProductSKU : listPContractProductSKU) {
