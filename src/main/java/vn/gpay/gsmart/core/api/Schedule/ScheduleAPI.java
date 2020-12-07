@@ -1222,6 +1222,7 @@ public class ScheduleAPI {
 				grant_old.setGrantamount(totalorder_old);
 				grant_old.setFinish_date_plan(end_old);
 				grant_old.setDuration(duration_old);
+				grant_old.setTotalamount_tt(grant_old.getTotalamount_tt() - entity.quantity);
 				grant_old = granttService.save(grant_old);
 				
 				//Cap nhat lai Processing cu sau khi tach
