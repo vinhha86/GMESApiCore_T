@@ -1167,6 +1167,11 @@ public class ScheduleAPI {
 				if(list_grant.size() == 0) {
 					porder.setStatus(POrderStatus.PORDER_STATUS_FREE);
 					porderService.save(porder);
+					
+
+					POrder_Req req = reqService.findOne(porder.getPorderreqid_link());
+					req.setStatus(0);
+					reqService.save(req);
 				}
 			}
 			
@@ -1261,7 +1266,7 @@ public class ScheduleAPI {
 				grant.setUsercreatedid_link(user.getId());
 				grant.setGrantdate(new Date());
 				grant.setGrantamount(total_new);
-				grant.setStatus(1);
+				grant.setStatus(grant_old.getStatus());
 				grant.setOrgrootid_link(orgrootid_link);
 				grant.setStart_date_plan(start_new);
 				grant.setFinish_date_plan(end_new);
@@ -1303,7 +1308,7 @@ public class ScheduleAPI {
 				new_data.setBuyername(grant_old.getBuyername());
 				new_data.setPordercode(grant_old.getOrdercode());
 				new_data.setParentid_origin(entity.parentid_origin);
-				new_data.setStatus(1);
+				new_data.setStatus(grant_old.getStatus());
 				new_data.setPorder_grantid_link(grant.getId());
 				new_data.setPorderid_link(grant.getPorderid_link());
 				new_data.setPcontract_poid_link(grant_old.getPcontract_poid_link());
