@@ -7,8 +7,6 @@ import vn.gpay.gsmart.core.base.Operations;
 
 public interface ITimeSheet_Service extends Operations<TimeSheet> {
 	
-	List<TimeSheet> getByTime(String register_code, Date datefrom, Date dateto);
-	
 	List<TimeSheetBinding> getForRegisterCodeCountChart(
 			Date tenDaysAgo, Date today
 			);
