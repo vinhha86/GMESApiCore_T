@@ -23,9 +23,11 @@ import vn.gpay.gsmart.core.salary.Salary_Sum;
 import vn.gpay.gsmart.core.salary.Salary_Sum_POrders;
 import vn.gpay.gsmart.core.timesheet.ITimeSheet_Service;
 import vn.gpay.gsmart.core.timesheet.TimeSheet;
+import vn.gpay.gsmart.core.timesheet_lunch.ITimeSheetLunchService;
 
 public class TimeSheet_Personnel implements Runnable{
 	private ITimeSheet_Service timesheetService;
+	private ITimeSheetLunchService timesheet_lunchService;
 	
 	
 	private Thread t;
@@ -38,12 +40,14 @@ public class TimeSheet_Personnel implements Runnable{
 	
 	TimeSheet_Personnel(Personel myPersonnel, int myyear, int mymonth, Long myorgid_link,
 			ITimeSheet_Service timesheetService,
+			ITimeSheetLunchService timesheet_lunchService,
 			CountDownLatch latch){
 		this.personnel = myPersonnel;
 		this.year = myyear;
 		this.month = mymonth;
 		this.orgid_link = myorgid_link;
 		this.timesheetService = timesheetService;
+		this.timesheet_lunchService = timesheet_lunchService;
 		this.latch = latch;
 	}
 	@Override
@@ -76,7 +80,34 @@ public class TimeSheet_Personnel implements Runnable{
 		try {
 			Date dateStart = sdf.parse(dateStartString);
 			Date dateEnd = sdf.parse(dateEndString);
-			List<TimeSheet> myTimeSheet = timesheetService.getByTime(personnel.getRegister_code(), dateStart, dateEnd);
+			
+			//I. Lấy danh sách các ca đi làm của nhân sự được khai báo trong tháng
+			
+			//II. Duyệt từng ngày, từng ca --> Lấy danh sách Timerecorded trong ca
+			//Tính thời gian bắt đầy và kết thúc ca - Sai so 30 phut truoc va sau
+			
+			List<TimeSheet> lsTimeSheet = timesheetService.getByTime(personnel.getRegister_code(), dateStart, dateEnd);
+			//Duyet tu dau den cuoi theo danh sach sap xep thứ tự thời gian tăng dần
+			for(TimeSheet theInOut:lsTimeSheet){
+				//2.1 Xac dinh xem Timerecorded la vao hay ra
+				//+ Xuất hiện lần đầu trong ca, tính từ đầu ca - sai số --> Vào
+				//+ Xuất hiện cuối cùng trong ca, tính từ cuối ca + sai số --> Ra
+				//+ Các lần Timerecorded ở giữa ca --> Không tính
+				
+				//2.2 Nếu trong khoảng sai số --> Cộng tròn công giờ trong ca 
+				//2.3 Nếu Vào muộn hơn sai số --> Lấy giờ vào thực tế; Ra sớm hơn sai số -- Lấy giờ ra thực tế
+				//--> Tính công giờ thực tê
+				
+				//2.4 Tính hệ số tăng ca (ca đêm/nghỉ/lễ) vào công ca và cộng dồn vào tổng công ngày
+				
+				//2.5 Ghi nhận tổng công ngày
+			}
+			
+			//III. Lay danh sach cac ngay nghi co dang ky của nhân sự trong khoảng thời gian
+			//3.1 Duyệt và xác định loại nghỉ, thời gian nghỉ
+			//3.2 Tính công theo hệ số công của ngày nghỉ (theo ca mặc định,ca ngày)
+			
+			
 			
 		} catch (Exception e){
 			e.printStackTrace();
