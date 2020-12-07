@@ -22,6 +22,8 @@ public class TimesheetShiftType implements Serializable {
 	private Integer from_minute;
 	private Integer to_hour;
 	private Integer to_minute;
+	private Boolean is_atnight;
+	private Boolean is_default;
 	public Long getId() {
 		return id;
 	}
@@ -57,6 +59,18 @@ public class TimesheetShiftType implements Serializable {
 	}
 	public void setTo_minute(Integer to_minute) {
 		this.to_minute = to_minute;
+	}
+	public Boolean getIs_atnight() {
+		return is_atnight;
+	}
+	public void setIs_atnight(Boolean is_atnight) {
+		this.is_atnight = is_atnight;
+	}
+	public Boolean getIs_default() {
+		return is_default;
+	}
+	public void setIs_default(Boolean is_default) {
+		this.is_default = is_default;
 	}
 	
 	

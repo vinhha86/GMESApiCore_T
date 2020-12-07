@@ -7,8 +7,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.timesheet_shift_type.TimesheetShiftType;
 
 @Table(name="timesheet_lunch")
 @Entity
@@ -27,6 +35,48 @@ public class TimeSheetLunch implements Serializable {
 	private Date workingdate;
 	private boolean isworking;
 	private boolean islunch;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="shifttypeid_link",insertable=false,updatable =false)
+    private TimesheetShiftType shifttype;
+	
+	@Transient
+	public Integer getShift_from_hour() {
+		if(shifttype != null)
+			return shifttype.getFrom_hour();
+		return null;
+	}
+	@Transient
+	public Integer getShift_from_minute() {
+		if(shifttype != null)
+			return shifttype.getFrom_minute();
+		return null;
+	}
+	@Transient
+	public Integer getShift_to_hour() {
+		if(shifttype != null)
+			return shifttype.getTo_hour();
+		return null;
+	}
+	@Transient
+	public Integer getShift_to_minute() {
+		if(shifttype != null)
+			return shifttype.getTo_minute();
+		return null;
+	}
+	@Transient
+	public Boolean getShift_is_atnight() {
+		if(shifttype != null)
+			return shifttype.getIs_atnight();
+		return null;
+	}
+	@Transient
+	public Boolean getShift_is_default() {
+		if(shifttype != null)
+			return shifttype.getIs_default();
+		return null;
+	}
 	public Long getId() {
 		return id;
 	}

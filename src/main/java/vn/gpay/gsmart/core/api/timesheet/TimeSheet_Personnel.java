@@ -1,29 +1,16 @@
 package vn.gpay.gsmart.core.api.timesheet;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import vn.gpay.gsmart.core.personel.Personel;
-import vn.gpay.gsmart.core.porderprocessingns.IPorderProcessingNsService;
-import vn.gpay.gsmart.core.salary.IOrgSal_BasicService;
-import vn.gpay.gsmart.core.salary.IOrgSal_ComService;
-import vn.gpay.gsmart.core.salary.IOrgSal_TypeService;
-import vn.gpay.gsmart.core.salary.IOrgSal_Type_LevelService;
-import vn.gpay.gsmart.core.salary.ISalary_SumService;
-import vn.gpay.gsmart.core.salary.ISalary_Sum_POrdersService;
-import vn.gpay.gsmart.core.salary.OrgSal_Basic;
-import vn.gpay.gsmart.core.salary.OrgSal_Com;
-import vn.gpay.gsmart.core.salary.OrgSal_Type;
-import vn.gpay.gsmart.core.salary.OrgSal_Type_Level;
-import vn.gpay.gsmart.core.salary.Salary_Sum;
-import vn.gpay.gsmart.core.salary.Salary_Sum_POrders;
 import vn.gpay.gsmart.core.timesheet.ITimeSheet_Service;
 import vn.gpay.gsmart.core.timesheet.TimeSheet;
 import vn.gpay.gsmart.core.timesheet_lunch.ITimeSheetLunchService;
+import vn.gpay.gsmart.core.timesheet_lunch.TimeSheetLunch;
 
 public class TimeSheet_Personnel implements Runnable{
 	private ITimeSheet_Service timesheetService;
@@ -69,6 +56,7 @@ public class TimeSheet_Personnel implements Runnable{
 	}
 	private void cal_timesheet_grid(){
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+		SimpleDateFormat sdf_date = new SimpleDateFormat("dd-M-yyyy");  
 		String dateStartString = "07-" + month.toString() + "-" + year.toString() + " 00:00:00";
 		Integer month_next = month + 1;
 		Integer year_next = year;
@@ -82,27 +70,58 @@ public class TimeSheet_Personnel implements Runnable{
 			Date dateEnd = sdf.parse(dateEndString);
 			
 			//I. Lấy danh sách các ca đi làm của nhân sự được khai báo trong tháng
+			List<TimeSheetLunch> lsWorkingShift= timesheet_lunchService.getByPersonnelDate(personnel.getId(), dateStart, dateEnd);
 			
-			//II. Duyệt từng ngày, từng ca --> Lấy danh sách Timerecorded trong ca
-			//Tính thời gian bắt đầy và kết thúc ca - Sai so 30 phut truoc va sau
-			
-			List<TimeSheet> lsTimeSheet = timesheetService.getByTime(personnel.getRegister_code(), dateStart, dateEnd);
-			//Duyet tu dau den cuoi theo danh sach sap xep thứ tự thời gian tăng dần
-			for(TimeSheet theInOut:lsTimeSheet){
-				//2.1 Xac dinh xem Timerecorded la vao hay ra
-				//+ Xuất hiện lần đầu trong ca, tính từ đầu ca - sai số --> Vào
-				//+ Xuất hiện cuối cùng trong ca, tính từ cuối ca + sai số --> Ra
-				//+ Các lần Timerecorded ở giữa ca --> Không tính
+			for (TimeSheetLunch theWorkingShift:lsWorkingShift){
+				//II. Duyệt từng ngày, từng ca --> Lấy danh sách Timerecorded trong ca
+				//Tính thời gian bắt đầy và kết thúc ca - Sai so 30 phut truoc va sau
 				
-				//2.2 Nếu trong khoảng sai số --> Cộng tròn công giờ trong ca 
-				//2.3 Nếu Vào muộn hơn sai số --> Lấy giờ vào thực tế; Ra sớm hơn sai số -- Lấy giờ ra thực tế
-				//--> Tính công giờ thực tê
+				//Thoi gian bat dau ca
+				Date shiftDate_Start = theWorkingShift.getWorkingdate();
+				Calendar cal_Start = Calendar.getInstance();
+				cal_Start.setTime(shiftDate_Start);
+				cal_Start.set(Calendar.HOUR_OF_DAY,theWorkingShift.getShift_from_hour());
+				cal_Start.set(Calendar.MINUTE,theWorkingShift.getShift_from_minute());
+				cal_Start.set(Calendar.SECOND,0);
+				cal_Start.set(Calendar.MILLISECOND,0);
+				//Cong sai so
+				cal_Start.add(Calendar.MINUTE, -30);
+				shiftDate_Start = cal_Start.getTime();
 				
-				//2.4 Tính hệ số tăng ca (ca đêm/nghỉ/lễ) vào công ca và cộng dồn vào tổng công ngày
+				//Thoi gian ket thuc ca
+				Date shiftDate_End = theWorkingShift.getWorkingdate();
+				if (theWorkingShift.getShift_to_hour() > 24){
+					Calendar cal_End = Calendar.getInstance();
+					cal_End.setTime(shiftDate_End);
+					cal_End.add(Calendar.DAY_OF_MONTH, 1);
+					//Cong sai so
+					cal_End.add(Calendar.MINUTE, 30);
+					shiftDate_End = cal_End.getTime();
+				} else {
+					Calendar cal_End = Calendar.getInstance();
+					cal_End.setTime(shiftDate_End);
+					//Cong sai so
+					cal_End.add(Calendar.MINUTE, 30);
+					shiftDate_End = cal_End.getTime();
+				}
 				
-				//2.5 Ghi nhận tổng công ngày
+				List<TimeSheet> lsTimeSheet = timesheetService.getByTime(personnel.getRegister_code(), shiftDate_Start, shiftDate_End);
+				//Duyet tu dau den cuoi theo danh sach sap xep thứ tự thời gian tăng dần
+				for(TimeSheet theInOut:lsTimeSheet){
+					//2.1 Xac dinh xem Timerecorded la vao hay ra
+					//+ Xuất hiện lần đầu trong ca, tính từ đầu ca - sai số --> Vào
+					//+ Xuất hiện cuối cùng trong ca, tính từ cuối ca + sai số --> Ra
+					//+ Các lần Timerecorded ở giữa ca --> Không tính
+					
+					//2.2 Nếu trong khoảng sai số --> Cộng tròn công giờ trong ca 
+					//2.3 Nếu Vào muộn hơn sai số --> Lấy giờ vào thực tế; Ra sớm hơn sai số -- Lấy giờ ra thực tế
+					//--> Tính công giờ thực tê
+					
+					//2.4 Tính hệ số tăng ca (ca đêm/nghỉ/lễ) vào công ca và cộng dồn vào tổng công ngày
+					
+					//2.5 Ghi nhận tổng công ngày
+				}
 			}
-			
 			//III. Lay danh sach cac ngay nghi co dang ky của nhân sự trong khoảng thời gian
 			//3.1 Duyệt và xác định loại nghỉ, thời gian nghỉ
 			//3.2 Tính công theo hệ số công của ngày nghỉ (theo ca mặc định,ca ngày)
@@ -112,5 +131,9 @@ public class TimeSheet_Personnel implements Runnable{
 		} catch (Exception e){
 			e.printStackTrace();
 		}
+	}
+	private long tomilisecond(Integer hour, Integer minute){
+		long themili = hour*3600000 + minute*60000;
+		return themili;
 	}
 }
