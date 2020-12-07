@@ -1070,9 +1070,11 @@ public class PContract_POAPI {
 				} catch (Exception e) {
 					mes_err = "Có lỗi ở dòng " +(rowNum+1)+" và cột "+ colNum; 
 				}
+				finally {
+					workbook.close();
+					serverFile.delete();
+				}
 
-				workbook.close();
-				serverFile.delete();
 				if (mes_err == "") {
 					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
