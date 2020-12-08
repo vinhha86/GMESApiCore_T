@@ -78,12 +78,11 @@ public class TimeSheet_Personnel implements Runnable{
 			Date dateStart = sdf.parse(dateStartString);
 			Date dateEnd = sdf.parse(dateEndString);
 			
-			System.out.println(personnel.getFullname());
-			
 			//I. Lấy danh sách các ca đi làm của nhân sự được khai báo trong tháng
 			List<TimeSheetLunch> lsWorkingShift= timesheet_lunchService.getByPersonnelDate(personnel.getId(), dateStart, dateEnd);
 			
 			for (TimeSheetLunch theWorkingShift:lsWorkingShift){
+			
 				//II. Duyệt từng ngày, từng ca --> Lấy danh sách Timerecorded trong ca
 				//Tính thời gian bắt đầy và kết thúc ca - Sai so 30 phut truoc va sau
 				
@@ -130,8 +129,6 @@ public class TimeSheet_Personnel implements Runnable{
 					shiftDate_End_ss = cal_End.getTime();
 				}
 				
-				System.out.println(shiftDate_Start);
-				System.out.println(shiftDate_Start);
 				//Lay danh sach check in/out cua nhan su trong ca
 				List<TimeSheet> lsTimeSheet = timesheetService.getByTime(personnel.getRegister_code(), shiftDate_Start_ss, shiftDate_End_ss);
 				
@@ -154,6 +151,8 @@ public class TimeSheet_Personnel implements Runnable{
 					long work_mili = checkout.getTime() - checkin.getTime() - theWorkingShift.getShift_lunch_minute()*3600;
 					Float work_h =  (float) (work_mili/3600000);
 					
+					System.out.println(personnel.getRegister_code() + "/" + personnel.getFullname() + "/" 
+					+ checkin + "/" + checkout + "/" + work_mili + "/" + work_h);
 					//2.4 Tính hệ số tăng ca (ca đêm/nghỉ/lễ) vào công ca và cộng dồn vào tổng công ngày
 					
 					//2.5 Ghi nhận tổng công ngày
