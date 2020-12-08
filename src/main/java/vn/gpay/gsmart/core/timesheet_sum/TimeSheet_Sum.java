@@ -7,8 +7,18 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.personel.Personel;
+import vn.gpay.gsmart.core.timesheet_sum_col.TimeSheet_Sum_Col;
+import vn.gpay.gsmart.core.timesheet_sum_col_type.TimeSheet_Sum_ColType;
 
 @Table(name="timesheet_sum")
 @Entity
@@ -30,6 +40,59 @@ public class TimeSheet_Sum implements Serializable{
 	private Integer sumcolid_link;
 	private Integer sumcoltypeid_link;
 	private Float sumvalue;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="sumcolid_link",insertable=false,updatable =false)
+    private TimeSheet_Sum_Col sumcol;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="sumcoltypeid_link",insertable=false,updatable =false)
+    private TimeSheet_Sum_ColType sumcoltype;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="personnelid_link",insertable=false,updatable =false)
+    private Personel personnel;
+	
+	@Transient
+	public String getSumcol_code() {
+		if(sumcol != null) {
+			return sumcol.getCode();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getSumcoltype_name() {
+		if(sumcoltype != null) {
+			return sumcoltype.getName();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getPersonel_fullname() {
+		if(personnel != null) {
+			return personnel.getFullname();
+		}
+		return "";
+	}
+	@Transient
+	public String getPersonel_saltypecode() {
+		if(personnel != null) {
+			return personnel.getSaltype_code();
+		}
+		return "";
+	}
+	@Transient
+	public String getPersonel_sallevelcode() {
+		if(personnel != null) {
+			return personnel.getSallevel_code();
+		}
+		return "";
+	}		
 	public Long getId() {
 		return id;
 	}

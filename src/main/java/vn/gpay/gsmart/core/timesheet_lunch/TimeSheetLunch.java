@@ -77,6 +77,12 @@ public class TimeSheetLunch implements Serializable {
 			return shifttype.getIs_default();
 		return null;
 	}
+	@Transient
+	public Integer getShift_lunch_minute() {
+		if(shifttype != null)
+			return shifttype.getLunch_minute();
+		return null;
+	}
 	public Long getId() {
 		return id;
 	}
