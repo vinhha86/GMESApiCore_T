@@ -871,7 +871,7 @@ public class ProductAPI {
 			String FolderPath = commonService.getFolderPath(entity.product_type);
 			
 			Product product = productService.findOne(entity.id);
-			String filename = product.getCode()+"_"+entity.img+"."+entity.ext;
+			String filename = product.getBuyercode().replace(" " , "")+"_"+entity.img+"."+entity.ext;
 			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
 			String filePath = uploadRootPath+"/"+ filename;
 			Path path = Paths.get(filePath);
@@ -897,7 +897,7 @@ public class ProductAPI {
 			String FolderPath = commonService.getFolderPath(entity.product_type);
 			
 			Product product = productService.findOne(entity.id);
-			String filename = product.getCode()+"_"+entity.img+"."+entity.ext;
+			String filename = product.getBuyercode().replace(" " , "")+"_"+entity.img+"."+entity.ext;
 			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
 			String filePath = uploadRootPath+"/"+ filename;
 			Path path = Paths.get(filePath);
@@ -936,7 +936,7 @@ public class ProductAPI {
 			if (name != null && name.length() > 0) {
 				String[] str = name.split("\\.");
 				String extend = str[str.length -1];	
-				name = product.getCode()+"_"+img+"."+extend;
+				name = product.getBuyercode().replace(" " , "")+"_"+img+"."+extend;
 				File serverFile = new File(uploadRootDir.getAbsolutePath() + File.separator + name);
 
 				BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));

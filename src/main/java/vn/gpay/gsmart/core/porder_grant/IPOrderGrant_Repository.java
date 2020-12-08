@@ -70,4 +70,13 @@ public interface IPOrderGrant_Repository extends JpaRepository<POrderGrant, Long
 			+ " a.granttoorgid_link = :granttoorgid_link"
 			+ " and a.status >= 4")
 	public List<POrderGrant>getProcessingByOrgId(@Param ("granttoorgid_link")final Long granttoorgid_link);
+	
+	@Query(value = "select a from POrderGrant a "
+			+ "inner join POrderGrant_SKU b on a.id = b.pordergrantid_link "
+			+ "where a.porderid_link = :porderid_link "
+			+ " and b.pcontract_poid_link =  :pcontract_poid_link "
+			+ "group by a")
+	public List<POrderGrant>getbyporder_andpo(
+			@Param ("porderid_link")final Long porderid_link,
+			@Param ("pcontract_poid_link")final Long pcontract_poid_link);
 }

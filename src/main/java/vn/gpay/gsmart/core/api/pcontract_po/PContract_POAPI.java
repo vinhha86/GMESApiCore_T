@@ -163,9 +163,9 @@ public class PContract_POAPI {
 				name = current_time.getTime() + "." + extend;
 				File serverFile = new File(uploadRootDir.getAbsolutePath() + File.separator + name);
 
-				BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-				stream.write(file.getBytes());
-				stream.close();
+//				BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+//				stream.write(file.getBytes());
+//				stream.close();
 
 				// doc file upload
 				XSSFWorkbook workbook = new XSSFWorkbook(serverFile);

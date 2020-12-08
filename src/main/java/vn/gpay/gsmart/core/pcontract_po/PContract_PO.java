@@ -21,6 +21,8 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.category.Port;
+import vn.gpay.gsmart.core.category.ShipMode;
 import vn.gpay.gsmart.core.currency.Currency;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract_po_productivity.PContract_PO_Productivity;
@@ -175,6 +177,28 @@ public class PContract_PO implements Serializable {/**
     @JoinColumn(name="orgmerchandiseid_link",insertable=false,updatable =false)
     private Org org_factory;
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="shipmodeid_link",insertable=false,updatable =false)
+    private ShipMode shipmode;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="porttoid_link",insertable=false,updatable =false)
+    private Port port_to;
+	
+	@Transient 
+	public String getPortTo() {
+		if(port_to!=null)
+			return port_to.getCode();
+		return "";
+	}
+	@Transient
+	public String getShipMode() {
+		if(shipmode != null)
+			return shipmode.getName();
+		return "";
+	}
 	@Transient
 	public Boolean getCheckamount() {
 		int amount_sku = 0;

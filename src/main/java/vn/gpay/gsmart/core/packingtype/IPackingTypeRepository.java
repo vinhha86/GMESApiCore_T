@@ -20,4 +20,10 @@ public interface IPackingTypeRepository extends JpaRepository<PackingType, Long>
 	public List<PackingType> getbyname(
 			@Param ("orgrootid_link")final  Long orgrootid_link,
 			@Param ("name")final  String name);
+	
+	@Query(value = "select c from PackingType c where c.orgrootid_link = :orgrootid_link "
+			+ "and c.id in :listid")
+	public List<PackingType> getbylistid(
+			@Param ("orgrootid_link")final  Long orgrootid_link,
+			@Param ("listid")final  List<Long> listid);
 }

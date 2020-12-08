@@ -196,4 +196,9 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		
 		return repo.getPO_Offer_Accept_ByPContract_AndOrg(pcontractid_link, productid_link, list_orgid_link);
 	}
+	@Override
+	public List<PContract_PO> getby_porder(Long porderid_link) {
+		// TODO Auto-generated method stub
+		return repo.getby_porder(porderid_link);
+	}
 }

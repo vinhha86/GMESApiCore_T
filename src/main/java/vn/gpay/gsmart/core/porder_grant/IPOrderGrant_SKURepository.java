@@ -56,4 +56,37 @@ public interface IPOrderGrant_SKURepository extends JpaRepository<POrderGrant_SK
 			@Param ("pcontract_poid_link")final Long pcontract_poid_link,
 			@Param ("skuid_link")final Long skuid_link
 			);
+	
+	@Query(value = "select a from POrderGrant_SKU a "
+			+ "inner join SKU_Attribute_Value c on a.skuid_link = c.skuid_link "
+			+ "where a.pordergrantid_link = :pordergrantid_link "
+			+ "and (c.attributeid_link = 4 and c.attributevalueid_link = :colorid_link)"
+			)
+		public List<POrderGrant_SKU>getlistco_by_mau(
+				@Param ("pordergrantid_link")final Long pordergrantid_link,
+				@Param ("colorid_link")final Long colorid_link
+				);
+	
+	@Query(value = "select b.value from POrderGrant_SKU a "
+			+ "inner join SKU_Attribute_Value c on a.skuid_link = c.skuid_link "
+			+ "inner join Attributevalue b on c.attributevalueid_link = b.id "
+			+ "where a.pordergrantid_link = :pordergrantid_link and b.attributeid_link = 4 "
+			+ "group by b.value"
+			)
+		public List<String>getlistmau(
+				@Param ("pordergrantid_link")final Long pordergrantid_link
+				);
+	
+	@Query(value = "select b.value from "
+			+ "POrderGrant_SKU a "
+			+ "inner join POrderGrant d on a.pordergrantid_link = d.id "
+			+ "inner join SKU_Attribute_Value c on a.skuid_link = c.skuid_link "
+			+ "inner join Attributevalue b on c.attributevalueid_link = b.id "
+			+ "where d.porderid_link = :porderid_link and b.attributeid_link = 30 "
+			+ "group by b.value, b.sortvalue "
+			+ "order by b.sortvalue"
+			)
+		public List<String>getlistco(
+				@Param ("porderid_link")final Long porderid_link
+				);
 }

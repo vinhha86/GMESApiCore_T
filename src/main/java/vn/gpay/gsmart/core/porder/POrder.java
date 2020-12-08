@@ -135,6 +135,24 @@ public class POrder implements Serializable {
     private List<POrderGrant> list_pordergrant = new ArrayList<POrderGrant>();
 	
 	@Transient
+	public String getPortTo() {
+		if(pcontract_po!=null)
+			return pcontract_po.getPortTo();
+		return "";
+	}
+	@Transient
+	public String getShipMode() {
+		if(pcontract_po!=null)
+			return pcontract_po.getShipMode();
+		return "";
+	}
+	@Transient
+	public String getPackingMethod() {
+		if(pcontract_po!=null)
+			return pcontract_po.getPackingnotice();
+		return "";
+	}
+	@Transient
 	public int getProductivity_po() {
 		if(pcontract_po!=null)
 			return pcontract_po.getProductivity_byproduct(productid_link);
@@ -270,6 +288,13 @@ public class POrder implements Serializable {
 	}
 	
 	@Transient
+	public String getMerName() {
+		if(pcontract_po!=null)
+			return pcontract_po.getMerchandiser_name();
+		return "";
+	}
+	
+	@Transient
 	public String getContractcode() {
 		if(pcontract != null) {
 			return pcontract.getContractcode();
@@ -349,6 +374,14 @@ public class POrder implements Serializable {
 	public String getBuyercode() {
 		if(product != null) {
 			return product.getBuyercode();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getImageurl() {
+		if(product != null) {
+			return product.getImgurl1();
 		}
 		return "";
 	}

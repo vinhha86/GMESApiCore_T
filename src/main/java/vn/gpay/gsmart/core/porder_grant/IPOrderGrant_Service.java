@@ -21,6 +21,7 @@ public interface IPOrderGrant_Service extends Operations<POrderGrant>{
 	List<POrderGrant>getByOrgId(Long granttoorgid_link);
 
 	List<POrderGrant> getProcessingByOrgId(Long granttoorgid_link);
+	List<POrderGrant> getbyporder_andpo(Long porderid_link, Long pcontract_poid_link);
 
 	void deleteAll(POrderGrant pordergrant);
 }

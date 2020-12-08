@@ -189,6 +189,15 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 	public List<PContract_PO> getBySearch_CodeOnly(
 			@Param ("po_code")final String po_code);
 	
+	@Query(value = "select c from PContract_PO c "
+			+ "inner join POrderGrant_SKU b on b.pcontract_poid_link = c.id "
+			+ "inner join POrderGrant a on a.id = b.pordergrantid_link "
+			+ "where a.porderid_link = :porderid_link "
+			+ "group by c"
+			)
+	public List<PContract_PO> getby_porder(
+			@Param ("porderid_link")final Long porderid_link);
+	
 	@Query(value = "select  sum(a.po_quantity), c.name "
 			+ "from PContract_PO a "
 			+ "inner join PContract b on a.pcontractid_link = b.id "

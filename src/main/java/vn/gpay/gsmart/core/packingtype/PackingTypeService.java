@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.packingtype;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,5 +30,24 @@ public class PackingTypeService extends AbstractService<PackingType> implements 
 	public List<PackingType> getbyname(String name, long orgrootid_link) {
 		// TODO Auto-generated method stub
 		return repo.getbyname(orgrootid_link, name);
+	}
+
+	@Override
+	public String getby_listid(String listid, long orgrootid_link) {
+		// TODO Auto-generated method stub
+		List<Long> list = new ArrayList<Long>();
+		String[] arr_id = listid.split(",");
+		for(String s_id : arr_id) {
+			list.add(Long.parseLong(s_id));
+		}
+		List<PackingType> list_packing = repo.getbylistid(orgrootid_link, list);
+		String name = "";
+		for(PackingType packing : list_packing) {
+			if(name=="")
+				name += packing.getCode();
+			else 
+				name += "," + packing.getCode();
+		}
+		return name;
 	}
 }

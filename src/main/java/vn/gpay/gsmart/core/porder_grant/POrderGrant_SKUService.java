@@ -47,6 +47,29 @@ public class POrderGrant_SKUService extends AbstractService<POrderGrant_SKU> imp
 		return repo.getPOrderGrant_SKUbySKUid_linkAndGrantId_AndPO(skuid_link, pordergrantid_link, pcontract_poid_link);
 	}
 
+	@Override
+	public List<String> getlistmau_by_grant(Long pordergrantid_link) {
+		// TODO Auto-generated method stub
+		return repo.getlistmau(pordergrantid_link);
+	}
+
+	@Override
+	public List<POrderGrant_SKU> getlistco_by_grant_andmau(Long pordergrantid_link, long colorid_link) {
+		// TODO Auto-generated method stub
+		return repo.getlistco_by_mau(pordergrantid_link, colorid_link);
+	}
+
+	@Override
+	public List<String> getlistco(Long porderid_link) {
+		// TODO Auto-generated method stub
+//		List<Object> list = repo.getlistco(porderid_link);
+//		List<String> list_ret = new ArrayList<String>();
+//		for(Object obj : list) {
+////			list_ret.add(o)
+//		}
+		return repo.getlistco(porderid_link);
+	}
+
 //	@Override
 //	public POrderGrant_SKU getPOrderGrant_SKUbySKUid_link(Long skuid_link) {
 //		return repo.getPOrderGrant_SKUbySKUid_link(skuid_link);

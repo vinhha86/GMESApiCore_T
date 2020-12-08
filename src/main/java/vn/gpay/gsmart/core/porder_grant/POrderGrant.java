@@ -100,6 +100,24 @@ public class POrderGrant implements Serializable {
     private Org org;
 	
 	@Transient
+	public String getPortTo() {
+		if(porder!=null) {
+			return porder.getPortTo();
+		}
+		return "";
+	}
+	@Transient
+	public String getPackingMethod() {
+		if(porder!=null) {
+			return porder.getPackingMethod();
+		}
+		return "";
+	}
+	@Transient
+	public String getXuongTo() {
+		return org.getParentcode()+"-"+org.getCode();
+	}
+	@Transient
 	public int getProductivity_po() {
 		if(porder!=null) {
 			return porder.getProductivity_po();
@@ -124,6 +142,12 @@ public class POrderGrant implements Serializable {
 			return porder.getPo_buyer();
 		return "";
 	}	
+	@Transient
+	public String getShipMode() {
+		if(porder!=null)
+			return porder.getShipMode();
+		return "";
+	}
 	@Transient
 	public String getProductcode() {
 		if(porder!=null)

@@ -69,6 +69,7 @@ public class ReportAPI {
 	@Autowired IProductService productService;
 	@Autowired IPContract_Price_Service priceService;
 	
+	
 	@RequestMapping(value = "/quatation", method = RequestMethod.POST)
 	public ResponseEntity<report_quotation_response> Quotation(HttpServletRequest request, @RequestBody report_quotation_request entity) throws IOException {
 		report_quotation_response response = new report_quotation_response();
