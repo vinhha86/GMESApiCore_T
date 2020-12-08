@@ -144,92 +144,96 @@ public class TimeSheetLunchAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long orgrootid_link = user.getRootorgid_link();
-
-			TimeSheetLunchBinding temp = entity.data;
-			String dataIndex = entity.dataIndex;
 			
-			Long personnelid_link = temp.getPersonnelid_link();
-			Date workingdate = temp.getWorkingdate();
+			List<TimeSheetLunchBinding> listTimeSheetLunchBinding = entity.data;
 			
-			if(dataIndex.equals("workingShift1") || dataIndex.equals("lunchShift1")) {
-				Integer shifttypeid_link = 1;
-				boolean isWorkingShift = temp.isWorkingShift1();
-				boolean isLunchShift = temp.isLunchShift1();
-				List<TimeSheetLunch> list = timeSheetLunchService.getByPersonnelDateAndShift(
-						personnelid_link, workingdate, shifttypeid_link);
+			for(TimeSheetLunchBinding temp : listTimeSheetLunchBinding) {
+	//			TimeSheetLunchBinding temp = entity.data;
+				String dataIndex = temp.getDataIndex();
 				
-				if(list.size() > 0) {
-					TimeSheetLunch timeSheetLunch = list.get(0);
-					timeSheetLunch.setIsworking(isWorkingShift);
-					timeSheetLunch.setIslunch(isLunchShift);
-					timeSheetLunchService.save(timeSheetLunch);
-				}else {
-					TimeSheetLunch timeSheetLunch = new TimeSheetLunch();
-					timeSheetLunch.setId(0L);
-					timeSheetLunch.setOrgrootid_link(orgrootid_link);
-					timeSheetLunch.setPersonnelid_link(personnelid_link);
-					timeSheetLunch.setShifttypeid_link(1);
-					timeSheetLunch.setUsercreatedid_link(user.getId());
-					timeSheetLunch.setTimecreated(new Date());
-					timeSheetLunch.setWorkingdate(workingdate);
-					timeSheetLunch.setIsworking(isWorkingShift);
-					timeSheetLunch.setIslunch(isLunchShift);
-					timeSheetLunch.setStatus(0);
-					timeSheetLunchService.save(timeSheetLunch);
+				Long personnelid_link = temp.getPersonnelid_link();
+				Date workingdate = temp.getWorkingdate();
+				
+				if(dataIndex.equals("workingShift1") || dataIndex.equals("lunchShift1")) {
+					Integer shifttypeid_link = 1;
+					boolean isWorkingShift = temp.isWorkingShift1();
+					boolean isLunchShift = temp.isLunchShift1();
+					List<TimeSheetLunch> list = timeSheetLunchService.getByPersonnelDateAndShift(
+							personnelid_link, workingdate, shifttypeid_link);
+					
+					if(list.size() > 0) {
+						TimeSheetLunch timeSheetLunch = list.get(0);
+						timeSheetLunch.setIsworking(isWorkingShift);
+						timeSheetLunch.setIslunch(isLunchShift);
+						timeSheetLunchService.save(timeSheetLunch);
+					}else {
+						TimeSheetLunch timeSheetLunch = new TimeSheetLunch();
+						timeSheetLunch.setId(0L);
+						timeSheetLunch.setOrgrootid_link(orgrootid_link);
+						timeSheetLunch.setPersonnelid_link(personnelid_link);
+						timeSheetLunch.setShifttypeid_link(1);
+						timeSheetLunch.setUsercreatedid_link(user.getId());
+						timeSheetLunch.setTimecreated(new Date());
+						timeSheetLunch.setWorkingdate(workingdate);
+						timeSheetLunch.setIsworking(isWorkingShift);
+						timeSheetLunch.setIslunch(isLunchShift);
+						timeSheetLunch.setStatus(0);
+						timeSheetLunchService.save(timeSheetLunch);
+					}
 				}
-			}
-			if(dataIndex.equals("workingShift2") || dataIndex.equals("lunchShift2")) {
-				Integer shifttypeid_link = 2;
-				boolean isWorkingShift = temp.isWorkingShift2();
-				boolean isLunchShift = temp.isLunchShift2();
-				List<TimeSheetLunch> list = timeSheetLunchService.getByPersonnelDateAndShift(
-						personnelid_link, workingdate, shifttypeid_link);
-				
-				if(list.size() > 0) {
-					TimeSheetLunch timeSheetLunch = list.get(0);
-					timeSheetLunch.setIsworking(isWorkingShift);
-					timeSheetLunch.setIslunch(isLunchShift);
-					timeSheetLunchService.save(timeSheetLunch);
-				}else {
-					TimeSheetLunch timeSheetLunch = new TimeSheetLunch();
-					timeSheetLunch.setId(0L);
-					timeSheetLunch.setOrgrootid_link(orgrootid_link);
-					timeSheetLunch.setPersonnelid_link(personnelid_link);
-					timeSheetLunch.setShifttypeid_link(2);
-					timeSheetLunch.setUsercreatedid_link(user.getId());
-					timeSheetLunch.setTimecreated(new Date());
-					timeSheetLunch.setWorkingdate(workingdate);
-					timeSheetLunch.setIsworking(isWorkingShift);
-					timeSheetLunch.setIslunch(isLunchShift);
-					timeSheetLunch.setStatus(0);
-					timeSheetLunchService.save(timeSheetLunch);
+				if(dataIndex.equals("workingShift2") || dataIndex.equals("lunchShift2")) {
+					Integer shifttypeid_link = 2;
+					boolean isWorkingShift = temp.isWorkingShift2();
+					boolean isLunchShift = temp.isLunchShift2();
+					List<TimeSheetLunch> list = timeSheetLunchService.getByPersonnelDateAndShift(
+							personnelid_link, workingdate, shifttypeid_link);
+					
+					if(list.size() > 0) {
+						TimeSheetLunch timeSheetLunch = list.get(0);
+						timeSheetLunch.setIsworking(isWorkingShift);
+						timeSheetLunch.setIslunch(isLunchShift);
+						timeSheetLunchService.save(timeSheetLunch);
+					}else {
+						TimeSheetLunch timeSheetLunch = new TimeSheetLunch();
+						timeSheetLunch.setId(0L);
+						timeSheetLunch.setOrgrootid_link(orgrootid_link);
+						timeSheetLunch.setPersonnelid_link(personnelid_link);
+						timeSheetLunch.setShifttypeid_link(2);
+						timeSheetLunch.setUsercreatedid_link(user.getId());
+						timeSheetLunch.setTimecreated(new Date());
+						timeSheetLunch.setWorkingdate(workingdate);
+						timeSheetLunch.setIsworking(isWorkingShift);
+						timeSheetLunch.setIslunch(isLunchShift);
+						timeSheetLunch.setStatus(0);
+						timeSheetLunchService.save(timeSheetLunch);
+					}
 				}
-			}
-			if(dataIndex.equals("workingShift3") || dataIndex.equals("lunchShift3")) {
-				Integer shifttypeid_link = 3;
-				boolean isWorkingShift = temp.isWorkingShift3();
-				boolean isLunchShift = temp.isLunchShift3();
-				List<TimeSheetLunch> list = timeSheetLunchService.getByPersonnelDateAndShift(
-						personnelid_link, workingdate, shifttypeid_link);
-				
-				if(list.size() > 0) {
-					TimeSheetLunch timeSheetLunch = list.get(0);
-					timeSheetLunch.setIsworking(isWorkingShift);
-					timeSheetLunch.setIslunch(isLunchShift);
-					timeSheetLunchService.save(timeSheetLunch);
-				}else {
-					TimeSheetLunch timeSheetLunch = new TimeSheetLunch();
-					timeSheetLunch.setId(0L);
-					timeSheetLunch.setOrgrootid_link(orgrootid_link);
-					timeSheetLunch.setPersonnelid_link(personnelid_link);
-					timeSheetLunch.setShifttypeid_link(3);
-					timeSheetLunch.setUsercreatedid_link(user.getId());
-					timeSheetLunch.setTimecreated(new Date());
-					timeSheetLunch.setWorkingdate(workingdate);
-					timeSheetLunch.setIsworking(isWorkingShift);
-					timeSheetLunch.setIslunch(isLunchShift);
-					timeSheetLunch.setStatus(0);
-					timeSheetLunchService.save(timeSheetLunch);
+				if(dataIndex.equals("workingShift3") || dataIndex.equals("lunchShift3")) {
+					Integer shifttypeid_link = 3;
+					boolean isWorkingShift = temp.isWorkingShift3();
+					boolean isLunchShift = temp.isLunchShift3();
+					List<TimeSheetLunch> list = timeSheetLunchService.getByPersonnelDateAndShift(
+							personnelid_link, workingdate, shifttypeid_link);
+					
+					if(list.size() > 0) {
+						TimeSheetLunch timeSheetLunch = list.get(0);
+						timeSheetLunch.setIsworking(isWorkingShift);
+						timeSheetLunch.setIslunch(isLunchShift);
+						timeSheetLunchService.save(timeSheetLunch);
+					}else {
+						TimeSheetLunch timeSheetLunch = new TimeSheetLunch();
+						timeSheetLunch.setId(0L);
+						timeSheetLunch.setOrgrootid_link(orgrootid_link);
+						timeSheetLunch.setPersonnelid_link(personnelid_link);
+						timeSheetLunch.setShifttypeid_link(3);
+						timeSheetLunch.setUsercreatedid_link(user.getId());
+						timeSheetLunch.setTimecreated(new Date());
+						timeSheetLunch.setWorkingdate(workingdate);
+						timeSheetLunch.setIsworking(isWorkingShift);
+						timeSheetLunch.setIslunch(isLunchShift);
+						timeSheetLunch.setStatus(0);
+						timeSheetLunchService.save(timeSheetLunch);
+					}
 				}
 			}
 			

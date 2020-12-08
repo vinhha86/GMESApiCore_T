@@ -15,6 +15,7 @@ public class TimeSheetLunchBinding {
 	private boolean isLunchShift2;
 	private boolean isLunchShift3;
 	private Integer status;
+	private String dataIndex;
 	
 	public Long getPersonnelid_link() {
 		return personnelid_link;
@@ -82,5 +83,10 @@ public class TimeSheetLunchBinding {
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
-	
+	public String getDataIndex() {
+		return dataIndex;
+	}
+	public void setDataIndex(String dataIndex) {
+		this.dataIndex = dataIndex;
+	}
 }
