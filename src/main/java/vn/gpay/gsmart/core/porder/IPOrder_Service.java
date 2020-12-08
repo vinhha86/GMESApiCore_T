@@ -39,8 +39,10 @@ public interface IPOrder_Service extends Operations<POrder> {
 	public List<POrder> getPOrderBySearch(
 			Long buyerid, Long vendorid, Long factoryid, 
 			String pobuyer, String stylebuyer, 
-			List<Integer> statuses, Long granttoorgid_link);
+			List<Integer> statuses, Long granttoorgid_link,
+			Date golivedatefrom, Date golivedateto);
 	public List<POrder> getPOrderBySearch(
 			Long buyerid, Long vendorid, Long factoryid, 
-			String pobuyer, String stylebuyer, Long granttoorgid_link);
+			String pobuyer, String stylebuyer, Long granttoorgid_link,
+			Date golivedatefrom, Date golivedateto);
 }

@@ -35,6 +35,7 @@ import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.Common;
+import vn.gpay.gsmart.core.utils.GPAYDateFormat;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -167,7 +168,12 @@ public class POrderListAPI {
 			Long buyerid = entity.buyerid;
 			Long vendorid = entity.vendorid;
 			Long factoryid = entity.factoryid;
+			Date golivedatefrom = entity.golivedatefrom;
+			Date golivedateto = entity.golivedateto;
 			List<Integer> statuses = entity.status;
+			
+//			System.out.println(golivedatefrom);
+//			System.out.println(golivedateto);
 			
 			if(statuses.size() == 0) {
 				response.data = porderService.getPOrderBySearch(
@@ -176,7 +182,9 @@ public class POrderListAPI {
 							factoryid,
 							pobuyer,
 							stylebuyer,
-							granttoorgid_link
+							granttoorgid_link,
+							GPAYDateFormat.atStartOfDay(golivedatefrom),
+							GPAYDateFormat.atEndOfDay(golivedateto)
 							);
 			}else {
 				response.data = porderService.getPOrderBySearch(
@@ -186,7 +194,9 @@ public class POrderListAPI {
 							pobuyer,
 							stylebuyer,
 							statuses,
-							granttoorgid_link
+							granttoorgid_link,
+							GPAYDateFormat.atStartOfDay(golivedatefrom),
+							GPAYDateFormat.atEndOfDay(golivedateto)
 							);
 			}
 			
@@ -207,6 +217,7 @@ public class POrderListAPI {
 		}catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
+			e.printStackTrace();
 		    return new ResponseEntity<POrderList_getlist_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}

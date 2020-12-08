@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.porder;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Sort;
@@ -80,6 +81,8 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 			+ "and lower(d.buyercode) like lower(concat('%',:stylebuyer,'%')) "
 //			+ "and (:statuses is null or a.status in :statuses) "
 			+ "and a.status in :statuses "
+			+ "and (CAST(:golivedatefrom AS date) IS NULL or a.golivedate >= :golivedatefrom) "
+			+ "and (CAST(:golivedateto AS date) IS NULL or a.golivedate <= :golivedateto) "
 			+ "order by a.granttoorgid_link, d.buyercode, a.golivedate "
 			)
 	public List<POrder> getPOrderBySearch(
@@ -89,7 +92,9 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 			@Param ("pobuyer")final String pobuyer,
 			@Param ("stylebuyer")final String stylebuyer,
 			@Param ("statuses")final List<Integer> statuses,
-			@Param ("granttoorgid_link")final Long granttoorgid_link
+			@Param ("granttoorgid_link")final Long granttoorgid_link,
+			@Param ("golivedatefrom")final Date golivedatefrom,
+			@Param ("golivedateto")final Date golivedateto
 			);
 	
 	@Query(value = "select a from POrder a "
@@ -102,6 +107,8 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 			+ "and (a.granttoorgid_link = :granttoorgid_link or :granttoorgid_link is null) "
 			+ "and lower(c.po_buyer) like lower(concat('%',:pobuyer,'%')) "
 			+ "and lower(d.buyercode) like lower(concat('%',:stylebuyer,'%')) "
+			+ "and (CAST(:golivedatefrom AS date) IS NULL or a.golivedate >= :golivedatefrom) "
+			+ "and (CAST(:golivedateto AS date) IS NULL or a.golivedate <= :golivedateto) "
 			+ "order by a.granttoorgid_link, d.buyercode, a.golivedate "
 			)
 	public List<POrder> getPOrderBySearch(
@@ -110,7 +117,9 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 			@Param ("factoryid")final Long factoryid,
 			@Param ("pobuyer")final String pobuyer,
 			@Param ("stylebuyer")final String stylebuyer,
-			@Param ("granttoorgid_link")final Long granttoorgid_link
+			@Param ("granttoorgid_link")final Long granttoorgid_link,
+			@Param ("golivedatefrom")final Date golivedatefrom,
+			@Param ("golivedateto")final Date golivedateto
 			);
 	
 	
