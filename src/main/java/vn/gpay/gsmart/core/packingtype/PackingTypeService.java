@@ -34,14 +34,14 @@ public class PackingTypeService extends AbstractService<PackingType> implements 
 
 	@Override
 	public String getby_listid(String listid, long orgrootid_link) {
-		if(listid=="") return "";
+		if(listid.equals("")) return "";
 		// TODO Auto-generated method stub
 		List<Long> list = new ArrayList<Long>();
 		String[] arr_id = listid.split(",");
 		for(String s_id : arr_id) {
 			list.add(Long.parseLong(s_id));
 		}
-		List<PackingType> list_packing = repo.getbylistid(orgrootid_link, list);
+		List<PackingType> list_packing = repo.getbylistid(orgrootid_link, list); 
 		String name = "";
 		for(PackingType packing : list_packing) {
 			if(name=="")
