@@ -1839,6 +1839,16 @@ public class PContract_POAPI {
 
 			pcontract_po = pcontract_POService.save(pcontract_po);
 
+			//Cap nhat productivity
+			List<PContract_PO_Productivity> list_productivity = entity.data.getPcontract_po_productivity();
+			for (PContract_PO_Productivity pContract_PO_Productivity : list_productivity) {
+				if(pContract_PO_Productivity.getId() == null) {
+					pContract_PO_Productivity.setOrgrootid_link(orgrootid_link);
+					pContract_PO_Productivity.setPcontract_poid_link(pcontract_po.getId());
+				}
+				productivityService.save(pContract_PO_Productivity);
+			}
+			
 			// Update POrder_Req
 //			int total = 0;
 			List<POrder_Req> lst_porders = entity.po_orders;
