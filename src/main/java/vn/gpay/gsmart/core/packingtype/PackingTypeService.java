@@ -34,6 +34,7 @@ public class PackingTypeService extends AbstractService<PackingType> implements 
 
 	@Override
 	public String getby_listid(String listid, long orgrootid_link) {
+		if(listid=="") return "";
 		// TODO Auto-generated method stub
 		List<Long> list = new ArrayList<Long>();
 		String[] arr_id = listid.split(",");

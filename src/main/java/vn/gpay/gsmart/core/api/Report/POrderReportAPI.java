@@ -194,27 +194,33 @@ public class POrderReportAPI
 			cell_L3.setCellStyle(cellStyle_align_left);
 			
 			//add anh san pham
-			String image_product = porder.getImageurl();
-			String FolderPath = commonService.getFolderPath(10);
-			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-			InputStream is_img = new FileInputStream(uploadRootPath+"/"+image_product);
-			byte[] img = IOUtils.toByteArray(is_img);
+			try {
+				String image_product = porder.getImageurl();
+				String FolderPath = commonService.getFolderPath(10);
+				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+				InputStream is_img = new FileInputStream(uploadRootPath+"/"+image_product);
+				byte[] img = IOUtils.toByteArray(is_img);
+				
+				int pictureIdx = workbook.addPicture(img, Workbook.PICTURE_TYPE_JPEG);
+				is_img.close();
+				
+				XSSFDrawing  drawing = sheet.createDrawingPatriarch();
+				
+				// add a picture shape
+				XSSFClientAnchor  anchor = new XSSFClientAnchor();
+				
+				// set top-left corner of the picture,
+				// subsequent call of Picture#resize() will operate relative to it
+				anchor.setCol1(ColumnExcel.R);
+				anchor.setRow1(0);
+				anchor.setCol2(ColumnExcel.R+2);
+				anchor.setRow2(3);
+				drawing.createPicture(anchor, pictureIdx);
+			}
+			catch (Exception e) {
+				// TODO: handle exception
+			}
 			
-			int pictureIdx = workbook.addPicture(img, Workbook.PICTURE_TYPE_JPEG);
-			is_img.close();
-			
-			XSSFDrawing  drawing = sheet.createDrawingPatriarch();
-			
-			// add a picture shape
-			XSSFClientAnchor  anchor = new XSSFClientAnchor();
-			
-			// set top-left corner of the picture,
-			// subsequent call of Picture#resize() will operate relative to it
-			anchor.setCol1(ColumnExcel.R);
-			anchor.setRow1(0);
-			anchor.setCol2(ColumnExcel.R+2);
-			anchor.setRow2(3);
-			drawing.createPicture(anchor, pictureIdx);
 			
 			//Ghi danh sach
 
@@ -283,7 +289,7 @@ public class POrderReportAPI
 						
 						Cell cell_ptdg = row_detail.createCell(ColumnExcel.F);
 						String s_packingid = po.getPackingnotice();
-						s_packingid.replace(";", ",");
+						s_packingid = s_packingid.replace(";", ",");
 						String s_packingname = packingService.getby_listid(s_packingid, orgrootid_link);
 						cell_ptdg.setCellValue(s_packingname);
 						cell_ptdg.setCellStyle(cellStyle_align_left_9);
