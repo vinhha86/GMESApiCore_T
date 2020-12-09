@@ -236,8 +236,10 @@ public class PContract_PO implements Serializable {/**
 		}
 		else if(pcontract_po_productivity!=null) {
 			for (PContract_PO_Productivity pContract_PO_Productivity2 : pcontract_po_productivity) {
-				if(pContract_PO_Productivity2.getProductid_link().equals(productid_link)) {
-					return pContract_PO_Productivity2.getPlan_productivity();
+				if(pContract_PO_Productivity2.getProductid_link() != null) {
+					if(pContract_PO_Productivity2.getProductid_link().equals(productid_link)) {
+						return pContract_PO_Productivity2.getPlan_productivity();
+					}
 				}
 			}
 		}
