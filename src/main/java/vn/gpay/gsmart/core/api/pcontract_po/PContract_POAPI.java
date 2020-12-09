@@ -56,6 +56,8 @@ import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
@@ -135,6 +137,7 @@ public class PContract_POAPI {
 	@Autowired IPackingTypeService packingService;
 	@Autowired IAttributeValueService attributevalueService;
 	@Autowired IPContractProductSKUService ppskuService;
+	@Autowired IPOrderGrant_Service grantService;
 
 	@RequestMapping(value = "/upload_template", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadTemplate(HttpServletRequest request,
@@ -2158,6 +2161,17 @@ public class PContract_POAPI {
 					POrder porder = list_porder.get(0);
 					if(porder.getStatus() == POrderStatus.PORDER_STATUS_UNCONFIRM)
 						porder.setStatus(POrderStatus.PORDER_STATUS_GRANTED);
+					
+
+					//Cap nhat porder_grant status ve 1
+					List<POrderGrant> list_grant = grantService.getByOrderId(porder.getId());
+					for(POrderGrant grant : list_grant) {
+						if(grant.getStatus() == -1)
+						{
+							grant.setStatus(1);
+							grantService.save(grant);
+						}
+					}
 				}
 				else {
 					porderService.createPOrder(req, user);
