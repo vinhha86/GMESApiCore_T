@@ -24,6 +24,7 @@ import org.hibernate.annotations.NotFoundAction;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
+import vn.gpay.gsmart.core.pcontract_po_productivity.PContract_PO_Productivity;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.sizeset.SizeSet;
@@ -109,7 +110,13 @@ public class POrder_Req implements Serializable {
 	@Transient
 	public Integer get_ProductivityPO() {
 		if(pcontract_po!=null)
-			return pcontract_po.getPlan_productivity() == null ? 0 : pcontract_po.getPlan_productivity();
+		{
+			for(PContract_PO_Productivity po_productivity: pcontract_po.getPcontract_po_productivity()) {
+				if(po_productivity.getProductid_link().equals(productid_link) || po_productivity.getProductid_link() == productid_link) {
+					return po_productivity.getPlan_productivity();
+				}
+			}
+		}
 		return 0;
 	}
 	@Transient

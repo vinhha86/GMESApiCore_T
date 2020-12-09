@@ -142,7 +142,7 @@ public class ScheduleAPI {
 			
 			//Lay danh sach nha may va to
 			List<Schedule_plan> list_sch_plan = new ArrayList<Schedule_plan>();
-			
+			orgid_link = orgid_link == 0 ? 1 : orgid_link;
 			Org orgroot = orgService.findOne(orgid_link);
 			
 			//Lay danh sach nhung don vi duoc phep xem cua user dang dang nhap

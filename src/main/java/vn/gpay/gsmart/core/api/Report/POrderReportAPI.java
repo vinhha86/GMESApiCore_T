@@ -283,6 +283,7 @@ public class POrderReportAPI
 						
 						Cell cell_ptdg = row_detail.createCell(ColumnExcel.F);
 						String s_packingid = po.getPackingnotice();
+						s_packingid.replace(";", ",");
 						String s_packingname = packingService.getby_listid(s_packingid, orgrootid_link);
 						cell_ptdg.setCellValue(s_packingname);
 						cell_ptdg.setCellStyle(cellStyle_align_left_9);
