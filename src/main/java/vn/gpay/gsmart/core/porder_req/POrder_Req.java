@@ -112,8 +112,10 @@ public class POrder_Req implements Serializable {
 		if(pcontract_po!=null)
 		{
 			for(PContract_PO_Productivity po_productivity: pcontract_po.getPcontract_po_productivity()) {
-				if(po_productivity.getProductid_link().equals(productid_link) || po_productivity.getProductid_link() == productid_link) {
-					return po_productivity.getPlan_productivity();
+				if(po_productivity.getProductid_link() != null) {
+					if(po_productivity.getProductid_link().equals(productid_link) || po_productivity.getProductid_link() == productid_link) {
+						return po_productivity.getPlan_productivity();
+					}
 				}
 			}
 		}
