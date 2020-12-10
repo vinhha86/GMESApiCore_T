@@ -883,7 +883,6 @@ public class ScheduleAPI {
 			sch.setName(name);
 			sch.setParentid_origin(entity.parentid_origin);
 			sch.setPordercode(porder.getOrdercode());
-			sch.setProductivity(productivity);
 			sch.setResourceId(entity.resourceid);
 			sch.setStartDate(startDate);
 			sch.setStatus(-1);
@@ -894,6 +893,7 @@ public class ScheduleAPI {
 			sch.setProductivity_po(productivity);
 			sch.setProductivity_porder(productivity);
 			sch.setPcontract_poid_link(req.getPcontract_poid_link());
+			sch.setProductid_link(req.getProductid_link());
 			
 			response.data = sch;
 			
