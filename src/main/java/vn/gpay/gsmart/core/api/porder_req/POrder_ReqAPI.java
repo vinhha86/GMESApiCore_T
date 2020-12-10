@@ -805,6 +805,8 @@ public class POrder_ReqAPI {
 					long pcontractpo_id_link = thePOrder_Req.getPcontract_poid_link();
 					PContract_PO po = pcontract_POService.findOne(pcontractpo_id_link);
 					List<POrder_Req> list_req = porder_req_Service.getByPO_is_calculate(pcontractpo_id_link);
+					//Loai porder_req dang xoa (chua xoa do dang trong transaction
+					list_req.removeIf(c->c.getId().equals(entity.id));
 					if(list_req.size() > 0) {
 						int amount = po.getPo_quantity()/list_req.size();
 						for(POrder_Req req : list_req) {

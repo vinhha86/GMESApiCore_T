@@ -64,7 +64,7 @@ public class POrder_Req implements Serializable {
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
 	@JoinColumn( name="porderreqid_link", referencedColumnName="id")
-	private List<POrder>  porderlist  = new ArrayList<>();	
+	private List<POrder>  porderlist  = new ArrayList<POrder>();	
 	
 	
 	public List<POrder> getPorderlist() {
