@@ -408,6 +408,7 @@ public class ScheduleAPI {
 						sch_porder.setPorderid_link(pordergrant.getPorderid_link());
 						sch_porder.setProductivity_po(pordergrant.getProductivity_po());
 						sch_porder.setProductivity_porder(pordergrant.getProductivity_porder());
+						sch_porder.setPcontractid_link(pordergrant.getPcontractid_link());
 						
 						response.events.rows.add(sch_porder);
 					}
