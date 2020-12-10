@@ -24,6 +24,8 @@ import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.security.GpayAuthentication;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.security.GpayUserOrg;
+import vn.gpay.gsmart.core.security.IGpayUserOrgService;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -32,6 +34,7 @@ public class OrgAPI {
 
 	@Autowired IOrgService orgService;
 	@Autowired IPOrder_Req_Service reqService;
+	@Autowired IGpayUserOrgService userorgService;
 	
     @GetMapping("/tosx")
     public List<Org> getAllOrgs_Tosx() throws IOException {
@@ -197,6 +200,12 @@ public class OrgAPI {
 			list_typeid.add("13");
 			
 			list_org = orgService.getorgChildrenbyOrg(orgid_link, list_typeid);
+			
+			//Lay nhung don vi ma user dang quan ly
+			List<GpayUserOrg> list_user_org = userorgService.getall_byuser(user.getId());
+			for (GpayUserOrg gpayUserOrg : list_user_org) {
+				list_org.add(gpayUserOrg.getOrg());
+			}
 			
 			for(POrder_Req req : list_req) {
 				list_org.removeIf(c->c.getId().equals(req.getGranttoorgid_link()));

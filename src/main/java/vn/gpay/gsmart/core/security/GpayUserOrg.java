@@ -53,6 +53,9 @@ public class GpayUserOrg implements Serializable  {
 			return org.getName();
 		return "";
 	}
+	public Org getOrg() {
+		return org;
+	}
 	public Long getId() {
 		return id;
 	}
