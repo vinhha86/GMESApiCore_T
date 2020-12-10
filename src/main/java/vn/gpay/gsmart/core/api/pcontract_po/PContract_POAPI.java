@@ -1516,62 +1516,62 @@ public class PContract_POAPI {
 								po = pcontract_POService.save(po);
 								
 								//Them porder req theo don vi chinh
-								Product product = productService.findOne(parent.getProductid_link());
-								if(product.getProducttypeid_link() != 5) {
-									List<POrder_Req> list_req = reqService.getByContractAndPO_and_Org(pcontractid_link, pcontractpoid_link, parent.getOrgmerchandiseid_link(), product.getId());
-									if(list_req.size() == 0) {
-										POrder_Req req = new POrder_Req();
-										req.setAmount_inset(1);
-										req.setGranttoorgid_link(parent.getOrgmerchandiseid_link());
-										req.setId(null);
-										req.setIs_calculate(false);
-										req.setOrgrootid_link(orgrootid_link);
-										req.setPcontract_poid_link(pcontractpoid_link);
-										req.setPcontractid_link(pcontractid_link);
-										req.setProductid_link(parent.getProductid_link());
-										req.setSizesetid_link((long)1);
-										req.setUsercreatedid_link(user.getId());
-										req.setStatus(POrderReqStatus.STATUS_FREE);
-										req.setTimecreated(new Date());
-										req.setTotalorder(amount_po);
-										reqService.save(req);
-									}
-									else {
-										POrder_Req req = list_req.get(0);
-										req.setTotalorder(amount_po);
-										reqService.save(req);
-									}
-								}
-								else {
-									List<ProductPairing> list_pair = productpairService.getproduct_pairing_detail_bycontract(orgrootid_link, pcontractid_link, product.getId());
-									for (ProductPairing productPairing : list_pair) {
-										List<POrder_Req> list_req = reqService.getByContractAndPO_and_Org(pcontractid_link, pcontractpoid_link, parent.getOrgmerchandiseid_link(), productPairing.getProductid_link());
-										if(list_req.size() == 0) {
-											POrder_Req req = new POrder_Req();
-											req.setAmount_inset(productPairing.getAmount());
-											req.setGranttoorgid_link(parent.getOrgmerchandiseid_link());
-											req.setId(null);
-											req.setIs_calculate(false);
-											req.setOrgrootid_link(orgrootid_link);
-											req.setPcontract_poid_link(pcontractpoid_link);
-											req.setPcontractid_link(pcontractid_link);
-											req.setProductid_link(productPairing.getProductid_link());
-											req.setSizesetid_link((long)1);
-											req.setUsercreatedid_link(user.getId());
-											req.setStatus(POrderReqStatus.STATUS_POCONFFIRMED);
-											req.setTimecreated(new Date());
-											req.setTotalorder(amount_po*productPairing.getAmount());
-											reqService.save(req);
-										}
-										else {
-											POrder_Req req = list_req.get(0);
-											req.setTotalorder(amount_po*productPairing.getAmount());
-											reqService.save(req);
-										}
-									}
+//								Product product = productService.findOne(parent.getProductid_link());
+//								if(product.getProducttypeid_link() != 5) {
+//									List<POrder_Req> list_req = reqService.getByContractAndPO_and_Org(pcontractid_link, pcontractpoid_link, parent.getOrgmerchandiseid_link(), product.getId());
+//									if(list_req.size() == 0) {
+//										POrder_Req req = new POrder_Req();
+//										req.setAmount_inset(1);
+//										req.setGranttoorgid_link(parent.getOrgmerchandiseid_link());
+//										req.setId(null);
+//										req.setIs_calculate(false);
+//										req.setOrgrootid_link(orgrootid_link);
+//										req.setPcontract_poid_link(pcontractpoid_link);
+//										req.setPcontractid_link(pcontractid_link);
+//										req.setProductid_link(parent.getProductid_link());
+//										req.setSizesetid_link((long)1);
+//										req.setUsercreatedid_link(user.getId());
+//										req.setStatus(POrderReqStatus.STATUS_FREE);
+//										req.setTimecreated(new Date());
+//										req.setTotalorder(amount_po);
+//										reqService.save(req);
+//									}
+//									else {
+//										POrder_Req req = list_req.get(0);
+//										req.setTotalorder(amount_po);
+//										reqService.save(req);
+//									}
 //								}
-								
-							}
+//								else {
+//									List<ProductPairing> list_pair = productpairService.getproduct_pairing_detail_bycontract(orgrootid_link, pcontractid_link, product.getId());
+//									for (ProductPairing productPairing : list_pair) {
+//										List<POrder_Req> list_req = reqService.getByContractAndPO_and_Org(pcontractid_link, pcontractpoid_link, parent.getOrgmerchandiseid_link(), productPairing.getProductid_link());
+//										if(list_req.size() == 0) {
+//											POrder_Req req = new POrder_Req();
+//											req.setAmount_inset(productPairing.getAmount());
+//											req.setGranttoorgid_link(parent.getOrgmerchandiseid_link());
+//											req.setId(null);
+//											req.setIs_calculate(false);
+//											req.setOrgrootid_link(orgrootid_link);
+//											req.setPcontract_poid_link(pcontractpoid_link);
+//											req.setPcontractid_link(pcontractid_link);
+//											req.setProductid_link(productPairing.getProductid_link());
+//											req.setSizesetid_link((long)1);
+//											req.setUsercreatedid_link(user.getId());
+//											req.setStatus(POrderReqStatus.STATUS_POCONFFIRMED);
+//											req.setTimecreated(new Date());
+//											req.setTotalorder(amount_po*productPairing.getAmount());
+//											reqService.save(req);
+//										}
+//										else {
+//											POrder_Req req = list_req.get(0);
+//											req.setTotalorder(amount_po*productPairing.getAmount());
+//											reqService.save(req);
+//										}
+//									}
+////								}
+//								
+//							}
 						}
 						rowNum++;
 						row = sheet.getRow(rowNum);
@@ -2028,23 +2028,23 @@ public class PContract_POAPI {
 			List<PContract_PO> pcontract = pcontract_POService.getPO_Offer_Accept_ByPContract_AndOrg(entity.pcontractid_link,
 					entity.productid_link == null ? 0 : entity.productid_link, list_org);
 			
-			if(orgs.size() > 0 ) {
-				for(PContract_PO parent: pcontract) {
-//				      new Thread("" + parent.getId()){
-//				          public void run(){
-				        	List<PContract_PO> list_remove = new ArrayList<PContract_PO>(parent.getSub_po());
-							for(String code : orgs) {
-								list_remove.removeIf(c-> c.getFactories().contains(code));
-							}
-							
-							for(PContract_PO po_remove: list_remove) {
-								parent.getSub_po().remove(po_remove);
-							}
-//				        	
-//				          }
-//				        }.start();
-				}
-			}
+//			if(orgs.size() > 0 ) {
+//				for(PContract_PO parent: pcontract) {
+////				      new Thread("" + parent.getId()){
+////				          public void run(){
+//				        	List<PContract_PO> list_remove = new ArrayList<PContract_PO>(parent.getSub_po());
+//							for(String code : orgs) {
+//								list_remove.removeIf(c-> c.getFactories().contains(code));
+//							}
+//							
+//							for(PContract_PO po_remove: list_remove) {
+//								parent.getSub_po().remove(po_remove);
+//							}
+////				        	
+////				          }
+////				        }.start();
+//				}
+//			}
 			
 			response.data = pcontract;
 //			System.out.println(new Date());
@@ -2418,6 +2418,12 @@ public class PContract_POAPI {
 				for (PContract_PO_Shipping theShipping : poshippingService.getByPOID(thePO.getId())) {
 					poshippingService.delete(theShipping);
 				}
+				
+				//Delete sku
+				List<PContractProductSKU> listsku = ppskuService.getbypo_and_product(thePO.getId(), thePO.getProductid_link());
+				for (PContractProductSKU pContractProductSKU : listsku) {
+					ppskuService.delete(pContractProductSKU);
+				}
 
 				// Delete PO Prices
 				for (PContract_Price thePrice : thePO.getPcontract_price()) {
@@ -2440,7 +2446,7 @@ public class PContract_POAPI {
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-			response.setMessage(e.getMessage());
+			response.setMessage(e.getMessage()); 
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 		}
 
