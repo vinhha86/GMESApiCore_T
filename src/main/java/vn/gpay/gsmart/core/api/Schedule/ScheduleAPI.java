@@ -41,6 +41,7 @@ import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
+import vn.gpay.gsmart.core.porder_req.POrder_Req_Service;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.product.Product;
@@ -55,6 +56,7 @@ import vn.gpay.gsmart.core.task_object.ITask_Object_Service;
 import vn.gpay.gsmart.core.task_object.Task_Object;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.OrgType;
+import vn.gpay.gsmart.core.utils.POrderReqStatus;
 import vn.gpay.gsmart.core.utils.POrderStatus;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -951,13 +953,15 @@ public class ScheduleAPI {
 			//xoa trong bang poder_grant
 			granttService.deleteById(pordergrantid_link);
 			
-			//Xoa trong bang porder
-			porderService.deleteById(porderid_link);
-			
-			//Cap nhat lai bang porder_req
-			POrder_Req req = reqService.findOne(porder.getPorderreqid_link());
-			req.setStatus(0);
-			reqService.save(req);
+			//Xoa trong bang porder neu porder khong con grant 
+			List<POrderGrant> list_grant = granttService.getByOrderId(porderid_link);
+			if(list_grant.size() == 0) {
+				porderService.deleteById(porderid_link);				
+
+				POrder_Req req = reqService.findOne(porder.getPorderreqid_link());
+				req.setStatus(POrderReqStatus.STATUS_FREE);
+				reqService.save(req);
+			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -1200,11 +1204,6 @@ public class ScheduleAPI {
 				if(list_grant.size() == 0) {
 					porder.setStatus(POrderStatus.PORDER_STATUS_FREE);
 					porderService.save(porder);
-					
-
-					POrder_Req req = reqService.findOne(porder.getPorderreqid_link());
-					req.setStatus(0);
-					reqService.save(req);
 				}
 			}
 			
