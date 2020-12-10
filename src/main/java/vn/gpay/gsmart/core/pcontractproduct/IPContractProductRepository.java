@@ -33,7 +33,7 @@ public interface IPContractProductRepository extends JpaRepository<PContractProd
 	//Get product by buyerid_link
 	@Query(value = "select c.productid_link from PContractProduct c inner join PContract b on c.pcontractid_link = b.id "
 			+ "where c.orgrootid_link = :orgrootid_link "
-			+ "and b.orgbuyerid_link = :orgbuyerid_link")
+			+ "and (b.orgbuyerid_link = :orgbuyerid_link or :orgbuyerid_link is null)")
 	public List<Long> get_by_orgcustomer(
 			@Param ("orgrootid_link")final  Long orgrootid_link,
 			@Param ("orgbuyerid_link")final Long orgbuyerid_link);

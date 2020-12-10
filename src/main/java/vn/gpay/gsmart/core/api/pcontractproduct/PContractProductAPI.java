@@ -448,7 +448,7 @@ public class PContractProductAPI {
 				binding.setProductinfo(pContractProduct.getProductinfo());
 				
 				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-				
+				uploadRootPath = uploadRootPath.replace("\\webapp", "");
 				binding.setImgproduct(getimg(pContractProduct.getImgurl1(),uploadRootPath));
 				
 				data.add(binding);
@@ -497,7 +497,7 @@ public class PContractProductAPI {
 				binding.setProductinfo(pContractProduct.getProductinfo());
 				
 				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-				
+				uploadRootPath = uploadRootPath.replace("\\webapp", "");
 				binding.setImgproduct(getimg(pContractProduct.getImgurl1(),uploadRootPath));
 				
 				data.add(binding);
@@ -596,7 +596,7 @@ public class PContractProductAPI {
 				binding.setProductBuyerCode(pContractProduct.getProductBuyerCode());
 				
 				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-				
+				uploadRootPath = uploadRootPath.replace("\\webapp", "");
 				binding.setImgproduct(getimg(pContractProduct.getImgurl1(),uploadRootPath));
 				
 				data.add(binding);
@@ -619,6 +619,7 @@ public class PContractProductAPI {
 	
 	
 	private byte[] getimg(String filename, String uploadRootPath) {
+		uploadRootPath = uploadRootPath.replace("\\webapp", "");
 		String filePath = uploadRootPath+"/"+ filename;
 		Path path = Paths.get(filePath);
 		byte[] data;

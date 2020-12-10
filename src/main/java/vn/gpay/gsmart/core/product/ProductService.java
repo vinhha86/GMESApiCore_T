@@ -85,9 +85,7 @@ public class ProductService extends AbstractService<Product> implements IProduct
 
 		// Danh sach product cua khach hang
 		List<Long> lsProduct_Id = new ArrayList<Long>();
-		if (null != orgcustomerid_link && orgcustomerid_link != 0) {
-			lsProduct_Id = serviceContractProduct.get_by_orgcustomer(orgrootid_link, orgcustomerid_link);
-		}
+		lsProduct_Id = serviceContractProduct.get_by_orgcustomer(orgrootid_link, orgcustomerid_link);
 		
 		//Lấy những sản phẩm mà chưa thuộc khách hàng nào
 		

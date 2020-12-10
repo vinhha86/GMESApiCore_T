@@ -41,7 +41,6 @@ import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
-import vn.gpay.gsmart.core.porder_req.POrder_Req_Service;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.product.Product;
@@ -1054,7 +1053,7 @@ public class ScheduleAPI {
 	} 
 	
 	@RequestMapping(value = "/get_duration",method = RequestMethod.POST)
-	public ResponseEntity<getduration_response> GetDuration(HttpServletRequest request,
+	public ResponseEntity<getduration_response> GetDuration(HttpServletRequest request, 
 			@RequestBody getduration_request entity) {
 		getduration_response response = new getduration_response();
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

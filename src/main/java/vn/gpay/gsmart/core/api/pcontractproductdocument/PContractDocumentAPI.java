@@ -56,7 +56,7 @@ public class PContractDocumentAPI {
 			
 			// Thư mục gốc upload file.			
 			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-
+			uploadRootPath = uploadRootPath.replace("\\webapp", "");
 			File uploadRootDir = new File(uploadRootPath);
 			// Tạo thư mục gốc upload nếu nó không tồn tại.
 			if (!uploadRootDir.exists()) {
@@ -129,7 +129,7 @@ public class PContractDocumentAPI {
 			
 			// Thư mục gốc upload file.			
 			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-			
+			uploadRootPath = uploadRootPath.replace("\\webapp", "");
 			String filePath = uploadRootPath+"/"+ entity.filename;
 			Path path = Paths.get(filePath);
 			byte[] data = Files.readAllBytes(path);
@@ -159,7 +159,7 @@ public class PContractDocumentAPI {
 			
 			// Thư mục gốc upload file.			
 			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-			
+			uploadRootPath = uploadRootPath.replace("\\webapp", "");
 			String filePath = uploadRootPath+"\\"+ entity.filename;
 			Path path = Paths.get(filePath);
 			byte[] data = Files.readAllBytes(path);
@@ -210,7 +210,7 @@ public class PContractDocumentAPI {
 			
 			// Thư mục gốc upload file.			
 			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-			
+			uploadRootPath = uploadRootPath.replace("\\webapp", "");
 			String filePath = uploadRootPath+"\\"+ filename;
 			File file = new File(filePath);
 			file.delete();
