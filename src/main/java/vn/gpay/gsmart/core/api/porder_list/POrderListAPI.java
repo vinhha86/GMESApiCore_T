@@ -197,6 +197,10 @@ public class POrderListAPI {
 							);
 			}
 			
+			if(response.data.size() > 1000) {
+				response.data = new ArrayList<>(response.data.subList(0, 1000));
+			}
+			
 //			response.data = result;
 			
 //			response.totalCount = response.data.size();
