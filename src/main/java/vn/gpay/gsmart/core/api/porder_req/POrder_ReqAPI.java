@@ -271,18 +271,30 @@ public class POrder_ReqAPI {
 						response.data.addAll(result);
 				}
 			}else {
-				List<POrder_Req> a = reqService.get_by_org(orgid_link);
+				//Lay danh sách org user dang quan ly
+				List<GpayUserOrg> list_user_org = userOrgService.getall_byuser(user.getId());
+				List<Long> list_org = new ArrayList<Long>();
 				
-				List<POrder_Req> result = new ArrayList<POrder_Req>();
-				for(POrder_Req pr : a) {
-					if(pr.getPorderlist().size() == 0)
-						result.add(pr);
+				for (GpayUserOrg userorg : list_user_org) {
+					list_org.add(userorg.getOrgid_link());
+				}
+				if(!list_org.contains(orgid_link))
+					list_org.add(orgid_link);
+				
+				for (Long orgid : list_org) {
+					List<POrder_Req> a = reqService.get_by_org(orgid);
+					
+					List<POrder_Req> result = new ArrayList<POrder_Req>();
+					for(POrder_Req pr : a) {
+						if(pr.getPorderlist().size() == 0)
+							result.add(pr);
+					}
+					
+					if(result.size()>0)
+						response.data.addAll(result);
 				}
 				
-//				if(a.size()>0)
-//					response.data.addAll(a);
-				if(result.size()>0)
-					response.data.addAll(result);
+				
 			}
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
