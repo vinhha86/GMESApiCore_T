@@ -84,6 +84,7 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 			+ "and (CAST(:golivedatefrom AS date) IS NULL or a.golivedate >= :golivedatefrom) "
 			+ "and (CAST(:golivedateto AS date) IS NULL or a.golivedate <= :golivedateto) "
 			+ "order by a.granttoorgid_link, d.buyercode, a.golivedate "
+//			+ "limit 0,1000 "
 			)
 	public List<POrder> getPOrderBySearch(
 			@Param ("buyerid")final Long buyerid,
@@ -110,6 +111,7 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 			+ "and (CAST(:golivedatefrom AS date) IS NULL or a.golivedate >= :golivedatefrom) "
 			+ "and (CAST(:golivedateto AS date) IS NULL or a.golivedate <= :golivedateto) "
 			+ "order by a.granttoorgid_link, d.buyercode, a.golivedate "
+//			+ "limit 0,1000 "
 			)
 	public List<POrder> getPOrderBySearch(
 			@Param ("buyerid")final Long buyerid,
