@@ -38,23 +38,23 @@ public class Schedule_porder {
 	
 	private long id_origin;
 	
-	private int duration;
-	private int productivity;//NS xưởng
-	private int productivity_po;//NS cua PO
-	private int productivity_porder;//NS Target (Khi tao lenh sx, lay tu NS Target tai chao gia vao)
-	private int productivity_line;//NS tổ (tính trung bình tiến độ ra chuyền)
+	private Integer duration;
+	private Integer productivity;//NS xưởng
+	private Integer productivity_po;//NS cua PO
+	private Integer productivity_porder;//NS Target (Khi tao lenh sx, lay tu NS Target tai chao gia vao)
+	private Integer productivity_line;//NS tổ (tính trung bình tiến độ ra chuyền)
 	
 		
-	public int getProductivity_po() {
+	public Integer getProductivity_po() {
 		return productivity_po;
 	}
-	public void setProductivity_po(int productivity_po) {
+	public void setProductivity_po(Integer productivity_po) {
 		this.productivity_po = productivity_po;
 	}
-	public int getProductivity_porder() {
+	public Integer getProductivity_porder() {
 		return productivity_porder;
 	}
-	public void setProductivity_porder(int productivity_porder) {
+	public void setProductivity_porder(Integer productivity_porder) {
 		this.productivity_porder = productivity_porder;
 	}
 	public Long getParentid_origin() {
@@ -112,16 +112,16 @@ public class Schedule_porder {
 	public void setId_origin(long id_origin) {
 		this.id_origin = id_origin;
 	}
-	public int getDuration() {
+	public Integer getDuration() {
 		return duration;
 	}
-	public void setDuration(int duration) {
+	public void setDuration(Integer duration) {
 		this.duration = duration;
 	}
-	public int getProductivity() {
+	public Integer getProductivity() {
 		return productivity;
 	}
-	public void setProductivity(int productivity) {
+	public void setProductivity(Integer productivity) {
 		this.productivity = productivity;
 	}
 	public String getVendorname() {
@@ -184,10 +184,10 @@ public class Schedule_porder {
 	public void setProductbuyercode(String productbuyercode) {
 		this.productbuyercode = productbuyercode;
 	}
-	public int getProductivity_line() {
+	public Integer getProductivity_line() {
 		return productivity_line;
 	}
-	public void setProductivity_line(int productivity_line) {
+	public void setProductivity_line(Integer productivity_line) {
 		this.productivity_line = productivity_line;
 	}
 	

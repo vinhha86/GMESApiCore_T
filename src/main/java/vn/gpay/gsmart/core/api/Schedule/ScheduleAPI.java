@@ -792,6 +792,13 @@ public class ScheduleAPI {
 
 			int productivity = req.get_ProductivityPO();
 			Date startDate = commonService.getBeginOfDate(req.getPO_Productiondate());
+			Calendar c_startdate = Calendar.getInstance();
+			c_startdate.setTime(startDate);
+			//Kiem tra ngay bat dau ma la ngay nghi thi tang len ngay di lam tiep theo
+			if(commonService.check_dayoff(c_startdate, orgrootid_link)) {
+				startDate = commonService.Date_Add_with_holiday(startDate, 1, orgrootid_link);
+				startDate = commonService.getBeginOfDate(startDate);
+			}
 			Date endDate = req.getShipdate();
 			
 			int duration = commonService.getDuration(startDate, endDate, orgrootid_link);
@@ -1060,6 +1067,31 @@ public class ScheduleAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<getduration_response>(response, HttpStatus.OK);
+		}
+	} 
+	
+	@RequestMapping(value = "/get_duration_from_matdate",method = RequestMethod.POST)
+	public ResponseEntity<get_duration_from_matdate_response> GetDurationMatDate(HttpServletRequest request,
+			@RequestBody get_duration_from_matdate_request entity) {
+		get_duration_from_matdate_response response = new get_duration_from_matdate_response();
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		long orgrootid_link = user.getRootorgid_link();
+		
+		try {
+			Date StartDate = commonService.Date_Add_with_holiday(entity.MatDate, 7, orgrootid_link);
+			StartDate = commonService.getBeginOfDate(StartDate);
+			int duration = commonService.getDuration(StartDate, entity.EndDate, orgrootid_link);
+			
+			response.duration = duration;
+			response.production_date = StartDate;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<get_duration_from_matdate_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<get_duration_from_matdate_response>(response, HttpStatus.OK);
 		}
 	} 
 	

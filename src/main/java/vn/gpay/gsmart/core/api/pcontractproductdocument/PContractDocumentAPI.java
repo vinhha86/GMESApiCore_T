@@ -125,7 +125,7 @@ public class PContractDocumentAPI {
 			Product product = productService.findOne(entity.productid_link);
 			PContract pcontract = pcontractService.findOne(entity.pcontractid_link);
 			
-			String FolderPath = String.format("upload/pcontract/%s/%s", pcontract.getContractcode(), product.getCode());
+			String FolderPath = String.format("upload/pcontract/%s/%s", pcontract.getContractcode(), product.getBuyercode());
 			
 			// Thư mục gốc upload file.			
 			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);

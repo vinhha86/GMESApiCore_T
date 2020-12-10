@@ -572,6 +572,10 @@ public class Common  {
 			start.add(Calendar.DAY_OF_WEEK , 1);
 		}
 		
+		if(!check_dayoff(end, orgrootid_link)) {
+			duration++;
+		}
+		
 		return duration;
 	}
 	
