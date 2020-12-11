@@ -51,9 +51,10 @@ public interface ITimeSheetLunchRepository extends JpaRepository<TimeSheetLunch,
 	@Query("SELECT a "
 			+ "FROM TimeSheetLunch a "
 			+ "where a.personnelid_link = :personnelid_link "
+			+ "and a.isworking = true "
 			+ "and a.workingdate >= :workingdate_start "
 			+ "and a.workingdate <= :workingdate_end "
-			+ "order by a.workingdate asc"
+			+ "order by a.workingdate, shifttypeid_link asc"
 			)
 	public List<TimeSheetLunch> getByPersonnelDate(
 			@Param ("personnelid_link")final Long personnelid_link,
