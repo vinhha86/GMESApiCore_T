@@ -79,6 +79,7 @@ public class TimeSheet_Personnel implements Runnable{
 			Date dateEnd = sdf.parse(dateEndString);
 			
 			//I. Lấy danh sách các ca đi làm của nhân sự được khai báo trong tháng
+			//Order theo ngày và thứ tự ca
 			List<TimeSheetLunch> lsWorkingShift= timesheet_lunchService.getByPersonnelDate(personnel.getId(), dateStart, dateEnd);
 			
 			for (TimeSheetLunch theWorkingShift:lsWorkingShift){
@@ -102,7 +103,7 @@ public class TimeSheet_Personnel implements Runnable{
 				//Thoi gian ket thuc ca
 				Date shiftDate_End = theWorkingShift.getWorkingdate();
 				Date shiftDate_End_ss = theWorkingShift.getWorkingdate();
-				if (theWorkingShift.getShift_to_hour() > 24){
+				if (theWorkingShift.getShift_to_hour() > 24){ //Neu la Ca 3, tgian ket thuc la ngay hom sau
 					Calendar cal_End = Calendar.getInstance();
 					cal_End.setTime(shiftDate_End);
 					cal_End.add(Calendar.DAY_OF_MONTH, 1);
@@ -148,8 +149,8 @@ public class TimeSheet_Personnel implements Runnable{
 					if (checkout.after(shiftDate_End)) checkout = shiftDate_End;
 					
 					//2.3 Tinh so gio cong = checkout - checkin - lunch_minute
-					long work_mili = checkout.getTime() - checkin.getTime() - theWorkingShift.getShift_lunch_minute()*3600;
-					Float work_h =  (float) (work_mili/3600000);
+					long work_mili = checkout.getTime() - checkin.getTime();// - theWorkingShift.getShift_lunch_minute()*3600;
+					Float work_h =  (float) work_mili/(float)3600000;
 					
 					System.out.println(personnel.getRegister_code() + "/" + personnel.getFullname() + "/" 
 					+ checkin + "/" + checkout + "/" + work_mili + "/" + work_h);
@@ -176,7 +177,8 @@ public class TimeSheet_Personnel implements Runnable{
 						timesheet_sumService.save(theSum);
 					}
 				} else {
-					//Moi check in 1 lan trong ca, khong co co so tinh toan
+					//Moi check in 1 lan trong ca, có các trường hợp sau xảy ra
+					//1-Nếu nhân sự có đăng ký làm ca tiếp sau trong ngày
 				}
 			}
 			//III. Lay danh sach cac ngay nghi co dang ky của nhân sự trong khoảng thời gian

@@ -925,6 +925,8 @@ public class ProductAPI {
 			String FolderPath = commonService.getFolderPath(product.getProducttypeid_link());
 			
 			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+			
+			System.out.println(System.getProperty("user.dir"));
 
 			File uploadRootDir = new File(uploadRootPath);
 			// Tạo thư mục gốc upload nếu nó không tồn tại.
