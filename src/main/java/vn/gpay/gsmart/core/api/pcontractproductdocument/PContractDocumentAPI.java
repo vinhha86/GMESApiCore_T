@@ -71,16 +71,16 @@ public class PContractDocumentAPI {
 				stream.write(file.getBytes());
 				stream.close();
 			}
-//			
-//			PContractProductDocument ppd = new PContractProductDocument();
-//			ppd.setId((long)0);
-//			ppd.setFilename(name);
-//			ppd.setPcontractid_link(pcontractid_link);
-//			ppd.setProductid_link(productid_link);
-//			ppd.setOrgrootid_link(orgrootid_link);
-//			ppd.setDescription("");
-//			
-//			pcdService.save(ppd);
+			
+			PContractProductDocument ppd = new PContractProductDocument();
+			ppd.setId((long)0);
+			ppd.setFilename(name);
+			ppd.setPcontractid_link(pcontractid_link);
+			ppd.setProductid_link(productid_link);
+			ppd.setOrgrootid_link(orgrootid_link);
+			ppd.setDescription("");
+			
+			pcdService.save(ppd);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
