@@ -30,6 +30,7 @@ import vn.gpay.gsmart.core.pcontractproductdocument.PContractProductDocument;
 import vn.gpay.gsmart.core.product.IProductService;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 
@@ -52,7 +53,7 @@ public class PContractDocumentAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
 					.getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
-			String FolderPath = String.format("upload/pcontract/%s/%s", pcontract.getContractcode(), product.getBuyercode());
+			String FolderPath = String.format("%s/pcontract/%s/%s",AtributeFixValues.folder_upload, pcontract.getContractcode(), product.getBuyercode());
 			
 			// Thư mục gốc upload file.			
 			String uploadRootPath = request.getServletContext().getRealPath("");
@@ -125,12 +126,14 @@ public class PContractDocumentAPI {
 			Product product = productService.findOne(entity.productid_link);
 			PContract pcontract = pcontractService.findOne(entity.pcontractid_link);
 			
-			String FolderPath = String.format("upload/pcontract/%s/%s", pcontract.getContractcode(), product.getBuyercode());
+			String FolderPath = String.format("%s/pcontract/%s/%s",AtributeFixValues.folder_upload, pcontract.getContractcode(), product.getBuyercode());
 			
 			// Thư mục gốc upload file.			
-			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-			uploadRootPath = uploadRootPath.replace("\\webapp", "");
-			String filePath = uploadRootPath+"/"+ entity.filename;
+			String uploadRootPath = request.getServletContext().getRealPath("");
+			File uploadRootDir = new File(uploadRootPath);
+			File folder_upload = new File(uploadRootDir.getParent()+"/"+FolderPath);
+			
+			String filePath = folder_upload+"/"+ entity.filename;
 			Path path = Paths.get(filePath);
 			byte[] data = Files.readAllBytes(path);
 			response.data = data;
@@ -145,36 +148,36 @@ public class PContractDocumentAPI {
 		}
 	}
 	
-	@RequestMapping(value = "/download_test", method = RequestMethod.POST)
-	public @ResponseBody byte[] DownloadTest(HttpServletRequest request,
-			@RequestBody PContractDocument_download_request entity)
-	{
-
-		Product_viewimg_response response = new Product_viewimg_response();
-		try {
-			Product product = productService.findOne(entity.productid_link);
-			PContract pcontract = pcontractService.findOne(entity.pcontractid_link);
-			
-			String FolderPath = String.format("upload/pcontract/%s/%s", pcontract.getContractcode(), product.getCode());
-			
-			// Thư mục gốc upload file.			
-			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-			uploadRootPath = uploadRootPath.replace("\\webapp", "");
-			String filePath = uploadRootPath+"\\"+ entity.filename;
-			Path path = Paths.get(filePath);
-			byte[] data = Files.readAllBytes(path);
-			response.data = data;
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			
-			return data;
-		}
-		catch(Exception e) {
-			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-			response.setMessage(e.getMessage());
-			return null;
-		}
-	}
+//	@RequestMapping(value = "/download_test", method = RequestMethod.POST)
+//	public @ResponseBody byte[] DownloadTest(HttpServletRequest request,
+//			@RequestBody PContractDocument_download_request entity)
+//	{
+//
+//		Product_viewimg_response response = new Product_viewimg_response();
+//		try {
+//			Product product = productService.findOne(entity.productid_link);
+//			PContract pcontract = pcontractService.findOne(entity.pcontractid_link);
+//			
+//			String FolderPath = String.format("upload/pcontract/%s/%s", pcontract.getContractcode(), product.getCode());
+//			
+//			// Thư mục gốc upload file.			
+//			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+//			uploadRootPath = uploadRootPath.replace("\\webapp", "");
+//			String filePath = uploadRootPath+"\\"+ entity.filename;
+//			Path path = Paths.get(filePath);
+//			byte[] data = Files.readAllBytes(path);
+//			response.data = data;
+//			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+//			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+//			
+//			return data;
+//		}
+//		catch(Exception e) {
+//			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+//			response.setMessage(e.getMessage());
+//			return null;
+//		}
+//	}
 	
 	@RequestMapping(value ="/update", method = RequestMethod.POST)
 	public  ResponseEntity<ResponseBase> Update(HttpServletRequest request, @RequestBody PContractDocument_update_request entity){
@@ -206,12 +209,13 @@ public class PContractDocumentAPI {
 			
 			pcdService.deleteById(entity.id);
 			
-			String FolderPath = String.format("upload/pcontract/%s/%s", pcontract.getContractcode(), product.getBuyercode());
+			String FolderPath = String.format("%s/pcontract/%s/%s",AtributeFixValues.folder_upload, pcontract.getContractcode(), product.getBuyercode());
 			
 			// Thư mục gốc upload file.			
-			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-			uploadRootPath = uploadRootPath.replace("\\webapp", "");
-			String filePath = uploadRootPath+"\\"+ filename;
+			String uploadRootPath = request.getServletContext().getRealPath("");
+			File uploadRootDir = new File(uploadRootPath);
+			File folder_upload = new File(uploadRootDir.getParent()+"/"+FolderPath);
+			String filePath = folder_upload+"\\"+ filename;
 			File file = new File(filePath);
 			file.delete();
 			
