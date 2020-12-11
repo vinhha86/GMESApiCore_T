@@ -187,9 +187,9 @@ public class POrderReportAPI
 			cell_G3.setCellValue(mer);
 			cell_G3.setCellStyle(cellStyle_align_left);
 			
-			String ngaylaplenh = dateFormat.format(porder.getOrderdate());
+			String xuongsx = porder.getGranttoorgcode();
 			Cell cell_L3 = row_3.getCell(ColumnExcel.L);
-			cell_L3.setCellValue(ngaylaplenh);
+			cell_L3.setCellValue(xuongsx);
 			cell_L3.setCellStyle(cellStyle_align_left);
 			
 			//add anh san pham
