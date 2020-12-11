@@ -15,7 +15,16 @@ public class ProductBinding {
 	private Integer pquantity;
 	private String info;
 	private String code_amount;
+	private String buyercode;
 	
+	
+	
+	public String getBuyercode() {
+		return buyercode;
+	}
+	public void setBuyercode(String buyercode) {
+		this.buyercode = buyercode;
+	}
 	public byte[] getUrlimage() {
 		return urlimage;
 	}

@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.api.pcontractproduct;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -429,7 +430,7 @@ public class PContractProductAPI {
 			}
 				
 			List<PContractProductBinding> data = new ArrayList<PContractProductBinding>();
-			String FolderPath = "upload/product";
+			String FolderPath = AtributeFixValues.folder_upload+"/product";
 			
 			for (PContractProduct pContractProduct : lst) {
 				PContractProductBinding binding = new PContractProductBinding();
@@ -447,9 +448,9 @@ public class PContractProductAPI {
 				binding.setProductBuyerCode(pContractProduct.getProductBuyerCode());
 				binding.setProductinfo(pContractProduct.getProductinfo());
 				
-				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-				uploadRootPath = uploadRootPath.replace("\\webapp", "");
-				binding.setImgproduct(getimg(pContractProduct.getImgurl1(),uploadRootPath));
+				String uploadRootPath = request.getServletContext().getRealPath("");
+				File uploadRootDir = new File(uploadRootPath);
+				binding.setImgproduct(getimg(pContractProduct.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath));
 				
 				data.add(binding);
 			}
@@ -479,7 +480,7 @@ public class PContractProductAPI {
 			lst.addAll(pcpservice.get_by_product_and_pcontract(orgrootid_link, entity.productid_link, pcontractid_link));
 			
 			List<PContractProductBinding> data = new ArrayList<PContractProductBinding>();
-			String FolderPath = "upload/product";
+			String FolderPath = AtributeFixValues.folder_upload+"/product";
 			
 			for (PContractProduct pContractProduct : lst) {
 				PContractProductBinding binding = new PContractProductBinding();
@@ -496,9 +497,9 @@ public class PContractProductAPI {
 				binding.setProducttypeid_link(pContractProduct.getProducttypeid_link());
 				binding.setProductinfo(pContractProduct.getProductinfo());
 				
-				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-				uploadRootPath = uploadRootPath.replace("\\webapp", "");
-				binding.setImgproduct(getimg(pContractProduct.getImgurl1(),uploadRootPath));
+				String uploadRootPath = request.getServletContext().getRealPath("");
+				File uploadRootDir = new File(uploadRootPath);
+				binding.setImgproduct(getimg(pContractProduct.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath));
 				
 				data.add(binding);
 			}
@@ -555,7 +556,7 @@ public class PContractProductAPI {
 			long pcontractid_link = entity.pcontractid_link;
 			List<PContractProduct> lst = pcpservice.get_by_product_and_pcontract(orgrootid_link, 0, pcontractid_link);
 			List<PContractProductBinding> data = new ArrayList<PContractProductBinding>();
-			String FolderPath = "upload/product";
+			String FolderPath = AtributeFixValues.folder_upload+"/product";
 			
 			//Lay nhung bo san pham
 			List<PContractProductPairing> listpair = pppairService.getall_bypcontract(orgrootid_link, pcontractid_link);
@@ -595,9 +596,9 @@ public class PContractProductAPI {
 				binding.setProducttypeid_link(pContractProduct.getProducttypeid_link());
 				binding.setProductBuyerCode(pContractProduct.getProductBuyerCode());
 				
-				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-				uploadRootPath = uploadRootPath.replace("\\webapp", "");
-				binding.setImgproduct(getimg(pContractProduct.getImgurl1(),uploadRootPath));
+				String uploadRootPath = request.getServletContext().getRealPath("");
+				File uploadRootDir = new File(uploadRootPath);
+				binding.setImgproduct(getimg(pContractProduct.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath));
 				
 				data.add(binding);
 			}
@@ -619,7 +620,6 @@ public class PContractProductAPI {
 	
 	
 	private byte[] getimg(String filename, String uploadRootPath) {
-		uploadRootPath = uploadRootPath.replace("\\webapp", "");
 		String filePath = uploadRootPath+"/"+ filename;
 		Path path = Paths.get(filePath);
 		byte[] data;

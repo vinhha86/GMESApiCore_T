@@ -459,12 +459,15 @@ public class Common  {
 
 	
 	public String getFolderPath(int producttypeid_link) {
-		String Path = "upload/";
+		String Path = AtributeFixValues.folder_upload+"/";
 		if(10 <= producttypeid_link && 20 > producttypeid_link) {
 			Path += "product";
 		}
 		else if (20 <= producttypeid_link && 30 > producttypeid_link) {
-			if (producttypeid_link == 21) {
+			if (producttypeid_link == 20) {
+				Path += "Material"; //Vai lot
+			}
+			else if (producttypeid_link == 21) {
 				Path += "Sub_Material"; //Vai lot
 			}
 			else if (producttypeid_link == 22) {
@@ -479,6 +482,9 @@ public class Common  {
 		}
 		else if (40 <= producttypeid_link && 50 > producttypeid_link) {
 			Path += "packingtrim";
+		}
+		else if (50 <= producttypeid_link && 60 > producttypeid_link) {
+			Path += "thread";
 		}
 		
 		return Path;

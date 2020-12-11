@@ -144,9 +144,9 @@ public class ProductAPI {
 				pb.setInfo(product.getDescription());
 				
 				FolderPath = commonService.getFolderPath(product.getProducttypeid_link());
-				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-				uploadRootPath = uploadRootPath.replace("\\webapp", "");
-				pb.setUrlimage(getimg(product.getImgurl1(),uploadRootPath));
+				String uploadRootPath = request.getServletContext().getRealPath("");
+				File uploadRootDir = new File(uploadRootPath);
+				pb.setUrlimage(getimg(product.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath));
 				lstdata.add(pb);
 			}
 			
@@ -174,7 +174,7 @@ public class ProductAPI {
 			Page<Product> pProduct = productService.getall_products(user.getRootorgid_link(), entity);
 			List<Product> lstproduct = pProduct.getContent();
 			List<ProductBinding> lstdata = new ArrayList<>();
-			String FolderPath = "upload/product";
+			String FolderPath = AtributeFixValues.folder_upload+"/product";
 			
 			for (Product product : lstproduct) {
 				ProductBinding pb = new ProductBinding();
@@ -190,9 +190,9 @@ public class ProductAPI {
 				pb.setDesignerName(product.getDesignerName());
 				pb.setInfo(product.getDescription());
 				
-				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-				uploadRootPath = uploadRootPath.replace("\\webapp", "");
-				pb.setUrlimage(getimg(product.getImgurl1(),uploadRootPath));
+				String uploadRootPath = request.getServletContext().getRealPath("");
+				File uploadRootDir = new File(uploadRootPath);
+				pb.setUrlimage(getimg(product.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath));
 				lstdata.add(pb);
 			}
 			
@@ -220,7 +220,7 @@ public class ProductAPI {
 			Page<Product> pProduct = productService.getall_mainmaterials(user.getRootorgid_link(), entity);
 			List<Product> lstproduct = pProduct.getContent();
 			List<ProductBinding> lstdata = new ArrayList<>();
-			String FolderPath = "upload/material";
+			String FolderPath = AtributeFixValues.folder_upload+"/material";
 			
 			for (Product product : lstproduct) {
 				ProductBinding pb = new ProductBinding();
@@ -234,10 +234,11 @@ public class ProductAPI {
 				pb.setThanhPhanVai(product.getThanhPhanVai());
 				pb.setTenMauNPL(product.getTenMauNPL());
 				pb.setDesignerName(product.getDesignerName());
+				pb.setBuyercode(product.getBuyercode());
 				
-				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-				uploadRootPath = uploadRootPath.replace("\\webapp", "");
-				pb.setUrlimage(getimg(product.getImgurl1(),uploadRootPath));
+				String uploadRootPath = request.getServletContext().getRealPath("");
+				File uploadRootDir = new File(uploadRootPath);
+				pb.setUrlimage(getimg(product.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath));
 				lstdata.add(pb);
 			}
 			
@@ -265,7 +266,7 @@ public class ProductAPI {
 			Page<Product> pProduct = productService.getall_sewingtrim(user.getRootorgid_link(), entity);
 			List<Product> lstproduct = pProduct.getContent();
 			List<ProductBinding> lstdata = new ArrayList<>();
-			String FolderPath = "upload/sewingtrim";
+			String FolderPath = AtributeFixValues.folder_upload+"upload/sewingtrim";
 			
 			for (Product product : lstproduct) {
 				ProductBinding pb = new ProductBinding();
@@ -279,10 +280,11 @@ public class ProductAPI {
 				pb.setThanhPhanVai(product.getThanhPhanVai());
 				pb.setTenMauNPL(product.getTenMauNPL());
 				pb.setDesignerName(product.getDesignerName());
+				pb.setBuyercode(product.getBuyercode());
 				
-				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-				uploadRootPath = uploadRootPath.replace("\\webapp", "");
-				pb.setUrlimage(getimg(product.getImgurl1(),uploadRootPath));
+				String uploadRootPath = request.getServletContext().getRealPath("");
+				File uploadRootDir = new File(uploadRootPath);
+				pb.setUrlimage(getimg(product.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath));
 				lstdata.add(pb);
 			}
 			
@@ -310,7 +312,7 @@ public class ProductAPI {
 			Page<Product> pProduct = productService.getall_sewingthread(user.getRootorgid_link(), entity);
 			List<Product> lstproduct = pProduct.getContent();
 			List<ProductBinding> lstdata = new ArrayList<>();
-			String FolderPath = "upload/sewingthread";
+			String FolderPath = AtributeFixValues.folder_upload+"/sewingthread";
 			
 			for (Product product : lstproduct) {
 				ProductBinding pb = new ProductBinding();
@@ -324,10 +326,11 @@ public class ProductAPI {
 				pb.setThanhPhanVai(product.getThanhPhanVai());
 				pb.setTenMauNPL(product.getTenMauNPL());
 				pb.setDesignerName(product.getDesignerName());
+				pb.setBuyercode(product.getBuyercode());
 				
-				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-				uploadRootPath = uploadRootPath.replace("\\webapp", "");
-				pb.setUrlimage(getimg(product.getImgurl1(),uploadRootPath));
+				String uploadRootPath = request.getServletContext().getRealPath("");
+				File uploadRootDir = new File(uploadRootPath);
+				pb.setUrlimage(getimg(product.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath));
 				lstdata.add(pb);
 			}
 			
@@ -355,7 +358,7 @@ public class ProductAPI {
 			Page<Product> pProduct = productService.getall_packingtrim(user.getRootorgid_link(), entity);
 			List<Product> lstproduct = pProduct.getContent();
 			List<ProductBinding> lstdata = new ArrayList<>();
-			String FolderPath = "upload/packingtrim";
+			String FolderPath = AtributeFixValues.folder_upload+"/packingtrim";
 			
 			for (Product product : lstproduct) {
 				ProductBinding pb = new ProductBinding();
@@ -369,10 +372,11 @@ public class ProductAPI {
 				pb.setThanhPhanVai(product.getThanhPhanVai());
 				pb.setTenMauNPL(product.getTenMauNPL());
 				pb.setDesignerName(product.getDesignerName());
+				pb.setBuyercode(product.getBuyercode());
 				
-				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-				uploadRootPath = uploadRootPath.replace("\\webapp", "");
-				pb.setUrlimage(getimg(product.getImgurl1(),uploadRootPath));
+				String uploadRootPath = request.getServletContext().getRealPath("");
+				File uploadRootDir = new File(uploadRootPath);
+				pb.setUrlimage(getimg(product.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath));
 				lstdata.add(pb);
 			}
 			
@@ -511,9 +515,9 @@ public class ProductAPI {
 				pb.setTenMauNPL(product.getTenMauNPL());
 				
 				String FolderPath = commonService.getFolderPath(product.getProducttypeid_link());
-				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-				uploadRootPath = uploadRootPath.replace("\\webapp", "");
-				pb.setUrlimage(getimg(product.getImgurl1(),uploadRootPath));
+				String uploadRootPath = request.getServletContext().getRealPath("");
+				File uploadRootDir = new File(uploadRootPath);
+				pb.setUrlimage(getimg(product.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath));
 				lstdata.add(pb);
 			}
 			response.data = lstdata;
@@ -552,9 +556,9 @@ public class ProductAPI {
 				pb.setTenMauNPL(product.getTenMauNPL());
 				
 				String FolderPath = commonService.getFolderPath(product.getProducttypeid_link());
-				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-				uploadRootPath = uploadRootPath.replace("\\webapp", "");
-				pb.setUrlimage(getimg(product.getImgurl1(),uploadRootPath));
+				String uploadRootPath = request.getServletContext().getRealPath("");
+				File uploadRootDir = new File(uploadRootPath);
+				pb.setUrlimage(getimg(product.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath));
 				lstdata.add(pb);
 			}
 			response.data = lstdata;
@@ -579,12 +583,14 @@ public class ProductAPI {
 			ProductImg pimg = new ProductImg();
 			String FolderPath = commonService.getFolderPath(product.getProducttypeid_link());
 			
-			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-			pimg.img1 = getimg(response.data.getImgurl1(),uploadRootPath);
-			pimg.img2 = getimg(response.data.getImgurl2(),uploadRootPath);
-			pimg.img3 = getimg(response.data.getImgurl3(),uploadRootPath);
-			pimg.img4 = getimg(response.data.getImgurl4(),uploadRootPath);
-			pimg.img5 = getimg(response.data.getImgurl5(),uploadRootPath);
+			String uploadRootPath = request.getServletContext().getRealPath("");
+			File uploadRootDir = new File(uploadRootPath);
+			
+			pimg.img1 = getimg(response.data.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath);
+			pimg.img2 = getimg(response.data.getImgurl2(),uploadRootDir.getParent()+"/"+FolderPath);
+			pimg.img3 = getimg(response.data.getImgurl3(),uploadRootDir.getParent()+"/"+FolderPath);
+			pimg.img4 = getimg(response.data.getImgurl4(),uploadRootDir.getParent()+"/"+FolderPath);
+			pimg.img5 = getimg(response.data.getImgurl5(),uploadRootDir.getParent()+"/"+FolderPath);
 			
 			response.img = pimg;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -598,7 +604,6 @@ public class ProductAPI {
 	}
 	
 	private byte[] getimg(String filename, String uploadRootPath) {
-		uploadRootPath = uploadRootPath.replace("\\webapp", "");
 		String filePath = uploadRootPath+"/"+ filename;
 		Path path = Paths.get(filePath);
 		byte[] data;
@@ -872,10 +877,10 @@ public class ProductAPI {
 			String FolderPath = commonService.getFolderPath(entity.product_type);
 			
 			Product product = productService.findOne(entity.id);
-			String filename = product.getBuyercode().replace(" " , "")+"_"+entity.img+"."+entity.ext;
-			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-			uploadRootPath = uploadRootPath.replace("\\webapp", "");
-			String filePath = uploadRootPath+"/"+ filename;
+			String filename = product.getBuyercode().replace(" " , "").replace("/", "-")+"_"+entity.img+"."+entity.ext;
+			String uploadRootPath = request.getServletContext().getRealPath("");
+			File uploadRootDir = new File(uploadRootPath);
+			String filePath = uploadRootDir.getParent()+"/"+FolderPath+"/"+ filename;
 			Path path = Paths.get(filePath);
 			byte[] data = Files.readAllBytes(path);
 			response.data = data;
@@ -899,10 +904,10 @@ public class ProductAPI {
 			String FolderPath = commonService.getFolderPath(entity.product_type);
 			
 			Product product = productService.findOne(entity.id);
-			String filename = product.getBuyercode().replace(" " , "")+"_"+entity.img+"."+entity.ext;
-			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-			uploadRootPath = uploadRootPath.replace("\\webapp", "");
-			String filePath = uploadRootPath+"/"+ filename;
+			String filename = product.getBuyercode().replace(" " , "").replace("/", "-")+"_"+entity.img+"."+entity.ext;
+			String uploadRootPath = request.getServletContext().getRealPath("");
+			File uploadRootDir = new File(uploadRootPath);
+			String filePath = uploadRootDir.getParent()+"/"+FolderPath+"/"+ filename;
 			Path path = Paths.get(filePath);
 			byte[] data = Files.readAllBytes(path);
 			response.data = data;
@@ -927,20 +932,20 @@ public class ProductAPI {
 			Product product = productService.findOne(id);
 			String FolderPath = commonService.getFolderPath(product.getProducttypeid_link());
 			
-			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-			uploadRootPath = uploadRootPath.replace("\\webapp", "");
+			String uploadRootPath = request.getServletContext().getRealPath("");
 			File uploadRootDir = new File(uploadRootPath);
+			File folder_upload = new File(uploadRootDir.getParent()+"/"+FolderPath);
 			// Tạo thư mục gốc upload nếu nó không tồn tại.
-			if (!uploadRootDir.exists()) {
-				uploadRootDir.mkdirs();
+			if (!folder_upload.exists()) {
+				folder_upload.mkdirs();
 			}
 
 			String name = file.getOriginalFilename();		
 			if (name != null && name.length() > 0) {
 				String[] str = name.split("\\.");
 				String extend = str[str.length -1];	
-				name = product.getBuyercode().replace(" " , "")+"_"+img+"."+extend;
-				File serverFile = new File(uploadRootDir.getAbsolutePath() + File.separator + name);
+				name = product.getBuyercode().replace(" " , "").replace("/", "-")+"_"+img+"."+extend;
+				File serverFile = new File(folder_upload.getAbsolutePath() + File.separator + name);
 
 				BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
 				stream.write(file.getBytes());
@@ -1152,9 +1157,9 @@ public class ProductAPI {
 					pb.setPquantity(entity.po_quantity);
 					
 					String FolderPath = commonService.getFolderPath(product.getProducttypeid_link());
-					String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-					uploadRootPath = uploadRootPath.replace("\\webapp", "");
-					pb.setUrlimage(getimg(product.getImgurl1(),uploadRootPath));
+					String uploadRootPath = request.getServletContext().getRealPath("");
+					File uploadRootDir = new File(uploadRootPath);
+					pb.setUrlimage(getimg(product.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath));
 					
 					response.data.add(pb);
 				}				
@@ -1181,9 +1186,9 @@ public class ProductAPI {
 						pb.setCode_amount(_product.getBuyercode()+" ("+commonService.FormatNumber(pb.getPquantity())+")");
 					}
 					String FolderPath = commonService.getFolderPath(_product.getProducttypeid_link());
-					String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-					uploadRootPath = uploadRootPath.replace("\\webapp", "");
-					pb.setUrlimage(getimg(_product.getImgurl1(),uploadRootPath));
+					String uploadRootPath = request.getServletContext().getRealPath("");
+					File uploadRootDir = new File(uploadRootPath);
+					pb.setUrlimage(getimg(product.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath));
 					
 					response.data.add(pb);
 				}
