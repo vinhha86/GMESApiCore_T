@@ -110,6 +110,7 @@ public class PContract_POAPI {
 	@Autowired ISKU_Service skuService;
 	@Autowired
 	IPContract_PO_ShippingService poshippingService;
+	@Autowired IPOrderProcessing_Service processService;
 	@Autowired
 	Common commonService;
 	@Autowired
@@ -130,7 +131,6 @@ public class PContract_POAPI {
 	IPContract_Price_Service priceService;
 	@Autowired ISizeSetService sizesetService;
 	@Autowired IPContract_PO_Productivity_Service productivityService;
-	@Autowired IPOrderProcessing_Service processService;
 	@Autowired IPContract_Price_DService pricedetailService;
 	@Autowired IOrgService orgService;
 	@Autowired IGpayUserOrgService userOrgService;
@@ -1669,6 +1669,7 @@ public class PContract_POAPI {
 				if(pContract_PO_Productivity.getId() == null) {
 					pContract_PO_Productivity.setOrgrootid_link(orgrootid_link);
 					pContract_PO_Productivity.setPcontract_poid_link(pcontract_poid_link);
+					pContract_PO_Productivity.setProductid_link(pcontract_po.getProductid_link());
 				}
 				productivityService.save(pContract_PO_Productivity);
 			}
@@ -1846,6 +1847,7 @@ public class PContract_POAPI {
 					pContract_PO_Productivity.setOrgrootid_link(orgrootid_link);
 					pContract_PO_Productivity.setPcontract_poid_link(pcontract_po.getId());
 				}
+				pContract_PO_Productivity.setProductid_link(pcontract_po.getProductid_link());
 				productivityService.save(pContract_PO_Productivity);
 			}
 			

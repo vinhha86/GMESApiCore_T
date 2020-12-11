@@ -55,6 +55,7 @@ import vn.gpay.gsmart.core.task_object.ITask_Object_Service;
 import vn.gpay.gsmart.core.task_object.Task_Object;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.OrgType;
+import vn.gpay.gsmart.core.utils.POrderReqStatus;
 import vn.gpay.gsmart.core.utils.POrderStatus;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -883,7 +884,6 @@ public class ScheduleAPI {
 			sch.setName(name);
 			sch.setParentid_origin(entity.parentid_origin);
 			sch.setPordercode(porder.getOrdercode());
-			sch.setProductivity(productivity);
 			sch.setResourceId(entity.resourceid);
 			sch.setStartDate(startDate);
 			sch.setStatus(-1);
@@ -894,6 +894,7 @@ public class ScheduleAPI {
 			sch.setProductivity_po(productivity);
 			sch.setProductivity_porder(productivity);
 			sch.setPcontract_poid_link(req.getPcontract_poid_link());
+			sch.setProductid_link(req.getProductid_link());
 			
 			response.data = sch;
 			
@@ -951,13 +952,15 @@ public class ScheduleAPI {
 			//xoa trong bang poder_grant
 			granttService.deleteById(pordergrantid_link);
 			
-			//Xoa trong bang porder
-			porderService.deleteById(porderid_link);
-			
-			//Cap nhat lai bang porder_req
-			POrder_Req req = reqService.findOne(porder.getPorderreqid_link());
-			req.setStatus(0);
-			reqService.save(req);
+			//Xoa trong bang porder neu porder khong con grant 
+			List<POrderGrant> list_grant = granttService.getByOrderId(porderid_link);
+			if(list_grant.size() == 0) {
+				porderService.deleteById(porderid_link);				
+
+				POrder_Req req = reqService.findOne(porder.getPorderreqid_link());
+				req.setStatus(POrderReqStatus.STATUS_FREE);
+				reqService.save(req);
+			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -1050,7 +1053,7 @@ public class ScheduleAPI {
 	} 
 	
 	@RequestMapping(value = "/get_duration",method = RequestMethod.POST)
-	public ResponseEntity<getduration_response> GetDuration(HttpServletRequest request,
+	public ResponseEntity<getduration_response> GetDuration(HttpServletRequest request, 
 			@RequestBody getduration_request entity) {
 		getduration_response response = new getduration_response();
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -1200,11 +1203,6 @@ public class ScheduleAPI {
 				if(list_grant.size() == 0) {
 					porder.setStatus(POrderStatus.PORDER_STATUS_FREE);
 					porderService.save(porder);
-					
-
-					POrder_Req req = reqService.findOne(porder.getPorderreqid_link());
-					req.setStatus(0);
-					reqService.save(req);
 				}
 			}
 			
