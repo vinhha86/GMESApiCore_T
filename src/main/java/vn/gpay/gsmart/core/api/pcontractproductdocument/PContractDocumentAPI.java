@@ -55,32 +55,32 @@ public class PContractDocumentAPI {
 			String FolderPath = String.format("upload/pcontract/%s/%s", pcontract.getContractcode(), product.getBuyercode());
 			
 			// Thư mục gốc upload file.			
-			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-			uploadRootPath = uploadRootPath.replace("\\webapp", "");
+			String uploadRootPath = request.getServletContext().getRealPath("");
 			File uploadRootDir = new File(uploadRootPath);
+			File folder_upload = new File(uploadRootDir.getParent()+"/"+FolderPath);
 			// Tạo thư mục gốc upload nếu nó không tồn tại.
-			if (!uploadRootDir.exists()) {
-				uploadRootDir.mkdirs();
+			if (!folder_upload.exists()) {
+				folder_upload.mkdirs();
 			}
 
 			String name = file.getOriginalFilename();		
 			if (name != null && name.length() > 0) {
-				File serverFile = new File(uploadRootDir.getAbsolutePath() + File.separator + name);
+				File serverFile = new File(folder_upload.getAbsolutePath() + File.separator + name);
 
 				BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
 				stream.write(file.getBytes());
 				stream.close();
 			}
-			
-			PContractProductDocument ppd = new PContractProductDocument();
-			ppd.setId((long)0);
-			ppd.setFilename(name);
-			ppd.setPcontractid_link(pcontractid_link);
-			ppd.setProductid_link(productid_link);
-			ppd.setOrgrootid_link(orgrootid_link);
-			ppd.setDescription("");
-			
-			pcdService.save(ppd);
+//			
+//			PContractProductDocument ppd = new PContractProductDocument();
+//			ppd.setId((long)0);
+//			ppd.setFilename(name);
+//			ppd.setPcontractid_link(pcontractid_link);
+//			ppd.setProductid_link(productid_link);
+//			ppd.setOrgrootid_link(orgrootid_link);
+//			ppd.setDescription("");
+//			
+//			pcdService.save(ppd);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
