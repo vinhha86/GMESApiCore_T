@@ -196,8 +196,9 @@ public class POrderReportAPI
 			try {
 				String image_product = porder.getImageurl();
 				String FolderPath = commonService.getFolderPath(10);
-				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-				InputStream is_img = new FileInputStream(uploadRootPath+"/"+image_product);
+				String uploadRootPath = request.getServletContext().getRealPath("");
+				File uploadRootDir_img = new File(uploadRootPath);
+				InputStream is_img = new FileInputStream(uploadRootDir_img.getParent()+"/"+FolderPath+"/"+image_product);
 				byte[] img = IOUtils.toByteArray(is_img);
 				
 				int pictureIdx = workbook.addPicture(img, Workbook.PICTURE_TYPE_JPEG);

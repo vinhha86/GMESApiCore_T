@@ -115,7 +115,7 @@ public class POrderGrant implements Serializable {
 	}
 	@Transient
 	public String getXuongTo() {
-		return org.getCode();
+		return org.getName();
 	}
 	@Transient
 	public int getProductivity_po() {
