@@ -1,5 +1,7 @@
 package vn.gpay.gsmart.core.api.timesheet;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -56,6 +58,8 @@ public class TimeSheet_SumAPI {
 			//1. Lay danh sach nhan su cua don vi quan ly (orgmanagerid_link)
 			List<Personel> ls_Personnel = personnelService.getby_orgmanager(entity.orgid_link, orgrootid_link);
 			CountDownLatch latch = new CountDownLatch(ls_Personnel.size());
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");  
+			System.out.println("Start:" + formatter.format(new Date()));
 			for(Personel personnel:ls_Personnel){
 				TimeSheet_Personnel sal_personnel =  new TimeSheet_Personnel(
 						personnel,
@@ -69,7 +73,9 @@ public class TimeSheet_SumAPI {
 				sal_personnel.start();
 			}
 			latch.await();
+			System.out.println("End:" + formatter.format(new Date()));
             response.data = timesheet_sumService.getall_bymanageorg(entity.orgid_link, entity.year, entity.month);
+            System.out.println(response.data);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<timesheet_sum_response>(response, HttpStatus.OK);

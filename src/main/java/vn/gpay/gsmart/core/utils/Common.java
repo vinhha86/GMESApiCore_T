@@ -616,7 +616,7 @@ public class Common  {
 		}
 		return false;
 	}
-	public Date Date_Add(Date date, int amount) {
+	public static Date Date_Add(Date date, int amount) {
 		Calendar _date = Calendar.getInstance();
 		_date.setTime(date);
 		_date.add(Calendar.DATE, amount);
@@ -624,6 +624,25 @@ public class Common  {
 		_date.set(Calendar.MINUTE, 0);
 		_date.set(Calendar.SECOND, 0);
 		return _date.getTime();
+	}
+	public static int Date_Compare(Date date1, Date date2) {
+	    Calendar calendar1 = Calendar.getInstance();
+
+	    calendar1.setTime(date1);
+	    calendar1.set(Calendar.HOUR_OF_DAY, 0);
+	    calendar1.set(Calendar.MINUTE, 0);
+	    calendar1.set(Calendar.SECOND, 0);
+	    calendar1.set(Calendar.MILLISECOND, 0);
+	    
+	    Calendar calendar2 = Calendar.getInstance();
+
+	    calendar2.setTime(date2);
+	    calendar2.set(Calendar.HOUR_OF_DAY, 0);
+	    calendar2.set(Calendar.MINUTE, 0);
+	    calendar2.set(Calendar.SECOND, 0);
+	    calendar2.set(Calendar.MILLISECOND, 0);
+
+	    return calendar1.compareTo(calendar2);
 	}
 	public Date Date_Add_with_holiday(Date date, int amount, long orgrootid_link) {
 		Calendar _date = Calendar.getInstance();
