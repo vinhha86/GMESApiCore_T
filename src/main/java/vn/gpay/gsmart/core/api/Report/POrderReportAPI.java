@@ -170,9 +170,9 @@ public class POrderReportAPI
 			cell_G2.setCellValue(ngaygiao);
 			cell_G2.setCellStyle(cellStyle_align_left);
 			
-			String malenh = porder.getOrdercode();
+			String ngayduyet = dateFormat.format(porder.getOrderdate());
 			Cell cell_L2 = row_2.getCell(ColumnExcel.L);
-			cell_L2.setCellValue(malenh);
+			cell_L2.setCellValue(ngayduyet);
 			cell_L2.setCellStyle(cellStyle_align_left);
 			
 			Row row_3 = sheet.getRow(2);

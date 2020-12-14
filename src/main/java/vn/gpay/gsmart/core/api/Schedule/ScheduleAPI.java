@@ -802,16 +802,15 @@ public class ScheduleAPI {
 				startDate = commonService.Date_Add_with_holiday(startDate, 1, orgrootid_link);
 				startDate = commonService.getBeginOfDate(startDate);
 			}
-			Date endDate = req.getShipdate();
+			Date endDate = commonService.getEndOfDate(req.getShipdate());
 			
 			int duration = commonService.getDuration(startDate, endDate, orgrootid_link);
 			
 			if(productivity == 0) {
 				productivity = commonService.getProductivity(req.getTotalorder(), duration);
+				duration = commonService.getDuration_byProductivity(req.getTotalorder(), productivity);
+				endDate = commonService.Date_Add_with_holiday(startDate, duration, orgrootid_link);
 			}
-			
-			duration = commonService.getDuration_byProductivity(req.getTotalorder(), productivity);
-			endDate = commonService.Date_Add_with_holiday(startDate, (duration-1), orgrootid_link);
 			
 			String po_code = req.getPo_buyer().length() > 0?req.getPo_vendor():req.getPo_buyer();
 			POrder porder = new POrder();
@@ -1061,7 +1060,9 @@ public class ScheduleAPI {
 		long orgrootid_link = user.getRootorgid_link();
 		
 		try {
-			int duration = commonService.getDuration(entity.StartDate, entity.EndDate, orgrootid_link);
+			Date StartDate = commonService.getBeginOfDate(entity.StartDate);
+			Date EndDate = commonService.getEndOfDate(entity.EndDate);
+			int duration = commonService.getDuration(StartDate, EndDate, orgrootid_link);
 			
 			response.duration = duration;
 			
@@ -1085,7 +1086,8 @@ public class ScheduleAPI {
 		try {
 			Date StartDate = commonService.Date_Add_with_holiday(entity.MatDate, 7, orgrootid_link);
 			StartDate = commonService.getBeginOfDate(StartDate);
-			int duration = commonService.getDuration(StartDate, entity.EndDate, orgrootid_link);
+			Date EndDate = commonService.getEndOfDate(entity.EndDate);
+			int duration = commonService.getDuration(StartDate, EndDate, orgrootid_link);
 			
 			response.duration = duration;
 			response.production_date = StartDate;
