@@ -90,6 +90,8 @@ public class TimeSheet_Personnel implements Runnable{
 				//Order theo ngày và thứ tự ca
 				List<TimeSheetLunch> lsWorkingShift= timesheet_lunchService.getByPersonnelDate(personnel.getId(), workingdate, workingdate);
 				
+				boolean isMoreShift = false;
+				
 				for (TimeSheetLunch theWorkingShift:lsWorkingShift){
 				
 					//II. Duyệt từng ngày, từng ca --> Lấy danh sách Timerecorded trong ca
