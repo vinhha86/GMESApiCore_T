@@ -17,4 +17,6 @@ public interface ISKU_Service extends Operations<SKU> {
 	public List<SKU> getProductSKU_ByCode(Integer skutypeid_link, String code);
 	
 	public List<SKU> getProductSKU_ByBarCode(Integer skutypeid_link, String barcode);
+	
+	public List<SKU> getSKUforHandOver(Long porderid_link);
 }

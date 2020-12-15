@@ -29,6 +29,7 @@ public interface Personnel_repository extends JpaRepository<Personel, Long>,JpaS
 			+ "where c.orgid_link = :orgid_link "
 			+ "and b.shifttypeid_link = :shifttypeid_link "
 			+ "and b.workingdate = :workingdate "
+			+ "and b.isworking = true "
 			)
 	public List<Personel> getForPProcessingProductivity (
 			@Param ("orgid_link")final Long orgid_link,

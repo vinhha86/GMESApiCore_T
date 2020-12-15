@@ -23,6 +23,8 @@ import vn.gpay.gsmart.core.handover_sku.IHandoverSKUService;
 import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.sku.ISKU_Service;
+import vn.gpay.gsmart.core.sku.SKU;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -32,6 +34,7 @@ public class HandoverSKUAPI {
 	@Autowired IHandoverSKUService handoverSkuService;
 	@Autowired IHandoverProductService handoverProductService;
 	@Autowired IPOrder_Product_SKU_Service porderskuService;
+	@Autowired ISKU_Service skuService;
 	
 	@RequestMapping(value = "/getall",method = RequestMethod.POST)
 	public ResponseEntity<HandoverSKU_getall_response> GetAll(HttpServletRequest request ) {
@@ -56,18 +59,47 @@ public class HandoverSKUAPI {
 			
 			List<HandoverSKU> list = handoverSkuService.getByHandoverId(entity.handoverid_link, entity.productid_link);
 			
+//			if(list.size() == 0) {
+//				// create
+//				Date date = new Date();
+//				List<POrder_Product_SKU> porderProductSkus = porderskuService.getby_porder(entity.porderid_link);
+//				for(POrder_Product_SKU porderProductSku : porderProductSkus) {
+//					HandoverSKU newHandoverSKU = new HandoverSKU();
+//					newHandoverSKU.setId(0L);
+//					newHandoverSKU.setOrgrootid_link(user.getRootorgid_link());
+//					newHandoverSKU.setHandoverid_link(entity.handoverid_link);
+//					newHandoverSKU.setHandoverproductid_link(entity.handoverproductid_link);
+//					newHandoverSKU.setProductid_link(entity.productid_link);
+//					newHandoverSKU.setSkuid_link(porderProductSku.getSkuid_link());
+//					newHandoverSKU.setTotalpackage(0);
+//					newHandoverSKU.setUsercreateid_link(user.getId());
+//					newHandoverSKU.setTimecreate(date);
+//					newHandoverSKU.setLastuserupdateid_link(user.getId());
+//					newHandoverSKU.setLasttimeupdate(date);
+//					handoverSkuService.save(newHandoverSKU);
+//				}
+//				list = handoverSkuService.getByHandoverId(entity.handoverid_link, entity.productid_link);
+//			}
+			
 			if(list.size() == 0) {
 				// create
 				Date date = new Date();
-				List<POrder_Product_SKU> porderProductSkus = porderskuService.getby_porder(entity.porderid_link);
-				for(POrder_Product_SKU porderProductSku : porderProductSkus) {
+				Long porderid_link = entity.porderid_link;
+				Long handoverid_link = entity.handoverid_link;
+				Long handoverproductid_link = entity.handoverproductid_link;
+				Long productid_link = entity.productid_link;
+				
+				// tim cac sku theo porder
+				
+				List<SKU> skus = skuService.getSKUforHandOver(porderid_link);
+				for(SKU sku : skus) {
 					HandoverSKU newHandoverSKU = new HandoverSKU();
 					newHandoverSKU.setId(0L);
 					newHandoverSKU.setOrgrootid_link(user.getRootorgid_link());
 					newHandoverSKU.setHandoverid_link(entity.handoverid_link);
 					newHandoverSKU.setHandoverproductid_link(entity.handoverproductid_link);
 					newHandoverSKU.setProductid_link(entity.productid_link);
-					newHandoverSKU.setSkuid_link(porderProductSku.getSkuid_link());
+					newHandoverSKU.setSkuid_link(sku.getId());
 					newHandoverSKU.setTotalpackage(0);
 					newHandoverSKU.setUsercreateid_link(user.getId());
 					newHandoverSKU.setTimecreate(date);

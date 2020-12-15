@@ -71,4 +71,9 @@ public class SKU_Service extends AbstractService<SKU> implements ISKU_Service {
 		// TODO Auto-generated method stub
 		return repo.getProductSKU_ByBarCode(skutypeid_link, barcode);
 	}
+
+	@Override
+	public List<SKU> getSKUforHandOver(Long porderid_link) {
+		return repo.getSKUforHandOver(porderid_link);
+	}
 }

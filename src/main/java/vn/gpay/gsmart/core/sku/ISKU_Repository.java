@@ -54,4 +54,14 @@ public interface ISKU_Repository extends JpaRepository<SKU, Long>, JpaSpecificat
 			@Param ("skutypeid_link")final Integer skutypeid_link,
 			@Param ("barcode")final String barcode);
 	
+	@Query(value = "select distinct a from SKU a "
+			+ "inner join POrderGrant_SKU b on a.id = b.skuid_link "
+			+ "inner join POrderGrant c on c.id = b.pordergrantid_link "
+			+ "inner join POrder d on d.id = c.porderid_link "
+			+ "where d.id = :porderid_link "
+			)
+	public List<SKU> getSKUforHandOver(
+			@Param ("porderid_link")final Long porderid_link
+			);
+	
 }
