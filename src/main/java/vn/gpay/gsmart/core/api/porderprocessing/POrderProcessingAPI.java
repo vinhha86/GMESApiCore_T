@@ -202,6 +202,10 @@ public class POrderProcessingAPI {
 					pprocess.setAmountpacked(0);
 					pprocess.setAmountpackedsum(pprocess.getAmountpackedsum());		
 					
+					pprocess.setAmountpackstockedsumprev(pprocess.getAmountpackstockedsum());
+					pprocess.setAmountpackstocked(0);
+					pprocess.setAmountpackstockedsum(pprocess.getAmountpackstockedsum());		
+					
 					pprocess.setAmountstockedsumprev(pprocess.getAmountstockedsum());
 					pprocess.setAmountstocked(0);
 					pprocess.setAmountstockedsum(pprocess.getAmountstockedsum());
@@ -1021,6 +1025,10 @@ public class POrderProcessingAPI {
 			        pprocess.setAmountpackedsumprev(entity.data.getAmountpackedsum());
 			        pprocess.setAmountpackedsum(entity.data.getAmountpackedsum());
 			        
+			        pprocess.setAmountpackstocked(entity.data.getAmountpackstocked());
+			        pprocess.setAmountpackstockedsumprev(entity.data.getAmountpackstockedsumprev());
+			        pprocess.setAmountpackstockedsum(entity.data.getAmountpackstockedsum());
+			        
 			        pprocess.setAmountstocked(entity.data.getAmountstocked());
 			        pprocess.setAmountstockedsumprev(entity.data.getAmountstockedsum());
 			        pprocess.setAmountstockedsum(entity.data.getAmountstockedsum());
@@ -1070,6 +1078,11 @@ public class POrderProcessingAPI {
 	        			pprocess.setAmountpackedsum((null==entity.data.getAmountpackedsumprev()?0:entity.data.getAmountpackedsumprev()) 
 	        					+ (null==entity.data.getAmountpacked()?0:entity.data.getAmountpacked()));
 	        			break;
+	        		case "amountpackstocked":
+	        			pprocess.setAmountpackstocked(entity.data.getAmountpackstocked());
+	        			pprocess.setAmountpackstockedsum((null==entity.data.getAmountpackstockedsumprev()?0:entity.data.getAmountpackstockedsumprev()) 
+	        					+ (null==entity.data.getAmountpackstocked()?0:entity.data.getAmountpackstocked()));
+	        			break;
 	        		case "amountstocked":
 	        			pprocess.setAmountstocked(entity.data.getAmountstocked());
 	        			pprocess.setAmountstockedsum((null==entity.data.getAmountstockedsumprev()?0:entity.data.getAmountstockedsumprev()) 
@@ -1111,6 +1124,7 @@ public class POrderProcessingAPI {
 			        int iAmountErrorSum = null==pprocess.getAmounterrorsum()?0:pprocess.getAmounterrorsum();
 			        int iAmountKcsSum = null==pprocess.getAmountkcssum()?0:pprocess.getAmountkcssum();
 			        int iAmountPackedSum = null==pprocess.getAmountpackedsum()?0:pprocess.getAmountpackedsum();
+			        int iAmountPackStockedSum = null==pprocess.getAmountpackstockedsum()?0:pprocess.getAmountpackstockedsum();
 			        int iAmountStockedSum = null==pprocess.getAmountstockedsum()?0:pprocess.getAmountstockedsum();
 			        int iLastStatus = pprocess.getStatus();
 			        
@@ -1132,6 +1146,9 @@ public class POrderProcessingAPI {
 			        	
 			        	pprocessAfter.setAmountpackedsumprev(iAmountPackedSum);
 			        	pprocessAfter.setAmountpackedsum(iAmountPackedSum + (null==pprocessAfter.getAmountpacked()?0:pprocessAfter.getAmountpacked()));
+			        	
+			        	pprocessAfter.setAmountpackstockedsumprev(iAmountPackStockedSum);
+			        	pprocessAfter.setAmountpackstockedsum(iAmountPackStockedSum + (null==pprocessAfter.getAmountpackstocked()?0:pprocessAfter.getAmountpackstocked()));
 			        	
 			        	pprocessAfter.setAmountstockedsumprev(iAmountStockedSum);
 			        	pprocessAfter.setAmountstockedsum(iAmountStockedSum + (null==pprocessAfter.getAmountstocked()?0:pprocessAfter.getAmountstocked()));
@@ -1161,6 +1178,7 @@ public class POrderProcessingAPI {
 				        iAmountErrorSum = null==pprocessAfter.getAmounterrorsum()?0:pprocessAfter.getAmounterrorsum();
 				        iAmountKcsSum = null==pprocessAfter.getAmountkcssum()?0:pprocessAfter.getAmountkcssum();
 				        iAmountPackedSum = null==pprocessAfter.getAmountpackedsum()?0:pprocessAfter.getAmountpackedsum();
+				        iAmountPackStockedSum = null==pprocessAfter.getAmountpackstockedsum()?0:pprocessAfter.getAmountpackstockedsum();
 				        iAmountStockedSum = null==pprocessAfter.getAmountstockedsum()?0:pprocessAfter.getAmountstockedsum();
 			        	
 				        iLastStatus = pprocessAfter.getStatus();
@@ -1182,6 +1200,7 @@ public class POrderProcessingAPI {
 		        response.amounterrorsum = pprocess.getAmounterrorsum();
 		        response.amountkcssum = pprocess.getAmountkcssum();
 		        response.amountpackedsum = pprocess.getAmountpackedsum();
+		        response.amountpackstockedsum = pprocess.getAmountpackstockedsum();
 		        response.amountstockedsum = pprocess.getAmountstockedsum();		        
 		        response.status = pprocess.getStatus();
 		        
