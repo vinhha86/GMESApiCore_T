@@ -270,6 +270,14 @@ public class POrderProcessing implements Serializable {
 	}
 	
 	@Transient
+	public String getProductcode() {
+		if(porder_grant != null) {
+			return porder_grant.getProductcode();
+		}
+		return null;
+	}
+	
+	@Transient
 	public String getPOrdercode() {
 		if(porder != null) {
 			return porder.getOrdercode();
