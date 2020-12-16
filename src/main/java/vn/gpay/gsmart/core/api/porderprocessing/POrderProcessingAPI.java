@@ -164,6 +164,7 @@ public class POrderProcessingAPI {
 		POrderProcessingResponse response = new POrderProcessingResponse();
 		try {
 			List<POrderProcessing> pprocessList = pprocessRepository.getByDateAndFactory(entity.processingdate_to,entity.orgid);
+			List<POrderProcessing> list_clone = new ArrayList<>(pprocessList);
 			
 			//If processingdate <> entity.processingdate_to --> Calcucate Amount's value of provided date
 			for(POrderProcessing pprocess: pprocessList){
@@ -176,58 +177,63 @@ public class POrderProcessingAPI {
 				}
 				
 				if (GPAYDateFormat.atStartOfDay(pprocess.getProcessingdate()).before(GPAYDateFormat.atStartOfDay(entity.processingdate_to))){
-					pprocess.setProcessingdate(entity.processingdate_to);
+					POrderProcessing new_process = new POrderProcessing();
+					new_process.setProcessingdate(entity.processingdate_to);
 					
-					pprocess.setAmountcutsumprev(pprocess.getAmountcutsum());
-					pprocess.setAmountcut(0);
-					pprocess.setAmountcutsum(pprocess.getAmountcutsum());
+					new_process.setAmountcutsumprev(pprocess.getAmountcutsum());
+					new_process.setAmountcut(0);
+					new_process.setAmountcutsum(pprocess.getAmountcutsum());
 					
-					pprocess.setAmountinputsumprev(pprocess.getAmountinputsum());
-					pprocess.setAmountinput(0);
-					pprocess.setAmountinputsum(pprocess.getAmountinputsum());
+					new_process.setAmountinputsumprev(pprocess.getAmountinputsum());
+					new_process.setAmountinput(0);
+					new_process.setAmountinputsum(pprocess.getAmountinputsum());
 					
-					pprocess.setAmountoutputsumprev(pprocess.getAmountoutputsum());
-					pprocess.setAmountoutput(0);
-					pprocess.setAmountoutputsum(pprocess.getAmountoutputsum());
+					new_process.setAmountoutputsumprev(pprocess.getAmountoutputsum());
+					new_process.setAmountoutput(0);
+					new_process.setAmountoutputsum(pprocess.getAmountoutputsum());
 					
-					pprocess.setAmounterrorsumprev(pprocess.getAmounterrorsum());
-					pprocess.setAmounterror(0);
-					pprocess.setAmounterrorsum(pprocess.getAmounterrorsum());
+					new_process.setAmounterrorsumprev(pprocess.getAmounterrorsum());
+					new_process.setAmounterror(0);
+					new_process.setAmounterrorsum(pprocess.getAmounterrorsum());
 					
-					pprocess.setAmountkcssumprev(pprocess.getAmountkcssum());
-					pprocess.setAmountkcs(0);
-					pprocess.setAmountkcssum(pprocess.getAmountkcssum());	
+					new_process.setAmountkcssumprev(pprocess.getAmountkcssum());
+					new_process.setAmountkcs(0);
+					new_process.setAmountkcssum(pprocess.getAmountkcssum());	
 					
-					pprocess.setAmountpackedsumprev(pprocess.getAmountpackedsum());
-					pprocess.setAmountpacked(0);
-					pprocess.setAmountpackedsum(pprocess.getAmountpackedsum());		
+					new_process.setAmountpackedsumprev(pprocess.getAmountpackedsum());
+					new_process.setAmountpacked(0);
+					new_process.setAmountpackedsum(pprocess.getAmountpackedsum());		
 					
-					pprocess.setAmountpackstockedsumprev(pprocess.getAmountpackstockedsum());
-					pprocess.setAmountpackstocked(0);
-					pprocess.setAmountpackstockedsum(pprocess.getAmountpackstockedsum());		
+					new_process.setAmountpackstockedsumprev(pprocess.getAmountpackstockedsum());
+					new_process.setAmountpackstocked(0);
+					new_process.setAmountpackstockedsum(pprocess.getAmountpackstockedsum());		
 					
-					pprocess.setAmountstockedsumprev(pprocess.getAmountstockedsum());
-					pprocess.setAmountstocked(0);
-					pprocess.setAmountstockedsum(pprocess.getAmountstockedsum());
+					new_process.setAmountstockedsumprev(pprocess.getAmountstockedsum());
+					new_process.setAmountstocked(0);
+					new_process.setAmountstockedsum(pprocess.getAmountstockedsum());
 					
-					pprocess.setAmounttarget(0);
-					pprocess.setAmounttargetprev(pprocess.getAmounttarget());
+					new_process.setAmounttarget(0);
+					new_process.setAmounttargetprev(pprocess.getAmounttarget());
 					
-					pprocess.setAmountkcsreg(0);
-					pprocess.setAmountkcsregprev(pprocess.getAmountkcsreg());
+					new_process.setAmountkcsreg(0);
+					new_process.setAmountkcsregprev(pprocess.getAmountkcsreg());
 					
-					pprocess.setComment("");
+					new_process.setComment("");
+					
+					list_clone.add(new_process);
 				} else {
 	    			List<POrderProcessing> pprocessList_BeforeDate = pprocessRepository.getByBeforeDateAndOrderGrantID(pprocess.getPordergrantid_link(), entity.processingdate_to);
 	    			if (null != pprocessList_BeforeDate && pprocessList_BeforeDate.size() > 0){
 	    				POrderProcessing pprocess_beforedate = pprocessList_BeforeDate.get(0);
 	    				pprocess.setAmountkcsregprev(pprocess_beforedate.getAmountkcsreg());
 	    				pprocess.setAmounttargetprev(pprocess_beforedate.getAmounttarget());
+	    				list_clone.add(pprocess);
 	    			}
+//					List<POrder> lst = pordersRepository.get_by_code("", (long)1);
 				}
 			}
 			
-			response.data=pprocessList;
+			response.data=list_clone;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
 			return new ResponseEntity<POrderProcessingResponse>(response,HttpStatus.OK);

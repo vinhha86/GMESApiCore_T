@@ -72,7 +72,8 @@ public interface IPOrderProcessing_Repository extends JpaRepository<POrderProces
 	public List<POrderProcessing>getByBeforeDateAndOrderCode(@Param ("ordercode")final String ordercode, @Param ("processingdate_to")final Date processingdate_to);
 
 	//get a production order before the given date
-	@Query(value = "select a from POrderProcessing a where a.pordergrantid_link = :pordergrantid_link and a.processingdate = "
+	@Query(value = "select a from POrderProcessing a "
+			+ "where a.pordergrantid_link = :pordergrantid_link and a.processingdate = "
 			+ "(select max(b.processingdate) from POrderProcessing b where b.processingdate < :processingdate_to "
 			+ "and b.pordergrantid_link = :pordergrantid_link)")
 	public List<POrderProcessing>getByBeforeDateAndOrderGrantID(@Param ("pordergrantid_link")final Long pordergrantid_link, @Param ("processingdate_to")final Date processingdate_to);

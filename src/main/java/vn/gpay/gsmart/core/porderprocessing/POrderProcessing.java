@@ -2,17 +2,16 @@ package vn.gpay.gsmart.core.porderprocessing;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
@@ -21,31 +20,26 @@ import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 
 @Table(name="porder_processing")
-@DynamicUpdate(true) //Chi update cac thuoc tinh thay doi, cac thuoc tinh khac giu nguyen gia tri
+//@DynamicUpdate(true) //Chi update cac thuoc tinh thay doi, cac thuoc tinh khac giu nguyen gia tri
 @Entity
 public class POrderProcessing implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	protected Long id;
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "porder_processing_generator")
+	@SequenceGenerator(name="porder_processing_generator", sequenceName = "porder_processing_id_seq", allocationSize=1)
+	private Long id;
 	
-	@Column(name ="orgrootid_link")
     private Long orgrootid_link ;
 	
-	@Column(name ="processingdate")
     private Date processingdate ;
 	
-	@Column(name ="porderid_link")
     private Long porderid_link ;	
 
-	@Column(name ="ordercode",length=50)
     private String ordercode ;
 
-	@Column(name ="orderdate")
     private Date orderdate ;
 
-	@Column(name ="season",length=100)
     private String season;		
 	
 	@Transient
@@ -54,170 +48,138 @@ public class POrderProcessing implements Serializable {
 	@Transient
     private Integer salaryyear;
 	
-	@Column(name ="collection",length=100)
     private String collection;
 	
-	@Column(name ="granttoorgid_link")
     private Long granttoorgid_link;	
 	
-	@Column(name ="totalorder")
     private Integer totalorder ;	
 	
 //Tổ cắt	
-	@Column(name ="amountcutting")
     private Integer amountcutting ;
 	@Transient
     private Integer amountcuttingold;	
 	
-	@Column(name ="amountcuttingsum")
     private Integer amountcuttingsum ;	
 	
-	@Column(name ="amountcuttingsumprev")
     private Integer amountcuttingsumprev ;	
 	
-	@Column(name ="amountnumbering")
     private Integer amountnumbering ;
 	@Transient
     private Integer amountnumberingold;	
 	
-	@Column(name ="amountnumberingsum")
     private Integer amountnumberingsum ;	
 	
-	@Column(name ="amountnumberingsumprev")
     private Integer amountnumberingsumprev ;		
 
-	@Column(name ="amountmex")
     private Integer amountmex ;
 	@Transient
     private Integer amountmexold;	
 	
-	@Column(name ="amountmexsum")
     private Integer amountmexsum ;	
 	
-	@Column(name ="amountmexsumprev")
     private Integer amountmexsumprev ;		
 	
-	@Column(name ="amounttoline")
     private Integer amounttoline ;
 	@Transient
     private Integer amounttolineold;	
 	
-	@Column(name ="amounttolinesum")
     private Integer amounttolinesum ;	
 	
-	@Column(name ="amounttolinesumprev")
     private Integer amounttolinesumprev ;		
 	
 //Sản xuất	
-	@Column(name ="amountcut")
     private Integer amountcut ;
 	@Transient
     private Integer amountcutold;	
 	
-	@Column(name ="amountcutsum")
     private Integer amountcutsum ;	
 	
-	@Column(name ="amountcutsumprev")
     private Integer amountcutsumprev ;	
 	
-	@Column(name ="amountinput")
     private Integer amountinput ;	
 	@Transient
     private Integer amountinputold;	
 	
-	@Column(name ="amountinputsum")
     private Integer amountinputsum ;	
 	
-	@Column(name ="amountinputsumprev")
     private Integer amountinputsumprev ;	
 	
-	@Column(name ="amountoutput")
     private Integer amountoutput ;
 	@Transient
     private Integer amountoutputold;		
 	
-	@Column(name ="amountoutputsum")
     private Integer amountoutputsum ;	
 	
-	@Column(name ="amountoutputsumprev")
     private Integer amountoutputsumprev ;	
 	
-	@Column(name ="amounterror")
     private Integer amounterror ;
 	@Transient
     private Integer amounterrorold;		
 	
-	@Column(name ="amounterrorsum")
     private Integer amounterrorsum ;	
 	
-	@Column(name ="amounterrorsumprev")
     private Integer amounterrorsumprev ;	
 
-	@Column(name ="amounttarget")
     private Integer amounttarget ;	
 	@Transient
     private Integer amounttargetold;	
 	
-	@Column(name ="amounttargetprev")
     private Integer amounttargetprev ;		
 	
-	@Column(name ="amountkcsreg")
     private Integer amountkcsreg ;
 	@Transient
     private Integer amountkcsregold;		
 	
-	@Column(name ="amountkcsregprev")
     private Integer amountkcsregprev ;		
 	
-	@Column(name ="amountkcs")
     private Integer amountkcs ;	
 	@Transient
     private Integer amountkcsold;		
 	
-	@Column(name ="amountkcssum")
+	//@Column(name ="amountkcssum")
     private Integer amountkcssum ;	
 	
-	@Column(name ="amountkcssumprev")
+	//@Column(name ="amountkcssumprev")
     private Integer amountkcssumprev ;	
 
-	@Column(name ="amountpackstocked")
+	//@Column(name ="amountpackstocked")
     private Integer amountpackstocked ;	
 	
-	@Column(name ="amountpackstockedsum")
+	//@Column(name ="amountpackstockedsum")
     private Integer amountpackstockedsum ;	
 	
-	@Column(name ="amountpackstockedsumprev")
+	//@Column(name ="amountpackstockedsumprev")
     private Integer amountpackstockedsumprev ;		
 	
-	@Column(name ="amountpacked")
+	//@Column(name ="amountpacked")
     private Integer amountpacked ;	
 	@Transient
     private Integer amountpackedold;		
 	
-	@Column(name ="amountpackedsum")
+	//@Column(name ="amountpackedsum")
     private Integer amountpackedsum ;	
 	
-	@Column(name ="amountpackedsumprev")
+	//@Column(name ="amountpackedsumprev")
     private Integer amountpackedsumprev ;	
 	
-	@Column(name ="amountstocked")
+	//@Column(name ="amountstocked")
     private Integer amountstocked ;	
 	@Transient
     private Integer amountstockedold;		
 	
-	@Column(name ="amountstockedsum")
+	//@Column(name ="amountstockedsum")
     private Integer amountstockedsum ;	
 	
-	@Column(name ="amountstockedsumprev")
+	//@Column(name ="amountstockedsumprev")
     private Integer amountstockedsumprev ;	
 	
-	@Column(name ="totalstocked")
+	//@Column(name ="totalstocked")
     private Integer totalstocked ;	
 	
-	@Column(name ="comment", length=100)
+	//@Column(name ="comment", length=100)
     private String comment ;	
 	
-	@Column(name ="status")
+	//@Column(name ="status")
     private Integer status ;	
 
 	@Transient
@@ -225,10 +187,10 @@ public class POrderProcessing implements Serializable {
 	@Transient
     private Integer shortvalue ;	
 	
-	@Column(name ="usercreatedid_link")
+	//@Column(name ="usercreatedid_link")
     private Long usercreatedid_link ;	
 	
-	@Column(name ="timecreated")
+	//@Column(name ="timecreated")
     private Date timecreated ;
 	
 	private Long pordergrantid_link;
