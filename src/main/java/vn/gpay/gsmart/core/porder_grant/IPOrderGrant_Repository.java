@@ -66,6 +66,16 @@ public interface IPOrderGrant_Repository extends JpaRepository<POrderGrant, Long
 	@Query(value = "select a from POrderGrant a where a.granttoorgid_link = :granttoorgid_link")
 	public List<POrderGrant>getByOrgId(@Param ("granttoorgid_link")final Long granttoorgid_link);
 	
+	@Query(value = "select a from POrderGrant a where (a.granttoorgid_link = :orgid_link or :orgid_link is null) "
+			+ "and reason_change is not null")
+	public List<POrderGrant>get_grant_change(@Param ("orgid_link")final Long orgid_link);
+	
+	@Query(value = "select a from POrderGrant a "
+			+ "where a.start_date_plan <= :holiday "
+			+ "and a.finish_date_plan >= :holiday")
+	public List<POrderGrant>getByDay(
+			@Param ("holiday")final Date holiday);
+	
 	@Query(value = "select a from POrderGrant a where"
 			+ " a.granttoorgid_link = :granttoorgid_link"
 			+ " and a.status >= 4")

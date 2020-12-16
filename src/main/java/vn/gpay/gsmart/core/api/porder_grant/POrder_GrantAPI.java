@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.api.porder_grant;
 
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -26,6 +27,8 @@ import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.security.GpayUserOrg;
+import vn.gpay.gsmart.core.security.IGpayUserOrgService;
 import vn.gpay.gsmart.core.utils.POrderStatus;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -36,6 +39,7 @@ public class POrder_GrantAPI {
 	@Autowired private IPOrderGrant_SKUService porderGrant_SKUService;
 	@Autowired private IPOrder_Service porderService;
 	@Autowired private IPOrderProcessing_Service pprocessRepository;
+	@Autowired IGpayUserOrgService userOrgService;
     ObjectMapper mapper = new ObjectMapper();
 
 	@RequestMapping(value = "/getone",method = RequestMethod.POST)
@@ -208,6 +212,39 @@ public class POrder_GrantAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<POrder_Grant_findByPorderId_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/get_grant_change",method = RequestMethod.POST)
+	public ResponseEntity<POrder_grant_getchange_response> getCHange(HttpServletRequest request ) {
+		POrder_grant_getchange_response response = new POrder_grant_getchange_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgid_link = user.getOrgid_link();
+			List<Long> orgs = new ArrayList<Long>();
+			if(orgid_link != 0 && orgid_link != 1) {
+				for(GpayUserOrg userorg:userOrgService.getall_byuser(user.getId())){
+					orgs.add(userorg.getOrgid_link());
+				}
+				//Them chinh don vi cua user
+				orgs.add(orgid_link);
+				
+				response.data = new ArrayList<POrderGrant>();
+				for(Long orgid : orgs) {
+					response.data.addAll(porderGrantService.get_grant_change(orgid));
+				}
+			}
+			else
+				response.data = porderGrantService.get_grant_change(null);
+//			response.data = porderGrantService.get_grant_change(entity.orgid_link);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<POrder_grant_getchange_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<POrder_grant_getchange_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
 }

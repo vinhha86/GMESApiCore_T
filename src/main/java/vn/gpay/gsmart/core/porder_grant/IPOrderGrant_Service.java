@@ -24,4 +24,8 @@ public interface IPOrderGrant_Service extends Operations<POrderGrant>{
 	List<POrderGrant> getbyporder_andpo(Long porderid_link, Long pcontract_poid_link);
 
 	void deleteAll(POrderGrant pordergrant);
+	
+
+	public List<POrderGrant> getgrant_contain_Day(Date holiday);
+	List<POrderGrant> get_grant_change(Long orgid_link);
 }

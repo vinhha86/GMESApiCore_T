@@ -122,4 +122,16 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 		// TODO Auto-generated method stub
 		return repo.getbyporder_andpo(porderid_link, pcontract_poid_link);
 	}
+
+	@Override
+	public List<POrderGrant> getgrant_contain_Day(Date holiday) {
+		// TODO Auto-generated method stub
+		return repo.getByDay(holiday);
+	}
+
+	@Override
+	public List<POrderGrant> get_grant_change(Long orgid_link) {
+		// TODO Auto-generated method stub
+		return repo.get_grant_change(orgid_link);
+	}
 }

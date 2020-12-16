@@ -71,7 +71,16 @@ public class POrderGrant implements Serializable {
 	private Integer productivity;
 	private Integer duration;
 	private Integer totalamount_tt;
+	private String reason_change;
 	
+	
+	
+	public String getReason_change() {
+		return reason_change;
+	}
+	public void setReason_change(String reason_change) {
+		this.reason_change = reason_change;
+	}
 	public Integer getProductivity() {
 		return productivity;
 	}

@@ -530,6 +530,19 @@ public class Common  {
 		return false;
 	}
 	
+	public boolean CompareDate(Date a, Date b) {
+		Calendar c_a = Calendar.getInstance();
+		c_a.setTime(a);
+		Calendar c_b = Calendar.getInstance();
+		c_b.setTime(b);
+		if(c_a.get(Calendar.DAY_OF_YEAR) == c_b.get(Calendar.DAY_OF_YEAR) &&
+			c_a.get(Calendar.MONTH) == c_b.get(Calendar.MONTH) &&
+			c_a.get(Calendar.YEAR) == c_b.get(Calendar.YEAR)) {
+			return true;
+		}
+		return false;
+	}
+	
 	public void ReCalculate(Long porder_grant_id_link, Long orgrootid_link) {
 		POrderGrant grant = grantService.findOne(porder_grant_id_link);
 		int amount = grant.getGrantamount();

@@ -524,6 +524,7 @@ public class ScheduleAPI {
 			grant.setFinish_date_plan(commonService.getPrevious(entity.data.getEndDate()));
 			grant.setDuration(duration);
 			grant.setProductivity(productivity);
+			grant.setReason_change(null);
 			granttService.save(grant);
 			
 			response.data = event;
@@ -555,6 +556,7 @@ public class ScheduleAPI {
 			grant.setFinish_date_plan(entity.EndDate);
 			grant.setDuration(duration);
 			grant.setProductivity(productivity);
+			grant.setReason_change(null);
 			granttService.save(grant);
 			
 			response.duration = duration;
@@ -590,6 +592,7 @@ public class ScheduleAPI {
 			grant.setGranttoorgid_link(entity.orggrant_toid_link);
 			grant.setStart_date_plan(commonService.getBeginOfDate(entity.startdate));
 			grant.setFinish_date_plan(commonService.getEndOfDate(end_date));
+			grant.setReason_change(null);
 			grant = granttService.save(grant);
 			
 			//Cap nhat lai Porder_processing
@@ -657,6 +660,7 @@ public class ScheduleAPI {
 			grant.setFinish_date_plan(commonService.getEndOfDate(entity.data.getEndDate()));
 			grant.setDuration(entity.data.getDuration());
 			grant.setProductivity(entity.data.getProductivity());
+			grant.setReason_change(null);
 			granttService.save(grant);
 			
 			Schedule_porder sch = entity.data;
@@ -989,6 +993,11 @@ public class ScheduleAPI {
 			
 			response.data = sch;
 			
+			//Xoa grant khoi danh sach bi thay doi nang suat boi ngay nghi le
+			POrderGrant grant = granttService.findOne(entity.data.getPorder_grantid_link());
+			grant.setReason_change(null);
+			granttService.save(grant);
+			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<update_duration_porder_response>(response, HttpStatus.OK);
@@ -1014,6 +1023,11 @@ public class ScheduleAPI {
 			sch.setProductivity(productivity);
 			
 			response.data = sch;
+			
+			//Xoa grant khoi danh sach bi thay doi nang suat boi ngay nghi le
+			POrderGrant grant = granttService.findOne(entity.data.getPorder_grantid_link());
+			grant.setReason_change(null);
+			granttService.save(grant);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -1041,6 +1055,11 @@ public class ScheduleAPI {
 			sch.setDuration(duration);
 			
 			response.data = sch;
+			
+			//Xoa grant khoi danh sach bi thay doi nang suat boi ngay nghi le
+			POrderGrant grant = granttService.findOne(entity.data.getPorder_grantid_link());
+			grant.setReason_change(null);
+			granttService.save(grant);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -1139,6 +1158,7 @@ public class ScheduleAPI {
 			grant_des.setGranttoorgid_link(grant_des.getGranttoorgid_link());
 			grant_des.setDuration(duration);
 			grant_des.setTotalamount_tt(grant_des.getTotalamount_tt() + grant_src.getTotalamount_tt());
+			grant_des.setReason_change(null);
 			grant_des = granttService.save(grant_des);
 			
 			Schedule_porder sch = entity.sch;
@@ -1262,6 +1282,7 @@ public class ScheduleAPI {
 				grant_old.setFinish_date_plan(end_old);
 				grant_old.setDuration(duration_old);
 				grant_old.setTotalamount_tt(grant_old.getTotalamount_tt() - entity.quantity);
+				grant_old.setReason_change(null);
 				grant_old = granttService.save(grant_old);
 				
 				//Cap nhat lai Processing cu sau khi tach

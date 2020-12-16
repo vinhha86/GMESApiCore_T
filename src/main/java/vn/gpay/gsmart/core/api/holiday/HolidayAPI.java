@@ -1,5 +1,7 @@
 package vn.gpay.gsmart.core.api.holiday;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -22,7 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.holiday.Holiday;
 import vn.gpay.gsmart.core.holiday.IHolidayService;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.GPAYDateFormat;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -30,6 +35,8 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 @RequestMapping("/api/v1/holiday")
 public class HolidayAPI {
 	@Autowired IHolidayService holidayService;
+	@Autowired IPOrderGrant_Service grantService;
+	@Autowired Common commonService;
 	
 	@RequestMapping(value = "/getall",method = RequestMethod.POST)
 	public ResponseEntity<Holiday_getall_response> GetAll(HttpServletRequest request ) {
@@ -160,13 +167,38 @@ public class HolidayAPI {
 				List<Holiday> listHoliday = holidayService.getByDate(dateObj);
 				if(listHoliday.size() == 0) {
 					Holiday holiday = new Holiday();
-					holiday.setId(0L);
+					holiday.setId(null);
 					holiday.setOrgrootid_link(user.getRootorgid_link());
 					holiday.setDay(dateObj);
 					holiday.setDayto(dateObj);
 					holiday.setComment(comment);
 					holiday.setYear(date.getYear());
 					holidayService.save(holiday);
+					
+					//Cap nhat lai ns nhung porder_grant bi anh huong
+					List<POrderGrant> list_grant = grantService.getgrant_contain_Day(dateObj);
+					for(POrderGrant grant : list_grant) {
+						//cap nhat lai duration va nang suat
+						int duration = grant.getDuration() - 1;
+						int productivity = commonService.getProductivity(grant.getGrantamount(), duration);
+						String reason = grant.getReason_change();
+						String pattern = "dd/MM/yyyy";
+						DateFormat df = new SimpleDateFormat(pattern);
+						if(reason!=null && reason.compareTo("") != 0) {		
+							if(!reason.contains("Xóa"))
+								reason += ";"+df.format(dateObj);
+							else
+								reason = "Ngày nghỉ: "+df.format(dateObj);
+						}
+						else {
+							reason = "Ngày nghỉ: "+df.format(dateObj);
+						}
+						grant.setDuration(duration);
+						grant.setProductivity(productivity);
+						grant.setReason_change(reason);
+						
+						grantService.save(grant);
+					}
 				}
 			}
 			
@@ -187,7 +219,26 @@ public class HolidayAPI {
 
 		try {
 			for(Holiday h : entity.data) {
-				holidayService.deleteById(h.getId());
+				Date date = h.getDay();
+				holidayService.delete(h);
+				
+				//Cap nhat lai ns nhung porder_grant bi anh huong
+				List<POrderGrant> list_grant = grantService.getgrant_contain_Day(date);
+				for(POrderGrant grant : list_grant) {
+					//cap nhat lai duration va nang suat
+					int duration = grant.getDuration() + 1;
+					int productivity = commonService.getProductivity(grant.getGrantamount(), duration);
+					
+					String pattern = "dd/MM/yyyy";
+					DateFormat df = new SimpleDateFormat(pattern);
+					String reason = "Xóa Ngày nghỉ: "+df.format(date);
+					
+					grant.setDuration(duration);
+					grant.setProductivity(productivity);
+					grant.setReason_change(reason);
+					
+					grantService.save(grant);
+				}
 			}
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
