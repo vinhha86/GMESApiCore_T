@@ -38,6 +38,17 @@ public interface IPOrderProcessing_Repository extends JpaRepository<POrderProces
 			+ "and a.granttoorgid_link in (select id from Org where parentid_link=:factoryid_link)")
 	public List<POrderProcessing>getByDateAndFactory2(@Param ("processingdate_to")final Date processingdate_to, @Param ("factoryid_link")final Long factoryid_link);
 
+	@Query(value = "select a from POrderProcessing a inner join POrder c on a.porderid_link = c.id "
+			+ "where a.granttoorgid_link = :orgid_to_link "
+			+ "and a.porderid_link = :porderid_link "
+			+ "and a.status <6 and a.processingdate = "
+			+ "(select max(b.processingdate) from POrderProcessing b where b.processingdate <= :receive_date "
+			+ "and b.pordergrantid_link = a.pordergrantid_link)")
+	public List<POrderProcessing>getByPOrderAndLineAndDate (
+			@Param ("porderid_link")final Long porderid_link,
+			@Param ("orgid_to_link")final Long orgid_to_link,
+			@Param ("receive_date")final Date receive_date
+			);
 	
 	//get all by salaryymonth
 	@Query(value = "select a from POrderProcessing a inner join POrder b on a.porderid_link = b.id where b.salaryyear=:salaryyear and b.salarymonth=:salarymonth")

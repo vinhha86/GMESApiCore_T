@@ -28,7 +28,13 @@ import vn.gpay.gsmart.core.handover_sku.IHandoverSKUService;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant;
+import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
+import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.utils.GPAYDateFormat;
+import vn.gpay.gsmart.core.utils.POrderStatus;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -40,6 +46,8 @@ public class HandoverAPI {
 	@Autowired IHandover_AutoID_Service handoverAutoIdService;
 	@Autowired IPOrder_Service porderService;
 	@Autowired IOrgService orgService;
+	@Autowired IPOrderProcessing_Service porderProcessingService;
+	@Autowired IPOrderGrant_Service porderGrantService;
 	
 	@RequestMapping(value = "/getall",method = RequestMethod.POST)
 	public ResponseEntity<Handover_getall_response> GetAll(HttpServletRequest request ) {
@@ -383,6 +391,14 @@ public class HandoverAPI {
 		Date date = new Date();
 		try {
 			Handover handover = handoverService.findOne(entity.handoverid_link);
+			// old info
+			Integer oldStatus = handover.getStatus();
+			Long old_approver_userid_link = handover.getApprover_userid_link();
+			Long old_receiver_userid_link = handover.getReceiver_userid_link();
+			Date old_receive_date = handover.getReceive_date();
+			Date old_lasttimeupdate = handover.getLasttimeupdate();
+			Long old_lastuserupdateid_link = handover.getLastuserupdateid_link();
+			
 			if(entity.approver_userid_link != 0) {
 				handover.setApprover_userid_link(entity.approver_userid_link);
 			}
@@ -393,7 +409,55 @@ public class HandoverAPI {
 			handover.setLasttimeupdate(date);
 			handover.setLastuserupdateid_link(user.getId());
 			handover.setStatus(entity.status);
-			handoverService.save(handover);
+			
+			// status = 0 // chưa duyệt
+			// status = 1 // đã duyệt
+			// status = 2 // đã nhận
+			
+			if(handover.getStatus() == 2 && oldStatus == 1) {
+				// xác nhận
+				Long handovertypeid_link = handover.getHandovertypeid_link();
+				Long granttoorgid_link = 0L;
+				Long porderid_link = handover.getPorderid_link();
+				Date receive_date = handover.getReceive_date(); // ngày vào chuyền
+				Integer sumProduct = 0; // sl thêm vào chuyền
+				String action = "Xác nhận";
+				if(handovertypeid_link.equals(1L) || handovertypeid_link.equals(4L)) {
+					// 1: cut to line
+					// 4: line to packstocked
+					if(handovertypeid_link.equals(1L)) {
+						granttoorgid_link = handover.getOrgid_to_link();
+					}else if(handovertypeid_link.equals(4L)) {
+						granttoorgid_link = handover.getOrgid_from_link();
+					}
+					List<HandoverProduct> listHandoverProduct = handover.getHandoverProducts();
+					for(HandoverProduct handoverProduct : listHandoverProduct) {
+						sumProduct += handoverProduct.getTotalpackage();
+					}
+					if(sumProduct > 0) {
+						String result = updatePOrderProcessing(
+								handovertypeid_link, 
+								granttoorgid_link, porderid_link, 
+								receive_date, sumProduct, action);
+						if(result.equals("Không tồn tại POrderProcessing")) {
+							handover.setStatus(oldStatus);
+							handover.setApprover_userid_link(old_approver_userid_link);
+							handover.setReceiver_userid_link(old_receiver_userid_link);
+							handover.setReceive_date(old_receive_date);
+							handover.setLasttimeupdate(old_lasttimeupdate);
+							handover.setLastuserupdateid_link(old_lastuserupdateid_link);
+							handover = handoverService.save(handover);
+							
+							response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+							response.setMessage(result);
+							return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
+						}
+					}
+				}
+			}
+
+			handover = handoverService.save(handover);
+			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
@@ -410,18 +474,56 @@ public class HandoverAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Handover handover = handoverService.findOne(entity.id);
+			Date date = new Date();
+			
 			if(handover.getStatus() != 2) {
 				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 				response.setMessage("Phiếu chưa được xác nhận");
 				return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
 			}
-			Date date = new Date();
+			
+			// update POrderProcessing
+
+			Long handovertypeid_link = handover.getHandovertypeid_link();
+			Long granttoorgid_link = 0L;
+			Long porderid_link = handover.getPorderid_link();
+			Date receive_date = handover.getReceive_date(); // ngày vào
+			Integer sumProduct = 0; // sl thêm vào
+			String action = "Huỷ";
+			
+			if(handovertypeid_link.equals(1L) || handovertypeid_link.equals(4L)) {
+				// 1: cut to line
+				// 4: line to packstocked
+				if(handovertypeid_link.equals(1L)) {
+					granttoorgid_link = handover.getOrgid_to_link();
+				}else if(handovertypeid_link.equals(4L)) {
+					granttoorgid_link = handover.getOrgid_from_link();
+				}
+				List<HandoverProduct> listHandoverProduct = handover.getHandoverProducts();
+				for(HandoverProduct handoverProduct : listHandoverProduct) {
+					sumProduct += handoverProduct.getTotalpackage();
+				}
+				if(sumProduct > 0) {
+					String result = updatePOrderProcessing(
+							handovertypeid_link, 
+							granttoorgid_link, porderid_link, 
+							receive_date, sumProduct, action
+							);
+					if(result.equals("Không tồn tại POrderProcessing")) {
+						response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+						response.setMessage(result);
+						return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
+					}
+				}
+			}
+			
+			// luu handover status
 			handover.setStatus(1);
 			handover.setReceiver_userid_link(null);
 			handover.setReceive_date(null);
 			handover.setLasttimeupdate(date);
 			handover.setLastuserupdateid_link(user.getId());
-			handoverService.save(handover);
+			handover = handoverService.save(handover);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -431,5 +533,211 @@ public class HandoverAPI {
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
 		}
+	}
+	
+	public String updatePOrderProcessing(
+			Long handovertypeid_link,
+			Long granttoorgid_link, Long porderid_link, 
+			Date receive_date, Integer sumProduct,
+			String action
+			) {
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Long rootorgid_link = user.getRootorgid_link();
+		// tìm xem lệnh này, tổ chuyền này, ngày này có POrderProcessinng không
+		receive_date = GPAYDateFormat.atStartOfDay(receive_date);
+		List<POrderProcessing> listPorderProcessing = porderProcessingService.getByPOrderAndLineAndDate(
+				porderid_link, granttoorgid_link, receive_date
+				);
+		System.out.println(listPorderProcessing.size());
+		POrderProcessing pprocess;
+		if(listPorderProcessing.size() > 0) {
+			// Có thì check ngày, nếu trùng thì sửa, ko trùng thì tạo mới và set thông tin dựa vào ngày trước
+			pprocess = listPorderProcessing.get(0);
+			if(receive_date.equals(pprocess.getProcessingdate())) {
+				// trùng ngày, thêm và tính toán amountinput
+				if(action.equals("Xác nhận")) {
+			        // Xác nhận lúc nào cũng là ngày hiện tại nên ko cần tính lại các ngày sau
+					if(handovertypeid_link.equals(1L)) { // cut to line
+						pprocess.setAmountinput(pprocess.getAmountinput() + sumProduct);
+		    			pprocess.setAmountinputsum((null==pprocess.getAmountinputsumprev()?0:pprocess.getAmountinputsumprev()) 
+		    					+ (null==pprocess.getAmountinput()?0:pprocess.getAmountinput()));
+					}else if(handovertypeid_link.equals(4L)) { // line to packstocked
+						pprocess.setAmountpackstocked(pprocess.getAmountpackstocked() + sumProduct);
+		    			pprocess.setAmountpackstockedsum((null==pprocess.getAmountpackstockedsumprev()?0:pprocess.getAmountpackstockedsumprev()) 
+		    					+ (null==pprocess.getAmountpackstocked()?0:pprocess.getAmountpackstocked()));
+					}
+				}else if(action.equals("Huỷ")) {
+					// Huỷ là sau xác nhận nên lúc nào cũng tồn tại POrderProcessing
+					if(handovertypeid_link.equals(1L)) { // cut to line
+						pprocess.setAmountinput(pprocess.getAmountinput() - sumProduct);
+		    			pprocess.setAmountinputsum((null==pprocess.getAmountinputsumprev()?0:pprocess.getAmountinputsumprev()) 
+		    					+ (null==pprocess.getAmountinput()?0:pprocess.getAmountinput()));
+					}else if(handovertypeid_link.equals(4L)) { // line to packstocked
+						System.out.println("here yet uncf");
+						pprocess.setAmountpackstocked(pprocess.getAmountpackstocked() - sumProduct);
+		    			pprocess.setAmountpackstockedsum((null==pprocess.getAmountpackstockedsumprev()?0:pprocess.getAmountpackstockedsumprev()) 
+		    					+ (null==pprocess.getAmountpackstocked()?0:pprocess.getAmountpackstocked()));
+					}
+	    			
+	    			// Tính lại sl các ngày sau
+	    			// Cộng dồn trong trường hợp sửa số của ngày trước ngày hiện tại
+			        // Update Amount SUM of following days. In case update amount of prev day
+
+			        POrderGrant porder_grant = porderGrantService.findOne(pprocess.getPordergrantid_link());
+	    			
+			        if (GPAYDateFormat.atStartOfDay(receive_date).before(GPAYDateFormat.atStartOfDay(new Date()))){
+				        List<POrderProcessing> pprocessListAfter = porderProcessingService.getAfterDate(porderid_link, pprocess.getPordergrantid_link(), receive_date);
+				        
+				        int iAmountCutSum = null==pprocess.getAmountcutsum()?0:pprocess.getAmountcutsum();
+				        int iAmountInputSum = null==pprocess.getAmountinputsum()?0:pprocess.getAmountinputsum();
+				        int iAmountOuputSum = null==pprocess.getAmountoutputsum()?0:pprocess.getAmountoutputsum();
+				        int iAmountErrorSum = null==pprocess.getAmounterrorsum()?0:pprocess.getAmounterrorsum();
+				        int iAmountKcsSum = null==pprocess.getAmountkcssum()?0:pprocess.getAmountkcssum();
+				        int iAmountPackedSum = null==pprocess.getAmountpackedsum()?0:pprocess.getAmountpackedsum();
+				        int iAmountPackStockedSum = null==pprocess.getAmountpackstockedsum()?0:pprocess.getAmountpackstockedsum();
+				        int iAmountStockedSum = null==pprocess.getAmountstockedsum()?0:pprocess.getAmountstockedsum();
+				        int iLastStatus = pprocess.getStatus();
+				        
+				        for(POrderProcessing pprocessAfter: pprocessListAfter){
+				        	pprocessAfter.setAmountcutsumprev(iAmountCutSum);
+				        	pprocessAfter.setAmountcutsum(iAmountCutSum + (null==pprocessAfter.getAmountcut()?0:pprocessAfter.getAmountcut()));
+				        	
+				        	pprocessAfter.setAmountinputsumprev(iAmountInputSum);
+				        	pprocessAfter.setAmountinputsum(iAmountInputSum + (null==pprocessAfter.getAmountinput()?0:pprocessAfter.getAmountinput()));
+				        	
+				        	pprocessAfter.setAmountoutputsumprev(iAmountOuputSum);
+				        	pprocessAfter.setAmountoutputsum(iAmountOuputSum + (null==pprocessAfter.getAmountoutput()?0:pprocessAfter.getAmountoutput()));
+				        	
+				        	pprocessAfter.setAmounterrorsumprev(iAmountErrorSum);
+				        	pprocessAfter.setAmounterrorsum(iAmountErrorSum + (null==pprocessAfter.getAmounterror()?0:pprocessAfter.getAmounterror()));
+				        	
+				        	pprocessAfter.setAmountkcssumprev(iAmountKcsSum);
+				        	pprocessAfter.setAmountkcssum(iAmountKcsSum + (null==pprocessAfter.getAmountkcssum()?0:pprocessAfter.getAmountkcssum()));
+				        	
+				        	pprocessAfter.setAmountpackedsumprev(iAmountPackedSum);
+				        	pprocessAfter.setAmountpackedsum(iAmountPackedSum + (null==pprocessAfter.getAmountpacked()?0:pprocessAfter.getAmountpacked()));
+				        	
+				        	pprocessAfter.setAmountpackstockedsumprev(iAmountPackStockedSum);
+				        	pprocessAfter.setAmountpackstockedsum(iAmountPackStockedSum + (null==pprocessAfter.getAmountpackstocked()?0:pprocessAfter.getAmountpackstocked()));
+				        	
+				        	pprocessAfter.setAmountstockedsumprev(iAmountStockedSum);
+				        	pprocessAfter.setAmountstockedsum(iAmountStockedSum + (null==pprocessAfter.getAmountstocked()?0:pprocessAfter.getAmountstocked()));
+				        	
+					        if ((null==pprocessAfter.getAmountinputsum()?0:pprocessAfter.getAmountinputsum()) > 0){
+					        	if (((null==pprocessAfter.getAmountoutputsum()?0:pprocessAfter.getAmountoutputsum()) 
+					        			+ (null==pprocessAfter.getAmounterrorsum()?0:pprocessAfter.getAmounterrorsum()))  
+					        			< (null==pprocessAfter.getAmountcutsum()||0==pprocessAfter.getAmountcutsum()?pprocessAfter.getTotalorder():pprocessAfter.getAmountcutsum())){
+					        		pprocessAfter.setStatus(POrderStatus.PORDER_STATUS_RUNNING);
+					        	}
+					        	else {
+					        		if ((null==pprocessAfter.getAmountpackedsum()?0:pprocessAfter.getAmountpackedsum()) 
+					        				< (null==pprocessAfter.getAmountcutsum()||0==pprocessAfter.getAmountcutsum()?pprocessAfter.getTotalorder():pprocessAfter.getAmountcutsum())){
+					        			pprocessAfter.setStatus(POrderStatus.PORDER_STATUS_DONE);
+					        		}
+					        		else {
+					        			pprocessAfter.setStatus(POrderStatus.PORDER_STATUS_FINISHED);
+					        		}
+					        	}
+					        }
+					        
+					        porderProcessingService.save(pprocessAfter);
+				        	
+					        iAmountCutSum = null==pprocessAfter.getAmountcutsum()?0:pprocessAfter.getAmountcutsum();
+					        iAmountInputSum = null==pprocessAfter.getAmountinputsum()?0:pprocessAfter.getAmountinputsum();
+					        iAmountOuputSum = null==pprocessAfter.getAmountoutputsum()?0:pprocessAfter.getAmountoutputsum();
+					        iAmountErrorSum = null==pprocessAfter.getAmounterrorsum()?0:pprocessAfter.getAmounterrorsum();
+					        iAmountKcsSum = null==pprocessAfter.getAmountkcssum()?0:pprocessAfter.getAmountkcssum();
+					        iAmountPackedSum = null==pprocessAfter.getAmountpackedsum()?0:pprocessAfter.getAmountpackedsum();
+					        iAmountPackStockedSum = null==pprocessAfter.getAmountpackstockedsum()?0:pprocessAfter.getAmountpackstockedsum();
+					        iAmountStockedSum = null==pprocessAfter.getAmountstockedsum()?0:pprocessAfter.getAmountstockedsum();
+				        	
+					        iLastStatus = pprocessAfter.getStatus();
+				        }
+				        
+				        //Update status of Porder_Grant to last status of Processing
+			        	porder_grant.setStatus(iLastStatus);
+			        	porderGrantService.save(porder_grant);		        	
+			        } else {
+			        	porder_grant.setStatus(pprocess.getStatus());
+			        	porderGrantService.save(porder_grant);	
+			        }
+	    			
+				}
+			}else {
+				// ko trùng ngày, tạo và tính toán
+				POrderProcessing temp = pprocess;
+				pprocess = new POrderProcessing();
+				
+				pprocess.setId(null);
+				pprocess.setOrgrootid_link(rootorgid_link); 
+				pprocess.setProcessingdate(receive_date);
+				pprocess.setPorderid_link(temp.getPorderid_link());
+				pprocess.setPordergrantid_link(temp.getPordergrantid_link());
+				pprocess.setGranttoorgid_link(temp.getGranttoorgid_link());
+	        	
+				pprocess.setAmountcut(temp.getAmountcut());
+				pprocess.setAmountcutsumprev(temp.getAmountcutsum());
+				pprocess.setAmountcutsum(temp.getAmountcutsum());
+	
+				pprocess.setAmountinput(sumProduct);
+				pprocess.setAmountinputsumprev(temp.getAmountinputsum());
+				pprocess.setAmountinputsum(temp.getAmountinputsum() + sumProduct);
+		        
+				pprocess.setAmountoutput(0);
+				pprocess.setAmountoutputsumprev(temp.getAmountoutputsum());
+				pprocess.setAmountoutputsum(temp.getAmountoutputsum());
+		        
+				pprocess.setAmounterror(0);
+				pprocess.setAmounterrorsumprev(temp.getAmounterrorsum());
+				pprocess.setAmounterrorsum(temp.getAmounterrorsum());
+		        
+				pprocess.setAmounttargetprev(temp.getAmounttarget());
+				pprocess.setAmountkcsregprev(temp.getAmountkcsreg());
+	        	
+				pprocess.setAmountkcs(0);
+				pprocess.setAmountkcssumprev(temp.getAmountkcssum());
+				pprocess.setAmountkcssum(temp.getAmountkcssum());
+		        
+				pprocess.setAmountpacked(0);
+				pprocess.setAmountpackedsumprev(temp.getAmountpackedsum());
+				pprocess.setAmountpackedsum(temp.getAmountpackedsum());
+		        
+				pprocess.setAmountpackstocked(0);
+				pprocess.setAmountpackstockedsumprev(temp.getAmountpackstockedsum());
+				pprocess.setAmountpackstockedsum(temp.getAmountpackstockedsum());
+		        
+				pprocess.setAmountstocked(0);
+				pprocess.setAmountstockedsumprev(temp.getAmountstockedsum());
+				pprocess.setAmountstockedsum(temp.getAmountstockedsum());
+		        
+//	        	pprocess.setOrdercode(porder_grant.getOrdercode());
+				pprocess.setTotalorder(temp.getGrantamount());	  
+	        	
+				pprocess.setUsercreatedid_link(user.getId());
+				pprocess.setTimecreated(new Date());
+			}
+			//Update trang thai lenh tuong ung
+	        if ((null==pprocess.getAmountinputsum()?0:pprocess.getAmountinputsum()) > 0){
+	        	if (((null==pprocess.getAmountoutputsum()?0:pprocess.getAmountoutputsum()) 
+	        			+ (null==pprocess.getAmounterrorsum()?0:pprocess.getAmounterrorsum()))  
+	        			< (null==pprocess.getAmountcutsum()||0==pprocess.getAmountcutsum()?pprocess.getTotalorder():pprocess.getAmountcutsum())){
+	        		pprocess.setStatus(POrderStatus.PORDER_STATUS_RUNNING);
+	        	}
+	        	else {
+	        		if ((null==pprocess.getAmountpackedsum()?0:pprocess.getAmountpackedsum()) 
+	        				< (null==pprocess.getAmountcutsum()||0==pprocess.getAmountcutsum()?pprocess.getTotalorder():pprocess.getAmountcutsum())){
+	        			pprocess.setStatus(POrderStatus.PORDER_STATUS_DONE);
+	        		}
+	        		else {
+	        			pprocess.setStatus(POrderStatus.PORDER_STATUS_FINISHED);
+	        		}
+	        	}
+	        }
+	        porderProcessingService.save(pprocess);
+		}else {
+			return "Không tồn tại POrderProcessing";
+		}
+		return "OK";
+		
 	}
 }

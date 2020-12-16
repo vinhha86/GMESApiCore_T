@@ -290,4 +290,9 @@ public class POrderProcessing_Service extends AbstractService<POrderProcessing> 
 			});
 		return data;
 	}
+	
+	@Override
+	public List<POrderProcessing> getByPOrderAndLineAndDate(Long porderid_link, Long orgid_to_link, Date receive_date) {
+		return repo.getByPOrderAndLineAndDate(porderid_link, orgid_to_link, receive_date);
+	}
 }
