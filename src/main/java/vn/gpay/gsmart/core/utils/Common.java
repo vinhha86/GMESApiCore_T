@@ -657,6 +657,10 @@ public class Common  {
 
 	    return calendar1.compareTo(calendar2);
 	}
+	public static String Date_ToString(Date date1, String format){
+		DateFormat dateFormat = new SimpleDateFormat(format);  
+		return dateFormat.format(date1);  
+	}
 	public Date Date_Add_with_holiday(Date date, int amount, long orgrootid_link) {
 		Calendar _date = Calendar.getInstance();
 		_date.setTime(date);
