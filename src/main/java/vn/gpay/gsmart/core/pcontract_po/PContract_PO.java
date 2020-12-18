@@ -75,6 +75,7 @@ public class PContract_PO implements Serializable {/**
 	private Date datecreated;
 	private Integer status;
 	private Integer productiondays;
+	private Integer productiondays_ns;
 	private Long orgmerchandiseid_link;
 	private Long merchandiserid_link;
 	private Long parentpoid_link;
@@ -707,6 +708,14 @@ public class PContract_PO implements Serializable {/**
 
 	public void setPcontract_po_productivity(List<PContract_PO_Productivity> pcontract_po_productivity) {
 		this.pcontract_po_productivity = pcontract_po_productivity;
+	}
+
+	public Integer getProductiondays_ns() {
+		return productiondays_ns;
+	}
+
+	public void setProductiondays_ns(Integer productiondays_ns) {
+		this.productiondays_ns = productiondays_ns;
 	}
 	
 }
