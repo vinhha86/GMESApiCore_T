@@ -48,6 +48,8 @@ import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
+import vn.gpay.gsmart.core.product.IProductService;
+import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_Service;
 import vn.gpay.gsmart.core.sku.SKU;
@@ -72,6 +74,7 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 @RequestMapping("/api/v1/porder")
 public class POrderAPI {
 	@Autowired private IPOrder_Service porderService;
+	@Autowired private IProductService productService;
 	@Autowired private IPContract_PO_Productivity_Service poProductivityService;
 	@Autowired private IPContract_POService pcontract_POService;
 	@Autowired private IPOrder_Product_SKU_Service porderskuService;
@@ -86,14 +89,10 @@ public class POrderAPI {
 	@Autowired private ITask_CheckList_Service checklistService;
 	@Autowired private ITask_Service taskService;
 	@Autowired private ITask_Flow_Service commentService;
-	@Autowired
-	IPOrder_Product_Service porderproductService;
-	@Autowired
-	ISKU_Service skuService;
-	@Autowired
-	IUnitService unitService;
-	@Autowired
-	IAttributeValueService attValService;
+	@Autowired IPOrder_Product_Service porderproductService;
+	@Autowired ISKU_Service skuService;
+	@Autowired IUnitService unitService;
+	@Autowired IAttributeValueService attValService;
 	@Autowired private Common commonService;
     ObjectMapper mapper = new ObjectMapper();
 	
@@ -167,7 +166,15 @@ public class POrderAPI {
 								porder.setPlan_productivity(poProductivityService.getProductivityByPOAndProduct(thePO.getParentpoid_link(), porder.getProductid_link()));
 							} 
 	//						Float productiondays = (float)thePO.getProductiondays();
-							porder = porderService.savePOrder(calPlan_FinishDate(orgrootid_link, porder), po_code);
+							
+							//Sinh mã lệnh theo Mã SP(Buyer)
+							Product theProduct = productService.findOne(porder.getProductid_link());
+							if (null != theProduct){
+								String theCode = theProduct.getBuyercode() + "-" + Common.Date_ToString(thePO.getShipdate(),"dd/MM/yy");
+								porder = porderService.savePOrder(calPlan_FinishDate(orgrootid_link, porder), theCode);
+							}
+							else
+								porder = porderService.savePOrder(calPlan_FinishDate(orgrootid_link, porder), po_code);
 							
 							//Neu chi co duy nhat 1 Porder_req cho san pham (chi phan lenh cho 1 xuong) --> Tu lay toan bo danh sach SKU
 							List<POrder_Req> lsPOrder_Req_product = porder_reqService.getByPOAndProduct(porder.getPcontract_poid_link(), porder.getProductid_link());
