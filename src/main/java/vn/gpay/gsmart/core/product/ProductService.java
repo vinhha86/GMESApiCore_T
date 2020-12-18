@@ -213,7 +213,7 @@ public class ProductService extends AbstractService<Product> implements IProduct
 				.like(name != "" && name != null, "name", "%" + name + "%")
 				.like(code != "" && code != null, "buyercode", "%" + code + "%").between("producttypeid_link", 10, 19)
 				.build();
-		Sort sort = Sorts.builder().asc("name").build();
+		Sort sort = Sorts.builder().asc("buyercode").build();
 
 		Page<Product> lst = repo.findAll(specification, PageRequest.of(request.page - 1, request.limit, sort));
 		return lst;
