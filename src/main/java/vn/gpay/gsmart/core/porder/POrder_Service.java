@@ -25,6 +25,8 @@ import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontract_po_productivity.IPContract_PO_Productivity_Service;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
+import vn.gpay.gsmart.core.product.IProductService;
+import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.GPAYDateFormat;
@@ -39,6 +41,7 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 	@Autowired private IPContract_PO_Productivity_Service poProductivityService;
 //	@Autowired private IPOrder_Req_Service porder_reqService;
 	@Autowired private Common commonService;
+	@Autowired private IProductService productService;
 	@Override
 	protected JpaRepository<POrder, Long> getRepository() {
 		// TODO Auto-generated method stub
@@ -103,8 +106,15 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 						//Lay thong tin NS target tu chao gia 
 						porder.setPlan_productivity(poProductivityService.getProductivityByPOAndProduct(thePO.getParentpoid_link(), porder.getProductid_link()));
 					} 
-//						Float productiondays = (float)thePO.getProductiondays();
-					porder = savePOrder(calPlan_FinishDate(orgrootid_link, porder), po_code);
+					Product theProduct = productService.findOne(porder.getProductid_link());
+					//Sinh mã lệnh theo Mã SP(Buyer)
+					if (null != theProduct){
+						String theCode = theProduct.getBuyercode() + "-" + Common.Date_ToString(thePO.getShipdate(),"dd/MM/yy");
+						porder = savePOrder(calPlan_FinishDate(orgrootid_link, porder), theCode);
+					}
+					else
+						porder = savePOrder(calPlan_FinishDate(orgrootid_link, porder), po_code);
+					
 					
 		
 					//Update lai trng thai cua Porder_req ve da tao lenh
