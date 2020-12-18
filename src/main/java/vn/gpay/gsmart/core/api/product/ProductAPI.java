@@ -181,6 +181,7 @@ public class ProductAPI {
 				
 				pb.setId(product.getId());
 				pb.setCode(product.getCode());
+				pb.setBuyercode(product.getBuyercode());
 				pb.setName(product.getName());
 				pb.setProduct_type(product.getProducttypeid_link());
 				pb.setProduct_typeName(product.getProducttype_name());

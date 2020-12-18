@@ -211,7 +211,7 @@ public class ProductService extends AbstractService<Product> implements IProduct
 //	            .eq("product_type", request.product_type)
 				.eq("status", 1).eq("orgrootid_link", orgrootid_link)
 				.like(name != "" && name != null, "name", "%" + name + "%")
-				.like(code != "" && code != null, "code", "%" + code + "%").between("producttypeid_link", 10, 19)
+				.like(code != "" && code != null, "buyercode", "%" + code + "%").between("producttypeid_link", 10, 19)
 				.build();
 		Sort sort = Sorts.builder().asc("name").build();
 
