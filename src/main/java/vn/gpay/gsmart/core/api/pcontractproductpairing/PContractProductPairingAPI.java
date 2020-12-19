@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.api.pcontractproductpairing;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,6 +33,7 @@ import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.productpairing.IProductPairingService;
 import vn.gpay.gsmart.core.productpairing.ProductPairing;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 
@@ -102,7 +104,8 @@ public class PContractProductPairingAPI {
 			List<ProductPairing> listpair = prodctpairservice.getproduct_pairing_detail_bycontract(orgrootid_link, pcontractid_link, productpairid_link);
 			
 			List<PContractProductBinding> data = new ArrayList<PContractProductBinding>();
-			String FolderPath = "upload/product";
+//			String FolderPath = "upload/product";
+			String FolderPath = AtributeFixValues.folder_upload+"/product";
 			
 			for (ProductPairing productPairing : listpair) {
 				PContractProductBinding binding = new PContractProductBinding();
@@ -115,9 +118,13 @@ public class PContractProductPairingAPI {
 				binding.setAmount(productPairing.getAmount());
 				binding.setProductBuyerCode(productPairing.getProductBuyerCode());
 				
-				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+//				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+//				
+//				binding.setImgproduct(getimg(productPairing.getImgurl1(),uploadRootPath));
 				
-				binding.setImgproduct(getimg(productPairing.getImgurl1(),uploadRootPath));
+				String uploadRootPath = request.getServletContext().getRealPath("");
+				File uploadRootDir = new File(uploadRootPath);
+				binding.setImgproduct(getimg(productPairing.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath));
 				
 				data.add(binding);
 			}
@@ -195,15 +202,17 @@ public class PContractProductPairingAPI {
 	}
 	
 	private byte[] getimg(String filename, String uploadRootPath) {
-		String filePath = uploadRootPath+"\\"+ filename;
+		String filePath = uploadRootPath+"/"+ filename;
 		Path path = Paths.get(filePath);
 		byte[] data;
+		
 		try {
 			data = Files.readAllBytes(path);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			data = null;
 		}
+		
 		return data;
 	}
 	
