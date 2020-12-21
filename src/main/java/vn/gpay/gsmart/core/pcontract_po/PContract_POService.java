@@ -112,28 +112,31 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 			long pcontractid_link, float vendor_targer) {
 		
 		List<PContract_PO> list_po = repo.getone_by_template(PO_No, shipmodeid_link, productid_link, ShipDate, pcontractid_link);
-		List<PContract_PO> list_remove = new ArrayList<PContract_PO>();
 		
-		for (PContract_PO pContract_PO : list_po) {
-//			List<PContract_Price> list_price = pContract_PO.getPcontract_price();
-			List<PContract_Price> list_price = price_repo.getPrice_by_product_and_sizeset(pContract_PO.getId(), productid_link, (long)1);
-			boolean check = false;
-			for (PContract_Price price : list_price) {
-				if(price.getSizesetid_link() != 1) continue;
-				if(price.getPrice_vendortarget().equals(vendor_targer)) {
-					check = true;
-					break;
+		if(vendor_targer != 0) {
+			List<PContract_PO> list_remove = new ArrayList<PContract_PO>();
+			for (PContract_PO pContract_PO : list_po) {
+//				List<PContract_Price> list_price = pContract_PO.getPcontract_price();
+				List<PContract_Price> list_price = price_repo.getPrice_by_product_and_sizeset(pContract_PO.getId(), productid_link, (long)1);
+				boolean check = false;
+				for (PContract_Price price : list_price) {
+					if(price.getSizesetid_link() != 1) continue;
+					if(price.getPrice_vendortarget().equals(vendor_targer)) {
+						check = true;
+						break;
+					}
+				}
+				
+				if(!check) {
+					list_remove.add(pContract_PO);
 				}
 			}
 			
-			if(!check) {
-				list_remove.add(pContract_PO);
+			for (PContract_PO pContract_PO : list_remove) {
+				list_po.remove(pContract_PO);
 			}
 		}
 		
-		for (PContract_PO pContract_PO : list_remove) {
-			list_po.remove(pContract_PO);
-		}
 		
 		return list_po;
 	}
