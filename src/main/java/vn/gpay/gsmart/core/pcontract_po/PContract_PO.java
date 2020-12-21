@@ -89,7 +89,23 @@ public class PContract_PO implements Serializable {/**
 	private Integer plan_productivity;
 	private Float plan_linerequired;
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
+	private List<PContractProductSKU> pcontractProductSKUs = new ArrayList<>();
 	
+	@Transient
+	public Integer getPcontractPoProductSkuQuantityTotal() { // sl sp sku trong po line
+		Integer sum = 0;
+		if(pcontractProductSKUs != null && pcontractProductSKUs.size() > 0){
+			for(PContractProductSKU PContractProductSKU : pcontractProductSKUs) {
+				if(PContractProductSKU.getPquantity_total() != null && PContractProductSKU.getPquantity_total() != 0) {
+					sum += PContractProductSKU.getPquantity_total();
+				}
+			}
+		}
+		return sum;
+	}
 	
 	public Integer getPlan_productivity() {
 		return plan_productivity;
@@ -717,5 +733,4 @@ public class PContract_PO implements Serializable {/**
 	public void setProductiondays_ns(Integer productiondays_ns) {
 		this.productiondays_ns = productiondays_ns;
 	}
-	
 }
