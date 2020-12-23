@@ -56,6 +56,7 @@ import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
@@ -93,42 +94,26 @@ import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 @RestController
 @RequestMapping("/api/v1/pcontract_po")
 public class PContract_POAPI {
-	@Autowired
-	IAttributeService attrService;
-	@Autowired
-	IPContract_POService pcontract_POService;
+	@Autowired IAttributeService attrService;
+	@Autowired IPContract_POService pcontract_POService;
 	@Autowired IProductAttributeService pavService;
-	@Autowired
-	IPContract_Price_Service pcontractpriceService;
-	@Autowired
-	IPContract_Price_DService pcontractpriceDService;
-	@Autowired
-	IPOrder_Service porderService;
-	@Autowired
-	IPOrder_Req_Service porder_req_Service;
+	@Autowired IPContract_Price_Service pcontractpriceService;
+	@Autowired IPContract_Price_DService pcontractpriceDService;
+	@Autowired IPOrder_Service porderService;
+	@Autowired IPOrder_Req_Service porder_req_Service;
 	@Autowired ISKU_AttributeValue_Service skuattService;
 	@Autowired ISKU_Service skuService;
-	@Autowired
-	IPContract_PO_ShippingService poshippingService;
+	@Autowired IPContract_PO_ShippingService poshippingService;
 	@Autowired IPOrderProcessing_Service processService;
-	@Autowired
-	Common commonService;
-	@Autowired
-	ITask_Object_Service taskobjectService;
-	@Autowired
-	IProductPairingService productpairService;
-	@Autowired
-	IPOrder_Req_Service reqService;
-	@Autowired
-	IProductService productService;
-	@Autowired
-	IShipModeService shipmodeService;
-	@Autowired
-	IPContractProductService pcontractproductService;
-	@Autowired
-	IPContractProductPairingService pcontractpairService;
-	@Autowired
-	IPContract_Price_Service priceService;
+	@Autowired Common commonService;
+	@Autowired ITask_Object_Service taskobjectService;
+	@Autowired IProductPairingService productpairService;
+	@Autowired IPOrder_Req_Service reqService;
+	@Autowired IProductService productService;
+	@Autowired IShipModeService shipmodeService;
+	@Autowired IPContractProductService pcontractproductService;
+	@Autowired IPContractProductPairingService pcontractpairService;
+	@Autowired IPContract_Price_Service priceService;
 	@Autowired ISizeSetService sizesetService;
 	@Autowired IPContract_PO_Productivity_Service productivityService;
 	@Autowired IPContract_Price_DService pricedetailService;
@@ -138,6 +123,7 @@ public class PContract_POAPI {
 	@Autowired IAttributeValueService attributevalueService;
 	@Autowired IPContractProductSKUService ppskuService;
 	@Autowired IPOrderGrant_Service grantService;
+	@Autowired IPOrderGrant_SKUService grantskuService;
 
 	@RequestMapping(value = "/upload_template", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadTemplate(HttpServletRequest request,
@@ -2551,6 +2537,11 @@ public class PContract_POAPI {
 			}
 			
 			List<PContract_PO> listPContractPO = pcontract_POService.get_by_parentid(pcontract_poid_link);
+			//Update danh sach to chuyen duoc giao sx cho PO Line
+			for (PContract_PO thePoline: listPContractPO){
+				thePoline.setProductionlines(grantskuService.getProductionLines(thePoline.getId()));
+			}
+
 			response.data = listPContractPO;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

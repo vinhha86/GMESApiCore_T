@@ -7,10 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import vn.gpay.gsmart.core.base.AbstractService;
+import vn.gpay.gsmart.core.org.IOrgService;
+import vn.gpay.gsmart.core.org.Org;
 
 @Service
 public class POrderGrant_SKUService extends AbstractService<POrderGrant_SKU> implements IPOrderGrant_SKUService {
 	@Autowired IPOrderGrant_SKURepository repo;
+	@Autowired IOrgService orgService;
 	@Override
 	protected JpaRepository<POrderGrant_SKU, Long> getRepository() {
 		// TODO Auto-generated method stub
@@ -70,6 +73,17 @@ public class POrderGrant_SKUService extends AbstractService<POrderGrant_SKU> imp
 		return repo.getlistco(porderid_link);
 	}
 
+	@Override
+	public String getProductionLines(Long pcontract_poid_link){
+		String orgLines = "";
+		List<Long> orglines = repo.getProductionLines(pcontract_poid_link);
+		for(Long orgid:orglines){
+			//Lay thong tin Org
+			Org theOrg = orgService.findOne(orgid);
+			orgLines += theOrg.getName() + ";";
+		}
+		return orgLines;
+	}
 //	@Override
 //	public POrderGrant_SKU getPOrderGrant_SKUbySKUid_link(Long skuid_link) {
 //		return repo.getPOrderGrant_SKUbySKUid_link(skuid_link);

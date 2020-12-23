@@ -88,6 +88,8 @@ public class PContract_PO implements Serializable {/**
 	private Date date_importdata;
 	private Integer plan_productivity;
 	private Float plan_linerequired;
+	@Transient
+    private String productionlines;	
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
@@ -733,4 +735,14 @@ public class PContract_PO implements Serializable {/**
 	public void setProductiondays_ns(Integer productiondays_ns) {
 		this.productiondays_ns = productiondays_ns;
 	}
+
+	public String getProductionlines() {
+		return productionlines;
+	}
+
+	public void setProductionlines(String productionlines) {
+		this.productionlines = productionlines;
+	}
+	
+	
 }
