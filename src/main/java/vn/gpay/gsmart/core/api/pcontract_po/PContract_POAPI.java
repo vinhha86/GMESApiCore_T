@@ -474,7 +474,7 @@ public class PContract_POAPI {
 						
 						List<PContract_PO> listpo = new ArrayList<PContract_PO>();
 						float target = product_set_id_link > 0 ? 0 : vendor_target;
-						listpo = pcontract_POService.check_exist_po(PO_No, ShipDate,
+						listpo = pcontract_POService.check_exist_po( ShipDate,
 								po_productid_link, shipmodeid_link, pcontractid_link, target);
 						
 						if (listpo.size() > 0) {

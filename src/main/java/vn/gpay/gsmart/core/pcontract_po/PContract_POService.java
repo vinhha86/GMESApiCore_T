@@ -108,10 +108,10 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		return repo.getone_by_template_set(PO_No, shipmode, productid_link, ShipDate, pcontractid_link);
 	}
 	@Override
-	public List<PContract_PO> check_exist_po(String PO_No, Date ShipDate, long productid_link, long shipmodeid_link,
+	public List<PContract_PO> check_exist_po(Date ShipDate, long productid_link, long shipmodeid_link,
 			long pcontractid_link, float vendor_targer) {
 		
-		List<PContract_PO> list_po = repo.getone_by_template(PO_No, shipmodeid_link, productid_link, ShipDate, pcontractid_link);
+		List<PContract_PO> list_po = repo.getone_by_template(shipmodeid_link, productid_link, ShipDate, pcontractid_link);
 		
 		if(vendor_targer != 0) {
 			List<PContract_PO> list_remove = new ArrayList<PContract_PO>();
