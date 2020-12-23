@@ -469,7 +469,7 @@ public class PContract_POAPI {
 							throw new Exception();
 						}
 						
-						Date production_date = commonService.Date_Add(matdate, 7);
+						Date production_date = Common.Date_Add(matdate, 7);
 						int production_day = commonService.getDuration(production_date, ShipDate, orgrootid_link);
 						
 						List<PContract_PO> listpo = new ArrayList<PContract_PO>();
