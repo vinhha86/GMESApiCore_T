@@ -844,9 +844,9 @@ public class Common  {
 			Double value = cell.getNumericCellValue();
 			int i_value = value.intValue();
 			if(value == i_value) {
-				return i_value+"";
+				return (i_value+"").equals("0") ? "" : i_value+"";
 			}
-			return value+"";
+			return (value+"").equals("0") ? "" : value+"";
 		}
 		catch (Exception e) {
 			
@@ -854,7 +854,7 @@ public class Common  {
 		
 		try {
 			int value = (int)cell.getNumericCellValue();
-			return value+"";
+			return (value+"").equals("0") ? "" : value+"";
 		}
 		catch (Exception e) {
 			
