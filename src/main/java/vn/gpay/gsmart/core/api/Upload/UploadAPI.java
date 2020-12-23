@@ -33,6 +33,10 @@ import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
+import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_DService;
+import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Service;
+import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
+import vn.gpay.gsmart.core.pcontract_price.PContract_Price_D;
 import vn.gpay.gsmart.core.pcontractproduct.IPContractProductService;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproductpairing.IPContractProductPairingService;
@@ -53,6 +57,7 @@ import vn.gpay.gsmart.core.utils.ColumnTempNew;
 import vn.gpay.gsmart.core.utils.ColumnTemplate;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.POStatus;
+import vn.gpay.gsmart.core.utils.POType;
 import vn.gpay.gsmart.core.utils.ProductType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -69,6 +74,7 @@ public class UploadAPI {
 	@Autowired ISKU_AttributeValue_Service skuattService;
 	@Autowired
 	IProductPairingService productpairService;
+	@Autowired IPContract_Price_DService pricedetailService;
 	@Autowired
 	IPContractProductService pcontractproductService;
 	@Autowired
@@ -78,6 +84,8 @@ public class UploadAPI {
 	@Autowired IOrgService orgService;
 	@Autowired
 	IPContract_POService pcontract_POService;
+	@Autowired
+	IPContract_Price_Service priceService;
 	
 	@RequestMapping(value = "/offers", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadTemplate(HttpServletRequest request,
@@ -116,7 +124,7 @@ public class UploadAPI {
 
 				// Kiem tra header
 				int rowNum = 2;
-				int colNum = 1, col_phancach1 = 12, col_phancach2 = 0, col_phancach3 = 0, col_phancach4 =0, col_phancach5 = 0;
+				int colNum = 1, col_phancach1 = 12, col_phancach2 = 0, col_phancach5 = 0;
 				
 				String mes_err = "";
 				Row row = sheet.getRow(rowNum);
@@ -410,6 +418,11 @@ public class UploadAPI {
 						s_price_fob = s_price_fob.replace(",", "");
 						float price_fob = s_price_fob.equals("") ? 0 : Float.parseFloat(s_price_fob);
 						
+						colNum = col_phancach5;
+						String s_price_cmp = commonService.getStringValue(row.getCell(col_phancach5-2));
+						s_price_cmp = s_price_fob.replace(",", "");
+						float price_cmp = s_price_cmp.equals("") ? 0 : Float.parseFloat(s_price_cmp);
+						
 						colNum = ColumnTempNew.vendor_target + 1;
 						String s_vendor_target = commonService.getStringValue(row.getCell(ColumnTempNew.vendor_target));
 						s_vendor_target = s_vendor_target.replace(",", "");
@@ -471,11 +484,18 @@ public class UploadAPI {
 							PO_No = "TBD";
 						}
 						
+						colNum = ColumnTempNew.status + 1;
+						String s_status = commonService.getStringValue(row.getCell(ColumnTempNew.status));
+						Integer status = POStatus.PO_STATUS_UNCONFIRM;
+						if(!s_status.equals("")) {
+							status = POStatus.PO_STATUS_CONFIRMED;
+						}
+						
 						List<PContract_PO> listpo = new ArrayList<PContract_PO>();
 						float target = product_set_id_link > 0 ? 0 : vendor_target;
 						listpo = pcontract_POService.check_exist_po(ShipDate,
 								po_productid_link, shipmodeid_link, pcontractid_link, target);
-						if(list_org.size() == 0) {
+						if(listpo.size() == 0) {
 							po_tong.setId(null);
 							po_tong.setCode(PO_No);
 							po_tong.setCurrencyid_link((long) 1);
@@ -490,16 +510,70 @@ public class UploadAPI {
 							po_tong.setProductid_link(po_productid_link);
 							po_tong.setShipdate(ShipDate);
 							po_tong.setShipmodeid_link(shipmodeid_link);
-							po_tong.setStatus(POStatus.PO_STATUS_PROBLEM);
+							po_tong.setStatus(status);
 							po_tong.setUsercreatedid_link(user.getId());
 							po_tong.setDate_importdata(current_time);
 							po_tong.setProductiondate(production_date);
 							po_tong.setProductiondays(production_day);
+							po_tong.setPo_typeid_link(POType.PO_LINE_PLAN);
+							po_tong.setSewtarget_percent((float)20);
 							po_tong.setMatdate(matdate);
+							
+							if(status == POStatus.PO_STATUS_CONFIRMED) {
+								po_tong.setOrgmerchandiseid_link(orgid_link);
+							}
 
 							po_tong = pcontract_POService.save(po_tong);
 							pcontractpo_id_link = po_tong.getId();
 						}
+						else {
+							pcontractpo_id_link = listpo.get(0).getId();
+							po_tong = listpo.get(0);
+						}
+
+						//Xoa cac dai co di roi insert lai vao san pham con hoac san pham don
+						List<PContract_Price> list_price = priceService.getPrice_by_product(pcontractpo_id_link, productid_link);
+						for(PContract_Price price : list_price) {
+							List<PContract_Price_D> list_price_d = pricedetailService.getPrice_D_ByPContractPrice(price.getId());
+							for(PContract_Price_D price_d : list_price_d) {
+								pricedetailService.delete(price_d);
+							}
+							priceService.delete(price);
+						}
+						
+						//Sinh cac dai co vao trong san pham
+						//Sinh dai co all
+						PContract_Price price_all = new PContract_Price();
+						price_all.setId(null);
+						price_all.setIs_fix(false);
+						price_all.setOrgrootid_link(orgrootid_link);
+						price_all.setPcontract_poid_link(pcontractpo_id_link);
+						price_all.setPcontractid_link(pcontractid_link);
+						price_all.setProductid_link(productid_link);
+						price_all.setSizesetid_link((long)1);
+						price_all.setDate_importdata(current_time);
+						price_all.setPrice_cmp(price_cmp);
+						price_all.setTotalprice(price_cmp + price_fob);
+						price_all.setPrice_fob(price_fob);
+						price_all = priceService.save(price_all);
+						
+						//Them detail
+						PContract_Price_D price_detail_all = new PContract_Price_D();
+						price_detail_all.setOrgrootid_link(orgrootid_link);
+						price_detail_all.setFobpriceid_link((long)1);
+						price_detail_all.setPrice(price_cmp);
+						price_detail_all.setIsfob(false);
+						price_detail_all.setId(null);
+						price_detail_all.setSizesetid_link((long)1);
+						price_detail_all.setPcontract_poid_link(pcontractpo_id_link);
+						price_detail_all.setPcontractid_link(pcontractid_link);
+						price_detail_all.setPcontractpriceid_link(price_all.getId());
+						price_detail_all.setProductid_link(productid_link);
+						pricedetailService.save(price_detail_all);
+						
+						
+						//Kiem tra line giao hang va sinh line giao hang
+						
 						
 						//Chuyen sang row tiep theo neu con du lieu thi xu ly tiep khong thi dung lai
 						rowNum++;

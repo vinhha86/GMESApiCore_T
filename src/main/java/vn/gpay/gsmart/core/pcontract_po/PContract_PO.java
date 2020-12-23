@@ -88,6 +88,17 @@ public class PContract_PO implements Serializable {/**
 	private Date date_importdata;
 	private Integer plan_productivity;
 	private Float plan_linerequired;
+	private Integer po_typeid_link;
+	
+	
+	public Integer getPo_typeid_link() {
+		return po_typeid_link;
+	}
+
+	public void setPo_typeid_link(Integer po_typeid_link) {
+		this.po_typeid_link = po_typeid_link;
+	}
+
 	@Transient
     private String productionlines;	
 	
