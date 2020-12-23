@@ -44,7 +44,6 @@ import vn.gpay.gsmart.core.menu.UserMenu;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract.IPContractService;
-import vn.gpay.gsmart.core.salary.OrgSal_Com_LaborLevel;
 import vn.gpay.gsmart.core.security.GpayAuthentication;
 import vn.gpay.gsmart.core.security.GpayRole;
 import vn.gpay.gsmart.core.security.GpayUser;

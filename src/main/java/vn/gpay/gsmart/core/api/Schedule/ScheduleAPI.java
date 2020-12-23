@@ -122,7 +122,7 @@ public class ScheduleAPI {
 				Schedule_holiday sch_holiday = new Schedule_holiday();
 				sch_holiday.setComment(holiday.getComment());
 				sch_holiday.setStartDate(holiday.getDay());
-				sch_holiday.setEndDate(commonService.Date_Add(holiday.getDay(), 1));
+				sch_holiday.setEndDate(Common.Date_Add(holiday.getDay(), 1));
 				sch_holiday.setCls("holiday");
 				
 				response.zones.rows.add(sch_holiday);
@@ -135,7 +135,7 @@ public class ScheduleAPI {
 				Schedule_holiday sch_sunday = new Schedule_holiday();
 				sch_sunday.setComment("");
 				sch_sunday.setStartDate(date);
-				sch_sunday.setEndDate(commonService.Date_Add(date, 1));
+				sch_sunday.setEndDate(Common.Date_Add(date, 1));
 				sch_sunday.setCls("sunday");
 				
 				response.zones.rows.add(sch_sunday);
