@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,6 +21,7 @@ import javax.persistence.Transient;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+import org.springframework.context.annotation.Lazy;
 
 import vn.gpay.gsmart.core.category.Port;
 import vn.gpay.gsmart.core.category.ShipMode;
@@ -31,6 +33,7 @@ import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.utils.POType;
 
 @Table(name="pcontract_po")
 @Entity
@@ -216,7 +219,8 @@ public class PContract_PO implements Serializable {/**
 	@ManyToOne
     @JoinColumn(name="porttoid_link",insertable=false,updatable =false)
     private Port port_to;
-	
+
+
 	@Transient 
 	public String getPortTo() {
 		if(port_to!=null)
@@ -332,9 +336,18 @@ public class PContract_PO implements Serializable {/**
 	public void setPcontract_price(List<PContract_Price> pcontract_price) {
 		this.pcontract_price = pcontract_price;
 	}
-	
+	@Lazy(true)
 	public List<PContract_PO> getSub_po() {
 		return sub_po;
+	}
+	
+	@Lazy(true)
+	public List<PContract_PO> getSub_po_plan() {
+		return sub_po.stream().filter(item -> null!=item.po_typeid_link && item.po_typeid_link==POType.PO_LINE_PLAN).collect(Collectors.toList());
+	}
+	@Lazy(true)
+	public List<PContract_PO> getSub_po_confirm() {
+		return sub_po.stream().filter(item -> null!=item.po_typeid_link && item.po_typeid_link==POType.PO_LINE_CONFIRMED).collect(Collectors.toList());
 	}
 
 	public void setSub_po(List<PContract_PO> sub_po) {
