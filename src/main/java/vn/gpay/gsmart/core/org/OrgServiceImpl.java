@@ -306,4 +306,16 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 	public List<Org> getOrgForContractBuyerBuyerList(List<Long> buyerIds) {
 		return repositoty.getOrgForContractBuyerBuyerList(buyerIds);
 	}
+
+	@Override
+	public List<Org> getByCodeAndType(String code, Integer orgtypeid_link) {
+		// TODO Auto-generated method stub
+		return repositoty.getByCodeAndType(code, orgtypeid_link);
+	}
+
+	@Override
+	public List<Org> getByNameAndType(String name, Integer orgtypeid_link) {
+		// TODO Auto-generated method stub
+		return repositoty.getByNameAndType(name, orgtypeid_link);
+	}
 }

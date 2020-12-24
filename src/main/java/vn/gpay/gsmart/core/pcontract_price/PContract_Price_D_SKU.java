@@ -48,6 +48,26 @@ public class PContract_Price_D_SKU implements Serializable{
 		return "";
 	}
 	
+	@Transient
+	public String getColor_name() {
+		if(material != null) {
+			if(material.getColor_name() != null) {
+				return material.getColor_name();
+			}
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getSize_name() {
+		if(material != null) {
+			if(material.getSize_name() != null) {
+				return material.getSize_name();
+			}
+		}
+		return "";
+	}
+	
 	public Long getId() {
 		return id;
 	}
