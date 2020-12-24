@@ -45,9 +45,11 @@ import vn.gpay.gsmart.core.pcontract_po_productivity.PContract_PO_Productivity;
 import vn.gpay.gsmart.core.pcontract_po_shipping.IPContract_PO_ShippingService;
 import vn.gpay.gsmart.core.pcontract_po_shipping.PContract_PO_Shipping;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_DService;
+import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_D_SKUService;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Service;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price_D;
+import vn.gpay.gsmart.core.pcontract_price.PContract_Price_D_SKU;
 import vn.gpay.gsmart.core.pcontractproduct.IPContractProductService;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproductpairing.IPContractProductPairingService;
@@ -99,6 +101,7 @@ public class PContract_POAPI {
 	@Autowired IProductAttributeService pavService;
 	@Autowired IPContract_Price_Service pcontractpriceService;
 	@Autowired IPContract_Price_DService pcontractpriceDService;
+	@Autowired IPContract_Price_D_SKUService pcontractpriceDSkuService;
 	@Autowired IPOrder_Service porderService;
 	@Autowired IPOrder_Req_Service porder_req_Service;
 	@Autowired ISKU_AttributeValue_Service skuattService;
@@ -1753,6 +1756,13 @@ public class PContract_POAPI {
 	private void updatePriceList(Long usercreatedid_link, Long orgrootid_link, Long pcontractid_link,
 			Long pcontract_poid_link, List<PContract_Price> list_price_new) {
 		// Xoa list price cu của PO
+		
+		// Xoa PContract_Price_D_SKU truoc vi lay pcontract_poid_link theo PContract_Price_D
+		List<PContract_Price_D_SKU> list_price_d_sku = pcontractpriceDSkuService.getPrice_D_SKU_ByPO(pcontract_poid_link);
+		for (PContract_Price_D_SKU price_d_sku : list_price_d_sku) {
+			pcontractpriceDSkuService.delete(price_d_sku);
+		}
+		
 		List<PContract_Price> list_price = pcontractpriceService.getPrice_ByPO(pcontract_poid_link);
 		for (PContract_Price price : list_price) {
 			pcontractpriceService.delete(price);
@@ -1801,6 +1811,23 @@ public class PContract_POAPI {
 				newPrice_D.setUnitid_link(price_d.getUnitid_link());
 				newPrice_D.setUsercreatedid_link(usercreatedid_link);
 				newPrice_D.setDatecreated(new Date());
+				
+				newPrice_D.setLost_ratio(price_d.getLost_ratio());
+				newPrice_D.setMaterialid_link(price_d.getMaterialid_link());
+				newPrice_D.setProviderid_link(price_d.getProviderid_link());
+				
+				for(PContract_Price_D_SKU price_d_sku : price_d.getPcontract_price_d_sku()) {
+					PContract_Price_D_SKU newPrice_D_SKU = new PContract_Price_D_SKU();
+					
+//					newPrice_D_SKU.setPcontractprice_d_id_link(pcontractprice_d_id_link);
+					newPrice_D_SKU.setMaterialid_link(price_d_sku.getMaterialid_link());
+					newPrice_D_SKU.setAmount(price_d_sku.getAmount());
+					newPrice_D_SKU.setUnitprice(price_d_sku.getUnitprice());
+					newPrice_D_SKU.setTotalprice(price_d_sku.getTotalprice());
+					
+					newPrice_D.getPcontract_price_d_sku().add(newPrice_D_SKU);
+				}
+
 
 				newPrice.getPcontract_price_d().add(newPrice_D);
 			}

@@ -1,14 +1,18 @@
 package vn.gpay.gsmart.core.pcontract_price;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -18,9 +22,11 @@ import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.category.Unit;
 import vn.gpay.gsmart.core.fob_price.FOBPrice;
+import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.sku.SKU;
 
 @Table(name="pcontract_price_d")
 @Entity
@@ -51,6 +57,52 @@ public class PContract_Price_D implements Serializable {/**
 	private Float quota;
 	private Float unitprice;
 	private Long unitid_link;
+	private Float lost_ratio; // tỉ lệ hao hụt
+	private Long materialid_link;
+	private Long providerid_link;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
+	@JoinColumn( name="pcontractprice_d_id_link", referencedColumnName="id")
+	private List<PContract_Price_D_SKU> pcontract_price_d_sku = new ArrayList<PContract_Price_D_SKU>();
+	
+	public List<PContract_Price_D_SKU> getPcontract_price_d_sku() {
+		return pcontract_price_d_sku;
+	}
+
+	public void setPcontract_price_d_sku(List<PContract_Price_D_SKU> pcontract_price_d_sku) {
+		this.pcontract_price_d_sku = pcontract_price_d_sku;
+	}
+
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="materialid_link",insertable=false,updatable =false)
+	private SKU material;
+	
+	@Transient
+	public String getMaterialCode() {
+		if(material != null) {
+			if(material.getCode() != null) {
+				return material.getCode();
+			}
+		}
+		return "";
+	}
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="providerid_link",insertable=false,updatable =false)
+	private Org provider;
+	
+	@Transient
+	public String getProviderCode() {
+		if(provider != null) {
+			if(provider.getCode() != null) {
+				return provider.getCode();
+			}
+		}
+		return "";
+	}
 	
 	public Long getFobpriceid_link() {
 		return fobpriceid_link;
@@ -308,6 +360,30 @@ public class PContract_Price_D implements Serializable {/**
 
 	public void setUnitid_link(Long unitid_link) {
 		this.unitid_link = unitid_link;
+	}
+
+	public Float getLost_ratio() {
+		return lost_ratio;
+	}
+
+	public void setLost_ratio(Float lost_ratio) {
+		this.lost_ratio = lost_ratio;
+	}
+
+	public Long getMaterialid_link() {
+		return materialid_link;
+	}
+
+	public void setMaterialid_link(Long materialid_link) {
+		this.materialid_link = materialid_link;
+	}
+
+	public Long getProviderid_link() {
+		return providerid_link;
+	}
+
+	public void setProviderid_link(Long providerid_link) {
+		this.providerid_link = providerid_link;
 	}
 
 }
