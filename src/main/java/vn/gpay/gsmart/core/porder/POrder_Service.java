@@ -447,15 +447,15 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 
 	@Override
 	public List<POrder> getPOrderBySearch(Long buyerid, Long vendorid, Long factoryid, String pobuyer,
-			String stylebuyer, List<Integer> statuses, Long granttoorgid_link, Date golivedatefrom, Date golivedateto) {
+			String stylebuyer, String contractcode, List<Integer> statuses, Long granttoorgid_link, Date golivedatefrom, Date golivedateto) {
 		// TODO Auto-generated method stub
-		return repo.getPOrderBySearch(buyerid, vendorid, factoryid, pobuyer, stylebuyer, statuses, granttoorgid_link, golivedatefrom, golivedateto);
+		return repo.getPOrderBySearch(buyerid, vendorid, factoryid, pobuyer, stylebuyer, contractcode, statuses, granttoorgid_link, golivedatefrom, golivedateto);
 	}
 	
 	@Override
 	public List<POrder> getPOrderBySearch(Long buyerid, Long vendorid, Long factoryid, String pobuyer,
-			String stylebuyer, Long granttoorgid_link, Date golivedatefrom, Date golivedateto) {
+			String stylebuyer, String contractcode, Long granttoorgid_link, Date golivedatefrom, Date golivedateto) {
 		// TODO Auto-generated method stub
-		return repo.getPOrderBySearch(buyerid, vendorid, factoryid, pobuyer, stylebuyer, granttoorgid_link, golivedatefrom, golivedateto);
+		return repo.getPOrderBySearch(buyerid, vendorid, factoryid, pobuyer, stylebuyer, contractcode, granttoorgid_link, golivedatefrom, golivedateto);
 	}
 }

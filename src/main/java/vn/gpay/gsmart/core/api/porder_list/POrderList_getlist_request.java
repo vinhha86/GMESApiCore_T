@@ -6,6 +6,7 @@ import java.util.List;
 import vn.gpay.gsmart.core.base.RequestBase;
 
 public class POrderList_getlist_request extends RequestBase{
+	public String contractcode;
 	public String ordercode;
 	public String povendor;
 	public String pobuyer;
