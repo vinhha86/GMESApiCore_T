@@ -346,7 +346,7 @@ public class ReportAPI {
 			// Thư mục gốc upload file.			
 			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
 			
-			String filePath = uploadRootPath+"/"+ "Template_ChaoGia.xlsx";
+			String filePath = uploadRootPath+"/"+ "Template_ChaoGia_New.xlsx";
 			Path path = Paths.get(filePath);
 			byte[] data = Files.readAllBytes(path);
 			response.data = data;
