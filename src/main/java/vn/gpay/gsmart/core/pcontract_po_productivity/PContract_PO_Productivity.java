@@ -27,6 +27,14 @@ public class PContract_PO_Productivity implements Serializable{
 	private Long productid_link;
 	private Integer plan_productivity;
 	private Float plan_linerequired;
+	private Integer amount;
+	
+	public Integer getAmount() {
+		return amount;
+	}
+	public void setAmount(Integer amount) {
+		this.amount = amount;
+	}
 	public Long getId() {
 		return id;
 	}

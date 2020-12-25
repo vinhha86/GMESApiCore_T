@@ -26,7 +26,8 @@ public interface IPContract_POService extends Operations<PContract_PO> {
 	List<PContract_PO> getPcontractPoByPContractAndPOBuyer(Long pcontractid_link, String po_buyer, String buyercode);
 	
 	List<PContract_PO> getone_by_template_set(String PO_No, Date ShipDate, long productid_link, long shipmodeid_link, long pcontractid_link);
-	List<PContract_PO> check_exist_po(Date ShipDate, long productid_link, long shipmodeid_link, long pcontractid_link, float vendor_targer);
+	List<PContract_PO> check_exist_po(Date ShipDate, long productid_link, long shipmodeid_link, long pcontractid_link);
+	List<PContract_PO> check_exist_line(Date ShipDate, long productid_link, long pcontractid_link, long parentid_link);
 	List<PContract_PO> get_by_parentid(Long pcontractpo_parentid_link);
 	List<PContract_PO> check_exist_po_children(String PO_No, Date Shipdate, Long shipmodeid_link, Long pcontractid_link, Long parentid_link);
 	List<PContract_PO> check_exist_PONo(String PO_No,Long pcontractid_link);

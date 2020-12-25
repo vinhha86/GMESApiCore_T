@@ -18,7 +18,8 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			+ "and c.parentpoid_link = null "
 			+ "and c.pcontractid_link = :pcontractid_link "
 			+ "and (c.productid_link = :productid_link or 0 = :productid_link) "
-			+ "and (:userid_link is null or c.merchandiserid_link = :userid_link) ")
+			+ "and (:userid_link is null or c.merchandiserid_link = :userid_link) "
+			+ "and po_typeid_link = 10")
 	public List<PContract_PO> getPOByContractProduct(@Param ("orgrootid_link")final  Long orgrootid_link,
 			@Param ("pcontractid_link")final  Long pcontractid_link,
 			@Param ("productid_link")final  Long productid_link,
@@ -101,18 +102,31 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			);
 	
 	@Query(value = "select c from PContract_PO c "
-			+ "inner join PContract_Price d on c.id = d.pcontract_poid_link "
 			+ "where c.shipmodeid_link = :shipmodeid_link "
-			+ "and d.productid_link = :productid_link "
+			+ "and c.productid_link = :productid_link "
 			+ "and (c.shipdate = :shipdate) "
 			+ "and c.pcontractid_link = :pcontractid_link "
-			+ "and d.sizesetid_link = 1"
+			+ "and c.po_typeid_link = 10"
 			)
 	public List<PContract_PO> getone_by_template(
 			@Param ("shipmodeid_link")final  Long shipmodeid_link, 
 			@Param ("productid_link")final  Long productid_link, 
 			@Param ("shipdate")final  Date shipdate,
 			@Param ("pcontractid_link")final  Long pcontractid_link
+			);
+	
+	@Query(value = "select c from PContract_PO c "
+			+ "where c.productid_link = :productid_link "
+			+ "and c.shipdate = :shipdate "
+			+ "and c.pcontractid_link = :pcontractid_link "
+			+ "and c.po_typeid_link = 10 "
+			+ "and c.parentpoid_link = :parentpoid_link"
+			)
+	public List<PContract_PO> getone_line_giaohang(
+			@Param ("productid_link")final  Long productid_link, 
+			@Param ("shipdate")final  Date shipdate,
+			@Param ("pcontractid_link")final  Long pcontractid_link,
+			@Param ("parentpoid_link")final  Long parentpoid_link
 			);
 	
 	@Query(value = "select c from PContract_PO c "

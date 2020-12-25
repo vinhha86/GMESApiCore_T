@@ -462,9 +462,8 @@ public class PContract_POAPI {
 						int production_day = commonService.getDuration(production_date, ShipDate, orgrootid_link);
 						
 						List<PContract_PO> listpo = new ArrayList<PContract_PO>();
-						float target = product_set_id_link > 0 ? 0 : vendor_target;
 						listpo = pcontract_POService.check_exist_po( ShipDate,
-								po_productid_link, shipmodeid_link, pcontractid_link, target);
+								po_productid_link, shipmodeid_link, pcontractid_link);
 						
 						if (listpo.size() > 0) {
 							pcontractpo_id_link = listpo.get(0).getId();

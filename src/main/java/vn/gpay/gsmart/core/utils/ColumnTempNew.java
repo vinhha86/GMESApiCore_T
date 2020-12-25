@@ -13,4 +13,5 @@ public class ColumnTempNew {
 	public static int status	  		= 9;
 	public static int vendor_target  	= 10;
 	public static int fob			  	= 11;
+	public static int ns_target			 = 12;
 }

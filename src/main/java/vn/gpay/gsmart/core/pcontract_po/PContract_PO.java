@@ -334,6 +334,7 @@ public class PContract_PO implements Serializable {/**
 	}
 	
 	public List<PContract_PO> getSub_po() {
+		sub_po.removeIf(c->c.getPo_typeid_link() != 10);
 		return sub_po;
 	}
 

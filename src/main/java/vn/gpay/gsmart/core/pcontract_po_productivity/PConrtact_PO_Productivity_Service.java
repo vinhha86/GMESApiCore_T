@@ -29,4 +29,9 @@ public class PConrtact_PO_Productivity_Service extends AbstractService<PContract
 		// TODO Auto-generated method stub
 		return repo.getByPO(pcontract_poid_link);
 	}
+	@Override
+	public List<PContract_PO_Productivity> getbypo_and_product(Long pcontract_poid_link, Long productid_link) {
+		// TODO Auto-generated method stub
+		return repo.getByPOAndProduct(pcontract_poid_link, productid_link);
+	}
 }

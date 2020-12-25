@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import vn.gpay.gsmart.core.base.AbstractService;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Repository;
-import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 
 @Service
 public class PContract_POService extends AbstractService<PContract_PO> implements IPContract_POService {
@@ -109,33 +108,9 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	}
 	@Override
 	public List<PContract_PO> check_exist_po(Date ShipDate, long productid_link, long shipmodeid_link,
-			long pcontractid_link, float vendor_targer) {
+			long pcontractid_link) {
 		
 		List<PContract_PO> list_po = repo.getone_by_template(shipmodeid_link, productid_link, ShipDate, pcontractid_link);
-		
-		if(vendor_targer != 0) {
-			List<PContract_PO> list_remove = new ArrayList<PContract_PO>();
-			for (PContract_PO pContract_PO : list_po) {
-//				List<PContract_Price> list_price = pContract_PO.getPcontract_price();
-				List<PContract_Price> list_price = price_repo.getPrice_by_product_and_sizeset(pContract_PO.getId(), productid_link, (long)1);
-				boolean check = false;
-				for (PContract_Price price : list_price) {
-					if(price.getSizesetid_link() != 1) continue;
-					if(price.getPrice_vendortarget().equals(vendor_targer)) {
-						check = true;
-						break;
-					}
-				}
-				
-				if(!check) {
-					list_remove.add(pContract_PO);
-				}
-			}
-			
-			for (PContract_PO pContract_PO : list_remove) {
-				list_po.remove(pContract_PO);
-			}
-		}
 		
 		
 		return list_po;
@@ -153,7 +128,6 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	}
 	@Override
 	public List<PContract_PO> check_exist_PONo(String PO_No,Long pcontractid_link) {
-		// TODO Auto-generated method stub
 		return repo.getone_po_byPO_no(PO_No, pcontractid_link);
 	}
 	
@@ -203,5 +177,11 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	public List<PContract_PO> getby_porder(Long porderid_link) {
 		// TODO Auto-generated method stub
 		return repo.getby_porder(porderid_link);
+	}
+	@Override
+	public List<PContract_PO> check_exist_line(Date ShipDate, long productid_link, long pcontractid_link,
+			long parentid_link) {
+		// TODO Auto-generated method stub
+		return repo.getone_line_giaohang(productid_link, ShipDate, pcontractid_link, parentid_link);
 	}
 }
