@@ -31,6 +31,7 @@ import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.GPAYDateFormat;
 import vn.gpay.gsmart.core.utils.POStatus;
+import vn.gpay.gsmart.core.utils.POType;
 import vn.gpay.gsmart.core.utils.POrderStatus;
 
 @Service
@@ -85,7 +86,8 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 				PContract_PO thePO = pcontract_POService.findOne(porder.getPcontract_poid_link());
 				
 				//Chi tao lenh cho Chao gia/ Khong tao lenh cho PO Line
-				if (null !=thePO && thePO.getParentpoid_link() == null){
+//				if (null !=thePO && thePO.getParentpoid_link() == null){
+				if(thePO != null & thePO.getPo_typeid_link() == POType.PO_LINE_PLAN && thePO.getParentpoid_link() != null) {
 					String po_code = null!=thePO.getPo_vendor()&&thePO.getPo_vendor().length() > 0?thePO.getPo_vendor():thePO.getPo_buyer();
 					
 					if (porder.getId() == null || porder.getId() == 0) {

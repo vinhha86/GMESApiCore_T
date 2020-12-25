@@ -44,6 +44,9 @@ import vn.gpay.gsmart.core.pcontractproduct.IPContractProductService;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproductpairing.IPContractProductPairingService;
 import vn.gpay.gsmart.core.pcontractproductpairing.PContractProductPairing;
+import vn.gpay.gsmart.core.porder.IPOrder_Service;
+import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
+import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.product.IProductService;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.productattributevalue.IProductAttributeService;
@@ -62,6 +65,7 @@ import vn.gpay.gsmart.core.utils.ColumnTemplate;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.POStatus;
 import vn.gpay.gsmart.core.utils.POType;
+import vn.gpay.gsmart.core.utils.POrderReqStatus;
 import vn.gpay.gsmart.core.utils.ProductType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -93,6 +97,8 @@ public class UploadAPI {
 	@Autowired
 	IPContract_PO_Productivity_Service productivityService;
 	@Autowired ISizeSetService sizesetService;
+	@Autowired IPOrder_Req_Service reqService;
+	@Autowired IPOrder_Service porderService;
 	
 	@RequestMapping(value = "/offers", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadTemplate(HttpServletRequest request,
@@ -131,7 +137,7 @@ public class UploadAPI {
 
 				// Kiem tra header
 				int rowNum = 2;
-				int colNum = 1, col_phancach1 = 13, col_phancach2 = 0, col_phancach5 = 0;
+				int colNum = 1, col_phancach1 = 13, col_phancach2 = 0;
 				
 				String mes_err = "";
 				Row row = sheet.getRow(rowNum);
@@ -431,7 +437,6 @@ public class UploadAPI {
 							colNum +=2;
 						}
 						
-						col_phancach5 = col_phancach2 + 17;
 						
 						//Kiem tra chao gia da ton tai hay chua
 						long pcontractpo_id_link = 0;
@@ -789,7 +794,7 @@ public class UploadAPI {
 								int soluong = list_soluong.get(i);
 								
 								List<PContract_PO> list_line_gh = new ArrayList<PContract_PO>();
-								list_line_gh = pcontract_POService.check_exist_line(ShipDate, po_productid_link, pcontractid_link, pcontractpo_id_link);
+								list_line_gh = pcontract_POService.check_exist_line(ngaygiao, po_productid_link, pcontractid_link, pcontractpo_id_link);
 								PContract_PO po_line = new PContract_PO();
 								
 								Date production_date_line = null;
@@ -836,7 +841,7 @@ public class UploadAPI {
 
 								}
 								else {
-									po_tong = list_line_gh.get(0);
+									po_line = list_line_gh.get(0);
 								}
 
 								po_line.setProductiondays_ns(productiondays_ns_line);
@@ -845,7 +850,7 @@ public class UploadAPI {
 								po_line.setMatdate(matdate);
 								po_line.setProductiondate(production_date_line);
 								po_line.setProductiondays(production_day_line);
-								po_line.setStatus(status);
+								po_line.setStatus(po_tong.getStatus());
 								po_line.setPo_buyer(PO_No);
 								po_line.setPo_vendor(PO_No);
 								po_line.setPo_quantity(soluong);
@@ -856,11 +861,69 @@ public class UploadAPI {
 								po_line = pcontract_POService.save(po_line);
 								
 								Long pcontract_po_line_id = po_line.getId();
+								
+								//Kiem tra ns cua san pham trong line
+								List<PContract_PO_Productivity> list_productivity_line = productivityService.getbypo_and_product(pcontract_po_line_id, productid_link);
+								PContract_PO_Productivity po_productivity_line = new PContract_PO_Productivity();
+								if(list_productivity_line.size() == 0) {
+									po_productivity_line.setId(null);
+									po_productivity_line.setOrgrootid_link(orgrootid_link);
+									po_productivity_line.setPcontract_poid_link(pcontract_po_line_id);
+									po_productivity_line.setProductid_link(productid_link);							
+								}
+								else {
+									po_productivity_line = list_productivity_line.get(0);
+								}
+								
+								po_productivity_line.setAmount(soluong*amount);
+								po_productivity_line.setPlan_linerequired(plan_linerequired_line);
+								po_productivity_line.setPlan_productivity(ns_target.intValue()*amount);
+								productivityService.save(po_productivity_line);
+								
+								if(product_set_id_link > 0) {
+									//Kiem tra ns cua san pham trong line
+									List<PContract_PO_Productivity> list_productivity_line_set = productivityService.getbypo_and_product(pcontract_po_line_id, product_set_id_link);
+									PContract_PO_Productivity po_productivity_line_set = new PContract_PO_Productivity();
+									if(list_productivity_line_set.size() == 0) {
+										po_productivity_line_set.setId(null);
+										po_productivity_line_set.setOrgrootid_link(orgrootid_link);
+										po_productivity_line_set.setPcontract_poid_link(pcontract_po_line_id);
+										po_productivity_line_set.setProductid_link(productid_link);							
+									}
+									else {
+										po_productivity_line_set = list_productivity_line_set.get(0);
+									}
+									
+									po_productivity_line_set.setAmount(soluong);
+									po_productivity_line_set.setPlan_linerequired(plan_linerequired_line);
+									po_productivity_line_set.setPlan_productivity(ns_target.intValue());
+									productivityService.save(po_productivity_line_set);
+								}
+								
+								//kiem tra porder_req ton tai chua thi them vao
+								if(orgid_link != null) {
+									List<POrder_Req> list_req = reqService.getByOrg_PO_Product(pcontract_po_line_id, productid_link, orgid_link);
+									if(list_req.size() == 0) {
+										POrder_Req porder_req = new POrder_Req();
+										porder_req.setAmount_inset(amount);
+										porder_req.setGranttoorgid_link(orgid_link);
+										porder_req.setId(null);
+										porder_req.setIs_calculate(true);
+										porder_req.setOrgrootid_link(orgrootid_link);
+										porder_req.setPcontract_poid_link(pcontract_po_line_id);
+										porder_req.setPcontractid_link(pcontractid_link);
+										porder_req.setProductid_link(productid_link);
+										porder_req.setStatus(status == POStatus.PO_STATUS_CONFIRMED ? POrderReqStatus.STATUS_POCONFFIRMED : POrderReqStatus.STATUS_FREE);
+										porder_req.setTotalorder(soluong);
+										porder_req = reqService.save(porder_req);
+										
+										if(po_tong.getStatus() == POStatus.PO_STATUS_CONFIRMED)
+											porderService.createPOrder(porder_req, user);
+									}
+									
+								}
 							}
 						}
-						
-						
-						
 						
 						//Chuyen sang row tiep theo neu con du lieu thi xu ly tiep khong thi dung lai
 						rowNum++;
