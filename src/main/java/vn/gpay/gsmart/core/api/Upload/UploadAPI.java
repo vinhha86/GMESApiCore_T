@@ -385,7 +385,8 @@ public class UploadAPI {
 						s_po_quantity = s_po_quantity.replace(",", "");
 						Float f_po_quantity = s_po_quantity.equals("") ? 0 : Float.parseFloat(s_po_quantity);
 						int po_quantity = f_po_quantity.intValue();
-						list_soluong.add(po_quantity);
+						if(po_quantity>0)
+							list_soluong.add(po_quantity);
 						
 						while (!s_header_phancach2.equals("xxx")) {
 							col_phancach2 += 2;
