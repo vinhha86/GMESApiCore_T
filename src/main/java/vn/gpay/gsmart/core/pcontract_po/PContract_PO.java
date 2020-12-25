@@ -320,7 +320,7 @@ public class PContract_PO implements Serializable {/**
     public String getFactories() {
     	String name = "";
     	for(POrder_Req req : porder_req) {
-    		if(name.contains(req.getGranttoorgname())) continue;
+    		if(name.contains(req.getGranttoorgcode())) continue;
     		if(name == "")
     			name += req.getGranttoorgcode();
     		else
