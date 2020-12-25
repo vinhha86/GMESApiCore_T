@@ -160,6 +160,7 @@ public class POrderListAPI {
 			
 			response.data = new ArrayList<>();
 			
+			String contractcode = entity.contractcode;
 			String pobuyer = entity.pobuyer;
 			String stylebuyer = entity.style;
 			Long buyerid = entity.buyerid;
@@ -174,27 +175,29 @@ public class POrderListAPI {
 			
 			if(statuses.size() == 0) {
 				response.data = porderService.getPOrderBySearch(
-							buyerid,
-							vendorid,
-							factoryid,
-							pobuyer,
-							stylebuyer,
-							granttoorgid_link,
-							GPAYDateFormat.atStartOfDay(golivedatefrom),
-							GPAYDateFormat.atEndOfDay(golivedateto)
-							);
+						buyerid,
+						vendorid,
+						factoryid,
+						pobuyer,
+						stylebuyer,
+						contractcode,
+						granttoorgid_link,
+						GPAYDateFormat.atStartOfDay(golivedatefrom),
+						GPAYDateFormat.atEndOfDay(golivedateto)
+						);
 			}else {
 				response.data = porderService.getPOrderBySearch(
-							buyerid,
-							vendorid,
-							factoryid,
-							pobuyer,
-							stylebuyer,
-							statuses,
-							granttoorgid_link,
-							GPAYDateFormat.atStartOfDay(golivedatefrom),
-							GPAYDateFormat.atEndOfDay(golivedateto)
-							);
+						buyerid,
+						vendorid,
+						factoryid,
+						pobuyer,
+						stylebuyer,
+						contractcode,
+						statuses,
+						granttoorgid_link,
+						GPAYDateFormat.atStartOfDay(golivedatefrom),
+						GPAYDateFormat.atEndOfDay(golivedateto)
+						);
 			}
 			
 			if(response.data.size() > 1000) {

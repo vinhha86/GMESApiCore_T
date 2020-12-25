@@ -81,7 +81,7 @@ public class ScheduleAPI {
 	@RequestMapping(value = "/getplan",method = RequestMethod.POST)
 	public ResponseEntity<get_schedule_porder_response> GetAll(HttpServletRequest request,
 			@RequestParam String listid, @RequestParam String startDate , @RequestParam String endDate,
-			@RequestParam String PO_code, @RequestParam String Buyer, @RequestParam String Vendor, 
+			@RequestParam String PO_code, @RequestParam String contractcode, @RequestParam String Buyer, @RequestParam String Vendor, 
 			 @RequestParam Boolean isReqPorder, @RequestParam Boolean isAllgrant) throws ParseException{
 		get_schedule_porder_response response = new get_schedule_porder_response();
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -223,7 +223,7 @@ public class ScheduleAPI {
 					//Lấy các lệnh của các tổ
 
 					List<POrderGrant> list_porder = granttService.get_granted_bygolivedate(startdate, toDate, org_grant.getId(),
-							PO_code, orgbuyerid_link, orgvendorid_link);
+							PO_code, contractcode ,orgbuyerid_link, orgvendorid_link);
 					
 					int day_grant = 0;
 					Date date_end = null;
@@ -379,7 +379,7 @@ public class ScheduleAPI {
 		            
 					//Lay cac lenh dang thu
 					List<POrderGrant> list_porder_test = granttService.get_porder_test(startdate, toDate, 
-							org_grant.getId(), PO_code, orgbuyerid_link, orgvendorid_link);
+							org_grant.getId(), PO_code, contractcode, orgbuyerid_link, orgvendorid_link);
 					
 					for(POrderGrant pordergrant : list_porder_test) {
 						Date start = commonService.getBeginOfDate(pordergrant.getStart_date_plan());

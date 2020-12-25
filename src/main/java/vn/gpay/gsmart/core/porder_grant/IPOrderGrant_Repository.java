@@ -32,7 +32,9 @@ public interface IPOrderGrant_Repository extends JpaRepository<POrderGrant, Long
 			+ "and b.status >= :status "
 			+ "and b.finishdate_plan >= :golivedate_from "
 			+ "and b.finishdate_plan <= :golivedate_to "
-			+ "and c.po_buyer like :POBuyer "
+//			+ "and c.po_buyer like :POBuyer "
+			+ "and lower(c.po_buyer) like lower(concat('%',:POBuyer,'%')) "
+			+ "and lower(d.contractcode) like lower(concat('%',:contractcode,'%')) "
 			+ "and (:orgbuyerid_link is null or d.orgbuyerid_link = :orgbuyerid_link) "
 			+ "and (:orgvendorid_link is null or d.orgvendorid_link = :orgvendorid_link)")
 	public List<POrderGrant>get_granted_bygolivedate(
@@ -41,6 +43,7 @@ public interface IPOrderGrant_Repository extends JpaRepository<POrderGrant, Long
 			@Param ("golivedate_from")final Date golivedate_from,
 			@Param ("golivedate_to")final Date golivedate_to,
 			@Param ("POBuyer")final String POBuyer,
+			@Param ("contractcode")final String contractcode,
 			@Param ("orgbuyerid_link")final Long orgbuyerid_link,
 			@Param ("orgvendorid_link")final Long orgvendorid_link);
 	
@@ -52,7 +55,9 @@ public interface IPOrderGrant_Repository extends JpaRepository<POrderGrant, Long
 			+ "and b.status = -1 "
 			+ "and b.finishdate_plan >= :golivedate_from "
 			+ "and b.finishdate_plan <= :golivedate_to "
-			+ "and c.po_buyer like :POBuyer "
+//			+ "and c.po_buyer like :POBuyer "
+			+ "and lower(c.po_buyer) like lower(concat('%',:POBuyer,'%')) "
+			+ "and lower(d.contractcode) like lower(concat('%',:contractcode,'%')) "
 			+ "and (:orgbuyerid_link is null or d.orgbuyerid_link = :orgbuyerid_link) "
 			+ "and (:orgvendorid_link is null or d.orgvendorid_link = :orgvendorid_link)")
 	public List<POrderGrant>get_grantedTest_bygolivedate(
@@ -60,6 +65,7 @@ public interface IPOrderGrant_Repository extends JpaRepository<POrderGrant, Long
 			@Param ("golivedate_from")final Date golivedate_from,
 			@Param ("golivedate_to")final Date golivedate_to,
 			@Param ("POBuyer")final String POBuyer,
+			@Param ("contractcode")final String contractcode,
 			@Param ("orgbuyerid_link")final Long orgbuyerid_link,
 			@Param ("orgvendorid_link")final Long orgvendorid_link);
 	

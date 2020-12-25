@@ -76,27 +76,27 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 	@Override
 	//Danh sach cac lenh duoc phan cho Phan xuong va da phan chuyen
 	public List<POrderGrant> get_granted_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link, 
-			String POBuyer, Long orgbuyerid_link , Long orgvendorid_link){
+			String POBuyer, String contractcode ,Long orgbuyerid_link , Long orgvendorid_link){
 		
 		int status = 1;
-		POBuyer = "%"+POBuyer+"%";
+//		POBuyer = "%"+POBuyer+"%";
 		orgvendorid_link = orgvendorid_link == 0 ? null : orgvendorid_link;
 		orgbuyerid_link = orgbuyerid_link == 0 ? null : orgbuyerid_link;
 		
 		List<POrderGrant> a = repo.get_granted_bygolivedate(status, granttoorgid_link, golivedate_from,
-				golivedate_to, POBuyer, orgbuyerid_link, orgvendorid_link);
+				golivedate_to, POBuyer, contractcode, orgbuyerid_link, orgvendorid_link);
 		return a;
 	}
 
 	@Override
 	public List<POrderGrant> get_porder_test(Date golivedate_from, Date golivedate_to, Long granttoorgid_link,
-			String POBuyer, Long orgbuyerid_link, Long orgvendorid_link) {
+			String POBuyer, String contractcode, Long orgbuyerid_link, Long orgvendorid_link) {
 		// TODO Auto-generated method stub
-		POBuyer = "%"+POBuyer+"%";
+//		POBuyer = "%"+POBuyer+"%";
 		orgvendorid_link = orgvendorid_link == 0 ? null : orgvendorid_link;
 		orgbuyerid_link = orgbuyerid_link == 0 ? null : orgbuyerid_link;
 		List<POrderGrant> a = repo.get_grantedTest_bygolivedate(granttoorgid_link, golivedate_from,
-				golivedate_to, POBuyer, orgbuyerid_link, orgvendorid_link);
+				golivedate_to, POBuyer, contractcode, orgbuyerid_link, orgvendorid_link);
 		return a;
 	}
 

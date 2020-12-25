@@ -141,6 +141,44 @@ public class OrgMenuAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/org_create_quick",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> org_create_quick(@RequestBody Org_create_Request entity, HttpServletRequest request ) {//@RequestParam("type") 
+		Org_create_Response response = new Org_create_Response();
+		try {
+			Org org = entity.data;
+			
+			String code = org.getCode().trim();
+			String name = org.getName().trim();
+			Integer type = org.getOrgtypeid_link();
+			
+			List<Org> listOrg = orgService.getByCodeAndType(code, type);
+			if(listOrg.size() > 0) {
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage("Mã đã tồn tại");
+				return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+			}
+			
+			listOrg = orgService.getByNameAndType(name, type);
+			if(listOrg.size() > 0) {
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage("Tên đã tồn tại");
+				return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+			}
+			
+			org.setCode(code);
+			org.setName(name);
+			orgService.save(org);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_SERVER_ERROR);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}
+	}
+	
 	@RequestMapping(value = "/duplicate",method = RequestMethod.POST)
 	public ResponseEntity<Org_create_Response> Duplicate(@RequestBody Org_create_Request entity, HttpServletRequest request ) {//@RequestParam("type") 
 		Org_create_Response response = new Org_create_Response();

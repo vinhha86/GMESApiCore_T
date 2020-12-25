@@ -2549,20 +2549,15 @@ public class PContract_POAPI {
 
 	}
 	
-	@RequestMapping(value = "/getPOLine", method = RequestMethod.POST)
-	public ResponseEntity<PContract_getbycontractproduct_response> getPOLine(@RequestBody PContract_PO_getByPorder_request entity,
+	@RequestMapping(value = "/getPOLine_Confirm", method = RequestMethod.POST)
+	public ResponseEntity<PContract_getbycontractproduct_response> getPOLine_Confirm(@RequestBody PContract_PO_getByPorder_request entity,
 			HttpServletRequest request) {
 		PContract_getbycontractproduct_response response = new PContract_getbycontractproduct_response();
 		try {
-//			Long porderid_link = entity.porderid_link;
 			Long pcontract_poid_link = entity.pcontract_poid_link;
-//			POrder porder = porderService.findOne(porderid_link);
 			PContract_PO pcontractPo = pcontract_POService.findOne(pcontract_poid_link);
-			if(pcontractPo.getParentpoid_link() != null) {
-				pcontract_poid_link = pcontractPo.getParentpoid_link();
-			}
+			List<PContract_PO> listPContractPO = pcontractPo.getSub_po_confirm();
 			
-			List<PContract_PO> listPContractPO = pcontract_POService.get_by_parentid(pcontract_poid_link);
 			//Update danh sach to chuyen duoc giao sx cho PO Line
 			for (PContract_PO thePoline: listPContractPO){
 				thePoline.setProductionlines(grantskuService.getProductionLines(thePoline.getId()));

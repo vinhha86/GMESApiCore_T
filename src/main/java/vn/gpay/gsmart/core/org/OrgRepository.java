@@ -59,6 +59,26 @@ public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecification
 			@Param ("orgrootid_link")final Long orgrootid_link,
 			@Param ("code")final String code);
 	
+	@Query(value = "select c from Org c "
+			+ "where c.orgtypeid_link = :orgtypeid_link "
+			+ "and trim(lower(replace(c.code,' ',''))) = trim(lower(replace(:code, ' ',''))) "
+//			+ "and c.name = :name "
+			)
+	public List<Org> getByCodeAndType(
+			@Param ("code")final String code,
+			@Param ("orgtypeid_link")final Integer orgtypeid_link
+			);
+	
+	@Query(value = "select c from Org c "
+			+ "where c.orgtypeid_link = :orgtypeid_link " 
+			+ "and trim(lower(replace(c.name,' ',''))) = trim(lower(replace(:name, ' ',''))) "
+//			+ "and c.name = :name "
+			)
+	public List<Org> getByNameAndType(
+			@Param ("name")final String name,
+			@Param ("orgtypeid_link")final Integer orgtypeid_link
+			);
+	
 	@Query(value = "select c from Org c where c.orgtypeid_link in(1,13,14,17) order by c.orgtypeid_link, c.name asc")
 	public List<Org> findOrgByTypeForInvCheckDeviceMenuOrg();
 	
