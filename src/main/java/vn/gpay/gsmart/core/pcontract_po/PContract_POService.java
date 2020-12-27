@@ -27,9 +27,12 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	}
 	@Override
 	public List<PContract_PO> getPOByContractProduct(Long orgrootid_link,
-			Long pcontractid_link,Long productid_link, Long userid_link, Long orgid_link){
+			Long pcontractid_link,Long productid_link, Long userid_link, Long orgid_link, Integer potype){
 		if(orgid_link == 1) userid_link = null;
-		return repo.getPOByContractProduct(orgrootid_link, pcontractid_link, productid_link, userid_link);
+		if (potype == 0)
+			return repo.getPO_Chaogia(orgrootid_link, pcontractid_link, productid_link, userid_link);
+		else
+			return repo.getPO_Duyet(orgrootid_link, pcontractid_link, productid_link, userid_link);
 	}
 
 	@Override

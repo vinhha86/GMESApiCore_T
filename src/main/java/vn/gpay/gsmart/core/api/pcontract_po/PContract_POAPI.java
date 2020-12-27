@@ -1928,7 +1928,7 @@ public class PContract_POAPI {
 			long orgid_link = user.getOrgid_link();
 
 			List<PContract_PO> pcontract = pcontract_POService.getPOByContractProduct(orgrootid_link,
-					entity.pcontractid_link, entity.productid_link, user.getId(), orgid_link);
+					entity.pcontractid_link, entity.productid_link, user.getId(), orgid_link, entity.potype);
 			response.data = pcontract;
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
