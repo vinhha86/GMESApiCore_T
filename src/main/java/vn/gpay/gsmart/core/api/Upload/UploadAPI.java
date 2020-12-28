@@ -885,7 +885,6 @@ public class UploadAPI {
 								
 								po_productivity_line.setAmount(soluong*amount);
 								po_productivity_line.setPlan_linerequired(plan_linerequired_line);
-								System.out.println(plan_linerequired_line);
 								po_productivity_line.setPlan_productivity(ns_target.intValue()*amount);
 								productivityService.save(po_productivity_line);
 								
@@ -905,7 +904,6 @@ public class UploadAPI {
 									
 									po_productivity_line_set.setAmount(soluong);
 									po_productivity_line_set.setPlan_linerequired(plan_linerequired_line);
-									System.out.println(plan_linerequired_line);
 									po_productivity_line_set.setPlan_productivity(ns_target.intValue());
 									productivityService.save(po_productivity_line_set);
 								}
