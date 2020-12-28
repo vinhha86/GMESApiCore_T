@@ -807,22 +807,22 @@ public class UploadAPI {
 									if(matdate != null) {
 										production_date_line = Common.Date_Add(matdate, 7);
 										production_day_line = commonService.getDuration(production_date_line, ngaygiao, orgrootid_link);
-										plan_linerequired = (float)productiondays_ns_line/(float)production_day_line;
-										if (plan_linerequired < 1) plan_linerequired = 1;
+										plan_linerequired_line = (float)productiondays_ns_line/(float)production_day_line;
+										if (plan_linerequired_line < 1) plan_linerequired_line = 1;
 										
 										DecimalFormat df_line = new DecimalFormat("#.##"); 
-										String formatted_line = df_line.format(plan_linerequired);
+										String formatted_line = df_line.format(plan_linerequired_line);
 										plan_linerequired_line = Float.parseFloat(formatted_line);
 									}
 								}
 								else {
 									production_date_line = commonService.Date_Add_with_holiday(list_ngaygiao.get(i-1), 1, orgrootid_link);
 									production_day_line = commonService.getDuration(production_date_line, ngaygiao, orgrootid_link);
-									plan_linerequired = (float)productiondays_ns_line/(float)production_day_line;
-									if (plan_linerequired < 1) plan_linerequired = 1;
+									plan_linerequired_line = (float)productiondays_ns_line/(float)production_day_line;
+									if (plan_linerequired_line < 1) plan_linerequired_line = 1;
 									
 									DecimalFormat df_line = new DecimalFormat("#.##"); 
-									String formatted_line = df_line.format(plan_linerequired);
+									String formatted_line = df_line.format(plan_linerequired_line);
 									plan_linerequired_line = Float.parseFloat(formatted_line);
 								}
 								
