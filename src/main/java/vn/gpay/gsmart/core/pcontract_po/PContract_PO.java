@@ -21,7 +21,6 @@ import javax.persistence.Transient;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
-import org.springframework.context.annotation.Lazy;
 
 import vn.gpay.gsmart.core.category.Port;
 import vn.gpay.gsmart.core.category.ShipMode;

@@ -87,6 +87,7 @@ import vn.gpay.gsmart.core.utils.ColumnTemplate;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.POStatus;
+import vn.gpay.gsmart.core.utils.POType;
 import vn.gpay.gsmart.core.utils.POrderReqStatus;
 import vn.gpay.gsmart.core.utils.POrderStatus;
 import vn.gpay.gsmart.core.utils.ProductType;
@@ -1247,6 +1248,7 @@ public class PContract_POAPI {
 									po_new.setPlan_productivity(parent.getPlan_productivity());
 									po_new.setPlan_linerequired(parent.getPlan_linerequired());
 									po_new.setStatus(POStatus.PO_STATUS_CONFIRMED);
+									po_new.setPo_typeid_link(POType.PO_LINE_CONFIRMED);
 									
 									po_new = pcontract_POService.save(po_new);
 									
