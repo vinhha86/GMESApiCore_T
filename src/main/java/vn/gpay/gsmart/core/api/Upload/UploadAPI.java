@@ -711,7 +711,7 @@ public class UploadAPI {
 									po_productivity_set.setId(null);
 									po_productivity_set.setOrgrootid_link(orgrootid_link);
 									po_productivity_set.setPcontract_poid_link(pcontractpo_id_link);
-									po_productivity_set.setProductid_link(productid_link);							
+									po_productivity_set.setProductid_link(product_set_id_link);							
 								}
 								else {
 									po_productivity_set = list_productivity_set.get(0);
@@ -806,7 +806,9 @@ public class UploadAPI {
 									if(matdate != null) {
 										production_date_line = Common.Date_Add(matdate, 7);
 										production_day_line = commonService.getDuration(production_date_line, ngaygiao, orgrootid_link);
-										plan_linerequired = productiondays_ns_line == 0 ? 0 : (float)production_day_line/(float)productiondays_ns_line;
+										plan_linerequired = (float)productiondays_ns_line/(float)production_day_line;
+										if (plan_linerequired < 1) plan_linerequired = 1;
+										
 										DecimalFormat df_line = new DecimalFormat("#.##"); 
 										String formatted_line = df_line.format(plan_linerequired);
 										plan_linerequired_line = Float.parseFloat(formatted_line);
@@ -815,7 +817,9 @@ public class UploadAPI {
 								else {
 									production_date_line = commonService.Date_Add_with_holiday(list_ngaygiao.get(i-1), 1, orgrootid_link);
 									production_day_line = commonService.getDuration(production_date_line, ngaygiao, orgrootid_link);
-									plan_linerequired = productiondays_ns_line == 0 ? 0 : (float)production_day_line/(float)productiondays_ns_line;
+									plan_linerequired = (float)productiondays_ns_line/(float)production_day_line;
+									if (plan_linerequired < 1) plan_linerequired = 1;
+									
 									DecimalFormat df_line = new DecimalFormat("#.##"); 
 									String formatted_line = df_line.format(plan_linerequired);
 									plan_linerequired_line = Float.parseFloat(formatted_line);
@@ -878,6 +882,7 @@ public class UploadAPI {
 								
 								po_productivity_line.setAmount(soluong*amount);
 								po_productivity_line.setPlan_linerequired(plan_linerequired_line);
+								System.out.println(plan_linerequired_line);
 								po_productivity_line.setPlan_productivity(ns_target.intValue()*amount);
 								productivityService.save(po_productivity_line);
 								
@@ -897,6 +902,7 @@ public class UploadAPI {
 									
 									po_productivity_line_set.setAmount(soluong);
 									po_productivity_line_set.setPlan_linerequired(plan_linerequired_line);
+									System.out.println(plan_linerequired_line);
 									po_productivity_line_set.setPlan_productivity(ns_target.intValue());
 									productivityService.save(po_productivity_line_set);
 								}
