@@ -130,7 +130,7 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			+ "and c.productid_link = :productid_link "
 			+ "and (c.shipdate = :shipdate) "
 			+ "and c.pcontractid_link = :pcontractid_link "
-			+ "and c.po_typeid_link = 10"
+			+ "and c.po_typeid_link = 0"
 			)
 	public List<PContract_PO> getone_by_template(
 			@Param ("shipmodeid_link")final  Long shipmodeid_link, 
@@ -143,7 +143,7 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			+ "where c.productid_link = :productid_link "
 			+ "and c.shipdate = :shipdate "
 			+ "and c.pcontractid_link = :pcontractid_link "
-			+ "and c.po_typeid_link = 10 "
+			+ "and c.po_typeid_link = 0 "
 			+ "and c.parentpoid_link = :parentpoid_link"
 			)
 	public List<PContract_PO> getone_line_giaohang(
@@ -158,7 +158,8 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			+ "and (c.shipmodeid_link = :shipmodeid_link or :shipmodeid_link is null) "
 			+ "and c.shipdate = :shipdate "
 			+ "and c.pcontractid_link = :pcontractid_link "
-			+ "and c.parentpoid_link = :parentid_link"
+			+ "and c.parentpoid_link = :parentid_link "
+			+ "and c.po_typeid_link = 11"
 			)
 	public List<PContract_PO> getone_po_upload(
 			@Param ("po_buyer")final  String po_buyer,
