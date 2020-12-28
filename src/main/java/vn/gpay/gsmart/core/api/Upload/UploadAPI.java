@@ -546,6 +546,7 @@ public class UploadAPI {
 								po_tong.setDate_importdata(current_time);
 								po_tong.setPo_typeid_link(POType.PO_CMP);
 								po_tong.setSewtarget_percent((float)20);
+								po_tong.setParentpoid_link(null);
 								
 								if(status == POStatus.PO_STATUS_CONFIRMED) {
 									po_tong.setOrgmerchandiseid_link(orgid_link);
