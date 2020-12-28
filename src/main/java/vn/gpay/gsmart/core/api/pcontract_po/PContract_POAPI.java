@@ -2447,6 +2447,8 @@ public class PContract_POAPI {
 					}
 					pcontractpriceService.delete(thePrice);
 				}
+				
+				
 
 				// Delete PO
 				pcontract_POService.delete(thePO);
