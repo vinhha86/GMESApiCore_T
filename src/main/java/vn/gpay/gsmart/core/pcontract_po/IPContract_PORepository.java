@@ -143,7 +143,7 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			+ "where c.productid_link = :productid_link "
 			+ "and c.shipdate = :shipdate "
 			+ "and c.pcontractid_link = :pcontractid_link "
-			+ "and c.po_typeid_link = 0 "
+			+ "and c.po_typeid_link = 10 "
 			+ "and c.parentpoid_link = :parentpoid_link"
 			)
 	public List<PContract_PO> getone_line_giaohang(
