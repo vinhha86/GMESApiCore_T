@@ -335,17 +335,14 @@ public class PContract_PO implements Serializable {/**
 	public void setPcontract_price(List<PContract_Price> pcontract_price) {
 		this.pcontract_price = pcontract_price;
 	}
-	@Transient
 	public List<PContract_PO> getSub_po() {
 //		sub_po.removeIf(c->c.getPo_typeid_link() != 10);
 		return sub_po;
 	}
 	
-	@Transient
 	public List<PContract_PO> getSub_po_plan() {
 		return sub_po.stream().filter(item -> null!=item.po_typeid_link && item.po_typeid_link==POType.PO_LINE_PLAN).collect(Collectors.toList());
 	}
-	@Transient
 	public List<PContract_PO> getSub_po_confirm() {
 		return sub_po.stream().filter(item -> null!=item.po_typeid_link && item.po_typeid_link==POType.PO_LINE_CONFIRMED).collect(Collectors.toList());
 	}
