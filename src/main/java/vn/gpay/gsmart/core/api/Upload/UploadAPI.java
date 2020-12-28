@@ -895,7 +895,7 @@ public class UploadAPI {
 										po_productivity_line_set.setId(null);
 										po_productivity_line_set.setOrgrootid_link(orgrootid_link);
 										po_productivity_line_set.setPcontract_poid_link(pcontract_po_line_id);
-										po_productivity_line_set.setProductid_link(productid_link);							
+										po_productivity_line_set.setProductid_link(product_set_id_link);							
 									}
 									else {
 										po_productivity_line_set = list_productivity_line_set.get(0);
