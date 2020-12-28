@@ -544,7 +544,7 @@ public class UploadAPI {
 								po_tong.setProductid_link(po_productid_link);
 								po_tong.setUsercreatedid_link(user.getId());
 								po_tong.setDate_importdata(current_time);
-								po_tong.setPo_typeid_link(POType.PO_LINE_PLAN);
+								po_tong.setPo_typeid_link(POType.PO_CMP);
 								po_tong.setSewtarget_percent((float)20);
 								
 								if(status == POStatus.PO_STATUS_CONFIRMED) {
@@ -569,7 +569,6 @@ public class UploadAPI {
 							po_tong.setIs_tbd(PO_No == "TBD" ? true : false);
 							po_tong.setCode(PO_No);
 							po_tong.setProductid_link(po_productid_link);
-							po_tong.setPo_typeid_link(POType.PO_CMP);
 							
 							po_tong = pcontract_POService.save(po_tong);
 							pcontractpo_id_link = po_tong.getId();

@@ -63,7 +63,7 @@ public class POrder_Req implements Serializable {
 	
 
 	@NotFound(action = NotFoundAction.IGNORE)
-	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true, fetch = FetchType.LAZY )
+	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true)
 	@JoinColumn( name="porderreqid_link", referencedColumnName="id")
 	private List<POrder>  porderlist  = new ArrayList<POrder>();	
 	
@@ -84,27 +84,27 @@ public class POrder_Req implements Serializable {
 	}
 
 	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne (fetch = FetchType.LAZY)
+	@ManyToOne
     @JoinColumn(name="granttoorgid_link",insertable=false,updatable =false)
     private Org org;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne (fetch = FetchType.LAZY)
+	@ManyToOne
     @JoinColumn(name="sizesetid_link",insertable=false,updatable =false)
     private SizeSet sizeset;
 
 	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne (fetch = FetchType.LAZY)
+	@ManyToOne
     @JoinColumn(name="pcontractid_link",insertable=false,updatable =false)
     private PContract pcontract;
 
 	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne (fetch = FetchType.LAZY)
+	@ManyToOne
     @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
     private PContract_PO pcontract_po;
 
 	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne (fetch = FetchType.LAZY)
+	@ManyToOne
     @JoinColumn(name="productid_link",insertable=false,updatable =false)
     private Product product;
 	
