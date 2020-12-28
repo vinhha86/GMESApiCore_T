@@ -508,7 +508,9 @@ public class UploadAPI {
 						if(matdate != null) {
 							production_date = Common.Date_Add(matdate, 7);
 							production_day = commonService.getDuration(production_date, ShipDate, orgrootid_link);
-							plan_linerequired = productiondays_ns == 0 ? 0 : (float)production_day/(float)productiondays_ns;
+							plan_linerequired = (float)productiondays_ns/(float)production_day;
+							if(plan_linerequired < 1) plan_linerequired = 1;
+							
 							DecimalFormat df = new DecimalFormat("#.##"); 
 							String formatted = df.format(plan_linerequired);
 							plan_linerequired = Float.parseFloat(formatted);
