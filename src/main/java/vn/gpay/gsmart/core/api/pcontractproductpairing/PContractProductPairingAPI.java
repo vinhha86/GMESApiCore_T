@@ -272,6 +272,14 @@ public class PContractProductPairingAPI {
 				
 				//Update vào bảng ProductPairing
 				for (ProductPairing productPairing : entity.listpair) {
+					list_pair.removeIf(c->c.getProductid_link().equals(productPairing.getProductid_link()));
+				}
+				
+				for(ProductPairing pair : list_pair) {
+					prodctpairservice.delete(pair);
+				}
+				
+				for (ProductPairing productPairing : entity.listpair) {
 					productPairing.setProductpairid_link(product.getId());
 					productPairing.setOrgrootid_link(orgrootid_link);
 					prodctpairservice.save(productPairing);
