@@ -55,8 +55,15 @@ public class PContractProductPairingAPI {
 					.getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
 			long pcontractid_link = entity.pcontractid_link;
+			long productpairid_link = entity.productpairid_link;
 			
 			List<PContractProduct> listproduct = ppservice.get_by_product_and_pcontract(orgrootid_link, (long)0, pcontractid_link);
+			
+			List<ProductPairing> list_pair = prodctpairservice.getproduct_pairing_detail_bycontract(orgrootid_link, pcontractid_link, productpairid_link);
+			
+			for(ProductPairing ppPair : list_pair) {
+				listproduct.removeIf(c->c.getProductid_link().equals(ppPair.getProductid_link()));
+			}
 						
 			List<PContractProductBinding> data = new ArrayList<PContractProductBinding>();
 			String FolderPath = "upload/product";

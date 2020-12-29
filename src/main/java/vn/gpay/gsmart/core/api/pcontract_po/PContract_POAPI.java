@@ -2079,9 +2079,9 @@ public class PContract_POAPI {
 		ResponseBase response = new ResponseBase();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			long orgrootid_link = user.getRootorgid_link();
-			long orgid_link = entity.orgid_link;
-			long userid_link = user.getId();
+//			long orgrootid_link = user.getRootorgid_link();
+//			long orgid_link = entity.orgid_link;
+//			long userid_link = user.getId();
 
 			PContract_PO po = pcontract_POService.findOne(entity.pcontract_poid_link);
 //			if(po.getPo_quantity() != po.getAmount_org()) {

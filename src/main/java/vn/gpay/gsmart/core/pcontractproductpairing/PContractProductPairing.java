@@ -2,6 +2,8 @@ package vn.gpay.gsmart.core.pcontractproductpairing;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -17,6 +20,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.product.Product;
+import vn.gpay.gsmart.core.productpairing.ProductPairing;
 
 @Table(name="pcontract_product_pairing")
 @Entity
@@ -36,6 +40,11 @@ public class PContractProductPairing implements Serializable {/**
 	@ManyToOne
     @JoinColumn(name="productpairid_link",insertable=false,updatable =false)
     private Product product;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+    @JoinColumn(name="productpairid_link",insertable=false,updatable =false)
+    private List<ProductPairing> list_product = new ArrayList<ProductPairing>();
 	
 	@Transient
 	public String getProductinfo() {

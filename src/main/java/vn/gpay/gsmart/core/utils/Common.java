@@ -558,6 +558,8 @@ public class Common  {
 	}
 
 	public int getDuration(Date startdate, Date enddate, long orgrootid_link) {
+		if(startdate.after(enddate)) return 1;
+		
 		int duration = 0;		
 		
 		Calendar start = Calendar.getInstance();

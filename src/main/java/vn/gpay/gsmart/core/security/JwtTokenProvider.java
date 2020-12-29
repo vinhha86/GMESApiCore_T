@@ -6,8 +6,6 @@ import java.util.Date;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -26,7 +24,7 @@ public class JwtTokenProvider {
    */
   //@Value("${security.jwt.token.secret-key:secret-key}")
   private String secretKey = "password";
-  private static final Logger logger = LogManager.getLogger(JwtTokenProvider.class);
+//  private static final Logger logger = LogManager.getLogger(JwtTokenProvider.class);
 
   @Autowired
   private GpayUserDetails myUserDetails;
@@ -90,7 +88,6 @@ public class JwtTokenProvider {
     	Date expDate = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration();
     	/* Compare with current time to validate token */
     	Date now = new Date();
-    	logger.info(expDate.getTime());
     	long diff = now.getTime() - (long)(expDate.getTime()/1000);
     	if(diff > 6000000L) { /* 5 min diff allow */
     		throw new CustomException("Expired JWT token", HttpStatus.UNAUTHORIZED);

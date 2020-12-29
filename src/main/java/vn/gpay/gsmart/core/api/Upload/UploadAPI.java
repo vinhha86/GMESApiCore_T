@@ -818,7 +818,7 @@ public class UploadAPI {
 									}
 								}
 								else {
-									production_date_line = commonService.Date_Add_with_holiday(list_ngaygiao.get(i-1), 1, orgrootid_link);
+									production_date_line = commonService.Date_Add_with_holiday(list_ngaygiao.get(i-1), -2, orgrootid_link);
 									production_day_line = commonService.getDuration(production_date_line, ngaygiao, orgrootid_link);
 									plan_linerequired_line = (float)productiondays_ns_line/(float)production_day_line;
 									if (plan_linerequired_line < 1) plan_linerequired_line = 1;
