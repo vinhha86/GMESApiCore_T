@@ -262,8 +262,19 @@ public class SKU implements Serializable {
 		return null;
 	}
 	
+	@Transient
+	public Float unitPrice;
 	
-//    @NotFound(action = NotFoundAction.IGNORE)
+	
+	public Float getUnitPrice() {
+		return unitPrice;
+	}
+
+	public void setUnitPrice(Float unitPrice) {
+		this.unitPrice = unitPrice;
+	}
+
+	//    @NotFound(action = NotFoundAction.IGNORE)
 //	@ManyToOne
 //    @JoinColumn(name="unitid_link",insertable=false,updatable =false)
 //    private Unit unit;	
