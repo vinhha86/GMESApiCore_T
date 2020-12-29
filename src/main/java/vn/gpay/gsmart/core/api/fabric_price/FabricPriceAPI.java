@@ -104,6 +104,39 @@ public class FabricPriceAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/getByMaterialIdLink",method = RequestMethod.POST)
+	public ResponseEntity<FabricPrice_getByMaterialIdLink_response> getByMaterialIdLink(@RequestBody FabricPrice_getByMaterial_request entity,HttpServletRequest request ) {
+		FabricPrice_getByMaterialIdLink_response response = new FabricPrice_getByMaterialIdLink_response();
+		try {
+			List<Long> materialid_link_list = entity.materialid_link_list;
+			Long materialid_link = materialid_link_list.get(0);
+			
+			List<FabricPrice> listFabricPrice = fabricPriceService.getByMaterial(materialid_link);
+			if(listFabricPrice.size() > 0) {
+				FabricPrice fabricPrice = listFabricPrice.get(0);
+				response.data = fabricPrice;
+			}else {
+				FabricPrice fabricPrice = new FabricPrice();
+				fabricPrice.setMaterialid_link(materialid_link);
+				fabricPrice.setM_per_kg(0F);
+				fabricPrice.setPrice_per_kg(0F);
+				fabricPrice.setPrice_per_m(0F);
+				
+				fabricPrice = fabricPriceService.save(fabricPrice);
+				
+				response.data = fabricPrice;
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<FabricPrice_getByMaterialIdLink_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<FabricPrice_getByMaterialIdLink_response>(response,HttpStatus.OK);
+		}
+	}
+	
 	@RequestMapping(value = "/update",method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> update(@RequestBody FabricPrice_update_request entity,HttpServletRequest request ) {
 		ResponseBase response = new ResponseBase();
