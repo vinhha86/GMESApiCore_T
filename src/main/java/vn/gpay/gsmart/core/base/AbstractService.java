@@ -15,7 +15,9 @@ public abstract class AbstractService<T extends Serializable> implements Operati
 	@Override
     @Transactional(readOnly = true)
     public T findOne(final long id) {
-        return getRepository().findById(id).get();
+		if(getRepository().findById(id).isPresent())
+			return getRepository().findById(id).get();
+		return null;
     }
 
 	// read - all
