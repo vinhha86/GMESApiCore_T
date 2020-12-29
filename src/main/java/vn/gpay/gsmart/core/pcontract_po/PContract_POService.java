@@ -187,4 +187,9 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		// TODO Auto-generated method stub
 		return repo.getone_line_giaohang(productid_link, ShipDate, pcontractid_link, parentid_link);
 	}
+	@Override
+	public List<PContract_PO> get_by_parent_and_type(Long pcontractpo_parentid_link, int po_typeid_link) {
+		// TODO Auto-generated method stub
+		return repo.getby_parentid_link_and_type(pcontractpo_parentid_link, po_typeid_link);
+	}
 }

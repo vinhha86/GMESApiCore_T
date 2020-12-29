@@ -2094,198 +2094,128 @@ public class PContract_POAPI {
 			po.setStatus(POStatus.PO_STATUS_CONFIRMED);
 
 			pcontract_POService.save(po);
-
-			// Sinh PO
-			// kiem tra po da co con hay chua thi moi sinh po con
-//			if (po.getSub_po().size() == 0) {
-//				PContract_PO ponew = new PContract_PO();
-//				ponew.setId(null);
-//				ponew.setCode(po.getCode());
-//				ponew.setActual_quantity(po.getActual_quantity());
-//				ponew.setActual_shipdate(po.getActual_shipdate());
-//				ponew.setCurrencyid_link(po.getCurrencyid_link());
-//				ponew.setDatecreated(new Date());
-//				ponew.setEtm_avr(po.getEtm_avr());
-//				ponew.setEtm_from(po.getEtm_from());
-//				ponew.setEtm_to(po.getEtm_to());
-//				ponew.setExchangerate(po.getExchangerate());
-//				ponew.setIs_tbd(po.getIs_tbd());
-//				ponew.setIsauto_calculate(po.getIsauto_calculate());
-//				ponew.setMatdate(po.getMatdate());
-//				ponew.setMerchandiserid_link(po.getMerchandiserid_link());
-//				ponew.setOrgmerchandiseid_link(po.getOrgmerchandiseid_link());
-//				ponew.setPackingnotice(po.getPackingnotice());
-//				ponew.setParentpoid_link(po.getId());
-//				ponew.setPcontractid_link(po.getPcontractid_link());
-//				ponew.setPo_buyer(po.getPo_buyer());
-//				ponew.setPo_vendor(po.getPo_vendor());
-//				ponew.setPortfromid_link(po.getPortfromid_link());
-//				ponew.setPorttoid_link(po.getPorttoid_link());
-//				ponew.setPrice_add(po.getPrice_add());
-//				ponew.setPrice_cmp(po.getPrice_cmp());
-//				ponew.setPrice_sweingfact(po.getPrice_sweingfact());
-//				ponew.setPrice_sweingtarget(po.getPrice_sweingtarget());
-//				ponew.setProductid_link(po.getProductid_link());
-//				ponew.setProductiondate(po.getProductiondate());
-//				ponew.setProductiondays(po.getProductiondays());
-//				ponew.setSalaryfund(po.getSalaryfund());
-//				ponew.setSewtarget_percent(po.getSewtarget_percent());
-//				ponew.setShipdate(po.getShipdate());
-//				ponew.setStatus(po.getStatus());
-//				ponew.setUnitid_link(po.getUnitid_link());
-//				ponew.setUsercreatedid_link(userid_link);
-//				ponew.setPo_quantity(po.getPo_quantity());
-//				ponew.setPlan_productivity(po.getPlan_productivity());
-//				ponew.setPlan_linerequired(po.getPlan_linerequired());
-//				ponew = pcontract_POService.save(ponew);
-//				
-////				//Cap nhat ns target tu po cha sang
-////				List<PContract_PO_Productivity> list_productivity = productivityService.getbypo(entity.pcontract_poid_link);
-////				for (PContract_PO_Productivity pContract_PO_Productivity : list_productivity) {
-////					PContract_PO_Productivity productivitynew = new PContract_PO_Productivity();
-////					productivitynew.setId(null);
-////					productivitynew.setOrgrootid_link(orgrootid_link);
-////					productivitynew.setPcontract_poid_link(ponew.getId());
-////					productivitynew.setPlan_linerequired(pContract_PO_Productivity.getPlan_linerequired());
-////					productivitynew.setPlan_productivity(pContract_PO_Productivity.getPlan_productivity());
-////					productivitynew.setProductid_link(pContract_PO_Productivity.getProductid_link());
-////					
-////					productivityService.save(productivitynew);
-////				}
-//
-//				List<POrder_Req> list_req = porder_req_Service.getByPO(po.getId());
-//
-//				for (POrder_Req porder : list_req) {
-////					
-//					POrder_Req porder_req = new POrder_Req();
-//
-//					porder_req.setPcontractid_link(ponew.getPcontractid_link());
-//					porder_req.setPcontract_poid_link(ponew.getId());
-//
-//					porder_req.setTotalorder(porder.getTotalorder());
-//					porder_req.setGranttoorgid_link(porder.getGranttoorgid_link());
-//					porder_req.setAmount_inset(porder.getAmount_inset());
-//
-//					porder_req.setOrgrootid_link(orgrootid_link);
-//					porder_req.setProductid_link(porder.getProductid_link());
-//					porder_req.setOrderdate(new Date());
-//					porder_req.setUsercreatedid_link(userid_link);
-//					porder_req.setStatus(POrderReqStatus.STATUS_POCONFFIRMED);
-//					porder_req.setTimecreated(new Date());
-//
-//					// Save to DB
-//					porder_req_Service.savePOrder_Req(porder_req);
-//				}
-//			}
 			
-			//Kiem tra xem porder_req da keo vao uom thu hay chua? Neu keo roi thi cap nhat lai trang thai cua lenh
-			List<POrder_Req> list_req = porder_req_Service.getByPO(po.getId());
-			for (POrder_Req req : list_req) {
-				List<POrder> list_porder = porderService.getByPOrder_Req(po.getId(), req.getId());
-				if(list_porder.size() > 0) {
-					POrder porder = list_porder.get(0);
-					if(porder.getStatus() == POrderStatus.PORDER_STATUS_UNCONFIRM)
-						porder.setStatus(POrderStatus.PORDER_STATUS_GRANTED);
-					
+			//Lay danh sach cac line cua po tong va chuyen ve trang thai xác nhận
+			List<PContract_PO> list_line_gh = pcontract_POService.get_by_parent_and_type(entity.pcontract_poid_link, POType.PO_LINE_PLAN);
+			
+			for(PContract_PO line : list_line_gh) {
+				line.setOrgmerchandiseid_link(entity.orgid_link);
+				line.setMerchandiserid_link(entity.userid_link);
+				line.setStatus(POStatus.PO_STATUS_CONFIRMED);
 
-					//Cap nhat porder_grant status ve 1
-					List<POrderGrant> list_grant = grantService.getByOrderId(porder.getId());
-					for(POrderGrant grant : list_grant) {
-						if(grant.getStatus() == -1)
-						{
-							grant.setStatus(1);
-							grantService.save(grant);
+				pcontract_POService.save(line);
+				
+				//Kiem tra xem porder_req da keo vao uom thu hay chua? Neu keo roi thi cap nhat lai trang thai cua lenh
+				List<POrder_Req> list_req = porder_req_Service.getByPO(line.getId());
+				for (POrder_Req req : list_req) {
+					List<POrder> list_porder = porderService.getByPOrder_Req(line.getId(), req.getId());
+					if(list_porder.size() > 0) {
+						POrder porder = list_porder.get(0);
+						if(porder.getStatus() == POrderStatus.PORDER_STATUS_UNCONFIRM)
+							porder.setStatus(POrderStatus.PORDER_STATUS_GRANTED);
+						
+
+						//Cap nhat porder_grant status ve 1
+						List<POrderGrant> list_grant = grantService.getByOrderId(porder.getId());
+						for(POrderGrant grant : list_grant) {
+							if(grant.getStatus() == -1)
+							{
+								grant.setStatus(1);
+								grantService.save(grant);
+							}
 						}
 					}
-				}
-				else {
-					porderService.createPOrder(req, user);
+					else {
+						porderService.createPOrder(req, user);
+					}
 				}
 			}
+			
+			
 
 			// Sinh Cong viec
-			long pcontractid_link = po.getPcontractid_link();
-			long pcontract_poid_link = po.getId();
-			long productid_link = po.getProductid_link();
-
-			long userinchargeid_link = entity.userid_link;
-			// Kiem tra san pham co phai la san pham bo hay ko. Neu la san pham bo thi phai
-			// tao task cho tung san pham con
-			List<ProductPairing> listpair = productpairService.getproduct_pairing_detail_bycontract(orgrootid_link,
-					pcontractid_link, productid_link);
-			if (listpair.size() == 0) {
-				List<Task_Object> list_object = new ArrayList<Task_Object>();
-
-				Task_Object object_pcontract = new Task_Object();
-				object_pcontract.setId(null);
-				object_pcontract.setObjectid_link(pcontractid_link);
-				object_pcontract.setOrgrootid_link(orgrootid_link);
-				object_pcontract.setTaskobjecttypeid_link((long) TaskObjectType_Name.DonHang);
-				list_object.add(object_pcontract);
-
-				Task_Object object_pcontractpo = new Task_Object();
-				object_pcontractpo.setId(null);
-				object_pcontractpo.setObjectid_link(pcontract_poid_link);
-				object_pcontractpo.setOrgrootid_link(orgrootid_link);
-				object_pcontractpo.setTaskobjecttypeid_link((long) TaskObjectType_Name.DonHangPO);
-				list_object.add(object_pcontractpo);
-
-				Task_Object object_product = new Task_Object();
-				object_product.setId(null);
-				object_product.setObjectid_link(productid_link);
-				object_product.setOrgrootid_link(orgrootid_link);
-				object_product.setTaskobjecttypeid_link((long) TaskObjectType_Name.SanPham);
-				list_object.add(object_product);
-
-				long tasktypeid_link_chitiet = 1; // chi tiet don hang
-				commonService.CreateTask(orgrootid_link, orgid_link, userid_link, tasktypeid_link_chitiet, list_object,
-						userinchargeid_link);
-
-				long tasktypeid_link_haiquan = 2; // dinh muc hai quan
-				commonService.CreateTask(orgrootid_link, orgid_link, userid_link, tasktypeid_link_haiquan, list_object,
-						userinchargeid_link);
-
-				long tasktypeid_link_candoi = 3; // dinh muc can doi
-				commonService.CreateTask(orgrootid_link, orgid_link, userid_link, tasktypeid_link_candoi, list_object,
-						userinchargeid_link);
-			} else {
-				for (ProductPairing pair : listpair) {
-					List<Task_Object> list_object = new ArrayList<Task_Object>();
-
-					Task_Object object_pcontract = new Task_Object();
-					object_pcontract.setId(null);
-					object_pcontract.setObjectid_link(pcontractid_link);
-					object_pcontract.setOrgrootid_link(orgrootid_link);
-					object_pcontract.setTaskobjecttypeid_link((long) TaskObjectType_Name.DonHang);
-					list_object.add(object_pcontract);
-
-					Task_Object object_pcontractpo = new Task_Object();
-					object_pcontractpo.setId(null);
-					object_pcontractpo.setObjectid_link(pcontract_poid_link);
-					object_pcontractpo.setOrgrootid_link(orgrootid_link);
-					object_pcontractpo.setTaskobjecttypeid_link((long) TaskObjectType_Name.DonHangPO);
-					list_object.add(object_pcontractpo);
-
-					Task_Object object_product = new Task_Object();
-					object_product.setId(null);
-					object_product.setObjectid_link(pair.getProductid_link());
-					object_product.setOrgrootid_link(orgrootid_link);
-					object_product.setTaskobjecttypeid_link((long) TaskObjectType_Name.SanPham);
-					list_object.add(object_product);
-
-					long tasktypeid_link_chitiet = 1; // chi tiet don hang
-					commonService.CreateTask(orgrootid_link, orgid_link, userid_link, tasktypeid_link_chitiet,
-							list_object, userinchargeid_link);
-
-					long tasktypeid_link_haiquan = 2; // dinh muc hai quan
-					commonService.CreateTask(orgrootid_link, orgid_link, userid_link, tasktypeid_link_haiquan,
-							list_object, userinchargeid_link);
-
-					long tasktypeid_link_candoi = 3; // dinh muc can doi
-					commonService.CreateTask(orgrootid_link, orgid_link, userid_link, tasktypeid_link_candoi,
-							list_object, userinchargeid_link);
-				}
-			}
+//			long pcontractid_link = po.getPcontractid_link();
+//			long pcontract_poid_link = po.getId();
+//			long productid_link = po.getProductid_link();
+//
+//			long userinchargeid_link = entity.userid_link;
+//			// Kiem tra san pham co phai la san pham bo hay ko. Neu la san pham bo thi phai
+//			// tao task cho tung san pham con
+//			List<ProductPairing> listpair = productpairService.getproduct_pairing_detail_bycontract(orgrootid_link,
+//					pcontractid_link, productid_link);
+//			if (listpair.size() == 0) {
+//				List<Task_Object> list_object = new ArrayList<Task_Object>();
+//
+//				Task_Object object_pcontract = new Task_Object();
+//				object_pcontract.setId(null);
+//				object_pcontract.setObjectid_link(pcontractid_link);
+//				object_pcontract.setOrgrootid_link(orgrootid_link);
+//				object_pcontract.setTaskobjecttypeid_link((long) TaskObjectType_Name.DonHang);
+//				list_object.add(object_pcontract);
+//
+//				Task_Object object_pcontractpo = new Task_Object();
+//				object_pcontractpo.setId(null);
+//				object_pcontractpo.setObjectid_link(pcontract_poid_link);
+//				object_pcontractpo.setOrgrootid_link(orgrootid_link);
+//				object_pcontractpo.setTaskobjecttypeid_link((long) TaskObjectType_Name.DonHangPO);
+//				list_object.add(object_pcontractpo);
+//
+//				Task_Object object_product = new Task_Object();
+//				object_product.setId(null);
+//				object_product.setObjectid_link(productid_link);
+//				object_product.setOrgrootid_link(orgrootid_link);
+//				object_product.setTaskobjecttypeid_link((long) TaskObjectType_Name.SanPham);
+//				list_object.add(object_product);
+//
+//				long tasktypeid_link_chitiet = 1; // chi tiet don hang
+//				commonService.CreateTask(orgrootid_link, orgid_link, userid_link, tasktypeid_link_chitiet, list_object,
+//						userinchargeid_link);
+//
+//				long tasktypeid_link_haiquan = 2; // dinh muc hai quan
+//				commonService.CreateTask(orgrootid_link, orgid_link, userid_link, tasktypeid_link_haiquan, list_object,
+//						userinchargeid_link);
+//
+//				long tasktypeid_link_candoi = 3; // dinh muc can doi
+//				commonService.CreateTask(orgrootid_link, orgid_link, userid_link, tasktypeid_link_candoi, list_object,
+//						userinchargeid_link);
+//			} else {
+//				for (ProductPairing pair : listpair) {
+//					List<Task_Object> list_object = new ArrayList<Task_Object>();
+//
+//					Task_Object object_pcontract = new Task_Object();
+//					object_pcontract.setId(null);
+//					object_pcontract.setObjectid_link(pcontractid_link);
+//					object_pcontract.setOrgrootid_link(orgrootid_link);
+//					object_pcontract.setTaskobjecttypeid_link((long) TaskObjectType_Name.DonHang);
+//					list_object.add(object_pcontract);
+//
+//					Task_Object object_pcontractpo = new Task_Object();
+//					object_pcontractpo.setId(null);
+//					object_pcontractpo.setObjectid_link(pcontract_poid_link);
+//					object_pcontractpo.setOrgrootid_link(orgrootid_link);
+//					object_pcontractpo.setTaskobjecttypeid_link((long) TaskObjectType_Name.DonHangPO);
+//					list_object.add(object_pcontractpo);
+//
+//					Task_Object object_product = new Task_Object();
+//					object_product.setId(null);
+//					object_product.setObjectid_link(pair.getProductid_link());
+//					object_product.setOrgrootid_link(orgrootid_link);
+//					object_product.setTaskobjecttypeid_link((long) TaskObjectType_Name.SanPham);
+//					list_object.add(object_product);
+//
+//					long tasktypeid_link_chitiet = 1; // chi tiet don hang
+//					commonService.CreateTask(orgrootid_link, orgid_link, userid_link, tasktypeid_link_chitiet,
+//							list_object, userinchargeid_link);
+//
+//					long tasktypeid_link_haiquan = 2; // dinh muc hai quan
+//					commonService.CreateTask(orgrootid_link, orgid_link, userid_link, tasktypeid_link_haiquan,
+//							list_object, userinchargeid_link);
+//
+//					long tasktypeid_link_candoi = 3; // dinh muc can doi
+//					commonService.CreateTask(orgrootid_link, orgid_link, userid_link, tasktypeid_link_candoi,
+//							list_object, userinchargeid_link);
+//				}
+//			}
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

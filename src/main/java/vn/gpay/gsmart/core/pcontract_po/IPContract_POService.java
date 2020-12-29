@@ -37,4 +37,5 @@ public interface IPContract_POService extends Operations<PContract_PO> {
 	
 	List<PContract_PO> getPO_Offer_Accept_ByPContract_AndOrg(Long pcontractid_link, Long productid_link, List<Long>  list_orgid_link);
 	List<PContract_PO> getby_porder(Long porderid_link);
+	List<PContract_PO> get_by_parent_and_type(Long pcontractpo_parentid_link, int po_typeid_link);
 }
