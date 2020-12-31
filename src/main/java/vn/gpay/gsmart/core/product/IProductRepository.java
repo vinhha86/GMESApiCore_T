@@ -24,7 +24,7 @@ public interface IProductRepository extends JpaRepository<Product, Long>, JpaSpe
 	@Query(value = "select c from Product c "
 			+ "where c.orgrootid_link = :orgrootid_link "
 			+ "and c.status = 1 "
-			+ "and buyercode = :code "
+			+ "and TRIM(LOWER(buyercode)) = TRIM(LOWER(:code)) "
 			+ "and id != :productid_link "
 			+ "and producttypeid_link = :producttypeid_link")
 	public List<Product> get_byorgid_link_and_code(

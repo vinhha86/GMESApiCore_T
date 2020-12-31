@@ -158,6 +158,7 @@ public class UploadAPI {
 						STT = STT.equals("0") ? "" : STT;
 						
 						while (!STT.equals("")) {
+							
 							//Lay thong tin PO kiem tra xem PO da ton tai trong he thong hay chua
 							//Neu la san pham don chiec thi kiem tra masp, ngay giao, vendor target
 							//Neu la san pham bo thi kiem tra masp bo, ngay giao
@@ -621,7 +622,6 @@ public class UploadAPI {
 								
 								for(int i= col_phancach2+1; i<=col_phancach2+6;i++) {
 									colNum = i+1;
-									
 									Row row2 = sheet.getRow(1);
 									String sizesetname = commonService.getStringValue(row2.getCell(i));
 									String s_price_sizeset = commonService.getStringValue(row.getCell(i));

@@ -35,7 +35,8 @@ public class ProductPairingService extends AbstractService<ProductPairing> imple
 	public List<ProductPairing> getproduct_pairing_detail_bycontract(long orgrootid_link, long pcontractid_link,
 			long productpairid_link) {
 		// TODO Auto-generated method stub
-		return repo.getall_product_pair_detail_bypcontract(pcontractid_link, productpairid_link, orgrootid_link);
+		Long pairid = productpairid_link == 0 ? null : productpairid_link;
+		return repo.getall_product_pair_detail_bypcontract(pcontractid_link, pairid, orgrootid_link);
 	}
 	@Override
 	public ProductPairing getproduct_pairing_bykey(long productid_link,

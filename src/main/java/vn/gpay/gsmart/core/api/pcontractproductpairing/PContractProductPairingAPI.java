@@ -237,18 +237,16 @@ public class PContractProductPairingAPI {
 			//Kiểm tra xem bộ đã tồn tại hay chưa
 			List<ProductPairing> list_pair = prodctpairservice.getproduct_pairing_bycontract(orgrootid_link, pcontractid_link);
 			
-			if(list_pair.size() == entity.listpair.size()) {
+			if(list_pair.size() > 0) {
 				for(ProductPairing productpair : entity.listpair) {
-					list_pair.removeIf(c-> c.getProductid_link() == productpair.getProductid_link() && c.getAmount() == productpair.getAmount());
+					list_pair.removeIf(c-> c.getProductid_link().equals(productpair.getProductid_link()) && c.getAmount().equals(productpair.getAmount()));
 				}
 				
 				if(list_pair.size() == 0) {
 					response.mesErr = "Bộ đã tồn tại trong hệ thống!";
 				}
 			}
-			else {
-				response.mesErr = "";
-			}
+			
 			
 			if(response.mesErr == "") {
 				Product product = new Product();
@@ -270,15 +268,6 @@ public class PContractProductPairingAPI {
 				
 				product = productService.save(product);
 				
-				//Update vào bảng ProductPairing
-				for (ProductPairing productPairing : entity.listpair) {
-					list_pair.removeIf(c->c.getProductid_link().equals(productPairing.getProductid_link()));
-				}
-				
-				for(ProductPairing pair : list_pair) {
-					prodctpairservice.delete(pair);
-				}
-				
 				for (ProductPairing productPairing : entity.listpair) {
 					productPairing.setProductpairid_link(product.getId());
 					productPairing.setOrgrootid_link(orgrootid_link);
@@ -293,6 +282,17 @@ public class PContractProductPairingAPI {
 					ppPair.setPcontractid_link(pcontractid_link);
 					ppPair.setProductpairid_link(product.getId());
 					ppPairingservice.save(ppPair);
+				}
+				else {
+					List<ProductPairing> list_product_inpair = prodctpairservice.getproduct_pairing_detail_bycontract(orgrootid_link, pcontractid_link, productpairid_link);
+					
+					for (ProductPairing productPairing : entity.listpair) {
+						list_product_inpair.removeIf(c->c.getProductid_link().equals(productPairing.getProductid_link()));
+					}
+					
+					for(ProductPairing pair : list_product_inpair) {
+						prodctpairservice.delete(pair);
+					}
 				}
 			}
 
