@@ -225,6 +225,13 @@ public class POrder_Req implements Serializable {
 		return null;
 	}
 	@Transient
+	public Integer getDuration() {
+		if(pcontract_po != null) {
+			return pcontract_po.getProductiondays();
+		}
+		return null;
+	}
+	@Transient
 	public Date getShipdate() {
 		if(pcontract_po != null) {
 			return pcontract_po.getShipdate();

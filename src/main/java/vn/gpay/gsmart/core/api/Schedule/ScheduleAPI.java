@@ -806,9 +806,10 @@ public class ScheduleAPI {
 				startDate = commonService.Date_Add_with_holiday(startDate, 1, orgrootid_link);
 				startDate = commonService.getBeginOfDate(startDate);
 			}
-			Date endDate = commonService.getEndOfDate(req.getShipdate());
+			Date endDate = commonService.Date_Add_with_holiday(startDate, req.getDuration(), orgrootid_link);
+			endDate = commonService.getEndOfDate(endDate);
 			
-			int duration = commonService.getDuration(startDate, endDate, orgrootid_link);
+			int duration = req.getDuration();
 			
 			if(productivity == 0) {
 				productivity = commonService.getProductivity(req.getTotalorder(), duration);

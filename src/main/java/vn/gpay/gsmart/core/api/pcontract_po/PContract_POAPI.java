@@ -1657,9 +1657,8 @@ public class PContract_POAPI {
 			for (PContract_PO_Productivity pContract_PO_Productivity : list_productivity) {
 				if(pContract_PO_Productivity.getId() == null) {
 					pContract_PO_Productivity.setOrgrootid_link(orgrootid_link);
-					pContract_PO_Productivity.setPcontract_poid_link(pcontract_poid_link);
-					pContract_PO_Productivity.setProductid_link(pcontract_po.getProductid_link());
 				}
+				pContract_PO_Productivity.setPcontract_poid_link(pcontract_poid_link);
 				productivityService.save(pContract_PO_Productivity);
 			}
 

@@ -436,7 +436,7 @@ public class UploadAPI {
 									Float f_sub_quantity = s_sub_quantity.equals("") ? 0 : Float.parseFloat(s_sub_quantity);
 									po_quantity += f_sub_quantity.intValue();
 									
-									list_soluong.add(f_sub_quantity.intValue());
+									list_soluong.add(f_sub_quantity.intValue() * amount);
 									
 									if(ShipDate ==null)
 										ShipDate = shipdate2;
@@ -599,7 +599,7 @@ public class UploadAPI {
 								
 								po_productivity.setAmount(po_quantity*amount);
 								po_productivity.setPlan_linerequired(plan_linerequired);
-								po_productivity.setPlan_productivity(ns_target.intValue()*amount);
+								po_productivity.setPlan_productivity(ns_target.intValue());
 								productivityService.save(po_productivity);
 
 								//Xoa cac dai co di roi insert lai vao san pham con hoac san pham don
@@ -894,7 +894,7 @@ public class UploadAPI {
 									
 									po_productivity_line.setAmount(soluong*amount);
 									po_productivity_line.setPlan_linerequired(plan_linerequired_line);
-									po_productivity_line.setPlan_productivity(ns_target.intValue()*amount);
+									po_productivity_line.setPlan_productivity(ns_target.intValue());
 									productivityService.save(po_productivity_line);
 									
 									if(product_set_id_link > 0) {
