@@ -28,7 +28,16 @@ public class PContract_PO_Productivity implements Serializable{
 	private Integer plan_productivity;
 	private Float plan_linerequired;
 	private Integer amount;
+	private Integer productiondays_ns;
 	
+	
+	
+	public Integer getProductiondays_ns() {
+		return productiondays_ns;
+	}
+	public void setProductiondays_ns(Integer productiondays_ns) {
+		this.productiondays_ns = productiondays_ns;
+	}
 	public Integer getAmount() {
 		return amount;
 	}
