@@ -388,18 +388,22 @@ public class POrder_ReqAPI {
 			//lay ra nhung line giao hang som nhat 
 			for(POrder_Req req : list_req) {
 				if(map.size() == 0) {
-					pcontractpoid_link = req.getPO_Offer();
-					map.put(pcontractpoid_link, req.getShipdate());
+					if(req.getPO_Offer()!=null) {
+						pcontractpoid_link = req.getPO_Offer();
+						map.put(pcontractpoid_link, req.getShipdate());
+					}
 				}
 				else {
-					if(req.getPO_Offer().equals(pcontractpoid_link)) {
-						if(req.getShipdate().before(map.get(pcontractpoid_link))) {
-							map.remove(pcontractpoid_link);
-							map.put(pcontractpoid_link, req.getShipdate());
+					if(req.getPO_Offer() != null) {
+						if(req.getPO_Offer().equals(pcontractpoid_link)) {
+							if(req.getShipdate().before(map.get(pcontractpoid_link))) {
+								map.remove(pcontractpoid_link);
+								map.put(pcontractpoid_link, req.getShipdate());
+							}
 						}
-					}
-					else {
-						map.put(req.getPO_Offer(), req.getShipdate());
+						else {
+							map.put(req.getPO_Offer(), req.getShipdate());
+						}
 					}
 				}
 			}
