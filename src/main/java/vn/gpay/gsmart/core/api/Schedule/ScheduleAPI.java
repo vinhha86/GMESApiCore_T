@@ -969,8 +969,9 @@ public class ScheduleAPI {
 			List<POrder_Req> list_req = new ArrayList<POrder_Req>();
 			long pcontractpo_id_link = entity.pcontract_poid_link;
 			long productid_link = entity.productid_link;
+			long orgid_link = entity.orgid_link;
 			
-			list_req = reqService.getbyOffer_and_Product(pcontractpo_id_link, productid_link);
+			list_req = reqService.getbyOffer_and_Product(pcontractpo_id_link, productid_link, orgid_link);
 			
 			List<Schedule_porder> list = new ArrayList<Schedule_porder>();
 			Date start_before = null, end_before = null;

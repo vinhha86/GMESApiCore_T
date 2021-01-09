@@ -6,4 +6,5 @@ public class create_many_pordertest_request {
 	public long parentid_origin;
 	public long resourceid;
 	public long orggrantto;
+	public long orgid_link;
 }

@@ -131,16 +131,17 @@ public class POrder_Req_Service extends AbstractService<POrder_Req> implements I
 	@Override
 	public List<POrder_Req> get_by_org(long orgid_link) {
 		// TODO Auto-generated method stub
-		Specification<POrder_Req> specification = Specifications.<POrder_Req>and()
-				.eq("granttoorgid_link", orgid_link)
-				.eq("status", 0)
-				.le("pcontract_po.status", -1)
-	            .build();
-		Sort sort = Sorts.builder()
-		        .desc("id")
-		        .build();
-		List<POrder_Req> a = repo.findAll(specification,sort);
-		return a.size() > 0 ? a : new ArrayList<POrder_Req>();
+//		Specification<POrder_Req> specification = Specifications.<POrder_Req>and()
+//				.eq("granttoorgid_link", orgid_link)
+//				.eq("status", 0)
+//				.le("pcontract_po.status", -1)
+//	            .build();
+//		Sort sort = Sorts.builder()
+//		        .desc("id")
+//		        .build();
+//		List<POrder_Req> a = repo.findAll(specification,sort);
+//		return a.size() > 0 ? a : new ArrayList<POrder_Req>();
+		return repo.getByOrg(orgid_link);
 	}
 	
 	@Override
@@ -207,8 +208,8 @@ public class POrder_Req_Service extends AbstractService<POrder_Req> implements I
 	}
 
 	@Override
-	public List<POrder_Req> getbyOffer_and_Product(Long pcontractpo_id_link, Long productid_link) {
+	public List<POrder_Req> getbyOffer_and_Product(Long pcontractpo_id_link, Long productid_link, Long orgid_link) {
 		// TODO Auto-generated method stub
-		return repo.getByOfferAndProduct(pcontractpo_id_link, productid_link);
+		return repo.getByOfferAndProduct(pcontractpo_id_link, productid_link, orgid_link);
 	}
 }

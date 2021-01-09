@@ -26,5 +26,5 @@ public interface IPOrder_Req_Service extends Operations<POrder_Req> {
 	List<POrder_Req> getByPOAndProduct(Long pcontract_poid_link, Long productid_link);
 	List<POrder_Req> getByContractAndPO_and_Org(Long pcontractid_link, Long pcontract_poid_link, Long granttoorgid_link, Long productid_link);
 	List<POrder_Req> getByOrgAndPO(Long pcontractpo_id_link, Long orgid_link);
-	List<POrder_Req> getbyOffer_and_Product(Long pcontractpo_id_link, Long productid_link);
+	List<POrder_Req> getbyOffer_and_Product(Long pcontractpo_id_link, Long productid_link, Long orgid_link);
 }

@@ -105,8 +105,9 @@ public class POrder_ReqAPI {
 		try {
 			long pcontractpo_id_link = entity.pcontract_poid_link;
 			long productid_link = entity.productid_link;
+			long orgid_link = entity.orgid_link;
 			
-			response.data = porder_req_Service.getbyOffer_and_Product(pcontractpo_id_link, productid_link);
+			response.data = porder_req_Service.getbyOffer_and_Product(pcontractpo_id_link, productid_link, orgid_link);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
