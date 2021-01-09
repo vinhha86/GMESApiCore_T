@@ -187,4 +187,38 @@ public class MenuAPI {
 		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@RequestMapping(value = "/menu_mobile",method = RequestMethod.POST)
+	public ResponseEntity<?> MenuMobile(HttpServletRequest request ) {
+		try {
+			MenuResponse response = new MenuResponse();
+			GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			List<Menu> menu = menuService.findByUserid(user.getId());
+			
+			List<Menu> result = new ArrayList<Menu>();
+			
+			for(Menu item : menu) {
+				// thêm nếu ko có con
+				if(item.getParent_id() == null || item.getParent_id().equals("")) {
+					List<Menu> list = menuService.getby_parentid(item.getId());
+					if(list.size() == 0) {
+						result.add(item);
+					}
+				}
+				// thêm nếu có cha
+				else {
+					result.add(item);
+				}
+			}
+			
+			response.data = result;
+			
+			return new ResponseEntity<MenuResponse>(response,HttpStatus.OK);
+		}catch (RuntimeException e) {
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(e.getMessage());
+		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }
