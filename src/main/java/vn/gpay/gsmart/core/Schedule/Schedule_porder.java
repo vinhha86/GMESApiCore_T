@@ -31,8 +31,8 @@ public class Schedule_porder {
 	private long pcontractid_link;
 	private long porderid_link;
 	private String productbuyercode;
+	private int grant_type; // 0 : kip giao hang, 1 qua ngay giao hang
 	
-
 	@JsonProperty("Cls")
 	private String Cls;
 	
@@ -45,6 +45,12 @@ public class Schedule_porder {
 	private Integer productivity_line;//NS tổ (tính trung bình tiến độ ra chuyền)
 	
 		
+	public int getGrant_type() {
+		return grant_type;
+	}
+	public void setGrant_type(int grant_type) {
+		this.grant_type = grant_type;
+	}
 	public Integer getProductivity_po() {
 		return productivity_po;
 	}

@@ -66,7 +66,6 @@ public class POrder_Req implements Serializable {
 	@JoinColumn( name="porderreqid_link", referencedColumnName="id")
 	private List<POrder>  porderlist  = new ArrayList<POrder>();	
 	
-	
 	public List<POrder> getPorderlist() {
 		return porderlist;
 	}
@@ -225,9 +224,27 @@ public class POrder_Req implements Serializable {
 		return null;
 	}
 	@Transient
+	public Integer getPo_parent_quantity() {
+		if(pcontract_po != null) {
+			return pcontract_po.getparent_quantity();
+		}
+		return 0;
+	}
+	@Transient
 	public Integer getDuration() {
 		if(pcontract_po != null) {
-			return pcontract_po.getProductiondays();
+			for(PContract_PO_Productivity po_productivity: pcontract_po.getPcontract_po_productivity()) {
+				if(po_productivity.getProductid_link() != null) {
+					if(po_productivity.getProductid_link().equals(productid_link) || po_productivity.getProductid_link() == productid_link) {
+						int duration = po_productivity.getProductiondays_ns();
+						if(duration == -1) 
+							duration = pcontract_po.getProductiondays();
+						else if (duration == 0 )
+							duration = 1;
+						return duration ;
+					}
+				}
+			}
 		}
 		return null;
 	}
@@ -291,6 +308,12 @@ public class POrder_Req implements Serializable {
 		return "";
 	}
 	
+	@Transient
+	public Long getPO_Offer() {
+		if(pcontract_po!=null)
+			return pcontract_po.getParentpoid_link();
+		return null;
+	}
 
 	public Long getId() {
 		return id;

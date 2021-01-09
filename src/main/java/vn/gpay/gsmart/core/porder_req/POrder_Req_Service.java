@@ -205,4 +205,10 @@ public class POrder_Req_Service extends AbstractService<POrder_Req> implements I
 		// TODO Auto-generated method stub
 		return repo.getByPO_Offer(pcontract_poid_link);
 	}
+
+	@Override
+	public List<POrder_Req> getbyOffer_and_Product(Long pcontractpo_id_link, Long productid_link) {
+		// TODO Auto-generated method stub
+		return repo.getByOfferAndProduct(pcontractpo_id_link, productid_link);
+	}
 }

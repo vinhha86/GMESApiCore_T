@@ -192,4 +192,9 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		// TODO Auto-generated method stub
 		return repo.getby_parentid_link_and_type(pcontractpo_parentid_link, po_typeid_link);
 	}
+	@Override
+	public List<PContract_PO> getall_offers_by_org(List<Long> orgid_link) {
+		// TODO Auto-generated method stub
+		return repo.getOffers_byOrg(orgid_link);
+	}
 }

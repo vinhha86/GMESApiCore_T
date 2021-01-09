@@ -2532,4 +2532,42 @@ public class PContract_POAPI {
 			return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/getOffers_byOrg", method = RequestMethod.POST)
+	public ResponseEntity<getOffes_byOrg_response> getOffers_byOrg(@RequestBody getOffers_byOrg_request entity,
+			HttpServletRequest request) {
+		getOffes_byOrg_response response = new getOffes_byOrg_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgid_link = user.getOrgid_link();
+			List<Long> list_org = new ArrayList<Long>();
+			
+			if(orgid_link != 0 && orgid_link != 1) {
+				for(GpayUserOrg userorg:userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY)){
+					list_org.add(userorg.getOrgid_link());
+				}
+				//Them chinh don vi cua user
+				list_org.add(orgid_link);
+			}
+			else {
+				List<Org> listorg = orgService.findOrgByType(user.getRootorgid_link(), orgid_link, OrgType.ORG_TYPE_FACTORY);
+				for(Org org :listorg){
+					list_org.add(org.getId());
+				}
+			}
+			
+			List<PContract_PO> list = new ArrayList<PContract_PO>();
+			list = pcontract_POService.getall_offers_by_org(list_org);
+			response.data = list;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			ResponseEntity<getOffes_byOrg_response> a = new ResponseEntity<getOffes_byOrg_response>(response, HttpStatus.OK);
+			return a;
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<getOffes_byOrg_response>(response, HttpStatus.OK);
+		}
+	}
 }

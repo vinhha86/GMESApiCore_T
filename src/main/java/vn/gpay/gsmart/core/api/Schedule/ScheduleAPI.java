@@ -278,6 +278,7 @@ public class ScheduleAPI {
 						sch_porder.setProductbuyercode(pordergrant.getProductcode());
 						sch_porder.setProductivity_po(pordergrant.getProductivity_po());
 						sch_porder.setProductivity_porder(pordergrant.getProductivity_porder());
+						sch_porder.setGrant_type(pordergrant.getType());
 						
 						int d = commonService.getDuration(start_free, end_free, orgrootid_link);
 						day_grant += d;
@@ -411,6 +412,7 @@ public class ScheduleAPI {
 						sch_porder.setProductivity_porder(pordergrant.getProductivity_porder());
 						sch_porder.setPcontractid_link(pordergrant.getPcontractid_link());
 						sch_porder.setProductbuyercode(pordergrant.getProductcode());
+						sch_porder.setGrant_type(pordergrant.getType());
 						
 						response.events.rows.add(sch_porder);
 					}
@@ -510,12 +512,18 @@ public class ScheduleAPI {
 			Date end = event.getEndDate();
 			long orgrootid_link = user.getRootorgid_link();
 			
+			POrder porder = porderService.findOne(entity.data.getPorderid_link());
+			int type = 0;
+			if(end.after(porder.getShipdate()))
+				type = 1;
+			
 			int duration = commonService.getDuration(start, end, orgrootid_link);
 			int productivity = commonService.getProductivity(event.getTotalpackage(), duration); 
 			event.setDuration(duration);
 			event.setProductivity(productivity);
 			event.setStartDate(commonService.getBeginOfDate(entity.data.getStartDate()));
 			event.setEndDate(commonService.getEndOfDate(entity.data.getEndDate()));
+			event.setGrant_type(type);
 			
 			//update vao grant
 			long pordergrantid_link = entity.data.getPorder_grantid_link();
@@ -525,6 +533,7 @@ public class ScheduleAPI {
 			grant.setDuration(duration);
 			grant.setProductivity(productivity);
 			grant.setReason_change(null);
+			grant.setType(type);
 			granttService.save(grant);
 			
 			response.data = event;
@@ -816,6 +825,7 @@ public class ScheduleAPI {
 				duration = commonService.getDuration_byProductivity(req.getTotalorder(), productivity);
 				endDate = commonService.Date_Add_with_holiday(startDate, duration, orgrootid_link);
 			}
+			int type = endDate.after(req.getShipdate()) ? 1 : 0;
 			
 			String po_code = req.getPo_buyer().length() > 0?req.getPo_vendor():req.getPo_buyer();
 			POrder porder = new POrder();
@@ -858,6 +868,7 @@ public class ScheduleAPI {
 			pg.setStart_date_plan(startDate);
 			pg.setFinish_date_plan(endDate);
 			pg.setTotalamount_tt(req.getTotalorder());
+			pg.setType(type);
 			pg = granttService.save(pg);
 			
 			PContract contract = req.getPcontract();
@@ -874,7 +885,7 @@ public class ScheduleAPI {
 			if(po!=null && product != null) {
 				String productcode = product.getBuyercode();
 				String PO = po.getPo_buyer() == null ? "" : po.getPo_vendor();
-				name += productcode+"/"+PO+"/"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
+				name += productcode+"/"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
 			}
 			
 			Schedule_porder sch = new Schedule_porder();
@@ -901,6 +912,7 @@ public class ScheduleAPI {
 			sch.setPcontract_poid_link(req.getPcontract_poid_link());
 			sch.setProductid_link(req.getProductid_link());
 			sch.setPcontractid_link(porder.getPcontractid_link());
+			sch.setGrant_type(type);
 			
 			response.data = sch;
 			
@@ -944,6 +956,159 @@ public class ScheduleAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<create_pordergrant_response>(response, HttpStatus.OK);
+		}
+	} 
+	
+	@RequestMapping(value = "/create_many_pordergrant_test",method = RequestMethod.POST)
+	public ResponseEntity<create_many_pordergrant_test_response> Create_Many_PorderGrantTest(HttpServletRequest request,
+			@RequestBody create_many_pordertest_request entity) {
+		create_many_pordergrant_test_response response = new create_many_pordergrant_test_response();
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		long orgrootid_link = user.getRootorgid_link();
+		
+		try {
+			List<POrder_Req> list_req = new ArrayList<POrder_Req>();
+			long pcontractpo_id_link = entity.pcontract_poid_link;
+			long productid_link = entity.productid_link;
+			
+			list_req = reqService.getbyOffer_and_Product(pcontractpo_id_link, productid_link);
+			
+			List<Schedule_porder> list = new ArrayList<Schedule_porder>();
+			Date start_before = null, end_before = null;
+			
+			for(POrder_Req req : list_req) {
+				req.setStatus(1);
+				reqService.save(req);
+				
+				int productivity = req.get_ProductivityPO();
+				Date startDate = null;
+				if(start_before == null) {
+					startDate = commonService.getBeginOfDate(req.getPO_Productiondate());
+					Calendar c_startdate = Calendar.getInstance();
+					c_startdate.setTime(startDate);
+					if(commonService.check_dayoff(c_startdate, orgrootid_link)) {
+						startDate = commonService.Date_Add_with_holiday(startDate, 1, orgrootid_link);
+					}
+				}
+				else {
+					startDate = commonService.Date_Add_with_holiday(end_before, 1, orgrootid_link);
+				}
+				//Kiem tra ngay bat dau ma la ngay nghi thi tang len ngay di lam tiep theo
+
+				startDate = commonService.getBeginOfDate(startDate);
+				Date endDate = commonService.Date_Add_with_holiday(startDate, req.getDuration(), orgrootid_link);
+				endDate = commonService.getEndOfDate(endDate);
+
+				start_before = startDate;
+				end_before = endDate;
+				
+				int duration = req.getDuration();
+				
+				if(productivity == 0) {
+					productivity = commonService.getProductivity(req.getTotalorder(), duration);
+					duration = commonService.getDuration_byProductivity(req.getTotalorder(), productivity);
+					endDate = commonService.Date_Add_with_holiday(startDate, duration, orgrootid_link);
+				}
+				
+				String po_code = req.getPo_buyer().length() > 0?req.getPo_vendor():req.getPo_buyer();
+				POrder porder = new POrder();
+				porder.setOrdercode(po_code);
+				porder.setFinishdate_plan(endDate);
+				porder.setGolivedate(req.getShipdate());
+				porder.setStatus(-1);
+				porder.setGranttoorgid_link(req.getGranttoorgid_link());
+				porder.setId(null);
+				porder.setOrgrootid_link(orgrootid_link);
+				porder.setPcontract_poid_link(req.getPcontract_poid_link());
+				porder.setPcontractid_link(req.getPcontractid_link());
+				porder.setProductiondate(startDate);
+				porder.setUsercreatedid_link(user.getId());
+				porder.setTimecreated(new Date());
+				porder.setProductiondate_plan(req.getPO_Productiondate());
+				porder.setPorderreqid_link(req.getId());
+				porder.setTotalorder(req.getTotalorder());
+				porder.setProductid_link(req.getProductid_link());
+				porder.setPlan_productivity(productivity);
+				porder = porderService.saveAndFlush(porder);
+				
+				
+//				Date endDate = commonService.getEndOfDate(porder.getFinishdate_plan());
+//				int duration = commonService.getDuration(startDate, endDate, orgrootid_link, year);
+				
+				POrderGrant pg = new POrderGrant();
+				pg.setId(null);
+				pg.setUsercreatedid_link(user.getId());
+				pg.setTimecreated(new Date());
+				pg.setGrantdate(new Date());
+				pg.setGrantamount(porder.getTotalorder());
+				pg.setGranttoorgid_link(entity.orggrantto);
+				pg.setOrdercode(porder.getOrdercode());
+				pg.setPorderid_link(porder.getId());
+				pg.setOrgrootid_link(orgrootid_link);
+				pg.setStatus(-1);
+				pg.setProductivity(productivity);
+				pg.setDuration(duration);
+				pg.setStart_date_plan(startDate);
+				pg.setFinish_date_plan(endDate);
+				pg.setTotalamount_tt(req.getTotalorder());
+				pg = granttService.save(pg);
+				
+				PContract contract = req.getPcontract();
+				PContract_PO po = req.getPcontract_po();
+				Product product = req.getProduct();
+				
+				String name = "";
+				int total = pg.getGrantamount() == null ? 0 : pg.getGrantamount();
+				float totalPO = po == null ? 0 : po.getPo_quantity();
+				
+				DecimalFormat decimalFormat = new DecimalFormat("#,###");
+				decimalFormat.setGroupingSize(3);
+				
+				if(po!=null && product != null) {
+					String productcode = product.getBuyercode();
+					String PO = po.getPo_buyer() == null ? "" : po.getPo_vendor();
+					name += productcode+"/"+PO+"/"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
+				}
+				int type = endDate.after(req.getShipdate()) ? 1 : 0;
+				
+				Schedule_porder sch = new Schedule_porder();
+				sch.setDuration(duration);
+				sch.setProductivity(productivity);
+				sch.setBuyername(contract.getBuyername());
+				sch.setCls(porder.getCls());
+				sch.setDuration(duration);
+				sch.setEndDate(endDate);
+				sch.setId_origin(porder.getId());
+				sch.setMahang(name);
+				sch.setName(name);
+				sch.setParentid_origin(entity.parentid_origin);
+				sch.setPordercode(porder.getOrdercode());
+				sch.setResourceId(entity.resourceid);
+				sch.setStartDate(startDate);
+				sch.setStatus(-1);
+				sch.setTotalpackage(porder.getTotalorder());
+				sch.setVendorname(contract.getVendorname());
+				sch.setPorder_grantid_link(pg.getId());
+				sch.setPorderid_link(porder.getId());
+				sch.setProductivity_po(productivity);
+				sch.setProductivity_porder(productivity);
+				sch.setPcontract_poid_link(req.getPcontract_poid_link());
+				sch.setProductid_link(req.getProductid_link());
+				sch.setPcontractid_link(porder.getPcontractid_link());
+				sch.setGrant_type(type);
+				
+				list.add(sch);
+			}
+						
+			response.data = list;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<create_many_pordergrant_test_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<create_many_pordergrant_test_response>(response, HttpStatus.OK);
 		}
 	} 
 	
@@ -1020,9 +1185,14 @@ public class ScheduleAPI {
 		try {
 			Date end = commonService.Date_Add_with_holiday(entity.data.getStartDate(), entity.data.getDuration(), orgrootid_link);
 			int productivity = commonService.getProductivity(entity.data.getTotalpackage(), entity.data.getDuration());
+			
+			POrder req = porderService.findOne(entity.data.getPorderid_link());
+			
+			int type = end.after(req.getShipdate()) ? 1 : 0;
 			Schedule_porder sch = entity.data;
 			sch.setEndDate(end);
 			sch.setProductivity(productivity);
+			sch.setGrant_type(type);
 			
 			response.data = sch;
 			
@@ -1052,9 +1222,13 @@ public class ScheduleAPI {
 			int duration = entity.data.getTotalpackage() / entity.data.getProductivity();			
 			Date end = commonService.Date_Add_with_holiday(entity.data.getStartDate(), duration, orgrootid_link);
 			
+			POrder req = porderService.findOne(entity.data.getPorderid_link());
+			
+			int type = end.after(req.getShipdate()) ? 1 : 0;
 			Schedule_porder sch = entity.data;
 			sch.setEndDate(end);
 			sch.setDuration(duration);
+			sch.setGrant_type(type);
 			
 			response.data = sch;
 			

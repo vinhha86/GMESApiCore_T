@@ -600,6 +600,7 @@ public class UploadAPI {
 								po_productivity.setAmount(po_quantity*amount);
 								po_productivity.setPlan_linerequired(plan_linerequired);
 								po_productivity.setPlan_productivity(ns_target.intValue());
+								po_productivity.setProductiondays_ns(productiondays_ns);
 								productivityService.save(po_productivity);
 
 								//Xoa cac dai co di roi insert lai vao san pham con hoac san pham don
@@ -732,6 +733,7 @@ public class UploadAPI {
 									po_productivity_set.setAmount(po_quantity);
 									po_productivity_set.setPlan_linerequired(plan_linerequired);
 									po_productivity_set.setPlan_productivity(ns_target.intValue());
+									po_productivity_set.setProductiondays_ns(productiondays_ns);
 									productivityService.save(po_productivity_set);
 									
 									//Xoa cac dai co di roi insert lai vao san pham con hoac san pham bo
@@ -895,6 +897,7 @@ public class UploadAPI {
 									po_productivity_line.setAmount(soluong*amount);
 									po_productivity_line.setPlan_linerequired(plan_linerequired_line);
 									po_productivity_line.setPlan_productivity(ns_target.intValue());
+									po_productivity_line.setProductiondays_ns(productiondays_ns_line);
 									productivityService.save(po_productivity_line);
 									
 									if(product_set_id_link > 0) {
@@ -914,6 +917,7 @@ public class UploadAPI {
 										po_productivity_line_set.setAmount(soluong);
 										po_productivity_line_set.setPlan_linerequired(plan_linerequired_line);
 										po_productivity_line_set.setPlan_productivity(ns_target.intValue());
+										po_productivity_line_set.setProductiondays_ns(productiondays_ns_line);
 										productivityService.save(po_productivity_line_set);
 									}
 									

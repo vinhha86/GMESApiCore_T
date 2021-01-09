@@ -33,7 +33,7 @@ public class PContract_PO_Productivity implements Serializable{
 	
 	
 	public Integer getProductiondays_ns() {
-		return productiondays_ns;
+		return productiondays_ns == null ? -1 : productiondays_ns;
 	}
 	public void setProductiondays_ns(Integer productiondays_ns) {
 		this.productiondays_ns = productiondays_ns;

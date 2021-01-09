@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections4.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,7 @@ import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
+import vn.gpay.gsmart.core.pcontract_po.PContractPO_Product;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
@@ -94,7 +97,26 @@ public class POrder_ReqAPI {
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<POrder_Req_GetOne_Response>(response, HttpStatus.BAD_REQUEST);
 		}
-	}    
+	}  
+	
+	@RequestMapping(value = "/getby_offer_product",method = RequestMethod.POST)
+	public ResponseEntity<getby_pcontractpo_offer_and_product_response> GetByOfferAndProduct(@RequestBody getby_pcontractpo_offer_and_product_request entity,HttpServletRequest request ) {
+		getby_pcontractpo_offer_and_product_response response = new getby_pcontractpo_offer_and_product_response();
+		try {
+			long pcontractpo_id_link = entity.pcontract_poid_link;
+			long productid_link = entity.productid_link;
+			
+			response.data = porder_req_Service.getbyOffer_and_Product(pcontractpo_id_link, productid_link);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getby_pcontractpo_offer_and_product_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<getby_pcontractpo_offer_and_product_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}  
 	
 	@RequestMapping(value = "/update_iscalculate",method = RequestMethod.POST)
 	public ResponseEntity<update_iscalculate_response > UpdateCalculate(@RequestBody update_iscalculate_request entity,HttpServletRequest request ) {
@@ -304,6 +326,113 @@ public class POrder_ReqAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<POrder_Req_getbyorg_response>(response, HttpStatus.BAD_REQUEST);
+		}
+		
+	}
+	
+	@RequestMapping(value = "/getpoline_product_by_org", method = RequestMethod.POST)
+	public ResponseEntity<get_poline_product_byorg_response> GetPOline_Product_ByOrg(HttpServletRequest request){
+		get_poline_product_byorg_response response = new get_poline_product_byorg_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgid_link = user.getOrgid_link();
+			
+			List<String> orgTypes = new ArrayList<String>();
+			orgTypes.add("13");
+			orgTypes.add("14");
+			List<Org> lsOrgChild = orgService.getorgChildrenbyOrg(orgid_link,orgTypes);
+			List<POrder_Req> list_req = new ArrayList<POrder_Req>();
+			
+			if(orgid_link == 1) {
+				for(Org theOrg:lsOrgChild){
+					List<POrder_Req> a = reqService.get_by_org(theOrg.getId());
+					
+					List<POrder_Req> result = new ArrayList<POrder_Req>();
+					for(POrder_Req pr : a) {
+						if(pr.getPorderlist().size() == 0)
+							result.add(pr);
+					}
+					
+	//				if(a.size()>0)
+	//					response.data.addAll(a);
+					if(result.size()>0)
+						list_req.addAll(result);
+				}
+			}else {
+				//Lay danh sách org user dang quan ly
+				List<GpayUserOrg> list_user_org = userOrgService.getall_byuser(user.getId());
+				List<Long> list_org = new ArrayList<Long>();
+				
+				for (GpayUserOrg userorg : list_user_org) {
+					list_org.add(userorg.getOrgid_link());
+				}
+				if(!list_org.contains(orgid_link))
+					list_org.add(orgid_link);
+				
+				for (Long orgid : list_org) {
+					List<POrder_Req> a = reqService.get_by_org(orgid);
+					
+					List<POrder_Req> result = new ArrayList<POrder_Req>();
+					for(POrder_Req pr : a) {
+						if(pr.getPorderlist().size() == 0)
+							result.add(pr);
+					}
+					
+					if(result.size()>0)
+						list_req.addAll(result);
+				}
+			}
+			Long pcontractpoid_link = null;
+			Map<Long, Date> map = new HashedMap<Long, Date>();
+			
+			//lay ra nhung line giao hang som nhat 
+			for(POrder_Req req : list_req) {
+				if(map.size() == 0) {
+					pcontractpoid_link = req.getPO_Offer();
+					map.put(pcontractpoid_link, req.getShipdate());
+				}
+				else {
+					if(req.getPO_Offer().equals(pcontractpoid_link)) {
+						if(req.getShipdate().before(map.get(pcontractpoid_link))) {
+							map.remove(pcontractpoid_link);
+							map.put(pcontractpoid_link, req.getShipdate());
+						}
+					}
+					else {
+						map.put(req.getPO_Offer(), req.getShipdate());
+					}
+				}
+			}
+			
+			//remove nhung line giao hang khong hop le
+			list_req.removeIf(c-> !map.containsKey(c.getPO_Offer()) || !map.get(c.getPO_Offer()).equals(c.getShipdate()));
+			
+			List<PContractPO_Product> listret = new ArrayList<PContractPO_Product>();
+			for(POrder_Req req : list_req) {
+				PContractPO_Product po_product = new PContractPO_Product();
+				po_product.setBuyername(req.getBuyername());
+				po_product.setGranttoorgid_link(req.getGranttoorgid_link());
+				po_product.setPcontract_poid_link(req.getPO_Offer());
+				po_product.setProductid_link(req.getProductid_link());
+				po_product.setShipdate(req.getShipdate());
+				po_product.setVendorname(req.getVendorname());
+				po_product.setProduct_buyername(req.getProduct_code());
+				po_product.setPo_buyer(req.getPo_buyer());
+				po_product.setQuantity(req.getPo_parent_quantity());
+				po_product.setOrgname(req.getGranttoorgcode());
+				
+				listret.add(po_product);
+			}
+			
+			response.data = listret;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<get_poline_product_byorg_response>(response, HttpStatus.OK);
+		}
+		catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<get_poline_product_byorg_response>(response, HttpStatus.BAD_REQUEST);
 		}
 		
 	}

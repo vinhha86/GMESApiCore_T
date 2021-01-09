@@ -26,6 +26,7 @@ import vn.gpay.gsmart.core.category.Port;
 import vn.gpay.gsmart.core.category.ShipMode;
 import vn.gpay.gsmart.core.currency.Currency;
 import vn.gpay.gsmart.core.org.Org;
+import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.pcontract_po_productivity.PContract_PO_Productivity;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
@@ -120,6 +121,31 @@ public class PContract_PO implements Serializable {/**
 			}
 		}
 		return sum;
+	}
+	
+	@Transient
+	public Long getId_MinPOShipdate() {
+		if(sub_po.size() > 0) {
+			
+			List<PContract_PO> list_line = sub_po.stream().filter(item -> null!=item.po_typeid_link && item.po_typeid_link==POType.PO_LINE_PLAN).collect(Collectors.toList());
+			Date min = null;
+			int i = -1;
+			for(int a= 0; a<list_line.size(); a++) {
+				if(a == 0) {
+					min = list_line.get(a).getShipdate();
+					i =a;
+				}
+				else {
+					if (min.after(list_line.get(a).getShipdate())) {
+						min = list_line.get(a).getShipdate();
+						i = a;
+					}
+				}
+			}
+			
+			return list_line.get(i).getId();
+		}
+			return null;
 	}
 	
 	public Integer getPlan_productivity() {
@@ -218,6 +244,11 @@ public class PContract_PO implements Serializable {/**
 	@ManyToOne
     @JoinColumn(name="porttoid_link",insertable=false,updatable =false)
     private Port port_to;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="pcontractid_link",insertable=false,updatable =false)
+    private PContract pcontract;
 
 
 	@Transient 
@@ -398,6 +429,22 @@ public class PContract_PO implements Serializable {/**
 	}
 	
 	@Transient
+	public String getBuyerName() {
+		if(pcontract != null) {
+			return pcontract.getBuyername();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getVendorName() {
+		if(pcontract != null) {
+			return pcontract.getVendorname();
+		}
+		return "";
+	}
+	
+	@Transient
 	public String getProductvendorcode() {
 		if(product != null) {
 			return product.getVendorcode();
@@ -411,6 +458,14 @@ public class PContract_PO implements Serializable {/**
 			return product.getBuyercode();
 		}
 		return "";
+	}
+	
+	@Transient
+	public Integer getparent_quantity() {
+		if(parent != null) {
+			return parent.getPo_quantity();
+		}
+		return 0;
 	}
 	
 	public Long getId() {

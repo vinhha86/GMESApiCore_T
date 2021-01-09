@@ -251,4 +251,17 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			+ "order by c.name "
 			)
 	public List<Object[]> getForMarketTypeChart();
+	
+	@Query(value = "select a from PContract_PO a "
+			+ "inner join PContract_PO c on a.id = c.parentpoid_link "
+			+ "inner join POrder_Req b on c.id = b.pcontract_poid_link "
+			+ "where a.po_typeid_link = 10 "
+			+ "and b.granttoorgid_link in :orgid_link "
+			+ "and a.parentpoid_link is null "
+			+ "and b.status = -1 "
+			+ "group by a"
+			)
+	public List<PContract_PO> getOffers_byOrg(
+			@Param ("orgid_link")final  List<Long> orgid_link
+			);
 }

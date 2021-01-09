@@ -72,9 +72,17 @@ public class POrderGrant implements Serializable {
 	private Integer duration;
 	private Integer totalamount_tt;
 	private String reason_change;
+	private Integer type;
 	
 	
 	
+	
+	public Integer getType() {
+		return type;
+	}
+	public void setType(Integer type) {
+		this.type = type;
+	}
 	public String getReason_change() {
 		return reason_change;
 	}
