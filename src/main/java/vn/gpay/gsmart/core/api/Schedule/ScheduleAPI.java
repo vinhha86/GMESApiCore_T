@@ -884,7 +884,6 @@ public class ScheduleAPI {
 			
 			if(po!=null && product != null) {
 				String productcode = product.getBuyercode();
-				String PO = po.getPo_buyer() == null ? "" : po.getPo_vendor();
 				name += productcode+"/"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
 			}
 			
@@ -1010,6 +1009,8 @@ public class ScheduleAPI {
 					endDate = commonService.Date_Add_with_holiday(startDate, duration, orgrootid_link);
 				}
 				
+				int type = endDate.after(req.getShipdate()) ? 1 : 0;
+				
 				String po_code = req.getPo_buyer().length() > 0?req.getPo_vendor():req.getPo_buyer();
 				POrder porder = new POrder();
 				porder.setOrdercode(po_code);
@@ -1051,6 +1052,7 @@ public class ScheduleAPI {
 				pg.setStart_date_plan(startDate);
 				pg.setFinish_date_plan(endDate);
 				pg.setTotalamount_tt(req.getTotalorder());
+				pg.setType(type);
 				pg = granttService.save(pg);
 				
 				PContract contract = req.getPcontract();
@@ -1069,7 +1071,6 @@ public class ScheduleAPI {
 					String PO = po.getPo_buyer() == null ? "" : po.getPo_vendor();
 					name += productcode+"/"+PO+"/"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
 				}
-				int type = endDate.after(req.getShipdate()) ? 1 : 0;
 				
 				Schedule_porder sch = new Schedule_porder();
 				sch.setDuration(duration);
