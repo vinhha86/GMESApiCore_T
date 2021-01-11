@@ -2107,6 +2107,7 @@ public class PContract_POAPI {
 				//Kiem tra xem porder_req da keo vao uom thu hay chua? Neu keo roi thi cap nhat lai trang thai cua lenh
 				List<POrder_Req> list_req = porder_req_Service.getByPO(line.getId());
 				for (POrder_Req req : list_req) {
+					//Req co porder la da duoc keo vao chuyen roi
 					List<POrder> list_porder = porderService.getByPOrder_Req(line.getId(), req.getId());
 					if(list_porder.size() > 0) {
 						POrder porder = list_porder.get(0);
@@ -2124,6 +2125,7 @@ public class PContract_POAPI {
 							}
 						}
 					}
+					//req chua co porder thi sinh porder cho req
 					else {
 						porderService.createPOrder(req, user);
 					}
