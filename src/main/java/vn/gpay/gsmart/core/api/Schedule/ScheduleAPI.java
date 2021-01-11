@@ -669,8 +669,12 @@ public class ScheduleAPI {
 			@RequestBody update_porder_productivity_request entity) {
 		update_porder_productivity_response response = new update_porder_productivity_response();
 		try {
-//			long porderid_link = entity.data.getId_origin();
-//			POrder porder = porderService.findOne(porderid_link);
+			long porderid_link = entity.data.getId_origin();
+			POrder porder = porderService.findOne(porderid_link);
+			Date end_date = commonService.getEndOfDate(entity.data.getEndDate());
+			int type = 0;
+			if(end_date.after(porder.getShipdate()))
+				type = 1;
 //			porder.setProductiondate_plan(entity.data.getStartDate());
 //			porder.setFinishdate_plan(commonService.getEndOfDate(entity.data.getEndDate()));
 //			porderService.save(porder);
@@ -678,14 +682,16 @@ public class ScheduleAPI {
 			long pordergrantid_link = entity.data.getPorder_grantid_link();
 			POrderGrant grant = granttService.findOne(pordergrantid_link);
 			grant.setStart_date_plan(commonService.getBeginOfDate(entity.data.getStartDate()));
-			grant.setFinish_date_plan(commonService.getEndOfDate(entity.data.getEndDate()));
+			grant.setFinish_date_plan(end_date);
 			grant.setDuration(entity.data.getDuration());
 			grant.setProductivity(entity.data.getProductivity());
 			grant.setReason_change(null);
+			grant.setType(type);
 			granttService.save(grant);
 			
 			Schedule_porder sch = entity.data;
-			sch.setEndDate(grant.getFinish_date_plan());
+			sch.setEndDate(end_date);
+			sch.setGrant_type(type);
 			
 			response.data = sch;
 			
@@ -1378,7 +1384,7 @@ public class ScheduleAPI {
 		
 		try {
 			int duration = entity.data.getTotalpackage() / entity.data.getProductivity();			
-			Date end = commonService.Date_Add_with_holiday(entity.data.getStartDate(), duration - 1, orgrootid_link);
+			Date end = commonService.Date_Add_with_holiday(entity.data.getStartDate(), duration, orgrootid_link);
 			
 			POrder req = porderService.findOne(entity.data.getPorderid_link());
 			
@@ -1619,16 +1625,16 @@ public class ScheduleAPI {
 //				Date end_new = grant_old.getFinish_date_plan();
 //				int productivity_old = commonService.getProductivity(totalorder_old, duration_old);
 
-				int type = 0;
+				int type_old = 0, type_new = 0;
 				if(end_old.after(porder.getShipdate()))
-					type =1;
+					type_old =1;
 				
 				grant_old.setGrantamount(totalorder_old);
 				grant_old.setFinish_date_plan(end_old);
 				grant_old.setDuration(duration_old);
 				grant_old.setTotalamount_tt(grant_old.getTotalamount_tt() - entity.quantity);
 				grant_old.setReason_change(null);
-				grant_old.setType(type);
+				grant_old.setType(type_old);
 				grant_old = granttService.save(grant_old);
 				
 				//Cap nhat lai Processing cu sau khi tach
@@ -1646,7 +1652,8 @@ public class ScheduleAPI {
 				old.setName(grant_old.getMaHang());
 				old.setMahang(grant_old.getMaHang());
 				old.setTotalpackage(totalorder_old);
-				old.setGrant_type(type);
+				old.setGrant_type(type_old);
+				old.setCls(grant_old.getCls());
 				response.old_data = old;
 				
 				//Sinh grant moi
@@ -1657,6 +1664,9 @@ public class ScheduleAPI {
 				int duration_new = commonService.getDuration_byProductivity(total_new, producttivity);
 				Date end_new = commonService.Date_Add_with_holiday(start_new, duration_new - 1, orgrootid_link);
 				end_new = commonService.getEndOfDate(end_new);
+
+				if(end_new.after(porder.getShipdate()))
+					type_new =1;
 				
 				POrderGrant grant = new POrderGrant();
 				grant.setGranttoorgid_link(grant_old.getGranttoorgid_link());
@@ -1674,6 +1684,7 @@ public class ScheduleAPI {
 				grant.setFinish_date_plan(end_new);
 				grant.setProductivity(producttivity);
 				grant.setDuration(duration_new);
+				grant.setType(type_new);
 				grant.setTotalamount_tt(entity.quantity);
 				grant = granttService.save(grant);
 				
@@ -1717,6 +1728,7 @@ public class ScheduleAPI {
 				new_data.setProductivity_po(grant_old.getProductivity_po());
 				new_data.setProductivity_porder(grant_old.getProductivity_porder());
 				new_data.setProductbuyercode(porder.getProductcode());
+				new_data.setGrant_type(type_new);
 				response.new_data = new_data;
 				 
 				//gan sku vao grant moi sinh ra va tru sku o grant tach
