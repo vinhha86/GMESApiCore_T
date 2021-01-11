@@ -2110,10 +2110,10 @@ public class PContract_POAPI {
 					List<POrder> list_porder = porderService.getByPOrder_Req(line.getId(), req.getId());
 					if(list_porder.size() > 0) {
 						POrder porder = list_porder.get(0);
-						if(porder.getStatus() == POrderStatus.PORDER_STATUS_UNCONFIRM)
-							porder.setStatus(POrderStatus.PORDER_STATUS_FREE);
+						if(porder.getStatus() == POrderStatus.PORDER_STATUS_UNCONFIRM) {
+							porder.setStatus(POrderStatus.PORDER_STATUS_GRANTED);
+						}
 						
-
 						//Cap nhat porder_grant status ve 1
 						List<POrderGrant> list_grant = grantService.getByOrderId(porder.getId());
 						for(POrderGrant grant : list_grant) {
