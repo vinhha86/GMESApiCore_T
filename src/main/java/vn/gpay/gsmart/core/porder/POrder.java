@@ -311,9 +311,7 @@ public class POrder implements Serializable {
 		
 		if(product != null && pcontract_po!=null) {
 			String buyer = product.getBuyercode() == null ? "" : product.getBuyercode();
-			String po_buyer = pcontract_po.getPo_buyer();
-			String PO = po_buyer == null ? pcontract_po.getPo_vendor() : po_buyer;
-			name += buyer+"/"+PO+"/"+decimalFormat.format(total)+"/"+decimalFormat.format(totalPO);
+			name += buyer+" / "+decimalFormat.format(total)+" / "+decimalFormat.format(totalPO);
 		}
 		
 		return name;
