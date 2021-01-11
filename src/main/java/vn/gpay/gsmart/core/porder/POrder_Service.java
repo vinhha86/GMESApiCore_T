@@ -336,23 +336,23 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 	//Danh sach cac lenh duoc phan cho Phan xuong nhung chua duoc phan chuyen
 	public List<POrder> get_free_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link,String PO_code,
 			Long orgbuyerid_link,Long orgvendorid_link){
-		int status = 0;
-		Specification<POrder> specification = Specifications.<POrder>and()
-				.eq("status", status)
-	            .eq("granttoorgid_link", granttoorgid_link)
-	            .ge(Objects.nonNull(golivedate_from),"golivedate",GPAYDateFormat.atStartOfDay(golivedate_from))
-                .le(Objects.nonNull(golivedate_to),"golivedate",GPAYDateFormat.atEndOfDay(golivedate_to))
-                .like(Objects.nonNull(PO_code), "pcontract_po.po_buyer", "%"+PO_code+"%")
-                .eq(orgbuyerid_link != 0, "pcontract.orgbuyerid_link",orgbuyerid_link)
-                .eq(orgvendorid_link!=0, "pcontract.orgvendorid_link", orgvendorid_link)
-                .ne("status", -3)
-	            .build();
-//		Sort sort = Sorts.builder()
-//		        .desc("ordercode")
-//		        .build();
-//		List<POrder> a = repo.findAll(specification,sort);
-		List<POrder> a = repo.findAll(specification);
-		return a;
+//		int status = 0;
+//		Specification<POrder> specification = Specifications.<POrder>and()
+//				.eq("status", status)
+//	            .eq("granttoorgid_link", granttoorgid_link)
+//	            .ge(Objects.nonNull(golivedate_from),"golivedate",GPAYDateFormat.atStartOfDay(golivedate_from))
+//                .le(Objects.nonNull(golivedate_to),"golivedate",GPAYDateFormat.atEndOfDay(golivedate_to))
+//                .like(Objects.nonNull(PO_code), "pcontract_po.po_buyer", "%"+PO_code+"%")
+//                .eq(orgbuyerid_link != 0, "pcontract.orgbuyerid_link",orgbuyerid_link)
+//                .eq(orgvendorid_link!=0, "pcontract.orgvendorid_link", orgvendorid_link)
+//                .ne("status", -3)
+//	            .build();
+////		Sort sort = Sorts.builder()
+////		        .desc("ordercode")
+////		        .build();
+////		List<POrder> a = repo.findAll(specification,sort);
+//		List<POrder> a = repo.findAll(specification);
+		return repo.getfree_groupby_product(granttoorgid_link);
 	}
 
 	@Override
@@ -459,5 +459,18 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 			String stylebuyer, String contractcode, Long granttoorgid_link, Date golivedatefrom, Date golivedateto) {
 		// TODO Auto-generated method stub
 		return repo.getPOrderBySearch(buyerid, vendorid, factoryid, pobuyer, stylebuyer, contractcode, granttoorgid_link, golivedatefrom, golivedateto);
+	}
+
+	@Override
+	public List<POrder> get_free_bygolivedate_groupby_product(Date golivedate_from, Date golivedate_to,
+			Long granttoorgid_link, String PO_code, Long orgbuyerid_link, Long orgvendorid_link) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<POrder> getby_offer(Long pcontract_poid_link, Long productid_link, Long orgid_link) {
+		// TODO Auto-generated method stub
+		return repo.getby_offer(orgid_link, pcontract_poid_link, productid_link);
 	}
 }

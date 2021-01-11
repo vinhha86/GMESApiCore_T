@@ -138,4 +138,26 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 			+ "order by b.id "
 			)
 	public List<Object[]> getForNotInProductionChart();
+	
+	@Query(value = "select a from POrder a "
+			+ "inner join PContract_PO b on a.pcontract_poid_link = b.id "
+			+ "where a.granttoorgid_link = :granttoorgid_link "
+			+ "and a.status >= 0 "
+			+ "and b.shipdate = "
+			+ "(select min(d.shipdate) from PContract_PO d where d.parentpoid_link = b.parentpoid_link)"
+			)
+	public List<POrder> getfree_groupby_product(
+			@Param ("granttoorgid_link")final Long granttoorgid_link);
+	
+	@Query(value = "select a from POrder a "
+			+ "inner join PContract_PO b on a.pcontract_poid_link = b.id "
+			+ "where a.granttoorgid_link = :orgid_link "
+			+ "and a.productid_link = :productid_link "
+			+ "and b.parentpoid_link = :pcontract_poid_link "
+			+ "and a.status = 0"
+			)
+	public List<POrder> getby_offer(
+			@Param ("orgid_link")final Long orgid_link,
+			@Param ("pcontract_poid_link")final Long pcontract_poid_link,
+			@Param ("productid_link")final Long productid_link);
 }

@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.collections4.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -383,34 +381,34 @@ public class POrder_ReqAPI {
 						list_req.addAll(result);
 				}
 			}
-			Long pcontractpoid_link = null;
-			Map<Long, Date> map = new HashedMap<Long, Date>();
+//			Long pcontractpoid_link = null;
+//			Map<Long, Date> map = new HashedMap<Long, Date>();
 			
 			//lay ra nhung line giao hang som nhat 
-			for(POrder_Req req : list_req) {
-				if(map.size() == 0) {
-					if(req.getPO_Offer()!=null) {
-						pcontractpoid_link = req.getPO_Offer();
-						map.put(pcontractpoid_link, req.getShipdate());
-					}
-				}
-				else {
-					if(req.getPO_Offer() != null) {
-						if(req.getPO_Offer().equals(pcontractpoid_link)) {
-							if(req.getShipdate().before(map.get(pcontractpoid_link))) {
-								map.remove(pcontractpoid_link);
-								map.put(pcontractpoid_link, req.getShipdate());
-							}
-						}
-						else {
-							map.put(req.getPO_Offer(), req.getShipdate());
-						}
-					}
-				}
-			}
-			
-			//remove nhung line giao hang khong hop le
-			list_req.removeIf(c-> !map.containsKey(c.getPO_Offer()) || !map.get(c.getPO_Offer()).equals(c.getShipdate()));
+//			for(POrder_Req req : list_req) {
+//				if(map.size() == 0) {
+//					if(req.getPO_Offer()!=null) {
+//						pcontractpoid_link = req.getPO_Offer();
+//						map.put(pcontractpoid_link, req.getShipdate());
+//					}
+//				}
+//				else {
+//					if(req.getPO_Offer() != null) {
+//						if(req.getPO_Offer().equals(pcontractpoid_link)) {
+//							if(req.getShipdate().before(map.get(pcontractpoid_link))) {
+//								map.remove(pcontractpoid_link);
+//								map.put(pcontractpoid_link, req.getShipdate());
+//							}
+//						}
+//						else {
+//							map.put(req.getPO_Offer(), req.getShipdate());
+//						}
+//					}
+//				}
+//			}
+//			
+//			//remove nhung line giao hang khong hop le
+//			list_req.removeIf(c-> !map.containsKey(c.getPO_Offer()) || !map.get(c.getPO_Offer()).equals(c.getShipdate()));
 			
 			List<PContractPO_Product> listret = new ArrayList<PContractPO_Product>();
 			for(POrder_Req req : list_req) {

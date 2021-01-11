@@ -2111,7 +2111,7 @@ public class PContract_POAPI {
 					if(list_porder.size() > 0) {
 						POrder porder = list_porder.get(0);
 						if(porder.getStatus() == POrderStatus.PORDER_STATUS_UNCONFIRM)
-							porder.setStatus(POrderStatus.PORDER_STATUS_GRANTED);
+							porder.setStatus(POrderStatus.PORDER_STATUS_FREE);
 						
 
 						//Cap nhat porder_grant status ve 1

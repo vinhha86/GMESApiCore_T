@@ -31,6 +31,7 @@ import vn.gpay.gsmart.core.category.Unit;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
+import vn.gpay.gsmart.core.pcontract_po.PContractPO_Product;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontract_po_productivity.IPContract_PO_Productivity_Service;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
@@ -51,6 +52,8 @@ import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.product.IProductService;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.security.GpayUserOrg;
+import vn.gpay.gsmart.core.security.IGpayUserOrgService;
 import vn.gpay.gsmart.core.sku.ISKU_Service;
 import vn.gpay.gsmart.core.sku.SKU;
 import vn.gpay.gsmart.core.stockin.StockInD;
@@ -94,6 +97,7 @@ public class POrderAPI {
 	@Autowired IUnitService unitService;
 	@Autowired IAttributeValueService attValService;
 	@Autowired private Common commonService;
+	@Autowired IGpayUserOrgService userOrgService;
     ObjectMapper mapper = new ObjectMapper();
 	
 	@RequestMapping(value = "/getone",method = RequestMethod.POST)
@@ -329,6 +333,88 @@ public class POrderAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<POrderResponse>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/getfree_groupby_product", method = RequestMethod.POST)
+	public ResponseEntity<getfree_groupby_product_response> get_free_groupby_product(HttpServletRequest request,
+			@RequestBody POrder_getbygolivedate_request entity) {
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Long orgid_link = user.getOrgid_link();
+		getfree_groupby_product_response response = new getfree_groupby_product_response();
+		try {
+			long i = (long)0;
+			List<POrder> lsPOrder = porderService.get_free_bygolivedate(entity.golivedate_from, entity.golivedate_to, orgid_link, "", i, i);
+			List<String> orgTypes = new ArrayList<String>();
+			orgTypes.add("13");
+			orgTypes.add("14");
+			List<Long> list_id_org = new ArrayList<Long>();
+			List<Org> lsOrgChild = orgService.getorgChildrenbyOrg(orgid_link,orgTypes);
+			
+			for(Org theOrg:lsOrgChild){
+				if(!list_id_org.contains(theOrg.getId())){
+					list_id_org.add(theOrg.getId());
+				}
+			}
+			
+			if(orgid_link != 1) {
+				List<GpayUserOrg> list_user_org = userOrgService.getall_byuser(user.getId());
+				for (GpayUserOrg userorg : list_user_org) {
+					if(!list_id_org.contains(userorg.getOrgid_link())){
+						list_id_org.add(userorg.getOrgid_link());
+					}
+				}
+			}
+			
+			for(Long orgid:list_id_org){
+				lsPOrder.addAll(porderService.get_free_bygolivedate(entity.golivedate_from, entity.golivedate_to, orgid , "", i, i));
+			}
+			
+			List<PContractPO_Product> list = new ArrayList<PContractPO_Product>();
+			for(POrder porder : lsPOrder) {
+				PContractPO_Product line = new PContractPO_Product();
+				line.setBuyername(porder.getBuyername());
+				line.setGranttoorgid_link(porder.getGranttoorgid_link());
+				line.setOrgname(porder.getGranttoorgname());
+				line.setPcontract_poid_link(porder.getPO_Offer());
+				line.setPo_buyer(porder.getPo_buyer());
+				line.setProduct_buyername(porder.getProductcode());
+				line.setProductid_link(porder.getProductid_link());
+				line.setQuantity(porder.getPo_parent_quantity());
+				line.setShipdate(porder.getShipdate());
+				line.setVendorname(porder.getVendorname());
+				
+				list.add(line);
+			}
+			
+			response.data = list;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getfree_groupby_product_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<getfree_groupby_product_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/getporder_by_offer", method = RequestMethod.POST)
+	public ResponseEntity<get_porder_by_offer_response> GetPOrderByOffer(HttpServletRequest request,
+			@RequestBody get_porder_by_offer_request entity) {
+		get_porder_by_offer_response response = new get_porder_by_offer_response();
+		try {
+			Long productid_link = entity.productid_link;
+			Long pcontract_poid_link = entity.pcontract_poid_link;
+			Long orgid_link = entity.orgid_link;
+			
+			response.data = porderService.getby_offer(pcontract_poid_link, productid_link, orgid_link);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<get_porder_by_offer_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<get_porder_by_offer_response>(response, HttpStatus.OK);
 		}
 	}
 		

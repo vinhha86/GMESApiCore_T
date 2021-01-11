@@ -24,6 +24,7 @@ import org.hibernate.annotations.NotFoundAction;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
+import vn.gpay.gsmart.core.pcontract_po_productivity.PContract_PO_Productivity;
 import vn.gpay.gsmart.core.porder_bom_sku.POrderBOMSKU;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.porder_product.POrder_Product;
@@ -141,6 +142,24 @@ public class POrder implements Serializable {
 		return "";
 	}
 	@Transient
+	public Integer getDuration() {
+		if(pcontract_po != null) {
+			for(PContract_PO_Productivity po_productivity: pcontract_po.getPcontract_po_productivity()) {
+				if(po_productivity.getProductid_link() != null) {
+					if(po_productivity.getProductid_link().equals(productid_link) || po_productivity.getProductid_link() == productid_link) {
+						int duration = po_productivity.getProductiondays_ns();
+						if(duration == -1) 
+							duration = pcontract_po.getProductiondays();
+						else if (duration == 0 )
+							duration = 1;
+						return duration ;
+					}
+				}
+			}
+		}
+		return null;
+	}
+	@Transient
 	public String getShipMode() {
 		if(pcontract_po!=null)
 			return pcontract_po.getShipMode();
@@ -156,6 +175,13 @@ public class POrder implements Serializable {
 	public int getProductivity_po() {
 		if(pcontract_po!=null)
 			return pcontract_po.getProductivity_byproduct(productid_link);
+		return 0;
+	}
+	@Transient
+	public Integer getPo_parent_quantity() {
+		if(pcontract_po != null) {
+			return pcontract_po.getparent_quantity();
+		}
 		return 0;
 	}
 	@Transient
@@ -198,6 +224,12 @@ public class POrder implements Serializable {
 			}
 		}
 		return date;
+	}
+	@Transient
+	public Long getPO_Offer() {
+		if(pcontract_po!=null)
+			return pcontract_po.getParentpoid_link();
+		return null;
 	}
 	
 	@Transient
