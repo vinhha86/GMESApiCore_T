@@ -829,7 +829,7 @@ public class ScheduleAPI {
 				startDate = commonService.Date_Add_with_holiday(startDate, 1, orgrootid_link);
 				startDate = commonService.getBeginOfDate(startDate);
 			}
-			Date endDate = commonService.Date_Add_with_holiday(startDate, req.getDuration(), orgrootid_link);
+			Date endDate = commonService.Date_Add_with_holiday(startDate, req.getDuration() - 1, orgrootid_link);
 			endDate = commonService.getEndOfDate(endDate);
 			
 			int duration = req.getDuration();
@@ -837,7 +837,7 @@ public class ScheduleAPI {
 			if(productivity == 0) {
 				productivity = commonService.getProductivity(req.getTotalorder(), duration);
 				duration = commonService.getDuration_byProductivity(req.getTotalorder(), productivity);
-				endDate = commonService.Date_Add_with_holiday(startDate, duration, orgrootid_link);
+				endDate = commonService.Date_Add_with_holiday(startDate, duration - 1, orgrootid_link);
 			}
 			int type = endDate.after(req.getShipdate()) ? 1 : 0;
 			
@@ -1010,7 +1010,7 @@ public class ScheduleAPI {
 				//Kiem tra ngay bat dau ma la ngay nghi thi tang len ngay di lam tiep theo
 
 				startDate = commonService.getBeginOfDate(startDate);
-				Date endDate = commonService.Date_Add_with_holiday(startDate, req.getDuration(), orgrootid_link);
+				Date endDate = commonService.Date_Add_with_holiday(startDate, req.getDuration() - 1, orgrootid_link);
 				endDate = commonService.getEndOfDate(endDate);
 
 				start_before = startDate;
@@ -1021,7 +1021,7 @@ public class ScheduleAPI {
 				if(productivity == 0) {
 					productivity = commonService.getProductivity(req.getTotalorder(), duration);
 					duration = commonService.getDuration_byProductivity(req.getTotalorder(), productivity);
-					endDate = commonService.Date_Add_with_holiday(startDate, duration, orgrootid_link);
+					endDate = commonService.Date_Add_with_holiday(startDate, duration - 1, orgrootid_link);
 				}
 				
 				int type = endDate.after(req.getShipdate()) ? 1 : 0;
@@ -1164,7 +1164,7 @@ public class ScheduleAPI {
 				//Kiem tra ngay bat dau ma la ngay nghi thi tang len ngay di lam tiep theo
 
 				startDate = commonService.getBeginOfDate(startDate);
-				Date endDate = commonService.Date_Add_with_holiday(startDate, porder.getDuration(), orgrootid_link);
+				Date endDate = commonService.Date_Add_with_holiday(startDate, porder.getDuration() - 1, orgrootid_link);
 				endDate = commonService.getEndOfDate(endDate);
 
 				start_before = startDate;
@@ -1195,8 +1195,8 @@ public class ScheduleAPI {
 				pg.setPorderid_link(porder.getId());
 				pg.setOrgrootid_link(orgrootid_link);
 				pg.setStatus(1);
-				pg.setStart_date_plan(porder.getProductiondate_plan());
-				pg.setFinish_date_plan(porder.getFinishdate_plan());
+				pg.setStart_date_plan(startDate);
+				pg.setFinish_date_plan(endDate);
 				pg.setProductivity(productivity);
 				pg.setTotalamount_tt(porder.getTotalorder());
 				pg.setDuration(duration);
@@ -1341,7 +1341,7 @@ public class ScheduleAPI {
 		long orgrootid_link = user.getRootorgid_link();
 		
 		try {
-			Date end = commonService.Date_Add_with_holiday(entity.data.getStartDate(), entity.data.getDuration(), orgrootid_link);
+			Date end = commonService.Date_Add_with_holiday(entity.data.getStartDate(), entity.data.getDuration() - 1, orgrootid_link);
 			int productivity = commonService.getProductivity(entity.data.getTotalpackage(), entity.data.getDuration());
 			
 			POrder req = porderService.findOne(entity.data.getPorderid_link());
@@ -1378,7 +1378,7 @@ public class ScheduleAPI {
 		
 		try {
 			int duration = entity.data.getTotalpackage() / entity.data.getProductivity();			
-			Date end = commonService.Date_Add_with_holiday(entity.data.getStartDate(), duration, orgrootid_link);
+			Date end = commonService.Date_Add_with_holiday(entity.data.getStartDate(), duration - 1, orgrootid_link);
 			
 			POrder req = porderService.findOne(entity.data.getPorderid_link());
 			
