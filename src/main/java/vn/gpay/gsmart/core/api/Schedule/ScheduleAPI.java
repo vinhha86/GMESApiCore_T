@@ -561,11 +561,17 @@ public class ScheduleAPI {
 			int duration = commonService.getDuration(entity.StartDate, entity.EndDate, orgrootid_link);
 			int productivity = commonService.getProductivity(grant.getGrantamount(), response.duration);
 			
+			POrder req = porderService.findOne(grant.getPorderid_link());
+			int type = 0;
+			if(entity.EndDate.after(req.getShipdate()))
+				type =1;
+			
 			grant.setStart_date_plan(entity.StartDate);
 			grant.setFinish_date_plan(entity.EndDate);
 			grant.setDuration(duration);
 			grant.setProductivity(productivity);
 			grant.setReason_change(null);
+			grant.setType(type);
 			granttService.save(grant);
 			
 			response.duration = duration;
@@ -592,16 +598,21 @@ public class ScheduleAPI {
 			
 			//Cap nhat lai grant
 			POrderGrant grant = granttService.findOne(pordergrantid_link);
-			
+			POrder porder = porderService.findOne(porderid_link);
 			//Giu lai grantorg cu de update Porder_processing
 //			long granttoorgid_link_old = grant.getGranttoorgid_link();
 			int duration = entity.schedule.getDuration();
 			Date end_date = commonService.Date_Add_with_holiday(entity.startdate, duration - 1, orgrootid_link);
 			
+			int type = 0;
+			if(end_date.after(porder.getShipdate()))
+				type = 1;
+			
 			grant.setGranttoorgid_link(entity.orggrant_toid_link);
 			grant.setStart_date_plan(commonService.getBeginOfDate(entity.startdate));
 			grant.setFinish_date_plan(commonService.getEndOfDate(end_date));
 			grant.setReason_change(null);
+			grant.setType(type);
 			grant = granttService.save(grant);
 			
 			//Cap nhat lai Porder_processing
@@ -640,6 +651,7 @@ public class ScheduleAPI {
 //			sch.setDuration(commonService.getDuration(grant.getStart_date_plan(), grant.getFinish_date_plan(), orgrootid_link, year));
 //			sch.setProductivity(commonService.getProductivity(grant.getGrantamount(), sch.getDuration()));
 			sch.setPorder_grantid_link(entity.pordergrant_id_link);
+			sch.setGrant_type(type);
 			
 			response.data = sch;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -1466,6 +1478,10 @@ public class ScheduleAPI {
 			Date end = commonService.Date_Add_with_holiday(start, duration - 1, orgrootid_link);
 			end = commonService.getEndOfDate(end);
 			
+			POrder porder = porderService.findOne(grant_des.getPorderid_link());
+			int type =0;
+			if(end.after(porder.getShipdate()))
+				type = 1;
 			//Xoa grant nguon va processing nguon
 			List<POrderProcessing> list_process = processService.getByOrderId_and_GrantId(grant_src.getPorderid_link(), entity.pordergrantid_link_src);
 			for(POrderProcessing process : list_process) {
@@ -1481,6 +1497,7 @@ public class ScheduleAPI {
 			grant_des.setDuration(duration);
 			grant_des.setTotalamount_tt(grant_des.getTotalamount_tt() + grant_src.getTotalamount_tt());
 			grant_des.setReason_change(null);
+			grant_des.setType(type);
 			grant_des = granttService.save(grant_des);
 			
 			Schedule_porder sch = entity.sch;
@@ -1491,6 +1508,7 @@ public class ScheduleAPI {
 			sch.setName(grant_des.getMaHang());
 			sch.setMahang(grant_des.getMaHang());
 			sch.setTotalpackage(total);
+			sch.setGrant_type(type);
 			
 			//chuyen sku cua grant_src sang grant_des
 			List<POrderGrant_SKU> list_sku_src = grantskuService.getPOrderGrant_SKU(entity.pordergrantid_link_src);
@@ -1587,6 +1605,7 @@ public class ScheduleAPI {
 			
 			if(response.mes == "") {
 				//Cập nhật lại grant cũ sau khi tách
+				POrder porder = porderService.findOne(entity.porderid_link);
 				POrderGrant grant_old = granttService.findOne(entity.pordergrant_id_link);
 				
 				int total = grant_old.getGrantamount();
@@ -1599,12 +1618,17 @@ public class ScheduleAPI {
 				end_old = commonService.getEndOfDate(end_old);
 //				Date end_new = grant_old.getFinish_date_plan();
 //				int productivity_old = commonService.getProductivity(totalorder_old, duration_old);
-							
+
+				int type = 0;
+				if(end_old.after(porder.getShipdate()))
+					type =1;
+				
 				grant_old.setGrantamount(totalorder_old);
 				grant_old.setFinish_date_plan(end_old);
 				grant_old.setDuration(duration_old);
 				grant_old.setTotalamount_tt(grant_old.getTotalamount_tt() - entity.quantity);
 				grant_old.setReason_change(null);
+				grant_old.setType(type);
 				grant_old = granttService.save(grant_old);
 				
 				//Cap nhat lai Processing cu sau khi tach
@@ -1622,6 +1646,7 @@ public class ScheduleAPI {
 				old.setName(grant_old.getMaHang());
 				old.setMahang(grant_old.getMaHang());
 				old.setTotalpackage(totalorder_old);
+				old.setGrant_type(type);
 				response.old_data = old;
 				
 				//Sinh grant moi
@@ -1651,8 +1676,6 @@ public class ScheduleAPI {
 				grant.setDuration(duration_new);
 				grant.setTotalamount_tt(entity.quantity);
 				grant = granttService.save(grant);
-				
-				POrder porder = porderService.findOne(entity.porderid_link);
 				
 				//Sinh 1 dong moi trong Processing
 				POrderProcessing process = new POrderProcessing();
