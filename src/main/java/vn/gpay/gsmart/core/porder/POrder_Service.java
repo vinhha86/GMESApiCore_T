@@ -69,19 +69,24 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 		Long orgrootid_link = user.getRootorgid_link();
 		try {
 			POrder porder = new POrder();
-			porder.setPorderreqid_link(porder_req.getId());
-			porder.setGranttoorgid_link(porder_req.getGranttoorgid_link());
-			porder.setPcontractid_link(porder_req.getPcontractid_link());
-			porder.setPcontract_poid_link(porder_req.getPcontract_poid_link());
-			porder.setProductid_link(porder_req.getProductid_link());
-			porder.setTotalorder_req(porder_req.getTotalorder());
-			porder.setTotalorder(porder_req.getTotalorder());
 			
 			//Kiem tra xem POrder_req da duoc tao lenhsx hay chua?
-			List<POrder> lsPOrder = getByPOrder_Req(porder.getPcontract_poid_link(), porder.getPorderreqid_link());
+			List<POrder> lsPOrder = getByPOrder_Req(porder_req.getPcontract_poid_link(), porder_req.getId());
 			if (lsPOrder.size() > 0){
-				return lsPOrder.get(0);
+				porder = lsPOrder.get(0);
+				porder.setGranttoorgid_link(porder_req.getGranttoorgid_link());
+				porder = this.save(porder);
+				return porder;
+				
 			} else {
+
+				porder.setPorderreqid_link(porder_req.getId());
+				porder.setGranttoorgid_link(porder_req.getGranttoorgid_link());
+				porder.setPcontractid_link(porder_req.getPcontractid_link());
+				porder.setPcontract_poid_link(porder_req.getPcontract_poid_link());
+				porder.setProductid_link(porder_req.getProductid_link());
+				porder.setTotalorder_req(porder_req.getTotalorder());
+				porder.setTotalorder(porder_req.getTotalorder());
 				//Lay thong tin PO
 				PContract_PO thePO = pcontract_POService.findOne(porder.getPcontract_poid_link());
 				

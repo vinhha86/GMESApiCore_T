@@ -80,7 +80,10 @@ public interface IPOrder_Req_Repository extends JpaRepository<POrder_Req, Long>,
 			+ "where c.granttoorgid_link = :orgid_link "
 			+ "and a.status <= -1 "
 			+ "and a.shipdate = "
-			+ "(select min(b.shipdate) from PContract_PO b where b.parentpoid_link = a.parentpoid_link)")
+			+ "(select min(b.shipdate) from POrder_Req d "
+			+ "inner join PContract_PO b on d.pcontract_poid_link = b.id "
+			+ "where b.parentpoid_link = a.parentpoid_link "
+			+ "and d.granttoorgid_link = :orgid_link)")
 	public List<POrder_Req> getByOrg(@Param ("orgid_link")final Long orgid_link);
 	
 }
