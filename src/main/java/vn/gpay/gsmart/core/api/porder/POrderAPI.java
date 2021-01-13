@@ -344,11 +344,11 @@ public class POrderAPI {
 		getfree_groupby_product_response response = new getfree_groupby_product_response();
 		try {
 			long i = (long)0;
-			List<POrder> lsPOrder = porderService.get_free_bygolivedate(entity.golivedate_from, entity.golivedate_to, orgid_link, "", i, i);
+			List<POrder> lsPOrder = new ArrayList<POrder>();
 			List<String> orgTypes = new ArrayList<String>();
 			orgTypes.add("13");
-			orgTypes.add("14");
 			List<Long> list_id_org = new ArrayList<Long>();
+			list_id_org.add(orgid_link);
 			List<Org> lsOrgChild = orgService.getorgChildrenbyOrg(orgid_link,orgTypes);
 			
 			for(Org theOrg:lsOrgChild){

@@ -16,6 +16,7 @@ public class PContractPO_Product {
 	
 	
 	
+	
 	public String getOrgname() {
 		return orgname;
 	}

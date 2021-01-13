@@ -338,7 +338,6 @@ public class POrder_ReqAPI {
 			
 			List<String> orgTypes = new ArrayList<String>();
 			orgTypes.add("13");
-			orgTypes.add("14");
 			List<Org> lsOrgChild = orgService.getorgChildrenbyOrg(orgid_link,orgTypes);
 			List<POrder_Req> list_req = new ArrayList<POrder_Req>();
 			
