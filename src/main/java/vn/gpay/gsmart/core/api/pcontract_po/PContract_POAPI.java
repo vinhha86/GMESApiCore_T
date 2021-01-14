@@ -2490,7 +2490,8 @@ public class PContract_POAPI {
 		PContract_getbycontractproduct_response response = new PContract_getbycontractproduct_response();
 		try {
 			Long pcontract_poid_link = entity.pcontract_poid_link;
-			PContract_PO pcontractPo = pcontract_POService.findOne(pcontract_poid_link);
+			PContract_PO pcontractPoKeHoach = pcontract_POService.findOne(pcontract_poid_link);
+			PContract_PO pcontractPo = pcontract_POService.findOne(pcontractPoKeHoach.getParentpoid_link());
 			List<PContract_PO> listPContractPO = pcontractPo.getSub_po_confirm();
 			
 			//Update danh sach to chuyen duoc giao sx cho PO Line
