@@ -1154,7 +1154,6 @@ public class ScheduleAPI {
 			Date start_before = null, end_before = null;
 			
 			for(POrder porder : list_porder) {
-
 				Date startDate = null;
 				if(start_before == null) {
 					startDate = commonService.getBeginOfDate(porder.getProductiondate_plan());
@@ -1168,9 +1167,13 @@ public class ScheduleAPI {
 					startDate = commonService.Date_Add_with_holiday(end_before, 1, orgrootid_link);
 				}
 				//Kiem tra ngay bat dau ma la ngay nghi thi tang len ngay di lam tiep theo
-
+				Date endDate = null;
+				int duration = porder.getDuration();
 				startDate = commonService.getBeginOfDate(startDate);
-				Date endDate = commonService.Date_Add_with_holiday(startDate, porder.getDuration() - 1, orgrootid_link);
+				if(duration != -1)
+					endDate = commonService.Date_Add_with_holiday(startDate, porder.getDuration() - 1, orgrootid_link);
+				else
+					endDate = porder.getFinishdate_plan();
 				endDate = commonService.getEndOfDate(endDate);
 
 				start_before = startDate;
@@ -1179,7 +1182,6 @@ public class ScheduleAPI {
 //				Date startDate = commonService.getBeginOfDate(porder.getProductiondate_plan());
 //				Date endDate = commonService.getEndOfDate(porder.getFinishdate_plan());
 				
-				int duration = porder.getDuration();
 				int productivity = porder.getPlan_productivity();
 				
 				if(productivity == 0) {

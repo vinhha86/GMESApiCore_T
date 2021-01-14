@@ -157,7 +157,7 @@ public class POrder implements Serializable {
 				}
 			}
 		}
-		return null;
+		return -1;
 	}
 	@Transient
 	public String getShipMode() {
