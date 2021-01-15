@@ -114,6 +114,21 @@ public class Handover implements Serializable {
 		return total;
 	}
 	
+	@Transient
+	public String getHandoverProductBuyercode() {
+		if(handoverProducts != null) {
+			if(handoverProducts.size() > 0) {
+				HandoverProduct handoverProduct = handoverProducts.get(0);
+				if(handoverProduct != null) {
+					if(handoverProduct.getBuyercode() != null) {
+						return handoverProduct.getBuyercode();
+					}
+				}
+			}
+		}
+		return "";
+	}
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="porderid_link",insertable=false,updatable =false)

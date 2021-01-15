@@ -80,8 +80,9 @@ public class HandoverProduct  implements Serializable{
 	@Transient
 	public String getBuyercode() {
 		if(product!=null) {
-//			if(product.getBuyercode() != null)
+			if(product.getBuyercode() != null) {
 				return product.getBuyercode();
+			}
 		}
 		return "";
 	}
