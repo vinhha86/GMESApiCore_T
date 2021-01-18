@@ -1,5 +1,9 @@
 package vn.gpay.gsmart.core.api.Schedule;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -280,6 +284,17 @@ public class ScheduleAPI {
 						sch_porder.setProductivity_porder(pordergrant.getProductivity_porder());
 						sch_porder.setGrant_type(pordergrant.getType());
 						
+						String FolderPath = commonService.getFolderPath(pordergrant.getProductType());
+						String filename = pordergrant.getImgProduct();
+						if(filename != "" && filename != null) {
+							String uploadRootPath = request.getServletContext().getRealPath("");
+							File uploadRootDir = new File(uploadRootPath);
+							String filePath = uploadRootDir.getParent()+"/"+FolderPath+"/"+ filename;
+							Path path = Paths.get(filePath);
+							byte[] data = Files.readAllBytes(path);
+							sch_porder.setImg(data);
+						}
+						
 						int d = commonService.getDuration(start_free, end_free, orgrootid_link);
 						day_grant += d;
 						
@@ -413,6 +428,18 @@ public class ScheduleAPI {
 						sch_porder.setPcontractid_link(pordergrant.getPcontractid_link());
 						sch_porder.setProductbuyercode(pordergrant.getProductcode());
 						sch_porder.setGrant_type(pordergrant.getType());
+						
+						String FolderPath = commonService.getFolderPath(pordergrant.getProductType());
+						String filename = pordergrant.getImgProduct();
+						if(filename != "" && filename != null) {
+							String uploadRootPath = request.getServletContext().getRealPath("");
+							File uploadRootDir = new File(uploadRootPath);
+							String filePath = uploadRootDir.getParent()+"/"+FolderPath+"/"+ filename;
+							Path path = Paths.get(filePath);
+							byte[] data = Files.readAllBytes(path);
+							sch_porder.setImg(data);
+						}
+						
 						
 						response.events.rows.add(sch_porder);
 					}

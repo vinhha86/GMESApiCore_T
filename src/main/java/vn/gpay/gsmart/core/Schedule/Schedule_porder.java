@@ -32,7 +32,7 @@ public class Schedule_porder {
 	private long porderid_link;
 	private String productbuyercode;
 	private int grant_type; // 0 : kip giao hang, 1 qua ngay giao hang
-	
+	private byte[] img;
 	@JsonProperty("Cls")
 	private String Cls;
 	
@@ -195,6 +195,12 @@ public class Schedule_porder {
 	}
 	public void setProductivity_line(Integer productivity_line) {
 		this.productivity_line = productivity_line;
+	}
+	public byte[] getImg() {
+		return img;
+	}
+	public void setImg(byte[] img) {
+		this.img = img;
 	}
 	
 	

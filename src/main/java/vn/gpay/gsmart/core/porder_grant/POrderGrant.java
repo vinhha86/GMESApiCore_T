@@ -117,6 +117,19 @@ public class POrderGrant implements Serializable {
     private Org org;
 	
 	@Transient
+	public int getProductType() {
+		if(porder!=null)
+			return porder.getProductType();
+		return 0;
+	}
+	@Transient
+	public String getImgProduct() {
+		if(porder!=null)
+			return porder.getImageurl();
+		return "";
+	}
+	
+	@Transient
 	public String getPortTo() {
 		if(porder!=null) {
 			return porder.getPortTo();

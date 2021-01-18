@@ -142,6 +142,12 @@ public class POrder implements Serializable {
 		return "";
 	}
 	@Transient
+	public int getProductType() {
+		if(product!=null)
+			return product.getProducttypeid_link();
+		return 0;
+	}
+	@Transient
 	public Integer getDuration() {
 		if(pcontract_po != null) {
 			for(PContract_PO_Productivity po_productivity: pcontract_po.getPcontract_po_productivity()) {
