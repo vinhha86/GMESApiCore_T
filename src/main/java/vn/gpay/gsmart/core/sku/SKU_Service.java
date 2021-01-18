@@ -76,4 +76,13 @@ public class SKU_Service extends AbstractService<SKU> implements ISKU_Service {
 	public List<SKU> getSKUforHandOver(Long porderid_link) {
 		return repo.getSKUforHandOver(porderid_link);
 	}
+
+	@Override
+	public List<SKU> getnpl_by_pcontract(Integer producttypeid_link, Long pcontractid_link) {
+		// TODO Auto-generated method stub
+		int producttypeid_link_from = producttypeid_link;
+		int producttypeid_link_to = producttypeid_link_from +10;
+		
+		return repo.getbytype_and_pcontract(producttypeid_link_from, producttypeid_link_to, pcontractid_link);
+	}
 }

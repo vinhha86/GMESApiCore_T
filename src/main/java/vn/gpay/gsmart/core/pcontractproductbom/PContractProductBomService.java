@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import vn.gpay.gsmart.core.base.AbstractService;
+import vn.gpay.gsmart.core.product.Product;
 
 @Service
 public class PContractProductBomService extends AbstractService<PContractProductBom> implements IPContractProductBomService {

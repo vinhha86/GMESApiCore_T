@@ -64,4 +64,16 @@ public interface ISKU_Repository extends JpaRepository<SKU, Long>, JpaSpecificat
 			@Param ("porderid_link")final Long porderid_link
 			);
 	
+	@Query(value = "select c from SKU c "
+			+ "inner join PContractProductBom2 a on c.id = a.materialid_link "
+			+ "inner join Product b on b.id = c.productid_link "
+			+ "where a.pcontractid_link = :pcontractid_link "
+			+ "and b.producttypeid_link >= :producttypeid_link_from "
+			+ "and b.producttypeid_link < :producttypeid_link_to "
+			+ "group by c")
+	public List<SKU> getbytype_and_pcontract(
+			@Param ("producttypeid_link_from")final  Integer producttypeid_link_from,
+			@Param ("producttypeid_link_to")final  Integer producttypeid_link_to,
+			@Param ("pcontractid_link")final  Long pcontractid_link);
+	
 }
