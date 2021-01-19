@@ -28,6 +28,7 @@ public interface IPOrder_Req_Repository extends JpaRepository<POrder_Req, Long>,
 			+ "and c.productid_link = :productid_link "
 			+ "and c.status = 0 "
 			+ "and c.granttoorgid_link = :orgid_link "
+			+ "and a.po_typeid_link = 10"
 			+ "order by a.shipdate asc")
 	public List<POrder_Req> getByOfferAndProduct(
 			@Param ("pcontract_poid_link")final Long pcontract_poid_link, 

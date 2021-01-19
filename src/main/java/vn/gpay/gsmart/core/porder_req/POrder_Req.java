@@ -110,6 +110,10 @@ public class POrder_Req implements Serializable {
 	public Integer get_ProductivityPO() {
 		if(pcontract_po!=null)
 		{
+			List<PContract_PO_Productivity> list = pcontract_po.getPcontract_po_productivity();
+			if(list == null || list.size() == 0)
+				list = pcontract_po.getpo_productivity_parent();
+			
 			for(PContract_PO_Productivity po_productivity: pcontract_po.getPcontract_po_productivity()) {
 				if(po_productivity.getProductid_link() != null) {
 					if(po_productivity.getProductid_link().equals(productid_link) || po_productivity.getProductid_link() == productid_link) {
@@ -233,7 +237,11 @@ public class POrder_Req implements Serializable {
 	@Transient
 	public Integer getDuration() {
 		if(pcontract_po != null) {
-			for(PContract_PO_Productivity po_productivity: pcontract_po.getPcontract_po_productivity()) {
+			List<PContract_PO_Productivity> list = pcontract_po.getPcontract_po_productivity();
+			if(list == null || list.size() == 0)
+				list = pcontract_po.getpo_productivity_parent();
+			
+			for(PContract_PO_Productivity po_productivity: list) {
 				if(po_productivity.getProductid_link() != null) {
 					if(po_productivity.getProductid_link().equals(productid_link) || po_productivity.getProductid_link() == productid_link) {
 						int duration = po_productivity.getProductiondays_ns();

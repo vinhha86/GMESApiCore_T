@@ -1053,19 +1053,23 @@ public class ScheduleAPI {
 				//Kiem tra ngay bat dau ma la ngay nghi thi tang len ngay di lam tiep theo
 
 				startDate = commonService.getBeginOfDate(startDate);
-				Date endDate = commonService.Date_Add_with_holiday(startDate, req.getDuration() - 1, orgrootid_link);
-				endDate = commonService.getEndOfDate(endDate);
-
-				start_before = startDate;
-				end_before = endDate;
 				
-				int duration = req.getDuration();
+				Date endDate = null;
+				Integer duration = req.getDuration();
+				if(duration != null) {
+					endDate = commonService.Date_Add_with_holiday(startDate, req.getDuration() - 1, orgrootid_link);
+					endDate = commonService.getEndOfDate(endDate);
+				}
+				
 				
 				if(productivity == 0) {
 					productivity = commonService.getProductivity(req.getTotalorder(), duration);
 					duration = commonService.getDuration_byProductivity(req.getTotalorder(), productivity);
 					endDate = commonService.Date_Add_with_holiday(startDate, duration - 1, orgrootid_link);
 				}
+				
+				start_before = startDate;
+				end_before = endDate;
 				
 				int type = endDate.after(req.getShipdate()) ? 1 : 0;
 				
@@ -1089,7 +1093,7 @@ public class ScheduleAPI {
 				porder.setProductid_link(req.getProductid_link());
 				porder.setPlan_productivity(productivity);
 				porder.setStatus(POrderStatus.PORDER_STATUS_UNCONFIRM);
-				porder = porderService.saveAndFlush(porder);
+				porder = porderService.save(porder);
 				
 				
 //				Date endDate = commonService.getEndOfDate(porder.getFinishdate_plan());

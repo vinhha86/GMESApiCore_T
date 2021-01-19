@@ -429,6 +429,13 @@ public class PContract_PO implements Serializable {/**
 	}
 	
 	@Transient
+	public List<PContract_PO_Productivity> getpo_productivity_parent(){
+		if(parent != null)
+				return parent.getPcontract_po_productivity();
+		return new ArrayList<PContract_PO_Productivity>();
+	}
+	
+	@Transient
 	public String getBuyerName() {
 		if(pcontract != null) {
 			return pcontract.getBuyername();
@@ -799,6 +806,8 @@ public class PContract_PO implements Serializable {/**
 	public List<PContract_PO_Productivity> getPcontract_po_productivity() {
 		return pcontract_po_productivity;
 	}
+	
+	
 
 	public void setPcontract_po_productivity(List<PContract_PO_Productivity> pcontract_po_productivity) {
 		this.pcontract_po_productivity = pcontract_po_productivity;
