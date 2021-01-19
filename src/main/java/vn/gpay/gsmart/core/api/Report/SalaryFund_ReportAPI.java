@@ -49,7 +49,7 @@ public class SalaryFund_ReportAPI {
 		try {
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(entity.reportdate);
-			response.data = salaryfundReportService.getData_ByMonth_ToSX(user.getRootorgid_link(), user.getOrgid_link(), calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR), entity.reportmonths);
+			response.data = salaryfundReportService.getData_ByMonth_ToSX(user.getRootorgid_link(), user.getOrgid_link(), calendar.get(Calendar.MONTH)+1, calendar.get(Calendar.YEAR), entity.reportmonths);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<salaryfund_report_response>(response, HttpStatus.OK);

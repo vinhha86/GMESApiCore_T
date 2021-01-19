@@ -1,9 +1,9 @@
 package vn.gpay.gsmart.core.api.Schedule;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+//import java.io.File;
+//import java.nio.file.Files;
+//import java.nio.file.Path;
+//import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -57,6 +57,7 @@ import vn.gpay.gsmart.core.task_checklist.ITask_CheckList_Service;
 import vn.gpay.gsmart.core.task_checklist.Task_CheckList;
 import vn.gpay.gsmart.core.task_object.ITask_Object_Service;
 import vn.gpay.gsmart.core.task_object.Task_Object;
+import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.POrderReqStatus;
@@ -259,6 +260,10 @@ public class ScheduleAPI {
 						int productivity = pordergrant.getProductivity();
 						
 						Schedule_porder sch_porder = new Schedule_porder();
+						if (null!=pordergrant.getImgProduct() && pordergrant.getImgProduct().length()>0)
+							sch_porder.setIcon(AtributeFixValues.folder_image + pordergrant.getImgProduct());
+						else
+							sch_porder.setIcon(null);
 						sch_porder.setCls(pordergrant.getCls());
 						sch_porder.setEndDate(end);
 						sch_porder.setId_origin(pordergrant.getPorderid_link());
@@ -284,16 +289,16 @@ public class ScheduleAPI {
 						sch_porder.setProductivity_porder(pordergrant.getProductivity_porder());
 						sch_porder.setGrant_type(pordergrant.getType());
 						
-						String FolderPath = commonService.getFolderPath(pordergrant.getProductType());
-						String filename = pordergrant.getImgProduct();
-						if(filename != "" && filename != null) {
-							String uploadRootPath = request.getServletContext().getRealPath("");
-							File uploadRootDir = new File(uploadRootPath);
-							String filePath = uploadRootDir.getParent()+"/"+FolderPath+"/"+ filename;
-							Path path = Paths.get(filePath);
-							byte[] data = Files.readAllBytes(path);
-							sch_porder.setImg(data);
-						}
+//						String FolderPath = commonService.getFolderPath(pordergrant.getProductType());
+//						String filename = pordergrant.getImgProduct();
+//						if(filename != "" && filename != null) {
+//							String uploadRootPath = request.getServletContext().getRealPath("");
+//							File uploadRootDir = new File(uploadRootPath);
+//							String filePath = uploadRootDir.getParent()+"/"+FolderPath+"/"+ filename;
+//							Path path = Paths.get(filePath);
+//							byte[] data = Files.readAllBytes(path);
+//							sch_porder.setImg(data);
+//						}
 						
 						int d = commonService.getDuration(start_free, end_free, orgrootid_link);
 						day_grant += d;
@@ -404,6 +409,11 @@ public class ScheduleAPI {
 						int productivity = pordergrant.getProductivity(); 
 						
 						Schedule_porder sch_porder = new Schedule_porder();
+						if (null!=pordergrant.getImgProduct() && pordergrant.getImgProduct().length()>0)
+							sch_porder.setIcon(AtributeFixValues.folder_image + pordergrant.getImgProduct());
+						else
+							sch_porder.setIcon(null);
+
 						sch_porder.setCls(pordergrant.getCls());
 						sch_porder.setEndDate(end);
 						sch_porder.setId_origin(pordergrant.getPorderid_link());
@@ -429,16 +439,16 @@ public class ScheduleAPI {
 						sch_porder.setProductbuyercode(pordergrant.getProductcode());
 						sch_porder.setGrant_type(pordergrant.getType());
 						
-						String FolderPath = commonService.getFolderPath(pordergrant.getProductType());
-						String filename = pordergrant.getImgProduct();
-						if(filename != "" && filename != null) {
-							String uploadRootPath = request.getServletContext().getRealPath("");
-							File uploadRootDir = new File(uploadRootPath);
-							String filePath = uploadRootDir.getParent()+"/"+FolderPath+"/"+ filename;
-							Path path = Paths.get(filePath);
-							byte[] data = Files.readAllBytes(path);
-							sch_porder.setImg(data);
-						}
+//						String FolderPath = commonService.getFolderPath(pordergrant.getProductType());
+//						String filename = pordergrant.getImgProduct();
+//						if(filename != "" && filename != null) {
+//							String uploadRootPath = request.getServletContext().getRealPath("");
+//							File uploadRootDir = new File(uploadRootPath);
+//							String filePath = uploadRootDir.getParent()+"/"+FolderPath+"/"+ filename;
+//							Path path = Paths.get(filePath);
+//							byte[] data = Files.readAllBytes(path);
+//							sch_porder.setImg(data);
+//						}
 						
 						
 						response.events.rows.add(sch_porder);

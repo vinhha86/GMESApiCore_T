@@ -43,8 +43,16 @@ public class Schedule_porder {
 	private Integer productivity_po;//NS cua PO
 	private Integer productivity_porder;//NS Target (Khi tao lenh sx, lay tu NS Target tai chao gia vao)
 	private Integer productivity_line;//NS tổ (tính trung bình tiến độ ra chuyền)
+	@JsonProperty("icon")
+	private String icon ;
 	
-		
+	public String getIcon() {
+		return icon;
+	}
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
+	
 	public int getGrant_type() {
 		return grant_type;
 	}

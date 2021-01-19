@@ -114,7 +114,7 @@ public class CMP_Service implements ICMP_Service {
 		}
 		month_data.add(new ReportMonth(month_prev,year_prev));
 		month_data.add(new ReportMonth(month,year));
-		for(int i=0;i<=reportmonths;i++){
+		for(int i=0;i<reportmonths;i++){
 			int month_next = month + 1;
 			int year_next = year;
 			if (month_next == 13){
@@ -229,18 +229,22 @@ public class CMP_Service implements ICMP_Service {
 		try {
 			Date dateStart = sdf.parse(dateStartString);
 			Date dateEnd = sdf.parse(dateEndString);
-			//Lay danh sach cac Porder trong khoang thoi gian
+			//Lay danh sach cac PorderGrant trong khoang thoi gian
 			Specification<POrderGrant> specification = Specifications.<POrderGrant>and()
 					.eq("granttoorgid_link", orgid_link)
 					.ge("status", POrderStatus.PORDER_STATUS_FREE)
-		            .ge("porder.finishdate_plan",dateStart)
-	                .le("porder.finishdate_plan",dateEnd)
+//		            .ge("porder.finishdate_plan",dateStart)
+//	                .le("porder.finishdate_plan",dateEnd)
+		            .ge("finish_date_plan",dateStart)
+	                .le("finish_date_plan",dateEnd)
 		            .build();
 //			Sort sort = Sorts.builder()
 //			        .desc("ordercode")
 //			        .build();
 			List<POrderGrant> lsPOrderGrant = repoPOrderGrant.findAll(specification);
-//			System.out.println(lsPOrder);
+//			if (orgid_link==312){
+//				System.out.println(lsPOrderGrant);
+//			}
 			Float totalCMP = (float) 0;
 			for(POrderGrant thePOrder: lsPOrderGrant){
 				//Lay gia CMP cua san pham trong pcontract_price

@@ -240,8 +240,8 @@ public class SalaryFund_Service implements ISalaryFund_Service {
 			Specification<POrderGrant> specification = Specifications.<POrderGrant>and()
 					.eq("granttoorgid_link", orgid_link)
 					.ge("status", POrderStatus.PORDER_STATUS_FREE)
-		            .ge("porder.finishdate_plan",dateStart)
-	                .le("porder.finishdate_plan",dateEnd)
+		            .ge("finish_date_plan",dateStart)
+	                .le("finish_date_plan",dateEnd)
 		            .build();
 //			Sort sort = Sorts.builder()
 //			        .desc("ordercode")
@@ -263,7 +263,7 @@ public class SalaryFund_Service implements ISalaryFund_Service {
 							//Lay gia CMP cua san pham trong PO cha
 							PContract_Price thePrice_Parent = priceService.getPrice_CMP(thePO.getParentpoid_link(), thePOrder.getProductid_link());
 							if (null != thePrice_Parent){
-								int price = Math.round(thePrice_Parent.getPrice_sewingcost()>0?thePrice_Parent.getPrice_sewingcost():thePrice_Parent.getPrice_sewingtarget());
+								int price = Math.round(null!=thePrice_Parent.getPrice_sewingcost()&&thePrice_Parent.getPrice_sewingcost()>0?thePrice_Parent.getPrice_sewingcost():null!=thePrice_Parent.getPrice_sewingtarget()?thePrice_Parent.getPrice_sewingtarget():0);
 								int totalorder = Math.round(null==thePOrder.getGrantamount()?0:thePOrder.getGrantamount());
 								totalSalaryFund = totalSalaryFund + (price*totalorder);							
 							}

@@ -48,7 +48,8 @@ public class CMP_ReportAPI {
 		try {
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(entity.reportdate);
-			response.data = cmpReportService.getData_ByMonth_ToSX(user.getRootorgid_link(), user.getOrgid_link(), calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR), entity.reportmonths);
+			int month = calendar.get(Calendar.MONTH) +1;
+			response.data = cmpReportService.getData_ByMonth_ToSX(user.getRootorgid_link(), user.getOrgid_link(), month, calendar.get(Calendar.YEAR), entity.reportmonths);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<cmp_report_response>(response, HttpStatus.OK);
