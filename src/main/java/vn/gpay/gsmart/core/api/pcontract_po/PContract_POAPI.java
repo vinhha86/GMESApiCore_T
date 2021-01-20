@@ -2022,9 +2022,7 @@ public class PContract_POAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgid_link = user.getOrgid_link();
 			String orgcode = user.getOrgcode();
-			
-			
-			
+				
 			List<String> orgs = new ArrayList<String>();
 			List<Long> list_org = new ArrayList<Long>();
 			if(orgid_link != 0 && orgid_link != 1) {
