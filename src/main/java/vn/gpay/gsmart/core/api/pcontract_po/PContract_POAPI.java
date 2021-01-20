@@ -2034,7 +2034,8 @@ public class PContract_POAPI {
 				}
 				//Them chinh don vi cua user
 				orgs.add(orgcode);
-				list_org.add(orgid_link);
+				if(!list_org.contains(orgid_link))
+					list_org.add(orgid_link);
 			}
 			
 //			list_org = "("+list_org+")";

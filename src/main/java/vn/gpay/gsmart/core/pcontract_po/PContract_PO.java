@@ -142,8 +142,8 @@ public class PContract_PO implements Serializable {/**
 					}
 				}
 			}
-			
-			return list_line.get(i).getId();
+			if(i>-1)
+				return list_line.get(i).getId();
 		}
 			return null;
 	}
