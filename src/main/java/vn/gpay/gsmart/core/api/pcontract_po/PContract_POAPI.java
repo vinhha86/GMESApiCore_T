@@ -1859,7 +1859,6 @@ public class PContract_POAPI {
 					pContract_PO_Productivity.setOrgrootid_link(orgrootid_link);
 					pContract_PO_Productivity.setPcontract_poid_link(pcontract_po.getId());
 				}
-				pContract_PO_Productivity.setProductid_link(pcontract_po.getProductid_link());
 				productivityService.save(pContract_PO_Productivity);
 			}
 			
