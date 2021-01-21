@@ -38,11 +38,14 @@ public class FabricPriceAPI {
 			List<Long> materialid_link_list = entity.materialid_link_list;
 			
 			List<SKU> listSku = new ArrayList<SKU>();
+			if(unitid_link == null) {
+				unitid_link = 0L;
+			}
 			
 			for(Long materialid_link : materialid_link_list) {
 				SKU sku = skuService.findOne(materialid_link);
 				List<FabricPrice> listFabricPrice = fabricPriceService.getByMaterial(materialid_link);
-				if(listFabricPrice.size() > 0 && (unitid_link == 1 || unitid_link == 4)) {
+				if(listFabricPrice.size() > 0 && (unitid_link == 1L || unitid_link == 4L)) {
 					// đã có giá
 					Currency pcontractpoCurrency = currencyService.findOne(pcontractpoCurrencyid_link);
 					FabricPrice fabricPrice = listFabricPrice.get(0);
@@ -98,6 +101,7 @@ public class FabricPriceAPI {
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<FabricPrice_getByMaterial_response>(response,HttpStatus.OK);
 		}catch (Exception e) {
+			e.printStackTrace();
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<FabricPrice_getByMaterial_response>(response,HttpStatus.OK);
