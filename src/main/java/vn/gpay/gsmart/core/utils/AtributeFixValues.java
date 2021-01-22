@@ -14,7 +14,8 @@ public class AtributeFixValues {
     public static long value_sizewidth_all = 155;
     public static long role_id_admin = 4;
     public static String folder_upload = "gmesdha_upload";
-    public static String folder_image = "http://27.71.231.154:8080/gmesdha_upload/product/";
+    public static String folder_image = "http://27.71.231.154:8080/gmesdha_upload/product/";//DHA
+//    public static String folder_image = "http://gpay.vn:8090/gmesdha_upload/product/";//GSmart
     public static String url_authen = "http://localhost:8081";//DHA
 //    public static String url_authen = "http://gpay.vn:8181";//GSmart
 //    public static String url_authen = "http://localhost:8181";//GSmart
