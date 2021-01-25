@@ -153,6 +153,7 @@ public class HandoverProductAPI {
 //			handoverProduct.setLasttimeupdate(date);
 //			handoverProduct.setLastuserupdateid_link(user.getId());
 			handoverProduct.setTotalpackage(0);
+			handoverProduct.setTotalpackagecheck(0);
 
 			response.data = handoverProduct;
 			response.buyername = product.getBuyername();

@@ -64,7 +64,7 @@ public class HandoverSKU implements Serializable{
 	
 	@Column(name ="lasttimeupdate")
 	private Date lasttimeupdate;
-
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="skuid_link",insertable=false,updatable =false)
@@ -216,6 +216,50 @@ public class HandoverSKU implements Serializable{
 
 	public void setLasttimeupdate(Date lasttimeupdate) {
 		this.lasttimeupdate = lasttimeupdate;
+	}
+	
+	@Transient
+	private String skuCodeString;
+	
+	@Transient
+	private String skuColorString;
+	
+	@Transient
+	private String skuSizeString;
+	
+	@Transient
+	private Integer skuSizeSortValInt;
+
+	public String getSkuCodeString() {
+		return skuCodeString;
+	}
+
+	public void setSkuCodeString(String skuCodeString) {
+		this.skuCodeString = skuCodeString;
+	}
+
+	public String getSkuColorString() {
+		return skuColorString;
+	}
+
+	public void setSkuColorString(String skuColorString) {
+		this.skuColorString = skuColorString;
+	}
+
+	public String getSkuSizeString() {
+		return skuSizeString;
+	}
+
+	public void setSkuSizeString(String skuSizeString) {
+		this.skuSizeString = skuSizeString;
+	}
+
+	public Integer getSkuSizeSortValInt() {
+		return skuSizeSortValInt;
+	}
+
+	public void setSkuSizeSortValInt(Integer skuSizeSortValInt) {
+		this.skuSizeSortValInt = skuSizeSortValInt;
 	}
 	
 	

@@ -230,6 +230,40 @@ public class HandoverAPI {
 							handoverSkuService.deleteById(handoverSKU.getId());
 						}
 					}
+					
+					for(HandoverProduct handoverProduct : handoverProducts) {
+						List<HandoverSKU> handoverSKUs = handoverProduct.getHandoverSKUs();
+						if(handoverProduct.getId() == null || handoverProduct.getId() == 0) {
+							handoverProduct.setOrgrootid_link(user.getRootorgid_link());
+							handoverProduct.setHandoverid_link(handover.getId());
+							handoverProduct.setUsercreateid_link(user.getId());
+							handoverProduct.setTimecreate(date);
+						}else {
+							handoverProduct.setLastuserupdateid_link(user.getId());
+							handoverProduct.setLasttimeupdate(date);
+						}
+						handoverProduct = handoverProductService.save(handoverProduct);
+						
+						if(handoverProduct.getTotalpackage() != null)
+							total+=handoverProduct.getTotalpackage();
+						if(handoverProduct.getTotalpackagecheck() != null)
+							totalCheck+=handoverProduct.getTotalpackagecheck();
+						
+						// skus
+						for(HandoverSKU handoverSKU : handoverSKUs) {
+							if(handoverSKU.getId() == null || handoverSKU.getId() == 0) {
+								handoverSKU.setOrgrootid_link(user.getRootorgid_link());
+								handoverSKU.setHandoverid_link(handover.getId());
+								handoverSKU.setHandoverproductid_link(handoverProduct.getId());
+								handoverSKU.setUsercreateid_link(user.getId());
+								handoverSKU.setTimecreate(date);
+							}else {
+								handoverSKU.setLastuserupdateid_link(user.getId());
+								handoverSKU.setLasttimeupdate(date);
+							}
+							handoverSkuService.save(handoverSKU);
+						}
+					}
 				}
 				handover = handoverService.save(handover);
 			}
@@ -529,6 +563,7 @@ public class HandoverAPI {
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
 		}catch (Exception e) {
+			e.printStackTrace();
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
@@ -679,6 +714,7 @@ public class HandoverAPI {
 				pprocess.setAmountcutsumprev(temp.getAmountcutsum());
 				pprocess.setAmountcutsum(temp.getAmountcutsum());
 	
+				if(temp.getAmountinputsum() == null) temp.setAmountinputsum(0);
 				pprocess.setAmountinput(sumProduct);
 				pprocess.setAmountinputsumprev(temp.getAmountinputsum());
 				pprocess.setAmountinputsum(temp.getAmountinputsum() + sumProduct);
