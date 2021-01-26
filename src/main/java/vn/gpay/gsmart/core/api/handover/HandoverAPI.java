@@ -265,6 +265,8 @@ public class HandoverAPI {
 						}
 					}
 				}
+				handover.setTotalpackage(total);
+				handover.setTotalpackagecheck(totalCheck);
 				handover = handoverService.save(handover);
 			}
 			
@@ -583,7 +585,6 @@ public class HandoverAPI {
 		List<POrderProcessing> listPorderProcessing = porderProcessingService.getByPOrderAndLineAndDate(
 				porderid_link, granttoorgid_link, receive_date
 				);
-		System.out.println(listPorderProcessing.size());
 		POrderProcessing pprocess;
 		if(listPorderProcessing.size() > 0) {
 			// Có thì check ngày, nếu trùng thì sửa, ko trùng thì tạo mới và set thông tin dựa vào ngày trước
@@ -608,7 +609,6 @@ public class HandoverAPI {
 		    			pprocess.setAmountinputsum((null==pprocess.getAmountinputsumprev()?0:pprocess.getAmountinputsumprev()) 
 		    					+ (null==pprocess.getAmountinput()?0:pprocess.getAmountinput()));
 					}else if(handovertypeid_link.equals(4L)) { // line to packstocked
-						System.out.println("here yet uncf");
 						pprocess.setAmountpackstocked(pprocess.getAmountpackstocked() - sumProduct);
 		    			pprocess.setAmountpackstockedsum((null==pprocess.getAmountpackstockedsumprev()?0:pprocess.getAmountpackstockedsumprev()) 
 		    					+ (null==pprocess.getAmountpackstocked()?0:pprocess.getAmountpackstocked()));
@@ -775,79 +775,5 @@ public class HandoverAPI {
 		}
 		return "OK";
 		
-	}
-	
-	@RequestMapping(value = "/createMobile",method = RequestMethod.POST)
-	public ResponseEntity<Handover_create_response> CreateMobile(@RequestBody Handover_create_request entity,HttpServletRequest request ) {
-		Handover_create_response response = new Handover_create_response();
-		try {
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			Handover handover = entity.data;
-			
-			if(handover.getId()==null || handover.getId()==0) {
-				// new
-				System.out.println("create new handover");
-			}else {
-				// update
-				System.out.println("update old handover");
-				Date date = new Date();
-				Integer total = 0;
-				Integer totalCheck = 0;
-				
-				Handover _handover =  handoverService.findOne(handover.getId());
-				handover.setOrgrootid_link(_handover.getOrgrootid_link());
-				handover.setUsercreateid_link(_handover.getUsercreateid_link());
-				handover.setTimecreate(_handover.getTimecreate());
-				handover.setLastuserupdateid_link(user.getId());
-				handover.setLasttimeupdate(date);
-				
-				List<HandoverProduct> handoverProducts = handover.getHandoverProducts();
-				for(HandoverProduct handoverProduct : handoverProducts) {
-					List<HandoverSKU> handoverSKUs = handoverProduct.getHandoverSKUs();
-					if(handoverProduct.getId() == null || handoverProduct.getId() == 0) {
-						handoverProduct.setOrgrootid_link(user.getRootorgid_link());
-						handoverProduct.setHandoverid_link(handover.getId());
-						handoverProduct.setUsercreateid_link(user.getId());
-						handoverProduct.setTimecreate(date);
-					}else {
-						handoverProduct.setLastuserupdateid_link(user.getId());
-						handoverProduct.setLasttimeupdate(date);
-					}
-					handoverProduct = handoverProductService.save(handoverProduct);
-					
-					if(handoverProduct.getTotalpackage() != null)
-						total+=handoverProduct.getTotalpackage();
-					if(handoverProduct.getTotalpackagecheck() != null)
-						totalCheck+=handoverProduct.getTotalpackagecheck();
-					
-					// skus
-					for(HandoverSKU handoverSKU : handoverSKUs) {
-						if(handoverSKU.getId() == null || handoverSKU.getId() == 0) {
-							handoverSKU.setOrgrootid_link(user.getRootorgid_link());
-							handoverSKU.setHandoverid_link(handover.getId());
-							handoverSKU.setHandoverproductid_link(handoverProduct.getId());
-							handoverSKU.setUsercreateid_link(user.getId());
-							handoverSKU.setTimecreate(date);
-						}else {
-							handoverSKU.setLastuserupdateid_link(user.getId());
-							handoverSKU.setLasttimeupdate(date);
-						}
-						handoverSkuService.save(handoverSKU);
-					}
-				}
-				handover.setTotalpackage(total);
-				handover.setTotalpackagecheck(totalCheck);
-				handover = handoverService.save(handover);
-			}
-			
-			response.data = handover;
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<Handover_create_response>(response,HttpStatus.OK);
-		}catch (Exception e) {
-			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-			response.setMessage(e.getMessage());
-		    return new ResponseEntity<Handover_create_response>(response,HttpStatus.BAD_REQUEST);
-		}
 	}
 }

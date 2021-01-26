@@ -127,6 +127,9 @@ public class HandoverSKUAPI {
 		HandoverSKU_getall_response response = new HandoverSKU_getall_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			if(entity.handoverid_link == null) {
+				entity.handoverid_link = 0L;
+			}
 			
 			List<HandoverSKU> list = new ArrayList<HandoverSKU>();
 			if(entity.handoverid_link != 0L) {
@@ -176,6 +179,7 @@ public class HandoverSKUAPI {
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<HandoverSKU_getall_response>(response,HttpStatus.OK);
 		}catch (Exception e) {
+			e.printStackTrace();
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<HandoverSKU_getall_response>(response,HttpStatus.OK);
