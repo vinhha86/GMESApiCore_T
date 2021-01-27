@@ -148,7 +148,6 @@ public class HandoverSKUAPI {
 				// tim cac sku theo porder
 				
 				List<SKU> skus = skuService.getSKUforHandOver(porderid_link);
-				System.out.println(skus.size());
 				for(SKU sku : skus) {
 					HandoverSKU newHandoverSKU = new HandoverSKU();
 					newHandoverSKU.setId(0L);
