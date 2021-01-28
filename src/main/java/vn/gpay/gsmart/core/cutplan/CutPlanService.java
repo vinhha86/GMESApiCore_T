@@ -1,0 +1,25 @@
+package vn.gpay.gsmart.core.cutplan;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import vn.gpay.gsmart.core.base.AbstractService;
+
+public class CutPlanService extends AbstractService<CutPlan> implements ICutPlan_Service {
+	@Autowired CutPlan_Repository repo;
+	
+	@Override
+	protected JpaRepository<CutPlan, Long> getRepository() {
+		// TODO Auto-generated method stub
+		return repo;
+	}
+
+	@Override
+	public List<CutPlan> getby_sku_and_porder(Long skuid_link, Long porderid_link, Long orgrootid_link) {
+		// TODO Auto-generated method stub
+		return repo.getby_sku_and_porder(skuid_link, porderid_link, orgrootid_link);
+	}
+
+}
