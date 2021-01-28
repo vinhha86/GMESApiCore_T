@@ -54,12 +54,16 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 			@Param ("ordercode")final  String ordercode);
 	
 	@Query(value = "select c from POrder c "
+			+ "inner join POrderGrant b on b.porderid_link = c.id "
 			+ "where lower(c.ordercode) like lower(concat('%',:ordercode,'%')) "
-			+ "and status > 0"
-			+ "and status < 5"
+			+ "and (:granttoorgid_link is null or b.granttoorgid_link = :granttoorgid_link) "
+			+ "and c.status > 0"
+			+ "and c.status < 5"
 			)
 	public List<POrder> getPOrderByOrdercode(
-			@Param ("ordercode")final String ordercode);
+			@Param ("ordercode")final String ordercode,
+			@Param ("granttoorgid_link")final Long granttoorgid_link
+			);
 	
 	@Query(value = "select c from POrder c "
 			+ "where lower(c.ordercode) = lower(:ordercode) "

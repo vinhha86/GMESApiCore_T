@@ -643,7 +643,7 @@ public class POrderListAPI {
 	public ResponseEntity<POrderList_getlist_response> getByPOrderCode(@RequestBody POrderList_getbypordercode_request entity,HttpServletRequest request ) {
 		POrderList_getlist_response response = new POrderList_getlist_response();
 		try {
-			response.data = porderService.getPOrderByOrdercode(entity.pordercode);
+			response.data = porderService.getPOrderByOrdercode(entity.pordercode, entity.granttoorgid_link);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<POrderList_getlist_response>(response,HttpStatus.OK);
