@@ -359,8 +359,8 @@ public class HandoverAPI {
 	public ResponseEntity<Handover_getall_response> Getbysearch(@RequestBody Handover_getbysearch_request entity,HttpServletRequest request ) {
 		Handover_getall_response response = new Handover_getall_response();
 		try {
-//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//			Long org_grant_id_link = user.getOrg_grant_id_link();
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long org_grant_id_link = user.getOrg_grant_id_link();
 //			Org org = orgService.findOne(org_grant_id_link);
 			//
 			Long handovertypeid_link = entity.handovertypeid_link;
@@ -369,6 +369,9 @@ public class HandoverAPI {
 			Long orgid_from_link = entity.orgid_from_link;
 			Long orgid_to_link = entity.orgid_to_link;
 			List<Integer> status = entity.status;
+			String viewId = entity.viewId;
+			
+//			System.out.println("viewId: " + viewId);
 			//
 			response.data = new ArrayList<>();
 			List<Handover> result = new ArrayList<>();
@@ -398,6 +401,41 @@ public class HandoverAPI {
 				if(!ordercode.contains(ordercode_req)) {
 					continue;
 				}
+				// check user org_grant_id_link
+				// handover_cut_toline, handover_line_topack, handover_line_toprint, handover_cut_toprint, handover_pack_tostock
+				// handover_line_fromcut, handover_pack_fromline
+				if(org_grant_id_link != null) {
+					switch(viewId) {
+						// orgid_from_link
+						case "handover_cut_toline":
+						case "handover_line_topack":
+						case "handover_line_toprint":
+						case "handover_cut_toprint":
+						case "handover_pack_tostock":
+							if(handover.getOrgid_from_link() != null) {
+								if(org_grant_id_link != handover.getOrgid_from_link()) {
+									continue;
+								}
+							}
+							break;
+						// orgid_to_link
+						case "handover_line_fromcut":
+						case "handover_pack_fromline":
+							if(handover.getOrgid_to_link() != null) {
+								if(!org_grant_id_link.equals(handover.getOrgid_to_link())) {
+//									System.out.println(org_grant_id_link);
+//									System.out.println(handover.getOrgid_to_link());
+//									System.out.println(handover.getId());
+//									System.out.println("--------");
+									continue;
+								}
+							}
+							break;
+						default:
+							break;
+					}
+				}
+				
 				response.data.add(handover);
 			}
 			

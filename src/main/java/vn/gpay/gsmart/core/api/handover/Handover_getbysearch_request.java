@@ -15,4 +15,5 @@ public class Handover_getbysearch_request extends RequestBase {
 	public List<Integer> status;
 	public Integer limit;
 	public Integer page;
+	public String viewId;
 }
