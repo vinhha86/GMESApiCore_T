@@ -31,8 +31,23 @@ public class CutPlan_Row implements Serializable {
 	private String so_cay;
 	private Date ngay;
 	private Integer type;
+	private Long product_skuid_link;
+	private Integer amount;
 	
 	
+	
+	public Integer getAmount() {
+		return amount;
+	}
+	public void setAmount(Integer amount) {
+		this.amount = amount;
+	}
+	public Long getProduct_skuid_link() {
+		return product_skuid_link;
+	}
+	public void setProduct_skuid_link(Long product_skuid_link) {
+		this.product_skuid_link = product_skuid_link;
+	}
 	public Long getId() {
 		return id;
 	}
