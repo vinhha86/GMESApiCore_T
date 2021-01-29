@@ -413,7 +413,7 @@ public class HandoverAPI {
 						case "handover_cut_toprint":
 						case "handover_pack_tostock":
 							if(handover.getOrgid_from_link() != null) {
-								if(org_grant_id_link != handover.getOrgid_from_link()) {
+								if(!org_grant_id_link.equals(handover.getOrgid_from_link())) {
 									continue;
 								}
 							}
@@ -423,10 +423,6 @@ public class HandoverAPI {
 						case "handover_pack_fromline":
 							if(handover.getOrgid_to_link() != null) {
 								if(!org_grant_id_link.equals(handover.getOrgid_to_link())) {
-//									System.out.println(org_grant_id_link);
-//									System.out.println(handover.getOrgid_to_link());
-//									System.out.println(handover.getId());
-//									System.out.println("--------");
 									continue;
 								}
 							}
