@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.cutplan.CutPlan;
 import vn.gpay.gsmart.core.cutplan.CutPlan_Row;
 import vn.gpay.gsmart.core.cutplan.ICutPlan_Row_Service;
@@ -157,9 +158,10 @@ public class CutPlanAPI {
 					map.put("sl_vai", ""+list_row_clone.get(0).getSl_vai());
 					map.put("kho", ""+list_row_clone.get(0).getKho());
 					map.put("so_cay", ""+list_row_clone.get(0).getSo_cay());
+					map.put("id", list_row_clone.get(0).getId().toString());
 					
 					Date date = list_row_clone.get(0).getNgay();  
-					DateFormat dateFormat = new SimpleDateFormat("dd-mm-yy");  
+					DateFormat dateFormat = new SimpleDateFormat("dd-MM-yy");  
 					String strDate = dateFormat.format(date); 
 					map.put("ngay", strDate);
 					map.put("type", ""+list_row_clone.get(0).getType());
@@ -190,6 +192,103 @@ public class CutPlanAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<getplanby_color_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/add_row", method = RequestMethod.POST)
+	public ResponseEntity<add_row_response> AddRow(HttpServletRequest request,
+			@RequestBody add_row_request entity) {
+		add_row_response response = new add_row_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+			Long skuid_link = entity.material_skuid_link;
+			Long porderid_link = entity.porderid_link;
+			Long orgrootid_link = user.getRootorgid_link();
+			Long productid_link = entity.productid_link;
+			Long pcontractid_link = entity.pcontractid_link;
+			Long colorid_link = entity.colorid_link;
+			
+			Date current = new Date();
+			DateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");  
+			String strDate = dateFormat.format(current);
+			
+			 
+			
+			List<Long> list_sku = pskuservice.getsku_bycolor(pcontractid_link, productid_link, colorid_link);
+			
+			for (Long product_skuid_link : list_sku) {
+				
+				CutPlan_Row row_new = new CutPlan_Row();
+				row_new.setAmount(0);
+				row_new.setCode("Sđ "+strDate);
+				row_new.setId(null);
+				row_new.setName("Sđ "+strDate);
+				row_new.setProduct_skuid_link(product_skuid_link);
+				row_new.setNgay(current);
+				row_new.setType(CutPlanRowType.sodocat);
+				
+				row_new = cutplanrowService.save(row_new);
+				
+				CutPlan plan = new CutPlan();
+				plan.setCreateddate(current);
+				plan.setCreateduserid_link(user.getId());
+				plan.setCutplanrowid_link(row_new.getId());
+				plan.setId(null);
+				plan.setOrgrootid_link(orgrootid_link);
+				plan.setPorderid_link(porderid_link);
+				plan.setSkuid_link(skuid_link);
+				
+				cutplanService.save(plan);
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<add_row_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<add_row_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/update_size_amount", method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> UpdateSizeAmount(HttpServletRequest request,
+			@RequestBody update_size_amount_request entity) {
+		ResponseBase response = new ResponseBase();
+		try {
+			Long material_skuid_link = entity.material_skuid_link;
+			Long porderid_link = entity.porderid_link;
+			Long colorid_link = entity.colorid_link;
+			Long sizeid_link = entity.sizeid_link;
+			Long productid_link = entity.productid_link;
+			String name = entity.name;
+			
+			long product_skuid_link = ppbom2skuservice.getskuid_link_by_color_and_size(colorid_link, sizeid_link, productid_link);
+			
+			List<CutPlan_Row> list_row = cutplanrowService.getby_porder_matsku_productsku(porderid_link, material_skuid_link, product_skuid_link, CutPlanRowType.sodocat, name);
+			if(list_row.size() > 0) {
+				CutPlan_Row row = list_row.get(0);
+				row.setAmount(entity.amount);
+				
+				cutplanrowService.save(row);
+				
+				//Cap nhat lai so cat du
+				List<CutPlan_Row> list_row_catdu = cutplanrowService.getby_porder_matsku_productsku(porderid_link, material_skuid_link, product_skuid_link, CutPlanRowType.catdu, "");
+				if(list_row_catdu.size() > 0) {
+					CutPlan_Row row_catdu = list_row_catdu.get(0);
+					row_catdu.setAmount(row_catdu.getAmount() + entity.amount);
+					cutplanrowService.save(row_catdu);
+				}
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 		}
 	}
 }

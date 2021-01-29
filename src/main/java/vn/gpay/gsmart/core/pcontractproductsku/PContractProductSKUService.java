@@ -144,4 +144,10 @@ public class PContractProductSKUService extends AbstractService<PContractProduct
 	public List<PContractProductSKU> getBySkuAndPcontractPo(Long skuid_link, Long pcontract_poid_link) {
 		return repo.getBySkuAndPcontractPo(skuid_link, pcontract_poid_link);
 	}
+	@Override
+	public List<PContractProductSKU> getsku_bycolorid_link(long pcontractid_link, long productid_link,
+			long colorid_link) {
+		// TODO Auto-generated method stub
+		return repo.getPContractProductSKU_bycolorid_link(productid_link, pcontractid_link, colorid_link);
+	}
 }
