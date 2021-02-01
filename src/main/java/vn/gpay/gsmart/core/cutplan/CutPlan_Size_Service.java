@@ -27,7 +27,7 @@ public class CutPlan_Size_Service extends AbstractService<CutPlan_Size> implemen
 	@Override
 	public List<CutPlan_Size> getby_row(Long orgrootid_link, Long cutplan_rowid_link) {
 		// TODO Auto-generated method stub
-		return null;
+		return repo.getby_row(cutplan_rowid_link, orgrootid_link);
 	}
 
 	@Override

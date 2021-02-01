@@ -24,11 +24,11 @@ public class CutPlan_Row implements Serializable {
 	private Long id;
 	private String code;
 	private String name;
-	private Float la_vai;
+	private Integer la_vai;
 	private Float dai_so_do;
 	private Float sl_vai;
 	private String kho;
-	private String so_cay;
+	private Integer so_cay;
 	private Date ngay;
 	private Integer type;
 	private Long material_skuid_link;
@@ -63,7 +63,7 @@ public class CutPlan_Row implements Serializable {
 	public String getName() {
 		return name;
 	}
-	public Float getLa_vai() {
+	public Integer getLa_vai() {
 		return la_vai;
 	}
 	public Float getDai_so_do() {
@@ -75,7 +75,7 @@ public class CutPlan_Row implements Serializable {
 	public String getKho() {
 		return kho;
 	}
-	public String getSo_cay() {
+	public Integer getSo_cay() {
 		return so_cay;
 	}
 	public Date getNgay() {
@@ -90,7 +90,7 @@ public class CutPlan_Row implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public void setLa_vai(Float la_vai) {
+	public void setLa_vai(Integer la_vai) {
 		this.la_vai = la_vai;
 	}
 	public void setDai_so_do(Float dai_so_do) {
@@ -102,7 +102,7 @@ public class CutPlan_Row implements Serializable {
 	public void setKho(String kho) {
 		this.kho = kho;
 	}
-	public void setSo_cay(String so_cay) {
+	public void setSo_cay(Integer so_cay) {
 		this.so_cay = so_cay;
 	}
 	public void setNgay(Date ngay) {

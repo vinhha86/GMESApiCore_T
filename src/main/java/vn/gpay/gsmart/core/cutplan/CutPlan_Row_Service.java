@@ -21,7 +21,7 @@ public class CutPlan_Row_Service extends AbstractService<CutPlan_Row> implements
 	public List<CutPlan_Row> getby_color(Long porderid_link, Long material_skuid_link, Long colorid_link, Long orgrootid_link) {
 		// TODO Auto-generated method stub
 		Long attributeid_link = AtributeFixValues.ATTR_COLOR;
-		return repo.getby_sku_and_porder(material_skuid_link, porderid_link, orgrootid_link, colorid_link, attributeid_link);
+		return repo.getby_sku_and_porder( porderid_link, material_skuid_link, orgrootid_link, colorid_link, attributeid_link);
 	}
 	@Override
 	public List<CutPlan_Row> getby_porder_matsku_productsku(Long porderid_link, Long material_skuid_link,
