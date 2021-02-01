@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
-import vn.gpay.gsmart.core.cutplan.CutPlan;
 import vn.gpay.gsmart.core.cutplan.CutPlan_Row;
+import vn.gpay.gsmart.core.cutplan.CutPlan_Size;
 import vn.gpay.gsmart.core.cutplan.ICutPlan_Row_Service;
 import vn.gpay.gsmart.core.cutplan.ICutPlan_Service;
 import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOM2SKUService;
@@ -54,7 +54,7 @@ public class CutPlanAPI {
 			Date current = new Date();
 			
 			//Kiem tra xem npl da co so do hay chua
-			List<CutPlan> list_cutplan = cutplanService.getby_sku_and_porder(skuid_link, porderid_link, orgrootid_link);
+			List<CutPlan_Size> list_cutplan = cutplanService.getby_sku_and_porder(skuid_link, porderid_link, orgrootid_link);
 			if(list_cutplan.size() == 0) {
 				//them vao plan
 				//Lay danh sach sku cua san pham trong don hang
@@ -67,8 +67,6 @@ public class CutPlanAPI {
 					row_yeucau.setName("SL yêu cầu");
 					row_yeucau.setType(CutPlanRowType.yeucau);
 					row_yeucau.setNgay(current);
-					row_yeucau.setProduct_skuid_link(pContractProductSKU.getSkuid_link());
-					row_yeucau.setAmount(pContractProductSKU.getPquantity_total());
 					
 					row_yeucau = cutplanrowService.save(row_yeucau);
 					
@@ -78,23 +76,19 @@ public class CutPlanAPI {
 					row_catdu.setName("SL cắt dư");
 					row_catdu.setType(CutPlanRowType.catdu);
 					row_catdu.setNgay(current);
-					row_catdu.setProduct_skuid_link(pContractProductSKU.getSkuid_link());
-					row_catdu.setAmount(0 - pContractProductSKU.getPquantity_total());
 					
 					row_catdu = cutplanrowService.save(row_catdu);
 					
-					CutPlan plan_yc = new CutPlan();
-					plan_yc.setCreateddate(current);
-					plan_yc.setCreateduserid_link(user.getId());
+					CutPlan_Size plan_yc = new CutPlan_Size();
 					plan_yc.setCutplanrowid_link(row_yeucau.getId());
 					plan_yc.setId(null);
 					plan_yc.setOrgrootid_link(orgrootid_link);
-					plan_yc.setPorderid_link(porderid_link);
-					plan_yc.setSkuid_link(skuid_link);
+					plan_yc.setAmount(pContractProductSKU.getPquantity_total());
+					plan_yc.setProduct_skuid_link(pContractProductSKU.getSkuid_link());					
 					
 					cutplanService.save(plan_yc);
 					
-					CutPlan plan_catdu = new CutPlan();
+					CutPlan_Size plan_catdu = new CutPlan_Size();
 					plan_catdu.setCreateddate(current);
 					plan_catdu.setCreateduserid_link(user.getId());
 					plan_catdu.setCutplanrowid_link(row_catdu.getId());

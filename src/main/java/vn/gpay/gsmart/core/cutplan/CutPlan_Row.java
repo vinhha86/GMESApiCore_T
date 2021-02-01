@@ -31,22 +31,28 @@ public class CutPlan_Row implements Serializable {
 	private String so_cay;
 	private Date ngay;
 	private Integer type;
-	private Long product_skuid_link;
-	private Integer amount;
+	private Long material_skuid_link;
+	private Long porderid_link;
+	private Long createduserid_link;	
 	
 	
-	
-	public Integer getAmount() {
-		return amount;
+	public Long getCreateduserid_link() {
+		return createduserid_link;
 	}
-	public void setAmount(Integer amount) {
-		this.amount = amount;
+	public void setCreateduserid_link(Long createduserid_link) {
+		this.createduserid_link = createduserid_link;
 	}
-	public Long getProduct_skuid_link() {
-		return product_skuid_link;
+	public Long getMaterial_skuid_link() {
+		return material_skuid_link;
 	}
-	public void setProduct_skuid_link(Long product_skuid_link) {
-		this.product_skuid_link = product_skuid_link;
+	public void setMaterial_skuid_link(Long material_skuid_link) {
+		this.material_skuid_link = material_skuid_link;
+	}
+	public Long getPorderid_link() {
+		return porderid_link;
+	}
+	public void setPorderid_link(Long porderid_link) {
+		this.porderid_link = porderid_link;
 	}
 	public Long getId() {
 		return id;
