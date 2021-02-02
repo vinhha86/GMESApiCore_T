@@ -23,6 +23,19 @@ public interface CutPlan_Repository extends JpaRepository<CutPlan_Size, Long>, J
 			@Param("orgrootid_link") final Long orgrootid_link);
 	
 	@Query(value = "select c from CutPlan_Size c "
+			+ "inner join CutPlan_Row a on a.id = c.cutplanrowid_link "
+			+ "inner join SKU_Attribute_Value b on c.product_skuid_link = b.skuid_link "
+			+ "where a.material_skuid_link = :material_skuid_link " 
+			+ "and a.porderid_link = :porderid_link "
+			+ "and c.orgrootid_link = :orgrootid_link "
+			+ "and b.attributevalueid_link = :colorid_link and b.attributeid_link = 4")
+	public List<CutPlan_Size> getby_sku_and_porder_color(
+			@Param("material_skuid_link") final Long material_skuid_link,
+			@Param("porderid_link") final Long porderid_link,
+			@Param("orgrootid_link") final Long orgrootid_link,
+			@Param("colorid_link") final Long colorid_link);
+	
+	@Query(value = "select c from CutPlan_Size c "
 			+ "where c.cutplanrowid_link = :cutplanrowid_link "
 			+ "and c.orgrootid_link = :orgrootid_link")
 	public List<CutPlan_Size> getby_row(

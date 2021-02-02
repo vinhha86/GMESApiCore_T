@@ -13,14 +13,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 public interface IPContractProductSKURepository extends JpaRepository<PContractProductSKU, Long>, JpaSpecificationExecutor<PContractProductSKU> {
-	@Query(value = "select c from PContractProductSKU c "
-			+ "where c.orgrootid_link = :orgrootid_link "
+	@Query(value = "select a from PContractProductSKU a "
+			+ "inner join SKU_Attribute_Value c on a.skuid_link = c.skuid_link "
+			+ "inner join Attributevalue b on b.id = c.attributevalueid_link "
+			+ "where a.orgrootid_link = :orgrootid_link "
 			+ "and productid_link = :productid_link "
-			+ "and pcontractid_link = :pcontractid_link")
+			+ "and pcontractid_link = :pcontractid_link "
+			+ "order by sortvalue")
 	public List<PContractProductSKU> getlistsku_byproduct_and_pcontract(
 			@Param ("orgrootid_link")final  Long orgrootid_link,
 			@Param ("productid_link")final  long productid_link, 
 			@Param ("pcontractid_link")final  long pcontractid_link);
+	
+	
 	@Query(value = "select c from PContractProductSKU c "
 			+ "where c.orgrootid_link = :orgrootid_link "
 			+ "and pcontractid_link = :pcontractid_link")
@@ -63,10 +68,12 @@ public interface IPContractProductSKURepository extends JpaRepository<PContractP
 			@Param ("productid_link")final  long productid_link,
 			@Param ("pcontract_poid_link")final  long pcontract_poid_link);
 	
-	@Query(value = "select a.attributevalueid_link from SKU_Attribute_Value a "
+	@Query(value = "select b.id from SKU_Attribute_Value a "
 			+ "inner join PContractProductSKU c on a.skuid_link = c.skuid_link "
+			+ "inner join Attributevalue b on b.id = a.attributevalueid_link "
 			+ "where c.productid_link = :productid_link "
-			+ "and c.pcontractid_link = :pcontractid_link and attributeid_link= :attributeid_link ")
+			+ "and c.pcontractid_link = :pcontractid_link and a.attributeid_link= :attributeid_link "
+			+ "order by b.sortvalue asc")
 	public List<Long> getvaluesize_in_product(
 			@Param ("productid_link")final  long productid_link, 
 			@Param ("pcontractid_link")final  long pcontractid_link,
