@@ -183,7 +183,7 @@ public class CutPlanAPI {
 					map.put("createduserid_link", row.getCreateduserid_link().toString());
 					
 					Date date = row.getNgay();  
-					DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");  
+					DateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");  
 					String strDate = dateFormat.format(date); 
 					map.put("ngay", strDate);
 					map.put("type", ""+row.getType());
