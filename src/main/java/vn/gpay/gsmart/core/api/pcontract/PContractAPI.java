@@ -7,7 +7,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -54,40 +56,58 @@ import vn.gpay.gsmart.core.security.IGpayUserOrgService;
 import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
-
 @RestController
 @RequestMapping("/api/v1/pcontract")
 public class PContractAPI {
-	@Autowired IPContractService pcontractService;
-	@Autowired IPContract_AutoID_Service pcontract_AutoID_Service;
-	@Autowired IOrgService orgService;
-	@Autowired IPContract_POService poService;
-	@Autowired IPOrder_Service porderService;
-	@Autowired IPContractProductSKUService pcontract_sku_Service;
-	@Autowired IPContractProductService pcontract_product_Service;
-	@Autowired IPContractProductPairingService pcontract_pairing_Service;
-	@Autowired IPContractProducDocumentService pcontract_document_Service;
-	@Autowired IPContractProductBomService pcontract_bom_Service;
-	@Autowired IPContractProductBom2Service pcontract_bom2_Service;
-	@Autowired IPContractBOMColorService pcontract_bom_color_Service;
-	@Autowired IPContractBom2ColorService pcontract_bom2_color_Service;
-	@Autowired IPContractBOMSKUService pcontract_bom_sku_Service;
-	@Autowired IPContractBOM2SKUService pcontract_bom2_sku_Service;
-	@Autowired IPOrder_Req_Service porderReqService;
-	@Autowired IGpayUserOrgService userOrgService;
-	@Autowired IProductService productService;
-	
-	@RequestMapping(value = "/create",method = RequestMethod.POST)
-	public ResponseEntity<PContract_create_response> PContractCreate(@RequestBody PContract_create_request entity,HttpServletRequest request ) {
+	@Autowired
+	IPContractService pcontractService;
+	@Autowired
+	IPContract_AutoID_Service pcontract_AutoID_Service;
+	@Autowired
+	IOrgService orgService;
+	@Autowired
+	IPContract_POService poService;
+	@Autowired
+	IPOrder_Service porderService;
+	@Autowired
+	IPContractProductSKUService pcontract_sku_Service;
+	@Autowired
+	IPContractProductService pcontract_product_Service;
+	@Autowired
+	IPContractProductPairingService pcontract_pairing_Service;
+	@Autowired
+	IPContractProducDocumentService pcontract_document_Service;
+	@Autowired
+	IPContractProductBomService pcontract_bom_Service;
+	@Autowired
+	IPContractProductBom2Service pcontract_bom2_Service;
+	@Autowired
+	IPContractBOMColorService pcontract_bom_color_Service;
+	@Autowired
+	IPContractBom2ColorService pcontract_bom2_color_Service;
+	@Autowired
+	IPContractBOMSKUService pcontract_bom_sku_Service;
+	@Autowired
+	IPContractBOM2SKUService pcontract_bom2_sku_Service;
+	@Autowired
+	IPOrder_Req_Service porderReqService;
+	@Autowired
+	IGpayUserOrgService userOrgService;
+	@Autowired
+	IProductService productService;
+
+	@RequestMapping(value = "/create", method = RequestMethod.POST)
+	public ResponseEntity<PContract_create_response> PContractCreate(@RequestBody PContract_create_request entity,
+			HttpServletRequest request) {
 		PContract_create_response response = new PContract_create_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
 			long usercreatedid_link = user.getId();
-			
+
 			PContract pcontract = entity.data;
-			if(pcontract.getId() == 0 || pcontract.getId() == null) {
-				if (null == pcontract.getContractcode() || pcontract.getContractcode().length() == 0){
+			if (pcontract.getId() == 0 || pcontract.getId() == null) {
+				if (null == pcontract.getContractcode() || pcontract.getContractcode().length() == 0) {
 					Org theBuyer = orgService.findOne(pcontract.getOrgbuyerid_link());
 					if (null != theBuyer)
 						pcontract.setContractcode(pcontract_AutoID_Service.getLastID(theBuyer.getCode()));
@@ -96,193 +116,209 @@ public class PContractAPI {
 				} else {
 					String contractcode = pcontract.getContractcode();
 					long pcontractid_link = pcontract.getId();
-					
-					List<PContract> lstcheck = pcontractService.getby_code(orgrootid_link, contractcode, pcontractid_link);
-					if(lstcheck.size() > 0) {
+
+					List<PContract> lstcheck = pcontractService.getby_code(orgrootid_link, contractcode,
+							pcontractid_link);
+					if (lstcheck.size() > 0) {
 						response.setRespcode(ResponseMessage.KEY_RC_BAD_REQUEST);
 						response.setMessage("Mã đã tồn tại trong hệ thống!");
 						return new ResponseEntity<PContract_create_response>(response, HttpStatus.BAD_REQUEST);
-					}					
+					}
 				}
 				pcontract.setOrgrootid_link(orgrootid_link);
 				pcontract.setUsercreatedid_link(usercreatedid_link);
 				pcontract.setDatecreated(new Date());
-			}
-			else {
+			} else {
 				PContract pc_old = pcontractService.findOne(pcontract.getId());
 				pcontract.setOrgrootid_link(pc_old.getOrgrootid_link());
 				pcontract.setUsercreatedid_link(pc_old.getUsercreatedid_link());
 				pcontract.setDatecreated(pc_old.getDatecreated());
 			}
-			
+
 			pcontract = pcontractService.save(pcontract);
 			response.id = pcontract.getId();
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<PContract_create_response>(response, HttpStatus.OK);
-			
-		}catch (Exception e) {
+
+		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<PContract_create_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
-	
-	@RequestMapping(value = "/getbypaging",method = RequestMethod.POST)
-	public ResponseEntity<PContract_getbypaging_response> PContractGetpage(@RequestBody PContract_getbypaging_request entity,HttpServletRequest request ) {
+
+	@RequestMapping(value = "/getbypaging", method = RequestMethod.POST)
+	public ResponseEntity<PContract_getbypaging_response> PContractGetpage(
+			@RequestBody PContract_getbypaging_request entity, HttpServletRequest request) {
 		PContract_getbypaging_response response = new PContract_getbypaging_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
-			
+
 			Page<PContract> pcontract = pcontractService.getall_by_orgrootid_paging(orgrootid_link, entity);
-			
+
 			response.data = pcontract.getContent();
 			response.totalCount = pcontract.getTotalElements();
-			
+
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<PContract_getbypaging_response>(response,HttpStatus.OK);
-		}catch (Exception e) {
+			return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-		    return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
+			return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
 		}
 	}
-	
-	@RequestMapping(value = "/getlistbypaging",method = RequestMethod.POST)
-	public ResponseEntity<PContract_getbypaging_response> PContractGetpageList(@RequestBody PContract_getbypaging_request entity,HttpServletRequest request ) {
+
+	@RequestMapping(value = "/getlistbypaging", method = RequestMethod.POST)
+	public ResponseEntity<PContract_getbypaging_response> PContractGetpageList(
+			@RequestBody PContract_getbypaging_request entity, HttpServletRequest request) {
 		PContract_getbypaging_response response = new PContract_getbypaging_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
-			
+
 			List<PContract> pcontract = pcontractService.getalllist_by_orgrootid_paging(orgrootid_link, entity);
-			
+
 			response.data = new ArrayList<PContract>();
-			
-			for(PContract pc : pcontract) {
+
+			for (PContract pc : pcontract) {
 				String cc = pc.getContractcode().toLowerCase();
 				String pl = pc.getProductlist().toLowerCase();
 				String pol = pc.getPolist().toLowerCase();
-				if(!cc.contains(entity.contractcode.toLowerCase())) continue;
-				if(!pl.contains(entity.style.toLowerCase())) continue;
-				if(!pol.contains(entity.po.toLowerCase())) continue;
+				if (!cc.contains(entity.contractcode.toLowerCase()))
+					continue;
+				if (!pl.contains(entity.style.toLowerCase()))
+					continue;
+				if (!pol.contains(entity.po.toLowerCase()))
+					continue;
 				response.data.add(pc);
 			}
 			response.totalCount = response.data.size();
-			
+
 			PageRequest page = PageRequest.of(entity.page - 1, entity.limit);
 			int start = (int) page.getOffset();
-			int end = (start + page.getPageSize()) > response.data.size() ? response.data.size() : (start + page.getPageSize());
-			Page<PContract> pageToReturn = new PageImpl<PContract>(response.data.subList(start, end), page, response.data.size()); 
-			
+			int end = (start + page.getPageSize()) > response.data.size() ? response.data.size()
+					: (start + page.getPageSize());
+			Page<PContract> pageToReturn = new PageImpl<PContract>(response.data.subList(start, end), page,
+					response.data.size());
+
 			response.data = pageToReturn.getContent();
 //			response.totalCount = pcontract.getTotalElements();
-			
+
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<PContract_getbypaging_response>(response,HttpStatus.OK);
-		}catch (Exception e) {
+			return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-		    return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
+			return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
 		}
 	}
-	
-	@RequestMapping(value = "/getone",method = RequestMethod.POST)
-	public ResponseEntity<PContract_getone_response> PContractGetOne(@RequestBody PContract_getone_request entity,HttpServletRequest request ) {
+
+	@RequestMapping(value = "/getone", method = RequestMethod.POST)
+	public ResponseEntity<PContract_getone_response> PContractGetOne(@RequestBody PContract_getone_request entity,
+			HttpServletRequest request) {
 		PContract_getone_response response = new PContract_getone_response();
 		try {
-			
-			response.data = pcontractService.findOne(entity.id); 
-			
+
+			response.data = pcontractService.findOne(entity.id);
+
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<PContract_getone_response>(response,HttpStatus.OK);
-		}catch (Exception e) {
+			return new ResponseEntity<PContract_getone_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-		    return new ResponseEntity<PContract_getone_response>(response, HttpStatus.OK);
+			return new ResponseEntity<PContract_getone_response>(response, HttpStatus.OK);
 		}
 	}
-	
-	@RequestMapping(value = "/delete",method = RequestMethod.POST)
-	public ResponseEntity<ResponseBase> PContractDelete(@RequestBody PContract_delete_request entity
-			,HttpServletRequest request ) {
+
+	@RequestMapping(value = "/delete", method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> PContractDelete(@RequestBody PContract_delete_request entity,
+			HttpServletRequest request) {
 		ResponseBase response = new ResponseBase();
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		try {
 			long orgrootid_link = user.getRootorgid_link();
-			//Check if having PO? refuse deleting if have
-			if (poService.getPOByContract(orgrootid_link, entity.id).size() > 0){
+			// Check if having PO? refuse deleting if have
+			if (poService.getPOByContract(orgrootid_link, entity.id).size() > 0) {
 				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-				response.setMessage("Hiện vẫn đang có đơn hàng (PO) trong hợp đồng! Cần xóa hết PO trước khi xóa hợp đồng");
-				return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);				
+				response.setMessage(
+						"Hiện vẫn đang có đơn hàng (PO) trong hợp đồng! Cần xóa hết PO trước khi xóa hợp đồng");
+				return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 			}
-			//Check if having POrder? refuse deleting if have
-			if (porderService.getByContract(entity.id).size() > 0){
+			// Check if having POrder? refuse deleting if have
+			if (porderService.getByContract(entity.id).size() > 0) {
 				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-				response.setMessage("Hiện vẫn đang có Lệnh SX trong hợp đồng! Cần xóa hết Lệnh SX trước khi xóa hợp đồng");
-				return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);				
-				
+				response.setMessage(
+						"Hiện vẫn đang có Lệnh SX trong hợp đồng! Cần xóa hết Lệnh SX trước khi xóa hợp đồng");
+				return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+
 			}
-			//Delete products
-			//pcontract_products;pcontract_product_sku;pcontract_product_pairing;pcontract_product_document
-			for(PContractProduct theProduct:pcontract_product_Service.get_by_pcontract(orgrootid_link, entity.id)){
+			// Delete products
+			// pcontract_products;pcontract_product_sku;pcontract_product_pairing;pcontract_product_document
+			for (PContractProduct theProduct : pcontract_product_Service.get_by_pcontract(orgrootid_link, entity.id)) {
 				pcontract_product_Service.delete(theProduct);
 			}
-			for(PContractProductSKU theSku:pcontract_sku_Service.getlistsku_bypcontract(orgrootid_link, entity.id)){
+			for (PContractProductSKU theSku : pcontract_sku_Service.getlistsku_bypcontract(orgrootid_link, entity.id)) {
 				pcontract_sku_Service.delete(theSku);
 			}
-			for(PContractProductPairing thePairing:pcontract_pairing_Service.getall_bypcontract(orgrootid_link, entity.id)){
+			for (PContractProductPairing thePairing : pcontract_pairing_Service.getall_bypcontract(orgrootid_link,
+					entity.id)) {
 				pcontract_pairing_Service.delete(thePairing);
 			}
-			for(PContractProductDocument theDocument:pcontract_document_Service.getlist_bycontract(orgrootid_link, entity.id)){
+			for (PContractProductDocument theDocument : pcontract_document_Service.getlist_bycontract(orgrootid_link,
+					entity.id)) {
 				pcontract_document_Service.delete(theDocument);
 			}
-			
-			//Delete BOM 
-			//pcontract_bom_sku;pcontract_bom_product;pcontract_bom_color
-			//pcontract_bom2_sku;pcontract_bom2_product;pcontract_bom2_color
-			for(PContractProductBom theBom:pcontract_bom_Service.getall_bypcontract(orgrootid_link, entity.id)){
+
+			// Delete BOM
+			// pcontract_bom_sku;pcontract_bom_product;pcontract_bom_color
+			// pcontract_bom2_sku;pcontract_bom2_product;pcontract_bom2_color
+			for (PContractProductBom theBom : pcontract_bom_Service.getall_bypcontract(orgrootid_link, entity.id)) {
 				pcontract_bom_Service.delete(theBom);
 			}
-			for(PContractBOMColor theBomcolor:pcontract_bom_color_Service.getall_bypcontract(orgrootid_link, entity.id)){
+			for (PContractBOMColor theBomcolor : pcontract_bom_color_Service.getall_bypcontract(orgrootid_link,
+					entity.id)) {
 				pcontract_bom_color_Service.delete(theBomcolor);
 			}
-			for(PContractBOMSKU theBomsku:pcontract_bom_sku_Service.getall_bypcontract(orgrootid_link, entity.id)){
+			for (PContractBOMSKU theBomsku : pcontract_bom_sku_Service.getall_bypcontract(orgrootid_link, entity.id)) {
 				pcontract_bom_sku_Service.delete(theBomsku);
 			}
-			
-			for(PContractProductBom2 theBom2:pcontract_bom2_Service.getall_bypcontract(orgrootid_link, entity.id)){
+
+			for (PContractProductBom2 theBom2 : pcontract_bom2_Service.getall_bypcontract(orgrootid_link, entity.id)) {
 				pcontract_bom2_Service.delete(theBom2);
 			}
-			for(PContractBom2Color theBom2color:pcontract_bom2_color_Service.getall_bypcontract(orgrootid_link, entity.id)){
+			for (PContractBom2Color theBom2color : pcontract_bom2_color_Service.getall_bypcontract(orgrootid_link,
+					entity.id)) {
 				pcontract_bom2_color_Service.delete(theBom2color);
 			}
-			for(PContractBOM2SKU theBom2sku:pcontract_bom2_sku_Service.getall_bypcontract(orgrootid_link, entity.id)){
+			for (PContractBOM2SKU theBom2sku : pcontract_bom2_sku_Service.getall_bypcontract(orgrootid_link,
+					entity.id)) {
 				pcontract_bom2_sku_Service.delete(theBom2sku);
 			}
-			
-			//Delete PContract
-			pcontractService.deleteById(entity.id); 
-			
+
+			// Delete PContract
+			pcontractService.deleteById(entity.id);
+
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
-	
-	@RequestMapping(value = "/getbysearch",method = RequestMethod.POST)
-	public ResponseEntity<PContract_getbypaging_response> PContractGetBySearch(@RequestBody PContract_getbysearch_request entity,HttpServletRequest request ) {
+
+	@RequestMapping(value = "/getbysearch", method = RequestMethod.POST)
+	public ResponseEntity<PContract_getbypaging_response> PContractGetBySearch(
+			@RequestBody PContract_getbysearch_request entity, HttpServletRequest request) {
 		PContract_getbypaging_response response = new PContract_getbypaging_response();
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		
+
 //		//fix dieu kien tim kiem cho vendor cua DHA
 //		if (user.getUsername().toLowerCase().trim().contains("hansoll")) 
 //			entity.orgvendorid_link = 197;
@@ -292,64 +328,111 @@ public class PContractAPI {
 //		else
 //			if (user.getUsername().toLowerCase().trim().contains("ekline")) 
 //				entity.orgvendorid_link = 189;
-		
-		//Lay danh sach Vendor duoc phep quan ly
+
+		// Lay danh sach Vendor duoc phep quan ly
 		List<GpayUserOrg> lsVendor = userOrgService.getall_byuser_andtype(user.getId(), OrgType.ORG_TYPE_VENDOR);
-		if (lsVendor.size() > 0){
+		if (lsVendor.size() > 0) {
 			entity.orgvendorid_link = lsVendor.get(0).getOrgid_link();
 		}
-		
+
 		try {
-			
+
 			List<Long> orgs = new ArrayList<Long>();
 			Long orgid_link = user.getOrgid_link();
-			if(orgid_link != 0 && orgid_link != 1 && orgid_link != null) {
-				//Lay danh sach cac phan xuong ma nguoi dung duoc phep quan ly
-				for(GpayUserOrg userorg:userOrgService.getall_byuser_andtype(user.getId(), OrgType.ORG_TYPE_FACTORY)){
+			if (orgid_link != 0 && orgid_link != 1 && orgid_link != null) {
+				// Lay danh sach cac phan xuong ma nguoi dung duoc phep quan ly
+				for (GpayUserOrg userorg : userOrgService.getall_byuser_andtype(user.getId(),
+						OrgType.ORG_TYPE_FACTORY)) {
 					orgs.add(userorg.getOrgid_link());
 				}
-				//Them chinh don vi cua user
+				// Them chinh don vi cua user
 				orgs.add(orgid_link);
 			}
-			
-			
-			//Lay danh sach product thoa man dieu kien
+
+			// Lay danh sach product thoa man dieu kien
 			List<Long> products = new ArrayList<Long>();
-			if (entity.productbuyer_code.length() > 0){
+			if (entity.productbuyer_code.length() > 0) {
 				List<Product> product_lst = productService.getProductByLikeBuyercode(entity.productbuyer_code);
-				for (Product theProduct:product_lst)products.add(theProduct.getId());
+				for (Product theProduct : product_lst)
+					products.add(theProduct.getId());
 			}
-			
+
 			List<Long> pos = new ArrayList<Long>();
-			//Lay danh sach PO thoa man dieu kien
-			if (user.getOrgid_link() != 1){
+			// Lay danh sach PO thoa man dieu kien
+			if (user.getOrgid_link() != 1) {
 				List<PContract_PO> lstPO = poService.getBySearch(entity.po_code, products, orgs);
-				for(PContract_PO thePO:lstPO)pos.add(thePO.getPcontractid_link());
+				for (PContract_PO thePO : lstPO)
+					pos.add(thePO.getPcontractid_link());
 			} else {
-				if (entity.po_code.length() > 0 || entity.productbuyer_code.length() > 0){
+				if (entity.po_code.length() > 0 || entity.productbuyer_code.length() > 0) {
 					List<PContract_PO> lstPO = poService.getBySearch(entity.po_code, products, orgs);
-					for(PContract_PO thePO:lstPO)pos.add(thePO.getPcontractid_link());
+					for (PContract_PO thePO : lstPO)
+						pos.add(thePO.getPcontractid_link());
 				}
 			}
-			
+
 			List<PContract> list = pcontractService.getBySearch_PosList(entity, pos);
-			if (user.getOrgid_link() != 1){
+			if (user.getOrgid_link() != 1) {
 				List<PContract> list_remove = new ArrayList<PContract>();
-				for (PContract thepcontract: list){
-					if (!thepcontract.getIsHavingPO()) list_remove.add(thepcontract);
+				for (PContract thepcontract : list) {
+					if (!thepcontract.getIsHavingPO())
+						list_remove.add(thepcontract);
 				}
 				list.removeAll(list_remove);
 			}
 			response.data = list;
-			
-			
+
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<PContract_getbypaging_response>(response,HttpStatus.OK);
-		}catch (Exception e) {
+			return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-		    return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
+			return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
 		}
 	}
+
+	@RequestMapping(value = "/findByContractcode", method = RequestMethod.POST)
+	public ResponseEntity<PContract_getbypaging_response> findByContractcode(
+			@RequestBody PContract_findByContractcode_request entity, HttpServletRequest request) {
+		PContract_getbypaging_response response = new PContract_getbypaging_response();
+//		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+		try {
+			response.data = pcontractService.findByContractcode(entity.contractcode);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/findByExactContractcode", method = RequestMethod.POST)
+	public ResponseEntity<PContract_getbypaging_response> findByExactContractcode(
+			@RequestBody PContract_findByContractcode_request entity, HttpServletRequest request) {
+		PContract_getbypaging_response response = new PContract_getbypaging_response();
+//		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+		try {
+			List<PContract> result = pcontractService.findByExactContractcode(entity.contractcode);
+			if(result.size() > 0) {
+				response.data = result;
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			}else {
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage("Mã đơn hàng không tồn tại");
+			}
+			return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
+		}
+	}
+
 }

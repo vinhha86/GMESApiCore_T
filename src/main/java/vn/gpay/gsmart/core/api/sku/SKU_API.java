@@ -125,4 +125,19 @@ public class SKU_API {
 		    return new ResponseEntity<SKU_getbyproduct_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	@RequestMapping(value = "/getSkuByCode",method = RequestMethod.POST)
+	public ResponseEntity<SKU_getbyproduct_response> getSkuByCode(HttpServletRequest request, @RequestBody SKU_getSkuByCode_request entity ) {
+		SKU_getbyproduct_response response = new SKU_getbyproduct_response();
+		try {
+			response.data = skuService.getSkuByCode(entity.code);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<SKU_getbyproduct_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<SKU_getbyproduct_response>(response, HttpStatus.OK);
+		}
+	}
 }
