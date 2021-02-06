@@ -82,6 +82,7 @@ public class ReportAPI {
 		size_set_name.put("Style", idx++);
 		size_set_name.put("Detail", idx++);
 		size_set_name.put("Description", idx++);
+		
 		size_set_name.put("Picture", idx++);
 		
 		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
@@ -124,7 +125,7 @@ public class ReportAPI {
 					
 					Map<String, String> map = new HashMap<String, String>();
 					map.put("Style", po.getPo_buyer());
-					map.put("Detail", pair.getProductCode());
+					map.put("Detail", pair.getProductBuyerCode());
 					map.put("Description", pair.getProductName());
 					map.put("Picture", pair.getImgurl1());
 					
@@ -283,29 +284,38 @@ public class ReportAPI {
 				else {
 					cell.setCellStyle(cellStyle_aligncenter);
 					String FolderPath = commonService.getFolderPath(10);
-					String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+					String uploadRootPath = request.getServletContext().getRealPath("");
+//					String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
 					
 					String filename = map.get(key);
 					if(filename!=null) {
-						String filePath = uploadRootPath+"/"+ filename;
-						InputStream isimg = new FileInputStream(filePath);
-						byte[] img = IOUtils.toByteArray(isimg);
+//						String filePath = uploadRootPath+"/"+ filename;
+						File uploadRootDir_img = new File(uploadRootPath);
+						String parent = uploadRootDir_img.getParent();
+						String filePath = parent+"/"+FolderPath+"/"+ filename;
 						
-						int pictureIdx = workbook.addPicture(img, Workbook.PICTURE_TYPE_JPEG);
-						isimg.close();
+						File img_tmp = new File(filePath);
+						if(img_tmp.exists() && !img_tmp.isDirectory()) {
+							InputStream isimg = new FileInputStream(filePath);
+							byte[] img = IOUtils.toByteArray(isimg);
+							
+							int pictureIdx = workbook.addPicture(img, Workbook.PICTURE_TYPE_JPEG);
+							isimg.close();
+							
+							XSSFDrawing  drawing = sheet.createDrawingPatriarch();
+							
+							// add a picture shape
+							XSSFClientAnchor  anchor = new XSSFClientAnchor();
+							
+							// set top-left corner of the picture,
+							// subsequent call of Picture#resize() will operate relative to it
+							anchor.setCol1(col_idx);
+							anchor.setRow1(rowNum);
+							anchor.setCol2(col_idx+1);
+							anchor.setRow2(rowNum+1);
+							drawing.createPicture(anchor, pictureIdx);
+						}
 						
-						XSSFDrawing  drawing = sheet.createDrawingPatriarch();
-						
-						// add a picture shape
-						XSSFClientAnchor  anchor = new XSSFClientAnchor();
-						
-						// set top-left corner of the picture,
-						// subsequent call of Picture#resize() will operate relative to it
-						anchor.setCol1(col_idx);
-						anchor.setRow1(rowNum);
-						anchor.setCol2(col_idx+1);
-						anchor.setRow2(rowNum+1);
-						drawing.createPicture(anchor, pictureIdx);
 					}
 					
 				}
