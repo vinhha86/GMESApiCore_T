@@ -12,6 +12,9 @@ import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,6 +106,9 @@ public class ReportAPI {
 				map.put("Picture", product.getImgurl1());
 				
 				List<PContract_Price> list_price = po.getPcontract_price();
+				Comparator<PContract_Price> compareBySortValue = (PContract_Price a1, PContract_Price a2) -> a1.getSortvalue().compareTo( a2.getSortvalue());
+				Collections.sort(list_price, compareBySortValue);
+				
 				for(PContract_Price price : list_price) {
 					map.put(price.getSizesetname(), price.getTotalprice()+" "+po.getCurrencyCode());
 					
@@ -131,6 +137,9 @@ public class ReportAPI {
 					
 					//Lay danh sach dai co theo san pham con
 					List<PContract_Price> list_price = priceService.getPrice_by_product(pcontractpoid_link, pair.getProductid_link());
+					Comparator<PContract_Price> compareBySortValue = (PContract_Price a1, PContract_Price a2) -> a1.getSortvalue().compareTo( a2.getSortvalue());
+					Collections.sort(list_price, compareBySortValue);
+					
 					for(PContract_Price price : list_price) {
 						map.put(price.getSizesetname(), price.getTotalprice()+" "+po.getCurrencyCode());
 						
@@ -344,6 +353,8 @@ public class ReportAPI {
 		
 		return new ResponseEntity<report_quotation_response>(response, HttpStatus.OK);
 	}
+	
+	
 	
 	@RequestMapping(value = "/download_temp_chaogia", method = RequestMethod.POST)
 	public ResponseEntity<download_template_chaogia_response> DownloadChaoGia(HttpServletRequest request)

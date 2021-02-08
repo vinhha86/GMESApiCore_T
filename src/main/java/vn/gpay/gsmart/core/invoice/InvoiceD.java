@@ -1,8 +1,11 @@
 package vn.gpay.gsmart.core.invoice;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -18,6 +22,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.category.Unit;
+import vn.gpay.gsmart.core.packinglist.PackingList;
 import vn.gpay.gsmart.core.sku.SKU;
 
 @Table(name="invoice_d")
@@ -81,10 +86,10 @@ public class InvoiceD implements Serializable {
 	private Float m3;
 	private Long sizeid_link;
 	
-//	@NotFound(action = NotFoundAction.IGNORE)
-//	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
-//	@JoinColumn( name="invoicedid_link", referencedColumnName="id")
-//	private List<PackingList>  packinglist  = new ArrayList<>();
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany( cascade =  CascadeType.ALL)
+	@JoinColumn( name="invoicedid_link", referencedColumnName="id")
+	private List<PackingList>  packinglist  = new ArrayList<PackingList>();
 	
 	//mo rong
 	public String getSkucode() {
