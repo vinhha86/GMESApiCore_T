@@ -236,13 +236,18 @@ public class PContractProductPairingAPI {
 			response.mesErr = "";
 			//Kiểm tra xem bộ đã tồn tại hay chưa
 			List<ProductPairing> list_pair = prodctpairservice.getproduct_pairing_bycontract(orgrootid_link, pcontractid_link);
+			List<ProductPairing> list_clone = new ArrayList<ProductPairing>(entity.listpair);
 			
 			if(list_pair.size() > 0) {
 				for(ProductPairing productpair : entity.listpair) {
 					list_pair.removeIf(c-> c.getProductid_link().equals(productpair.getProductid_link()) && c.getAmount().equals(productpair.getAmount()));
 				}
 				
-				if(list_pair.size() == 0) {
+				for(ProductPairing pair : list_pair) {
+					list_clone.removeIf(c->c.getProductid_link().equals(pair.getProductid_link()) && c.getAmount().equals(pair.getAmount()));
+				}
+				
+				if(list_pair.size() == 0 && list_clone.size() == 0) {
 					response.mesErr = "Bộ đã tồn tại trong hệ thống!";
 				}
 			}

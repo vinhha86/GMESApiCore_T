@@ -12,7 +12,6 @@ import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -241,7 +240,7 @@ public class ReportAPI {
 //		cellStyle_wraptext_left.setFillBackgroundColor(HSSFColor.SKY_BLUE.index);
 //		cellStyle_wraptext_left.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 		
-		int rowNum = 0;
+		int rowNum = 0, start = 0, end = 0;
 		//sinh header
 		Row row_header = sheet.createRow(rowNum);
 		for (String key : size_set_name.keySet()) {
@@ -266,8 +265,20 @@ public class ReportAPI {
 				String old_value = row_old.getCell(0).getStringCellValue();
 				String new_val = map.get("Style");
 				if(old_value == new_val) {
-					sheet.addMergedRegion(new CellRangeAddress(rowNum-1 , rowNum  , 0, 0));
+					end = rowNum;
+					if(rowNum == list.size() )
+						sheet.addMergedRegion(new CellRangeAddress(start , end  , 0, 0));
 				}
+				else {
+					if(start < end)
+						sheet.addMergedRegion(new CellRangeAddress(start , end, 0, 0));
+					start = rowNum;
+					end = rowNum;
+				}
+			}
+			else {
+				start = rowNum;
+				end = rowNum;
 			}
 			
 			
