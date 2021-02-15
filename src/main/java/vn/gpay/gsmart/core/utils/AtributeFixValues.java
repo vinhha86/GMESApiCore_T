@@ -19,4 +19,6 @@ public class AtributeFixValues {
     public static String url_authen = "http://localhost:8081";//DHA
 //    public static String url_authen = "http://gpay.vn:8181";//GSmart
 //    public static String url_authen = "http://localhost:8181";//GSmart
+    public static String url_gmes = "http://localhost:8990";//GMES
+    public static String url_jitin = "http://localhost:8991/jitin";//JITIN
 }

@@ -484,4 +484,92 @@ public class PContractProductBom2API {
 		}
 		return new ResponseEntity<PContractProductBOM_getbomcolor_response>(response, HttpStatus.OK);
 	}
+	public List<Map<String, String>> GetListProductBomColor(PContractProductBOM_getbomcolor_request entity) {
+		PContractProductBOM_getbomcolor_response response = new PContractProductBOM_getbomcolor_response();
+		try {
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+//					.getPrincipal();
+			long pcontractid_link = entity.pcontractid_link;
+			long productid_link = entity.productid_link;
+			long colorid_link = entity.colorid_link;
+			List<Map<String, String>> listdata = new ArrayList<Map<String, String>>();			
+			
+			List<PContractProductBom2> listbom = ppbom2service.get_pcontract_productBOMbyid(productid_link, pcontractid_link);
+			List<PContractBom2Color> listbomcolor = ppbomcolor2service.getall_material_in_productBOMColor(pcontractid_link, productid_link, colorid_link, (long)0);
+			List<PContractBOM2SKU> listbomsku = ppbom2skuservice.getmaterial_bycolorid_link(pcontractid_link, productid_link, colorid_link, 0);
+			
+			List<Long> List_size = ppskuService.getlistvalue_by_product(pcontractid_link, productid_link, (long)30);
+//			List<Long> List_size = ppatt_service.getvalueid_by_product_and_pcontract_and_attribute(orgrootid_link, pcontractid_link, productid_link, (long) 30);
+					//ppbomskuservice.getsize_bycolor(pcontractid_link, productid_link, colorid_link);
+			
+			for (PContractProductBom2 pContractProductBom : listbom) {
+				Map<String, String> map = new HashMap<String, String>();
+				List<PContractBom2Color> listbomcolorclone = new ArrayList<PContractBom2Color>(listbomcolor);
+				listbomcolorclone.removeIf(c -> !c.getMaterialid_link().equals(pContractProductBom.getMaterialid_link()));
+				
+				Float amount_color = (float) 0;
+				if(listbomcolorclone.size() > 0)
+					amount_color = listbomcolorclone.get(0).getAmount();
+				
+				map.put("amount", "0"+pContractProductBom.getAmount());
+				
+				map.put("amount_color", "0"+amount_color);
+				
+				map.put("coKho", pContractProductBom.getCoKho()+"");
+				
+				map.put("createddate", pContractProductBom.getCreateddate()+"");
+				
+				map.put("createduserid_link", "0"+pContractProductBom.getCreateduserid_link());
+				
+				map.put("description", pContractProductBom.getDescription()+"");
+				
+				map.put("id", "0"+pContractProductBom.getId());
+				
+				map.put("lost_ratio", "0"+pContractProductBom.getLost_ratio());
+				
+				map.put("materialid_link", "0"+pContractProductBom.getMaterialid_link());
+				
+				map.put("materialName", pContractProductBom.getMaterialName()+"");
+				
+				map.put("materialCode", pContractProductBom.getMaterialCode()+"");
+				
+				map.put("orgrootid_link", "0"+pContractProductBom.getOrgrootid_link());
+				
+				map.put("pcontractid_link", "0"+pContractProductBom.getPcontractid_link());
+				
+				map.put("product_type", pContractProductBom.getProduct_type()+"");
+				
+				map.put("product_typename", pContractProductBom.getProduct_typeName()+"");
+				
+				map.put("productid_link", pContractProductBom.getProductid_link()+"");
+				
+				map.put("tenMauNPL", pContractProductBom.getTenMauNPL()+"");
+				
+				map.put("thanhPhanVai", pContractProductBom.getThanhPhanVai()+"");
+				
+				map.put("unitName", pContractProductBom.getUnitName()+"");
+				
+				map.put("unitid_link", "0"+pContractProductBom.getUnitid_link());
+				
+				for(Long size : List_size) {
+					List<PContractBOM2SKU> listbomsku_clone = new ArrayList<PContractBOM2SKU>(listbomsku);
+					long skuid_link = ppbom2skuservice.getskuid_link_by_color_and_size(colorid_link, size, productid_link);
+					listbomsku_clone.removeIf(c -> !c.getMaterialid_link().equals(pContractProductBom.getMaterialid_link()) || 
+							!c.getSkuid_link().equals(skuid_link));
+					Float amount_size = (float) 0;
+					if(listbomsku_clone.size() > 0)
+						amount_size = listbomsku_clone.get(0).getAmount();
+					map.put(""+size, amount_size+"");
+				}
+				
+				listdata.add(map);
+			}
+			
+			return listdata;
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return null;
+		}
+	}
 }

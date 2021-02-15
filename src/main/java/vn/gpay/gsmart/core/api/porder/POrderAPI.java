@@ -1183,23 +1183,23 @@ public class POrderAPI {
 		}    			
 	}
 	
-	@RequestMapping(value = "/getcolor_by_porder",method = RequestMethod.POST)
-	public ResponseEntity<get_color_by_porder_response> GetColorByPOrder(HttpServletRequest request, @RequestBody get_color_by_porder_request entity) {
-		get_color_by_porder_response response = new get_color_by_porder_response();
-		try {
-			POrder porder = porderService.findOne(entity.porderid_link);
-			Long pcontractpoid_link = porder.getPcontract_poid_link();
-			Long productid_link = porder.getProductid_link();
-			
-			
-			
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
-			return new ResponseEntity<get_color_by_porder_response>(response,HttpStatus.OK);
-		}catch (Exception e) {
-			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-			response.setMessage(e.getMessage());			
-		    return new ResponseEntity<get_color_by_porder_response>(HttpStatus.OK);
-		}    			
-	}
+//	@RequestMapping(value = "/getcolor_by_porder",method = RequestMethod.POST)
+//	public ResponseEntity<get_color_by_porder_response> GetColorByPOrder(HttpServletRequest request, @RequestBody get_color_by_porder_request entity) {
+//		get_color_by_porder_response response = new get_color_by_porder_response();
+//		try {
+//			POrder porder = porderService.findOne(entity.porderid_link);
+//			Long pcontractpoid_link = porder.getPcontract_poid_link();
+//			Long productid_link = porder.getProductid_link();
+//			
+//			
+//			
+//			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+//			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
+//			return new ResponseEntity<get_color_by_porder_response>(response,HttpStatus.OK);
+//		}catch (Exception e) {
+//			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+//			response.setMessage(e.getMessage());			
+//		    return new ResponseEntity<get_color_by_porder_response>(HttpStatus.OK);
+//		}    			
+//	}
 }

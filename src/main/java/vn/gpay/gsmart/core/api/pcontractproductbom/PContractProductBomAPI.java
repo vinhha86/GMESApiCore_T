@@ -486,6 +486,65 @@ public class PContractProductBomAPI {
 		return new ResponseEntity<PContractProductBOM_getbomcolor_response>(response, HttpStatus.OK);
 	}
 	
+	public List<Map<String, String>> GetListProductBomColor(PContractProductBOM_getbomcolor_request entity) {
+		try {
+			long pcontractid_link = entity.pcontractid_link;
+			long productid_link = entity.productid_link;
+			long colorid_link = entity.colorid_link;
+			List<Map<String, String>> listdata = new ArrayList<Map<String, String>>();			
+			
+			List<PContractProductBom> listbom = ppbomservice.get_pcontract_productBOMbyid(productid_link, pcontractid_link);
+			List<PContractBOMColor> listbomcolor = ppbomcolorservice.getall_material_in_productBOMColor(pcontractid_link, productid_link, colorid_link, (long)0);
+			List<PContractBOMSKU> listbomsku = ppbomskuservice.getmaterial_bycolorid_link(pcontractid_link, productid_link, colorid_link, 0);
+			
+			List<Long> List_size = ppskuService.getlistvalue_by_product(pcontractid_link, productid_link, (long)30);
+			
+			for (PContractProductBom pContractProductBom : listbom) {
+				Map<String, String> map = new HashMap<String, String>();
+				List<PContractBOMColor> listbomcolorclone = new ArrayList<PContractBOMColor>(listbomcolor);
+				listbomcolorclone.removeIf(c -> !c.getMaterialid_link().equals(pContractProductBom.getMaterialid_link()));
+				
+				Float amount_color = (float) 0;
+				if(listbomcolorclone.size() > 0)
+					amount_color = listbomcolorclone.get(0).getAmount();
+				
+				map.put("amount", pContractProductBom.getAmount()+"");
+				
+				map.put("amount_color", amount_color+"");
+					
+				map.put("id", pContractProductBom.getId()+"");
+				
+				map.put("lost_ratio", pContractProductBom.getLost_ratio()+"");
+				
+				map.put("materialid_link", pContractProductBom.getMaterialid_link()+"");
+				
+				map.put("materialName", pContractProductBom.getMaterialName()+"");
+				
+				map.put("materialCode", pContractProductBom.getMaterialCode()+"");
+
+				map.put("unitName", pContractProductBom.getUnitName()+"");
+				
+				for(Long size : List_size) {
+					List<PContractBOMSKU> listbomsku_clone = new ArrayList<PContractBOMSKU>(listbomsku);
+					long skuid_link = ppbomskuservice.getskuid_link_by_color_and_size(colorid_link, size, productid_link);
+					listbomsku_clone.removeIf(c -> !c.getMaterialid_link().equals(pContractProductBom.getMaterialid_link()) || 
+							!c.getSkuid_link().equals(skuid_link));
+					Float amount_size = (float) 0;
+					if(listbomsku_clone.size() > 0)
+						amount_size = listbomsku_clone.get(0).getAmount();
+					map.put(""+size, amount_size+"");
+				}
+				
+				listdata.add(map);
+			}
+			
+			return listdata;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	@RequestMapping(value = "/deletematerial", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> DeleteMaterial(HttpServletRequest request,
 			@RequestBody PContractProductBom_delete_material_request entity) {

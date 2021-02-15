@@ -158,7 +158,7 @@ public class InvoiceAPI {
 					invoice.setLastuserupdateid_link(user.getUserId());
 					
 					InvoiceD invoice_d = new InvoiceD();
-					invoice_d.setColorid_link(sku.getColor_id());
+//					invoice_d.setColorid_link(sku.getColor_id());
 					invoice_d.setFoc((float)0);
 					invoice_d.setGrossweight((float)0);
 					invoice_d.setId(null);
@@ -166,12 +166,12 @@ public class InvoiceAPI {
 					invoice_d.setM3((float)0);
 					invoice_d.setNetweight((float)0);
 					invoice_d.setOrgrootid_link(orgrootid_link);
-					invoice_d.setSizeid_link(sku.getSize_id());
+//					invoice_d.setSizeid_link(sku.getSize_id());
 					invoice_d.setSkuid_link(skuid_link);
 					invoice_d.setTimecreate(new Date());
 					invoice_d.setTotalamount((float)0);
 					invoice_d.setTotalpackage(0);
-					invoice_d.setUnitid_link(sku.getUnitid_link());
+//					invoice_d.setUnitid_link(sku.getUnitid_link());
 					invoice_d.setUnitprice((float)0);
 					invoice_d.setUsercreateid_link(user.getUserId());
 					invoice_d.setYds((float)0);
