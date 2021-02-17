@@ -2,12 +2,13 @@ package vn.gpay.gsmart.core.api.balance;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import vn.gpay.gsmart.core.packinglist.PackingList;
 
-public class Balance_Invoice_Data implements Serializable {
+public class Jitin_Invoice_Data implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Long invoiceid_link;
+	private Date invoice_shipdateto;
 	private Long skuid_link;
 	private Integer unitid_link;
 	private Integer totalpackage;
@@ -27,7 +28,7 @@ public class Balance_Invoice_Data implements Serializable {
 	private String hsname;
 	private String unitname;
 	
-	private List<PackingList> packinglist = new ArrayList<>();
+	private List<Jitin_PkList_Data> packinglist = new ArrayList<>();
 
 	public Long getInvoiceid_link() {
 		return invoiceid_link;
@@ -173,12 +174,20 @@ public class Balance_Invoice_Data implements Serializable {
 		this.unitname = unitname;
 	}
 
-	public List<PackingList> getPackinglist() {
+	public List<Jitin_PkList_Data> getPackinglist() {
 		return packinglist;
 	}
 
-	public void setPackinglist(List<PackingList> packinglist) {
+	public void setPackinglist(List<Jitin_PkList_Data> packinglist) {
 		this.packinglist = packinglist;
+	}
+
+	public Date getInvoice_shipdateto() {
+		return invoice_shipdateto;
+	}
+
+	public void setInvoice_shipdateto(Date invoice_shipdateto) {
+		this.invoice_shipdateto = invoice_shipdateto;
 	}
 	
 }

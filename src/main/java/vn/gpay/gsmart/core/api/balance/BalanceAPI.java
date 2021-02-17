@@ -58,6 +58,7 @@ public class BalanceAPI {
 						Balance_SKU theBalance =  new Balance_SKU(
 								ls_SKUBalance,
 								thePO.getPcontractid_link(),
+								thePO.getId(),
 								mat_sku,
 								request.getHeader("Authorization"),
 								latch);
@@ -65,6 +66,7 @@ public class BalanceAPI {
 					}
 					latch.await();
 		            response.data = ls_SKUBalance;
+		            response.product_data = ls_Product;
 					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 					return new ResponseEntity<Balance_Response>(response, HttpStatus.OK);
@@ -104,15 +106,20 @@ public class BalanceAPI {
 				List<Balance_Product_Data> ls_Product_Balance = new ArrayList<Balance_Product_Data>();
 				for(PContractProductSKU poSKU: ls_SKU_Balance){
 					SKU theSKU = skuService.findOne(poSKU.getSkuid_link());
-					Balance_Product_Data theBalance = ls_Product_Balance.stream().filter(prod -> prod.productid_link.equals(poSKU.getProductid_link()) && prod.colorid_link.equals(theSKU.getColor_id())).findAny().orElse(null);
-					if (null!=theBalance){
-						theBalance.amount += poSKU.getPquantity_total();
-					} else {
-						Balance_Product_Data newBalance = new Balance_Product_Data();
-						newBalance.productid_link = poSKU.getProductid_link();
-						newBalance.colorid_link = theSKU.getColor_id();
-						newBalance.amount = poSKU.getPquantity_total();
-						ls_Product_Balance.add(newBalance);
+					if (null != theSKU){
+						Balance_Product_Data theBalance = ls_Product_Balance.stream().filter(prod -> prod.productid_link.equals(poSKU.getProductid_link()) && prod.colorid_link.equals(theSKU.getColorid_link())).findAny().orElse(null);
+						if (null!=theBalance){
+							theBalance.amount += poSKU.getPquantity_total();
+						} else {
+							Balance_Product_Data newBalance = new Balance_Product_Data();
+							newBalance.productid_link = poSKU.getProductid_link();
+							newBalance.product_code = theSKU.getCode();
+							newBalance.product_name = theSKU.getName();
+							newBalance.colorid_link = theSKU.getColorid_link();
+							newBalance.color_name = theSKU.getColor_name();
+							newBalance.amount = poSKU.getPquantity_total();
+							ls_Product_Balance.add(newBalance);
+						}
 					}
 				}	
 				return ls_Product_Balance;
@@ -135,13 +142,20 @@ public class BalanceAPI {
 		List<Map<String, String>> ls_bomdata = bom2Service.GetListProductBomColor(entity);
 		if (null!=ls_bomdata){
 			for(Map<String, String> bomdata:ls_bomdata){
+//				System.out.println(bomdata);
 				Long materialid_link = Long.valueOf(bomdata.get("materialid_link"));
-				Float amount_color = null!=bomdata.get("amount_color")?Float.valueOf(bomdata.get("amount_color")):0;
+				Float amount_color = (float) 0;
+				if (null!=bomdata.get("amount") && Float.valueOf(bomdata.get("amount")) > (float) 0){
+					amount_color = Float.valueOf(bomdata.get("amount"));
+				} else {
+					amount_color = null!=bomdata.get("amount_color")?Float.valueOf(bomdata.get("amount_color")):0;
+				}
+				
 				Float lostratio = null!=bomdata.get("lost_ratio")?Float.valueOf(bomdata.get("lost_ratio")):0;
 				SKUBalance_Data theSKUBalance = ls_SKUBalance.stream().filter(sku -> sku.getMat_skuid_link().equals(materialid_link)).findAny().orElse(null);
 				if (null!=theSKUBalance){
 					//Tinh tong dinh muc
-					theSKUBalance.setMat_sku_bom_amount(theSKUBalance.getMat_sku_bom_amount() + amount_color);
+//					theSKUBalance.setMat_sku_bom_amount(theSKUBalance.getMat_sku_bom_amount() + amount_color);
 					theSKUBalance.setMat_sku_demand(theSKUBalance.getMat_sku_demand() + amount_color*p_amount);
 				} else {
 					SKUBalance_Data newSKUBalance = new SKUBalance_Data();
@@ -152,6 +166,7 @@ public class BalanceAPI {
 					newSKUBalance.setMat_sku_unit_name(bomdata.get("unitName"));
 					newSKUBalance.setMat_sku_size_name(bomdata.get("coKho"));
 					newSKUBalance.setMat_sku_color_name(bomdata.get("tenMauNPL"));
+					newSKUBalance.setMat_sku_product_typename(bomdata.get("product_typename"));
 					
 					newSKUBalance.setMat_sku_bom_lostratio(lostratio);
 					newSKUBalance.setMat_sku_bom_amount(amount_color);

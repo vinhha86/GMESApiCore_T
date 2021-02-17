@@ -28,6 +28,7 @@ public class PackingList implements Serializable {
 	@SequenceGenerator(name="invoice_pklist_generator", sequenceName = "invoice_pklist_id_seq", allocationSize=1)
 	protected Long id;
 	
+	@Column(name ="orgrootid_link")
     private Long orgrootid_link;
 	
 	@Column(name ="invoiceid_link")
@@ -56,6 +57,9 @@ public class PackingList implements Serializable {
 	
 	@Column(name ="m3")
     private Float m3;
+	
+	@Column(name ="width")
+    private Float width;
 	
 	@Column(name ="netweight")
     private Float netweight;
@@ -116,16 +120,50 @@ public class PackingList implements Serializable {
 				return "";
 			}
 			
+			
+//			public String getColorcode() {
+//				if(color!=null) {
+//					return color.getCode();
+//				}
+//				return "";
+//				
+//			}
+//			public String getColorname() {
+//				if(color!=null) {
+//					return color.getName();
+//				}
+//				return "";
+//				
+//			}
+//			public String getColorRGB() {
+//				if(color!=null) {
+//					return color.getRgbvalue();
+//				}
+//				return "";
+//				
+//			}
+			
 			@NotFound(action = NotFoundAction.IGNORE)
 			@ManyToOne
 		    @JoinColumn(name="skuid_link",updatable =false,insertable =false)
 		    private SKU sku;
+			
+//			@NotFound(action = NotFoundAction.IGNORE)
+//			@ManyToOne
+//		    @JoinColumn(name="colorid_link",updatable =false,insertable =false)
+//		    private Color color;
 
 			public Long getId() {
 				return id;
 			}
 			public void setId(Long id) {
 				this.id = id;
+			}
+			public Long getOrgrootid_link() {
+				return orgrootid_link;
+			}
+			public void setOrgrootid_link(Long orgrootid_link) {
+				this.orgrootid_link = orgrootid_link;
 			}
 			public Long getInvoiceid_link() {
 				return invoiceid_link;
@@ -174,6 +212,12 @@ public class PackingList implements Serializable {
 			}
 			public void setYdscheck(Float ydscheck) {
 				this.ydscheck = ydscheck;
+			}
+			public Float getWidth() {
+				return width;
+			}
+			public void setWidth(Float width) {
+				this.width = width;
 			}
 			public Float getNetweight() {
 				return netweight;
@@ -229,15 +273,18 @@ public class PackingList implements Serializable {
 			public void setLasttimeupdate(Date lasttimeupdate) {
 				this.lasttimeupdate = lasttimeupdate;
 			}
-			public SKU getSku() {
-				return sku;
-			}
-			public Long getOrgrootid_link() {
-				return orgrootid_link;
-			}
-			public void setOrgrootid_link(Long orgrootid_link) {
-				this.orgrootid_link = orgrootid_link;
-			}
+//			public SKU getSku() {
+//				return sku;
+//			}
+//			public void setSku(SKU sku) {
+//				this.sku = sku;
+//			}
+//			public Color getColor() {
+//				return color;
+//			}
+//			public void setColor(Color color) {
+//				this.color = color;
+//			}
 			public String getSizenumber() {
 				return sizenumber;
 			}
@@ -250,7 +297,5 @@ public class PackingList implements Serializable {
 			public void setM3(Float m3) {
 				this.m3 = m3;
 			}
-	
-	
 	
 }
