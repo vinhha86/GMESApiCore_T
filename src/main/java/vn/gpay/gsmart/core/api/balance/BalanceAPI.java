@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,6 +22,7 @@ import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
+import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_Service;
 import vn.gpay.gsmart.core.sku.SKU;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
@@ -86,6 +88,42 @@ public class BalanceAPI {
 			return new ResponseEntity<Balance_Response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+	@RequestMapping(value = "/get_material_bypcontract", method = RequestMethod.POST)
+	public ResponseEntity<Balance_Response> get_material_bypcontract(HttpServletRequest request,
+			@RequestBody Balance_Request entity) {
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		long orgrootid_link = user.getRootorgid_link();
+		
+		Balance_Response response = new Balance_Response();
+		try {
+			//Lay danh sach PO cua PContract
+			List<PContract_PO> ls_PO = pcontract_POService.getPOByContract(orgrootid_link, entity.pcontractid_link);
+			
+			List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
+			List<Balance_Product_Data> ls_Product = new ArrayList<Balance_Product_Data>();
+			for(PContract_PO thePO: ls_PO){
+				//1. Lay danh sach Product, Color va SL yeu cau SX theo PO 
+				//(Neu la PO cha thi lay tong yeu cau cua cac PO con)
+				List<Balance_Product_Data> ls_Product_PO = get_BalanceProduct_List(thePO.getId());
+				if (null!=ls_Product){
+					//2. Lay tong hop BOM theo PContractid_link, Productid_link, Colorid_link
+					for(Balance_Product_Data theProduct:ls_Product_PO){
+						cal_demand(ls_SKUBalance, thePO.getPcontractid_link(), theProduct.productid_link,theProduct.colorid_link, theProduct.amount);
+					}
+					ls_Product.addAll(ls_Product_PO);
+				}
+			}
+            response.data = ls_SKUBalance;
+            response.product_data = ls_Product;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<Balance_Response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<Balance_Response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}	
 	//Lay danh sach SKU cua Product trong PO
 	private List<Balance_Product_Data> get_BalanceProduct_List(Long pcontract_poid_link){
 		try {
