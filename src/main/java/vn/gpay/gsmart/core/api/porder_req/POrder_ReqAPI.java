@@ -421,7 +421,8 @@ public class POrder_ReqAPI {
 				po_product.setProduct_buyername(req.getProduct_code());
 				po_product.setPo_buyer(req.getPo_buyer());
 				po_product.setQuantity(req.getPo_parent_quantity());
-				po_product.setOrgname(req.getGranttoorgcode());
+//				po_product.setOrgname(req.getGranttoorgcode());
+				po_product.setOrgname(req.getGranttoorgname());
 				
 				listret.add(po_product);
 			}
