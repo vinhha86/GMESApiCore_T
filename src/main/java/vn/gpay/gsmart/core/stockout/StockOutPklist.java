@@ -117,6 +117,10 @@ public class StockOutPklist implements Serializable {
 	@Column(name ="lasttimeupdate")
 	private Date lasttimeupdate;
 	
+	private Float met_origin;
+	private Float met_check;
+	private Float met_processed;
+
 	//mo rong
 	public String getSkucode() {
 		if(sku!=null) {
@@ -394,4 +398,24 @@ public class StockOutPklist implements Serializable {
 	public void setSkutypeid_link(Integer skutypeid_link) {
 		this.skutypeid_link = skutypeid_link;
 	}
+	public Float getMet_origin() {
+		return met_origin;
+	}
+	public void setMet_origin(Float met_origin) {
+		this.met_origin = met_origin;
+	}
+	public Float getMet_check() {
+		return met_check;
+	}
+	public void setMet_check(Float met_check) {
+		this.met_check = met_check;
+	}
+	public Float getMet_processed() {
+		return met_processed;
+	}
+	public void setMet_processed(Float met_processed) {
+		this.met_processed = met_processed;
+	}
+	
+	
 }

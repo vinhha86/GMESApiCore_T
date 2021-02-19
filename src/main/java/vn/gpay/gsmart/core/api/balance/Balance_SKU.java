@@ -120,7 +120,7 @@ public class Balance_SKU implements Runnable{
             if (null != ls_stockind){
             	Float yds_stockin = (float) 0;
             	for(StockInD stockinD: ls_stockind.data){
-            		yds_stockin+=stockinD.getYds();
+            		yds_stockin+=stockinD.getTotalydsorigin();
             	}
             	mat_sku.setMat_sku_stockin(yds_stockin);
             	

@@ -8,6 +8,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -75,8 +76,8 @@ public class StockOutD implements Serializable {
 	@Column(name ="listpackage", length=1000)
     private String listpackage;	
 	
-	@Column(name ="totalyds")
-    private Float totalyds;
+	@Column(name ="totalydsorigin")
+    private Float totalydsorigin;
 	
 	@Column(name ="totalpackagecheck")
     private Integer totalpackagecheck;
@@ -125,11 +126,16 @@ public class StockOutD implements Serializable {
 	
 	private Long sizeid_link;
 	
+	private Float totalmet_origin;
+	private Float totalmet_check;
+	private Float totalmet_processed;
+	private Float totalmet_stockout;
 	
+//	@OneToMany(fetch = FetchType.EAGER, cascade =  CascadeType.ALL , orphanRemoval=true )
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
-	@JoinColumn( name="stockoutdid_link", referencedColumnName="id")
-	private List<StockOutPklist>  stockoutpklist  = new ArrayList<>();
+    @JoinColumn(name="stockoutdid_link",referencedColumnName="id")
+	private List<StockOutPklist>  stockout_packinglist  = new ArrayList<>();
 	
 	@Transient
 	public String getProduct_code() {
@@ -311,11 +317,11 @@ public class StockOutD implements Serializable {
 	public void setListpackage(String listpackage) {
 		this.listpackage = listpackage;
 	}
-	public Float getTotalyds() {
-		return totalyds;
+	public Float getTotalydsorigin() {
+		return totalydsorigin;
 	}
-	public void setTotalyds(Float totalyds) {
-		this.totalyds = totalyds;
+	public void setTotalydsorigin(Float totalydsorigin) {
+		this.totalydsorigin =totalydsorigin;
 	}
 	public Integer getTotalpackagecheck() {
 		return totalpackagecheck;
@@ -407,12 +413,16 @@ public class StockOutD implements Serializable {
 	public void setLasttimeupdate(Date lasttimeupdate) {
 		this.lasttimeupdate = lasttimeupdate;
 	}
-	public List<StockOutPklist> getStockoutpklist() {
-		return stockoutpklist;
+	
+
+	public List<StockOutPklist> getStockout_packinglist() {
+		return stockout_packinglist;
 	}
-	public void setStockoutpklist(List<StockOutPklist> stockoutpklist) {
-		this.stockoutpklist = stockoutpklist;
+
+	public void setStockout_packinglist(List<StockOutPklist> stockout_packinglist) {
+		this.stockout_packinglist = stockout_packinglist;
 	}
+
 	public void setSku(SKU sku) {
 		this.sku = sku;
 	}
@@ -437,4 +447,37 @@ public class StockOutD implements Serializable {
 	public void setSizeid_link(Long sizeid_link) {
 		this.sizeid_link = sizeid_link;
 	}
+
+	public Float getTotalmet_origin() {
+		return totalmet_origin;
+	}
+
+	public void setTotalmet_origin(Float totalmet_origin) {
+		this.totalmet_origin = totalmet_origin;
+	}
+
+	public Float getTotalmet_check() {
+		return totalmet_check;
+	}
+
+	public void setTotalmet_check(Float totalmet_check) {
+		this.totalmet_check = totalmet_check;
+	}
+
+	public Float getTotalmet_processed() {
+		return totalmet_processed;
+	}
+
+	public void setTotalmet_processed(Float totalmet_processed) {
+		this.totalmet_processed = totalmet_processed;
+	}
+
+	public Float getTotalmet_stockout() {
+		return totalmet_stockout;
+	}
+
+	public void setTotalmet_stockout(Float totalmet_stockout) {
+		this.totalmet_stockout = totalmet_stockout;
+	}
+	
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,7 +26,7 @@ import vn.gpay.gsmart.core.category.Color;
 import vn.gpay.gsmart.core.category.Unit;
 import vn.gpay.gsmart.core.sku.SKU;
 
-@Table(name="stockin_d")
+@Table(name="Stockin_d")
 @Entity
 public class StockInD implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -67,8 +68,8 @@ public class StockInD implements Serializable {
 	@Column(name ="totalpackage")
     private Integer totalpackage;
 	
-	@Column(name ="yds")
-    private Float yds;
+	@Column(name ="totalydsorigin")
+    private Float totalydsorigin;
 	
 	@Column(name ="foc")
     private Float foc;
@@ -101,10 +102,15 @@ public class StockInD implements Serializable {
     private Integer status;
 	
 	private Integer totalpackage_order;
-	
+    private Float netweight;
+    private Float grossweight;
+    private Float m3;
+    private Float totalmet_origin;
+    private Float totalmet_check;
+    
 	
 	@NotFound(action = NotFoundAction.IGNORE)
-	@OneToMany//fetch = FetchType.LAZY load tu tu
+	@OneToMany(cascade =  CascadeType.ALL , orphanRemoval=true )//fetch = FetchType.LAZY load tu tu
 	@JoinColumn( name="stockindid_link", referencedColumnName="id")
 	private List<StockInPklist>  stockin_packinglist  = new ArrayList<StockInPklist>();
 	
@@ -255,11 +261,12 @@ public class StockInD implements Serializable {
 	public void setTotalpackage(Integer totalpackage) {
 		this.totalpackage = totalpackage;
 	}
-	public Float getYds() {
-		return yds;
+
+	public Float getTotalydsorigin() {
+		return totalydsorigin;
 	}
-	public void setYds(Float yds) {
-		this.yds = yds;
+	public void setTotalydsorigin(Float totalydsorigin) {
+		this.totalydsorigin = totalydsorigin;
 	}
 	public Float getFoc() {
 		return foc;
@@ -384,8 +391,36 @@ public class StockInD implements Serializable {
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
-	
-	
+	public Float getNetweight() {
+		return netweight;
+	}
+	public void setNetweight(Float netweight) {
+		this.netweight = netweight;
+	}
+	public Float getGrossweight() {
+		return grossweight;
+	}
+	public void setGrossweight(Float grossweight) {
+		this.grossweight = grossweight;
+	}
+	public Float getM3() {
+		return m3;
+	}
+	public void setM3(Float m3) {
+		this.m3 = m3;
+	}
+	public Float getTotalmet_origin() {
+		return totalmet_origin;
+	}
+	public void setTotalmet_origin(Float totalmet_origin) {
+		this.totalmet_origin = totalmet_origin;
+	}
+	public Float getTotalmet_check() {
+		return totalmet_check;
+	}
+	public void setTotalmet_check(Float totalmet_check) {
+		this.totalmet_check = totalmet_check;
+	}
 	
 	/*
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

@@ -96,6 +96,8 @@ public class StockInPklist implements Serializable {
 	@Column(name = "status")
     private Integer status;
 	
+	private Float met_origin;
+	private Float met_check;
 	//mo rong
 	public String getSkucode() {
 		if(sku!=null) {
@@ -326,4 +328,18 @@ public class StockInPklist implements Serializable {
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
+	public Float getMet_origin() {
+		return met_origin;
+	}
+	public void setMet_origin(Float met_origin) {
+		this.met_origin = met_origin;
+	}
+	public Float getMet_check() {
+		return met_check;
+	}
+	public void setMet_check(Float met_check) {
+		this.met_check = met_check;
+	}
+	
+	
 }

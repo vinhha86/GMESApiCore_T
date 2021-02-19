@@ -74,7 +74,7 @@ public class StockOutAPI {
 					stockoutd.setStatus(StockoutStatus.STOCKOUT_D_STATUS_OK);
 					stockoutd.setOrgrootid_link(user.getRootorgid_link());
 					
-					for (StockOutPklist item_epc : stockoutd.getStockoutpklist()) {
+					for (StockOutPklist item_epc : stockoutd.getStockout_packinglist()) {
 						item_epc.setOrgrootid_link(user.getRootorgid_link());
 						
 						if (null == item_epc.getId()){
@@ -99,7 +99,7 @@ public class StockOutAPI {
 					List<StockOutD> stockoutd = stockout.getStockoutd();
 					if(stockoutd !=null && stockoutd.size() >0) {
 						for (StockOutD item_sku : stockoutd) {
-							List<StockOutPklist> Pklist = item_sku.getStockoutpklist();
+							List<StockOutPklist> Pklist = item_sku.getStockout_packinglist();
 							if(Pklist !=null && Pklist.size() >0) {
 								for (StockOutPklist item_epc : Pklist) {
 									warehouseService.deleteByEpc(item_epc.getEpc(),user.getOrgId());
@@ -260,7 +260,7 @@ public class StockOutAPI {
 			if (null != stockout && stockout.getStatus() == 0){
 				//Hoàn trả epc đã xuất về warehouse
 				for (StockOutD sku: stockout.getStockoutd()){
-					for(StockOutPklist epc: sku.getStockoutpklist()){
+					for(StockOutPklist epc: sku.getStockout_packinglist()){
 	    				Warehouse stockin_ws = new Warehouse();
 	
 		    			//Orgid_link trong Warehouse la noi hang dc chuyyen toi
