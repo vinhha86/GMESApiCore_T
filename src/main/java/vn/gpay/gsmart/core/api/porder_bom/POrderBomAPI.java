@@ -110,11 +110,12 @@ public class POrderBomAPI {
 				pContractBOMColor.setCreateddate(new Date());
 				pContractBOMColor.setCreateduserid_link(user.getId());
 				pContractBOMColor.setDescription(entity.data.getDescription());
-				pContractBOMColor.setId((long) 0);
+				pContractBOMColor.setId(null);
 				pContractBOMColor.setMaterialid_link(materialid_link);
 				pContractBOMColor.setOrgrootid_link(user.getRootorgid_link());
 				pContractBOMColor.setPcontractid_link(pcontractid_link);
 				pContractBOMColor.setProductid_link(productid_link);
+				pContractBOMColor.setPorderid_link(porderid_link);
 			}
 			porderbomcolorService.save(pContractBOMColor);
 			

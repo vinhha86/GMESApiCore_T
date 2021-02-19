@@ -45,10 +45,10 @@ public class CutPlan_Size_Service extends AbstractService<CutPlan_Size> implemen
 	}
 
 	@Override
-	public List<CutPlan_Size> getby_sku_and_porder_and_color(Long skuid_link, Long porderid_link, Long orgrootid_link,
+	public List<CutPlan_Size> getby_sku_and_porder_and_color(Long material_skuid_link, Long porderid_link, Long orgrootid_link,
 			Long colorid_link) {
 		// TODO Auto-generated method stub
-		return repo.getby_sku_and_porder_color(skuid_link, porderid_link, orgrootid_link, colorid_link);
+		return repo.getby_sku_and_porder_color(material_skuid_link, porderid_link, orgrootid_link, colorid_link);
 	}
 
 }

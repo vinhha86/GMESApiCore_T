@@ -87,4 +87,11 @@ public class POrderBOMSKU_Service extends AbstractService<POrderBOMSKU> implemen
 		}
 		return repo.getByPOrder_and_material_and_sku(porderid_link, materialid_link, skuid_link);
 	}
+
+	@Override
+	public List<POrderBOMSKU> getby_porder_and_material_and_sku(Long porderid_link,
+			Long materialid_link, long skuid_link) {
+		// TODO Auto-generated method stub
+		return repo.getByPOrder_and_material_and_sku(porderid_link, materialid_link, skuid_link);
+	}
 }

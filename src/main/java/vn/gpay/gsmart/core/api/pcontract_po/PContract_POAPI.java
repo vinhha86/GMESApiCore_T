@@ -27,8 +27,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import vn.gpay.gsmart.core.api.porder.POrderGetByIDResponse;
-import vn.gpay.gsmart.core.api.porder.POrder_getbyid_request;
 import vn.gpay.gsmart.core.attribute.Attribute;
 import vn.gpay.gsmart.core.attribute.IAttributeService;
 import vn.gpay.gsmart.core.attributevalue.Attributevalue;

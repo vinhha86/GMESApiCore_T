@@ -15,4 +15,11 @@ public interface POrderBomProduct_Repository extends JpaRepository<POrderBomProd
 	@Query("SELECT c FROM POrderBomProduct c where c.porderid_link = :porderid_link")
 	public List<POrderBomProduct> getby_porder(
 			@Param ("porderid_link")final Long porderid_link);
+	
+	@Query("SELECT c FROM POrderBomProduct c "
+			+ "where c.porderid_link = :porderid_link "
+			+ "and materialid_link = :material_skuid_link")
+	public List<POrderBomProduct> getby_porder_and_material(
+			@Param ("porderid_link")final Long porderid_link,
+			@Param ("material_skuid_link")final Long material_skuid_link);
 }

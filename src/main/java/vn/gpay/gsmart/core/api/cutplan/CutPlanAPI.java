@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.cutplan.CutPlan_Row;
 import vn.gpay.gsmart.core.cutplan.CutPlan_Size;
 import vn.gpay.gsmart.core.cutplan.ICutPlan_Row_Service;
@@ -27,7 +26,12 @@ import vn.gpay.gsmart.core.cutplan.ICutPlan_Size_Service;
 import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOM2SKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
+import vn.gpay.gsmart.core.porder.IPOrder_Service;
+import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
+import vn.gpay.gsmart.core.sku.SKU_Attribute_Value;
+import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.CutPlanRowType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -38,6 +42,8 @@ public class CutPlanAPI {
 	@Autowired ICutPlan_Row_Service cutplanrowService;
 	@Autowired IPContractProductSKUService pskuservice;
 	@Autowired IPContractBOM2SKUService ppbom2skuservice;
+	@Autowired IPOrder_Service porderService;
+	@Autowired ISKU_AttributeValue_Service skuavService;
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ResponseEntity<create_cutplan_response> CreateCutPlan(HttpServletRequest request,
@@ -341,9 +347,9 @@ public class CutPlanAPI {
 	}
 	
 	@RequestMapping(value = "/update_size_amount", method = RequestMethod.POST)
-	public ResponseEntity<ResponseBase> UpdateSizeAmount(HttpServletRequest request,
+	public ResponseEntity<update_size_amount_response> UpdateSizeAmount(HttpServletRequest request,
 			@RequestBody update_size_amount_request entity) {
-		ResponseBase response = new ResponseBase();
+		update_size_amount_response response = new update_size_amount_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
 					.getPrincipal();
@@ -359,7 +365,10 @@ public class CutPlanAPI {
 			long product_skuid_link = ppbom2skuservice.getskuid_link_by_color_and_size(colorid_link, sizeid_link, productid_link);
 			
 			List<CutPlan_Size> list_size = cutplan_size_Service.getby_row_and_productsku(orgrootid_link, cutplanrowid_link, product_skuid_link);
+			
+			response.catdu = null;
 			if(list_size.size() > 0) {
+				
 				CutPlan_Size row = list_size.get(0);
 				row.setAmount(entity.amount);
 				
@@ -373,21 +382,27 @@ public class CutPlanAPI {
 				int sodo = 0;
 				
 				for (CutPlan_Size cutPlan_Size : listsize_sodo) {
-					sodo += cutPlan_Size.getAmount() == null ? 0 : cutPlan_Size.getAmount();
+					CutPlan_Row cut_row = cutplanrowService.findOne(cutPlan_Size.getCutplanrowid_link());
+					int la_vai = cut_row.getLa_vai();
+					sodo += la_vai*(cutPlan_Size.getAmount() == null ? 0 : cutPlan_Size.getAmount());
 				}
 				
 				CutPlan_Size size_catdu = listsize_catdu.get(0);
-				size_catdu.setAmount(sodo - yeucau);
+				int amount = sodo - yeucau;
+				response.catdu = amount;
+				size_catdu.setAmount(amount);
 				cutplan_size_Service.save(size_catdu);
 			}
+			POrder porder = porderService.findOne(porderid_link);
+			cutplanrowService.sync_porder_bom(material_skuid_link, porder, colorid_link, user.getId(), orgrootid_link);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+			return new ResponseEntity<update_size_amount_response>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+			return new ResponseEntity<update_size_amount_response>(response, HttpStatus.OK);
 		}
 	}
 	
@@ -403,9 +418,11 @@ public class CutPlanAPI {
 			Long porderid_link = entity.porderid_link;
 			Long material_skuid_link = entity.material_skuid_link;
 			
+			
 			//delete row
 			cutplanrowService.deleteById(cutplanrowid_link);
 			
+			POrder porder = porderService.findOne(porderid_link);
 			//delete size in row
 			List<CutPlan_Size> list_size = cutplan_size_Service.getby_row(orgrootid_link, cutplanrowid_link);
 			for (CutPlan_Size cutPlan_Size : list_size) {
@@ -421,15 +438,25 @@ public class CutPlanAPI {
 				int sodo = 0;
 				
 				for (CutPlan_Size cutPlanSize : listsize_sodo) {
-					sodo += cutPlanSize.getAmount() == null ? 0 : cutPlanSize.getAmount();
+					CutPlan_Row cut_row = cutplanrowService.findOne(cutPlanSize.getCutplanrowid_link());
+					int la_vai = cut_row.getLa_vai();
+					sodo += (cutPlanSize.getAmount() == null ? 0 : cutPlanSize.getAmount()) * la_vai;
 				}
 				
 				CutPlan_Size size_catdu = listsize_catdu.get(0);
 				size_catdu.setAmount(sodo - yeucau);
 				cutplan_size_Service.save(size_catdu);
+				
+				//Dong bo sang dinh muc san xuat
+				List<SKU_Attribute_Value> list_value = skuavService.getlist_bysku(product_skuid_link);
+				long colorid_link = 0;
+				for(SKU_Attribute_Value value : list_value) {
+					if(value.getAttributeid_link().equals(AtributeFixValues.ATTR_COLOR) || value.getAttributeid_link() == AtributeFixValues.ATTR_COLOR) {
+						colorid_link = value.getAttributevalueid_link();
+					}
+				}
+				cutplanrowService.sync_porder_bom(material_skuid_link, porder, colorid_link, user.getId(), orgrootid_link);
 			}
-			
-			
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -446,8 +473,50 @@ public class CutPlanAPI {
 			@RequestBody update_row_request entity) {
 		update_row_response response = new update_row_response();
 		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+			Long cutplanrowid_link = entity.data.getId();
+			Long orgrootid_link = user.getRootorgid_link();
+			Long porderid_link = entity.data.getPorderid_link();
+			Long material_skuid_link = entity.data.getMaterial_skuid_link();
 			
 			cutplanrowService.save(entity.data);
+			
+			POrder porder = porderService.findOne(porderid_link);
+			
+			//Cap nhat lai cat du trong truong hop nhap lai so la
+			List<CutPlan_Size> list_size = cutplan_size_Service.getby_row(orgrootid_link, cutplanrowid_link);
+			for (CutPlan_Size cutPlan_Size : list_size) {
+				
+				long product_skuid_link = cutPlan_Size.getProduct_skuid_link();
+				
+				//Cap nhat lai so cat du
+				List<CutPlan_Size> listsize_yeucau = cutplan_size_Service.getby_porder_matsku_productsku(porderid_link, material_skuid_link, product_skuid_link, CutPlanRowType.yeucau, "");
+				List<CutPlan_Size> listsize_catdu = cutplan_size_Service.getby_porder_matsku_productsku(porderid_link, material_skuid_link, product_skuid_link, CutPlanRowType.catdu, "");
+				List<CutPlan_Size> listsize_sodo = cutplan_size_Service.getby_porder_matsku_productsku(porderid_link, material_skuid_link, product_skuid_link, CutPlanRowType.sodocat, "");
+				int yeucau = listsize_yeucau.get(0).getAmount();
+				int sodo = 0;
+				
+				for (CutPlan_Size cutPlanSize : listsize_sodo) {
+					CutPlan_Row cut_row = cutplanrowService.findOne(cutPlanSize.getCutplanrowid_link());
+					int la_vai = cut_row.getLa_vai();
+					sodo += (cutPlanSize.getAmount() == null ? 0 : cutPlanSize.getAmount()) * la_vai;
+				}
+				
+				CutPlan_Size size_catdu = listsize_catdu.get(0);
+				size_catdu.setAmount(sodo - yeucau);
+				cutplan_size_Service.save(size_catdu);
+				
+				//Dong bo sang dinh muc san xuat
+				List<SKU_Attribute_Value> list_value = skuavService.getlist_bysku(product_skuid_link);
+				long colorid_link = 0;
+				for(SKU_Attribute_Value value : list_value) {
+					if(value.getAttributeid_link().equals(AtributeFixValues.ATTR_COLOR) || value.getAttributeid_link() == AtributeFixValues.ATTR_COLOR) {
+						colorid_link = value.getAttributevalueid_link();
+					}
+				}
+				cutplanrowService.sync_porder_bom(material_skuid_link, porder, colorid_link, user.getId(), orgrootid_link);
+			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

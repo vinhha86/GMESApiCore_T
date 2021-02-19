@@ -24,4 +24,10 @@ public class POrderBomProduct_Service extends AbstractService<POrderBomProduct> 
 		return repo.getby_porder(porderid_link);
 	}
 
+	@Override
+	public List<POrderBomProduct> getby_porder_and_material(Long porderid_link, Long material_skuid_link) {
+		// TODO Auto-generated method stub
+		return repo.getby_porder_and_material(porderid_link, material_skuid_link);
+	}
+
 }

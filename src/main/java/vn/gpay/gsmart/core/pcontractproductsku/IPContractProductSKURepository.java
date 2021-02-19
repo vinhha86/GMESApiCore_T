@@ -19,7 +19,7 @@ public interface IPContractProductSKURepository extends JpaRepository<PContractP
 			+ "where a.orgrootid_link = :orgrootid_link "
 			+ "and productid_link = :productid_link "
 			+ "and pcontractid_link = :pcontractid_link "
-			+ "order by sortvalue")
+			+ "group by a")
 	public List<PContractProductSKU> getlistsku_byproduct_and_pcontract(
 			@Param ("orgrootid_link")final  Long orgrootid_link,
 			@Param ("productid_link")final  long productid_link, 
@@ -88,7 +88,8 @@ public interface IPContractProductSKURepository extends JpaRepository<PContractP
 	@Query(value = "select a.skuid_link from SKU_Attribute_Value a "
 			+ "inner join PContractProductSKU c on a.skuid_link = c.skuid_link "
 			+ "where c.productid_link = :productid_link "
-			+ "and c.pcontractid_link = :pcontractid_link and attributevalueid_link= :colorid_link "
+			+ "and c.pcontractid_link = :pcontractid_link "
+			+ "and attributevalueid_link= :colorid_link "
 			+ "group by a.skuid_link")
 	public List<Long> getskuid_bycolorid_link(
 			@Param ("productid_link")final  long productid_link, 
