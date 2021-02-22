@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -2336,11 +2337,14 @@ public class PContract_POAPI {
 
 			PContract_PO thePO = pcontract_POService.findOne(entity.id);
 			if (null != thePO) {
-				// Check if having POrder? refuse deleting if have
-				if (porderService.getByContractAndPO(thePO.getPcontractid_link(), thePO.getId()).size() > 0) {
+//				 Check if having POrder? refuse deleting if have
+				List<POrder> list_porder = porderService.getByContractAndPO(thePO.getPcontractid_link(), thePO.getId());
+				//chi lay nhung lenh da keo vao bieu do
+				List<POrder> list_porder_grant = list_porder.stream().filter(item -> null!=item.getStatus() && item.getStatus() > POrderStatus.PORDER_STATUS_FREE).collect(Collectors.toList());
+				if (list_porder_grant.size() > 0) {
 					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 					response.setMessage(
-							"Hiện vẫn đang có Lệnh SX của đơn hàng! Cần xóa hết Lệnh SX trước khi xóa đơn hàng");
+							"Hiện vẫn đang có Lệnh SX của đơn hàng đã phân chuyền! Cần hủy phân chuyền Lệnh SX trước khi xóa đơn hàng");
 					return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 				}
 				
@@ -2349,7 +2353,7 @@ public class PContract_POAPI {
 				if(list_po.size() > 0) {
 					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 					response.setMessage(
-							"Bạn không thể xóa chào giá đã phát sinh PO!");
+							"Bạn không thể xóa chào giá đã phát sinh PO hoặc line giao hàng!");
 					return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 				}
 
@@ -2361,6 +2365,12 @@ public class PContract_POAPI {
 				// Delete Shipping
 				for (PContract_PO_Shipping theShipping : poshippingService.getByPOID(thePO.getId())) {
 					poshippingService.delete(theShipping);
+				}
+				
+				//Delete porder 
+				List<POrder> list_porder_free = list_porder.stream().filter(item -> null!=item.getStatus() && item.getStatus() == POrderStatus.PORDER_STATUS_FREE).collect(Collectors.toList());
+				for(POrder porder : list_porder_free) {
+					porderService.delete(porder);
 				}
 				
 				//Delete sku

@@ -150,9 +150,10 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 			+ "and b.shipdate = "
 			+ "(select min(d.shipdate) from POrder e "
 			+ "inner join PContract_PO d on d.id = e.pcontract_poid_link "
-			+ " where d.parentpoid_link = b.parentpoid_link "
+			+ "where d.parentpoid_link = b.parentpoid_link "
 			+ "and e.granttoorgid_link = :granttoorgid_link "
-			+ "and e.status = 0) group by a"
+			+ "and e.status = 0) "
+			+ " group by a"
 			)
 	public List<POrder> getfree_groupby_product(
 			@Param ("granttoorgid_link")final Long granttoorgid_link);
