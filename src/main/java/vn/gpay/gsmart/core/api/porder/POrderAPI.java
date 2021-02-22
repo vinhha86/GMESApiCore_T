@@ -3,9 +3,11 @@ package vn.gpay.gsmart.core.api.porder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections4.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -370,21 +372,29 @@ public class POrderAPI {
 				lsPOrder.addAll(porderService.get_free_bygolivedate(entity.golivedate_from, entity.golivedate_to, orgid , "", i, i));
 			}
 			
+			Map<Long, Date> map = new HashedMap<Long, Date>();
+			//Kiem tra ngay giao hang 
 			List<PContractPO_Product> list = new ArrayList<PContractPO_Product>();
 			for(POrder porder : lsPOrder) {
-				PContractPO_Product line = new PContractPO_Product();
-				line.setBuyername(porder.getBuyername());
-				line.setGranttoorgid_link(porder.getGranttoorgid_link());
-				line.setOrgname(porder.getGranttoorgname());
-				line.setPcontract_poid_link(porder.getPO_Offer());
-				line.setPo_buyer(porder.getPo_buyer());
-				line.setProduct_buyername(porder.getProductcode());
-				line.setProductid_link(porder.getProductid_link());
-				line.setQuantity(porder.getPo_parent_quantity());
-				line.setShipdate(porder.getShipdate());
-				line.setVendorname(porder.getVendorname());
-				
-				list.add(line);
+				//kiem tra chao gia va ngay giao hang co chua thi moi lay ra
+				if(map.get(porder.getPO_Offer()) == null) {
+					PContractPO_Product line = new PContractPO_Product();
+					
+					line.setBuyername(porder.getBuyername());
+					line.setGranttoorgid_link(porder.getGranttoorgid_link());
+					line.setOrgname(porder.getGranttoorgname());
+					line.setPcontract_poid_link(porder.getPO_Offer());
+					line.setPo_buyer(porder.getPo_buyer());
+					line.setProduct_buyername(porder.getProductcode());
+					line.setProductid_link(porder.getProductid_link());
+					line.setQuantity(porder.getPo_parent_quantity());
+					line.setShipdate(porder.getShipdate());
+					line.setVendorname(porder.getVendorname());
+					
+					list.add(line);
+					
+					map.put(porder.getPO_Offer(), porder.getShipdate());
+				}
 			}
 			
 			response.data = list;
