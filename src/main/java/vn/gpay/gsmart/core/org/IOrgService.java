@@ -44,4 +44,6 @@ public interface IOrgService extends Operations<Org>{
 	List<Org> getOrgForContractBuyerBuyerList(List<Long> buyerIds);
 	
 	public List<Org> getOrgForVendorStoreByBuyerId(Long buyerid_link);
+	
+	List<Org> getOrgReq_by_po(Long pcontract_poid_link);
 }

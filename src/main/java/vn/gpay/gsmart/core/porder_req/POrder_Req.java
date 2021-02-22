@@ -244,7 +244,7 @@ public class POrder_Req implements Serializable {
 			for(PContract_PO_Productivity po_productivity: list) {
 				if(po_productivity.getProductid_link() != null) {
 					if(po_productivity.getProductid_link().equals(productid_link) || po_productivity.getProductid_link() == productid_link) {
-						int duration = po_productivity.getProductiondays_ns();
+						Integer duration = po_productivity.getProductiondays_ns();
 						if(duration == -1) 
 							duration = pcontract_po.getProductiondays();
 						else if (duration == 0 )

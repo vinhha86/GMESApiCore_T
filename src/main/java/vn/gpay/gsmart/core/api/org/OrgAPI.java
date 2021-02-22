@@ -166,17 +166,19 @@ public class OrgAPI {
 	public ResponseEntity<get_orgreq_response> getOrg_Req(@RequestBody get_orgreq_request entity, HttpServletRequest request ) {//@RequestParam("type") 
 		get_orgreq_response response = new get_orgreq_response();
 		try {
-			List<POrder_Req> list_req = reqService.getByPO_Offer(entity.pcontract_poid_link);
-			List<Long> list_org = new ArrayList<Long>();
-			for(POrder_Req req : list_req) {
-				if(!list_org.contains(req.getGranttoorgid_link())) {
-					list_org.add(req.getGranttoorgid_link());
-				}
-			}
+//			List<POrder_Req> list_req = reqService.getByPO_Offer(entity.pcontract_poid_link);
+//			List<Long> list_org = new ArrayList<Long>();
+//			for(POrder_Req req : list_req) {
+//				if(!list_org.contains(req.getGranttoorgid_link())) {
+//					list_org.add(req.getGranttoorgid_link());
+//				}
+//			}
+//			
+//			for (long id : list_org) {
+//				response.data.add(orgService.findOne(id));
+//			}
 			
-			for (long id : list_org) {
-				response.data.add(orgService.findOne(id));
-			}
+			response.data = orgService.getOrgReq_by_po(entity.pcontract_poid_link);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<get_orgreq_response>(response,HttpStatus.OK);
