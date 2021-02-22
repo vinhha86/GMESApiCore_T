@@ -42,4 +42,6 @@ public interface IOrgService extends Operations<Org>{
 	public List<Org> getByNameAndType(String name, Integer orgtypeid_link);
 	
 	List<Org> getOrgForContractBuyerBuyerList(List<Long> buyerIds);
+	
+	public List<Org> getOrgForVendorStoreByBuyerId(Long buyerid_link);
 }
