@@ -2571,4 +2571,159 @@ public class PContract_POAPI {
 			return new ResponseEntity<getOffes_byOrg_response>(response, HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/copyline", method = RequestMethod.POST)
+	public ResponseEntity<copy_poline_response> CopyLine(@RequestBody copy_poline_request entity,
+			HttpServletRequest request) {
+		copy_poline_response response = new copy_poline_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long orgrootid_link = user.getRootorgid_link();
+			
+			PContract_PO po_old = pcontract_POService.findOne(entity.pcontract_poid_Link);
+			
+			PContract_PO po_new = new PContract_PO();
+			po_new.setCode(po_old.getCode());
+			po_new.setCurrencyid_link(po_old.getCurrencyid_link());
+			po_new.setDatecreated(new Date());
+			po_new.setEtm_from(po_old.getEtm_from());
+			po_new.setEtm_to(po_old.getEtm_to());
+			po_new.setExchangerate(po_old.getExchangerate());
+			po_new.setId(null);
+			po_new.setIs_tbd(po_old.getIs_tbd());
+			po_new.setIsauto_calculate(po_old.getIsauto_calculate());
+			po_new.setMatdate(po_old.getMatdate());
+			po_new.setOrgrootid_link(orgrootid_link);
+			po_new.setPackingnotice(po_old.getPackingnotice());
+			po_new.setParentpoid_link(po_old.getParentpoid_link());
+			po_new.setPcontractid_link(po_old.getPcontractid_link());
+			po_new.setPlan_linerequired(po_old.getPlan_linerequired());
+			po_new.setPlan_productivity(po_old.getPlan_productivity());
+			po_new.setPo_buyer(po_old.getPo_buyer() + " copy");
+			po_new.setPo_quantity(po_old.getPo_quantity());
+			po_new.setPo_typeid_link(po_old.getPo_typeid_link());
+			po_new.setPo_vendor(po_old.getPo_vendor() + " copy");
+			po_new.setPortfromid_link(po_old.getPortfromid_link());
+			po_new.setPorttoid_link(po_old.getPorttoid_link());
+			po_new.setPrice_add(po_old.getPrice_add());
+			po_new.setPrice_cmp(po_old.getPrice_cmp());
+			po_new.setPrice_commission(po_old.getPrice_commission());
+			po_new.setPrice_fob(po_old.getPrice_fob());
+			po_new.setPrice_sweingfact(po_old.getPrice_sweingfact());
+			po_new.setPrice_sweingtarget(po_old.getPrice_sweingtarget());
+			po_new.setProductid_link(po_old.getProductid_link());
+			po_new.setProductiondate(po_old.getProductiondate());
+			po_new.setProductiondays(po_old.getProductiondays());
+			po_new.setProductiondays_ns(po_old.getProductiondays_ns());
+			po_new.setProductionlines(po_old.getProductionlines());
+			po_new.setQcorgid_link(po_old.getQcorgid_link());
+			po_new.setQcorgname(po_old.getQcorgname());
+			po_new.setSalaryfund(po_old.getSalaryfund());
+			po_new.setSewtarget_percent(po_old.getSewtarget_percent());
+			po_new.setShipdate(po_old.getShipdate());
+			po_new.setShipmodeid_link(po_old.getShipmodeid_link());
+			po_new.setStatus(po_old.getStatus());
+			po_new.setUnitid_link(po_old.getUnitid_link());
+			po_new.setUsercreatedid_link(user.getId());
+			
+			po_new = pcontract_POService.save(po_new);
+			
+			//copy price
+//			List<PContract_Price> pcontract_price = po_old.getPcontract_price();
+//			for(PContract_Price price : pcontract_price) {
+//				//price 
+//				
+//				PContract_Price price_new = new PContract_Price();
+//				price_new.setId(null);
+//				price_new.setIs_fix(price.getIs_fix());
+//				price_new.setOrgrootid_link(orgrootid_link);
+//				price_new.setPcontract_poid_link(po_new.getId());
+//				price_new.setPcontractid_link(price.getPcontractid_link());
+//				price_new.setPrice_cmp(price.getPrice_cmp());
+//				price_new.setPrice_fob(price.getPrice_fob());
+//				price_new.setPrice_sewingcost(price.getPrice_sewingcost());
+//				price_new.setPrice_sewingtarget(price.getPrice_sewingtarget());
+//				price_new.setPrice_vendortarget(price.getPrice_vendortarget());
+//				price_new.setProductid_link(price.getProductid_link());
+//				price_new.setQuantity(price.getQuantity());
+//				price_new.setSalaryfund(price.getSalaryfund());
+//				price_new.setSewfobratio(price.getSewfobratio());
+//				price_new.setSizesetid_link(price.getSizesetid_link());
+//				price_new.setTotalprice(price.getTotalprice());
+//				
+//				price_new = priceService.save(price_new);
+//				
+//				//price detail
+//				List<PContract_Price_D> list_price_d = price.getPcontract_price_d();
+//				for(PContract_Price_D price_d : list_price_d) {
+//					PContract_Price_D price_d_new = new PContract_Price_D();
+//					price_d_new.setCost(price_d.getCost());
+//					price_d_new.setCurrencyid_link(price_d.getCurrencyid_link());
+//					price_d_new.setDatecreated(new Date());
+//					price_d_new.setExchangerate(price_d.getExchangerate());
+//					price_d_new.setFobpriceid_link(price_d.getFobpriceid_link());
+//					price_d_new.setId(null);
+//					price_d_new.setIsfob(price_d.getIsfob());
+//					price_d_new.setLost_ratio(price_d.getLost_ratio());
+//					price_d_new.setMaterialid_link(price_d.getMaterialid_link());
+//					price_d_new.setOrgrootid_link(orgrootid_link);
+//					price_d_new.setPcontract_poid_link(po_new.getId());
+//					price_d_new.setPcontractid_link(po_new.getPcontractid_link());
+//					price_d_new.setPcontractpriceid_link(price_new.getId());
+//					price_new.set
+//				}
+//				
+//				
+//			}
+			
+			//copy ns_production
+			List<PContract_PO_Productivity> list_productivity = po_old.getPcontract_po_productivity();
+			for(PContract_PO_Productivity po_productivity : list_productivity) {
+				PContract_PO_Productivity po_productivity_new = new PContract_PO_Productivity();
+				po_productivity_new.setAmount(po_productivity.getAmount());
+				po_productivity_new.setId(null);
+				po_productivity_new.setOrgrootid_link(orgrootid_link);
+				po_productivity_new.setPcontract_poid_link(po_new.getId());
+				po_productivity_new.setPlan_linerequired(po_productivity.getPlan_linerequired());
+				po_productivity_new.setPlan_productivity(po_productivity.getPlan_productivity());
+				po_productivity_new.setProductid_link(po_productivity.getProductid_link());
+				po_productivity_new.setProductiondays_ns(po_productivity.getProductiondays_ns());
+				
+				productivityService.save(po_productivity_new);
+			}
+			
+			//copy porder_req
+			List<POrder_Req> list_req = porder_req_Service.getByContractAndPO(po_old.getPcontractid_link(), po_old.getId());
+			for(POrder_Req req : list_req) {
+				POrder_Req req_new = new POrder_Req();
+				req_new.setAmount_inset(req.getAmount_inset());
+				req_new.setGranttoorgid_link(req.getGranttoorgid_link());
+				req_new.setId(null);
+				req_new.setIs_calculate(req.getIs_calculate());
+				req_new.setOrdercode(req.getOrdercode());
+				req_new.setOrderdate(req.getOrderdate());
+				req_new.setOrgrootid_link(orgrootid_link);
+				req_new.setPcontract_poid_link(po_new.getId());
+				req_new.setPcontractid_link(req.getPcontractid_link());
+				req_new.setPlandate_required(req.getPlandate_required());
+				req_new.setProductid_link(req.getProductid_link());
+				req_new.setSizesetid_link(req.getSizesetid_link());
+				req_new.setStatus(req.getStatus());
+				req_new.setTimecreated(new Date());
+				req_new.setTotalorder(req.getTotalorder());
+				req_new.setUsercreatedid_link(user.getId());
+				
+				porder_req_Service.save(req_new);
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			ResponseEntity<copy_poline_response> a = new ResponseEntity<copy_poline_response>(response, HttpStatus.OK);
+			return a;
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<copy_poline_response>(response, HttpStatus.OK);
+		}
+	}
 }
