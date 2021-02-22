@@ -111,9 +111,9 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	}
 	@Override
 	public List<PContract_PO> check_exist_po(Date ShipDate, long productid_link, long shipmodeid_link,
-			long pcontractid_link) {
-		
-		List<PContract_PO> list_po = repo.getone_by_template(shipmodeid_link, productid_link, ShipDate, pcontractid_link);
+			long pcontractid_link, String po_buyer) {
+		po_buyer = (po_buyer == "" || po_buyer.toUpperCase() == "TBD") ? null : po_buyer;
+		List<PContract_PO> list_po = repo.getone_by_template(shipmodeid_link, productid_link, ShipDate, pcontractid_link, po_buyer);
 		
 		
 		return list_po;

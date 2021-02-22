@@ -542,8 +542,14 @@ public class UploadAPI {
 							//Neu khong cot ngay giao hang nao co gia tri thi ko xu ly nua chuyen den dong tiep theo
 							if(ShipDate !=null) {
 								List<PContract_PO> listpo = new ArrayList<PContract_PO>();
-								listpo = pcontract_POService.check_exist_po(ShipDate,
-										po_productid_link, shipmodeid_link, pcontractid_link);
+								if(product_set_id_link == 0) {
+									listpo = pcontract_POService.check_exist_po(ShipDate,
+											po_productid_link, shipmodeid_link, pcontractid_link, PO_No);
+								}
+								else {
+									listpo = pcontract_POService.check_exist_po(ShipDate,
+											po_productid_link, shipmodeid_link, pcontractid_link, "");
+								}
 								if(listpo.size() == 0) {
 									po_tong.setId(null);
 									po_tong.setCurrencyid_link((long) 1);

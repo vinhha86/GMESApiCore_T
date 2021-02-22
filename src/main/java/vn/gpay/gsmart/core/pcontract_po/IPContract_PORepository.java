@@ -138,13 +138,15 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			+ "and c.productid_link = :productid_link "
 			+ "and (c.shipdate = :shipdate) "
 			+ "and c.pcontractid_link = :pcontractid_link "
+			+ "and (c.po_buyer = :po_buyer or :po_buyer is null)"
 			+ "and c.po_typeid_link = 0"
 			)
 	public List<PContract_PO> getone_by_template(
 			@Param ("shipmodeid_link")final  Long shipmodeid_link, 
 			@Param ("productid_link")final  Long productid_link, 
 			@Param ("shipdate")final  Date shipdate,
-			@Param ("pcontractid_link")final  Long pcontractid_link
+			@Param ("pcontractid_link")final  Long pcontractid_link,
+			@Param ("po_buyer")final  String po_buyer
 			);
 	
 	@Query(value = "select c from PContract_PO c "
