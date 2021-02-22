@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections4.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -408,23 +410,29 @@ public class POrder_ReqAPI {
 //			
 //			//remove nhung line giao hang khong hop le
 //			list_req.removeIf(c-> !map.containsKey(c.getPO_Offer()) || !map.get(c.getPO_Offer()).equals(c.getShipdate()));
-			
+			Map<Long, Date> map = new HashedMap<Long, Date>();
 			List<PContractPO_Product> listret = new ArrayList<PContractPO_Product>();
+			
 			for(POrder_Req req : list_req) {
-				PContractPO_Product po_product = new PContractPO_Product();
-				po_product.setBuyername(req.getBuyername());
-				po_product.setGranttoorgid_link(req.getGranttoorgid_link());
-				po_product.setPcontract_poid_link(req.getPO_Offer());
-				po_product.setProductid_link(req.getProductid_link());
-				po_product.setShipdate(req.getShipdate());
-				po_product.setVendorname(req.getVendorname());
-				po_product.setProduct_buyername(req.getProduct_code());
-				po_product.setPo_buyer(req.getPo_buyer());
-				po_product.setQuantity(req.getPo_parent_quantity());
-//				po_product.setOrgname(req.getGranttoorgcode());
-				po_product.setOrgname(req.getGranttoorgname());
+				if(map.get(req.getPO_Offer()) == null) {
+					PContractPO_Product po_product = new PContractPO_Product();
+					po_product.setBuyername(req.getBuyername());
+					po_product.setGranttoorgid_link(req.getGranttoorgid_link());
+					po_product.setPcontract_poid_link(req.getPO_Offer());
+					po_product.setProductid_link(req.getProductid_link());
+					po_product.setShipdate(req.getShipdate());
+					po_product.setVendorname(req.getVendorname());
+					po_product.setProduct_buyername(req.getProduct_code());
+					po_product.setPo_buyer(req.getPo_buyer());
+					po_product.setQuantity(req.getPo_parent_quantity());
+//					po_product.setOrgname(req.getGranttoorgcode());
+					po_product.setOrgname(req.getGranttoorgname());
+					
+					listret.add(po_product);
+					
+					map.put(req.getPO_Offer(), req.getShipdate());
+				}
 				
-				listret.add(po_product);
 			}
 			
 			response.data = listret;

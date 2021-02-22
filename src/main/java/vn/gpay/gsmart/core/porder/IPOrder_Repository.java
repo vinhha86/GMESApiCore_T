@@ -163,7 +163,8 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 			+ "where a.granttoorgid_link = :orgid_link "
 			+ "and a.productid_link = :productid_link "
 			+ "and b.parentpoid_link = :pcontract_poid_link "
-			+ "and a.status = 0"
+			+ "and a.status = 0 "
+			+ "order by b.shipdate asc"
 			)
 	public List<POrder> getby_offer(
 			@Param ("orgid_link")final Long orgid_link,
