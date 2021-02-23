@@ -18,7 +18,6 @@ import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.category.LaborLevel;
 import vn.gpay.gsmart.core.devices.DeviceGroup;
-import vn.gpay.gsmart.core.devices.Devices;
 import vn.gpay.gsmart.core.workingprocess.WorkingProcess;
 
 @Table(name="porders_sewingcost")

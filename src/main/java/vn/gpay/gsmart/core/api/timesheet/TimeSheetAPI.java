@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -138,10 +137,10 @@ public class TimeSheetAPI {
 		create_timesheet_sum_col_response response = new create_timesheet_sum_col_response();
 		try {
 //			Calendar cal = new GregorianCalendar();
-			Calendar cal = new GregorianCalendar(2020, 10, 27);
-			Date today = cal.getTime();
-			cal.add(Calendar.DAY_OF_MONTH, -10);
-			Date tenDaysAgo = cal.getTime();
+//			Calendar cal = new GregorianCalendar(2020, 10, 27);
+//			Date today = cal.getTime();
+//			cal.add(Calendar.DAY_OF_MONTH, -10);
+//			Date tenDaysAgo = cal.getTime();
 //			Date today = new Date();
 			
 

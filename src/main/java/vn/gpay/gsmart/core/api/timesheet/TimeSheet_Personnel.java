@@ -8,8 +8,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import javax.print.attribute.standard.DateTimeAtCompleted;
-
 import vn.gpay.gsmart.core.personel.Personel;
 import vn.gpay.gsmart.core.timesheet.ITimeSheet_Service;
 import vn.gpay.gsmart.core.timesheet.TimeSheet;
@@ -33,6 +31,12 @@ public class TimeSheet_Personnel implements Runnable{
 	
 	CountDownLatch latch;
 	
+	public long getOrgid_link() {
+		return orgid_link;
+	}
+	public void setOrgid_link(long orgid_link) {
+		this.orgid_link = orgid_link;
+	}
 	TimeSheet_Personnel(Personel myPersonnel, int myyear, int mymonth, Long myorgid_link,
 			ITimeSheet_Service timesheetService,
 			ITimeSheetLunchService timesheet_lunchService,
@@ -90,7 +94,7 @@ public class TimeSheet_Personnel implements Runnable{
 				//Order theo ngày và thứ tự ca
 				List<TimeSheetLunch> lsWorkingShift= timesheet_lunchService.getByPersonnelDate(personnel.getId(), workingdate, workingdate);
 				
-				boolean isMoreShift = false;
+//				boolean isMoreShift = false;
 				
 				for (TimeSheetLunch theWorkingShift:lsWorkingShift){
 				
