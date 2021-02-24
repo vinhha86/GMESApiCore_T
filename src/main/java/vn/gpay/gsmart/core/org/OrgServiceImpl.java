@@ -63,6 +63,21 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 		
 	}
 	@Override
+	public List<Org> findChildByListType(long orgrootid_link,long parentid_link,List<String> list_typeid) {
+		// TODO Auto-generated method stub
+		//return repositoty.findOrgByType(root_orgid,orgid,type);
+		Specification<Org> specification = Specifications.<Org>and()
+	            .eq( "orgrootid_link", orgrootid_link)
+	            .eq("parentid_link", parentid_link)
+	            .in(list_typeid.size() > 0,"orgtypeid_link", list_typeid.toArray())
+	            .ge("status", 0)
+	            .build();
+		Sort sort = Sorts.builder()
+		        .desc("id")
+		        .build();
+	    return repositoty.findAll(specification,sort);
+	}
+	@Override
 	public List<Org> findStoreByType(long root_orgid, Long orgid, long type) {
 		// TODO Auto-generated method stub
 		Specification<Org> specification = Specifications.<Org>and()

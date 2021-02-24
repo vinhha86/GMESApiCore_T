@@ -106,7 +106,14 @@ public class OrgAPI {
 		OrgResponse response = new OrgResponse();
 		try {
 			GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			List<Org> ls_tosx = orgService.findChildByType(user.getRootorgid_link(),entity.id,14);
+			List<String> list  = new ArrayList<String>();
+			list.add("3");
+			list.add("8");
+			list.add("9");
+			list.add("14");
+			list.add("17");
+			
+			List<Org> ls_tosx = orgService.findChildByListType(user.getRootorgid_link(),entity.id,list);
 	    	
 	    	response.data = ls_tosx;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

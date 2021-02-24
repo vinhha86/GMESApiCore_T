@@ -349,6 +349,12 @@ public class UserAPI {
 			appuser.setStatus(entity.user.getStatus());
 			appuser.setOrg_grant_id_link(entity.user.getOrg_grant_id_link());
 			
+			//update lai Orgtype cua User
+			Org userorg = orgService.findOne(null!=entity.user.getOrg_grant_id_link()?entity.user.getOrg_grant_id_link():entity.user.getOrgid_link());
+			if (null != userorg){
+				appuser.setOrg_type(userorg.getOrgtypeid_link());
+			}
+			
 			userDetailsService.save(appuser);
 			
 			//Cap nhat sang authen ve nhom quyen cua user co phai admin nua khong
