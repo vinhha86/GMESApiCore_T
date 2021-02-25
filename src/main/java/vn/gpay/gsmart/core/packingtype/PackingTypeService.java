@@ -51,4 +51,25 @@ public class PackingTypeService extends AbstractService<PackingType> implements 
 		}
 		return name;
 	}
+
+	@Override
+	public String getNameby_listid(String listid, long orgrootid_link) {
+		// TODO Auto-generated method stub
+		if(listid.equals("")) return "";
+		// TODO Auto-generated method stub
+		List<Long> list = new ArrayList<Long>();
+		String[] arr_id = listid.split(",");
+		for(String s_id : arr_id) {
+			list.add(Long.parseLong(s_id));
+		}
+		List<PackingType> list_packing = repo.getbylistid(orgrootid_link, list); 
+		String name = "";
+		for(PackingType packing : list_packing) {
+			if(name=="")
+				name += packing.getName();
+			else 
+				name += "," + packing.getName();
+		}
+		return name;
+	}
 }

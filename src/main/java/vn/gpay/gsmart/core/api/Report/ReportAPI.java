@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,10 +48,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.gpay.gsmart.core.packingtype.IPackingTypeService;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
+import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_DService;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Service;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
+import vn.gpay.gsmart.core.pcontract_price.PContract_Price_D;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProductService;
 import vn.gpay.gsmart.core.product.IProductService;
@@ -70,17 +74,25 @@ public class ReportAPI {
 	@Autowired IProductPairingService pairService;
 	@Autowired IProductService productService;
 	@Autowired IPContract_Price_Service priceService;
-	
+	@Autowired IPContract_Price_DService fobpriceService;
+	@Autowired IPackingTypeService packingService;
 	
 	@RequestMapping(value = "/quatation", method = RequestMethod.POST)
 	public ResponseEntity<report_quotation_response> Quotation(HttpServletRequest request, @RequestBody report_quotation_request entity) throws IOException {
 		report_quotation_response response = new report_quotation_response();
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		long orgrootid_link = user.getRootorgid_link();		
-
+		Date curent = new Date();
+		
+		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
+		String s_current = dateFormat.format(curent);  
 		//Tao hashmap de sinh cac cot trong report
 		Map<String, Integer> size_set_name = new HashMap<String, Integer>();
 		int idx = 0;
+		size_set_name.put("DateOffer", idx++);
+		size_set_name.put("Buyer", idx++);
+		size_set_name.put("Vendor", idx++);
+		size_set_name.put("PO", idx++);
 		size_set_name.put("Style", idx++);
 		size_set_name.put("Detail", idx++);
 		size_set_name.put("Description", idx++);
@@ -99,17 +111,22 @@ public class ReportAPI {
 			if(product.getProducttypeid_link() == 10) {
 				Map<String, String> map = new HashMap<String, String>();
 				
-				map.put("Style", po.getPo_buyer());
+				map.put("DateOffer", s_current);
+				map.put("Buyer", po.getBuyerName());
+				map.put("Vendor", po.getVendorName());
+				map.put("PO", po.getPo_buyer());
+				map.put("Style", product.getBuyercode());
 				map.put("Detail", product.getBuyercode());
-				map.put("Description", product.getName());
+				map.put("Description", product.getDescription());
 				map.put("Picture", product.getImgurl1());
+				map.put("Packing", packingService.getNameby_listid(po.getPackingnotice(), orgrootid_link));
 				
 				List<PContract_Price> list_price = po.getPcontract_price();
 				Comparator<PContract_Price> compareBySortValue = (PContract_Price a1, PContract_Price a2) -> a1.getSortvalue().compareTo( a2.getSortvalue());
 				Collections.sort(list_price, compareBySortValue);
 				
 				for(PContract_Price price : list_price) {
-					map.put(price.getSizesetname(), price.getTotalprice()+" "+po.getCurrencyCode());
+					map.put(price.getSizesetname(), price.getTotalprice()+" ");
 					
 					//kiem tra dai co co trong hashmap sinh cot chua thi them vao
 					if(!size_set_name.containsKey(price.getSizesetname())) {
@@ -118,9 +135,46 @@ public class ReportAPI {
 				}
 				
 				map.put("Quantity", commonService.FormatNumber(po.getPo_quantity().intValue()));
-				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
 				map.put("Shipdate", dateFormat.format(po.getShipdate()));
 				map.put("Material", dateFormat.format(po.getMatdate()));
+				
+				if(!size_set_name.containsKey("Quantity")) {
+					size_set_name.put("Quantity", idx++);
+				}
+				if(!size_set_name.containsKey("Shipdate")) {
+					size_set_name.put("Shipdate", idx++);
+				}
+				if(!size_set_name.containsKey("Material")) {
+					size_set_name.put("Material", idx++);
+				}
+				
+				//fob price
+				List<PContract_Price_D> list_fob_price = fobpriceService.getbypo_product(po.getId(), po.getProductid_link());
+				if(list_fob_price.size() > 0)
+					list_fob_price.removeIf(c->!c.getIsfob());
+				for(PContract_Price_D fob_price : list_fob_price) {
+					if(map.get(fob_price.getFobprice_name()) != null) {
+						Float price_old = Float.parseFloat(map.get(fob_price.getFobprice_name()));
+						map.put(fob_price.getFobprice_name(), (fob_price.getPrice() +price_old) +" ");
+					}
+					else {
+						map.put(fob_price.getFobprice_name(), fob_price.getPrice() +" ");
+					}
+					
+					
+					//kiem tra gia co trong hashmap sinh cot chua thi them vao
+					if(!size_set_name.containsKey(fob_price.getFobprice_name())) {
+						size_set_name.put(fob_price.getFobprice_name(), idx++);
+					}
+				}
+				
+				if(!size_set_name.containsKey("Packing")) {
+					size_set_name.put("Packing", idx++);
+				}
+				
+				if(!size_set_name.containsKey("Note")) {
+					size_set_name.put("Note", idx++);
+				}
 								
 				list.add(map);
 			}
@@ -129,10 +183,15 @@ public class ReportAPI {
 				for(ProductPairing pair : list_product) {
 					
 					Map<String, String> map = new HashMap<String, String>();
-					map.put("Style", po.getPo_buyer());
+					map.put("DateOffer", s_current);
+					map.put("Buyer", po.getBuyerName());
+					map.put("Vendor", po.getVendorName());
+					map.put("PO", po.getPo_buyer());
+					map.put("Style", pair.getSetCode());
 					map.put("Detail", pair.getProductBuyerCode());
-					map.put("Description", pair.getProductName());
+					map.put("Description", product.getDescription());
 					map.put("Picture", pair.getImgurl1());
+					map.put("Packing", ""+packingService.getNameby_listid(po.getPackingnotice(), orgrootid_link));
 					
 					//Lay danh sach dai co theo san pham con
 					List<PContract_Price> list_price = priceService.getPrice_by_product(pcontractpoid_link, pair.getProductid_link());
@@ -140,7 +199,7 @@ public class ReportAPI {
 					Collections.sort(list_price, compareBySortValue);
 					
 					for(PContract_Price price : list_price) {
-						map.put(price.getSizesetname(), price.getTotalprice()+" "+po.getCurrencyCode());
+						map.put(price.getSizesetname(), price.getTotalprice()+" ");
 						
 						//kiem tra dai co co trong hashmap sinh cot chua thi them vao
 						if(!size_set_name.containsKey(price.getSizesetname())) {
@@ -149,19 +208,51 @@ public class ReportAPI {
 					}
 					
 					map.put("Quantity", commonService.FormatNumber(po.getPo_quantity().intValue()));
-					DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
 					map.put("Shipdate", dateFormat.format(po.getShipdate()));
 					map.put("Material", dateFormat.format(po.getMatdate()));
+					
+					if(!size_set_name.containsKey("Quantity")) {
+						size_set_name.put("Quantity", idx++);
+					}
+					if(!size_set_name.containsKey("Shipdate")) {
+						size_set_name.put("Shipdate", idx++);
+					}
+					if(!size_set_name.containsKey("Material")) {
+						size_set_name.put("Material", idx++);
+					}
+					
+					//fob price
+					List<PContract_Price_D> list_fob_price = fobpriceService.getbypo_product(po.getId(), pair.getProductid_link());
+					if(list_fob_price.size() > 0)
+						list_fob_price.removeIf(c->!c.getIsfob());
+					for(PContract_Price_D fob_price : list_fob_price) {
+						if(map.get(fob_price.getFobprice_name()) != null) {
+							Float price_old = Float.parseFloat(map.get(fob_price.getFobprice_name()));
+							map.put(fob_price.getFobprice_name(), (fob_price.getPrice() +price_old) +" ");
+						}
+						else {
+							map.put(fob_price.getFobprice_name(), fob_price.getPrice() +" ");
+						}
+						
+						
+						//kiem tra gia co trong hashmap sinh cot chua thi them vao
+						if(!size_set_name.containsKey(fob_price.getFobprice_name())) {
+							size_set_name.put(fob_price.getFobprice_name(), idx++);
+						}
+					}
+					
+					if(!size_set_name.containsKey("Packing")) {
+						size_set_name.put("Packing", idx++);
+					}
+					
+					if(!size_set_name.containsKey("Note")) {
+						size_set_name.put("Note", idx++);
+					}
 									
 					list.add(map);
 				}
 			}
 		}
-		
-
-		size_set_name.put("Quantity", idx++);
-		size_set_name.put("Shipdate", idx++);
-		size_set_name.put("Material", idx++);
 		
 		// Ghi ra File
 		
@@ -216,6 +307,17 @@ public class ReportAPI {
 		cellStyle_align_right.setBorderRight(BorderStyle.THIN);
 		cellStyle_align_right.setDataFormat(format.getFormat("#,###"));
 		
+		XSSFCellStyle cellStyle_align_right_currency = workbook.createCellStyle();
+		cellStyle_align_right_currency.setAlignment(HorizontalAlignment.RIGHT);
+		cellStyle_align_right_currency.setVerticalAlignment(VerticalAlignment.CENTER);
+//		cellStyle_align_right.setFillForegroundColor(HSSFColor.SKY_BLUE.index);
+//		cellStyle_align_right.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+		cellStyle_align_right_currency.setBorderTop(BorderStyle.THIN);
+		cellStyle_align_right_currency.setBorderBottom(BorderStyle.THIN);
+		cellStyle_align_right_currency.setBorderLeft(BorderStyle.THIN);
+		cellStyle_align_right_currency.setBorderRight(BorderStyle.THIN);
+		cellStyle_align_right_currency.setDataFormat(format.getFormat("_($* #,##0.00_);_($* (#,##0.00);_($* \"-\"??_);_(@_)"));
+		
 		XSSFCellStyle cellStyle_align_left = workbook.createCellStyle();
 		cellStyle_align_left.setAlignment(HorizontalAlignment.LEFT);
 		cellStyle_align_left.setVerticalAlignment(VerticalAlignment.CENTER);
@@ -226,12 +328,14 @@ public class ReportAPI {
 		cellStyle_align_left.setBorderLeft(BorderStyle.THIN);
 		cellStyle_align_left.setBorderRight(BorderStyle.THIN);
 		
-//		CellStyle cellStyle_wraptext = workbook.createCellStyle();
-//		cellStyle_wraptext.setAlignment(HorizontalAlignment.CENTER);
-//		cellStyle_wraptext.setVerticalAlignment(VerticalAlignment.CENTER);
-//		cellStyle_wraptext.setWrapText(true);
-//		cellStyle_wraptext.setFillBackgroundColor(HSSFColor.SKY_BLUE.index);
-//		cellStyle_wraptext.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+		CellStyle cellStyle_wraptext = workbook.createCellStyle();
+		cellStyle_wraptext.setAlignment(HorizontalAlignment.LEFT);
+		cellStyle_wraptext.setVerticalAlignment(VerticalAlignment.TOP);
+		cellStyle_wraptext.setWrapText(true);
+		cellStyle_wraptext.setBorderTop(BorderStyle.THIN);
+		cellStyle_wraptext.setBorderBottom(BorderStyle.THIN);
+		cellStyle_wraptext.setBorderLeft(BorderStyle.THIN);
+		cellStyle_wraptext.setBorderRight(BorderStyle.THIN);
 //		
 //		CellStyle cellStyle_wraptext_left = workbook.createCellStyle();
 //		cellStyle_wraptext_left.setAlignment(HorizontalAlignment.LEFT);
@@ -262,16 +366,16 @@ public class ReportAPI {
 			row.setHeight((short)(80*20));
 			
 			if(row_old!= null) {
-				String old_value = row_old.getCell(0).getStringCellValue();
+				String old_value = row_old.getCell(4).getStringCellValue();
 				String new_val = map.get("Style");
 				if(old_value == new_val) {
 					end = rowNum;
 					if(rowNum == list.size() )
-						sheet.addMergedRegion(new CellRangeAddress(start , end  , 0, 0));
+						sheet.addMergedRegion(new CellRangeAddress(start , end  , 4, 4));
 				}
 				else {
 					if(start < end)
-						sheet.addMergedRegion(new CellRangeAddress(start , end, 0, 0));
+						sheet.addMergedRegion(new CellRangeAddress(start , end, 4, 4));
 					start = rowNum;
 					end = rowNum;
 				}
@@ -287,21 +391,38 @@ public class ReportAPI {
 								
 				Cell cell = row.createCell(col_idx);
 				if(key != "Picture") {
-					cell.setCellValue(map.get(key));
 					if(key == "Shipdate" || key == "Material") {
+						cell.setCellValue(map.get(key));
 						cell.setCellStyle(cellStyle_aligncenter);
 					}
-					else if (key == "Description" ||  key == "Detail") {
+					else if (key == "Description") {
+						cell.setCellValue(map.get(key));
+						cell.setCellStyle(cellStyle_wraptext);
+					}
+					else if (key == "Detail" || key == "DateOffer" ||
+							key == "Buyer" || key == "Vendor" || key == "PO") {
+						cell.setCellValue(map.get(key));
 						cell.setCellStyle(cellStyle_aligncenter);
 					}
 					else if (key == "Style" ) {
+						cell.setCellValue(map.get(key));
 						cell.setCellStyle(cellStyle_aligncenter_fontBold);
 					}
+					else if(col_idx > size_set_name.get("Picture") && col_idx < size_set_name.get("Quantity")) {
+						cell.setCellValue(map.get(key) == null ? 0 : Float.parseFloat(map.get(key)));
+						cell.setCellStyle(cellStyle_align_right_currency);
+					}
+					else if(col_idx > size_set_name.get("Material") && col_idx < size_set_name.get("Packing")) {
+						cell.setCellValue((map.get(key) == null ) ? 0 : Float.parseFloat(map.get(key)));
+						cell.setCellStyle(cellStyle_align_right_currency);
+					}
 					else {
+						cell.setCellValue(map.get(key));
 						cell.setCellStyle(cellStyle_align_right);
 					}
 				}
 				else {
+					
 					cell.setCellStyle(cellStyle_aligncenter);
 					String FolderPath = commonService.getFolderPath(10);
 					String uploadRootPath = request.getServletContext().getRealPath("");

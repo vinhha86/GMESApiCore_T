@@ -38,6 +38,18 @@ public class ProductPairing implements Serializable {
     @JoinColumn(name="productid_link",insertable=false,updatable =false)
     private Product product;
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="productpairid_link",insertable=false,updatable =false)
+    private Product parent;
+	
+	@Transient
+	public String getSetCode() {
+		if(parent!=null)
+			return parent.getBuyercode();
+		return "";
+	}
+	
 	@Transient
 	public  String getProductName() {
 		if(product != null)
