@@ -13,7 +13,6 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import vn.gpay.gsmart.core.stockin.StockInD;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
 
 public class Balance_SKU implements Runnable{
@@ -81,7 +80,7 @@ public class Balance_SKU implements Runnable{
             Jitin_Invoice_Response ls_invoiced = objectMapper.readValue(result, Jitin_Invoice_Response.class);
             if (null != ls_invoiced){
             	Float yds_invoice = (float) 0;
-            	for(Jitin_Invoice_Data invoiceD: ls_invoiced.data){
+            	for(Jitin_Invoice_D_Data invoiceD: ls_invoiced.data){
             		yds_invoice+=invoiceD.getYds();
             		mat_sku.setMat_sku_invoice_date(invoiceD.getInvoice_shipdateto());
             		
@@ -119,11 +118,11 @@ public class Balance_SKU implements Runnable{
             Jitin_StockinList_Response ls_stockind = objectMapper.readValue(result, Jitin_StockinList_Response.class);
             if (null != ls_stockind){
             	Float yds_stockin = (float) 0;
-            	for(StockInD stockinD: ls_stockind.data){
+            	for(Jitin_Stockin_D_Data stockinD: ls_stockind.data){
             		yds_stockin+=stockinD.getTotalydsorigin();
             	}
             	mat_sku.setMat_sku_stockin(yds_stockin);
-            	
+            	mat_sku.setMat_sku_dif(mat_sku.getMat_sku_stockin() - mat_sku.getMat_sku_demand());
             }
 			
 		} catch (Exception e) {

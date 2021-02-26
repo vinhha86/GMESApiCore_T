@@ -5,5 +5,5 @@ import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.stockin.StockInD;
 
 public class Jitin_StockinList_Response extends ResponseBase{
-	public List<StockInD> data;
+	public List<Jitin_Stockin_D_Data> data;
 }

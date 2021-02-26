@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Jitin_Invoice_Data implements Serializable {
+public class Jitin_Invoice_D_Data implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Long invoiceid_link;
 	private Date invoice_shipdateto;
@@ -28,7 +28,7 @@ public class Jitin_Invoice_Data implements Serializable {
 	private String hsname;
 	private String unitname;
 	
-	private List<Jitin_PkList_Data> packinglist = new ArrayList<>();
+	private List<Jitin_Invoice_PkList_Data> packinglist = new ArrayList<>();
 
 	public Long getInvoiceid_link() {
 		return invoiceid_link;
@@ -174,11 +174,11 @@ public class Jitin_Invoice_Data implements Serializable {
 		this.unitname = unitname;
 	}
 
-	public List<Jitin_PkList_Data> getPackinglist() {
+	public List<Jitin_Invoice_PkList_Data> getPackinglist() {
 		return packinglist;
 	}
 
-	public void setPackinglist(List<Jitin_PkList_Data> packinglist) {
+	public void setPackinglist(List<Jitin_Invoice_PkList_Data> packinglist) {
 		this.packinglist = packinglist;
 	}
 

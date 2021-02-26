@@ -3,36 +3,45 @@ package vn.gpay.gsmart.core.api.balance;
 import java.io.Serializable;
 import java.util.Date;
 
-public class Jitin_PkList_Data implements Serializable {
+public class Jitin_Stockin_PkList_Data implements Serializable {
 	private static final long serialVersionUID = 1L;
-	protected Long id;
+	private Long id;
     private Long orgrootid_link;
-    private Long invoiceid_link;
-    private Long invoicedid_link;
+    private Long stockinid_link;
+    private Long stockindid_link;
     private Long skuid_link;
     private Long colorid_link;
+	private Long sizeid_link;
+    private Integer unitid_link;
     private String lotnumber ;
     private Integer packageid;
 	private Float ydsorigin;
 	private Float ydscheck;
-    private Float m3;
     private Float width;
     private Float netweight;
     private Float grossweight;
+    private Float m3;
     private String epc;
-	private Integer rssi;	
+	private Integer skutypeid_link;	
     private Date encryptdatetime;
 	private Long usercreateid_link;
 	private Date timecreate;
 	private Long lastuserupdateid_link;
 	private Date lasttimeupdate;
+    private Integer status;
+    private String comment;
+    private Float width_check;
+	private Float met_origin;
+	private Float met_check;
+	private String barcode;
 	
-	private String sizenumber;
-	
+	//Transient
 	private String skucode;
 	private String skuname;
 	private String hscode;
 	private String hsname;
+	private String checked;
+	private String unitname;
 	public Long getId() {
 		return id;
 	}
@@ -45,17 +54,17 @@ public class Jitin_PkList_Data implements Serializable {
 	public void setOrgrootid_link(Long orgrootid_link) {
 		this.orgrootid_link = orgrootid_link;
 	}
-	public Long getInvoiceid_link() {
-		return invoiceid_link;
+	public Long getStockinid_link() {
+		return stockinid_link;
 	}
-	public void setInvoiceid_link(Long invoiceid_link) {
-		this.invoiceid_link = invoiceid_link;
+	public void setStockinid_link(Long stockinid_link) {
+		this.stockinid_link = stockinid_link;
 	}
-	public Long getInvoicedid_link() {
-		return invoicedid_link;
+	public Long getStockindid_link() {
+		return stockindid_link;
 	}
-	public void setInvoicedid_link(Long invoicedid_link) {
-		this.invoicedid_link = invoicedid_link;
+	public void setStockindid_link(Long stockindid_link) {
+		this.stockindid_link = stockindid_link;
 	}
 	public Long getSkuid_link() {
 		return skuid_link;
@@ -68,6 +77,18 @@ public class Jitin_PkList_Data implements Serializable {
 	}
 	public void setColorid_link(Long colorid_link) {
 		this.colorid_link = colorid_link;
+	}
+	public Long getSizeid_link() {
+		return sizeid_link;
+	}
+	public void setSizeid_link(Long sizeid_link) {
+		this.sizeid_link = sizeid_link;
+	}
+	public Integer getUnitid_link() {
+		return unitid_link;
+	}
+	public void setUnitid_link(Integer unitid_link) {
+		this.unitid_link = unitid_link;
 	}
 	public String getLotnumber() {
 		return lotnumber;
@@ -93,12 +114,6 @@ public class Jitin_PkList_Data implements Serializable {
 	public void setYdscheck(Float ydscheck) {
 		this.ydscheck = ydscheck;
 	}
-	public Float getM3() {
-		return m3;
-	}
-	public void setM3(Float m3) {
-		this.m3 = m3;
-	}
 	public Float getWidth() {
 		return width;
 	}
@@ -117,17 +132,23 @@ public class Jitin_PkList_Data implements Serializable {
 	public void setGrossweight(Float grossweight) {
 		this.grossweight = grossweight;
 	}
+	public Float getM3() {
+		return m3;
+	}
+	public void setM3(Float m3) {
+		this.m3 = m3;
+	}
 	public String getEpc() {
 		return epc;
 	}
 	public void setEpc(String epc) {
 		this.epc = epc;
 	}
-	public Integer getRssi() {
-		return rssi;
+	public Integer getSkutypeid_link() {
+		return skutypeid_link;
 	}
-	public void setRssi(Integer rssi) {
-		this.rssi = rssi;
+	public void setSkutypeid_link(Integer skutypeid_link) {
+		this.skutypeid_link = skutypeid_link;
 	}
 	public Date getEncryptdatetime() {
 		return encryptdatetime;
@@ -159,11 +180,41 @@ public class Jitin_PkList_Data implements Serializable {
 	public void setLasttimeupdate(Date lasttimeupdate) {
 		this.lasttimeupdate = lasttimeupdate;
 	}
-	public String getSizenumber() {
-		return sizenumber;
+	public Integer getStatus() {
+		return status;
 	}
-	public void setSizenumber(String sizenumber) {
-		this.sizenumber = sizenumber;
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+	public String getComment() {
+		return comment;
+	}
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+	public Float getWidth_check() {
+		return width_check;
+	}
+	public void setWidth_check(Float width_check) {
+		this.width_check = width_check;
+	}
+	public Float getMet_origin() {
+		return met_origin;
+	}
+	public void setMet_origin(Float met_origin) {
+		this.met_origin = met_origin;
+	}
+	public Float getMet_check() {
+		return met_check;
+	}
+	public void setMet_check(Float met_check) {
+		this.met_check = met_check;
+	}
+	public String getBarcode() {
+		return barcode;
+	}
+	public void setBarcode(String barcode) {
+		this.barcode = barcode;
 	}
 	public String getSkucode() {
 		return skucode;
@@ -189,6 +240,18 @@ public class Jitin_PkList_Data implements Serializable {
 	public void setHsname(String hsname) {
 		this.hsname = hsname;
 	}
+	public String getChecked() {
+		return checked;
+	}
+	public void setChecked(String checked) {
+		this.checked = checked;
+	}
+	public String getUnitname() {
+		return unitname;
+	}
+	public void setUnitname(String unitname) {
+		this.unitname = unitname;
+	}
 	
-
+	
 }

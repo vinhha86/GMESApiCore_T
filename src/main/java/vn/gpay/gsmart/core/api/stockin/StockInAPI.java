@@ -142,7 +142,7 @@ public class StockInAPI {
 									    			//Orgid_link trong Warehouse la noi hang dc chuyyen toi
 								    				stockin_ws.setStockid_link(stockin.getOrgid_to_link());
 								    				stockin_ws.setUnitprice(stockind.getUnitprice());
-								    				stockin_ws.setColor(pklist.getColor());
+//								    				stockin_ws.setColor(pklist.getColor());
 								    				stockin_ws.setColorid_link(pklist.getColorid_link());
 								    				stockin_ws.setEncryptdatetime(new Date());
 								    				stockin_ws.setEpc(pklist.getEpc());

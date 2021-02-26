@@ -72,6 +72,9 @@ public class StockInPklist implements Serializable {
 	@Column(name ="grossweight")
     private Float grossweight;
 	
+	@Column(name ="m3")
+    private Float m3;
+	
 	@Column(name ="epc",length =50)
     private String epc;
 		
@@ -96,8 +99,15 @@ public class StockInPklist implements Serializable {
 	@Column(name = "status")
     private Integer status;
 	
+	@Column(name ="comment")
+    private String comment;
+	
+	@Column(name ="width_check")
+    private Float width_check;
+	
 	private Float met_origin;
 	private Float met_check;
+	private String barcode;
 	//mo rong
 	public String getSkucode() {
 		if(sku!=null) {
@@ -129,26 +139,38 @@ public class StockInPklist implements Serializable {
 	}
 	
 	
-	public String getColorcode() {
-		if(color!=null) {
-			return color.getCode();
+//	public String getColorcode() {
+//		if(color!=null) {
+//			return color.getCode();
+//		}
+//		return "";
+//		
+//	}
+//	public String getColorname() {
+//		if(color!=null) {
+//			return color.getName();
+//		}
+//		return "";
+//		
+//	}
+//	public String getColorRGB() {
+//		if(color!=null) {
+//			return color.getRgbvalue();
+//		}
+//		return "";
+//		
+//	}
+	
+	@Transient
+	public Integer getChecked() {
+		if(status!=null) {
+			if(status == 0) {
+				return 1;
+			}else {
+				return 0;
+			}
 		}
-		return "";
-		
-	}
-	public String getColorname() {
-		if(color!=null) {
-			return color.getName();
-		}
-		return "";
-		
-	}
-	public String getColorRGB() {
-		if(color!=null) {
-			return color.getRgbvalue();
-		}
-		return "";
-		
+		return 0;
 	}
 	
 	@Transient
@@ -164,10 +186,10 @@ public class StockInPklist implements Serializable {
     @JoinColumn(name="skuid_link",updatable =false,insertable =false)
     private SKU sku;
 	
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne
-    @JoinColumn(name="colorid_link",updatable =false,insertable =false)
-    private Color color;
+//	@NotFound(action = NotFoundAction.IGNORE)
+//	@ManyToOne
+//    @JoinColumn(name="colorid_link",updatable =false,insertable =false)
+//    private Color color;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -258,6 +280,12 @@ public class StockInPklist implements Serializable {
 	public void setGrossweight(Float grossweight) {
 		this.grossweight = grossweight;
 	}
+	public Float getM3() {
+		return m3;
+	}
+	public void setM3(Float m3) {
+		this.m3 = m3;
+	}
 	public String getEpc() {
 		return epc;
 	}
@@ -304,12 +332,12 @@ public class StockInPklist implements Serializable {
 	public void setSku(SKU sku) {
 		this.sku = sku;
 	}
-	public Color getColor() {
-		return color;
-	}
-	public void setColor(Color color) {
-		this.color = color;
-	}
+//	public Color getColor() {
+//		return color;
+//	}
+//	public void setColor(Color color) {
+//		this.color = color;
+//	}
 	public Unit getUnit() {
 		return unit;
 	}
@@ -339,6 +367,24 @@ public class StockInPklist implements Serializable {
 	}
 	public void setMet_check(Float met_check) {
 		this.met_check = met_check;
+	}
+	public String getBarcode() {
+		return barcode;
+	}
+	public void setBarcode(String barcode) {
+		this.barcode = barcode;
+	}
+	public String getComment() {
+		return comment;
+	}
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+	public Float getWidth_check() {
+		return width_check;
+	}
+	public void setWidth_check(Float width_check) {
+		this.width_check = width_check;
 	}
 	
 	
