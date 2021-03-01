@@ -94,6 +94,7 @@ public class PContract_PO implements Serializable {/**
 	private Integer plan_productivity;
 	private Float plan_linerequired;
 	private Integer po_typeid_link;
+	private String comment;
 	
 	
 	public Integer getPo_typeid_link() {
@@ -835,6 +836,14 @@ public class PContract_PO implements Serializable {/**
 
 	public void setProductionlines(String productionlines) {
 		this.productionlines = productionlines;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 	
 	
