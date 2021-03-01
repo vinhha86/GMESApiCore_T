@@ -110,7 +110,7 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 	}
 
 	@Override
-	public List<PContract> getBySearch_PosList(PContract_getbysearch_request entity, List<Long> pos) {
+	public List<PContract> getBySearch_PosList(PContract_getbysearch_request entity, List<Long> pos, List<Long> product) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 
 		CriteriaQuery<PContract> cq_po = cb.createQuery(PContract.class);
@@ -147,6 +147,15 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 				inContractClause.value(thePContract);
 			}
 			thePredicates.add(cb.and(inContractClause));
+		}
+		
+		// pos
+		if (product.size() > 0) {
+			In<Long> inContractProductClause = cb.in(rootPcontract.get("id"));
+			for (Long p : product) {
+				inContractProductClause.value(p);
+			}
+			thePredicates.add(cb.and(inContractProductClause));
 		}
 
 		Predicate p = cb.and(thePredicates.toArray(new Predicate[0]));

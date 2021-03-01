@@ -135,14 +135,14 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	}
 	
 	@Override
-	public List<PContract_PO> getBySearch(String po_code,List<Long> products, List<Long> orgs) {
+	public List<PContract_PO> getBySearch(String po_code, List<Long> orgs) {
 		List<PContract_PO> lst = new ArrayList<PContract_PO>();
-		if (products.size() > 0)
-			if (orgs.size() > 0)
-				lst = repo.getBySearch(po_code, products,orgs);
-			else
-				lst = repo.getBySearch_ProductOnly(po_code, products);
-		else 
+//		if (products.size() > 0)
+//			if (orgs.size() > 0)
+//				lst = repo.getBySearch(po_code,orgs);
+//			else
+//				lst = repo.getBySearch_ProductOnly(po_code);
+//		else 
 			if (orgs.size() > 0)
 				lst = repo.getBySearch_OrgOnly(po_code, orgs);
 			else

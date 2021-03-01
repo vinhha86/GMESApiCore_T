@@ -34,4 +34,10 @@ public class PContractProductService extends AbstractService<PContractProduct> i
 	public List<Long> get_by_orgcustomer(Long orgrootid_link,Long orgbuyerid_link){
 		return repo.get_by_orgcustomer(orgrootid_link, orgbuyerid_link);
 	}
+	@Override
+	public List<Long> getby_product(List<Long> product) {
+		product = product.size() == 0 ? null : product;
+		// TODO Auto-generated method stub
+		return repo.get_by_product(product);
+	}
 }

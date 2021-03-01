@@ -30,6 +30,12 @@ public interface IPContractProductRepository extends JpaRepository<PContractProd
 			@Param ("orgrootid_link")final  Long orgrootid_link,
 			@Param ("pcontractid_link")final Long pcontractid_link);
 	
+	@Query(value = "select c.pcontractid_link from PContractProduct c "
+			+ "where (productid_link in :productid_link or :productid_link is null) "
+			+ "group by c.pcontractid_link")
+	public List<Long> get_by_product(
+			@Param ("productid_link")final  List<Long> productid_link);
+	
 	
 	//Get product by buyerid_link
 	@Query(value = "select c.productid_link from PContractProduct c inner join PContract b on c.pcontractid_link = b.id "

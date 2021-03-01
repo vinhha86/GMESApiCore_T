@@ -19,7 +19,7 @@ public interface IPContractService extends Operations<PContract> {
 
 	List<PContract> getBySearch(PContract_getbysearch_request entity);
 
-	List<PContract> getBySearch_PosList(PContract_getbysearch_request entity, List<Long> pos);
+	List<PContract> getBySearch_PosList(PContract_getbysearch_request entity, List<Long> pos, List<Long> product);
 
 	public List<PContract> findByContractcode(String contractcode);
 	

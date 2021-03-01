@@ -48,4 +48,9 @@ public class ProductPairingService extends AbstractService<ProductPairing> imple
 		else 
 			return null;
 	}
+	@Override
+	public List<ProductPairing> getby_product(Long productid_link) {
+		// TODO Auto-generated method stub
+		return repo.getproduct_pairing_bykey(productid_link, null);
+	}
 }

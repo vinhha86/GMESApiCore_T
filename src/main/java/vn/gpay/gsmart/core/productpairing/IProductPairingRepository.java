@@ -42,8 +42,9 @@ public interface IProductPairingRepository extends JpaRepository<ProductPairing,
 	
 	@Query(value = "select c from ProductPairing c "
 			+ "where c.productid_link = :productid_link "
-			+ "and c.productpairid_link = :productpairid_link")
+			+ "and (c.productpairid_link = :productpairid_link or :productpairid_link is null)")
 	public List<ProductPairing> getproduct_pairing_bykey(
 			@Param ("productid_link")final  Long productid_link,
 			@Param ("productpairid_link")final  Long productpairid_link);
+	
 }

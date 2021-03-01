@@ -50,6 +50,8 @@ import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.product.IProductService;
 import vn.gpay.gsmart.core.product.Product;
+import vn.gpay.gsmart.core.productpairing.IProductPairingService;
+import vn.gpay.gsmart.core.productpairing.ProductPairing;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.security.GpayUserOrg;
 import vn.gpay.gsmart.core.security.IGpayUserOrgService;
@@ -95,6 +97,8 @@ public class PContractAPI {
 	IGpayUserOrgService userOrgService;
 	@Autowired
 	IProductService productService;
+	@Autowired
+	IProductPairingService pairService;
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ResponseEntity<PContract_create_response> PContractCreate(@RequestBody PContract_create_request entity,
@@ -353,25 +357,34 @@ public class PContractAPI {
 			List<Long> products = new ArrayList<Long>();
 			if (entity.productbuyer_code.length() > 0) {
 				List<Product> product_lst = productService.getProductByLikeBuyercode(entity.productbuyer_code);
-				for (Product theProduct : product_lst)
+				for (Product theProduct : product_lst) {
+					//kiem tra xem san pham co nam trong bo ko thì lay san pham bo vao
+					List<ProductPairing> list_pair = pairService.getby_product(theProduct.getId());
+					for(ProductPairing pair : list_pair) {
+						products.add(pair.getProductpairid_link());
+					}
+					
 					products.add(theProduct.getId());
+				}
+					
 			}
 
 			List<Long> pos = new ArrayList<Long>();
 			// Lay danh sach PO thoa man dieu kien
-			if (user.getOrgid_link() != 1) {
-				List<PContract_PO> lstPO = poService.getBySearch(entity.po_code, products, orgs);
+			if (entity.po_code.length() > 0 ) {
+				List<PContract_PO> lstPO = poService.getBySearch(entity.po_code, orgs);
 				for (PContract_PO thePO : lstPO)
 					pos.add(thePO.getPcontractid_link());
-			} else {
-				if (entity.po_code.length() > 0 || entity.productbuyer_code.length() > 0) {
-					List<PContract_PO> lstPO = poService.getBySearch(entity.po_code, products, orgs);
-					for (PContract_PO thePO : lstPO)
-						pos.add(thePO.getPcontractid_link());
-				}
+			}
+			
+			List<Long> product = new ArrayList<Long>();
+			// Lay danh sach PO thoa man dieu kien
+			List<Long> list_product = pcontract_product_Service.getby_product(products);
+			for(Long p : list_product) {
+				product.add(p);
 			}
 
-			List<PContract> list = pcontractService.getBySearch_PosList(entity, pos);
+			List<PContract> list = pcontractService.getBySearch_PosList(entity, pos, product);
 			if (user.getOrgid_link() != 1) {
 				List<PContract> list_remove = new ArrayList<PContract>();
 				for (PContract thepcontract : list) {

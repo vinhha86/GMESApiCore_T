@@ -11,5 +11,5 @@ public interface IPContractProductService extends Operations<PContractProduct>{
 	List<Long> get_by_orgcustomer(Long orgrootid_link, Long orgbuyerid_link);
 
 	List<PContractProduct> get_by_pcontract(long orgrootid_link, long pcontractid_link);
-	
+	List<Long> getby_product(List<Long> product);
 }
