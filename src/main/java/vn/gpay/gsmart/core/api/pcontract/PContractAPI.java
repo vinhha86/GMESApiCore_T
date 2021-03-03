@@ -335,11 +335,18 @@ public class PContractAPI {
 
 		// Lay danh sach Vendor duoc phep quan ly
 		List<GpayUserOrg> lsVendor = userOrgService.getall_byuser_andtype(user.getId(), OrgType.ORG_TYPE_VENDOR);
-		if (lsVendor.size() > 0) {
-			entity.orgvendorid_link = lsVendor.get(0).getOrgid_link();
-		}
+		List<GpayUserOrg> lsBuyer = userOrgService.getall_byuser_andtype(user.getId(), OrgType.ORG_TYPE_BUYER);
 
 		try {
+			List<Long> vendors = new ArrayList<Long>();
+			for(GpayUserOrg vendor : lsVendor) {
+				vendors.add(vendor.getOrgid_link());
+			}
+			
+			List<Long> buyers = new ArrayList<Long>();
+			for(GpayUserOrg buyer : lsBuyer) {
+				buyers.add(buyer.getOrgid_link());
+			}
 
 			List<Long> orgs = new ArrayList<Long>();
 			Long orgid_link = user.getOrgid_link();
@@ -384,15 +391,15 @@ public class PContractAPI {
 				product.add(p);
 			}
 
-			List<PContract> list = pcontractService.getBySearch_PosList(entity, pos, product);
-			if (user.getOrgid_link() != 1) {
-				List<PContract> list_remove = new ArrayList<PContract>();
-				for (PContract thepcontract : list) {
-					if (!thepcontract.getIsHavingPO())
-						list_remove.add(thepcontract);
-				}
-				list.removeAll(list_remove);
-			}
+			List<PContract> list = pcontractService.getBySearch_PosList(entity, pos, product, vendors, buyers);
+//			if (user.getOrgid_link() != 1) {
+//				List<PContract> list_remove = new ArrayList<PContract>();
+//				for (PContract thepcontract : list) {
+//					if (!thepcontract.getIsHavingPO())
+//						list_remove.add(thepcontract);
+//				}
+//				list.removeAll(list_remove);
+//			}
 			response.data = list;
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
