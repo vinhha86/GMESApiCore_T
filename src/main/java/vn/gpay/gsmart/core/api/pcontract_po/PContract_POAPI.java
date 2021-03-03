@@ -1972,29 +1972,6 @@ public class PContract_POAPI {
 		}
 	}
 
-	@RequestMapping(value = "/getleafonly", method = RequestMethod.POST)
-	public ResponseEntity<PContract_getbycontractproduct_response> getPOLeafOnly(
-			@RequestBody PContract_getbycontractproduct_request entity, HttpServletRequest request) {
-		PContract_getbycontractproduct_response response = new PContract_getbycontractproduct_response();
-		try {
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			long orgrootid_link = user.getRootorgid_link();
-			long orgid_link = user.getOrgid_link();
-
-			List<PContract_PO> pcontract = pcontract_POService.getPO_LeafOnly(orgrootid_link, entity.pcontractid_link,
-					entity.productid_link, user.getId(), orgid_link);
-			response.data = pcontract;
-
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.OK);
-		} catch (Exception e) {
-			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-			response.setMessage(e.getMessage());
-			return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.BAD_REQUEST);
-		}
-	}
-
 	@RequestMapping(value = "/getleafonly_bycontract", method = RequestMethod.POST)
 	public ResponseEntity<PContract_getbycontractproduct_response> getPOLeafOnly_ByPContract(
 			@RequestBody PContract_getbycontractproduct_request entity, HttpServletRequest request) {
@@ -2504,9 +2481,7 @@ public class PContract_POAPI {
 		PContract_getbycontractproduct_response response = new PContract_getbycontractproduct_response();
 		try {
 			Long pcontract_poid_link = entity.pcontract_poid_link;
-			PContract_PO pcontractPoKeHoach = pcontract_POService.findOne(pcontract_poid_link);
-			PContract_PO pcontractPo = pcontract_POService.findOne(pcontractPoKeHoach.getParentpoid_link());
-			List<PContract_PO> listPContractPO = pcontractPo.getSub_po_confirm();
+			List<PContract_PO> listPContractPO = pcontract_POService.get_by_parent_and_type(pcontract_poid_link, POType.PO_LINE_CONFIRMED);
 			
 			//Update danh sach to chuyen duoc giao sx cho PO Line
 			for (PContract_PO thePoline: listPContractPO){
@@ -2588,6 +2563,25 @@ public class PContract_POAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/get_poline_by_offer", method = RequestMethod.POST)
+	public ResponseEntity<get_poline_by_po_response> GetLineByOffer(@RequestBody get_poline_by_po entity,
+			HttpServletRequest request) {
+		get_poline_by_po_response response = new get_poline_by_po_response();
+		try {
+			Long parentid_link = entity.pcontract_poid_link;
+			response.data = pcontract_POService.get_by_parent_and_type(parentid_link, POType.PO_LINE_PLAN);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			ResponseEntity<get_poline_by_po_response> a = new ResponseEntity<get_poline_by_po_response>(response, HttpStatus.OK);
+			return a;
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<get_poline_by_po_response>(response, HttpStatus.OK);
+		}
+	}
+	
 	@RequestMapping(value = "/copyline", method = RequestMethod.POST)
 	public ResponseEntity<copy_poline_response> CopyLine(@RequestBody copy_poline_request entity,
 			HttpServletRequest request) {
@@ -2643,54 +2637,6 @@ public class PContract_POAPI {
 			po_new.setUsercreatedid_link(user.getId());
 			
 			po_new = pcontract_POService.save(po_new);
-			
-			//copy price
-//			List<PContract_Price> pcontract_price = po_old.getPcontract_price();
-//			for(PContract_Price price : pcontract_price) {
-//				//price 
-//				
-//				PContract_Price price_new = new PContract_Price();
-//				price_new.setId(null);
-//				price_new.setIs_fix(price.getIs_fix());
-//				price_new.setOrgrootid_link(orgrootid_link);
-//				price_new.setPcontract_poid_link(po_new.getId());
-//				price_new.setPcontractid_link(price.getPcontractid_link());
-//				price_new.setPrice_cmp(price.getPrice_cmp());
-//				price_new.setPrice_fob(price.getPrice_fob());
-//				price_new.setPrice_sewingcost(price.getPrice_sewingcost());
-//				price_new.setPrice_sewingtarget(price.getPrice_sewingtarget());
-//				price_new.setPrice_vendortarget(price.getPrice_vendortarget());
-//				price_new.setProductid_link(price.getProductid_link());
-//				price_new.setQuantity(price.getQuantity());
-//				price_new.setSalaryfund(price.getSalaryfund());
-//				price_new.setSewfobratio(price.getSewfobratio());
-//				price_new.setSizesetid_link(price.getSizesetid_link());
-//				price_new.setTotalprice(price.getTotalprice());
-//				
-//				price_new = priceService.save(price_new);
-//				
-//				//price detail
-//				List<PContract_Price_D> list_price_d = price.getPcontract_price_d();
-//				for(PContract_Price_D price_d : list_price_d) {
-//					PContract_Price_D price_d_new = new PContract_Price_D();
-//					price_d_new.setCost(price_d.getCost());
-//					price_d_new.setCurrencyid_link(price_d.getCurrencyid_link());
-//					price_d_new.setDatecreated(new Date());
-//					price_d_new.setExchangerate(price_d.getExchangerate());
-//					price_d_new.setFobpriceid_link(price_d.getFobpriceid_link());
-//					price_d_new.setId(null);
-//					price_d_new.setIsfob(price_d.getIsfob());
-//					price_d_new.setLost_ratio(price_d.getLost_ratio());
-//					price_d_new.setMaterialid_link(price_d.getMaterialid_link());
-//					price_d_new.setOrgrootid_link(orgrootid_link);
-//					price_d_new.setPcontract_poid_link(po_new.getId());
-//					price_d_new.setPcontractid_link(po_new.getPcontractid_link());
-//					price_d_new.setPcontractpriceid_link(price_new.getId());
-//					price_new.set
-//				}
-//				
-//				
-//			}
 			
 			//copy ns_production
 			List<PContract_PO_Productivity> list_productivity = po_old.getPcontract_po_productivity();

@@ -2,8 +2,6 @@ package vn.gpay.gsmart.core.pcontract_po;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -369,23 +367,23 @@ public class PContract_PO implements Serializable {/**
 	public void setPcontract_price(List<PContract_Price> pcontract_price) {
 		this.pcontract_price = pcontract_price;
 	}
-	public List<PContract_PO> getSub_po() {
-//		sub_po.removeIf(c->c.getPo_typeid_link() != 10);
-		return sub_po;
-	}
+//	public List<PContract_PO> getSub_po() {
+////		sub_po.removeIf(c->c.getPo_typeid_link() != 10);
+//		return sub_po;
+//	}
 	
-	public List<PContract_PO> getSub_po_plan() {
-		List<PContract_PO> list_line = sub_po.stream().filter(item -> null!=item.po_typeid_link && item.po_typeid_link==POType.PO_LINE_PLAN).collect(Collectors.toList());
-		Comparator<PContract_PO> compareBySortValue = (PContract_PO a1, PContract_PO a2) -> a1.getShipdate().compareTo( a2.getShipdate());
-		Collections.sort(list_line, compareBySortValue);
-		return list_line;
-	}
-	public List<PContract_PO> getSub_po_confirm() {
-		List<PContract_PO> list_line = sub_po.stream().filter(item -> null!=item.po_typeid_link && item.po_typeid_link==POType.PO_LINE_CONFIRMED).collect(Collectors.toList());
-		Comparator<PContract_PO> compareBySortValue = (PContract_PO a1, PContract_PO a2) -> a1.getShipdate().compareTo( a2.getShipdate());
-		Collections.sort(list_line, compareBySortValue);
-		return list_line;
-	}
+//	public List<PContract_PO> getSub_po_plan() {
+//		List<PContract_PO> list_line = sub_po.stream().filter(item -> null!=item.po_typeid_link && item.po_typeid_link==POType.PO_LINE_PLAN).collect(Collectors.toList());
+//		Comparator<PContract_PO> compareBySortValue = (PContract_PO a1, PContract_PO a2) -> a1.getShipdate().compareTo( a2.getShipdate());
+//		Collections.sort(list_line, compareBySortValue);
+//		return list_line;
+//	}
+//	public List<PContract_PO> getSub_po_confirm() {
+//		List<PContract_PO> list_line = sub_po.stream().filter(item -> null!=item.po_typeid_link && item.po_typeid_link==POType.PO_LINE_CONFIRMED).collect(Collectors.toList());
+//		Comparator<PContract_PO> compareBySortValue = (PContract_PO a1, PContract_PO a2) -> a1.getShipdate().compareTo( a2.getShipdate());
+//		Collections.sort(list_line, compareBySortValue);
+//		return list_line;
+//	}
 
 	public void setSub_po(List<PContract_PO> sub_po) {
 		this.sub_po = sub_po;

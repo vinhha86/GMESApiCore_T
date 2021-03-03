@@ -12,7 +12,7 @@ public interface IPContract_POService extends Operations<PContract_PO> {
 
 	List<PContract_PO> getPOByContract(Long orgrootid_link, Long pcontractid_link);
 
-	List<PContract_PO> getPO_LeafOnly(Long orgrootid_link, Long pcontractid_link, Long productid_link, Long userid_link, Long orgid_link);
+//	List<PContract_PO> getPO_LeafOnly(Long orgrootid_link, Long pcontractid_link, Long productid_link, Long userid_link, Long orgid_link);
 
 	List<PContract_PO> getPO_LaterShipdate(Long orgrootid_link, Long pcontractid_link, Long productid_link,
 			Date shipdate);
@@ -40,4 +40,5 @@ public interface IPContract_POService extends Operations<PContract_PO> {
 	List<PContract_PO> get_by_parent_and_type(Long pcontractpo_parentid_link, int po_typeid_link);
 	
 	List<PContract_PO> getall_offers_by_org(List<Long> orgid_link);
+	List<PContract_PO> getby_parent_and_type(Long parentid_link, Integer po_typeid_link);
 }

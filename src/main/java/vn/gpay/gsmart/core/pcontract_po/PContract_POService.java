@@ -40,31 +40,19 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		return repo.getPOByContractAndProduct(pcontractid_link, productid_link);
 	}
 	
-	@Override
-	//Chi lay cac PO o muc la
-	public List<PContract_PO> getPO_LeafOnly(Long orgrootid_link,
-			Long pcontractid_link,Long productid_link, Long userid_link, Long orgid_link){
-		try{
-			if(orgid_link == 1) userid_link = null;
-			List<PContract_PO> a = repo.getPOByContractProduct(orgrootid_link, pcontractid_link, productid_link, userid_link);
-//			List<PContract_PO> parentPO = new ArrayList<PContract_PO>();
-			List<PContract_PO> returnPO = new ArrayList<PContract_PO>();
-			for(PContract_PO thePO: a){
-				if (thePO.getSub_po().size() > 0){
-					for(PContract_PO subPO: thePO.getSub_po()){
-						returnPO.add(subPO);
-					}
-//					parentPO.add(thePO);
-				} else
-					returnPO.add(thePO);
-			}
-//			a.removeAll(parentPO);
-			return returnPO;
-		} catch(Exception ex){
-			ex.printStackTrace();
-			return null;
-		}
-	}
+//	@Override
+//	//Chi lay cac PO o muc la
+//	public List<PContract_PO> getPO_LeafOnly(Long orgrootid_link,
+//			Long pcontractid_link,Long productid_link, Long userid_link, Long orgid_link){
+//		try{
+//			if(orgid_link == 1) userid_link = null;
+//			List<PContract_PO> a = repo.getPOByContractProduct(orgrootid_link, pcontractid_link, productid_link, userid_link);
+//			return a;
+//		} catch(Exception ex){
+//			ex.printStackTrace();
+//			return null;
+//		}
+//	}
 	
 	@Override
 	public List<PContract_PO> getPOLeafOnlyByContract(Long pcontractid_link, Long productid_link){
@@ -196,5 +184,10 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	public List<PContract_PO> getall_offers_by_org(List<Long> orgid_link) {
 		// TODO Auto-generated method stub
 		return repo.getOffers_byOrg(orgid_link);
+	}
+	@Override
+	public List<PContract_PO> getby_parent_and_type(Long parentid_link, Integer po_typeid_link) {
+		// TODO Auto-generated method stub
+		return repo.getby_parent_and_type(parentid_link, po_typeid_link);
 	}
 }

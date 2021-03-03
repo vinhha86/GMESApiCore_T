@@ -62,6 +62,14 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			@Param ("pcontractpo_id_link")final  Long pcontractpo_id_link);
 	
 	@Query(value = "select c from PContract_PO c "
+			+ "where c.parentpoid_link = :parentid_link "
+			+ "and c.po_typeid_link =:po_typeid_link "
+			+ "order by shipdate asc")
+	public List<PContract_PO> getby_parent_and_type(
+			@Param ("parentid_link")final  Long parentid_link,
+			@Param ("po_typeid_link")final  Integer po_typeid_link);
+	
+	@Query(value = "select c from PContract_PO c "
 			+ "where c.parentpoid_link = :pcontractpo_id_link "
 			+ "and c.po_typeid_link = :po_typeid_link")
 	public List<PContract_PO> getby_parentid_link_and_type(
