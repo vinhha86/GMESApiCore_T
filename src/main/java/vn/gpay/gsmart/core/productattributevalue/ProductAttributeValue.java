@@ -59,6 +59,14 @@ public class ProductAttributeValue implements Serializable {
 		return "";
 	}
 	
+	@Transient
+	public Integer getAttributeSortValue() {
+		if(attribute!=null) {
+			return attribute.getSortvalue();
+		}
+		return 0;
+	}
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="attributevalueid_link",insertable=false,updatable =false)

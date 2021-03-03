@@ -630,6 +630,7 @@ public class ProductAPI {
 				obj.setAttributeid_link(productAttributeValue.getAttributeid_link());
 				obj.setAttributeValueName("");
 				obj.setIs_select(productAttributeValue.getIs_select());
+				obj.setSortvalue(productAttributeValue.getAttributeSortValue());
 				
 				boolean isExist = false;
 				
@@ -696,6 +697,9 @@ public class ProductAPI {
 				}
 				binding.setAttributeValueName(name);
 			}
+			
+			Comparator<ProductAttributeValueBinding> compareBySortValue = (ProductAttributeValueBinding a1, ProductAttributeValueBinding a2) -> a1.getSortvalue().compareTo( a2.getSortvalue());
+			Collections.sort(response.data, compareBySortValue);
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

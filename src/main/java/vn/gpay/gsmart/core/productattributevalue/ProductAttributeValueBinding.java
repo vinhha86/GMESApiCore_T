@@ -7,6 +7,7 @@ public class ProductAttributeValueBinding {
 	private  String attributeName;
 	private Long attributeid_link;
 	private Boolean is_select;
+	private Integer sortvalue;
 	
 	
 	public String getAttributeValueName() {
@@ -39,4 +40,11 @@ public class ProductAttributeValueBinding {
 	public void setIs_select(Boolean is_select) {
 		this.is_select = is_select;
 	}
+	public Integer getSortvalue() {
+		return sortvalue;
+	}
+	public void setSortvalue(Integer sortvalue) {
+		this.sortvalue = sortvalue;
+	}
+	
 }

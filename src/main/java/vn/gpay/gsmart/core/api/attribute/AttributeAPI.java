@@ -191,4 +191,27 @@ public class AttributeAPI {
 		    return new ResponseEntity<Attribute_getall_response>(HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/attribute_reorder",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> AttributeReorder(@RequestBody Attribute_reorder_request entity,HttpServletRequest request ) {
+		ResponseBase response = new ResponseBase();
+		try {
+		
+			for (Attribute att:entity.data){
+				Attribute Attr = attService.findOne(att.getId());
+				if (null != Attr){
+					Attr.setSortvalue(att.getSortvalue());
+					attService.save(Attr);
+				}
+				
+			}
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_EXCEPTION));
+		    return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 }

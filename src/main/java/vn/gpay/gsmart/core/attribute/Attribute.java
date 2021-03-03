@@ -65,6 +65,8 @@ public class Attribute implements Serializable {
 	
 	private Boolean isthread;
 	
+	private Integer sortvalue;
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
 	@JoinColumn( name="attributeid_link", referencedColumnName="id")	
@@ -185,6 +187,14 @@ public class Attribute implements Serializable {
 
 	public void setSelectedids(String selectedids) {
 		this.selectedids = selectedids;
+	}
+
+	public Integer getSortvalue() {
+		return sortvalue;
+	}
+
+	public void setSortvalue(Integer sortvalue) {
+		this.sortvalue = sortvalue;
 	}
 	
 }
