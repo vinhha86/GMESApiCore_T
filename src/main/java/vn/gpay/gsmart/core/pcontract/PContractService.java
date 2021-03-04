@@ -125,6 +125,7 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 		if (entity.orgvendorid_link > 0) {
 			thePredicates.add(cb.equal(rootPcontract.get("orgvendorid_link"), entity.orgvendorid_link));
 		}
+		
 		// contractbuyer_code
 		if (entity.contractbuyer_code.length() > 0) {
 			thePredicates
@@ -155,7 +156,7 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 			for (Long vendor : vendors) {
 				inVendorClause.value(vendor);
 			}
-			thePredicates.add(cb.or(inVendorClause));
+			thePredicates.add(cb.and(inVendorClause));
 		}
 		
 		//buyer
@@ -164,7 +165,7 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 			for (Long buyer : buyers) {
 				inBuyerClause.value(buyer);
 			}
-			thePredicates.add(cb.or(inBuyerClause));
+			thePredicates.add(cb.and(inBuyerClause));
 		}
 		
 		// pos

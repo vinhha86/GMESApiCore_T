@@ -25,7 +25,6 @@ import vn.gpay.gsmart.core.pcontract.IPContractService;
 import vn.gpay.gsmart.core.pcontract.IPContract_AutoID_Service;
 import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
-import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBOMColorService;
 import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBom2ColorService;
 import vn.gpay.gsmart.core.pcontractbomcolor.PContractBOMColor;
@@ -376,13 +375,12 @@ public class PContractAPI {
 					
 			}
 
-			List<Long> pos = new ArrayList<Long>();
+			List<Long> pos = poService.getpcontract_BySearch(entity.po_code, orgs);
 			// Lay danh sach PO thoa man dieu kien
-			if (entity.po_code.length() > 0 ) {
-				List<PContract_PO> lstPO = poService.getBySearch(entity.po_code, orgs);
-				for (PContract_PO thePO : lstPO)
-					pos.add(thePO.getPcontractid_link());
-			}
+//			List<PContract_PO> lstPO = poService.getBySearch(entity.po_code, orgs);
+//			for (PContract_PO thePO : lstPO)
+//				if(!pos.contains(thePO.getPcontractid_link()))
+//					pos.add(thePO.getPcontractid_link());
 			
 			List<Long> product = new ArrayList<Long>();
 			// Lay danh sach PO thoa man dieu kien

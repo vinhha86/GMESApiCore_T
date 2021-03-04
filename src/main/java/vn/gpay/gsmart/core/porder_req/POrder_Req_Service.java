@@ -129,7 +129,7 @@ public class POrder_Req_Service extends AbstractService<POrder_Req> implements I
 	}
 
 	@Override
-	public List<POrder_Req> get_by_org(long orgid_link) {
+	public List<POrder_Req> get_by_org(long orgid_link, List<Long> vendors, List<Long> buyers) {
 		// TODO Auto-generated method stub
 //		Specification<POrder_Req> specification = Specifications.<POrder_Req>and()
 //				.eq("granttoorgid_link", orgid_link)
@@ -141,7 +141,9 @@ public class POrder_Req_Service extends AbstractService<POrder_Req> implements I
 //		        .build();
 //		List<POrder_Req> a = repo.findAll(specification,sort);
 //		return a.size() > 0 ? a : new ArrayList<POrder_Req>();
-		return repo.getByOrg(orgid_link);
+		vendors = vendors.size() == 0 ? null : vendors;
+		buyers = buyers.size() == 0 ? null : buyers;
+		return repo.getByOrg(orgid_link,vendors , buyers);
 	}
 	
 	@Override

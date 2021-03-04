@@ -224,8 +224,19 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 	public List<PContract_PO> getBySearch_ProductOnly(
 			@Param ("po_code")final String po_code);
 	
+	@Query(value = "select a.id from PContract a "
+			+ "left join PContract_PO c on a.id = c.pcontractid_link "
+			+ "left join POrder_Req b on b.pcontract_poid_link = c.id "
+			+ "where (lower(c.po_buyer) like lower(concat('%',:po_code,'%')) or :po_code ='') "
+			+ "and (b.granttoorgid_link in :orgs or :orgs is null) "
+			+ "group by a.id"
+			)
+	public List<Long> getPContractBySearch_OrgOnly(
+			@Param ("po_code")final String po_code,
+			@Param ("orgs")final List<Long> orgs);
+	
 	@Query(value = "select c from PContract_PO c "
-			+ "inner join POrder_Req b on b.pcontract_poid_link = c.id "
+			+ "left join POrder_Req b on b.pcontract_poid_link = c.id "
 			+ "where lower(c.po_buyer) like lower(concat('%',:po_code,'%')) "
 			+ "and b.granttoorgid_link in :orgs "
 			)
@@ -234,8 +245,8 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			@Param ("orgs")final List<Long> orgs);
 	
 	@Query(value = "select c from PContract_PO c "
-			+ "inner join POrder_Req b on b.pcontract_poid_link = c.id "
-			+ "where lower(c.po_buyer) like lower(concat('%',:po_code,'%')) "
+			+ "left join POrder_Req b on b.pcontract_poid_link = c.id "
+			+ "where (lower(c.po_buyer) like lower(concat('%',:po_code,'%')) or :po_code = '')"
 			)
 	public List<PContract_PO> getBySearch_CodeOnly(
 			@Param ("po_code")final String po_code);

@@ -78,14 +78,23 @@ public interface IPOrder_Req_Repository extends JpaRepository<POrder_Req, Long>,
 	
 	@Query("SELECT c FROM POrder_Req c "
 			+ "inner join PContract_PO a on c.pcontract_poid_link = a.id "
+			+ "inner join PContract e on e.id = a.pcontractid_link "
 			+ "where c.granttoorgid_link = :orgid_link "
+			+ "and (e.orgvendorid_link in :vendors or :vendors is null) "
+			+ "and (e.orgbuyerid_link in :buyers or :buyers is null) "
 			+ "and a.status <= -1 "
 			+ "and a.shipdate = "
 			+ "(select min(b.shipdate) from POrder_Req d "
 			+ "inner join PContract_PO b on d.pcontract_poid_link = b.id "
+			+ "inner join PContract f on f.id = b.pcontractid_link "
 			+ "where b.parentpoid_link = a.parentpoid_link "
+			+ "and (f.orgvendorid_link in :vendors or :vendors is null) "
+			+ "and (f.orgbuyerid_link in :buyers or :buyers is null) "
 			+ "and d.granttoorgid_link = :orgid_link) "
 			+ "order by a.shipdate asc")
-	public List<POrder_Req> getByOrg(@Param ("orgid_link")final Long orgid_link);
+	public List<POrder_Req> getByOrg(
+			@Param ("orgid_link")final Long orgid_link,
+			@Param ("vendors")final List<Long> vendors,
+			@Param ("buyers")final List<Long> buyers);
 	
 }

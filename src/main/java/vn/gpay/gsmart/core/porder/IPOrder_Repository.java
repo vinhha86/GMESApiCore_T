@@ -145,18 +145,26 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 	
 	@Query(value = "select a from POrder a "
 			+ "inner join PContract_PO b on a.pcontract_poid_link = b.id "
+			+ "inner join PContract c on c.id = b.pcontractid_link "
 			+ "where a.granttoorgid_link = :granttoorgid_link "
 			+ "and a.status = 0 "
+			+ "and (c.orgvendorid_link in :vendors or :vendors is null) "
+			+ "and (c.orgbuyerid_link in :buyers or :buyers is null) "
 			+ "and b.shipdate = "
 			+ "(select min(d.shipdate) from POrder e "
 			+ "inner join PContract_PO d on d.id = e.pcontract_poid_link "
+			+ "inner join PContract f on f.id = d.pcontractid_link "
 			+ "where d.parentpoid_link = b.parentpoid_link "
+			+ "and (f.orgvendorid_link in :vendors or :vendors is null) "
+			+ "and (f.orgbuyerid_link in :buyers or :buyers is null) "
 			+ "and e.granttoorgid_link = :granttoorgid_link "
 			+ "and e.status = 0) "
 			+ " group by a"
 			)
 	public List<POrder> getfree_groupby_product(
-			@Param ("granttoorgid_link")final Long granttoorgid_link);
+			@Param ("granttoorgid_link")final Long granttoorgid_link,
+			@Param ("vendors")final List<Long> vendors,
+			@Param ("buyers")final List<Long> buyers);
 	
 	@Query(value = "select a from POrder a "
 			+ "inner join PContract_PO b on a.pcontract_poid_link = b.id "

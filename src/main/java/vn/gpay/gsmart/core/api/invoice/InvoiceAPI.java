@@ -148,7 +148,6 @@ public class InvoiceAPI {
 			Invoice invoice = invoiceService.findOne(entity.invoiceid_link);
 			
 			for(Long skuid_link : entity.list_skuid_link) {
-				SKU sku = skuService.findOne(skuid_link);
 				//kiem tra trong invoice-d co sku chua chua co thi them vao
 				List<InvoiceD> list_invoiced = invoiceDService.get_invoiced_bysku(invoiceid_link, skuid_link);
 				

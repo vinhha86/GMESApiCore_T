@@ -340,7 +340,7 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 	@Override
 	//Danh sach cac lenh duoc phan cho Phan xuong nhung chua duoc phan chuyen
 	public List<POrder> get_free_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link,String PO_code,
-			Long orgbuyerid_link,Long orgvendorid_link){
+			Long orgbuyerid_link,Long orgvendorid_link, List<Long> vendors, List<Long> buyers){
 //		int status = 0;
 //		Specification<POrder> specification = Specifications.<POrder>and()
 //				.eq("status", status)
@@ -357,7 +357,9 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 ////		        .build();
 ////		List<POrder> a = repo.findAll(specification,sort);
 //		List<POrder> a = repo.findAll(specification);
-		return repo.getfree_groupby_product(granttoorgid_link);
+		vendors = vendors.size() == 0 ? null : vendors;
+		buyers = buyers.size() == 0 ? null : buyers;
+		return repo.getfree_groupby_product(granttoorgid_link, vendors, buyers);
 	}
 
 	@Override

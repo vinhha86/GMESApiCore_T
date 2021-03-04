@@ -69,6 +69,7 @@ import vn.gpay.gsmart.core.task_object.ITask_Object_Service;
 import vn.gpay.gsmart.core.task_object.Task_Object;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.NetworkUtils;
+import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.POStatus;
 import vn.gpay.gsmart.core.utils.POrderReqStatus;
 import vn.gpay.gsmart.core.utils.POrderStatus;
@@ -318,14 +319,28 @@ public class POrderAPI {
 		POrderResponse response = new POrderResponse();
 		try {
 			long i = (long)0;
-			List<POrder> lsPOrder = porderService.get_free_bygolivedate(entity.golivedate_from, entity.golivedate_to, orgid_link, "", i, i);
+			
+			List<GpayUserOrg> lsVendor = userOrgService.getall_byuser_andtype(user.getId(), OrgType.ORG_TYPE_VENDOR);
+			List<GpayUserOrg> lsBuyer = userOrgService.getall_byuser_andtype(user.getId(), OrgType.ORG_TYPE_BUYER);
+			
+			List<Long> vendors = new ArrayList<Long>();
+			for(GpayUserOrg vendor : lsVendor) {
+				vendors.add(vendor.getOrgid_link());
+			}
+			
+			List<Long> buyers = new ArrayList<Long>();
+			for(GpayUserOrg buyer : lsBuyer) {
+				buyers.add(buyer.getOrgid_link());
+			}
+			
+			List<POrder> lsPOrder = porderService.get_free_bygolivedate(entity.golivedate_from, entity.golivedate_to, orgid_link, "", i, i, vendors, buyers);
 			List<String> orgTypes = new ArrayList<String>();
 			orgTypes.add("13");
 			orgTypes.add("14");
 			List<Org> lsOrgChild = orgService.getorgChildrenbyOrg(orgid_link,orgTypes);
 			for(Org theOrg:lsOrgChild){
 				long orgid = theOrg.getId();
-				lsPOrder.addAll(porderService.get_free_bygolivedate(entity.golivedate_from, entity.golivedate_to, orgid , "", i, i));
+				lsPOrder.addAll(porderService.get_free_bygolivedate(entity.golivedate_from, entity.golivedate_to, orgid , "", i, i, vendors, buyers));
 			}
 			response.data = lsPOrder;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -368,16 +383,29 @@ public class POrderAPI {
 				}
 			}
 			
-			for(Long orgid:list_id_org){
-				lsPOrder.addAll(porderService.get_free_bygolivedate(entity.golivedate_from, entity.golivedate_to, orgid , "", i, i));
+			List<GpayUserOrg> lsVendor = userOrgService.getall_byuser_andtype(user.getId(), OrgType.ORG_TYPE_VENDOR);
+			List<GpayUserOrg> lsBuyer = userOrgService.getall_byuser_andtype(user.getId(), OrgType.ORG_TYPE_BUYER);
+			
+			List<Long> vendors = new ArrayList<Long>();
+			for(GpayUserOrg vendor : lsVendor) {
+				vendors.add(vendor.getOrgid_link());
 			}
 			
-			Map<Long, Date> map = new HashedMap<Long, Date>();
+			List<Long> buyers = new ArrayList<Long>();
+			for(GpayUserOrg buyer : lsBuyer) {
+				buyers.add(buyer.getOrgid_link());
+			}
+			
+			for(Long orgid:list_id_org){
+				lsPOrder.addAll(porderService.get_free_bygolivedate(entity.golivedate_from, entity.golivedate_to, orgid , "", i, i, vendors, buyers));
+			}
+			
+			Map<String, Date> map = new HashedMap<String, Date>();
 			//Kiem tra ngay giao hang 
 			List<PContractPO_Product> list = new ArrayList<PContractPO_Product>();
 			for(POrder porder : lsPOrder) {
 				//kiem tra chao gia va ngay giao hang co chua thi moi lay ra
-				if(map.get(porder.getPO_Offer()) == null) {
+				if(map.get(porder.getPO_Offer()+"_"+porder.getGranttoorgname()) == null) {
 					PContractPO_Product line = new PContractPO_Product();
 					
 					line.setBuyername(porder.getBuyername());
@@ -393,7 +421,7 @@ public class POrderAPI {
 					
 					list.add(line);
 					
-					map.put(porder.getPO_Offer(), porder.getShipdate());
+					map.put(porder.getPO_Offer()+"_"+porder.getGranttoorgname(), porder.getShipdate());
 				}
 			}
 			

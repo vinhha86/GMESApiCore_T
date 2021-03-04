@@ -54,6 +54,7 @@ import vn.gpay.gsmart.core.task_flow.Task_Flow;
 import vn.gpay.gsmart.core.task_object.ITask_Object_Service;
 import vn.gpay.gsmart.core.task_object.Task_Object;
 import vn.gpay.gsmart.core.utils.Common;
+import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.POStatus;
 import vn.gpay.gsmart.core.utils.POrderReqStatus;
 import vn.gpay.gsmart.core.utils.POrderStatus;
@@ -278,9 +279,22 @@ public class POrder_ReqAPI {
 			orgTypes.add("14");
 			List<Org> lsOrgChild = orgService.getorgChildrenbyOrg(orgid_link,orgTypes);
 			
+			List<GpayUserOrg> lsVendor = userOrgService.getall_byuser_andtype(user.getId(), OrgType.ORG_TYPE_VENDOR);
+			List<GpayUserOrg> lsBuyer = userOrgService.getall_byuser_andtype(user.getId(), OrgType.ORG_TYPE_BUYER);
+			
+			List<Long> vendors = new ArrayList<Long>();
+			for(GpayUserOrg vendor : lsVendor) {
+				vendors.add(vendor.getOrgid_link());
+			}
+			
+			List<Long> buyers = new ArrayList<Long>();
+			for(GpayUserOrg buyer : lsBuyer) {
+				buyers.add(buyer.getOrgid_link());
+			}
+			
 			if(orgid_link == 1) {
 				for(Org theOrg:lsOrgChild){
-					List<POrder_Req> a = reqService.get_by_org(theOrg.getId());
+					List<POrder_Req> a = reqService.get_by_org(theOrg.getId(), vendors, buyers);
 					
 					List<POrder_Req> result = new ArrayList<POrder_Req>();
 					for(POrder_Req pr : a) {
@@ -305,7 +319,7 @@ public class POrder_ReqAPI {
 					list_org.add(orgid_link);
 				
 				for (Long orgid : list_org) {
-					List<POrder_Req> a = reqService.get_by_org(orgid);
+					List<POrder_Req> a = reqService.get_by_org(orgid, vendors, buyers);
 					
 					List<POrder_Req> result = new ArrayList<POrder_Req>();
 					for(POrder_Req pr : a) {
@@ -343,9 +357,22 @@ public class POrder_ReqAPI {
 			List<Org> lsOrgChild = orgService.getorgChildrenbyOrg(orgid_link,orgTypes);
 			List<POrder_Req> list_req = new ArrayList<POrder_Req>();
 			
+			List<GpayUserOrg> lsVendor = userOrgService.getall_byuser_andtype(user.getId(), OrgType.ORG_TYPE_VENDOR);
+			List<GpayUserOrg> lsBuyer = userOrgService.getall_byuser_andtype(user.getId(), OrgType.ORG_TYPE_BUYER);
+			
+			List<Long> vendors = new ArrayList<Long>();
+			for(GpayUserOrg vendor : lsVendor) {
+				vendors.add(vendor.getOrgid_link());
+			}
+			
+			List<Long> buyers = new ArrayList<Long>();
+			for(GpayUserOrg buyer : lsBuyer) {
+				buyers.add(buyer.getOrgid_link());
+			}
+			
 			if(orgid_link == 1) {
 				for(Org theOrg:lsOrgChild){
-					List<POrder_Req> a = reqService.get_by_org(theOrg.getId());
+					List<POrder_Req> a = reqService.get_by_org(theOrg.getId(), vendors, buyers);
 					
 					List<POrder_Req> result = new ArrayList<POrder_Req>();
 					for(POrder_Req pr : a) {
@@ -370,7 +397,7 @@ public class POrder_ReqAPI {
 					list_org.add(orgid_link);
 				
 				for (Long orgid : list_org) {
-					List<POrder_Req> a = reqService.get_by_org(orgid);
+					List<POrder_Req> a = reqService.get_by_org(orgid, vendors, buyers);
 					
 					List<POrder_Req> result = new ArrayList<POrder_Req>();
 					for(POrder_Req pr : a) {
@@ -410,11 +437,11 @@ public class POrder_ReqAPI {
 //			
 //			//remove nhung line giao hang khong hop le
 //			list_req.removeIf(c-> !map.containsKey(c.getPO_Offer()) || !map.get(c.getPO_Offer()).equals(c.getShipdate()));
-			Map<Long, Date> map = new HashedMap<Long, Date>();
+			Map<String, Date> map = new HashedMap<String, Date>();
 			List<PContractPO_Product> listret = new ArrayList<PContractPO_Product>();
 			
 			for(POrder_Req req : list_req) {
-				if(map.get(req.getPO_Offer()) == null) {
+				if(map.get(req.getPO_Offer()+"_"+req.getGranttoorgname()) == null) {
 					PContractPO_Product po_product = new PContractPO_Product();
 					po_product.setBuyername(req.getBuyername());
 					po_product.setGranttoorgid_link(req.getGranttoorgid_link());
@@ -430,7 +457,7 @@ public class POrder_ReqAPI {
 					
 					listret.add(po_product);
 					
-					map.put(req.getPO_Offer(), req.getShipdate());
+					map.put(req.getPO_Offer()+"_"+req.getGranttoorgname(), req.getShipdate());
 				}
 				
 			}
