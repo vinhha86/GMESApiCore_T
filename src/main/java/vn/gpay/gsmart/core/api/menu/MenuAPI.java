@@ -199,6 +199,9 @@ public class MenuAPI {
 			
 			for(Menu item : menu) {
 				// thêm nếu ko có con
+				if(item.getId().equals("dashboard")) {
+					continue;
+				}
 				if(item.getParent_id() == null || item.getParent_id().equals("")) {
 					List<Menu> list = menuService.getby_parentid(item.getId());
 					if(list.size() == 0) {
