@@ -58,7 +58,7 @@ public class PackingTypeService extends AbstractService<PackingType> implements 
 		if(listid.equals("")) return "";
 		// TODO Auto-generated method stub
 		List<Long> list = new ArrayList<Long>();
-		String[] arr_id = listid.split(",");
+		String[] arr_id = listid.split(";");
 		for(String s_id : arr_id) {
 			list.add(Long.parseLong(s_id));
 		}
@@ -68,7 +68,7 @@ public class PackingTypeService extends AbstractService<PackingType> implements 
 			if(name=="")
 				name += packing.getName();
 			else 
-				name += "," + packing.getName();
+				name += ", \n" + packing.getName();
 		}
 		return name;
 	}
