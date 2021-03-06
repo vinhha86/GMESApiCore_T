@@ -85,6 +85,53 @@ public class ProductAPI {
 			return new ResponseEntity<Product_filter_response>(response, HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/delete_img", method = RequestMethod.POST)
+	public ResponseEntity<delete_image_response> DeleteImg(HttpServletRequest request,@RequestBody delete_image_request entity) {
+	delete_image_response response = new delete_image_response();
+		try {
+			Product product = productService.findOne(entity.productid_link);
+			String uploadRootPath = request.getServletContext().getRealPath("");
+			File uploadRootDir = new File(uploadRootPath);
+			String FolderPath = AtributeFixValues.folder_upload+"/product";
+			String img_path = uploadRootDir.getParent()+"/"+FolderPath;
+			switch (entity.img) {
+			case 1:
+
+				img_path += "/"+ product.getImgurl1();
+				product.setImgurl1(null);
+				break;
+			case 2:
+				img_path += "/"+ product.getImgurl1();
+				product.setImgurl2(null);
+				break;
+			case 3:
+				img_path += "/"+ product.getImgurl1();
+				product.setImgurl3(null);
+				break;
+			case 4:
+				img_path += "/"+ product.getImgurl1();
+				product.setImgurl4(null);
+				break;
+			case 5:
+				img_path += "/"+ product.getImgurl1();
+				product.setImgurl5(null);
+				break;
+			default:
+				break;
+			}
+			File img = new File(img_path);
+			img.delete();
+			productService.save(product);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<delete_image_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<delete_image_response>(response, HttpStatus.OK);
+		}
+	}
 	@RequestMapping(value = "/getDefaultAttr", method = RequestMethod.POST)
 	public ResponseEntity<Product_DefaultAttr_response> getDefaultAttr(HttpServletRequest request,
 			@RequestBody Product_DefaultAttr_request entity) {
