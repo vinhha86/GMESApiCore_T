@@ -46,6 +46,8 @@ public class MenuTree  implements Serializable{
 	
 	private String xtype_new;
 	
+	private String xtype_edit_detail;
+	
 	private Integer type;
 	
 	private boolean checked;
@@ -209,6 +211,12 @@ public class MenuTree  implements Serializable{
 	}
 	public void setParent_id(String parent_id) {
 		this.parent_id = parent_id;
+	}
+	public String getXtype_edit_detail() {
+		return xtype_edit_detail;
+	}
+	public void setXtype_edit_detail(String xtype_edit_detail) {
+		this.xtype_edit_detail = xtype_edit_detail;
 	}
 	public Integer getIndex() {
 		return index;

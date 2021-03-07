@@ -36,7 +36,6 @@ public class MenuServiceImpl extends StringAbstractService<Menu> implements IMen
 	
 	@Override
 	public List<MenuTree> createTree(final List<Menu> nodes) {
-		 
         Map<String, MenuTree> mapTmp = new HashMap<>();
         List<Menu> secondMenuList = new ArrayList<>(); // cần vì trong list nodes chứa duplicate Menu
 //        for(Menu menu : nodes) {
@@ -67,6 +66,7 @@ public class MenuServiceImpl extends StringAbstractService<Menu> implements IMen
         	menu.setTitle_new_vi(current.getTxtcreate_vi());
         	menu.setTitle_vi(current.getTitle_list_vi());
         	menu.setTitle_en(current.getTitle_list_vi());
+        	menu.setXtype_edit_detail(current.getEdit_detail());
         	menu.setExpanded(true);
         	menu.setChecked(current.checked);
         	
@@ -109,6 +109,7 @@ public class MenuServiceImpl extends StringAbstractService<Menu> implements IMen
                 	current_n.setTitle_en(current.getTitle_list_vi());     
                 	current_n.setParent_id(parentId);
                 	current_n.setParent_name(parent.getText_vi());
+                	current_n.setXtype_edit_detail(current.getEdit_detail());
                 	current_n.setChecked(current.checked);
                     parent.addChild(current_n);
                     parent.setExpanded(false);

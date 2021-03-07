@@ -198,10 +198,11 @@ public class MenuAPI {
 			List<Menu> result = new ArrayList<Menu>();
 			
 			for(Menu item : menu) {
-				// thêm nếu ko có con
+				// bỏ trang chủ
 				if(item.getId().equals("dashboard")) {
 					continue;
 				}
+				// thêm nếu ko có con
 				if(item.getParent_id() == null || item.getParent_id().equals("")) {
 					List<Menu> list = menuService.getby_parentid(item.getId());
 					if(list.size() == 0) {

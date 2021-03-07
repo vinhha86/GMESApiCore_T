@@ -65,6 +65,9 @@ public class Menu implements Serializable {
 	@Column(name = "parent_id")
 	private String parent_id;
 	
+	@Column(name = "edit_detail")
+	private String edit_detail;
+	
 	@Transient
 	public boolean checked;
 
@@ -202,6 +205,14 @@ public class Menu implements Serializable {
 
 	public void setParent_id(String parent_id) {
 		this.parent_id = parent_id;
+	}
+
+	public String getEdit_detail() {
+		return edit_detail;
+	}
+
+	public void setEdit_detail(String edit_detail) {
+		this.edit_detail = edit_detail;
 	}
 
 	public boolean isChecked() {
