@@ -441,7 +441,7 @@ public class POrder_ReqAPI {
 			List<PContractPO_Product> listret = new ArrayList<PContractPO_Product>();
 			
 			for(POrder_Req req : list_req) {
-				if(map.get(req.getPO_Offer()+"_"+req.getGranttoorgname()) == null) {
+				if(map.get(req.getPO_Offer()+"_"+req.getGranttoorgname()+"_"+req.getProduct_code()) == null) {
 					PContractPO_Product po_product = new PContractPO_Product();
 					po_product.setBuyername(req.getBuyername());
 					po_product.setGranttoorgid_link(req.getGranttoorgid_link());
@@ -457,7 +457,7 @@ public class POrder_ReqAPI {
 					
 					listret.add(po_product);
 					
-					map.put(req.getPO_Offer()+"_"+req.getGranttoorgname(), req.getShipdate());
+					map.put(req.getPO_Offer()+"_"+req.getGranttoorgname()+"_"+req.getProduct_code(), req.getShipdate());
 				}
 				
 			}

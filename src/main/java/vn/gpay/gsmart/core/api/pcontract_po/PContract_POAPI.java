@@ -2582,6 +2582,50 @@ public class PContract_POAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/delete_plan_porder", method = RequestMethod.POST)
+	public ResponseEntity<delete_plan_porder_response> DeletePlanPOrder(@RequestBody delete_porder_plan_request entity,
+			HttpServletRequest request) {
+		delete_plan_porder_response response = new delete_plan_porder_response();
+		try {
+			Long pcontract_poid_link = entity.pcontract_poid_link;
+			
+			//Lay nhung line giao hang cua po
+			List<PContract_PO> list_line = pcontract_POService.get_by_parent_and_type(pcontract_poid_link, POType.PO_LINE_PLAN);
+			
+			for (PContract_PO line : list_line) {
+				//lay nhung porder_req cua line
+				List<POrder_Req> list_req = porder_req_Service.getByPO(line.getId());
+				
+				for(POrder_Req req: list_req) {
+					//Lay nhung porder
+					List<POrder> list_porder = porderService.getByPOrder_Req(pcontract_poid_link, req.getId());
+					//Lay cac lenh uom thu
+					for(POrder porder : list_porder) {
+						List<POrderGrant> list_grant = grantService.getByOrderId(porder.getId());
+						
+						for (POrderGrant grant : list_grant) {
+							grantService.delete(grant);
+						}
+						
+						porderService.delete(porder);
+					}
+					
+					porder_req_Service.delete(req);
+				}
+			}
+			
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			ResponseEntity<delete_plan_porder_response> a = new ResponseEntity<delete_plan_porder_response>(response, HttpStatus.OK);
+			return a;
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<delete_plan_porder_response>(response, HttpStatus.OK);
+		}
+	}
+	
 	@RequestMapping(value = "/copyline", method = RequestMethod.POST)
 	public ResponseEntity<copy_poline_response> CopyLine(@RequestBody copy_poline_request entity,
 			HttpServletRequest request) {
