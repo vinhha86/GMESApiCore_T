@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.security;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import com.github.wenhao.jpa.Sorts;
 import com.github.wenhao.jpa.Specifications;
 
 import vn.gpay.gsmart.core.base.AbstractService;
+import vn.gpay.gsmart.core.org.Org;
 
 @Service
 public class GpayUserImpl  extends AbstractService<GpayUser> implements IGpayUserService{
@@ -73,5 +75,23 @@ public class GpayUserImpl  extends AbstractService<GpayUser> implements IGpayUse
 			listuser.removeIf(c-> !c.getUsergroup_name().contains(groupuserid_link.toString()));
 	    return listuser;
 	}
-
+	@Override
+	public List<GpayUser> getUserinOrgid(List<Org> listorg) {
+		// TODO Auto-generated method stub
+		List<Long> listid = new ArrayList<>();
+		
+		for(Org org : listorg) {
+			listid.add(org.getId());
+		}
+		
+		Specification<GpayUser> specification = Specifications.<GpayUser>and()
+	            .ne("status", -1)
+	            .in(listid.size() > 0 ,"orgid_link", listid.toArray())
+	            .build();
+		Sort sort = Sorts.builder()
+		        .desc("id")
+		        .build();
+		List<GpayUser> list = repository.findAll(specification,sort);
+	    return list;
+	}
 }

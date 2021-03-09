@@ -647,4 +647,23 @@ public class UserAPI {
 		    return new ResponseEntity<ResponseBase>(response,HttpStatus.BAD_REQUEST);
 		}
 	}
+	@RequestMapping(value = "/user_getuserinorg",method = RequestMethod.POST)
+	public ResponseEntity<UserResponse> GetUserinOrgId(HttpServletRequest request ) {
+		UserResponse response = new UserResponse();
+		try {
+			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
+			Long orgid_link = user.getOrgId();
+			
+			List<Org> listorg = orgService.findOrgAllByRoot(user.getRootorgid_link(), orgid_link, new ArrayList<String>(), true);
+						
+			response.data=userDetailsService.getUserinOrgid(listorg);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<UserResponse>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<UserResponse>(response,HttpStatus.OK);
+		}
+	}
 }
