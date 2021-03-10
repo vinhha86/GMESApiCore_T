@@ -74,8 +74,24 @@ public class ProductAPI {
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Product_filter_response response = new Product_filter_response();
 		try {
-			response.data = productService.filter(user.getRootorgid_link(), entity.product_type,
+			List<Product> lst_product = productService.filter(user.getRootorgid_link(), entity.product_type,
 					entity.code, entity.partnercode, entity.attributes, entity.productid_link, entity.orgcustomerid_link);
+			List<ProductBinding> list = new ArrayList<ProductBinding>();
+			for(Product product : lst_product) {
+				ProductBinding bind = new ProductBinding();
+				bind.setBuyercode(product.getBuyercode());
+				bind.setId(product.getId());
+				bind.setPartnercode(product.getPartnercode());
+				bind.setName(product.getName());
+				
+				String FolderPath = commonService.getFolderPath(product.getProducttypeid_link());
+				String uploadRootPath = request.getServletContext().getRealPath("");
+				File uploadRootDir = new File(uploadRootPath);
+				bind.setUrlimage(getimg(product.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath));
+				
+				list.add(bind);
+			}
+			response.data = list;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<Product_filter_response>(response, HttpStatus.OK);

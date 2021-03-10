@@ -16,6 +16,8 @@ public class ProductBinding {
 	private String info;
 	private String code_amount;
 	private String buyercode;
+	private String partnercode;
+	
 	
 	
 	
@@ -108,6 +110,12 @@ public class ProductBinding {
 	}
 	public void setCode_amount(String code_amount) {
 		this.code_amount = code_amount;
+	}
+	public String getPartnercode() {
+		return partnercode;
+	}
+	public void setPartnercode(String partnercode) {
+		this.partnercode = partnercode;
 	}
 	
 }
