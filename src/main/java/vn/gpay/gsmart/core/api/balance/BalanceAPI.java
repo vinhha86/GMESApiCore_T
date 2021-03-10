@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.api.pcontractproductbom.PContractProductBOM_getbomcolor_request;
 import vn.gpay.gsmart.core.api.pcontractproductbom.PContractProductBom2API;
+import vn.gpay.gsmart.core.pcontract.IPContractService;
+import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
@@ -30,6 +32,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 @RestController
 @RequestMapping("/api/v1/balance")
 public class BalanceAPI {
+	@Autowired IPContractService pcontractService;
 	@Autowired IPContract_POService pcontract_POService;
 	@Autowired IPContractProductSKUService po_SKU_Service;
 	@Autowired ISKU_Service skuService;
@@ -88,6 +91,59 @@ public class BalanceAPI {
 			return new ResponseEntity<Balance_Response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+	@RequestMapping(value = "/cal_balance_bycontract", method = RequestMethod.POST)
+	public ResponseEntity<Balance_Response> cal_balance_bycontract(HttpServletRequest request,
+			@RequestBody Balance_Request entity) {
+//		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Balance_Response response = new Balance_Response();
+		try {
+			//Lay danh sách các PO Cha đã chốt của pcontract
+			List<PContract_PO> ls_PO = pcontract_POService.getPO_Offer_Accept_ByPContract(entity.pcontractid_link, Long.parseLong("0"));
+			List<Balance_Product_Data> ls_Product_Total = new ArrayList<Balance_Product_Data>();
+			List<SKUBalance_Data> ls_SKUBalance_Total = new ArrayList<SKUBalance_Data>();
+			
+			for(PContract_PO thePO: ls_PO)
+			{
+				//1. Lay danh sach Product, Color va SL yeu cau SX theo PO 
+				//(Neu la PO cha thi lay tong yeu cau cua cac PO con)
+				List<Balance_Product_Data> ls_Product = get_BalanceProduct_List(thePO.getId());
+				if (null!=ls_Product){
+					//2. Lay tong hop BOM theo PContractid_link, Productid_link, Colorid_link
+					List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
+					for(Balance_Product_Data theProduct:ls_Product){
+						cal_demand(ls_SKUBalance, thePO.getPcontractid_link(), theProduct.productid_link,theProduct.colorid_link, theProduct.amount);
+					}
+		
+					//3. Tinh toan can doi cho tung nguyen phu lieu trong BOM
+					CountDownLatch latch = new CountDownLatch(ls_SKUBalance.size());
+
+					for(SKUBalance_Data mat_sku:ls_SKUBalance){
+						Balance_SKU theBalance =  new Balance_SKU(
+								ls_SKUBalance,
+								thePO.getPcontractid_link(),
+								thePO.getId(),
+								mat_sku,
+								request.getHeader("Authorization"),
+								latch);
+						theBalance.start();
+					}
+					latch.await();
+					ls_SKUBalance_Total.addAll(ls_SKUBalance);
+		            ls_Product_Total.addAll(ls_Product);
+				} 
+			}
+			
+            response.data = ls_SKUBalance_Total;
+            response.product_data = ls_Product_Total;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<Balance_Response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<Balance_Response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}	
 	@RequestMapping(value = "/get_material_bypcontract", method = RequestMethod.POST)
 	public ResponseEntity<Balance_Response> get_material_bypcontract(HttpServletRequest request,
 			@RequestBody Balance_Request entity) {

@@ -42,6 +42,8 @@ public class Jitin_Stockin_PkList_Data implements Serializable {
 	private String hsname;
 	private String checked;
 	private String unitname;
+	private String warning;
+	
 	public Long getId() {
 		return id;
 	}
@@ -251,6 +253,12 @@ public class Jitin_Stockin_PkList_Data implements Serializable {
 	}
 	public void setUnitname(String unitname) {
 		this.unitname = unitname;
+	}
+	public String getWarning() {
+		return warning;
+	}
+	public void setWarning(String warning) {
+		this.warning = warning;
 	}
 	
 	

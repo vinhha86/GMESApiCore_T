@@ -15,6 +15,7 @@ public class Jitin_Invoice_PkList_Data implements Serializable {
     private Integer packageid;
 	private Float ydsorigin;
 	private Float ydscheck;
+	private Float met_origin;
     private Float m3;
     private Float width;
     private Float netweight;
@@ -188,6 +189,12 @@ public class Jitin_Invoice_PkList_Data implements Serializable {
 	}
 	public void setHsname(String hsname) {
 		this.hsname = hsname;
+	}
+	public Float getMet_origin() {
+		return met_origin;
+	}
+	public void setMet_origin(Float met_origin) {
+		this.met_origin = met_origin;
 	}
 	
 
