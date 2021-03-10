@@ -38,7 +38,7 @@ public class CutPlan_Size implements Serializable {
     private CutPlan_Row row;
 	
 	@Transient
-	public int getLaVai() {
+	public Integer getLaVai() {
 		if(row!=null)
 			return row.getLa_vai();
 		return 0;

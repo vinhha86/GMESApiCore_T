@@ -389,7 +389,7 @@ public class CutPlanAPI {
 					}
 					else {
 						if(!sodo.getAmount().equals(0)) {
-							sl_catdu = (0 -catdu.getAmount());
+							sl_catdu = (0 -catdu.getAmount()) + la_vai*sodo.getAmount();
 							if(la_vai == 0) {
 								la_vai =  sl_catdu / sodo.getAmount();
 							}
@@ -429,12 +429,12 @@ public class CutPlanAPI {
 				List<CutPlan_Size> listsize_sodo_clone = new ArrayList<CutPlan_Size>(listsize_sodo);
 				listsize_sodo_clone.removeIf(c-> !c.getProduct_skuid_link().equals(size_yc.getProduct_skuid_link()));
 				
-				for (CutPlan_Size cutPlan_Size : listsize_sodo) {
+				for (CutPlan_Size cutPlan_Size : listsize_sodo_clone) {
 //					CutPlan_Row cut_row = cutplanrowService.findOne(cutPlan_Size.getCutplanrowid_link());
-					sodo += la_vai*(cutPlan_Size.getAmount() == null ? 0 : cutPlan_Size.getAmount());
+					sodo += (cutPlan_Size.getLaVai() == null || cutPlan_Size.getAmount() == null) ? 0 : cutPlan_Size.getLaVai()*cutPlan_Size.getAmount();
 				}
 				
-				CutPlan_Size size_catdu = listsize_catdu.get(0);
+				CutPlan_Size size_catdu = listsize_catdu_clone.get(0);
 				int amount = sodo - yeucau;
 				response.catdu = amount;
 				size_catdu.setAmount(amount);
