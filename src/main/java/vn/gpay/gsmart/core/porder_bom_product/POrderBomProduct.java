@@ -67,6 +67,14 @@ public class POrderBomProduct implements Serializable {
 	}
 	
 	@Transient
+	public Long getColorid_link() {
+		if(sku !=null) {
+			return sku.getColorid_link();
+		}
+		return (long)0;
+	}
+	
+	@Transient
 	public String getMaterialCode() {
 		if(sku !=null) {
 			return sku.getCode();

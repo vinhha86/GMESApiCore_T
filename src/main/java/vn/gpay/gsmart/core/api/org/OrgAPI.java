@@ -126,6 +126,31 @@ public class OrgAPI {
 		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}    
+	
+	@RequestMapping(value = "/getby_listtype",method = RequestMethod.POST)
+	public ResponseEntity<?> getByListType(@RequestBody getorg_by_type_request entity, HttpServletRequest request ) {//@RequestParam("type") 
+		getorg_by_type_response response = new getorg_by_type_response();
+		try {
+			GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			List<String> list  = new ArrayList<String>();
+			String[] arr_id = entity.list_type_id.split(",");
+			for (String string : arr_id) {
+				list.add(string);
+			}
+			List<Org> ls_tosx = orgService.findChildByListType(user.getRootorgid_link(),user.getOrgid_link(),list);
+	    	
+	    	response.data = ls_tosx;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getorg_by_type_response>(response,HttpStatus.OK);
+		}catch (RuntimeException e) {
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(e.getMessage());
+		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}    
+	
 	@RequestMapping(value = "/getOrgByType",method = RequestMethod.POST)
 	public ResponseEntity<?> GetOrgByType(@RequestBody OrgByTypeRequest entity, HttpServletRequest request ) {//@RequestParam("type") 
 		OrgResponse response = new OrgResponse();

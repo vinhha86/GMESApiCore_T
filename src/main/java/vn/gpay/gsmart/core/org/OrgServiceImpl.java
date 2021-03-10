@@ -68,7 +68,7 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 		//return repositoty.findOrgByType(root_orgid,orgid,type);
 		Specification<Org> specification = Specifications.<Org>and()
 	            .eq( "orgrootid_link", orgrootid_link)
-	            .eq("parentid_link", parentid_link)
+	            .eq(parentid_link != 1 ,"parentid_link", parentid_link)
 	            .in(list_typeid.size() > 0,"orgtypeid_link", list_typeid.toArray())
 	            .ge("status", 0)
 	            .build();

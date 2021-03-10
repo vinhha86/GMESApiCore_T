@@ -364,6 +364,11 @@ public class CutPlanAPI {
 			
 			long product_skuid_link = ppbom2skuservice.getskuid_link_by_color_and_size(colorid_link, sizeid_link, productid_link);
 			
+			//tinh so la vai
+
+			int la_vai = 0;
+			List<CutPlan_Size> list_catdu = cutplan_size_Service.getby_porder_matsku_productsku(porderid_link, material_skuid_link, product_skuid_link, CutPlanRowType.catdu, "");
+			
 			List<CutPlan_Size> list_size = cutplan_size_Service.getby_row_and_productsku(orgrootid_link, cutplanrowid_link, product_skuid_link);
 			
 			response.catdu = null;
@@ -383,7 +388,6 @@ public class CutPlanAPI {
 				
 				for (CutPlan_Size cutPlan_Size : listsize_sodo) {
 					CutPlan_Row cut_row = cutplanrowService.findOne(cutPlan_Size.getCutplanrowid_link());
-					int la_vai = cut_row.getLa_vai();
 					sodo += la_vai*(cutPlan_Size.getAmount() == null ? 0 : cutPlan_Size.getAmount());
 				}
 				

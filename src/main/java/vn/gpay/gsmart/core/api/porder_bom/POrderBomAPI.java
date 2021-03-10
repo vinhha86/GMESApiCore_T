@@ -167,6 +167,25 @@ public class POrderBomAPI {
 		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/get_npl_by_type", method = RequestMethod.POST)
+	public ResponseEntity<getnpl_by_type_response> GetNPLByType(HttpServletRequest request,
+			@RequestBody getnpl_by_type_request entity) {
+		getnpl_by_type_response response = new getnpl_by_type_response();
+		try {
+			Long porderid_link = entity.porderid_link;
+			int type_from = entity.type_from;
+			int type_to = entity.type_to;
+					
+			response.data = porderbomproductService.getby_porder_and_type(porderid_link, type_from, type_to);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<getnpl_by_type_response>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/update_porder_bomsku", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UpdateProductBomSKU(HttpServletRequest request,
 			@RequestBody update_porderbom_sku_request entity) {
@@ -381,7 +400,7 @@ public class POrderBomAPI {
 				
 				map.put("product_type", pContractProductBom.getProduct_type()+"");
 				
-				map.put("product_typename", pContractProductBom.getProduct_typeName().toString());
+				map.put("product_typeName", pContractProductBom.getProduct_typeName().toString());
 				
 				map.put("productid_link", pContractProductBom.getProductid_link().toString());
 				

@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import vn.gpay.gsmart.core.cutplan.CutPlan_Size;
 import vn.gpay.gsmart.core.holiday.Holiday;
 import vn.gpay.gsmart.core.holiday.IHolidayService;
 import vn.gpay.gsmart.core.org.IOrgService;
@@ -95,6 +96,9 @@ public class Common  {
 	
 	@Autowired IProductService productService;
 	
+//	public int Tinh_LaVai(CutPlan_Size size_catdu, CutPlan_Size size_sodo) {
+//		
+//	}
 	
 	public Long CreateTask(Long orgrootid_link, Long orgid_link, Long userid_link, long tasktypeid_link, List<Task_Object> list_object, Long userinchargeid_link) {
 		TaskType tasktype = tasktypeService.findOne(tasktypeid_link);

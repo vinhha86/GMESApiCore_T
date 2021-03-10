@@ -55,7 +55,7 @@ public interface CutPlan_Repository extends JpaRepository<CutPlan_Size, Long>, J
 			+ "inner join CutPlan_Size a on a.cutplanrowid_link = c.id "
 			+ " where c.material_skuid_link = :material_skuid_link " 
 			+ "and c.porderid_link = :porderid_link "
-			+ "and a.product_skuid_link = :product_skuid_link "
+			+ "and (a.product_skuid_link = :product_skuid_link or :product_skuid_link is null) "
 			+ "and c.type = :type "
 			+ "and (c.name = :name or '' = :name) ")
 	public List<CutPlan_Size> getby_matsku_and_porder_and_productsku(
