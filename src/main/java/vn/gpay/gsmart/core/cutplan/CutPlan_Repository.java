@@ -57,7 +57,8 @@ public interface CutPlan_Repository extends JpaRepository<CutPlan_Size, Long>, J
 			+ "and c.porderid_link = :porderid_link "
 			+ "and (a.product_skuid_link = :product_skuid_link or :product_skuid_link is null) "
 			+ "and c.type = :type "
-			+ "and (c.name = :name or '' = :name) ")
+			+ "and (c.name = :name or '' = :name) "
+			+ "group by a")
 	public List<CutPlan_Size> getby_matsku_and_porder_and_productsku(
 			@Param("material_skuid_link") final Long material_skuid_link,
 			@Param("porderid_link") final Long porderid_link,

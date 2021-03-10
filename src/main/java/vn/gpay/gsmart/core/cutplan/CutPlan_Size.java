@@ -6,8 +6,14 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 @Table(name="cutplan_size")
 @Entity
@@ -25,6 +31,19 @@ public class CutPlan_Size implements Serializable {
 	private Long product_skuid_link;
 	private Long cutplanrowid_link;
 	private Integer amount;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="cutplanrowid_link",insertable=false,updatable =false)
+    private CutPlan_Row row;
+	
+	@Transient
+	public int getLaVai() {
+		if(row!=null)
+			return row.getLa_vai();
+		return 0;
+	}
+	
 	public Long getId() {
 		return id;
 	}

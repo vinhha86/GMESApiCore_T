@@ -41,6 +41,7 @@ public class CutPlan_Size_Service extends AbstractService<CutPlan_Size> implemen
 	public List<CutPlan_Size> getby_porder_matsku_productsku(Long porderid_link, Long material_skuid_link,
 			Long product_skuid_link, Integer type, String name) {
 		// TODO Auto-generated method stub
+		product_skuid_link = product_skuid_link == 0? null: product_skuid_link;
 		return repo.getby_matsku_and_porder_and_productsku(material_skuid_link, porderid_link, product_skuid_link, type, name);
 	}
 
