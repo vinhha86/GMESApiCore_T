@@ -178,7 +178,7 @@ public class POrder implements Serializable {
 		return "";
 	}
 	@Transient
-	public int getProductivity_po() {
+	public Integer getProductivity_po() {
 		if(pcontract_po!=null)
 			return pcontract_po.getProductivity_byproduct(productid_link);
 		return 0;

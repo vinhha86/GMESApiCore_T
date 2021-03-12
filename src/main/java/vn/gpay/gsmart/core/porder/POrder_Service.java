@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -458,7 +460,9 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 	public List<POrder> getPOrderBySearch(Long buyerid, Long vendorid, Long factoryid, String pobuyer,
 			String stylebuyer, String contractcode, List<Integer> statuses, Long granttoorgid_link, Date golivedatefrom, Date golivedateto) {
 		// TODO Auto-generated method stub
-		return repo.getPOrderBySearch(buyerid, vendorid, factoryid, pobuyer, stylebuyer, contractcode, statuses, granttoorgid_link, golivedatefrom, golivedateto);
+		Page<POrder> page = repo.getPOrderBySearch(buyerid, vendorid, factoryid, pobuyer, stylebuyer, contractcode, statuses, 
+				granttoorgid_link, golivedatefrom, golivedateto, PageRequest.of(0,1000));
+		return page.getContent();
 	}
 	
 	@Override

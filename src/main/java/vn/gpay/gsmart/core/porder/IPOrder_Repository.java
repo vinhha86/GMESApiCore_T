@@ -3,6 +3,8 @@ package vn.gpay.gsmart.core.porder;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -75,7 +77,7 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 	public List<POrder> getPOrderByExactOrdercode(
 			@Param ("ordercode")final String ordercode);
 	
-	@Query(value = "select a from POrder a "
+	@Query(value = "select  a from POrder a "
 			+ "inner join PContract b on a.pcontractid_link = b.id "
 			+ "inner join PContract_PO c on a.pcontract_poid_link = c.id "
 			+ "inner join Product d on a.productid_link = d.id "
@@ -93,7 +95,7 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 			+ "order by a.granttoorgid_link, d.buyercode, a.golivedate "
 //			+ "limit 0,1000 "
 			)
-	public List<POrder> getPOrderBySearch(
+	public Page<POrder> getPOrderBySearch(
 			@Param ("buyerid")final Long buyerid,
 			@Param ("vendorid")final Long vendorid,
 			@Param ("factoryid")final Long factoryid,
@@ -103,7 +105,8 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 			@Param ("statuses")final List<Integer> statuses,
 			@Param ("granttoorgid_link")final Long granttoorgid_link,
 			@Param ("golivedatefrom")final Date golivedatefrom,
-			@Param ("golivedateto")final Date golivedateto
+			@Param ("golivedateto")final Date golivedateto,
+			Pageable pageable
 			);
 	
 	@Query(value = "select a from POrder a "
