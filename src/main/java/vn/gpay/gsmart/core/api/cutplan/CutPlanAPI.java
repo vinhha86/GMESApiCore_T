@@ -431,7 +431,13 @@ public class CutPlanAPI {
 				
 				for (CutPlan_Size cutPlan_Size : listsize_sodo_clone) {
 //					CutPlan_Row cut_row = cutplanrowService.findOne(cutPlan_Size.getCutplanrowid_link());
-					sodo += (cutPlan_Size.getLaVai() == null || cutPlan_Size.getAmount() == null) ? 0 : cutPlan_Size.getLaVai()*cutPlan_Size.getAmount();
+					if(cutPlan_Size.getCutplanrowid_link().equals(cutplanrowid_link)) {
+						sodo += cutPlan_Size.getAmount() == null ? 0 : la_vai*cutPlan_Size.getAmount();
+					}
+					else {
+						sodo += (cutPlan_Size.getLaVai() == null || cutPlan_Size.getAmount() == null) ? 0 : cutPlan_Size.getLaVai()*cutPlan_Size.getAmount();
+					}
+					
 				}
 				
 				CutPlan_Size size_catdu = listsize_catdu_clone.get(0);
