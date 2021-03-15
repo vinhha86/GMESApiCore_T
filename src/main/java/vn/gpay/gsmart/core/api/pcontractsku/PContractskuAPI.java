@@ -23,6 +23,7 @@ import vn.gpay.gsmart.core.pcontractattributevalue.PContractAttributeValue;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKUBinding;
+import vn.gpay.gsmart.core.pcontractproductsku.POLineSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
@@ -56,7 +57,7 @@ public class PContractskuAPI {
 			long porderid_link = entity.porderid_link;
 			POrder porder = porder_Service.findOne(porderid_link);
 			Long parentpo_id_link = porder.getPOParentid_link();
-			List<Object> list = pskuservice.get_totalsku_by_po_parent(parentpo_id_link);
+			List<POLineSKU> list = pskuservice.get_totalsku_by_po_parent(parentpo_id_link);
 //			response.data = pskuservice.get_totalsku_by_po_parent(parentpo_id_link);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
