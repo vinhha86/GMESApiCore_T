@@ -27,6 +27,8 @@ import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
+import vn.gpay.gsmart.core.porder_product_sku.get_sku_by_porder_requets;
+import vn.gpay.gsmart.core.porder_product_sku.get_sku_by_porder_response;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 import vn.gpay.gsmart.core.sku.SKU_Attribute_Value;
@@ -45,6 +47,27 @@ public class PContractskuAPI {
 	@Autowired Common commonService;
 	@Autowired IPContract_POService poService;
 	@Autowired IPOrderGrant_SKUService porderGrantSkuService;
+	
+	@RequestMapping(value = "/getbyporder",method = RequestMethod.POST)
+	public ResponseEntity<get_sku_by_porder_response> GetByPOrder
+	(HttpServletRequest request, @RequestBody get_sku_by_porder_requets entity ) {
+		get_sku_by_porder_response response = new get_sku_by_porder_response();
+		try {
+			long porderid_link = entity.porderid_link;
+			POrder porder = porder_Service.findOne(porderid_link);
+			Long parentpo_id_link = porder.getPOParentid_link();
+			List<Object> list = pskuservice.get_totalsku_by_po_parent(parentpo_id_link);
+//			response.data = pskuservice.get_totalsku_by_po_parent(parentpo_id_link);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		}
+		catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		
+		return new ResponseEntity<get_sku_by_porder_response>(response, HttpStatus.OK);
+	}
 	
 	@RequestMapping(value = "/getbypcontract_product",method = RequestMethod.POST)
 	public ResponseEntity<PContractSKU_getbyproduct_response> SKU_GetbyProduct

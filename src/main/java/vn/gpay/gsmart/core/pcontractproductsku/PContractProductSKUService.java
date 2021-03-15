@@ -165,4 +165,9 @@ public class PContractProductSKUService extends AbstractService<PContractProduct
 		// TODO Auto-generated method stub
 		return repo.getPContractProductSKU_bycolorid_link(productid_link, pcontractid_link, colorid_link);
 	}
+	@Override
+	public List<Object> get_totalsku_by_po_parent(Long parentpo_id_link) {
+		// TODO Auto-generated method stub
+		return repo.getTotalSKU_by_poparent(parentpo_id_link);
+	}
 }

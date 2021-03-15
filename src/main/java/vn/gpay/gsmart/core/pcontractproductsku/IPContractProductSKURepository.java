@@ -112,4 +112,13 @@ public interface IPContractProductSKURepository extends JpaRepository<PContractP
 	public List<PContractProductSKU> getBySkuAndPcontractPo(
 			@Param ("skuid_link")final  long skuid_link,
 			@Param ("pcontract_poid_link")final  long pcontract_poid_link);
+	
+	@Query(value = "select c.pcontractid_link, c.productid_link, c.skuid_link, sum(c.pquantity_sample) as pquantity_sample, "
+			+ "sum(c.pquantity_porder) as pquantity_porder, sum(c.pquantity_total) as pquantity_total "
+			+ "from PContractProductSKU c "
+			+ "inner join PContract_PO a on .a.id = c.pcontract_poid_link "
+			+ "where a.parentpoid_link = :po_parentid_link "
+			+ "group by c.pcontractid_link, c.productid_link, c.skuid_link")
+	public List<Object> getTotalSKU_by_poparent(
+			@Param ("po_parentid_link")final  long po_parentid_link);
 }

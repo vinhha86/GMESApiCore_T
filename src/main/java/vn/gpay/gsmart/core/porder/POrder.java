@@ -136,6 +136,12 @@ public class POrder implements Serializable {
     private List<POrderGrant> list_pordergrant = new ArrayList<POrderGrant>();
 	
 	@Transient
+	public Long getPOParentid_link() {
+		if(pcontract_po!=null)
+			return pcontract_po.getParentpoid_link();
+		return null;
+	}
+	@Transient
 	public String getPortTo() {
 		if(pcontract_po!=null)
 			return pcontract_po.getPortTo();
