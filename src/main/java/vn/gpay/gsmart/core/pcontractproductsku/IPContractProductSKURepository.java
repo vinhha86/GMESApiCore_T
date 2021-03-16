@@ -122,5 +122,5 @@ public interface IPContractProductSKURepository extends JpaRepository<PContractP
 			+ "where a.parentpoid_link = :po_parentid_link "
 			+ "group by c.pcontractid_link, c.productid_link, c.skuid_link", nativeQuery = true)
 	public List<POLineSKU> getTotalSKU_by_poparent(
-			@Param ("po_parentid_link")final  long po_parentid_link);
+			@Param ("po_parentid_link")final  Long po_parentid_link);
 }

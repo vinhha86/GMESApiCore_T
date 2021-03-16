@@ -148,7 +148,7 @@ public class POrder implements Serializable {
 		return "";
 	}
 	@Transient
-	public int getProductType() {
+	public Integer getProductType() {
 		if(product!=null)
 			return product.getProducttypeid_link();
 		return 0;
@@ -253,7 +253,7 @@ public class POrder implements Serializable {
 	}	
 	
 	@Transient
-	public int getTotal_process() {
+	public Integer getTotal_process() {
 		int total = 0;
 		for(POrderProcessing process : list_process) {
 			total += process.getAmountinput() == null ? 0: process.getAmountinput();
