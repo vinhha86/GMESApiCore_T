@@ -48,6 +48,15 @@ public class POrderGrant_SKU implements Serializable {
     @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
     private PContract_PO pcontractPo;
     
+    @NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="pordergrantid_link",insertable=false,updatable =false)
+    private POrderGrant porder_grant;
+    
+    @Transient
+    public Long getPorderid_link() {
+    	return porder_grant.getPorderid_link();
+    }
     @Transient
 	public String getPcontractPo_PoBuyer() {
 		if(pcontractPo!=null) {

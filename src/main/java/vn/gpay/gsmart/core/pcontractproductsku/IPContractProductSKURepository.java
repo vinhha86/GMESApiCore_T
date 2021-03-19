@@ -45,11 +45,36 @@ public interface IPContractProductSKURepository extends JpaRepository<PContractP
 	public List<PContractProductSKU> getlistsku_bypo(
 			@Param ("pcontract_poid_link")final  long pcontract_poid_link);
 	
-	@Query(value = "select c.productid_link, c.skuid_link, sum(c.pquantity_total) as pquantity_total from PContractProductSKU c "
-			+ "where c.pcontract_poid_link in (select a.id from PContract_PO a where parentpoid_link = :pcontract_poid_link) "
+	@Query(value = "select c.productid_link, c.skuid_link, "
+			+ "sum(c.pquantity_total) as pquantity_total, "
+			+ "sum(c.pquantity_production) as pquantity_production, "
+			+ "sum(c.pquantity_sample) as pquantity_sample "
+			+ "from PContractProductSKU c "
+			+ "inner join PContract_PO a on a.id = c.pcontract_poid_link "
+			+ "where a.parentpoid_link = :pcontract_poid_link "
 			+ "group by c.productid_link, c.skuid_link")
 	public List<Object[]> getsumsku_bypo_parent(
-			@Param ("pcontract_poid_link")final  long pcontract_poid_link);
+			@Param ("pcontract_poid_link")final  Long pcontract_poid_link);
+	
+	@Query(value = "select c.productid_link, c.skuid_link, "
+			+ "sum(c.pquantity_total) as pquantity_total, "
+			+ "(select sum(b.pquantity_total) "
+				+ "from POrder_Product_SKU b "
+				+ "inner join POrder d on d.id= b.porderid_link "
+				+ "inner join PContract_PO e on e.id = d.pcontract_poid_link "
+				+ "where b.productid_link = :productid_link "
+				+ "and b.skuid_link = c.skuid_link "
+				+ "and e.parentpoid_link = :pcontract_poid_link) as pquantity_granted, "
+			+ "sum(c.pquantity_production) as pquantity_production, "
+			+ "sum(c.pquantity_sample) as pquantity_sample "
+			+ "from PContractProductSKU c "
+			+ "inner join PContract_PO a on a.id = c.pcontract_poid_link "
+			+ "where a.parentpoid_link = :pcontract_poid_link and c.productid_link = :productid_link "
+			+ "group by c.productid_link, c.skuid_link")
+	public List<Object[]> getsumsku_bypo_parent_and_product(
+			@Param ("pcontract_poid_link")final  Long pcontract_poid_link,
+			@Param ("productid_link")final  Long productid_link);
+	
 	
 	@Query(value = "select c from PContractProductSKU c "
 			+ "where pcontract_poid_link = :pcontract_poid_link "
@@ -113,14 +138,4 @@ public interface IPContractProductSKURepository extends JpaRepository<PContractP
 			@Param ("skuid_link")final  long skuid_link,
 			@Param ("pcontract_poid_link")final  long pcontract_poid_link);
 	
-	@Query(value = "select c.pcontractid_link, c.productid_link, c.skuid_link, "
-			+ "sum(c.pquantity_sample) as pquantity_sample, "
-			+ "sum(c.pquantity_porder) as pquantity_porder, "
-			+ "sum(c.pquantity_total) as pquantity_total "
-			+ "from PContractProductSKU c "
-			+ "inner join PContract_PO a on a.id = c.pcontract_poid_link "
-			+ "where a.parentpoid_link = :po_parentid_link "
-			+ "group by c.pcontractid_link, c.productid_link, c.skuid_link", nativeQuery = true)
-	public List<POLineSKU> getTotalSKU_by_poparent(
-			@Param ("po_parentid_link")final  Long po_parentid_link);
 }

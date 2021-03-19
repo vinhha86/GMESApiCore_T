@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public interface IPOrderGrant_SKURepository extends JpaRepository<POrderGrant_SKU, Long>, JpaSpecificationExecutor<POrderGrant_SKU>{
 	@Query(value = "select a from POrderGrant_SKU a where a.pordergrantid_link = :pordergrantid_link "
-			+ "and a.pcontract_poid_link is not null "
 			)
 	public List<POrderGrant_SKU>getPOrderGrant_SKU(@Param ("pordergrantid_link")final Long pordergrantid_link);
 	
@@ -46,7 +45,7 @@ public interface IPOrderGrant_SKURepository extends JpaRepository<POrderGrant_SK
 	
 	@Query(value = "select a from POrderGrant_SKU a where a.skuid_link = :skuid_link " 
 			+ "and a.pordergrantid_link = :pordergrantid_link "
-			+ "and a.pcontract_poid_link = :pcontract_poid_link "
+			+ "and (a.pcontract_poid_link = :pcontract_poid_link or :pcontract_poid_link is null)"
 			)
 	public POrderGrant_SKU getPOrderGrant_SKUbySKUAndGrantAndPcontractPo(
 			@Param ("skuid_link")final Long skuid_link, 
@@ -55,7 +54,7 @@ public interface IPOrderGrant_SKURepository extends JpaRepository<POrderGrant_SK
 			);
 	
 	@Query(value = "select a from POrderGrant_SKU a "
-		+ "where a.pcontract_poid_link = :pcontract_poid_link "
+		+ "where (a.pcontract_poid_link = :pcontract_poid_link or :pcontract_poid_link is null) "
 		+ "and a.skuid_link = :skuid_link "
 		)
 	public List<POrderGrant_SKU>getByPContractPOAndSKU(

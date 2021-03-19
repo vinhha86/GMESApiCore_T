@@ -50,6 +50,10 @@ public class POrder_Product_SKU implements Serializable {
     private SKU sku;
 	
 	@Transient
+	public Integer getpquantity_ungranted() {
+		return pquantity_total - pquantity_granted;
+	}
+	@Transient
 	public int getSort_size() {
 		if(sku!=null)
 			return sku.getSort_size();

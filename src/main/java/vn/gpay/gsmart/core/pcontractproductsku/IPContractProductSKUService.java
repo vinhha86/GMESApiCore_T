@@ -35,6 +35,5 @@ public interface IPContractProductSKUService extends Operations<PContractProduct
 	public List<PContractProductSKU> getBySkuAndPcontractPo(Long skuid_link, Long pcontract_poid_link);
 
 	List<PContractProductSKU> getsumsku_bypo_parent(Long pcontract_poid_link);
-	
-	List<POLineSKU> get_totalsku_by_po_parent(Long parentpo_id_link);
+	List<POLineSKU> gettotalsku_bypo_parent_and_product(Long pcontract_poid_link, Long productid_link);
 }

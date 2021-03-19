@@ -12,12 +12,16 @@ import vn.gpay.gsmart.core.base.AbstractService;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
+import vn.gpay.gsmart.core.sku.ISKU_Repository;
+import vn.gpay.gsmart.core.sku.SKU;
 
 
 @Service
 public class PContractProductSKUService extends AbstractService<PContractProductSKU> implements IPContractProductSKUService {
 	@Autowired IPContractProductSKURepository repo;
 	@Autowired IPOrder_Service porder_Service;
+	@Autowired ISKU_Repository sku_repo;
+	
 	@Override
 	protected JpaRepository<PContractProductSKU, Long> getRepository() {
 		// TODO Auto-generated method stub
@@ -166,8 +170,26 @@ public class PContractProductSKUService extends AbstractService<PContractProduct
 		return repo.getPContractProductSKU_bycolorid_link(productid_link, pcontractid_link, colorid_link);
 	}
 	@Override
-	public List<POLineSKU> get_totalsku_by_po_parent(Long parentpo_id_link) {
+	public List<POLineSKU> gettotalsku_bypo_parent_and_product(Long pcontract_poid_link, Long productid_link) {
 		// TODO Auto-generated method stub
-		return repo.getTotalSKU_by_poparent(parentpo_id_link);
+		List<Object[]> a = repo.getsumsku_bypo_parent_and_product(pcontract_poid_link, productid_link);
+		List<POLineSKU> ls_SKU_SUM = new ArrayList<POLineSKU>();
+		for (Object[] sku_sum:a){
+			POLineSKU theSKU_SUM = new POLineSKU();
+			theSKU_SUM.setProductid_link(Long.valueOf(sku_sum[0].toString()));
+			theSKU_SUM.setSkuid_link(Long.valueOf(sku_sum[1].toString()));
+			theSKU_SUM.setPquantity_granted(Integer.valueOf(sku_sum[3] == null ? "0" : sku_sum[3].toString()));
+			theSKU_SUM.setPquantity_production(Integer.valueOf(sku_sum[4] == null ? "0" : sku_sum[4].toString()));
+			theSKU_SUM.setPquantity_sample(Integer.valueOf(sku_sum[5] == null ? "0" : sku_sum[5].toString()));
+			theSKU_SUM.setPquantity_ungranted(theSKU_SUM.getPquantity_production() + theSKU_SUM.getPquantity_sample() - theSKU_SUM.getPquantity_granted());
+			SKU sku = sku_repo.getOne(theSKU_SUM.getSkuid_link());
+			theSKU_SUM.setCoSanPham(sku.getSize_name());
+			theSKU_SUM.setMauSanPham(sku.getColor_name());
+			
+			if(theSKU_SUM.getPquantity_ungranted() > 0)
+				ls_SKU_SUM.add(theSKU_SUM);
+			
+		}
+		return ls_SKU_SUM;
 	}
 }
