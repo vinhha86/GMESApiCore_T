@@ -144,6 +144,59 @@ public class BalanceAPI {
 			return new ResponseEntity<Balance_Response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}	
+	@RequestMapping(value = "/cal_balance_byporder", method = RequestMethod.POST)
+	public ResponseEntity<Balance_Response> cal_balance_byporder(HttpServletRequest request,
+			@RequestBody Balance_Request entity) {
+//		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Balance_Response response = new Balance_Response();
+		try {
+			//Check if PO exist
+			PContract_PO thePO = pcontract_POService.findOne(entity.pcontract_poid_link);
+			if (null!=thePO){
+				//1. Lay danh sach Product, Color va SL yeu cau SX theo PO 
+				//(Neu la PO cha thi lay tong yeu cau cua cac PO con)
+				List<Balance_Product_Data> ls_Product = get_BalanceProduct_List(entity.pcontract_poid_link);
+				if (null!=ls_Product){
+					//2. Lay tong hop BOM theo PContractid_link, Productid_link, Colorid_link
+					List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
+					for(Balance_Product_Data theProduct:ls_Product){
+						cal_demand(ls_SKUBalance, thePO.getPcontractid_link(), theProduct.productid_link,theProduct.colorid_link, theProduct.amount);
+					}
+		
+					//3. Tinh toan can doi cho tung nguyen phu lieu trong BOM
+					CountDownLatch latch = new CountDownLatch(ls_SKUBalance.size());
+					for(SKUBalance_Data mat_sku:ls_SKUBalance){
+						Balance_SKU theBalance =  new Balance_SKU(
+								ls_SKUBalance,
+								thePO.getPcontractid_link(),
+								thePO.getId(),
+								mat_sku,
+								request.getHeader("Authorization"),
+								latch);
+						theBalance.start();
+					}
+					latch.await();
+		            response.data = ls_SKUBalance;
+		            response.product_data = ls_Product;
+					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+					return new ResponseEntity<Balance_Response>(response, HttpStatus.OK);
+				} else {
+					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+					response.setMessage("Chưa khai báo chi tiết màu cỡ");
+					return new ResponseEntity<Balance_Response>(response, HttpStatus.BAD_REQUEST);
+				}
+			} else {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage("PO Không tồn tại");
+				return new ResponseEntity<Balance_Response>(response, HttpStatus.BAD_REQUEST);
+			}
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<Balance_Response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}	
 	@RequestMapping(value = "/get_material_bypcontract", method = RequestMethod.POST)
 	public ResponseEntity<Balance_Response> get_material_bypcontract(HttpServletRequest request,
 			@RequestBody Balance_Request entity) {
