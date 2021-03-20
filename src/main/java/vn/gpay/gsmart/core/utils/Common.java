@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import vn.gpay.gsmart.core.cutplan.CutPlan_Size;
 import vn.gpay.gsmart.core.holiday.Holiday;
 import vn.gpay.gsmart.core.holiday.IHolidayService;
 import vn.gpay.gsmart.core.org.IOrgService;

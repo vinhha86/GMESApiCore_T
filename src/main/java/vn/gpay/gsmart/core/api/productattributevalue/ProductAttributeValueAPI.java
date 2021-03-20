@@ -94,6 +94,12 @@ public class ProductAttributeValueAPI {
 					lstco = pavService.getList_byAttId(AtributeFixValues.ATTR_SIZEWIDTH, entity.productid_link);
 				}
 			}
+			else if(product.getProducttypeid_link() >= 50 && product.getProducttypeid_link() < 60) {
+				if (entity.attributeid_link == AtributeFixValues.ATTR_COLOR || entity.attributeid_link == AtributeFixValues.ATTR_TEX) {
+					lstmau = pavService.getList_byAttId(AtributeFixValues.ATTR_COLOR, entity.productid_link);
+					lstco = pavService.getList_byAttId(AtributeFixValues.ATTR_TEX, entity.productid_link);
+				}
+			}
 
 			for (ProductAttributeValue pavMau : lstmau) {
 				for (ProductAttributeValue pavCo : lstco) {

@@ -6,7 +6,7 @@ public class AtributeFixValues {
     public static long ATTR_SIZE    	= 30; //cỡ sản phẩm
     public static long ATTR_SIZEWIDTH   = 36; //cỡ khổ nguyên liệu
     public static long ATTR_FABRIC    	= 37; //thành phần vải
-    
+    public static long ATTR_TEX			= 42; //Tex chi
     public static int orgtype_factory = 13;
     
     public static long value_color_all = 148;
