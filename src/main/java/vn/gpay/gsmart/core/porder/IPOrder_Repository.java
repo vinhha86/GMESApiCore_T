@@ -51,9 +51,10 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 	public Integer getMaxPriority();
 	
 	@Query(value = "select c from POrder c "
+			+ "inner join PContract_PO a on c.pcontract_poid_link = a.id "
 			+ "where c.orgrootid_link = :orgrootid_link "
-			+ "and ordercode = :ordercode "
-			+ "and status <> -1")
+			+ "and lower(a.po_buyer) like lower(concat('%',:ordercode,'%')) "
+			+ "and c.status <> -1")
 	public List<POrder> get_by_code(@Param ("orgrootid_link")final  Long orgrootid_link,
 			@Param ("ordercode")final  String ordercode);
 	

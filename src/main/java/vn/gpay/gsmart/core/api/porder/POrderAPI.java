@@ -1030,54 +1030,59 @@ public class POrderAPI {
 			long orgrootid_link = user.getRootorgid_link();
 			String ordercode = entity.ordercode;
 			List<StockInD> list = new ArrayList<StockInD>();
+			List<POrder> list_porder = porderService.get_by_code(ordercode, orgrootid_link);
+			if(list_porder.size() == 1) {
+				POrder porder = porderService.get_by_code(ordercode, orgrootid_link).get(0);
+				Long porderid_link = porder.getId();
 
-			POrder porder = porderService.get_by_code(ordercode, orgrootid_link).get(0);
-			Long porderid_link = porder.getId();
+				// get SKU within porder
+				List<POrder_Product_SKU> list_sku = porderskuService.getlist_sku_in_porder(orgrootid_link, porderid_link);
+				// get product within porder
+				List<POrder_Product> list_product = porderproductService.get_product_inporder(orgrootid_link,
+						porderid_link);
 
-			// get SKU within porder
-			List<POrder_Product_SKU> list_sku = porderskuService.getlist_sku_in_porder(orgrootid_link, porderid_link);
-			// get product within porder
-			List<POrder_Product> list_product = porderproductService.get_product_inporder(orgrootid_link,
-					porderid_link);
+				for (POrder_Product_SKU porder_sku : list_sku) {
+					Float unitprice = (float) 0;
+					SKU sku = skuService.findOne(porder_sku.getSkuid_link());
+					Unit unit = unitService.findOne(porder_sku.getUnitid_link());
+					Attributevalue attMau = attValService.findOne(porder_sku.getColorid_link());
+					Attributevalue attCo = attValService.findOne(porder_sku.getSizeid_link());
 
-			for (POrder_Product_SKU porder_sku : list_sku) {
-				Float unitprice = (float) 0;
-				SKU sku = skuService.findOne(porder_sku.getSkuid_link());
-				Unit unit = unitService.findOne(porder_sku.getUnitid_link());
-				Attributevalue attMau = attValService.findOne(porder_sku.getColorid_link());
-				Attributevalue attCo = attValService.findOne(porder_sku.getSizeid_link());
-
-				for (POrder_Product obj : list_product) {
-					if (obj.getProductid_link().equals(porder_sku.getProductid_link())) {
-						unitprice = Float.parseFloat("0"+obj.getEmt());
+					for (POrder_Product obj : list_product) {
+						if (obj.getProductid_link().equals(porder_sku.getProductid_link())) {
+							unitprice = Float.parseFloat("0"+obj.getEmt());
+						}
 					}
+
+					StockInD stockind = new StockInD();
+					stockind.setColorid_link(porder_sku.getColorid_link());
+					stockind.setId(null);
+					stockind.setOrgrootid_link(orgrootid_link);
+					stockind.setSizeid_link(porder_sku.getSizeid_link());
+					stockind.setSkucode(porder_sku.getSkucode());
+					stockind.setSkuid_link(porder_sku.getSkuid_link());
+					stockind.setSkutypeid_link(porder_sku.getSkutypeid_link());
+					stockind.setStockinid_link(null);
+					stockind.setTimecreate(new Date());
+					stockind.setTotalpackage(0);
+					stockind.setTotalpackage_order(porder_sku.getPquantity_total());
+					stockind.setUnitid_link(porder_sku.getUnitid_link());
+					stockind.setUsercreateid_link(user.getId());
+					stockind.setUnitprice(unitprice);
+					stockind.setSku(sku);
+					stockind.setUnit(unit);
+					stockind.setPorder_year(porder_sku.getPorder_year());
+					stockind.setAttMau(attMau);
+					stockind.setAttCo(attCo);
+
+					list.add(stockind);
 				}
 
-				StockInD stockind = new StockInD();
-				stockind.setColorid_link(porder_sku.getColorid_link());
-				stockind.setId(null);
-				stockind.setOrgrootid_link(orgrootid_link);
-				stockind.setSizeid_link(porder_sku.getSizeid_link());
-				stockind.setSkucode(porder_sku.getSkucode());
-				stockind.setSkuid_link(porder_sku.getSkuid_link());
-				stockind.setSkutypeid_link(porder_sku.getSkutypeid_link());
-				stockind.setStockinid_link(null);
-				stockind.setTimecreate(new Date());
-				stockind.setTotalpackage(0);
-				stockind.setTotalpackage_order(porder_sku.getPquantity_total());
-				stockind.setUnitid_link(porder_sku.getUnitid_link());
-				stockind.setUsercreateid_link(user.getId());
-				stockind.setUnitprice(unitprice);
-				stockind.setSku(sku);
-				stockind.setUnit(unit);
-				stockind.setPorder_year(porder_sku.getPorder_year());
-				stockind.setAttMau(attMau);
-				stockind.setAttCo(attCo);
-
-				list.add(stockind);
+				response.data = list;
 			}
-
-			response.data = list;
+			
+			response.size = list_porder.size();
+			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 		} catch (Exception e) {
