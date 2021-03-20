@@ -83,6 +83,7 @@ public class ProductAPI {
 				bind.setId(product.getId());
 				bind.setPartnercode(product.getPartnercode());
 				bind.setName(product.getName());
+				bind.setProduct_type(product.getProducttypeid_link());
 				
 				String FolderPath = commonService.getFolderPath(product.getProducttypeid_link());
 				String uploadRootPath = request.getServletContext().getRealPath("");

@@ -164,7 +164,11 @@ public class SKU implements Serializable {
 			else if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) {
 				name = sku_Attribute_Value.getAttributeValueName();
 				break;
-			}			
+			}	
+			else if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_TEX) {
+				name = sku_Attribute_Value.getAttributeValueName();
+				break;
+			}
 		}
     	return name;
     }      
@@ -212,6 +216,10 @@ public class SKU implements Serializable {
 				break;
 			}
 			else if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) {
+				name = sku_Attribute_Value.getAttributeValueName();
+				break;
+			}
+			else if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_TEX) {
 				name = sku_Attribute_Value.getAttributeValueName();
 				break;
 			}
