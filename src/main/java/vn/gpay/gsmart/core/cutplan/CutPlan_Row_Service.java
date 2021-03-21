@@ -132,5 +132,10 @@ public class CutPlan_Row_Service extends AbstractService<CutPlan_Row> implements
 		
 		return true;
 	}
+	@Override
+	public List<CutPlan_Row> findByPOrder(Long porderid_link) {
+		// TODO Auto-generated method stub
+		return repo.findByPOrder(porderid_link);
+	}
 
 }

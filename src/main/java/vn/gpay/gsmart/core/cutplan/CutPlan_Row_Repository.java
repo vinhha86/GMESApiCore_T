@@ -41,4 +41,10 @@ public interface CutPlan_Row_Repository extends JpaRepository<CutPlan_Row, Long>
 			@Param("product_skuid_link") final Long product_skuid_link,
 			@Param("type") final Integer type,
 			@Param("name") final String name);
+	
+	@Query(value = "select c from CutPlan_Row c "
+			+ " where c.porderid_link = :porderid_link "
+			+ "order by c.id")
+	public List<CutPlan_Row> findByPOrder(
+			@Param("porderid_link") final Long porderid_link);
 }

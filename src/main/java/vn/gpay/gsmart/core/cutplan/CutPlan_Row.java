@@ -4,11 +4,20 @@ import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.porder.POrder;
 
 @Table(name="cutplan_row")
 @Entity
@@ -35,6 +44,21 @@ public class CutPlan_Row implements Serializable {
 	private Long porderid_link;
 	private Long createduserid_link;	
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(optional = false,fetch = FetchType.LAZY)
+    @JoinColumn(name="porderid_link",insertable=false,updatable =false)
+	private POrder porder;
+	
+	@Transient
+	public String getPordercode() {
+		if(porder != null) {
+			if(porder.getOrdercode() != null) {
+				return porder.getOrdercode();
+			}
+			return "porder.getOrdercode() null";
+		}
+		return "porder null";
+	}
 	
 	public Long getCreateduserid_link() {
 		return createduserid_link;
