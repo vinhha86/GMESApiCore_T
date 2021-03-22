@@ -303,7 +303,9 @@ public class BalanceAPI {
 				if (null!=theSKUBalance){
 					//Tinh tong dinh muc
 //					theSKUBalance.setMat_sku_bom_amount(theSKUBalance.getMat_sku_bom_amount() + amount_color);
-					theSKUBalance.setMat_sku_demand(theSKUBalance.getMat_sku_demand() + amount_color*p_amount);
+					Float f_skudemand =amount_color*p_amount;
+					Float f_lost = (f_skudemand*lostratio)/100;
+					theSKUBalance.setMat_sku_demand(theSKUBalance.getMat_sku_demand() + f_skudemand + f_lost);
 				} else {
 					SKUBalance_Data newSKUBalance = new SKUBalance_Data();
 					newSKUBalance.setMat_skuid_link(materialid_link);
@@ -317,7 +319,10 @@ public class BalanceAPI {
 					
 					newSKUBalance.setMat_sku_bom_lostratio(lostratio);
 					newSKUBalance.setMat_sku_bom_amount(amount_color);
-					newSKUBalance.setMat_sku_demand(amount_color*p_amount);
+					
+					Float f_skudemand =amount_color*p_amount;
+					Float f_lost = (f_skudemand*lostratio)/100;
+					newSKUBalance.setMat_sku_demand(f_skudemand + f_lost);
 					
 					ls_SKUBalance.add(newSKUBalance);
 				}

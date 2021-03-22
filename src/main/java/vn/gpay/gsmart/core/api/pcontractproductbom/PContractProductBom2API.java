@@ -509,7 +509,7 @@ public class PContractProductBom2API {
 				
 				Float amount_color = (float) 0;
 				if(listbomcolorclone.size() > 0)
-					amount_color = listbomcolorclone.get(0).getAmount();
+					amount_color = null!=listbomcolorclone.get(0).getAmount()?listbomcolorclone.get(0).getAmount():0;
 				
 				map.put("amount", "0"+pContractProductBom.getAmount());
 				
