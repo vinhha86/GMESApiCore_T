@@ -18,6 +18,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.sku.SKU;
 
 @Table(name="cutplan_row")
 @Entity
@@ -45,7 +46,23 @@ public class CutPlan_Row implements Serializable {
 	private Long createduserid_link;	
 	
 	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(optional = false,fetch = FetchType.LAZY)
+	@ManyToOne //(optional = false,fetch = FetchType.LAZY)
+    @JoinColumn(name="material_skuid_link",insertable=false,updatable =false)
+	private SKU sku;
+	
+	@Transient
+	public String getMaSP() {
+		if(sku != null) {
+			if(sku.getCode() != null) {
+				return sku.getCode();
+			}
+			return "sku.getCode() null";
+		}
+		return "sku null";
+	}
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne //(optional = false,fetch = FetchType.LAZY)
     @JoinColumn(name="porderid_link",insertable=false,updatable =false)
 	private POrder porder;
 	

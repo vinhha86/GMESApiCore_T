@@ -64,9 +64,18 @@ public class CutplanProcessing implements Serializable {
 	private List<CutplanProcessingD> cutplanProcessingD = new ArrayList<CutplanProcessingD>();
 	
 	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(optional = false,fetch = FetchType.LAZY)
+	@ManyToOne
     @JoinColumn(name="cutplanrowid_link",insertable=false,updatable =false)
 	private CutPlan_Row cutPlanRow;
+	
+	@Transient
+	public String getMaSP() {
+		if(cutPlanRow != null) {
+			return cutPlanRow.getMaSP();
+		}
+		return "cutPlanRow null";
+	}
+	
 	
 	@Transient
 	public String getPordercode() {
