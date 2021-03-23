@@ -248,16 +248,28 @@ public class PContract_PO implements Serializable {/**
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
+    @JoinColumn(name="portfromid_link",insertable=false,updatable =false)
+    private Port port_from;
+		
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
     @JoinColumn(name="pcontractid_link",insertable=false,updatable =false)
     private PContract pcontract;
-
-
+	
 	@Transient 
 	public String getPortTo() {
 		if(port_to!=null)
 			return port_to.getCode();
 		return "";
 	}
+	
+	@Transient 
+	public String getPortFrom() {
+		if(port_from!=null)
+			return port_from.getCode();
+		return "";
+	}
+	
 	@Transient
 	public String getShipMode() {
 		if(shipmode != null)

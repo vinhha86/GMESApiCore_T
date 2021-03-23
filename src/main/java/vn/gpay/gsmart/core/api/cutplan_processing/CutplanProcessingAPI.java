@@ -1,12 +1,12 @@
 package vn.gpay.gsmart.core.api.cutplan_processing;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,10 +25,7 @@ import vn.gpay.gsmart.core.cutplan_processing.CutplanProcessingD;
 import vn.gpay.gsmart.core.cutplan_processing.ICutplanProcessingDService;
 import vn.gpay.gsmart.core.cutplan_processing.ICutplanProcessingService;
 import vn.gpay.gsmart.core.org.IOrgService;
-import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.security.GpayAuthentication;
-import vn.gpay.gsmart.core.security.GpayUser;
-import vn.gpay.gsmart.core.sku.SKU;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -50,11 +47,11 @@ public class CutplanProcessingAPI {
 				GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
 				if (user != null) {
 					//Nếu thêm mới isNew = true
-					boolean isNew = false;
+//					boolean isNew = false;
 					
 					CutplanProcessing cutplanProcessing =entity.data.get(0);
 				    if(cutplanProcessing.getId()==null || cutplanProcessing.getId()==0) {
-				    	isNew = true;
+//				    	isNew = true;
 				    	cutplanProcessing.setOrgrootid_link(user.getRootorgid_link());
 				    	cutplanProcessing.setUsercreatedid_link(user.getUserId());
 				    	cutplanProcessing.setTimecreated(new Date());
@@ -103,22 +100,24 @@ public class CutplanProcessingAPI {
 		CutplanProcessingListResponse response = new CutplanProcessingListResponse();
 		try {
 //			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			Long orgid_link = user.getOrgid_link();
-			Org userOrg = orgService.findOne(orgid_link);
-			Long userOrgId = userOrg.getId();
-			Integer userOrgType = userOrg.getOrgtypeid_link();
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//			Long orgid_link = user.getOrgid_link();
+//			Org userOrg = orgService.findOne(orgid_link);
+//			Long userOrgId = userOrg.getId();
+//			Integer userOrgType = userOrg.getOrgtypeid_link();
 			
 			if (entity.page == 0) entity.page = 1;
 			if (entity.limit == 0) entity.limit = 100;
 			
 			// 
 			
-			response.data = cutplanProcessingService.findAll();
+			Page<CutplanProcessing> pageToReturn = cutplanProcessingService.cutplanProcessing_page(
+					entity.processingdate_from, entity.processingdate_to, 
+					entity.limit, entity.page);
+			response.data = pageToReturn.getContent();
+			response.totalCount = pageToReturn.getTotalElements();
 			
-			for(CutplanProcessing cutplanProcessing : response.data) {
-				System.out.println("masp " + cutplanProcessing.getMaSP());
-			}
+//			response.data = cutplanProcessingService.findAll();
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -154,11 +153,10 @@ public class CutplanProcessingAPI {
 		CutPlanRow_List_Response response = new CutPlanRow_List_Response();
 		try {
 //			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long porderid_link = entity.porderid_link;
 			
 			// 
-			System.out.println("here");
 			response.data = cutplanRowService.findByPOrder(porderid_link);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

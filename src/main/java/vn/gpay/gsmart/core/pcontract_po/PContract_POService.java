@@ -219,4 +219,11 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 
 		return repo.getPContractBySearch_OrgOnly(po_code, orgs);
 	}
+
+	@Override
+	public List<PContract_PO> getBySearch_andType(String po_code, List<Long> orgs, int po_type) {
+		// TODO Auto-generated method stub
+		orgs = orgs.size() == 0 ? null : orgs;
+		return repo.getBySearch_OrgAndType(po_code, orgs, po_type);
+	}
 }

@@ -245,6 +245,20 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			@Param ("orgs")final List<Long> orgs);
 	
 	@Query(value = "select c from PContract_PO c "
+			+ "inner join PContract_PO parent on c.parentpoid_link = parent.id "
+			+ "inner join PContract_PO plan on plan.parentpoid_link = parent.id "
+			+ "left join POrder_Req b on b.pcontract_poid_link = plan.id "
+			+ "where lower(c.po_buyer) like lower(concat('%',:po_code,'%')) "
+			+ "and (b.granttoorgid_link in :orgs or :orgs is null) "
+			+ "and c.po_typeid_link =:po_type "
+			+ "group by c"
+			)
+	public List<PContract_PO> getBySearch_OrgAndType(
+			@Param ("po_code")final String po_code,
+			@Param ("orgs")final List<Long> orgs,
+			@Param ("po_type")final Integer po_type);
+	
+	@Query(value = "select c from PContract_PO c "
 			+ "left join POrder_Req b on b.pcontract_poid_link = c.id "
 			+ "where (lower(c.po_buyer) like lower(concat('%',:po_code,'%')) or :po_code = '')"
 			)

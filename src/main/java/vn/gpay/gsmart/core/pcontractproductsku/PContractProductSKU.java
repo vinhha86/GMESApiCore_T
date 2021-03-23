@@ -16,6 +16,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.sku.SKU;
 
 @Table(name="pcontract_product_skus")
@@ -48,6 +49,39 @@ public class PContractProductSKU implements Serializable {/**
 	@ManyToOne
     @JoinColumn(name="skuid_link",insertable=false,updatable =false)
     private SKU sku;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="productid_link",insertable=false,updatable =false)
+    private Product product;
+	
+	@Transient
+	public String getProductcode() {
+		if(product!=null)
+			return product.getBuyercode();
+		return "";
+	}
+	
+	@Transient
+	public String getProductname() {
+		if(product!=null)
+			return product.getBuyername();
+		return "";
+	}
+	
+	@Transient
+	public Long getUnitid_link() {
+		if(product!=null)
+			return product.getUnitid_link();
+		return null;
+	}
+	
+	@Transient
+	public String getUnitname() {
+		if(product!=null)
+			return product.getUnitName();
+		return "";
+	}
 	
 	@Transient
 	public String getSkuName() {

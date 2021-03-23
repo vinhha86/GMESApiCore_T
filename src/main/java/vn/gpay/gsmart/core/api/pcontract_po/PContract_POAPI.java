@@ -1947,6 +1947,81 @@ public class PContract_POAPI {
 			return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	@RequestMapping(value = "/getall_bycode", method = RequestMethod.POST)
+	public ResponseEntity<getall_poline_by_code_response> GetAllByCode(
+			@RequestBody getall_poline_by_code_request entity, HttpServletRequest request) {
+		getall_poline_by_code_response response = new getall_poline_by_code_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//			long orgrootid_link = user.getRootorgid_link();
+			long orgid_link = user.getOrgid_link();
+			String po_code = entity.po_buyer;
+			
+			List<Long> list_org = new ArrayList<Long>();
+			if(orgid_link != 0 && orgid_link != 1) {
+				for(GpayUserOrg userorg:userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY)){
+					list_org.add(userorg.getOrgid_link());
+				}
+				//Them chinh don vi cua user
+				if(!list_org.contains(orgid_link))
+					list_org.add(orgid_link);
+			}
+			
+			
+			
+			response.data = pcontract_POService.getBySearch_andType(po_code, list_org, POType.PO_LINE_CONFIRMED);
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getall_poline_by_code_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<getall_poline_by_code_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/getall_sku_byline", method = RequestMethod.POST)
+	public ResponseEntity<get_sku_by_line_response> GetAllSKUByLine(
+			@RequestBody get_sku_by_line_request entity, HttpServletRequest request) {
+		get_sku_by_line_response response = new get_sku_by_line_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long orgrootid_link = user.getRootorgid_link();
+			PContract_PO po_line = pcontract_POService.findOne(entity.pcontract_poid_link);
+			Long pcontractid_link = po_line.getPcontractid_link();
+			
+			Product product = productService.findOne(po_line.getProductid_link());
+			List<Long> list_product = new ArrayList<Long>();
+			
+			if(product.getProducttypeid_link() == ProductType.SKU_TYPE_PRODUCT_PAIR) {
+				Long productpairid_link = product.getId();
+				List<ProductPairing> list_pair = productpairService.getproduct_pairing_detail_bycontract(orgrootid_link, pcontractid_link, productpairid_link);
+				for(ProductPairing pair: list_pair) {
+					list_product.add(pair.getProductid_link());
+				}
+			}
+			else {
+				list_product.add(product.getId());
+			}
+			
+			List<PContractProductSKU> list_sku = new ArrayList<PContractProductSKU>();
+			for(Long productid_link: list_product) {
+				list_sku.addAll(ppskuService.getbypo_and_product(po_line.getId(), productid_link));
+			}
+			
+			response.data = list_sku;
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<get_sku_by_line_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<get_sku_by_line_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 
 	@RequestMapping(value = "/get_productiondate", method = RequestMethod.POST)
 	public ResponseEntity<get_productiondate_response> getProductionDate(@RequestBody get_productiondate_request entity,

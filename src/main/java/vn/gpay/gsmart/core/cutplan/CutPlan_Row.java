@@ -46,7 +46,7 @@ public class CutPlan_Row implements Serializable {
 	private Long createduserid_link;	
 	
 	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne //(optional = false,fetch = FetchType.LAZY)
+	@ManyToOne (optional = false,fetch = FetchType.LAZY)
     @JoinColumn(name="material_skuid_link",insertable=false,updatable =false)
 	private SKU sku;
 	
@@ -75,6 +75,39 @@ public class CutPlan_Row implements Serializable {
 			return "porder.getOrdercode() null";
 		}
 		return "porder null";
+	}
+	
+	@Transient
+	public Long getPorderId() {
+		if(porder != null) {
+			if(porder.getId() != null) {
+				return porder.getId();
+			}
+			return null;
+		}
+		return null;
+	}
+	
+	@Transient
+	public Long getPorderPcontractId() {
+		if(porder != null) {
+			if(porder.getPcontractid_link() != null) {
+				return porder.getPcontractid_link();
+			}
+			return null;
+		}
+		return null;
+	}
+	
+	@Transient
+	public Long getPorderProductId() {
+		if(porder != null) {
+			if(porder.getProductid_link() != null) {
+				return porder.getProductid_link();
+			}
+			return null;
+		}
+		return null;
 	}
 	
 	public Long getCreateduserid_link() {

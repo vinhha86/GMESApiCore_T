@@ -7,4 +7,5 @@ import vn.gpay.gsmart.core.cutplan_processing.CutplanProcessing;
 
 public class CutplanProcessingListResponse extends ResponseBase{
 	public List<CutplanProcessing> data;
+	public Long totalCount;
 }
