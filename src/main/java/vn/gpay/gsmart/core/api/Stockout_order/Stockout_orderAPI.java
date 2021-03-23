@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.api.Stockout_order;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -117,5 +118,29 @@ public class Stockout_orderAPI {
 			response.setMessage(e.getMessage());
 		}
 		return new ResponseEntity<getby_porder_response>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/getStockoutorder", method = RequestMethod.POST)
+	public ResponseEntity<Stockout_order_response> getStockoutorder(HttpServletRequest request,
+			@RequestBody Stockout_order_getBySearch_request entity) {
+		Stockout_order_response response = new Stockout_order_response();
+		try {
+			Date stockoutorderdate_from = entity.stockoutorderdate_from;
+			Date stockoutorderdate_to = entity.stockoutorderdate_to;
+			if (entity.page == 0) entity.page = 1;
+			if (entity.limit == 0) entity.limit = 100;
+			
+			List<Stockout_order> result = stockout_order_Service.findBySearch(stockoutorderdate_from, stockoutorderdate_to);
+			
+			response.data = result;
+			response.totalCount = result.size();
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<Stockout_order_response>(response, HttpStatus.OK);
 	}
 }

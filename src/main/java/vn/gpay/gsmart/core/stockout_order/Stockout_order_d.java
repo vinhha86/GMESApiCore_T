@@ -72,6 +72,22 @@ public class Stockout_order_d implements Serializable {
 	}
 	
 	@Transient
+	public String getSkucode() {
+		if(sku!=null) {
+			return sku.getCode();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getSkuname() {
+		if(sku!=null) {
+			return sku.getName();
+		}
+		return "";
+	}
+	
+	@Transient
 	public String getMaterialName() {
 		if(sku!=null)
 			return sku.getProduct_name();

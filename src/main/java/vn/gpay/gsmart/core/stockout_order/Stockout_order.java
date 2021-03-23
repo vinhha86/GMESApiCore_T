@@ -1,14 +1,18 @@
 package vn.gpay.gsmart.core.stockout_order;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -17,6 +21,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.org.Org;
+import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.security.GpayUser;
 
 @Table(name="stockout_order")
@@ -68,6 +73,17 @@ public class Stockout_order implements Serializable {
     @JoinColumn(name="usercreateid_link",insertable=false,updatable =false)
     private GpayUser usercreate;
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="porderid_link",insertable=false,updatable =false)
+    private POrder porder;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
+	//@BatchSize(size=10)
+	@JoinColumn( name="stockoutorderid_link", referencedColumnName="id")
+	private List<Stockout_order_d>  stockout_order_d  = new ArrayList<Stockout_order_d>();
+	
 	@Transient
 	public String getUsercreate_name() {
 		if(usercreate!=null)
@@ -87,6 +103,13 @@ public class Stockout_order implements Serializable {
 		if(orgTo!=null) 
 			return orgTo.getName();
 		return "";
+	}
+	
+	@Transient
+	public Long getPcontractid_link() {
+		if(porder!=null) 
+			return porder.getPcontractid_link();
+		return null;
 	}
 	
 	public Long getId() {
@@ -220,6 +243,14 @@ public class Stockout_order implements Serializable {
 	}
 	public void setOrgrootid_link(Long orgrootid_link) {
 		this.orgrootid_link = orgrootid_link;
+	}
+
+	public List<Stockout_order_d> getStockout_order_d() {
+		return stockout_order_d;
+	}
+
+	public void setStockout_order_d(List<Stockout_order_d> stockout_order_d) {
+		this.stockout_order_d = stockout_order_d;
 	}
 	
 	
