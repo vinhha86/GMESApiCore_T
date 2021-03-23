@@ -1,7 +1,6 @@
 package vn.gpay.gsmart.core.porder_req;
 
 import java.io.Serializable;
-import java.text.DecimalFormat;
 import java.util.Date;
 
 import javax.persistence.Entity;

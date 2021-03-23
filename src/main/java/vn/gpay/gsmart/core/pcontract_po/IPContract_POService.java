@@ -33,6 +33,7 @@ public interface IPContract_POService extends Operations<PContract_PO> {
 	List<PContract_PO> check_exist_PONo(String PO_No,Long pcontractid_link);
 
 	List<PContract_PO> getBySearch(String po_code, List<Long> orgs);
+	List<PContract_PO> getBySearch_andType(String po_code, List<Long> orgs, int po_type);
 	List<Long> getpcontract_BySearch(String po_code, List<Long> orgs);
 	List<PContract_POBinding> getForMarketTypeChart();
 	

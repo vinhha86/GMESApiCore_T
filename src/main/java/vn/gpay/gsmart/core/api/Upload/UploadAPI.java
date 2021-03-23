@@ -158,7 +158,9 @@ public class UploadAPI {
 						STT = STT.equals("0") ? "" : STT;
 						
 						while (!STT.equals("")) {
-							
+							if(rowNum ==3) {
+								String a = "";
+							}
 							//Lay thong tin PO kiem tra xem PO da ton tai trong he thong hay chua
 							//Neu la san pham don chiec thi kiem tra masp, ngay giao, vendor target
 							//Neu la san pham bo thi kiem tra masp bo, ngay giao
