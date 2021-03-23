@@ -8,7 +8,6 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -58,6 +57,12 @@ public class CutplanProcessing implements Serializable {
 	@Column(name = "timecreated")
 	private Date timecreated;
 	
+	@Column(name = "colorid_link")
+	private Long colorid_link;
+	
+	@Column(name = "material_skuid_link")
+	private Long material_skuid_link;
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
 	@JoinColumn( name="cutplan_processingid_link", referencedColumnName="id")
@@ -84,6 +89,32 @@ public class CutplanProcessing implements Serializable {
 		}
 		return "cutPlanRow null";
 	}
+	
+	@Transient
+	public Long getPorderid_link() {
+		if(cutPlanRow != null) {
+			return cutPlanRow.getPorderId();
+		}
+		return null;
+	}
+	
+	@Transient
+	public Long getPcontractid_link() {
+		if(cutPlanRow != null) {
+			return cutPlanRow.getPorderPcontractId();
+		}
+		return null;
+	}
+	
+	@Transient
+	public Long getProductid_link() {
+		if(cutPlanRow != null) {
+			return cutPlanRow.getPorderProductId();
+		}
+		return null;
+	}
+	
+	
 
 	public Long getId() {
 		return id;
@@ -164,5 +195,26 @@ public class CutplanProcessing implements Serializable {
 	public void setCutplanProcessingD(List<CutplanProcessingD> cutplanProcessingD) {
 		this.cutplanProcessingD = cutplanProcessingD;
 	}
+
+
+	public Long getColorid_link() {
+		return colorid_link;
+	}
+
+
+	public void setColorid_link(Long colorid_link) {
+		this.colorid_link = colorid_link;
+	}
+
+
+	public Long getMaterial_skuid_link() {
+		return material_skuid_link;
+	}
+
+
+	public void setMaterial_skuid_link(Long material_skuid_link) {
+		this.material_skuid_link = material_skuid_link;
+	}
+	
 	
 }
