@@ -79,15 +79,15 @@ public class Balance_SKU implements Runnable{
 //            System.out.println(result);
             Jitin_Invoice_Response ls_invoiced = objectMapper.readValue(result, Jitin_Invoice_Response.class);
             if (null != ls_invoiced){
-            	Float yds_invoice = (float) 0;
+            	Float met_invoice = (float) 0;
             	for(Jitin_Invoice_D_Data invoiceD: ls_invoiced.data){
-            		yds_invoice+=invoiceD.getYds();
+            		met_invoice+=invoiceD.getMet();
             		mat_sku.setMat_sku_invoice_date(invoiceD.getInvoice_shipdateto());
             		
             		//Tinh so luong da nhap kho theo Invoice
             		cal_stockin(invoiceD.getInvoiceid_link());
             	}
-            	mat_sku.setMat_sku_invoice(yds_invoice);
+            	mat_sku.setMat_sku_invoice(met_invoice);
             	
             }
 			
@@ -117,11 +117,11 @@ public class Balance_SKU implements Runnable{
 //            System.out.println(result);
             Jitin_StockinList_Response ls_stockind = objectMapper.readValue(result, Jitin_StockinList_Response.class);
             if (null != ls_stockind){
-            	Float yds_stockin = (float) 0;
+            	Float met_stockin = (float) 0;
             	for(Jitin_Stockin_D_Data stockinD: ls_stockind.data){
-            		yds_stockin+=stockinD.getTotalydsorigin();
+            		met_stockin+=stockinD.getTotalmet_check();
             	}
-            	mat_sku.setMat_sku_stockin(yds_stockin);
+            	mat_sku.setMat_sku_stockin(met_stockin);
             	mat_sku.setMat_sku_dif(mat_sku.getMat_sku_stockin() - mat_sku.getMat_sku_demand());
             }
 			

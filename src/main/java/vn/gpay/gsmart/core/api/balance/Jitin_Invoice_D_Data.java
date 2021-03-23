@@ -16,6 +16,7 @@ public class Jitin_Invoice_D_Data implements Serializable {
 	private Float grossweight;
 	private Float foc;
 	private Float m3;
+	private Float met;
 	private Float yds;
 	private Float unitprice;
 	private Float totalamount;
@@ -188,6 +189,14 @@ public class Jitin_Invoice_D_Data implements Serializable {
 
 	public void setInvoice_shipdateto(Date invoice_shipdateto) {
 		this.invoice_shipdateto = invoice_shipdateto;
+	}
+
+	public Float getMet() {
+		return met;
+	}
+
+	public void setMet(Float met) {
+		this.met = met;
 	}
 	
 }

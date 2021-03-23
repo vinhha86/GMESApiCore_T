@@ -43,6 +43,7 @@ public class Jitin_Stockin_PkList_Data implements Serializable {
 	private String checked;
 	private String unitname;
 	private String warning;
+	private String color_name;
 	
 	public Long getId() {
 		return id;
@@ -259,6 +260,12 @@ public class Jitin_Stockin_PkList_Data implements Serializable {
 	}
 	public void setWarning(String warning) {
 		this.warning = warning;
+	}
+	public String getColor_name() {
+		return color_name;
+	}
+	public void setColor_name(String color_name) {
+		this.color_name = color_name;
 	}
 	
 	
