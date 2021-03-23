@@ -41,15 +41,15 @@ public class POrder_AutoID_Service extends AbstractService<POrder_AutoID> implem
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			if (repo.fetchLastID("SX").size() > 0){
-				POrder_AutoID pOrderID = repo.fetchLastID("SX").get(0);
+			if (repo.fetchLastID(Prefix).size() > 0){
+				POrder_AutoID pOrderID = repo.fetchLastID(Prefix).get(0);
 				pOrderID.setMaxvalue(pOrderID.getMaxvalue() + 1);
 				repo.save(pOrderID);
 				
 				return pOrderID.getPrefix() + "_" + pOrderID.getMaxvalue().toString();
 			} else {
 				POrder_AutoID pOrderID = new POrder_AutoID();
-				pOrderID.setPrefix("SX");
+				pOrderID.setPrefix(Prefix);
 				pOrderID.setMaxvalue(1);
 				repo.save(pOrderID);
 				
