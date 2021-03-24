@@ -52,4 +52,8 @@ public class CutPlan_Size_Service extends AbstractService<CutPlan_Size> implemen
 		return repo.getby_sku_and_porder_color(material_skuid_link, porderid_link, orgrootid_link, colorid_link);
 	}
 
+	@Override
+	public Integer getTotalAmount_By_CutPlanRow(Long cutplanrowid_link){
+		return repo.getTotalAmount_By_CutPlanRow(cutplanrowid_link);
+	}
 }

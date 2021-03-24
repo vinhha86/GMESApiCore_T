@@ -10,4 +10,5 @@ public interface ICutPlan_Size_Service extends Operations<CutPlan_Size> {
 	List<CutPlan_Size> getby_row(Long orgrootid_link, Long cutplan_rowid_link);
 	List<CutPlan_Size> getby_row_and_productsku(Long orgrootid_link, Long cutplanrowid_link, Long product_skuid_link);
 	List<CutPlan_Size> getby_porder_matsku_productsku(Long porderid_link, Long material_skuid_link, Long product_skuid_link, Integer type, String name);
+	Integer getTotalAmount_By_CutPlanRow(Long cutplanrowid_link);
 }

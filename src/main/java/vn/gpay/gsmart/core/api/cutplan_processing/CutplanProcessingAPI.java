@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.base.ResponseError;
 import vn.gpay.gsmart.core.cutplan.ICutPlan_Row_Service;
+import vn.gpay.gsmart.core.cutplan.ICutPlan_Size_Service;
 import vn.gpay.gsmart.core.cutplan_processing.CutplanProcessing;
 import vn.gpay.gsmart.core.cutplan_processing.CutplanProcessingD;
 import vn.gpay.gsmart.core.cutplan_processing.ICutplanProcessingDService;
@@ -34,6 +35,7 @@ public class CutplanProcessingAPI {
 	@Autowired ICutplanProcessingService cutplanProcessingService;
 	@Autowired ICutplanProcessingDService cutplanProcessingDService;
 	@Autowired ICutPlan_Row_Service cutplanRowService;
+	@Autowired ICutPlan_Size_Service cutplan_SizeService;
 	@Autowired IOrgService orgService;
 	
 	@RequestMapping(value = "/cutplan_processing_create",method = RequestMethod.POST)
@@ -59,13 +61,20 @@ public class CutplanProcessingAPI {
 				    }
 				    
 				    List<CutplanProcessingD> cutplanProcessingDs = cutplanProcessing.getCutplanProcessingD();
+				    
+				    int tong_so_la = 0;
 				    for (CutplanProcessingD cutplanProcessingD : cutplanProcessingDs) {
 				    	if(cutplanProcessingD.getId()==null || cutplanProcessingD.getId()==0) {
 				    		cutplanProcessingD.setOrgrootid_link(user.getRootorgid_link());
 				    		cutplanProcessingD.setTimecreated(new Date());
 				    	}
+				    	tong_so_la += cutplanProcessingD.getLa_vai();
 			    	};
-				    
+			    	
+			    	//Tính số lượng amount_cut dựa trên sơ đồ cắt và tổng số lá
+			    	Integer total_size_amount = cutplan_SizeService.getTotalAmount_By_CutPlanRow(cutplanProcessing.getCutplanrowid_link());
+			    	cutplanProcessing.setAmountcut(total_size_amount*tong_so_la);
+			    	
 			    	cutplanProcessing = cutplanProcessingService.save(cutplanProcessing);
 					
 					response.data = cutplanProcessing;

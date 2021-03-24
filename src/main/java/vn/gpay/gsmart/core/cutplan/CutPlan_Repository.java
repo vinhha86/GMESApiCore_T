@@ -65,4 +65,7 @@ public interface CutPlan_Repository extends JpaRepository<CutPlan_Size, Long>, J
 			@Param("product_skuid_link") final Long product_skuid_link,
 			@Param("type") final Integer type,
 			@Param("name") final String name);
+	
+	@Query(value = "select SUM(a.amount) from CutPlan_Size a where a.cutplanrowid_link = :cutplanrowid_link")
+	public Integer getTotalAmount_By_CutPlanRow(@Param("cutplanrowid_link") final Long cutplanrowid_link);
 }
