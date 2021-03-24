@@ -502,7 +502,7 @@ public class HandoverAPI {
 					}
 					List<HandoverProduct> listHandoverProduct = handover.getHandoverProducts();
 					for(HandoverProduct handoverProduct : listHandoverProduct) {
-						sumProduct += handoverProduct.getTotalpackage();
+						sumProduct += handoverProduct.getTotalpackagecheck();
 					}
 					if(sumProduct > 0) {
 						String result = updatePOrderProcessing(
