@@ -21,6 +21,10 @@ import vn.gpay.gsmart.core.handover_product.HandoverProduct;
 import vn.gpay.gsmart.core.handover_product.IHandoverProductService;
 import vn.gpay.gsmart.core.handover_sku.HandoverSKU;
 import vn.gpay.gsmart.core.handover_sku.IHandoverSKUService;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
 import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_Service;
@@ -35,6 +39,8 @@ public class HandoverSKUAPI {
 	@Autowired IHandoverProductService handoverProductService;
 	@Autowired IPOrder_Product_SKU_Service porderskuService;
 	@Autowired ISKU_Service skuService;
+	@Autowired IPOrderGrant_Service porderGrantService;
+	@Autowired IPOrderGrant_SKUService pordergrantskuService;
 	
 	@RequestMapping(value = "/getall",method = RequestMethod.POST)
 	public ResponseEntity<HandoverSKU_getall_response> GetAll(HttpServletRequest request ) {
@@ -137,39 +143,72 @@ public class HandoverSKUAPI {
 			
 			
 			if(list.size() == 0) {
-				// create
-				Date date = new Date();
-				Long porderid_link = entity.porderid_link;
-//				Long handoverid_link = entity.handoverid_link;
-//				Long handoverproductid_link = entity.handoverproductid_link;
-//				Long productid_link = entity.productid_link;
-				
-				// tim cac sku theo porder
-				
-				List<SKU> skus = skuService.getSKUforHandOver(porderid_link);
-				for(SKU sku : skus) {
-					HandoverSKU newHandoverSKU = new HandoverSKU();
-					newHandoverSKU.setId(0L);
-					newHandoverSKU.setOrgrootid_link(user.getRootorgid_link());
-//					newHandoverSKU.setHandoverid_link(entity.handoverid_link);
-//					newHandoverSKU.setHandoverproductid_link(entity.handoverproductid_link);
-					newHandoverSKU.setProductid_link(entity.productid_link);
-					newHandoverSKU.setTotalpackage(0);
-					newHandoverSKU.setTotalpackagecheck(0);
-					newHandoverSKU.setUsercreateid_link(user.getId());
-					newHandoverSKU.setTimecreate(date);
-					newHandoverSKU.setLastuserupdateid_link(user.getId());
-					newHandoverSKU.setLasttimeupdate(date);
-					// sku properties
-					newHandoverSKU.setSkuid_link(sku.getId());
-					newHandoverSKU.setSkuCodeString(sku.getCode());
-					newHandoverSKU.setSkuColorString(sku.getColor_name());
-					newHandoverSKU.setSkuSizeString(sku.getSize_name());
-					newHandoverSKU.setSkuSizeSortValInt(sku.getSort_size());
-//					handoverSkuService.save(newHandoverSKU);
-					list.add(newHandoverSKU);
+//				if(entity.orgid_to_link == null) {
+//					System.out.println(11);
+//					// create
+//					Date date = new Date();
+//					Long porderid_link = entity.porderid_link;
+//	//				Long handoverid_link = entity.handoverid_link;
+//	//				Long handoverproductid_link = entity.handoverproductid_link;
+//	//				Long productid_link = entity.productid_link;
+//					
+//					// tim cac sku theo porder
+//					
+//					List<SKU> skus = skuService.getSKUforHandOver(porderid_link);
+//					System.out.println("size1" + skus.size());
+//					for(SKU sku : skus) {
+//						HandoverSKU newHandoverSKU = new HandoverSKU();
+//						newHandoverSKU.setId(0L);
+//						newHandoverSKU.setOrgrootid_link(user.getRootorgid_link());
+//	//					newHandoverSKU.setHandoverid_link(entity.handoverid_link);
+//	//					newHandoverSKU.setHandoverproductid_link(entity.handoverproductid_link);
+//						newHandoverSKU.setProductid_link(entity.productid_link);
+//						newHandoverSKU.setTotalpackage(0);
+//						newHandoverSKU.setTotalpackagecheck(0);
+//						newHandoverSKU.setUsercreateid_link(user.getId());
+//						newHandoverSKU.setTimecreate(date);
+//						newHandoverSKU.setLastuserupdateid_link(user.getId());
+//						newHandoverSKU.setLasttimeupdate(date);
+//						// sku properties
+//						newHandoverSKU.setSkuid_link(sku.getId());
+//						newHandoverSKU.setSkuCodeString(sku.getCode());
+//						newHandoverSKU.setSkuColorString(sku.getColor_name());
+//						newHandoverSKU.setSkuSizeString(sku.getSize_name());
+//						newHandoverSKU.setSkuSizeSortValInt(sku.getSort_size());
+//	//					handoverSkuService.save(newHandoverSKU);
+//						list.add(newHandoverSKU);
+//					}
+//				}else 
+				if(entity.orgid_to_link != null) {
+					List<POrderGrant> pOrderGrants = porderGrantService.getByOrderId(entity.porderid_link);
+					for(POrderGrant pordergrant : pOrderGrants) { // System.out.println("id" + pordergrant.getId());
+						if(entity.orgid_to_link.equals(pordergrant.getGranttoorgid_link())) {
+							List<POrderGrant_SKU> porder_grant_skus = pordergrantskuService.getPOrderGrant_SKU(pordergrant.getId());
+							
+							for(POrderGrant_SKU porderGrantSku : porder_grant_skus) {
+								HandoverSKU newHandoverSKU = new HandoverSKU();
+								newHandoverSKU.setId(0L);
+								newHandoverSKU.setOrgrootid_link(user.getRootorgid_link());
+								newHandoverSKU.setProductid_link(entity.productid_link);
+								newHandoverSKU.setTotalpackage(0);
+								newHandoverSKU.setTotalpackagecheck(0);
+								newHandoverSKU.setUsercreateid_link(user.getId());
+								newHandoverSKU.setTimecreate(new Date());
+								newHandoverSKU.setLastuserupdateid_link(user.getId());
+								newHandoverSKU.setLasttimeupdate(new Date());
+								// sku properties
+								newHandoverSKU.setSkuid_link(porderGrantSku.getSkuid_link());
+								newHandoverSKU.setSkuCodeString(porderGrantSku.getSkucode());
+								newHandoverSKU.setSkuColorString(porderGrantSku.getMauSanPham());
+								newHandoverSKU.setSkuSizeString(porderGrantSku.getCoSanPham());
+								newHandoverSKU.setSkuSizeSortValInt(porderGrantSku.getSort_size());
+			//					handoverSkuService.save(newHandoverSKU);
+								list.add(newHandoverSKU);
+							}
+							break;
+						}
+					}
 				}
-//				list = handoverSkuService.getByHandoverId(entity.handoverid_link, entity.productid_link);
 			}
 			
 			response.data = list;
