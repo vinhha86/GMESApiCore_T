@@ -405,7 +405,7 @@ public class POrderAPI {
 			List<PContractPO_Product> list = new ArrayList<PContractPO_Product>();
 			for(POrder porder : lsPOrder) {
 				//kiem tra chao gia va ngay giao hang co chua thi moi lay ra
-				if(map.get(porder.getPO_Offer()+"_"+porder.getGranttoorgname()) == null) {
+				if(map.get(porder.getPO_Offer()+"_"+porder.getGranttoorgname()+"_"+porder.getProductid_link()) == null) {
 					PContractPO_Product line = new PContractPO_Product();
 					
 					line.setBuyername(porder.getBuyername());
@@ -421,7 +421,7 @@ public class POrderAPI {
 					
 					list.add(line);
 					
-					map.put(porder.getPO_Offer()+"_"+porder.getGranttoorgname(), porder.getShipdate());
+					map.put(porder.getPO_Offer()+"_"+porder.getGranttoorgname()+"_"+porder.getProductid_link(), porder.getShipdate());
 				}
 			}
 			
