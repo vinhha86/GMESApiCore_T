@@ -22,6 +22,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.cutplan.CutPlan_Row;
+import vn.gpay.gsmart.core.org.Org;
 
 @Table(name="cutplan_processing")
 @Entity
@@ -72,6 +73,19 @@ public class CutplanProcessing implements Serializable {
 	@ManyToOne
     @JoinColumn(name="cutplanrowid_link",insertable=false,updatable =false)
 	private CutPlan_Row cutPlanRow;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="cutorgid_link",insertable=false,updatable =false)
+    private Org cutorg ;
+	
+	@Transient
+	public String getCutorg_name() {
+		if(cutorg!=null) {
+			return cutorg.getName();
+		}
+		return "";
+	}
 	
 	@Transient
 	public String getMaSP() {
