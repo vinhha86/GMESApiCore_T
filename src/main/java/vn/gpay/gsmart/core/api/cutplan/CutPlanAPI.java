@@ -378,7 +378,7 @@ public class CutPlanAPI {
 				if(list_sodo_clone.size() > 0) {
 					CutPlan_Size sodo = list_sodo_clone.get(0);
 					if(sodo.getProduct_skuid_link().equals(product_skuid_link)) {
-						sl_catdu = catdu.getAmount() +(entity.amount_old * sodo.getLaVai());
+						sl_catdu = catdu.getAmount() - entity.amount_old * sodo.getLaVai();
 						sl_catdu = 0 - sl_catdu;
 						if(la_vai == 0) {
 							la_vai = sl_catdu / entity.amount;
