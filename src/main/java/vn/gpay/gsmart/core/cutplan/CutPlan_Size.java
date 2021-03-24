@@ -15,6 +15,8 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.sku.SKU;
+
 @Table(name="cutplan_size")
 @Entity
 public class CutPlan_Size implements Serializable {
@@ -36,6 +38,18 @@ public class CutPlan_Size implements Serializable {
 	@ManyToOne
     @JoinColumn(name="cutplanrowid_link",insertable=false,updatable =false)
     private CutPlan_Row row;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="product_skuid_link",insertable=false,updatable =false)
+    private SKU sku;
+	
+	@Transient
+	public String getSizeName() {
+		if(sku!=null)
+			return sku.getSize_name();
+		return "";
+	}
 	
 	@Transient
 	public Integer getLaVai() {

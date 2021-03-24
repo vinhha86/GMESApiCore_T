@@ -369,6 +369,7 @@ public class CutPlanAPI {
 			
 			int la_vai = row.getLa_vai();
 			int sl_catdu = 0;
+			
 			List<CutPlan_Size> list_sodo = cutplan_size_Service.getby_row(orgrootid_link, cutplanrowid_link);
 			List<CutPlan_Size> list_yeucau = cutplan_size_Service.getby_porder_matsku_productsku(porderid_link, material_skuid_link, (long)0, CutPlanRowType.yeucau, "");
 			List<CutPlan_Size> list_sodo_all = cutplan_size_Service.getby_porder_matsku_productsku(porderid_link, material_skuid_link, (long)0, CutPlanRowType.sodocat, "");
@@ -412,12 +413,6 @@ public class CutPlanAPI {
 				}
 			}
 			
-
-			
-			//Cap nhat lai row
-			row.setLa_vai(la_vai);
-			cutplanrowService.save(row);
-			
 			
 			List<CutPlan_Size> list_size = cutplan_size_Service.getby_row_and_productsku(orgrootid_link, cutplanrowid_link, product_skuid_link);
 			
@@ -429,6 +424,28 @@ public class CutPlanAPI {
 				
 				cutplan_size_Service.save(size);
 			}
+
+			
+			//sinh ten so do theo co
+			String name = "";
+			
+			list_sodo = cutplan_size_Service.getby_row(orgrootid_link, cutplanrowid_link);
+			for(CutPlan_Size size: list_sodo) {
+				if(size.getAmount() >0) {
+					if(name=="") {
+						name = size.getAmount()+size.getSizeName();
+					}
+					else {
+						name+= " - "+size.getAmount()+size.getSizeName();
+					}
+				}
+				
+			}
+			
+			//Cap nhat lai row
+			row.setLa_vai(la_vai);
+			row.setName(name);
+			cutplanrowService.save(row);
 			
 			//Cap nhat lai so cat du
 			
