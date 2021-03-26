@@ -196,19 +196,13 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	@Override
 	public List<PContract_PO> get_by_parent_and_type(Long pcontractpo_parentid_link, int po_typeid_link) {
 		// TODO Auto-generated method stub
-		return repo.getby_parentid_link_and_type(pcontractpo_parentid_link, po_typeid_link);
+		return repo.getby_parent_and_type(pcontractpo_parentid_link, po_typeid_link);
 	}
 
 	@Override
 	public List<PContract_PO> getall_offers_by_org(List<Long> orgid_link) {
 		// TODO Auto-generated method stub
 		return repo.getOffers_byOrg(orgid_link);
-	}
-
-	@Override
-	public List<PContract_PO> getby_parent_and_type(Long parentid_link, Integer po_typeid_link) {
-		// TODO Auto-generated method stub
-		return repo.getby_parent_and_type(parentid_link, po_typeid_link);
 	}
 
 	@Override
@@ -225,5 +219,11 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		// TODO Auto-generated method stub
 		orgs = orgs.size() == 0 ? null : orgs;
 		return repo.getBySearch_OrgAndType(po_code, orgs, po_type);
+	}
+
+	@Override
+	public List<PContract_PO> getby_pcontract_and_type(Long pcontractid_link, List<Integer> type) {
+		// TODO Auto-generated method stub
+		return repo.getby_pcontract_and_type(type, pcontractid_link);
 	}
 }

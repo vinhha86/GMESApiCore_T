@@ -68,15 +68,7 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 	public List<PContract_PO> getby_parent_and_type(
 			@Param ("parentid_link")final  Long parentid_link,
 			@Param ("po_typeid_link")final  Integer po_typeid_link);
-	
-	@Query(value = "select c from PContract_PO c "
-			+ "where c.parentpoid_link = :pcontractpo_id_link "
-			+ "and c.po_typeid_link = :po_typeid_link "
-			+ "order by c.shipdate asc")
-	public List<PContract_PO> getby_parentid_link_and_type(
-			@Param ("pcontractpo_id_link")final  Long pcontractpo_id_link,
-			@Param ("po_typeid_link")final  Integer po_typeid_link);
-	
+		
 	
 	@Query(value = "select c from PContract_PO c "
 			+ "where c.orgrootid_link = :orgrootid_link "
@@ -296,5 +288,14 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			)
 	public List<PContract_PO> getOffers_byOrg(
 			@Param ("orgid_link")final  List<Long> orgid_link
+			);
+	
+	@Query(value = "select a from PContract_PO a "
+			+ "where pcontractid_link = :pcontractid_link "
+			+ "and po_typeid_link in :type"
+			)
+	public List<PContract_PO> getby_pcontract_and_type(
+			@Param ("type")final  List<Integer> type,
+			@Param ("pcontractid_link")final  Long pcontractid_link
 			);
 }

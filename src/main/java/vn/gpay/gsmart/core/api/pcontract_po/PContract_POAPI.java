@@ -1948,6 +1948,48 @@ public class PContract_POAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/quick_update_line", method = RequestMethod.POST)
+	public ResponseEntity<quickupdate_line_response> getPOByContractProduct(
+			@RequestBody quickupdate_line_request entity, HttpServletRequest request) {
+		quickupdate_line_response response = new quickupdate_line_response();
+		try {
+			pcontract_POService.save(entity.data);
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<quickupdate_line_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<quickupdate_line_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/getbycontract_type", method = RequestMethod.POST)
+	public ResponseEntity<getby_pcontract_and_type_response> getPOByContractAndType(
+			@RequestBody getby_pcontract_and_type_request entity, HttpServletRequest request) {
+		getby_pcontract_and_type_response response = new getby_pcontract_and_type_response();
+		try {
+			List<Integer> type = new ArrayList<Integer>();
+			Long pcontractid_link = entity.pcontractid_link;
+			String [] list_type = entity.potype.split(",");
+			for(String id: list_type) {
+				type.add(Integer.parseInt(id));
+			}
+
+			List<PContract_PO> pcontract = pcontract_POService.getby_pcontract_and_type(pcontractid_link, type);
+			response.data = pcontract;
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getby_pcontract_and_type_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<getby_pcontract_and_type_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@RequestMapping(value = "/cancel_po_offer", method = RequestMethod.POST)
 	public ResponseEntity<cancel_po_offer_response> Cancel_PO_Offer(
 			@RequestBody cancel_po_offer_request entity, HttpServletRequest request) {
