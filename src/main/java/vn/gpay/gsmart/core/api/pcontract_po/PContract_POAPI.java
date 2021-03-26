@@ -1948,6 +1948,58 @@ public class PContract_POAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/cancel_po_offer", method = RequestMethod.POST)
+	public ResponseEntity<cancel_po_offer_response> Cancel_PO_Offer(
+			@RequestBody cancel_po_offer_request entity, HttpServletRequest request) {
+		cancel_po_offer_response response = new cancel_po_offer_response();
+		try {
+			Long pcontract_poid_link = entity.pcontract_poid_link;
+			//Lay ds nhung line giao hang cua chao gia
+			List<PContract_PO> list_line = pcontract_POService.get_by_parent_and_type(pcontract_poid_link, POType.PO_LINE_PLAN);
+			for(PContract_PO line : list_line) {
+				//Lay nhung porder
+				Long pcontractid_link = line.getPcontractid_link();
+				List<POrder> list_porder = porderService.getByContractAndPO(pcontractid_link, line.getId());
+				
+				for(POrder porder: list_porder) {
+					//lay nhung grant cua lenh
+					List<POrderGrant> list_grant = grantService.getbyporder_andpo(porder.getId(), pcontract_poid_link);
+					for(POrderGrant grant : list_grant) {
+						grantService.delete(grant);
+					}
+					
+					//xoa lenh chua phan chuyen
+					porderService.delete(porder);
+					
+					//Cap nhat lai trang thai cua porder-req
+					if(porder.getPorderreqid_link() != null) {
+						POrder_Req req = porder_req_Service.findOne(porder.getPorderreqid_link());
+						req.setStatus(POrderReqStatus.STATUS_FREE);
+						porder_req_Service.save(req);
+					}
+					
+				}
+				
+				//Cap nhat trang thai cua line
+				line.setStatus(POStatus.PO_STATUS_UNCONFIRM);
+				pcontract_POService.save(line);
+			}
+			
+			//Cap nhat trang thai cua chao gia
+			PContract_PO offer = pcontract_POService.findOne(pcontract_poid_link);
+			offer.setStatus(POStatus.PO_STATUS_UNCONFIRM);
+			pcontract_POService.save(offer);
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<cancel_po_offer_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<cancel_po_offer_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@RequestMapping(value = "/getall_bycode", method = RequestMethod.POST)
 	public ResponseEntity<getall_poline_by_code_response> GetAllByCode(
 			@RequestBody getall_poline_by_code_request entity, HttpServletRequest request) {

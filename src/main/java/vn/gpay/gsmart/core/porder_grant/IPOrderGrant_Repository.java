@@ -89,7 +89,7 @@ public interface IPOrderGrant_Repository extends JpaRepository<POrderGrant, Long
 	
 	@Query(value = "select a from POrderGrant a "
 			+ "inner join POrderGrant_SKU b on a.id = b.pordergrantid_link "
-			+ "where a.porderid_link = :porderid_link "
+			+ "where (a.porderid_link = :porderid_link or :porderid_link is null) "
 			+ " and b.pcontract_poid_link =  :pcontract_poid_link "
 			+ "group by a")
 	public List<POrderGrant>getbyporder_andpo(
