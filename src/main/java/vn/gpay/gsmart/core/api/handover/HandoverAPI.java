@@ -34,6 +34,7 @@ import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.GPAYDateFormat;
+import vn.gpay.gsmart.core.utils.HandOverType;
 import vn.gpay.gsmart.core.utils.POrderStatus;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -454,13 +455,216 @@ public class HandoverAPI {
 		}
 	}
 	
+//	@RequestMapping(value = "/setstatus",method = RequestMethod.POST)
+//	public ResponseEntity<Handover_getall_response> setStatus(@RequestBody Handover_setstatus_request entity,HttpServletRequest request ) {
+//		Handover_getall_response response = new Handover_getall_response();
+//		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//		Date date = new Date();
+//		try {
+//			Handover handover = handoverService.findOne(entity.handoverid_link);
+//			// old info
+//			Integer oldStatus = handover.getStatus();
+//			Long old_approver_userid_link = handover.getApprover_userid_link();
+//			Long old_receiver_userid_link = handover.getReceiver_userid_link();
+//			Date old_receive_date = handover.getReceive_date();
+//			Date old_lasttimeupdate = handover.getLasttimeupdate();
+//			Long old_lastuserupdateid_link = handover.getLastuserupdateid_link();
+//			
+//			if(entity.approver_userid_link != 0) {
+//				handover.setApprover_userid_link(entity.approver_userid_link);
+//			}
+//			if(entity.receiver_userid_link != 0) {
+//				handover.setReceiver_userid_link(entity.receiver_userid_link);
+//				handover.setReceive_date(date);
+//			}
+//			handover.setLasttimeupdate(date);
+//			handover.setLastuserupdateid_link(user.getId());
+//			handover.setStatus(entity.status);
+//			
+//			// status = 0 // chưa duyệt
+//			// status = 1 // đã duyệt
+//			// status = 2 // đã nhận
+//			
+//			if(handover.getStatus() == 2 && oldStatus == 1) {
+//				// xác nhận
+//				Long handovertypeid_link = handover.getHandovertypeid_link();
+//				Long granttoorgid_link = 0L;
+//				Long porderid_link = handover.getPorderid_link();
+//				Date receive_date = handover.getReceive_date(); // ngày vào chuyền
+//				Integer sumProduct = 0; // sl thêm vào chuyền
+//				String action = "Xác nhận";
+//				if(handovertypeid_link.equals(1L) || handovertypeid_link.equals(4L)) {
+//					// 1: cut to line
+//					// 4: line to packstocked
+//					if(handovertypeid_link.equals(1L)) {
+//						granttoorgid_link = handover.getOrgid_to_link();
+//					}else if(handovertypeid_link.equals(4L)) {
+//						granttoorgid_link = handover.getOrgid_from_link();
+//					}
+//					List<HandoverProduct> listHandoverProduct = handover.getHandoverProducts();
+//					for(HandoverProduct handoverProduct : listHandoverProduct) {
+//						sumProduct += handoverProduct.getTotalpackagecheck();
+//					}
+//					if(sumProduct > 0) {
+//						String result = updatePOrderProcessing(
+//								handovertypeid_link, 
+//								granttoorgid_link, porderid_link, 
+//								receive_date, sumProduct, action);
+//						if(result.equals("Không tồn tại POrderProcessing")) {
+//							handover.setStatus(oldStatus);
+//							handover.setApprover_userid_link(old_approver_userid_link);
+//							handover.setReceiver_userid_link(old_receiver_userid_link);
+//							handover.setReceive_date(old_receive_date);
+//							handover.setLasttimeupdate(old_lasttimeupdate);
+//							handover.setLastuserupdateid_link(old_lastuserupdateid_link);
+//							handover = handoverService.save(handover);
+//							
+//							response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+//							response.setMessage(result);
+//							return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
+//						}
+//					}
+//				}
+//			}
+//
+//			handover = handoverService.save(handover);
+//			
+//			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+//			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+//			return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
+//		}catch (Exception e) {
+//			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+//			response.setMessage(e.getMessage());
+//		    return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
+//		}
+//	}
+	
 	@RequestMapping(value = "/setstatus",method = RequestMethod.POST)
-	public ResponseEntity<Handover_getall_response> setStatus(@RequestBody Handover_setstatus_request entity,HttpServletRequest request ) {
-		Handover_getall_response response = new Handover_getall_response();
+	public ResponseEntity<Handover_create_response> setStatus(@RequestBody Handover_setstatus_request entity,HttpServletRequest request ) {
+		Handover_create_response response = new Handover_create_response();
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		Date date = new Date();
 		try {
-			Handover handover = handoverService.findOne(entity.handoverid_link);
+			Date date = new Date();
+//			Handover handover = handoverService.findOne(entity.handoverid_link);
+			Handover handover = entity.data;
+			if(handover != null) {
+				List<HandoverProduct> handoverProducts = handover.getHandoverProducts();
+				
+				Integer total = 0;
+				Integer totalCheck = 0;
+				
+				if(handover.getHandovertypeid_link().equals(9L)) { // nếu type là pack to stock
+					// chia điều kiện vì pack to stock không có porderid_link
+					handover.setOrgrootid_link(user.getRootorgid_link());
+					handover.setUsercreateid_link(user.getId());
+					handover.setTimecreate(date);
+					handover.setLastuserupdateid_link(user.getId());
+					handover.setLasttimeupdate(date);
+	//				handover.setTotalpackage(handoverProduct.getTotalpackage());
+					handover = handoverService.save(handover);
+					
+					for(HandoverProduct handoverProduct : handoverProducts) {
+						List<HandoverSKU> handoverSKUs = handoverProduct.getHandoverSKUs();
+						if(handoverProduct.getId() == null || handoverProduct.getId() == 0) {
+							handoverProduct.setOrgrootid_link(user.getRootorgid_link());
+							handoverProduct.setHandoverid_link(handover.getId());
+							handoverProduct.setUsercreateid_link(user.getId());
+							handoverProduct.setTimecreate(date);
+						}else {
+							handoverProduct.setLastuserupdateid_link(user.getId());
+							handoverProduct.setLasttimeupdate(date);
+						}
+						handoverProduct = handoverProductService.save(handoverProduct);
+						
+						if(handoverProduct.getTotalpackage() != null)
+							total+=handoverProduct.getTotalpackage();
+						if(handoverProduct.getTotalpackagecheck() != null)
+							totalCheck+=handoverProduct.getTotalpackagecheck();
+						
+						// skus
+						for(HandoverSKU handoverSKU : handoverSKUs) {
+							if(handoverSKU.getId() == null || handoverSKU.getId() == 0) {
+								handoverSKU.setOrgrootid_link(user.getRootorgid_link());
+								handoverSKU.setHandoverid_link(handover.getId());
+								handoverSKU.setHandoverproductid_link(handoverProduct.getId());
+								handoverSKU.setUsercreateid_link(user.getId());
+								handoverSKU.setTimecreate(date);
+							}else {
+								handoverSKU.setLastuserupdateid_link(user.getId());
+								handoverSKU.setLasttimeupdate(date);
+							}
+							handoverSkuService.save(handoverSKU);
+						}
+					}
+					handover.setTotalpackage(total);
+					handover.setTotalpackagecheck(totalCheck);
+					handover = handoverService.save(handover);
+				}else { // type còn lại
+					Handover _handover =  handoverService.findOne(handover.getId());
+					handover.setOrgrootid_link(_handover.getOrgrootid_link());
+					handover.setUsercreateid_link(_handover.getUsercreateid_link());
+					handover.setTimecreate(_handover.getTimecreate());
+					handover.setLastuserupdateid_link(user.getId());
+					handover.setLasttimeupdate(date);
+					// nếu porder thay đổi
+					if(!handover.getPorderid_link().equals(_handover.getPorderid_link())) {
+						// Xoá HandoverProduct trong db
+						List<HandoverProduct> listHandoverProducts = handoverProductService.getByHandoverId(handover.getId());
+						for(HandoverProduct product : listHandoverProducts) {
+							handoverProductService.deleteById(product.getId());
+						}
+						// Xoá HandoverSKU trong db
+						List<HandoverSKU> handoverSKUs = handoverSkuService.getByHandoverId(handover.getId());
+						for(HandoverSKU handoverSKU : handoverSKUs) {
+							handoverSkuService.deleteById(handoverSKU.getId());
+						}
+					}
+					
+					// luu handoverProduct, sku tu obj request
+					for(HandoverProduct handoverProduct : handoverProducts) {
+						List<HandoverSKU> handoverSKUs = handoverProduct.getHandoverSKUs();
+						if(handoverProduct.getId() == null || handoverProduct.getId() == 0) {
+							handoverProduct.setOrgrootid_link(user.getRootorgid_link());
+							handoverProduct.setHandoverid_link(handover.getId());
+							handoverProduct.setUsercreateid_link(user.getId());
+							handoverProduct.setTimecreate(date);
+						}else {
+							handoverProduct.setLastuserupdateid_link(user.getId());
+							handoverProduct.setLasttimeupdate(date);
+						}
+						handoverProduct = handoverProductService.save(handoverProduct);
+						
+						if(handoverProduct.getTotalpackage() != null)
+							total+=handoverProduct.getTotalpackage();
+						if(handoverProduct.getTotalpackagecheck() != null)
+							totalCheck+=handoverProduct.getTotalpackagecheck();
+						
+						// skus
+						for(HandoverSKU handoverSKU : handoverSKUs) {
+							if(handoverSKU.getId() == null || handoverSKU.getId() == 0) {
+								handoverSKU.setOrgrootid_link(user.getRootorgid_link());
+								handoverSKU.setHandoverid_link(handover.getId());
+								handoverSKU.setHandoverproductid_link(handoverProduct.getId());
+								handoverSKU.setUsercreateid_link(user.getId());
+								handoverSKU.setTimecreate(date);
+							}else {
+								handoverSKU.setLastuserupdateid_link(user.getId());
+								handoverSKU.setLasttimeupdate(date);
+							}
+							handoverSkuService.save(handoverSKU);
+						}
+					}
+				}
+				handover.setTotalpackage(total);
+				handover.setTotalpackagecheck(totalCheck);
+				handover = handoverService.save(handover);
+			}else {
+				// để test, sau khi chuyển tất cả các view handover thành view riêng thì bỏ phần này đi
+				// vì view cũ chỉ gửi id, view mới gửi obj
+				handover = handoverService.findOne(entity.handoverid_link);
+			}
+			
+			// set new status
 			// old info
 			Integer oldStatus = handover.getStatus();
 			Long old_approver_userid_link = handover.getApprover_userid_link();
@@ -469,10 +673,10 @@ public class HandoverAPI {
 			Date old_lasttimeupdate = handover.getLasttimeupdate();
 			Long old_lastuserupdateid_link = handover.getLastuserupdateid_link();
 			
-			if(entity.approver_userid_link != 0) {
+			if(entity.approver_userid_link != 0) { System.out.println("approver_userid_link");
 				handover.setApprover_userid_link(entity.approver_userid_link);
 			}
-			if(entity.receiver_userid_link != 0) {
+			if(entity.receiver_userid_link != 0) { System.out.println("receiver_userid_link");
 				handover.setReceiver_userid_link(entity.receiver_userid_link);
 				handover.setReceive_date(date);
 			}
@@ -484,20 +688,21 @@ public class HandoverAPI {
 			// status = 1 // đã duyệt
 			// status = 2 // đã nhận
 			
+			// nếu xác nhận nhận tại nơi nhận, thay đổi trong porder processing
 			if(handover.getStatus() == 2 && oldStatus == 1) {
-				// xác nhận
+				// xác nhận nhận, update porder processing
 				Long handovertypeid_link = handover.getHandovertypeid_link();
 				Long granttoorgid_link = 0L;
 				Long porderid_link = handover.getPorderid_link();
 				Date receive_date = handover.getReceive_date(); // ngày vào chuyền
 				Integer sumProduct = 0; // sl thêm vào chuyền
 				String action = "Xác nhận";
-				if(handovertypeid_link.equals(1L) || handovertypeid_link.equals(4L)) {
+				if(handovertypeid_link.equals(HandOverType.HANDOVER_TYPE_CUT_LINE) || handovertypeid_link.equals(HandOverType.HANDOVER_TYPE_LINE_PACK)) {
 					// 1: cut to line
 					// 4: line to packstocked
-					if(handovertypeid_link.equals(1L)) {
+					if(handovertypeid_link.equals(HandOverType.HANDOVER_TYPE_CUT_LINE)) {
 						granttoorgid_link = handover.getOrgid_to_link();
-					}else if(handovertypeid_link.equals(4L)) {
+					}else if(handovertypeid_link.equals(HandOverType.HANDOVER_TYPE_LINE_PACK)) {
 						granttoorgid_link = handover.getOrgid_from_link();
 					}
 					List<HandoverProduct> listHandoverProduct = handover.getHandoverProducts();
@@ -518,23 +723,26 @@ public class HandoverAPI {
 							handover.setLastuserupdateid_link(old_lastuserupdateid_link);
 							handover = handoverService.save(handover);
 							
+							response.data = handover;
 							response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 							response.setMessage(result);
-							return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
+							return new ResponseEntity<Handover_create_response>(response,HttpStatus.OK);
 						}
 					}
 				}
 			}
 
 			handover = handoverService.save(handover);
+			response.data = handover;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
+			return new ResponseEntity<Handover_create_response>(response,HttpStatus.OK);
 		}catch (Exception e) {
+			e.printStackTrace();
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-		    return new ResponseEntity<Handover_getall_response>(response,HttpStatus.OK);
+		    return new ResponseEntity<Handover_create_response>(response,HttpStatus.OK);
 		}
 	}
 	
@@ -612,6 +820,9 @@ public class HandoverAPI {
 			Date receive_date, Integer sumProduct,
 			String action
 			) {
+		
+		System.out.println("updatePOrderProcessing " + sumProduct);
+		
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Long rootorgid_link = user.getRootorgid_link();
 		// tìm xem lệnh này, tổ chuyền này, ngày này có POrderProcessinng không
@@ -619,6 +830,11 @@ public class HandoverAPI {
 		List<POrderProcessing> listPorderProcessing = porderProcessingService.getByPOrderAndLineAndDate(
 				porderid_link, granttoorgid_link, receive_date
 				);
+		
+		System.out.println(porderid_link);
+		System.out.println(granttoorgid_link);
+		System.out.println(receive_date);
+		
 		POrderProcessing pprocess;
 		if(listPorderProcessing.size() > 0) {
 			// Có thì check ngày, nếu trùng thì sửa, ko trùng thì tạo mới và set thông tin dựa vào ngày trước
