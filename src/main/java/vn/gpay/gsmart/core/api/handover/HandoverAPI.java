@@ -822,6 +822,7 @@ public class HandoverAPI {
 			) {
 		
 		System.out.println("updatePOrderProcessing " + sumProduct);
+		System.out.println("handovertypeid_link " + handovertypeid_link);
 		
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Long rootorgid_link = user.getRootorgid_link();
@@ -839,7 +840,7 @@ public class HandoverAPI {
 				// trùng ngày, thêm và tính toán amountinput
 				if(action.equals("Xác nhận")) {
 			        // Xác nhận lúc nào cũng là ngày hiện tại nên ko cần tính lại các ngày sau
-					if(handovertypeid_link.equals(HandOverType.HANDOVER_TYPE_CUT_LINE)) { // cut to line
+					if(handovertypeid_link.equals(HandOverType.HANDOVER_TYPE_CUT_LINE)) { // cut to line 
 						pprocess.setAmountinput(pprocess.getAmountinput() + sumProduct);
 		    			pprocess.setAmountinputsum((null==pprocess.getAmountinputsumprev()?0:pprocess.getAmountinputsumprev()) 
 		    					+ (null==pprocess.getAmountinput()?0:pprocess.getAmountinput()));
@@ -850,11 +851,11 @@ public class HandoverAPI {
 					}
 				}else if(action.equals("Huỷ")) {
 					// Huỷ là sau xác nhận nên lúc nào cũng tồn tại POrderProcessing
-					if(handovertypeid_link.equals(1L)) { // cut to line
+					if(handovertypeid_link.equals(HandOverType.HANDOVER_TYPE_CUT_LINE)) { // cut to line
 						pprocess.setAmountinput(pprocess.getAmountinput() - sumProduct);
 		    			pprocess.setAmountinputsum((null==pprocess.getAmountinputsumprev()?0:pprocess.getAmountinputsumprev()) 
 		    					+ (null==pprocess.getAmountinput()?0:pprocess.getAmountinput()));
-					}else if(handovertypeid_link.equals(4L)) { // line to packstocked
+					}else if(handovertypeid_link.equals(HandOverType.HANDOVER_TYPE_LINE_PACK)) { // line to packstocked
 						pprocess.setAmountpackstocked(pprocess.getAmountpackstocked() - sumProduct);
 		    			pprocess.setAmountpackstockedsum((null==pprocess.getAmountpackstockedsumprev()?0:pprocess.getAmountpackstockedsumprev()) 
 		    					+ (null==pprocess.getAmountpackstocked()?0:pprocess.getAmountpackstocked()));
@@ -961,9 +962,9 @@ public class HandoverAPI {
 				pprocess.setAmountcutsum(temp.getAmountcutsum());
 	
 				if(temp.getAmountinputsum() == null) temp.setAmountinputsum(0);
-				pprocess.setAmountinput(sumProduct);
+				pprocess.setAmountinput(0);
 				pprocess.setAmountinputsumprev(temp.getAmountinputsum());
-				pprocess.setAmountinputsum(temp.getAmountinputsum() + sumProduct);
+				pprocess.setAmountinputsum(temp.getAmountinputsum());
 		        
 				pprocess.setAmountoutput(0);
 				pprocess.setAmountoutputsumprev(temp.getAmountoutputsum());
@@ -984,6 +985,7 @@ public class HandoverAPI {
 				pprocess.setAmountpackedsumprev(temp.getAmountpackedsum());
 				pprocess.setAmountpackedsum(temp.getAmountpackedsum());
 		        
+				if(temp.getAmountpackstockedsum() == null) temp.setAmountpackstockedsum(0);
 				pprocess.setAmountpackstocked(0);
 				pprocess.setAmountpackstockedsumprev(temp.getAmountpackstockedsum());
 				pprocess.setAmountpackstockedsum(temp.getAmountpackstockedsum());
@@ -997,6 +999,18 @@ public class HandoverAPI {
 	        	
 				pprocess.setUsercreatedid_link(user.getId());
 				pprocess.setTimecreated(new Date());
+				
+				if(handovertypeid_link.equals(HandOverType.HANDOVER_TYPE_CUT_LINE)) {
+					if(temp.getAmountinputsum() == null) temp.setAmountinputsum(0);
+					pprocess.setAmountinput(sumProduct);
+					pprocess.setAmountinputsumprev(temp.getAmountinputsum());
+					pprocess.setAmountinputsum(temp.getAmountinputsum() + sumProduct);
+				}else if(handovertypeid_link.equals(HandOverType.HANDOVER_TYPE_LINE_PACK)) {
+					if(temp.getAmountpackstockedsum() == null) temp.setAmountpackstockedsum(0);
+					pprocess.setAmountpackstocked(sumProduct);
+					pprocess.setAmountpackstockedsumprev(temp.getAmountpackstockedsum());
+					pprocess.setAmountpackstockedsum(temp.getAmountpackstockedsum() + sumProduct);
+				}
 			}
 			//Update trang thai lenh tuong ung
 	        if ((null==pprocess.getAmountinputsum()?0:pprocess.getAmountinputsum()) > 0){
