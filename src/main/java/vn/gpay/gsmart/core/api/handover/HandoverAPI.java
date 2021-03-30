@@ -673,10 +673,10 @@ public class HandoverAPI {
 			Date old_lasttimeupdate = handover.getLasttimeupdate();
 			Long old_lastuserupdateid_link = handover.getLastuserupdateid_link();
 			
-			if(entity.approver_userid_link != 0) { System.out.println("approver_userid_link");
+			if(entity.approver_userid_link != 0) { 
 				handover.setApprover_userid_link(entity.approver_userid_link);
 			}
-			if(entity.receiver_userid_link != 0) { System.out.println("receiver_userid_link");
+			if(entity.receiver_userid_link != 0) { 
 				handover.setReceiver_userid_link(entity.receiver_userid_link);
 				handover.setReceive_date(date);
 			}
@@ -831,10 +831,6 @@ public class HandoverAPI {
 				porderid_link, granttoorgid_link, receive_date
 				);
 		
-		System.out.println(porderid_link);
-		System.out.println(granttoorgid_link);
-		System.out.println(receive_date);
-		
 		POrderProcessing pprocess;
 		if(listPorderProcessing.size() > 0) {
 			// Có thì check ngày, nếu trùng thì sửa, ko trùng thì tạo mới và set thông tin dựa vào ngày trước
@@ -843,11 +839,11 @@ public class HandoverAPI {
 				// trùng ngày, thêm và tính toán amountinput
 				if(action.equals("Xác nhận")) {
 			        // Xác nhận lúc nào cũng là ngày hiện tại nên ko cần tính lại các ngày sau
-					if(handovertypeid_link.equals(1L)) { // cut to line
+					if(handovertypeid_link.equals(HandOverType.HANDOVER_TYPE_CUT_LINE)) { // cut to line
 						pprocess.setAmountinput(pprocess.getAmountinput() + sumProduct);
 		    			pprocess.setAmountinputsum((null==pprocess.getAmountinputsumprev()?0:pprocess.getAmountinputsumprev()) 
 		    					+ (null==pprocess.getAmountinput()?0:pprocess.getAmountinput()));
-					}else if(handovertypeid_link.equals(4L)) { // line to packstocked
+					}else if(handovertypeid_link.equals(HandOverType.HANDOVER_TYPE_LINE_PACK)) { // line to packstocked
 						pprocess.setAmountpackstocked(pprocess.getAmountpackstocked() + sumProduct);
 		    			pprocess.setAmountpackstockedsum((null==pprocess.getAmountpackstockedsumprev()?0:pprocess.getAmountpackstockedsumprev()) 
 		    					+ (null==pprocess.getAmountpackstocked()?0:pprocess.getAmountpackstocked()));
