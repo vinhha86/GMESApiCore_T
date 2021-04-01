@@ -769,17 +769,17 @@ public class HandoverAPI {
 			Integer sumProduct = 0; // sl thêm vào
 			String action = "Huỷ";
 			
-			if(handovertypeid_link.equals(1L) || handovertypeid_link.equals(4L)) {
+			if(handovertypeid_link.equals(HandOverType.HANDOVER_TYPE_CUT_LINE) || handovertypeid_link.equals(HandOverType.HANDOVER_TYPE_LINE_PACK)) {
 				// 1: cut to line
 				// 4: line to packstocked
-				if(handovertypeid_link.equals(1L)) {
+				if(handovertypeid_link.equals(HandOverType.HANDOVER_TYPE_CUT_LINE)) {
 					granttoorgid_link = handover.getOrgid_to_link();
-				}else if(handovertypeid_link.equals(4L)) {
+				}else if(handovertypeid_link.equals(HandOverType.HANDOVER_TYPE_LINE_PACK)) {
 					granttoorgid_link = handover.getOrgid_from_link();
 				}
 				List<HandoverProduct> listHandoverProduct = handover.getHandoverProducts();
 				for(HandoverProduct handoverProduct : listHandoverProduct) {
-					sumProduct += handoverProduct.getTotalpackage();
+					sumProduct += handoverProduct.getTotalpackagecheck();
 				}
 				if(sumProduct > 0) {
 					String result = updatePOrderProcessing(
