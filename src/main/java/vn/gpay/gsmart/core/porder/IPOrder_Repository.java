@@ -90,7 +90,7 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 			+ "and (a.granttoorgid_link = :factoryid or :factoryid is null) "
 			+ "and (a.granttoorgid_link = :granttoorgid_link or :granttoorgid_link is null) "
 			+ "and lower(c.po_buyer) like lower(concat('%',:pobuyer,'%')) "
-			+ "and lower(d.buyercode) like lower(concat('%',:stylebuyer,'%')) "
+			+ "and (d.buyercode is null or lower(d.buyercode) like lower(concat('%',:stylebuyer,'%'))) "
 			+ "and lower(b.contractcode) like lower(concat('%',:contractcode,'%')) "
 //			+ "and (:statuses is null or a.status in :statuses) "
 			+ "and a.status in :statuses "
