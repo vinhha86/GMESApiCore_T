@@ -61,7 +61,7 @@ public class POrderBomProduct implements Serializable {
 	@Transient
 	public String getMaterialName() {
 		if(sku !=null) {
-			return sku.getName();
+			return sku.getProduct_name();
 		}
 		return "";
 	}
@@ -77,7 +77,7 @@ public class POrderBomProduct implements Serializable {
 	@Transient
 	public String getMaterialCode() {
 		if(sku !=null) {
-			return sku.getCode();
+			return sku.getProduct_code();
 		}
 		return "";
 	}

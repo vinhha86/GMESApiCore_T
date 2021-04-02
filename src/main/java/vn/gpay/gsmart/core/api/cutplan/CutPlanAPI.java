@@ -284,14 +284,25 @@ public class CutPlanAPI {
 				//Tao size cho cac row
 				List<PContractProductSKU> list_sku_clone = pskuservice.getlistsku_byproduct_and_pcontract(orgrootid_link, productid_link, pcontractid_link);
 				list_sku_clone.removeIf(c -> !c.getColor_id().equals(colorid_link));
-				
+				Map<Long, Integer> map_sku = new HashMap<Long, Integer>();
+				List<Long> list_sku_id = new ArrayList<Long>();
 				for (PContractProductSKU sku : list_sku_clone) {
+					if(!map_sku.containsKey(sku.getSkuid_link())) {
+						map_sku.put(sku.getSkuid_link(), sku.getPquantity_total());
+						list_sku_id.add(sku.getSkuid_link());
+					}
+					else {
+						map_sku.put(sku.getSkuid_link(), sku.getPquantity_total() + map_sku.get(sku.getSkuid_link()));
+					}
+				}
+				
+				for (Long skuid_link : list_sku_id) {
 					CutPlan_Size plan_yc = new CutPlan_Size();
 					plan_yc.setCutplanrowid_link(row_yeucau.getId());
 					plan_yc.setId(null);
 					plan_yc.setOrgrootid_link(orgrootid_link);
-					plan_yc.setAmount(sku.getPquantity_total());
-					plan_yc.setProduct_skuid_link(sku.getSkuid_link());	
+					plan_yc.setAmount(map_sku.get(skuid_link));
+					plan_yc.setProduct_skuid_link(skuid_link);	
 					
 					cutplan_size_Service.save(plan_yc);
 					
@@ -299,8 +310,8 @@ public class CutPlanAPI {
 					plan_catdu.setCutplanrowid_link(row_catdu.getId());
 					plan_catdu.setId(null);
 					plan_catdu.setOrgrootid_link(orgrootid_link);
-					plan_catdu.setAmount(0 - sku.getPquantity_total());
-					plan_catdu.setProduct_skuid_link(sku.getSkuid_link());
+					plan_catdu.setAmount(0 - map_sku.get(skuid_link));
+					plan_catdu.setProduct_skuid_link(skuid_link);
 					
 					cutplan_size_Service.save(plan_catdu);
 				}
@@ -381,7 +392,9 @@ public class CutPlanAPI {
 				//tinh so luong cat du
 				int sodo_all = 0;
 				List<CutPlan_Size> list_sodo_all_clone = new ArrayList<CutPlan_Size>(list_sodo_all);
-				list_sodo_all_clone.removeIf(c-> !c.getProduct_skuid_link().equals(yeucau.getProduct_skuid_link()) || c.getCutplanrowid_link().equals(cutplanrowid_link));
+				//bo nhung size khong nam trong row va size dang sua 
+				list_sodo_all_clone.removeIf(c-> !c.getProduct_skuid_link().equals(yeucau.getProduct_skuid_link()) || 
+						(c.getProduct_skuid_link().equals(yeucau.getProduct_skuid_link()) && c.getCutplanrowid_link().equals(cutplanrowid_link)));
 				for(CutPlan_Size sodo_size_all : list_sodo_all_clone) {
 					sodo_all += (sodo_size_all.getAmount() == null || sodo_size_all.getLaVai() == null) ? 0 : sodo_size_all.getAmount() * sodo_size_all.getLaVai();
 				}
@@ -459,15 +472,17 @@ public class CutPlanAPI {
 
 				List<CutPlan_Size> list_size_sodo_all = cutplan_size_Service.getby_porder_matsku_productsku(porderid_link, material_skuid_link, size_yc.getProduct_skuid_link(), CutPlanRowType.sodocat, "");
 				for(CutPlan_Size sizesd : list_size_sodo_all) {
-					sodo += (sizesd.getAmount() == null || sizesd.getLaVai() == null) ? 0 : sizesd.getAmount() * sizesd.getLaVai();
+					int amount_sd = sizesd.getAmount() == null ? 0 : sizesd.getAmount();
+					int lavai_sd = sizesd.getLaVai() == null ? 0 : sizesd.getLaVai();
+					sodo += amount_sd * lavai_sd;
 				}
 				
 
 				List<CutPlan_Size> listsize_catdu = cutplan_size_Service.getby_porder_matsku_productsku(porderid_link, material_skuid_link, size_yc.getProduct_skuid_link(), CutPlanRowType.catdu, "");
+				listsize_catdu.removeIf(c-> !c.getProduct_skuid_link().equals(size_yc.getProduct_skuid_link()));
 				
 				CutPlan_Size size_catdu = listsize_catdu.get(0);
 				int amount = sodo - yeucau;
-				response.catdu = amount;
 				size_catdu.setAmount(amount);
 				cutplan_size_Service.save(size_catdu);
 			}
@@ -480,7 +495,6 @@ public class CutPlanAPI {
 			POrder porder = porderService.findOne(porderid_link);
 			cutplanrowService.sync_porder_bom(material_skuid_link, porder, colorid_link, user.getId(), orgrootid_link);
 			
-			response.lavai = la_vai;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<update_size_amount_response>(response, HttpStatus.OK);
@@ -524,7 +538,7 @@ public class CutPlanAPI {
 				
 				for (CutPlan_Size cutPlanSize : listsize_sodo) {
 					CutPlan_Row cut_row = cutplanrowService.findOne(cutPlanSize.getCutplanrowid_link());
-					int la_vai = cut_row.getLa_vai();
+					int la_vai = cut_row.getLa_vai() == null ? 0 : cut_row.getLa_vai();
 					sodo += (cutPlanSize.getAmount() == null ? 0 : cutPlanSize.getAmount()) * la_vai;
 				}
 				
