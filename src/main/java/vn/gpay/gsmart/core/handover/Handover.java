@@ -101,6 +101,26 @@ public class Handover implements Serializable {
 	@Column(name ="receive_date")
 	private Date receive_date;
 	
+	@Column(name ="amount_time_to_receive")
+	private Long amount_time_to_receive; // miliseconds
+	
+	@Transient
+	public String getAmountTimeToReceiveString() {
+		if(amount_time_to_receive != null) {
+			long minutes = (amount_time_to_receive / 1000) / 60;
+			long seconds = (amount_time_to_receive / 1000) % 60;
+			long hours = minutes / 60;
+			minutes = minutes % 60;
+			
+			String hourStr = hours < 10 ? "0"+hours : ""+hours;
+			String minuteStr = minutes < 10 ? "0"+minutes : ""+minutes;
+			String secondStr = seconds < 10 ? "0"+seconds : ""+seconds;
+			
+			return hourStr + ":" + minuteStr + ":" + secondStr;
+		}
+		return "";
+	}
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
     @JoinColumn(name="handoverid_link",insertable=false,updatable =false)
@@ -411,6 +431,14 @@ public class Handover implements Serializable {
 
 	public void setReceive_date(Date receive_date) {
 		this.receive_date = receive_date;
+	}
+
+	public Long getAmount_time_to_receive() {
+		return amount_time_to_receive;
+	}
+
+	public void setAmount_time_to_receive(Long amount_time_to_receive) {
+		this.amount_time_to_receive = amount_time_to_receive;
 	}
 	
 }

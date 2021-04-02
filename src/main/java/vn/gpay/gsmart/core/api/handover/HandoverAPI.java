@@ -3,6 +3,7 @@ package vn.gpay.gsmart.core.api.handover;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -672,6 +673,7 @@ public class HandoverAPI {
 			Date old_receive_date = handover.getReceive_date();
 			Date old_lasttimeupdate = handover.getLasttimeupdate();
 			Long old_lastuserupdateid_link = handover.getLastuserupdateid_link();
+			Long old_amount_time_to_receive = handover.getAmount_time_to_receive();
 			
 			if(entity.approver_userid_link != 0) { 
 				handover.setApprover_userid_link(entity.approver_userid_link);
@@ -679,10 +681,14 @@ public class HandoverAPI {
 			if(entity.receiver_userid_link != 0) { 
 				handover.setReceiver_userid_link(entity.receiver_userid_link);
 				handover.setReceive_date(date);
+				
+				Long amount_time_to_receive = date.getTime() - handover.getHandover_date().getTime();
+				handover.setAmount_time_to_receive(amount_time_to_receive);
 			}
 			handover.setLasttimeupdate(date);
 			handover.setLastuserupdateid_link(user.getId());
 			handover.setStatus(entity.status);
+			
 			
 			// status = 0 // chưa duyệt
 			// status = 1 // đã duyệt
@@ -721,6 +727,7 @@ public class HandoverAPI {
 							handover.setReceive_date(old_receive_date);
 							handover.setLasttimeupdate(old_lasttimeupdate);
 							handover.setLastuserupdateid_link(old_lastuserupdateid_link);
+							handover.setAmount_time_to_receive(old_amount_time_to_receive);
 							handover = handoverService.save(handover);
 							
 							response.data = handover;
@@ -801,6 +808,7 @@ public class HandoverAPI {
 			handover.setReceive_date(null);
 			handover.setLasttimeupdate(date);
 			handover.setLastuserupdateid_link(user.getId());
+			handover.setAmount_time_to_receive(null);
 			handover = handoverService.save(handover);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

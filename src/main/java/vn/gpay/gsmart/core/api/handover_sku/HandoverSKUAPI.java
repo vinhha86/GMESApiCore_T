@@ -203,9 +203,22 @@ public class HandoverSKUAPI {
 								newHandoverSKU.setSkuSizeString(porderGrantSku.getCoSanPham());
 								newHandoverSKU.setSkuSizeSortValInt(porderGrantSku.getSort_size());
 			//					handoverSkuService.save(newHandoverSKU);
-								list.add(newHandoverSKU);
+								
+								// kiểm tra xem list đã chứa skuid_link này hay chưa
+								// trong trường hợp 1 lệnh tách làm 2 lệnh con và kéo vào cùng 1 chuyền
+								// 2 lệnh con này có thể có các sku trùng nhau
+								boolean isContainSku = false;
+								for(HandoverSKU handoversku : list) {
+									if(handoversku.getSkuid_link().equals(newHandoverSKU.getSkuid_link())) {
+										isContainSku = true;
+										break;
+									}
+								}
+								if(!isContainSku) { // thêm nếu không chứa sku này
+									list.add(newHandoverSKU);
+								}
 							}
-							break;
+//							break;
 						}
 					}
 				}
