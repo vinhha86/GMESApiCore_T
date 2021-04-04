@@ -7,5 +7,6 @@ public class HandoverSKU_getByHandoverProduct_request extends RequestBase {
 	public Long handoverproductid_link;
 	public Long porderid_link;
 	public Long productid_link;
-	public Long orgid_to_link; // org grant
+	public Long orgid_to_link; // org grant (cut to line)
+	public Long orgid_from_link; // org grant ((line to pack))
 }

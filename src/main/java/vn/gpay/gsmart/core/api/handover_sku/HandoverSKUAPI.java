@@ -143,46 +143,53 @@ public class HandoverSKUAPI {
 			
 			
 			if(list.size() == 0) {
-//				if(entity.orgid_to_link == null) {
-//					System.out.println(11);
-//					// create
-//					Date date = new Date();
-//					Long porderid_link = entity.porderid_link;
-//	//				Long handoverid_link = entity.handoverid_link;
-//	//				Long handoverproductid_link = entity.handoverproductid_link;
-//	//				Long productid_link = entity.productid_link;
-//					
-//					// tim cac sku theo porder
-//					
-//					List<SKU> skus = skuService.getSKUforHandOver(porderid_link);
-//					System.out.println("size1" + skus.size());
-//					for(SKU sku : skus) {
-//						HandoverSKU newHandoverSKU = new HandoverSKU();
-//						newHandoverSKU.setId(0L);
-//						newHandoverSKU.setOrgrootid_link(user.getRootorgid_link());
-//	//					newHandoverSKU.setHandoverid_link(entity.handoverid_link);
-//	//					newHandoverSKU.setHandoverproductid_link(entity.handoverproductid_link);
-//						newHandoverSKU.setProductid_link(entity.productid_link);
-//						newHandoverSKU.setTotalpackage(0);
-//						newHandoverSKU.setTotalpackagecheck(0);
-//						newHandoverSKU.setUsercreateid_link(user.getId());
-//						newHandoverSKU.setTimecreate(date);
-//						newHandoverSKU.setLastuserupdateid_link(user.getId());
-//						newHandoverSKU.setLasttimeupdate(date);
-//						// sku properties
-//						newHandoverSKU.setSkuid_link(sku.getId());
-//						newHandoverSKU.setSkuCodeString(sku.getCode());
-//						newHandoverSKU.setSkuColorString(sku.getColor_name());
-//						newHandoverSKU.setSkuSizeString(sku.getSize_name());
-//						newHandoverSKU.setSkuSizeSortValInt(sku.getSort_size());
-//	//					handoverSkuService.save(newHandoverSKU);
-//						list.add(newHandoverSKU);
-//					}
-//				}else 
-				if(entity.orgid_to_link != null) {
+				if(entity.orgid_to_link != null && entity.orgid_from_link == null) {
 					List<POrderGrant> pOrderGrants = porderGrantService.getByOrderId(entity.porderid_link);
 					for(POrderGrant pordergrant : pOrderGrants) { // System.out.println("id" + pordergrant.getId());
 						if(entity.orgid_to_link.equals(pordergrant.getGranttoorgid_link())) {
+							List<POrderGrant_SKU> porder_grant_skus = pordergrantskuService.getPOrderGrant_SKU(pordergrant.getId());
+							
+							for(POrderGrant_SKU porderGrantSku : porder_grant_skus) {
+								HandoverSKU newHandoverSKU = new HandoverSKU();
+								newHandoverSKU.setId(0L);
+								newHandoverSKU.setOrgrootid_link(user.getRootorgid_link());
+								newHandoverSKU.setProductid_link(entity.productid_link);
+								newHandoverSKU.setTotalpackage(0);
+								newHandoverSKU.setTotalpackagecheck(0);
+								newHandoverSKU.setUsercreateid_link(user.getId());
+								newHandoverSKU.setTimecreate(new Date());
+								newHandoverSKU.setLastuserupdateid_link(user.getId());
+								newHandoverSKU.setLasttimeupdate(new Date());
+								// sku properties
+								newHandoverSKU.setSkuid_link(porderGrantSku.getSkuid_link());
+								newHandoverSKU.setSkuCodeString(porderGrantSku.getSkucode());
+								newHandoverSKU.setSkuColorString(porderGrantSku.getMauSanPham());
+								newHandoverSKU.setSkuSizeString(porderGrantSku.getCoSanPham());
+								newHandoverSKU.setSkuSizeSortValInt(porderGrantSku.getSort_size());
+			//					handoverSkuService.save(newHandoverSKU);
+								
+								// kiểm tra xem list đã chứa skuid_link này hay chưa
+								// trong trường hợp 1 lệnh tách làm 2 lệnh con và kéo vào cùng 1 chuyền
+								// 2 lệnh con này có thể có các sku trùng nhau
+								boolean isContainSku = false;
+								for(HandoverSKU handoversku : list) {
+									if(handoversku.getSkuid_link().equals(newHandoverSKU.getSkuid_link())) {
+										isContainSku = true;
+										break;
+									}
+								}
+								if(!isContainSku) { // thêm nếu không chứa sku này
+									list.add(newHandoverSKU);
+								}
+							}
+//							break;
+						}
+					}
+				}
+				if(entity.orgid_to_link == null && entity.orgid_from_link != null) {
+					List<POrderGrant> pOrderGrants = porderGrantService.getByOrderId(entity.porderid_link);
+					for(POrderGrant pordergrant : pOrderGrants) { // System.out.println("id" + pordergrant.getId());
+						if(entity.orgid_from_link.equals(pordergrant.getGranttoorgid_link())) {
 							List<POrderGrant_SKU> porder_grant_skus = pordergrantskuService.getPOrderGrant_SKU(pordergrant.getId());
 							
 							for(POrderGrant_SKU porderGrantSku : porder_grant_skus) {
