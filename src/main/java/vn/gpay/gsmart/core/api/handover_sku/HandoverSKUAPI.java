@@ -143,6 +143,49 @@ public class HandoverSKUAPI {
 			
 			
 			if(list.size() == 0) {
+				if(entity.orgid_to_link == null && entity.orgid_from_link == null) {
+					List<POrderGrant> pOrderGrants = porderGrantService.getByOrderId(entity.porderid_link);
+					for(POrderGrant pordergrant : pOrderGrants) { // System.out.println("id" + pordergrant.getId());
+						if(true) {
+							List<POrderGrant_SKU> porder_grant_skus = pordergrantskuService.getPOrderGrant_SKU(pordergrant.getId());
+							
+							for(POrderGrant_SKU porderGrantSku : porder_grant_skus) {
+								HandoverSKU newHandoverSKU = new HandoverSKU();
+								newHandoverSKU.setId(0L);
+								newHandoverSKU.setOrgrootid_link(user.getRootorgid_link());
+								newHandoverSKU.setProductid_link(entity.productid_link);
+								newHandoverSKU.setTotalpackage(0);
+								newHandoverSKU.setTotalpackagecheck(0);
+								newHandoverSKU.setUsercreateid_link(user.getId());
+								newHandoverSKU.setTimecreate(new Date());
+								newHandoverSKU.setLastuserupdateid_link(user.getId());
+								newHandoverSKU.setLasttimeupdate(new Date());
+								// sku properties
+								newHandoverSKU.setSkuid_link(porderGrantSku.getSkuid_link());
+								newHandoverSKU.setSkuCodeString(porderGrantSku.getSkucode());
+								newHandoverSKU.setSkuColorString(porderGrantSku.getMauSanPham());
+								newHandoverSKU.setSkuSizeString(porderGrantSku.getCoSanPham());
+								newHandoverSKU.setSkuSizeSortValInt(porderGrantSku.getSort_size());
+			//					handoverSkuService.save(newHandoverSKU);
+								
+								// kiểm tra xem list đã chứa skuid_link này hay chưa
+								// trong trường hợp 1 lệnh tách làm 2 lệnh con và kéo vào cùng 1 chuyền
+								// 2 lệnh con này có thể có các sku trùng nhau
+								boolean isContainSku = false;
+								for(HandoverSKU handoversku : list) {
+									if(handoversku.getSkuid_link().equals(newHandoverSKU.getSkuid_link())) {
+										isContainSku = true;
+										break;
+									}
+								}
+								if(!isContainSku) { // thêm nếu không chứa sku này
+									list.add(newHandoverSKU);
+								}
+							}
+//							break;
+						}
+					}
+				}
 				if(entity.orgid_to_link != null && entity.orgid_from_link == null) {
 					List<POrderGrant> pOrderGrants = porderGrantService.getByOrderId(entity.porderid_link);
 					for(POrderGrant pordergrant : pOrderGrants) { // System.out.println("id" + pordergrant.getId());
