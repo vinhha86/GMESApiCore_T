@@ -720,7 +720,11 @@ public class HandoverAPI {
 								handovertypeid_link, 
 								granttoorgid_link, porderid_link, 
 								receive_date, sumProduct, action);
-						if(result.equals("Không tồn tại POrderProcessing")) {
+						if(
+								result.equals("Không tồn tại POrderProcessing") ||
+								result.equals("Tổng SL vào chuyền không được vượt quá SL đơn") ||
+								result.equals("Tổng SL nhập hoàn thiện không được vượt quá tổng SL vào chuyền")
+						) {
 							handover.setStatus(oldStatus);
 							handover.setApprover_userid_link(old_approver_userid_link);
 							handover.setReceiver_userid_link(old_receiver_userid_link);
@@ -728,6 +732,7 @@ public class HandoverAPI {
 							handover.setLasttimeupdate(old_lasttimeupdate);
 							handover.setLastuserupdateid_link(old_lastuserupdateid_link);
 							handover.setAmount_time_to_receive(old_amount_time_to_receive);
+							handover.setTotalpackagecheck(0);
 							handover = handoverService.save(handover);
 							
 							response.data = handover;
@@ -849,13 +854,32 @@ public class HandoverAPI {
 				if(action.equals("Xác nhận")) {
 			        // Xác nhận lúc nào cũng là ngày hiện tại nên ko cần tính lại các ngày sau
 					if(handovertypeid_link.equals(HandOverType.HANDOVER_TYPE_CUT_LINE)) { // cut to line 
-						pprocess.setAmountinput(pprocess.getAmountinput() + sumProduct);
-		    			pprocess.setAmountinputsum((null==pprocess.getAmountinputsumprev()?0:pprocess.getAmountinputsumprev()) 
-		    					+ (null==pprocess.getAmountinput()?0:pprocess.getAmountinput()));
+						// kiểm tra amountinputsum có > grantamount của pordergrant không
+						Integer amountinput = null==pprocess.getAmountinput()?0:pprocess.getAmountinput() + sumProduct;
+						Integer amountinputsum = (null==pprocess.getAmountinputsumprev()?0:pprocess.getAmountinputsumprev())
+								+ amountinput;
+						Integer grantamount = null==pprocess.getGrantamount()?0:pprocess.getGrantamount();
+						
+						if(amountinputsum <= grantamount) {
+							pprocess.setAmountinput(amountinput);
+			    			pprocess.setAmountinputsum(amountinputsum);
+						}else {
+							return "Tổng SL vào chuyền không được vượt quá SL đơn";
+						}
+						
 					}else if(handovertypeid_link.equals(HandOverType.HANDOVER_TYPE_LINE_PACK)) { // line to packstocked
-						pprocess.setAmountpackstocked(pprocess.getAmountpackstocked() + sumProduct);
-		    			pprocess.setAmountpackstockedsum((null==pprocess.getAmountpackstockedsumprev()?0:pprocess.getAmountpackstockedsumprev()) 
-		    					+ (null==pprocess.getAmountpackstocked()?0:pprocess.getAmountpackstocked()));
+						// kiểm tra amountpackstockedsum có > amountinputsum không
+						Integer amountpackstocked = null==pprocess.getAmountpackstocked()?0:pprocess.getAmountpackstocked() + sumProduct;
+						Integer amountpackstockedsum = (null==pprocess.getAmountpackstockedsumprev()?0:pprocess.getAmountpackstockedsumprev())
+								+ amountpackstocked;
+						Integer amountinputsum = null==pprocess.getAmountinputsum()?0:pprocess.getAmountinputsum();
+						
+						if(amountpackstockedsum <= amountinputsum) {
+							pprocess.setAmountpackstocked(amountpackstocked);
+			    			pprocess.setAmountpackstockedsum(amountpackstockedsum);
+						}else {
+							return "Tổng SL nhập hoàn thiện không được vượt quá tổng SL vào chuyền";
+						}
 					}
 				}else if(action.equals("Huỷ")) {
 					// Huỷ là sau xác nhận nên lúc nào cũng tồn tại POrderProcessing
@@ -1009,15 +1033,33 @@ public class HandoverAPI {
 				pprocess.setTimecreated(new Date());
 				
 				if(handovertypeid_link.equals(HandOverType.HANDOVER_TYPE_CUT_LINE)) {
-					if(temp.getAmountinputsum() == null) temp.setAmountinputsum(0);
-					pprocess.setAmountinput(sumProduct);
-					pprocess.setAmountinputsumprev(temp.getAmountinputsum());
-					pprocess.setAmountinputsum(temp.getAmountinputsum() + sumProduct);
+					// kiểm tra amountinputsum có > grantamount của porder grant không
+					Integer amountinput = sumProduct;
+					Integer amountinputsum = temp.getAmountinputsum() + amountinput;
+					Integer grantamount = null==temp.getGrantamount()?0:temp.getGrantamount();
+					
+					if(amountinputsum <= grantamount) {
+		    			pprocess.setAmountinput(amountinput);
+						pprocess.setAmountinputsumprev(temp.getAmountinputsum());
+						pprocess.setAmountinputsum(amountinputsum);
+					}else {
+						return "Tổng SL vào chuyền không được vượt quá SL đơn";
+					}
+					
+					
 				}else if(handovertypeid_link.equals(HandOverType.HANDOVER_TYPE_LINE_PACK)) {
-					if(temp.getAmountpackstockedsum() == null) temp.setAmountpackstockedsum(0);
-					pprocess.setAmountpackstocked(sumProduct);
-					pprocess.setAmountpackstockedsumprev(temp.getAmountpackstockedsum());
-					pprocess.setAmountpackstockedsum(temp.getAmountpackstockedsum() + sumProduct);
+					// kiểm tra amountpackstockedsum có > amountinputsum không
+					Integer amountpackstocked = sumProduct;
+					Integer amountpackstockedsum = temp.getAmountpackstockedsum() + amountpackstocked;
+					Integer amountinputsum = null==pprocess.getAmountinputsum()?0:pprocess.getAmountinputsum();
+					
+					if(amountpackstockedsum <= amountinputsum) {
+						pprocess.setAmountpackstocked(amountpackstocked);
+						pprocess.setAmountpackstockedsumprev(temp.getAmountpackstockedsum());
+						pprocess.setAmountpackstockedsum(amountpackstockedsum);
+					}else {
+						return "Tổng SL nhập hoàn thiện không được vượt quá tổng SL vào chuyền";
+					}
 				}
 			}
 			//Update trang thai lenh tuong ung
@@ -1040,6 +1082,7 @@ public class HandoverAPI {
 	        porderProcessingService.save(pprocess);
 		}else {
 			return "Không tồn tại POrderProcessing";
+			// ko còn tồn tại porder processing gốc được sinh ra khi kéo lệnh vào chuyền
 		}
 		return "OK";
 		
