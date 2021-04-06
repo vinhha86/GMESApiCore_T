@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.stockout_order.IStockout_order_d_service;
+import vn.gpay.gsmart.core.stockout_order.IStockout_order_pkl_Service;
 import vn.gpay.gsmart.core.stockout_order.IStockout_order_service;
 import vn.gpay.gsmart.core.stockout_order.Stockout_order;
 import vn.gpay.gsmart.core.stockout_order.Stockout_order_d;
+import vn.gpay.gsmart.core.stockout_order.Stockout_order_pkl;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -26,6 +28,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 public class Stockout_orderAPI {
 	@Autowired IStockout_order_service stockout_order_Service;
 	@Autowired IStockout_order_d_service stockout_order_d_Service;
+	@Autowired IStockout_order_pkl_Service stockout_pkl_Service;
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ResponseEntity<create_order_response> Create(HttpServletRequest request,
@@ -49,18 +52,37 @@ public class Stockout_orderAPI {
 			Long stockout_orderid_link = order.getId();
 			for(Stockout_order_d detail : entity.detail) {
 				detail.setStockoutorderid_link(stockout_orderid_link);
-				detail.setOrgrootid_link(orgrootid_link);
 				if(detail.getId() == null) {
 					detail.setTimecreate(current_time);
 					detail.setUsercreateid_link(user.getId());
+					detail.setOrgrootid_link(orgrootid_link);
 				}
 				else {
 					detail.setLasttimeupdate(current_time);
 					detail.setLastuserupdateid_link(user.getId());
 				}
 				
-				stockout_order_d_Service.save(detail);
+				Long stockout_order_did_link = detail.getId();
+				
+				for(Stockout_order_pkl pkl : detail.getStockout_order_pkl()) {
+					pkl.setStockoutorderdid_link(stockout_order_did_link);
+					pkl.setStockoutorderid_link(stockout_orderid_link);
+					
+					if(pkl.getId() == null) {
+						pkl.setTimecreate(current_time);
+						pkl.setUsercreateid_link(user.getId());
+						pkl.setOrgid_link(orgrootid_link);
+					}
+					else {
+						pkl.setLasttimeupdate(current_time);
+						pkl.setLastuserupdateid_link(user.getId());
+					}
+				}
+								
+				detail = stockout_order_d_Service.save(detail);
 			}
+			
+			//cap nhat lai warehouse
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -86,6 +108,22 @@ public class Stockout_orderAPI {
 			response.setMessage(e.getMessage());
 		}
 		return new ResponseEntity<getby_id_response>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/unlock_pkl", method = RequestMethod.POST)
+	public ResponseEntity<unlock_stockout_pkl_response> UnlockStockoutPKL(HttpServletRequest request,
+			@RequestBody unlock_stockout_pkl_request entity) {
+		unlock_stockout_pkl_response response = new unlock_stockout_pkl_response();
+		try {
+			stockout_pkl_Service.deleteById(entity.id);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<unlock_stockout_pkl_response>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/getdetail_byorder", method = RequestMethod.POST)

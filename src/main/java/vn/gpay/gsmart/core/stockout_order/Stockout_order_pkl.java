@@ -7,8 +7,14 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 @Table(name="stockout_order_pklist")
 @Entity
@@ -41,6 +47,40 @@ public class Stockout_order_pkl implements Serializable{
 	private Long lastuserupdateid_link;
 	private Date lasttimeupdate;
 	private String spaceepc_link;
+	private Float met;
+	
+	public Float getMet() {
+		return met;
+	}
+
+	public void setMet(Float met) {
+		this.met = met;
+	}
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="stockoutorderdid_link",insertable=false,updatable =false)
+    private Stockout_order_d detail;
+	
+	@Transient
+	public String getmaterial_product_code() {
+		return detail.getMaterialCode();
+	}
+	
+	@Transient
+	public String getColor_name() {
+		return detail.getTenMauNPL();
+	}
+	
+	@Transient
+	public Long getIdx() {
+		return id;
+	}
+	
+	@Transient
+	public String getunit_name() {
+		return detail.getUnitName();
+	}
+	
 	public Long getId() {
 		return id;
 	}
