@@ -390,9 +390,9 @@ public class POrderBomAPI {
 				
 				map.put("materialid_link", pContractProductBom.getMaterialid_link().toString());
 				
-				map.put("materialName", pContractProductBom.getMaterialName().toString());
+				map.put("materialName", pContractProductBom.getMaterialName()+"");
 				
-				map.put("materialCode", pContractProductBom.getMaterialCode().toString());
+				map.put("materialCode", pContractProductBom.getMaterialCode()+"");
 				
 				map.put("orgrootid_link", pContractProductBom.getOrgrootid_link().toString());
 				
@@ -408,11 +408,11 @@ public class POrderBomAPI {
 				
 				map.put("thanhPhanVai", pContractProductBom.getThanhPhanVai().toString());
 				
-				map.put("unitName", pContractProductBom.getUnitName().toString());
+				map.put("unitName", pContractProductBom.getUnitName()+"");
 				
-				map.put("porderid_link", pContractProductBom.getPorderid_link().toString());
+				map.put("porderid_link", pContractProductBom.getPorderid_link()+"");
 				
-				map.put("unitid_link", pContractProductBom.getUnitid_link().toString());
+				map.put("unitid_link", pContractProductBom.getUnitid_link()+"");
 				
 				for(Long size : List_size) {
 					List<POrderBOMSKU> listbomsku_clone = new ArrayList<POrderBOMSKU>(listbomsku);
