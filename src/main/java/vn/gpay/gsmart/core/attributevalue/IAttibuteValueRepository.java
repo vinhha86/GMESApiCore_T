@@ -29,4 +29,16 @@ public interface IAttibuteValueRepository extends JpaRepository<Attributevalue, 
 	public List<Attributevalue> getByValue(
 			@Param ("value")final String value,
 			@Param ("attributeid_link")final Long attributeid_link);
+	
+	@Query(value = "select distinct a from Attributevalue a "
+			+ "inner join SKU_Attribute_Value b on a.id = b.attributevalueid_link "
+			+ "inner join SKU c on c.id = b.skuid_link "
+			+ "inner join StockInD d on d.skuid_link = c.id "
+			+ "inner join StockIn e on d.stockinid_link = e.id "
+			+ "where e.id = :stockinid_link "
+			+ "and a.attributeid_link = 4 "
+			+ "order by a.sortvalue "
+			)
+	public List<Attributevalue> getColorForStockin(
+			@Param ("stockinid_link")final Long stockinid_link);
 }

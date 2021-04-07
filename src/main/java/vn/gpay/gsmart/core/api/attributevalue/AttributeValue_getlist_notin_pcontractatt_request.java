@@ -6,4 +6,5 @@ public class AttributeValue_getlist_notin_pcontractatt_request extends RequestBa
 	public long pcontractid_link;
 	public long productid_link;
 	public long attributeid_link;
+	public long stockinid_link;
 }

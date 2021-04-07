@@ -64,5 +64,11 @@ public class AttributeValueService extends AbstractService<Attributevalue> imple
 		return repo.getByValue(value, attributeid_link);
 	}
 
+	@Override
+	public List<Attributevalue> getColorForStockin(Long stockinid_link) {
+		// TODO Auto-generated method stub
+		return repo.getColorForStockin(stockinid_link);
+	}
+
 
 }

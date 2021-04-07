@@ -167,4 +167,24 @@ public class AttributeValueAPI {
 		    return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/getColorForStockin",method = RequestMethod.POST)
+	public ResponseEntity<AttributeValue_getlist_byId_Response> getColorForStockin
+	(@RequestBody AttributeValue_getlist_notin_pcontractatt_request entity,HttpServletRequest request ) {
+		AttributeValue_getlist_byId_Response response = new AttributeValue_getlist_byId_Response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long stockinid_link = entity.stockinid_link;
+			
+			response.data = attValueService.getColorForStockin(stockinid_link);
+			
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<AttributeValue_getlist_byId_Response>(response,HttpStatus.OK);
+		}
+		catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<AttributeValue_getlist_byId_Response>(response,HttpStatus.OK);
+		}
+	}
 }
