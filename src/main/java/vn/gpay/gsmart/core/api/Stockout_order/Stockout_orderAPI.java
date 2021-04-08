@@ -159,19 +159,23 @@ public class Stockout_orderAPI {
 		calculate_response response = new calculate_response();
 		try {
 			Stockout_order order = stockout_order_Service.findOne(entity.id);
+			//Lay danh sach cac mau cua lenh
+			List<Stockout_order_coloramount> list_color_amount = amount_color_Service.getby_stockout_Order(entity.id);
 			//lay nhung npl cua detail
 			List<Stockout_order_d> list_detail = stockout_order_d_Service.getby_Stockout_order(entity.id);
 			
 			for(Stockout_order_d detail : list_detail) {
-				
-			}
-			
-			List<Stockout_order_coloramount> list_color_amount = amount_color_Service.getby_stockout_Order(entity.id);
-			for(Stockout_order_coloramount color : list_color_amount) {
-				List<PorderBomColor> list_bom_color = bomcolorService.getby_porder_and_color(order.getPorderid_link(), color.getColorid_link());
-				for(PorderBomColor bom_color: list_bom_color) {
-					
+				float amount_req = 0;
+				for(Stockout_order_coloramount color : list_color_amount) {
+					List<PorderBomColor> list_bom_color = bomcolorService.getby_porder_and_material_and_color(order.getPorderid_link(), detail.getMaterial_skuid_link(), color.getColorid_link());
+					if(list_bom_color.size() > 0) {
+						int amount = color.getAmount() == null ? 0 : color.getAmount();
+						float bom = list_bom_color.get(0).getAmount() == null ? 0 : list_bom_color.get(0).getAmount();
+						amount_req += amount * bom;
+					}
 				}
+				detail.setTotalyds(amount_req);
+				stockout_order_d_Service.save(detail);
 			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
