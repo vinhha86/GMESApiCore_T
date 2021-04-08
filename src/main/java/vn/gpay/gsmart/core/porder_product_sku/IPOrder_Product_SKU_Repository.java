@@ -31,4 +31,12 @@ public interface IPOrder_Product_SKU_Repository extends JpaRepository<POrder_Pro
 			+ "and porderid_link = :porderid_link ")
 	public List<POrder_Product_SKU> get_sku_inporder(@Param ("orgrootid_link")final  Long orgrootid_link,
 			@Param ("porderid_link")final  Long porderid_link);
+	
+	@Query(value = "select b.id from POrder_Product_SKU c "
+			+ "inner join SKU_Attribute_Value a on c.skuid_link = a.skuid_link "
+			+ "inner join Attributevalue b on b.id = a.attributevalueid_link "
+			+ "where porderid_link = :porderid_link and b.attributeid_link = 4 "
+			+ "group by b.id")
+	public List<Long> get_colorid_byporder(
+			@Param ("porderid_link")final  Long porderid_link);
 }

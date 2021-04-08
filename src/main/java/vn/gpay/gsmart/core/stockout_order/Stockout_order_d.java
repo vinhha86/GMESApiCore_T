@@ -67,6 +67,15 @@ public class Stockout_order_d implements Serializable {
 	private List<Stockout_order_pkl>  stockout_order_pkl  = new ArrayList<Stockout_order_pkl>();
 	
 	@Transient
+	public Float gettotalyds_lock() {
+		float sum = 0;
+		for(Stockout_order_pkl pkl : stockout_order_pkl) {
+			sum += pkl.getMet();
+		}
+		return sum;
+	}
+	
+	@Transient
 	public String getUnitName() {
 		if(unit!=null)
 			return unit.getName();
