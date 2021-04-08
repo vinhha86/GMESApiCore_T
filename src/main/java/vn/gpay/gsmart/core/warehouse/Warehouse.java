@@ -109,6 +109,9 @@ public class Warehouse implements Serializable {
 	private Date lasttimeupdate;
 	
 	private long sizeid_link;
+	private Float met;
+	
+	
 
 	public String getSkucode() {
 		return skucode;
@@ -401,6 +404,14 @@ public class Warehouse implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public Float getMet() {
+		return met;
+	}
+
+	public void setMet(Float met) {
+		this.met = met;
 	}
 	
 	

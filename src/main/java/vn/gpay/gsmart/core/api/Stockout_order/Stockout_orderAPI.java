@@ -18,6 +18,7 @@ import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder_bom_color.IPOrderBomColor_Service;
 import vn.gpay.gsmart.core.porder_bom_color.PorderBomColor;
 import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
+import vn.gpay.gsmart.core.security.GpayAuthentication;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.stockout_order.IStockout_order_coloramount_Service;
 import vn.gpay.gsmart.core.stockout_order.IStockout_order_d_service;
@@ -28,6 +29,7 @@ import vn.gpay.gsmart.core.stockout_order.Stockout_order_coloramount;
 import vn.gpay.gsmart.core.stockout_order.Stockout_order_d;
 import vn.gpay.gsmart.core.stockout_order.Stockout_order_pkl;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
+import vn.gpay.gsmart.core.warehouse.Warehouse;
 
 @RestController
 @RequestMapping("/api/v1/stockoutorder")
@@ -151,6 +153,58 @@ public class Stockout_orderAPI {
 			response.setMessage(e.getMessage());
 		}
 		return new ResponseEntity<delete_stockout_order_d_response>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/getpkl_bydetail", method = RequestMethod.POST)
+	public ResponseEntity<get_pkl_by_detail_response> getPKLByDetail(HttpServletRequest request,
+			@RequestBody get_pkl_by_detail_request entity) {
+		get_pkl_by_detail_response response = new get_pkl_by_detail_response();
+		try {
+			response.data = stockout_pkl_Service.getby_detail(entity.id);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<get_pkl_by_detail_response>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/add_pkl", method = RequestMethod.POST)
+	public ResponseEntity<add_pkl_response> AddPKL(HttpServletRequest request,
+			@RequestBody add_pkl_request entity) {
+		add_pkl_response response = new add_pkl_response();
+		GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Long orgid_link = user.getOrgid_link();
+		try {
+			for(Warehouse wh : entity.data) {
+				Stockout_order_pkl pkl = new Stockout_order_pkl();
+				pkl.setColorid_link(wh.getColorid_link());
+				pkl.setEncryptdatetime(wh.getEncryptdatetime());
+				pkl.setEpc(wh.getEpc());
+				pkl.setId(null);
+				pkl.setLotnumber(wh.getLotnumber());
+				pkl.setMet(wh.getMet());
+				pkl.setOrgid_link(orgid_link);
+				pkl.setPackageid(wh.getPackageid());
+				pkl.setSkuid_link(wh.getSkuid_link());
+				pkl.setStockoutorderdid_link(entity.stockoutorderid_link);
+				pkl.setStockoutorderid_link(entity.stockoutorderid_link);
+				pkl.setTimecreate(new Date());
+				pkl.setUsercreateid_link(user.getId());
+				pkl.setWidth(wh.getWidth());
+				
+				stockout_pkl_Service.save(pkl);
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<add_pkl_response>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/calculate", method = RequestMethod.POST)
