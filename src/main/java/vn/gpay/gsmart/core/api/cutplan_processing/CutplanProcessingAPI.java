@@ -26,7 +26,9 @@ import vn.gpay.gsmart.core.cutplan_processing.CutplanProcessingD;
 import vn.gpay.gsmart.core.cutplan_processing.ICutplanProcessingDService;
 import vn.gpay.gsmart.core.cutplan_processing.ICutplanProcessingService;
 import vn.gpay.gsmart.core.org.IOrgService;
-import vn.gpay.gsmart.core.security.GpayAuthentication;
+import vn.gpay.gsmart.core.porder.IPOrder_Service;
+import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -37,6 +39,8 @@ public class CutplanProcessingAPI {
 	@Autowired ICutPlan_Row_Service cutplanRowService;
 	@Autowired ICutPlan_Size_Service cutplan_SizeService;
 	@Autowired IOrgService orgService;
+	@Autowired IPOrder_Service porderService;
+	@Autowired ICutPlan_Row_Service cutplanrowService;
 	
 	@RequestMapping(value = "/cutplan_processing_create",method = RequestMethod.POST)
 	@Transactional(rollbackFor = RuntimeException.class)
@@ -46,7 +50,9 @@ public class CutplanProcessingAPI {
 		try {
 			
 			if(entity.data.size()>0) {
-				GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
+				GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+				Long orgrootid_link = user.getRootorgid_link();
+				
 				if (user != null) {
 					//Nếu thêm mới isNew = true
 //					boolean isNew = false;
@@ -55,7 +61,7 @@ public class CutplanProcessingAPI {
 				    if(cutplanProcessing.getId()==null || cutplanProcessing.getId()==0) {
 //				    	isNew = true;
 				    	cutplanProcessing.setOrgrootid_link(user.getRootorgid_link());
-				    	cutplanProcessing.setUsercreatedid_link(user.getUserId());
+				    	cutplanProcessing.setUsercreatedid_link(user.getId());
 				    	cutplanProcessing.setTimecreated(new Date());
 				    	cutplanProcessing.setStatus(0);
 				    }
@@ -76,6 +82,13 @@ public class CutplanProcessingAPI {
 			    	cutplanProcessing.setAmountcut(total_size_amount*tong_so_la);
 			    	
 			    	cutplanProcessing = cutplanProcessingService.save(cutplanProcessing);
+			    	
+			    	Long porderid_link = entity.porderid_link;
+			    	POrder porder = porderService.findOne(porderid_link);
+			    	Long material_skuid_link = entity.material_skuid_link;
+			    	Long colorid_link = entity.colorid_link;
+			    	
+					cutplanrowService.sync_porder_bom(material_skuid_link, porder, colorid_link, user.getId(), orgrootid_link);
 					
 					response.data = cutplanProcessing;
 					response.id = cutplanProcessing.getId();

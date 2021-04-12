@@ -492,8 +492,8 @@ public class CutPlanAPI {
 			
 			
 			//dong bo dinh muc
-			POrder porder = porderService.findOne(porderid_link);
-			cutplanrowService.sync_porder_bom(material_skuid_link, porder, colorid_link, user.getId(), orgrootid_link);
+//			POrder porder = porderService.findOne(porderid_link);
+//			cutplanrowService.sync_porder_bom(material_skuid_link, porder, colorid_link, user.getId(), orgrootid_link);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

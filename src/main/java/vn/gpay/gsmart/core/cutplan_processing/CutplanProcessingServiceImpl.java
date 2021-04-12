@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.cutplan_processing;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -41,6 +42,12 @@ public class CutplanProcessingServiceImpl extends AbstractService<CutplanProcess
 		        .desc("processingdate")
 		        .build();
 	    return repo.findAll(specification,PageRequest.of(page - 1, limit, sort));
+	}
+
+	@Override
+	public List<CutplanProcessing> getby_cutplanrow(Long cutplanrowid_link) {
+		// TODO Auto-generated method stub
+		return repo.getby_cutplanrow(cutplanrowid_link);
 	}
 
 }

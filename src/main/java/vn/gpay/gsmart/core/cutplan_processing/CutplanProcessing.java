@@ -128,7 +128,14 @@ public class CutplanProcessing implements Serializable {
 		return null;
 	}
 	
-	
+	@Transient
+	public int getLa_vai() {
+		int sum = 0;
+		for(CutplanProcessingD detail : cutplanProcessingD) {
+			sum += detail.getLa_vai() == null ? 0 : detail.getLa_vai();
+		}
+		return sum;
+	}
 
 	public Long getId() {
 		return id;
