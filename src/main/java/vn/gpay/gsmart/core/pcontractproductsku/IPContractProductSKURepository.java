@@ -104,6 +104,7 @@ public interface IPContractProductSKURepository extends JpaRepository<PContractP
 			+ "inner join Attributevalue b on b.id = a.attributevalueid_link "
 			+ "where c.productid_link = :productid_link "
 			+ "and c.pcontractid_link = :pcontractid_link and a.attributeid_link= :attributeid_link "
+			+ "group by b.id, b.sortvalue "
 			+ "order by b.sortvalue asc")
 	public List<Long> getvaluesize_in_product(
 			@Param ("productid_link")final  long productid_link, 

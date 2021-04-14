@@ -38,7 +38,7 @@ public interface IPContractBOM2SKURepository extends JpaRepository<PContractBOM2
 			+ "inner join SKU_Attribute_Value d on c.skuid_link = d.skuid_link "
 			+ "where c.productid_link = :productid_link "
 			+ "and c.pcontractid_link = :pcontractid_link "
-			+ "and d.attributevalueid_link = :colorid_link "
+			+ "and (d.attributevalueid_link = :colorid_link or :colorid_link = 0) "
 			+ "and (c.materialid_link = :materialid_link or 0 = :materialid_link)")
 	public List<PContractBOM2SKU> get_material_by_colorid_link(
 			@Param ("productid_link")final  Long productid_link,
