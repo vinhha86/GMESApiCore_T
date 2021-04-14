@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.api.Stockout_order;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 
@@ -13,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.healthmarketscience.jackcess.Database;
+import com.healthmarketscience.jackcess.DatabaseBuilder;
 
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder_bom_color.IPOrderBomColor_Service;
@@ -129,7 +133,13 @@ public class Stockout_orderAPI {
 			response.detail = stockout_order_d_Service.getby_Stockout_order(entity.id);
 			response.color = amount_color_Service.getby_stockout_Order(entity.id);
 			
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+//			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+//			
+//			//test
+////			Database database = DatabaseBuilder.open(mdbFile)
+//			Database db= DatabaseBuilder.open(new File("C:\\Users\\Phong\\Downloads\\ATSOFT\\data 20_03_2020.mdb"));  
+//			System.out.println(db.getDatabasePassword() );
+//			System.out.println();
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
