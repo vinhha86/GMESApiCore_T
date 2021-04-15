@@ -511,7 +511,6 @@ public class PContractProductBom2API {
 					//ppbomskuservice.getsize_bycolor(pcontractid_link, productid_link, colorid_link);
 			
 			for (PContractProductBom2 pContractProductBom : listbom) {
-				Map<String, String> map = new HashMap<String, String>();
 				List<PContractBom2Color> listbomcolorclone = new ArrayList<PContractBom2Color>(listbomcolor);
 				listbomcolorclone.removeIf(c -> !c.getMaterialid_link().equals(pContractProductBom.getMaterialid_link()));
 				
@@ -521,6 +520,8 @@ public class PContractProductBom2API {
 				
 				//Chay de lay tung mau san pham
 				for(Long colorid : list_colorid) {
+					Map<String, String> map = new HashMap<String, String>();
+					
 					map.put("amount", "0"+pContractProductBom.getAmount());
 					
 					map.put("amount_color", "0"+amount_color);
@@ -564,7 +565,8 @@ public class PContractProductBom2API {
 					map.put("colorid_link", "0"+colorid);
 					
 					Attributevalue value = avService.findOne(colorid);
-					map.put("color_name", ""+value.getValue());
+					String color_name = value.getValue();
+					map.put("color_name", ""+color_name);
 					
 					for(Long size : List_size) {
 						List<PContractBOM2SKU> listbomsku_clone = new ArrayList<PContractBOM2SKU>(listbomsku);
