@@ -42,7 +42,9 @@ public class Jitin_Stockin_D_Data implements Serializable {
     private String hsname;
     private String unit_name;
     private String color_name;
+    private Long sku_product_id;
     private String sku_product_code;
+    private String sku_product_desc;
     private String size_name;
 
     private List<Jitin_Stockin_PkList_Data> stockin_packinglist = new ArrayList<>();
@@ -333,6 +335,22 @@ public class Jitin_Stockin_D_Data implements Serializable {
 
 	public void setStockin_packinglist(List<Jitin_Stockin_PkList_Data> stockin_packinglist) {
 		this.stockin_packinglist = stockin_packinglist;
+	}
+
+	public Long getSku_product_id() {
+		return sku_product_id;
+	}
+
+	public void setSku_product_id(Long sku_product_id) {
+		this.sku_product_id = sku_product_id;
+	}
+
+	public String getSku_product_desc() {
+		return sku_product_desc;
+	}
+
+	public void setSku_product_desc(String sku_product_desc) {
+		this.sku_product_desc = sku_product_desc;
 	}
     
 }

@@ -33,6 +33,8 @@ public class Jitin_Stockin_PkList_Data implements Serializable {
     private Float width_check;
 	private Float met_origin;
 	private Float met_check;
+	private Float sample_check;
+	private Integer rssi;	
 	private String barcode;
 	
 	//Transient
@@ -44,7 +46,7 @@ public class Jitin_Stockin_PkList_Data implements Serializable {
 	private String unitname;
 	private String warning;
 	private String color_name;
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -266,6 +268,18 @@ public class Jitin_Stockin_PkList_Data implements Serializable {
 	}
 	public void setColor_name(String color_name) {
 		this.color_name = color_name;
+	}
+	public Float getSample_check() {
+		return sample_check;
+	}
+	public void setSample_check(Float sample_check) {
+		this.sample_check = sample_check;
+	}
+	public Integer getRssi() {
+		return rssi;
+	}
+	public void setRssi(Integer rssi) {
+		this.rssi = rssi;
 	}
 	
 	
