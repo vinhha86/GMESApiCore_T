@@ -11,6 +11,7 @@ public interface IPContractProductSKUService extends Operations<PContractProduct
 	public List<PContractProductSKU> getlistsku_bysku_and_pcontract(long skuid_link, long pcontractid_link);
 	
 	public List<Long> getlistvalue_by_product(long pcontractid_link, long productid_link, long attributeid_link);
+	public List<String> getlistnamevalue_by_product(long pcontractid_link, long productid_link, long attributeid_link);
 	
 	public List<Long> getsku_bycolor(long pcontractid_link, long productid_link, long colorid_link);
 	public List<PContractProductSKU> getsku_bycolorid_link(long pcontractid_link, long productid_link, long colorid_link);

@@ -48,6 +48,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.healthmarketscience.jackcess.impl.RowEvalContext;
+
 import vn.gpay.gsmart.core.packingtype.IPackingTypeService;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
@@ -57,11 +59,14 @@ import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price_D;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProductService;
+import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.product.IProductService;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.productpairing.IProductPairingService;
 import vn.gpay.gsmart.core.productpairing.ProductPairing;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.utils.AtributeFixValues;
+import vn.gpay.gsmart.core.utils.ColumnExcel;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -76,6 +81,7 @@ public class ReportAPI {
 	@Autowired IPContract_Price_Service priceService;
 	@Autowired IPContract_Price_DService fobpriceService;
 	@Autowired IPackingTypeService packingService;
+	@Autowired IPContractProductSKUService ppskuService;
 	
 	@RequestMapping(value = "/quatation", method = RequestMethod.POST)
 	public ResponseEntity<report_quotation_response> Quotation(HttpServletRequest request, @RequestBody report_quotation_request entity) throws IOException {
@@ -537,6 +543,93 @@ public class ReportAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<download_template_chaogia_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/download_temp_bom_candoi", method = RequestMethod.POST)
+	public ResponseEntity<down_temp_bom_response> DownloadBomCanDoi(HttpServletRequest request, @RequestBody down_temp_bom_request entity) throws IOException
+	{
+
+		down_temp_bom_response response = new down_temp_bom_response();
+		try {
+			String FolderPath = "TemplateUpload";
+			
+			// Thư mục gốc upload file.			
+			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+			
+			Date current_time = new Date();
+			File FileExport = new File(uploadRootPath+"/Template_Bom_CanDoi.xlsx");
+			File FileCopy = new File(uploadRootPath+"/Template_Bom_CanDoi_"+current_time.getTime()+".xlsx");
+			File file = new File(uploadRootPath+"/Bom_CanDoi_"+current_time.getTime()+".xlsx");
+			
+			com.google.common.io.Files.copy(FileExport, FileCopy);
+			FileInputStream is_filecopy = new FileInputStream(FileCopy);
+			
+			XSSFWorkbook workbook = new XSSFWorkbook(is_filecopy);
+			XSSFSheet sheet = workbook.getSheetAt(0);
+			
+			try {
+				//get tat ca co cua san pham trong don hang
+				Long pcontractid_link = entity.pcontractid_link;
+				Long productid_link = entity.productid_link;
+				List<String> list_size = ppskuService.getlistnamevalue_by_product(pcontractid_link, productid_link, AtributeFixValues.ATTR_SIZE);
+				
+				Row row_1 = sheet.getRow(0);
+				
+				Cell cellstyle_row1 = row_1.getCell(ColumnExcel.B);
+				CellStyle style_row1 = workbook.createCellStyle();
+				style_row1.cloneStyleFrom(cellstyle_row1.getCellStyle());
+				
+				int start = ColumnExcel.L;
+				int end = start+ list_size.size() - 1;
+				sheet.addMergedRegion(new CellRangeAddress( 0, 0,start , end));	
+								
+				Cell cell_ds = row_1.createCell(ColumnExcel.L);
+				cell_ds.setCellValue("Danh sách cỡ và định mức sử dụng NPL cho từng cỡ");
+				cell_ds.setCellStyle(style_row1);				
+
+				Row row_2 = sheet.getRow(1);
+				Cell cellstyle_row2 = row_2.getCell(ColumnExcel.B);
+				CellStyle style_row2 = workbook.createCellStyle();
+				style_row2.cloneStyleFrom(cellstyle_row2.getCellStyle());
+				
+				for(int i =0; i<list_size.size(); i++) {
+					Cell cell_size = row_2.createCell(ColumnExcel.L+ i);
+					cell_size.setCellValue(list_size.get(i));
+					cell_size.setCellStyle(style_row2);
+				}
+				
+				
+				//tra file ve dang byte[]
+				OutputStream outputstream = new FileOutputStream(file);
+				workbook.write(outputstream);
+				workbook.close();
+
+				outputstream.close();
+				
+				InputStream isimg = new FileInputStream(file);
+				response.data = IOUtils.toByteArray(isimg);
+				isimg.close();
+				
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			}
+			catch (Exception e) {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage(e.getMessage());
+			}
+			finally {
+				workbook.close();
+				FileCopy.delete();
+				file.delete();
+			}
+			
+			return new ResponseEntity<down_temp_bom_response>(response, HttpStatus.OK);			
+		}
+		catch(Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<down_temp_bom_response>(response, HttpStatus.OK);
 		}
 	}
 	
