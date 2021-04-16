@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.pcontractproductsku;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -31,6 +32,12 @@ public interface IPContractProductSKURepository extends JpaRepository<PContractP
 			+ "and pcontractid_link = :pcontractid_link")
 	public List<PContractProductSKU> getlistsku_bypcontract(
 			@Param ("orgrootid_link")final  Long orgrootid_link,
+			@Param ("pcontractid_link")final  long pcontractid_link);	
+	
+	@Query(value = "select c.skuid_link, sum(c.pquantity_total) from PContractProductSKU c "
+			+ "where pcontractid_link = :pcontractid_link "
+			+ "group by c.skuid_link")
+	public List<SumSKU> getsumsku_bypcontract(
 			@Param ("pcontractid_link")final  long pcontractid_link);	
 	
 	@Query(value = "select c from PContractProductSKU c "

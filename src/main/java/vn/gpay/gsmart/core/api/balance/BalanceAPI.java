@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.api.pcontractproductbom.PContractProductBOM_getbomcolor_request;
 import vn.gpay.gsmart.core.api.pcontractproductbom.PContractProductBom2API;
+import vn.gpay.gsmart.core.api.pcontractproductbom.get_bom_by_product_request;
+import vn.gpay.gsmart.core.api.pcontractproductbom.get_bom_by_product_response;
 import vn.gpay.gsmart.core.pcontract.IPContractService;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
@@ -62,7 +64,7 @@ public class BalanceAPI {
 					//2. Lay tong hop BOM theo PContractid_link, Productid_link, Colorid_link
 					List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
 					for(Balance_Product_Data theProduct:ls_Product){
-						cal_demand(ls_SKUBalance, thePO.getPcontractid_link(), theProduct.productid_link,theProduct.colorid_link, theProduct.amount);
+						cal_demand(request, ls_SKUBalance, thePO.getPcontractid_link(), theProduct.productid_link,theProduct.colorid_link, theProduct.amount);
 					}
 		
 					//3. Tinh toan can doi cho tung nguyen phu lieu trong BOM
@@ -100,13 +102,14 @@ public class BalanceAPI {
 		}
 	}
 	@RequestMapping(value = "/cal_balance_bycontract", method = RequestMethod.POST)
-	public ResponseEntity<Balance_Response> cal_balance_bycontract(HttpServletRequest request,
+	public ResponseEntity<Balance_Response> cal_balance_bycontract_new(HttpServletRequest request,
 			@RequestBody Balance_Request entity) {
 //		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Balance_Response response = new Balance_Response();
 		try {
-			//Lay danh sách các PO Cha đã chốt của pcontract
-			List<PContract_PO> ls_PO = pcontract_POService.getPO_Offer_Accept_ByPContract(entity.pcontractid_link, Long.parseLong("0"));
+			//Lay danh sách sku của pcontract (có SKU nghĩa là đã chốt)
+			List<PContractProductSKU> ls_Product_SKU = po_SKU_Service.getsumsku_bypcontract(entity.pcontractid_link);
+			
 			List<Balance_Product_Data> ls_Product_Total = new ArrayList<Balance_Product_Data>();
 			List<SKUBalance_Data> ls_SKUBalance_Total = new ArrayList<SKUBalance_Data>();
 			
@@ -120,36 +123,28 @@ public class BalanceAPI {
 				}
 			}
 			
-			for(PContract_PO thePO: ls_PO)
-			{
-				//1. Lay danh sach Product, Color va SL yeu cau SX theo PO 
-				//(Neu la PO cha thi lay tong yeu cau cua cac PO con)
-				List<Balance_Product_Data> ls_Product = get_BalanceProduct_List(thePO.getId(), ls_productid);
+			for (PContractProductSKU thePContractSKU: ls_Product_SKU){
+				SKU theSKU = skuService.findOne(thePContractSKU.getSkuid_link());
 				
-				if (null!=ls_Product){
-					//2. Lay tong hop BOM theo PContractid_link, Productid_link, Colorid_link
-					List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
-					for(Balance_Product_Data theProduct:ls_Product){
-						cal_demand(ls_SKUBalance, thePO.getPcontractid_link(), theProduct.productid_link,theProduct.colorid_link, theProduct.amount);
-					}
-		
-					//3. Tinh toan can doi cho tung nguyen phu lieu trong BOM
-					CountDownLatch latch = new CountDownLatch(ls_SKUBalance.size());
+				List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
+				cal_demand(request, ls_SKUBalance, entity.pcontractid_link, theSKU.getProductid_link(),theSKU.getColor_id(), thePContractSKU.getPquantity_total());
+				
+				//3. Tinh toan can doi cho tung nguyen phu lieu trong BOM
+				CountDownLatch latch = new CountDownLatch(ls_SKUBalance.size());
 
-					for(SKUBalance_Data mat_sku:ls_SKUBalance){
-						Balance_SKU theBalance =  new Balance_SKU(
-								ls_SKUBalance,
-								thePO.getPcontractid_link(),
-								thePO.getId(),
-								mat_sku,
-								request.getHeader("Authorization"),
-								latch);
-						theBalance.start();
-					}
-					latch.await();
-					ls_SKUBalance_Total.addAll(ls_SKUBalance);
-		            ls_Product_Total.addAll(ls_Product);
-				} 
+				for(SKUBalance_Data mat_sku:ls_SKUBalance){
+					Balance_SKU theBalance =  new Balance_SKU(
+							ls_SKUBalance,
+							entity.pcontractid_link,
+							null,
+							mat_sku,
+							request.getHeader("Authorization"),
+							latch);
+					theBalance.start();
+				}
+				latch.await();
+				ls_SKUBalance_Total.addAll(ls_SKUBalance);
+//	            ls_Product_Total.addAll(ls_Product);
 			}
 			
             response.data = ls_SKUBalance_Total;
@@ -163,6 +158,69 @@ public class BalanceAPI {
 			return new ResponseEntity<Balance_Response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}	
+//	public ResponseEntity<Balance_Response> cal_balance_bycontract(HttpServletRequest request,
+//			@RequestBody Balance_Request entity) {
+////		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//		Balance_Response response = new Balance_Response();
+//		try {
+//			//Lay danh sách các PO Cha đã chốt của pcontract
+//			List<PContract_PO> ls_PO = pcontract_POService.getPO_Offer_Accept_ByPContract(entity.pcontractid_link, Long.parseLong("0"));
+//			List<Balance_Product_Data> ls_Product_Total = new ArrayList<Balance_Product_Data>();
+//			List<SKUBalance_Data> ls_SKUBalance_Total = new ArrayList<SKUBalance_Data>();
+//			
+//			List<Long> ls_productid = new ArrayList<Long>();
+//			//Nếu có danh sách SP --> Chỉ tính các SP trong danh sách
+//			if (null != entity.list_productid && entity.list_productid.length() > 0){
+//				String[] s_productid = entity.list_productid.split(";"); 
+//				for(String sID:s_productid){
+//					Long lID = Long.valueOf(sID);
+//					ls_productid.add(lID);
+//				}
+//			}
+//			
+//			for(PContract_PO thePO: ls_PO)
+//			{
+//				//1. Lay danh sach Product, Color va SL yeu cau SX theo PO 
+//				//(Neu la PO cha thi lay tong yeu cau cua cac PO con)
+//				List<Balance_Product_Data> ls_Product = get_BalanceProduct_List(thePO.getId(), ls_productid);
+//				
+//				if (null!=ls_Product){
+//					//2. Lay tong hop BOM theo PContractid_link, Productid_link, Colorid_link
+//					List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
+//					for(Balance_Product_Data theProduct:ls_Product){
+//						cal_demand(request, ls_SKUBalance, thePO.getPcontractid_link(), theProduct.productid_link,theProduct.colorid_link, theProduct.amount);
+//					}
+//		
+//					//3. Tinh toan can doi cho tung nguyen phu lieu trong BOM
+//					CountDownLatch latch = new CountDownLatch(ls_SKUBalance.size());
+//
+//					for(SKUBalance_Data mat_sku:ls_SKUBalance){
+//						Balance_SKU theBalance =  new Balance_SKU(
+//								ls_SKUBalance,
+//								thePO.getPcontractid_link(),
+//								thePO.getId(),
+//								mat_sku,
+//								request.getHeader("Authorization"),
+//								latch);
+//						theBalance.start();
+//					}
+//					latch.await();
+//					ls_SKUBalance_Total.addAll(ls_SKUBalance);
+//		            ls_Product_Total.addAll(ls_Product);
+//				} 
+//			}
+//			
+//            response.data = ls_SKUBalance_Total;
+//            response.product_data = ls_Product_Total;
+//			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+//			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+//			return new ResponseEntity<Balance_Response>(response, HttpStatus.OK);
+//		} catch (Exception e) {
+//			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+//			response.setMessage(e.getMessage());
+//			return new ResponseEntity<Balance_Response>(response, HttpStatus.BAD_REQUEST);
+//		}
+//	}	
 	@RequestMapping(value = "/cal_balance_byporder", method = RequestMethod.POST)
 	public ResponseEntity<Balance_Response> cal_balance_byporder(HttpServletRequest request,
 			@RequestBody Balance_Request entity) {
@@ -189,7 +247,7 @@ public class BalanceAPI {
 					//2. Lay tong hop BOM theo PContractid_link, Productid_link, Colorid_link
 					List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
 					for(Balance_Product_Data theProduct:ls_Product){
-						cal_demand(ls_SKUBalance, thePO.getPcontractid_link(), theProduct.productid_link,theProduct.colorid_link, theProduct.amount);
+						cal_demand(request, ls_SKUBalance, thePO.getPcontractid_link(), theProduct.productid_link,theProduct.colorid_link, theProduct.amount);
 					}
 		
 					//3. Tinh toan can doi cho tung nguyen phu lieu trong BOM
@@ -255,7 +313,7 @@ public class BalanceAPI {
 				if (null!=ls_Product){
 					//2. Lay tong hop BOM theo PContractid_link, Productid_link, Colorid_link
 					for(Balance_Product_Data theProduct:ls_Product_PO){
-						cal_demand(ls_SKUBalance, thePO.getPcontractid_link(), theProduct.productid_link,theProduct.colorid_link, theProduct.amount);
+						cal_demand(request, ls_SKUBalance, thePO.getPcontractid_link(), theProduct.productid_link,theProduct.colorid_link, theProduct.amount);
 					}
 					ls_Product.addAll(ls_Product_PO);
 				}
@@ -339,13 +397,15 @@ public class BalanceAPI {
 		}		
 	}
 	//Tinh nhu cau NPL theo định mức
-	private void cal_demand(List<SKUBalance_Data> ls_SKUBalance, Long pcontractid_link, Long productid_link, Long colorid_link, Integer p_amount){
-		PContractProductBOM_getbomcolor_request entity =  new PContractProductBOM_getbomcolor_request();
+	private void cal_demand(HttpServletRequest request, List<SKUBalance_Data> ls_SKUBalance, Long pcontractid_link, Long productid_link, Long colorid_link, Integer p_amount){
+		get_bom_by_product_request entity =  new get_bom_by_product_request();
 		entity.pcontractid_link = pcontractid_link;
-		entity.colorid_link = colorid_link;
+//		entity.colorid_link = colorid_link;
 		entity.productid_link = productid_link;
 		
-		List<Map<String, String>> ls_bomdata = bom2Service.GetListProductBomColor(entity);
+		ResponseEntity<get_bom_by_product_response> bom_response = bom2Service.GetBomByProduct(request, entity);
+		
+		List<Map<String, String>> ls_bomdata = bom_response.getBody().data;
 		if (null!=ls_bomdata){
 			for(Map<String, String> bomdata:ls_bomdata){
 //				System.out.println(bomdata);
@@ -364,6 +424,8 @@ public class BalanceAPI {
 //					theSKUBalance.setMat_sku_bom_amount(theSKUBalance.getMat_sku_bom_amount() + amount_color);
 					Float f_skudemand =amount_color*p_amount;
 					Float f_lost = (f_skudemand*lostratio)/100;
+					
+//					theSKUBalance.setMat_sku_bom_amount((theSKUBalance.getMat_sku_bom_amount() + amount_color)/2);
 					theSKUBalance.setMat_sku_demand(theSKUBalance.getMat_sku_demand() + f_skudemand + f_lost);
 				} else {
 					SKUBalance_Data newSKUBalance = new SKUBalance_Data();

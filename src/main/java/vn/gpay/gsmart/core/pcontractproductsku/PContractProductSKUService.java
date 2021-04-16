@@ -2,6 +2,7 @@ package vn.gpay.gsmart.core.pcontractproductsku;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -38,6 +39,18 @@ public class PContractProductSKUService extends AbstractService<PContractProduct
 		// TODO Auto-generated method stub
 		return repo.getlistsku_bypcontract(orgrootid_link, pcontractid_link);
 	}
+	@Override
+	public List<PContractProductSKU> getsumsku_bypcontract(long pcontractid_link) {
+		List<PContractProductSKU> result = new ArrayList<PContractProductSKU>();
+		List<SumSKU> rs = repo.getsumsku_bypcontract(pcontractid_link);
+		for(SumSKU record:rs){
+			PContractProductSKU sku = new PContractProductSKU();
+			sku.setSkuid_link(record.getSkuid_link());
+			sku.setPquantity_total(record.getPquantity_total());
+		}
+		return result;
+	}
+	
 	@Override
 	public List<PContractProductSKU> getlistsku_bypo_and_pcontract(long orgrootid_link, long pcontract_poid_link,
 			long pcontractid_link) {

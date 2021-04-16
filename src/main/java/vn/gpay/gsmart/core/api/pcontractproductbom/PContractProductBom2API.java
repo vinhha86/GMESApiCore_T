@@ -522,8 +522,6 @@ public class PContractProductBom2API {
 				for(Long colorid : list_colorid) {
 					Map<String, String> map = new HashMap<String, String>();
 					
-					map.put("amount", "0"+pContractProductBom.getAmount());
-					
 					map.put("amount_color", "0"+amount_color);
 					
 					map.put("coKho", pContractProductBom.getCoKho()+"");
@@ -568,6 +566,8 @@ public class PContractProductBom2API {
 					String color_name = value.getValue();
 					map.put("color_name", ""+color_name);
 					
+					Float total_amount = (float) 0;
+					int total_size=0;
 					for(Long size : List_size) {
 						List<PContractBOM2SKU> listbomsku_clone = new ArrayList<PContractBOM2SKU>(listbomsku);
 						long skuid_link = ppbom2skuservice.getskuid_link_by_color_and_size(colorid, size, productid_link);
@@ -577,7 +577,17 @@ public class PContractProductBom2API {
 						if(listbomsku_clone.size() > 0)
 							amount_size = listbomsku_clone.get(0).getAmount();
 						map.put(""+size, amount_size+"");
+						
+						if (amount_size>0){
+							total_amount += amount_size;
+							total_size++;
+						}
 					}
+					
+					if (total_size>0)
+						map.put("amount", "0"+(total_amount/total_size));
+					else
+						map.put("amount", "0");
 					
 					listdata.add(map);	
 				}
