@@ -45,10 +45,19 @@ public class BalanceAPI {
 		try {
 			//Check if PO exist
 			PContract_PO thePO = pcontract_POService.findOne(entity.pcontract_poid_link);
+			List<Long> ls_productid = new ArrayList<Long>();
+			//Nếu có danh sách SP --> Chỉ tính các SP trong danh sách
+			if (null != entity.list_productid && entity.list_productid.length() > 0){
+				String[] s_productid = entity.list_productid.split(";"); 
+				for(String sID:s_productid){
+					Long lID = Long.valueOf(sID);
+					ls_productid.add(lID);
+				}
+			}			
 			if (null!=thePO){
 				//1. Lay danh sach Product, Color va SL yeu cau SX theo PO 
 				//(Neu la PO cha thi lay tong yeu cau cua cac PO con)
-				List<Balance_Product_Data> ls_Product = get_BalanceProduct_List(entity.pcontract_poid_link);
+				List<Balance_Product_Data> ls_Product = get_BalanceProduct_List(entity.pcontract_poid_link, ls_productid);
 				if (null!=ls_Product){
 					//2. Lay tong hop BOM theo PContractid_link, Productid_link, Colorid_link
 					List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
@@ -101,11 +110,22 @@ public class BalanceAPI {
 			List<Balance_Product_Data> ls_Product_Total = new ArrayList<Balance_Product_Data>();
 			List<SKUBalance_Data> ls_SKUBalance_Total = new ArrayList<SKUBalance_Data>();
 			
+			List<Long> ls_productid = new ArrayList<Long>();
+			//Nếu có danh sách SP --> Chỉ tính các SP trong danh sách
+			if (null != entity.list_productid && entity.list_productid.length() > 0){
+				String[] s_productid = entity.list_productid.split(";"); 
+				for(String sID:s_productid){
+					Long lID = Long.valueOf(sID);
+					ls_productid.add(lID);
+				}
+			}
+			
 			for(PContract_PO thePO: ls_PO)
 			{
 				//1. Lay danh sach Product, Color va SL yeu cau SX theo PO 
 				//(Neu la PO cha thi lay tong yeu cau cua cac PO con)
-				List<Balance_Product_Data> ls_Product = get_BalanceProduct_List(thePO.getId());
+				List<Balance_Product_Data> ls_Product = get_BalanceProduct_List(thePO.getId(), ls_productid);
+				
 				if (null!=ls_Product){
 					//2. Lay tong hop BOM theo PContractid_link, Productid_link, Colorid_link
 					List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
@@ -149,12 +169,22 @@ public class BalanceAPI {
 //		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Balance_Response response = new Balance_Response();
 		try {
+			List<Long> ls_productid = new ArrayList<Long>();
+			//Nếu có danh sách SP --> Chỉ tính các SP trong danh sách
+			if (null != entity.list_productid && entity.list_productid.length() > 0){
+				String[] s_productid = entity.list_productid.split(";"); 
+				for(String sID:s_productid){
+					Long lID = Long.valueOf(sID);
+					ls_productid.add(lID);
+				}
+			}
+			
 			//Check if PO exist
 			PContract_PO thePO = pcontract_POService.findOne(entity.pcontract_poid_link);
 			if (null!=thePO){
 				//1. Lay danh sach Product, Color va SL yeu cau SX theo PO 
 				//(Neu la PO cha thi lay tong yeu cau cua cac PO con)
-				List<Balance_Product_Data> ls_Product = get_BalanceProduct_List(entity.pcontract_poid_link);
+				List<Balance_Product_Data> ls_Product = get_BalanceProduct_List(entity.pcontract_poid_link, ls_productid);
 				if (null!=ls_Product){
 					//2. Lay tong hop BOM theo PContractid_link, Productid_link, Colorid_link
 					List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
@@ -206,13 +236,22 @@ public class BalanceAPI {
 		try {
 			//Lay danh sach PO cua PContract
 			List<PContract_PO> ls_PO = pcontract_POService.getPOByContract(orgrootid_link, entity.pcontractid_link);
+			List<Long> ls_productid = new ArrayList<Long>();
+			//Nếu có danh sách SP --> Chỉ tính các SP trong danh sách
+			if (null != entity.list_productid && entity.list_productid.length() > 0){
+				String[] s_productid = entity.list_productid.split(";"); 
+				for(String sID:s_productid){
+					Long lID = Long.valueOf(sID);
+					ls_productid.add(lID);
+				}
+			}
 			
 			List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
 			List<Balance_Product_Data> ls_Product = new ArrayList<Balance_Product_Data>();
 			for(PContract_PO thePO: ls_PO){
 				//1. Lay danh sach Product, Color va SL yeu cau SX theo PO 
 				//(Neu la PO cha thi lay tong yeu cau cua cac PO con)
-				List<Balance_Product_Data> ls_Product_PO = get_BalanceProduct_List(thePO.getId());
+				List<Balance_Product_Data> ls_Product_PO = get_BalanceProduct_List(thePO.getId(), ls_productid);
 				if (null!=ls_Product){
 					//2. Lay tong hop BOM theo PContractid_link, Productid_link, Colorid_link
 					for(Balance_Product_Data theProduct:ls_Product_PO){
@@ -233,7 +272,7 @@ public class BalanceAPI {
 		}
 	}	
 	//Lay danh sach SKU cua Product trong PO
-	private List<Balance_Product_Data> get_BalanceProduct_List(Long pcontract_poid_link){
+	private List<Balance_Product_Data> get_BalanceProduct_List(Long pcontract_poid_link, List<Long> ls_productid){
 		try {
 			PContract_PO thePO =  pcontract_POService.findOne(pcontract_poid_link);
 			if (null!=thePO){
@@ -251,20 +290,41 @@ public class BalanceAPI {
 				//Tổng hợp theo Productid, Color_id
 				List<Balance_Product_Data> ls_Product_Balance = new ArrayList<Balance_Product_Data>();
 				for(PContractProductSKU poSKU: ls_SKU_Balance){
-					SKU theSKU = skuService.findOne(poSKU.getSkuid_link());
-					if (null != theSKU){
-						Balance_Product_Data theBalance = ls_Product_Balance.stream().filter(prod -> prod.productid_link.equals(poSKU.getProductid_link()) && prod.colorid_link.equals(theSKU.getColorid_link())).findAny().orElse(null);
-						if (null!=theBalance){
-							theBalance.amount += poSKU.getPquantity_total();
-						} else {
-							Balance_Product_Data newBalance = new Balance_Product_Data();
-							newBalance.productid_link = poSKU.getProductid_link();
-							newBalance.product_code = theSKU.getCode();
-							newBalance.product_name = theSKU.getName();
-							newBalance.colorid_link = theSKU.getColorid_link();
-							newBalance.color_name = theSKU.getColor_name();
-							newBalance.amount = poSKU.getPquantity_total();
-							ls_Product_Balance.add(newBalance);
+					if (ls_productid.size() > 0){
+						 if (ls_productid.contains(poSKU.getProductid_link())){
+								SKU theSKU = skuService.findOne(poSKU.getSkuid_link());
+								if (null != theSKU){
+									Balance_Product_Data theBalance = ls_Product_Balance.stream().filter(prod -> prod.productid_link.equals(poSKU.getProductid_link()) && prod.colorid_link.equals(theSKU.getColorid_link())).findAny().orElse(null);
+									if (null!=theBalance){
+										theBalance.amount += poSKU.getPquantity_total();
+									} else {
+										Balance_Product_Data newBalance = new Balance_Product_Data();
+										newBalance.productid_link = poSKU.getProductid_link();
+										newBalance.product_code = theSKU.getCode();
+										newBalance.product_name = theSKU.getName();
+										newBalance.colorid_link = theSKU.getColorid_link();
+										newBalance.color_name = theSKU.getColor_name();
+										newBalance.amount = poSKU.getPquantity_total();
+										ls_Product_Balance.add(newBalance);
+									}
+								}
+						 }
+					} else {
+						SKU theSKU = skuService.findOne(poSKU.getSkuid_link());
+						if (null != theSKU){
+							Balance_Product_Data theBalance = ls_Product_Balance.stream().filter(prod -> prod.productid_link.equals(poSKU.getProductid_link()) && prod.colorid_link.equals(theSKU.getColorid_link())).findAny().orElse(null);
+							if (null!=theBalance){
+								theBalance.amount += poSKU.getPquantity_total();
+							} else {
+								Balance_Product_Data newBalance = new Balance_Product_Data();
+								newBalance.productid_link = poSKU.getProductid_link();
+								newBalance.product_code = theSKU.getCode();
+								newBalance.product_name = theSKU.getName();
+								newBalance.colorid_link = theSKU.getColorid_link();
+								newBalance.color_name = theSKU.getColor_name();
+								newBalance.amount = poSKU.getPquantity_total();
+								ls_Product_Balance.add(newBalance);
+							}
 						}
 					}
 				}	
@@ -311,6 +371,7 @@ public class BalanceAPI {
 					
 					newSKUBalance.setMat_sku_code(bomdata.get("materialCode"));
 					newSKUBalance.setMat_sku_name(bomdata.get("materialName"));
+					newSKUBalance.setMat_sku_desc(bomdata.get("description"));
 					newSKUBalance.setMat_sku_unit_name(bomdata.get("unitName"));
 					newSKUBalance.setMat_sku_size_name(bomdata.get("coKho"));
 					newSKUBalance.setMat_sku_color_name(bomdata.get("tenMauNPL"));
