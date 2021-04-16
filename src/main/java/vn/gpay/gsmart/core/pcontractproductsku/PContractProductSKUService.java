@@ -192,4 +192,9 @@ public class PContractProductSKUService extends AbstractService<PContractProduct
 		}
 		return ls_SKU_SUM;
 	}
+	@Override
+	public List<String> getlistnamevalue_by_product(long pcontractid_link, long productid_link, long attributeid_link) {
+		// TODO Auto-generated method stub
+		return repo.getvaluename_in_product(productid_link, pcontractid_link, attributeid_link);
+	}
 }

@@ -111,6 +111,18 @@ public interface IPContractProductSKURepository extends JpaRepository<PContractP
 			@Param ("pcontractid_link")final  long pcontractid_link,
 			@Param ("attributeid_link")final long attributeid_link);
 	
+	@Query(value = "select b.value from SKU_Attribute_Value a "
+			+ "inner join PContractProductSKU c on a.skuid_link = c.skuid_link "
+			+ "inner join Attributevalue b on b.id = a.attributevalueid_link "
+			+ "where c.productid_link = :productid_link "
+			+ "and c.pcontractid_link = :pcontractid_link and a.attributeid_link= :attributeid_link "
+			+ "group by b.value, b.sortvalue "
+			+ "order by b.sortvalue asc")
+	public List<String> getvaluename_in_product(
+			@Param ("productid_link")final  long productid_link, 
+			@Param ("pcontractid_link")final  long pcontractid_link,
+			@Param ("attributeid_link")final long attributeid_link);
+	
 	@Query(value = "select a.skuid_link from SKU_Attribute_Value a "
 			+ "inner join PContractProductSKU c on a.skuid_link = c.skuid_link "
 			+ "where c.productid_link = :productid_link "
