@@ -62,7 +62,7 @@ public interface IPContractBOM2SKURepository extends JpaRepository<PContractBOM2
 	
 	@Query(value = "select c from PContractBOM2SKU c where "
 			+ "c.pcontractid_link = :pcontractid_link and "
-			+ "c.skuid_link = :skuid_link")
+			+ "c.product_skuid_link = :skuid_link")
 	public List<PContractBOM2SKU> getBOM_By_PContractSKU(
 			@Param ("pcontractid_link")final  Long pcontractid_link,
 			@Param ("skuid_link")final  Long skuid_link);
