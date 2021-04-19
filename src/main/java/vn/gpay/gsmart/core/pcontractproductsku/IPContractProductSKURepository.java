@@ -34,10 +34,10 @@ public interface IPContractProductSKURepository extends JpaRepository<PContractP
 			@Param ("orgrootid_link")final  Long orgrootid_link,
 			@Param ("pcontractid_link")final  long pcontractid_link);	
 	
-	@Query(value = "select c.skuid_link, sum(c.pquantity_total) from PContractProductSKU c "
+	@Query(value = "select c.skuid_link as skuid_link, sum(c.pquantity_total) as pquantity_total from PContractProductSKU c "
 			+ "where pcontractid_link = :pcontractid_link "
 			+ "group by c.skuid_link")
-	public List<SumSKU> getsumsku_bypcontract(
+	public List<Object[]> getsumsku_bypcontract(
 			@Param ("pcontractid_link")final  long pcontractid_link);	
 	
 	@Query(value = "select c from PContractProductSKU c "

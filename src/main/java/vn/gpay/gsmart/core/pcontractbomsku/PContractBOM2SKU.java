@@ -17,6 +17,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.product.Product;
+import vn.gpay.gsmart.core.sku.SKU;
 
 @Table(name="pcontract_bom2_sku")
 @Entity
@@ -43,7 +44,15 @@ public class PContractBOM2SKU implements Serializable {/**
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="materialid_link",insertable=false,updatable =false)
-    private Product product;
+    private SKU product;
+	
+	@Transient
+	public String getMaterialCode() {
+		if(product !=null) {
+			return product.getCode();
+		}
+		return "";
+	}
 	
 	@Transient
 	public String getMaterialName() {
@@ -56,7 +65,7 @@ public class PContractBOM2SKU implements Serializable {/**
 	@Transient
 	public String getTenMauNPL() {
 		if(product !=null) {
-			return product.getTenMauNPL();
+			return product.getMauSanPham();
 		}
 		return "";
 	}
@@ -64,7 +73,7 @@ public class PContractBOM2SKU implements Serializable {/**
 	@Transient
 	public String getCoKho() {
 		if(product !=null) {
-			return product.getCoKho();
+			return product.getCoSanPham();
 		}
 		return "";
 	}
@@ -96,7 +105,7 @@ public class PContractBOM2SKU implements Serializable {/**
 	@Transient
 	public String getUnitName() {
 		if(product !=null) {
-			return product.getUnitName();
+			return product.getUnit_name();
 		}
 		return "";
 	}

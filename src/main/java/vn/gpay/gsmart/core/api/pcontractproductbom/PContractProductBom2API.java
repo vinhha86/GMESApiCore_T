@@ -692,4 +692,8 @@ public class PContractProductBom2API {
 			return null;
 		}
 	}
+	
+	public List<PContractBOM2SKU> getBOM_By_PContractSKU(Long pcontractid_link, Long skuid_link){
+		return ppbom2skuservice.getBOM_By_PContractSKU(pcontractid_link, skuid_link);
+	}
 }

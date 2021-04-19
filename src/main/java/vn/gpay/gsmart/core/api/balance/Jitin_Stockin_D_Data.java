@@ -46,6 +46,7 @@ public class Jitin_Stockin_D_Data implements Serializable {
     private String sku_product_code;
     private String sku_product_desc;
     private String size_name;
+    private String stockinDLot;
 
     private List<Jitin_Stockin_PkList_Data> stockin_packinglist = new ArrayList<>();
 
@@ -351,6 +352,14 @@ public class Jitin_Stockin_D_Data implements Serializable {
 
 	public void setSku_product_desc(String sku_product_desc) {
 		this.sku_product_desc = sku_product_desc;
+	}
+
+	public String getStockinDLot() {
+		return stockinDLot;
+	}
+
+	public void setStockinDLot(String stockinDLot) {
+		this.stockinDLot = stockinDLot;
 	}
     
 }

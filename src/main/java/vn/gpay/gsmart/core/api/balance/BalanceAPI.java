@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import vn.gpay.gsmart.core.api.pcontractproductbom.PContractProductBOM_getbomcolor_request;
 import vn.gpay.gsmart.core.api.pcontractproductbom.PContractProductBom2API;
 import vn.gpay.gsmart.core.api.pcontractproductbom.get_bom_by_product_request;
 import vn.gpay.gsmart.core.api.pcontractproductbom.get_bom_by_product_response;
 import vn.gpay.gsmart.core.pcontract.IPContractService;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
+import vn.gpay.gsmart.core.pcontractbomsku.PContractBOM2SKU;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -123,31 +123,35 @@ public class BalanceAPI {
 				}
 			}
 			
+			List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
 			for (PContractProductSKU thePContractSKU: ls_Product_SKU){
-				SKU theSKU = skuService.findOne(thePContractSKU.getSkuid_link());
+				SKU theProduct_SKU = skuService.findOne(thePContractSKU.getSkuid_link());
+				//Chỉ tính các sku của SP trong danh sách chọn
+				if (ls_productid.contains(theProduct_SKU.getProductid_link())){
 				
-				List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
-				cal_demand(request, ls_SKUBalance, entity.pcontractid_link, theSKU.getProductid_link(),theSKU.getColor_id(), thePContractSKU.getPquantity_total());
-				
-				//3. Tinh toan can doi cho tung nguyen phu lieu trong BOM
-				CountDownLatch latch = new CountDownLatch(ls_SKUBalance.size());
-
-				for(SKUBalance_Data mat_sku:ls_SKUBalance){
-					Balance_SKU theBalance =  new Balance_SKU(
-							ls_SKUBalance,
-							entity.pcontractid_link,
-							null,
-							mat_sku,
-							request.getHeader("Authorization"),
-							latch);
-					theBalance.start();
+					cal_demand_bysku(ls_SKUBalance, entity.pcontractid_link, theProduct_SKU.getId(), thePContractSKU.getPquantity_total());
+					
+//					ls_SKUBalance_Total.addAll(ls_SKUBalance);
+//		            ls_Product_Total.addAll(ls_Product);
 				}
-				latch.await();
-				ls_SKUBalance_Total.addAll(ls_SKUBalance);
-//	            ls_Product_Total.addAll(ls_Product);
 			}
 			
-            response.data = ls_SKUBalance_Total;
+			//3. Tinh toan can doi cho tung nguyen phu lieu trong BOM
+			CountDownLatch latch = new CountDownLatch(ls_SKUBalance.size());
+
+			for(SKUBalance_Data mat_sku:ls_SKUBalance){
+				Balance_SKU theBalance =  new Balance_SKU(
+						ls_SKUBalance,
+						entity.pcontractid_link,
+						null,
+						mat_sku,
+						request.getHeader("Authorization"),
+						latch);
+				theBalance.start();
+			}
+			latch.await();	
+			
+            response.data = ls_SKUBalance;
             response.product_data = ls_Product_Total;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -449,6 +453,54 @@ public class BalanceAPI {
 					ls_SKUBalance.add(newSKUBalance);
 				}
 			}
+		}
+	}
+	private void cal_demand_bysku(List<SKUBalance_Data> ls_SKUBalance, Long pcontractid_link, Long skuid_link, Integer p_amount){
+	
+		List<PContractBOM2SKU> bom_response = bom2Service.getBOM_By_PContractSKU(pcontractid_link, skuid_link);
+		for (PContractBOM2SKU skubom:bom_response){
+			SKUBalance_Data theSKUBalance = ls_SKUBalance.stream().filter(sku -> sku.getMat_skuid_link().equals(skubom.getMaterialid_link())).findAny().orElse(null);
+			if (null!=theSKUBalance){
+				//Tinh tong dinh muc
+				Float f_skudemand =skubom.getAmount()*p_amount;
+				Float f_lost = (f_skudemand*skubom.getLost_ratio())/100;
+				
+				theSKUBalance.setMat_sku_demand(theSKUBalance.getMat_sku_demand() + f_skudemand + f_lost);
+				
+//				System.out.println("p_sku:" + skuid_link.toString() + "-" + p_amount + 
+//						"/Amount:" + skubom.getAmount() + 
+//						"/Lost:" + skubom.getLost_ratio() + 
+//						"/Demand:" + theSKUBalance.getMat_sku_demand()
+//						);		
+			} else {
+				SKUBalance_Data newSKUBalance = new SKUBalance_Data();
+				newSKUBalance.setMat_skuid_link(skubom.getMaterialid_link());
+				
+				newSKUBalance.setMat_sku_code(skubom.getMaterialCode());
+				newSKUBalance.setMat_sku_name(skubom.getMaterialCode());
+				newSKUBalance.setMat_sku_desc(skubom.getDescription());
+				newSKUBalance.setMat_sku_unit_name(skubom.getUnitName());
+				newSKUBalance.setMat_sku_size_name(skubom.getCoKho());
+				newSKUBalance.setMat_sku_color_name(skubom.getTenMauNPL());
+				newSKUBalance.setMat_sku_product_typename(skubom.getProduct_typeName());
+				
+				newSKUBalance.setMat_sku_bom_lostratio(skubom.getLost_ratio());
+				newSKUBalance.setMat_sku_bom_amount(skubom.getAmount());
+				
+				Float f_skudemand =skubom.getAmount()*p_amount;
+				Float f_lost = (f_skudemand*skubom.getLost_ratio())/100;
+				newSKUBalance.setMat_sku_demand(f_skudemand + f_lost);
+				
+//				if(skubom.getMaterialid_link() ==  750){
+//					System.out.println("p_sku:" + skuid_link.toString() + "-" + p_amount + 
+//							"/Amount:" + skubom.getAmount() + 
+//							"/Lost:" + skubom.getLost_ratio() + 
+//							"/Demand:" + newSKUBalance.getMat_sku_demand()
+//							);
+//				}
+				
+				ls_SKUBalance.add(newSKUBalance);
+			}			
 		}
 	}
 }
