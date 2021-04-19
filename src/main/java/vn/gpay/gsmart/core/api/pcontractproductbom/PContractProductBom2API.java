@@ -177,27 +177,21 @@ public class PContractProductBom2API {
 			long productid_link = entity.data.getProductid_link();
 			long materialid_link = entity.data.getMaterialid_link();
 			
-			if(entity.isUpdateBOM) {
-				List<PContractBom2Color> listcolor = ppbomcolor2service.getcolor_bymaterial_in_productBOMColor
-						(pcontractid_link, productid_link, materialid_link);
-				for (PContractBom2Color pContractBOMColor : listcolor) {
-					ppbomcolor2service.delete(pContractBOMColor);
-				}
+			//cap nhat lai vao bang bom-sku
+			float amount = entity.data.getAmount();
+			float lost_ratio = entity.data.getLost_ratio();
+			
+			List<Long> list_skuid = ppskuService.getsku_bypcontract_and_product(pcontractid_link, productid_link);
+			for(Long skuid : list_skuid) {
+				SKU sku = skuService.findOne(skuid);
 				
-				//cap nhat lai vao bang bom-sku
-				float amount = entity.data.getAmount();
-				float lost_ratio = entity.data.getLost_ratio();
+				long sizeid_link = sku.getSize_id();
+				long colorid = sku.getColor_id();
+				List<PContractBOM2SKU> list_pContractBOMSKU = ppbom2skuservice.getall_material_in_productBOMSKU(pcontractid_link, productid_link, sizeid_link, colorid, materialid_link);
+				PContractBOM2SKU bomsku = null;
 				
-				List<Long> list_skuid = ppskuService.getsku_bypcontract_and_product(pcontractid_link, productid_link);
-				for(Long skuid : list_skuid) {
-					SKU sku = skuService.findOne(skuid);
-					
-					long sizeid_link = sku.getSize_id();
-					long colorid = sku.getColor_id();
-					List<PContractBOM2SKU> list_pContractBOMSKU = ppbom2skuservice.getall_material_in_productBOMSKU(pcontractid_link, productid_link, sizeid_link, colorid, materialid_link);
-					PContractBOM2SKU bomsku = null;
-					
-					if(list_pContractBOMSKU.size() == 0) {
+				if(list_pContractBOMSKU.size() == 0) {
+					if(amount> 0) {
 						bomsku = new PContractBOM2SKU();
 						bomsku.setAmount(amount);
 						bomsku.setCreateddate(new Date());
@@ -209,20 +203,23 @@ public class PContractProductBom2API {
 						bomsku.setPcontractid_link(pcontractid_link);
 						bomsku.setProduct_skuid_link(sku.getId());
 						bomsku.setProductid_link(productid_link);
-						
 					}
-					else {
-						bomsku = list_pContractBOMSKU.get(0);
+				}
+				else {
+					bomsku = list_pContractBOMSKU.get(0);
+					bomsku.setLost_ratio(lost_ratio);
+					if(amount>0)
 						bomsku.setAmount(amount);
-					}
-					
-					ppbom2skuservice.save(bomsku);
 				}
 				
-				List<PContractBOM2SKU> listsku = ppbom2skuservice.getcolor_bymaterial_in_productBOMSKU(pcontractid_link, productid_link, materialid_link);
-				for (PContractBOM2SKU pContractBOMSKU : listsku) {
-					pContractBOMSKU.setAmount(entity.data.getAmount());
-					ppbom2skuservice.save(pContractBOMSKU);
+				ppbom2skuservice.save(bomsku);
+			}
+			
+			if(entity.isUpdateBOM) {
+				List<PContractBom2Color> listcolor = ppbomcolor2service.getcolor_bymaterial_in_productBOMColor
+						(pcontractid_link, productid_link, materialid_link);
+				for (PContractBom2Color pContractBOMColor : listcolor) {
+					ppbomcolor2service.delete(pContractBOMColor);
 				}
 			}
 			
@@ -302,9 +299,38 @@ public class PContractProductBom2API {
 			ppbom2service.update(pContractProductBom);
 			
 			//update lai bang sku bom
-			List<PContractBOM2SKU> listsku = ppbom2skuservice.getmaterial_bycolorid_link(pcontractid_link, productid_link, colorid_link, materialid_link);
-			for (PContractBOM2SKU pContractBOMSKU : listsku) {
-				ppbom2skuservice.delete(pContractBOMSKU);
+			float amount = entity.data.getAmount_color();
+			float lost_ratio = entity.data.getLost_ratio();
+			List<Long> list_skuid = ppskuService.getsku_bycolor(pcontractid_link, productid_link, colorid_link);
+			
+			for(Long skuid : list_skuid) {
+				SKU sku = skuService.findOne(skuid);
+				
+				long sizeid_link = sku.getSize_id();
+				long colorid = sku.getColor_id();
+				List<PContractBOM2SKU> list_pContractBOMSKU = ppbom2skuservice.getall_material_in_productBOMSKU(pcontractid_link, productid_link, sizeid_link, colorid, materialid_link);
+				PContractBOM2SKU bomsku = null;
+				
+				if(list_pContractBOMSKU.size() == 0) {
+					bomsku = new PContractBOM2SKU();
+					bomsku.setAmount(amount);
+					bomsku.setCreateddate(new Date());
+					bomsku.setCreateduserid_link(user.getId());
+					bomsku.setId(null);
+					bomsku.setLost_ratio(lost_ratio);
+					bomsku.setMaterial_skuid_link(materialid_link);
+					bomsku.setOrgrootid_link(user.getRootorgid_link());
+					bomsku.setPcontractid_link(pcontractid_link);
+					bomsku.setProduct_skuid_link(sku.getId());
+					bomsku.setProductid_link(productid_link);
+					
+				}
+				else {
+					bomsku = list_pContractBOMSKU.get(0);
+					bomsku.setAmount(amount);
+				}
+				
+				ppbom2skuservice.save(bomsku);
 			}			
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -502,16 +528,19 @@ public class PContractProductBom2API {
 				
 				map.put("unitid_link", "0"+pContractProductBom.getUnitid_link());
 				
-				for(Long size : List_size) {
-					List<PContractBOM2SKU> listbomsku_clone = new ArrayList<PContractBOM2SKU>(listbomsku);
-					long skuid_link = ppbom2skuservice.getskuid_link_by_color_and_size(colorid_link, size, productid_link);
-					listbomsku_clone.removeIf(c -> !c.getMaterial_skuid_link().equals(pContractProductBom.getMaterialid_link()) || 
-							!c.getProduct_skuid_link().equals(skuid_link));
-					Float amount_size = (float) 0;
-					if(listbomsku_clone.size() > 0)
-						amount_size = listbomsku_clone.get(0).getAmount();
-					map.put(""+size, amount_size+"");
+				if(pContractProductBom.getAmount() == 0 && amount_color == 0) {
+					for(Long size : List_size) {
+						List<PContractBOM2SKU> listbomsku_clone = new ArrayList<PContractBOM2SKU>(listbomsku);
+						long skuid_link = ppbom2skuservice.getskuid_link_by_color_and_size(colorid_link, size, productid_link);
+						listbomsku_clone.removeIf(c -> !c.getMaterial_skuid_link().equals(pContractProductBom.getMaterialid_link()) || 
+								!c.getProduct_skuid_link().equals(skuid_link));
+						Float amount_size = (float) 0;
+						if(listbomsku_clone.size() > 0)
+							amount_size = listbomsku_clone.get(0).getAmount();
+						map.put(""+size, amount_size+"");
+					}
 				}
+				
 				
 				listdata.add(map);
 			}
@@ -606,6 +635,9 @@ public class PContractProductBom2API {
 					
 					Float total_amount = (float) 0;
 					int total_size=0;
+					if(amount_color == 0) {
+						
+					}
 					for(Long size : List_size) {
 						List<PContractBOM2SKU> listbomsku_clone = new ArrayList<PContractBOM2SKU>(listbomsku);
 						long skuid_link = ppbom2skuservice.getskuid_link_by_color_and_size(colorid, size, productid_link);
