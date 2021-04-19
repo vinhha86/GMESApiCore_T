@@ -121,7 +121,7 @@ public class PContractProductSKUService extends AbstractService<PContractProduct
 		return list;
 	}
 	@Override
-	public List<Long> getsku_bycolor(long pcontractid_link, long productid_link, long colorid_link) {
+	public List<Long> getsku_bycolor(long pcontractid_link, long productid_link, Long colorid_link) {
 		// TODO Auto-generated method stub
 		return repo.getskuid_bycolorid_link(productid_link, pcontractid_link, colorid_link);
 	}
@@ -180,7 +180,8 @@ public class PContractProductSKUService extends AbstractService<PContractProduct
 	public List<PContractProductSKU> getsku_bycolorid_link(long pcontractid_link, long productid_link,
 			long colorid_link) {
 		// TODO Auto-generated method stub
-		return repo.getPContractProductSKU_bycolorid_link(productid_link, pcontractid_link, colorid_link);
+		Long colorid = colorid_link == 0 ? null : colorid_link; 
+		return repo.getPContractProductSKU_bycolorid_link(productid_link, pcontractid_link, colorid);
 	}
 	@Override
 	public List<POLineSKU> gettotalsku_bypo_parent_and_product(Long pcontract_poid_link, Long productid_link) {
@@ -209,5 +210,10 @@ public class PContractProductSKUService extends AbstractService<PContractProduct
 	public List<String> getlistnamevalue_by_product(long pcontractid_link, long productid_link, long attributeid_link) {
 		// TODO Auto-generated method stub
 		return repo.getvaluename_in_product(productid_link, pcontractid_link, attributeid_link);
+	}
+	@Override
+	public List<Long> getsku_bypcontract_and_product(long pcontractid_link, long productid_link) {
+		// TODO Auto-generated method stub
+		return repo.getskuid_byproduct_and_pcontract(productid_link, pcontractid_link);
 	}
 }

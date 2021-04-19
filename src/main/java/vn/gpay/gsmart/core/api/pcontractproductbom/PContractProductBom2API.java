@@ -30,7 +30,6 @@ import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
 import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom2;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
-import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_Service;
 import vn.gpay.gsmart.core.sku.SKU;
@@ -189,10 +188,11 @@ public class PContractProductBom2API {
 				float amount = entity.data.getAmount();
 				float lost_ratio = entity.data.getLost_ratio();
 				
-				long colorid_link = 0; //0 la lay tat ca cac co ko theo mau
-				List<PContractProductSKU> list_sku = ppskuService.getsku_bycolorid_link(pcontractid_link, productid_link, colorid_link);
-				for(PContractProductSKU sku : list_sku) {
-					long sizeid_link = sku.getSizeid_link();
+				List<Long> list_skuid = ppskuService.getsku_bypcontract_and_product(pcontractid_link, productid_link);
+				for(Long skuid : list_skuid) {
+					SKU sku = skuService.findOne(skuid);
+					
+					long sizeid_link = sku.getSize_id();
 					long colorid = sku.getColor_id();
 					List<PContractBOM2SKU> list_pContractBOMSKU = ppbom2skuservice.getall_material_in_productBOMSKU(pcontractid_link, productid_link, sizeid_link, colorid, materialid_link);
 					PContractBOM2SKU bomsku = null;
