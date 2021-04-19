@@ -111,7 +111,7 @@ public class BalanceAPI {
 			List<PContractProductSKU> ls_Product_SKU = po_SKU_Service.getsumsku_bypcontract(entity.pcontractid_link);
 			
 			List<Balance_Product_Data> ls_Product_Total = new ArrayList<Balance_Product_Data>();
-			List<SKUBalance_Data> ls_SKUBalance_Total = new ArrayList<SKUBalance_Data>();
+//			List<SKUBalance_Data> ls_SKUBalance_Total = new ArrayList<SKUBalance_Data>();
 			
 			List<Long> ls_productid = new ArrayList<Long>();
 			//Nếu có danh sách SP --> Chỉ tính các SP trong danh sách
