@@ -459,7 +459,7 @@ public class BalanceAPI {
 	
 		List<PContractBOM2SKU> bom_response = bom2Service.getBOM_By_PContractSKU(pcontractid_link, skuid_link);
 		for (PContractBOM2SKU skubom:bom_response){
-			SKUBalance_Data theSKUBalance = ls_SKUBalance.stream().filter(sku -> sku.getMat_skuid_link().equals(skubom.getMaterialid_link())).findAny().orElse(null);
+			SKUBalance_Data theSKUBalance = ls_SKUBalance.stream().filter(sku -> sku.getMat_skuid_link().equals(skubom.getMaterial_skuid_link())).findAny().orElse(null);
 			if (null!=theSKUBalance){
 				//Tinh tong dinh muc
 				Float f_skudemand =skubom.getAmount()*p_amount;
@@ -474,7 +474,7 @@ public class BalanceAPI {
 //						);		
 			} else {
 				SKUBalance_Data newSKUBalance = new SKUBalance_Data();
-				newSKUBalance.setMat_skuid_link(skubom.getMaterialid_link());
+				newSKUBalance.setMat_skuid_link(skubom.getMaterial_skuid_link());
 				
 				newSKUBalance.setMat_sku_code(skubom.getMaterialCode());
 				newSKUBalance.setMat_sku_name(skubom.getMaterialCode());
