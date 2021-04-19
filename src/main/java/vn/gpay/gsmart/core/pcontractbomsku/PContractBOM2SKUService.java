@@ -63,6 +63,11 @@ public class PContractBOM2SKUService extends AbstractService<PContractBOM2SKU> i
 	}
 	
 	@Override
+	public List<PContractBOM2SKU> getBOM_By_PContractSKU(Long pcontractid_link, Long skuid_link){
+		return repo.getBOM_By_PContractSKU(pcontractid_link, skuid_link);
+	}
+	
+	@Override
 	public List<PContractBOM2SKU> getall_bypcontract(long orgrootid_link, long pcontractid_link) {
 		// TODO Auto-generated method stub
 		return repo.getall_bypcontract(orgrootid_link, pcontractid_link);

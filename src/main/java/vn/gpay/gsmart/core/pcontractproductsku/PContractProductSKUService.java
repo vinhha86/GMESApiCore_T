@@ -41,11 +41,12 @@ public class PContractProductSKUService extends AbstractService<PContractProduct
 	@Override
 	public List<PContractProductSKU> getsumsku_bypcontract(long pcontractid_link) {
 		List<PContractProductSKU> result = new ArrayList<PContractProductSKU>();
-		List<SumSKU> rs = repo.getsumsku_bypcontract(pcontractid_link);
-		for(SumSKU record:rs){
+		List<Object[]> rs = repo.getsumsku_bypcontract(pcontractid_link);
+		for(Object[] record:rs){
 			PContractProductSKU sku = new PContractProductSKU();
-			sku.setSkuid_link(record.getSkuid_link());
-			sku.setPquantity_total(record.getPquantity_total());
+			sku.setSkuid_link((Long)record[0]);
+			sku.setPquantity_total(((Long)record[1]).intValue());
+			result.add(sku);
 		}
 		return result;
 	}

@@ -16,6 +16,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+
 import vn.gpay.gsmart.core.sku.SKU;
 
 @Table(name="pcontract_bom2_sku")
@@ -44,7 +45,7 @@ public class PContractBOM2SKU implements Serializable {/**
 	@ManyToOne
     @JoinColumn(name="material_skuid_link",insertable=false,updatable =false)
     private SKU sku;
-	
+
 	@Transient
 	public String getMaterialName() {
 		if(sku !=null) {

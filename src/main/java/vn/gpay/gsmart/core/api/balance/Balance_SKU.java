@@ -40,9 +40,9 @@ public class Balance_SKU implements Runnable{
 	@Override
 	public void run() {
 		try {
-			cal_invoice();
-			
-			cal_stockout();
+//			cal_invoice();
+			cal_stockin_bycontract();
+			cal_stockout_bycontract();
 			latch.countDown();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -129,8 +129,42 @@ public class Balance_SKU implements Runnable{
 			e.printStackTrace();
 		}	
 	}
+	//Tinh SL da nhap kho
+	private void cal_stockin_bycontract(){
+		try {
+	    	RestTemplate restTemplate = new RestTemplate();
+	    	HttpHeaders headers = new HttpHeaders();
+	        headers.setContentType(MediaType.APPLICATION_JSON);
+	        headers.set("authorization", this.token);
+	        headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+	        headers.setAccessControlRequestMethod(HttpMethod.POST);
+			String urlPost = AtributeFixValues.url_jitin+"/api/v1/stockin/stockind_bypcontract_and_sku";
+            
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode appParNode = objectMapper.createObjectNode();
+            appParNode.put("pcontractid_link", pcontractid_link);
+            appParNode.put("skuid_link", this.mat_sku.getMat_skuid_link());
+            String jsonReq = objectMapper.writeValueAsString(appParNode);
+            
+            HttpEntity<String> request = new HttpEntity<String>(jsonReq, headers);
+            String result = restTemplate.postForObject(urlPost, request, String.class);
+//            System.out.println(result);
+            Jitin_StockinList_Response ls_stockind = objectMapper.readValue(result, Jitin_StockinList_Response.class);
+            if (null != ls_stockind){
+            	Float met_stockin = (float) 0;
+            	for(Jitin_Stockin_D_Data stockinD: ls_stockind.data){
+            		met_stockin+=stockinD.getTotalmet_check();
+            	}
+            	mat_sku.setMat_sku_stockin(met_stockin);
+            	mat_sku.setMat_sku_dif(mat_sku.getMat_sku_stockin() - mat_sku.getMat_sku_demand());
+            }
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}	
+	}
 	//Tinh SL da xuat kho
-	private void cal_stockout(){
+	private void cal_stockout_bycontract(){
 		return;
 	}
 }

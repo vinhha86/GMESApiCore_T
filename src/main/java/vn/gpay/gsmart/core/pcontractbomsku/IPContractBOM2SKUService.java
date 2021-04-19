@@ -14,4 +14,5 @@ public interface IPContractBOM2SKUService extends Operations<PContractBOM2SKU>{
 	List<PContractBOM2SKU> getMaterials_BySKUId(Long skuid_link);
 	List<PContractBOM2SKU> getall_bypcontract(long orgrootid_link, long pcontractid_link);
 	public List<PContractBOM2SKU> getbypcontract_and_product(long pcontractid_link, long productid_link);
+	List<PContractBOM2SKU> getBOM_By_PContractSKU(Long pcontractid_link, Long skuid_link);
 }	
