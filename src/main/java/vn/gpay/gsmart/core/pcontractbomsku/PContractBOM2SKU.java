@@ -55,6 +55,14 @@ public class PContractBOM2SKU implements Serializable {/**
 	}
 	
 	@Transient
+	public String getMaterialCode() {
+		if(sku !=null) {
+			return sku.getProduct_code();
+		}
+		return "";
+	}
+	
+	@Transient
 	public String getTenMauNPL() {
 		if(sku !=null) {
 			return sku.getColor_name();
