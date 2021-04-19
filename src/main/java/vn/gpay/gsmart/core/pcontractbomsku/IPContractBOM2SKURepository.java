@@ -17,8 +17,8 @@ public interface IPContractBOM2SKURepository extends JpaRepository<PContractBOM2
 	@Query(value = "select c from PContractBOM2SKU c "
 			+ "where c.productid_link = :productid_link "
 			+ "and c.pcontractid_link = :pcontractid_link "
-			+ "and c.skuid_link = :skuid_link "
-			+ "and c.materialid_link = :materialid_link")
+			+ "and c.product_skuid_link = :skuid_link "
+			+ "and c.material_skuid_link = :materialid_link")
 	public List<PContractBOM2SKU> getall_material_in_productBOMSKU(
 			@Param ("productid_link")final  Long productid_link,
 			@Param ("pcontractid_link")final  Long pcontractid_link,
@@ -28,27 +28,27 @@ public interface IPContractBOM2SKURepository extends JpaRepository<PContractBOM2
 	@Query(value = "select c from PContractBOM2SKU c "
 			+ "where c.productid_link = :productid_link "
 			+ "and c.pcontractid_link = :pcontractid_link "
-			+ "and c.materialid_link = :materialid_link")
+			+ "and c.material_skuid_link = :materialid_link")
 	public List<PContractBOM2SKU> getall_bymaterial_in_productBOMSKU(
 			@Param ("productid_link")final  Long productid_link,
 			@Param ("pcontractid_link")final  Long pcontractid_link,
 			@Param ("materialid_link")final  Long materialid_link);
 	
 	@Query(value = "select c from PContractBOM2SKU c "
-			+ "inner join SKU_Attribute_Value d on c.skuid_link = d.skuid_link "
+			+ "inner join SKU_Attribute_Value d on c.product_skuid_link = d.skuid_link "
 			+ "where c.productid_link = :productid_link "
 			+ "and c.pcontractid_link = :pcontractid_link "
 			+ "and (d.attributevalueid_link = :colorid_link or :colorid_link = 0) "
-			+ "and (c.materialid_link = :materialid_link or 0 = :materialid_link)")
+			+ "and (c.material_skuid_link = :materialid_link or 0 = :materialid_link)")
 	public List<PContractBOM2SKU> get_material_by_colorid_link(
 			@Param ("productid_link")final  Long productid_link,
 			@Param ("pcontractid_link")final  Long pcontractid_link,
-			@Param ("colorid_link")final  Long colorid_link,
-			@Param ("materialid_link")final  Long materialid_link);
+			@Param ("colorid_link")final  long colorid_link,
+			@Param ("materialid_link")final  long materialid_link);
 	
 	@Query(value = "select d.attributevalueid_link "
 			+ "from SKU_Attribute_Value d "
-			+ "left join PContractBOMSKU c on c.skuid_link = d.skuid_link "
+			+ "left join PContractBOM2SKU c on c.product_skuid_link = d.skuid_link "
 			+ "where c.productid_link = :productid_link "
 			+ "and c.pcontractid_link = :pcontractid_link "
 			+ "and d.attributevalueid_link != :colorid_link")
@@ -57,7 +57,7 @@ public interface IPContractBOM2SKURepository extends JpaRepository<PContractBOM2
 			@Param ("pcontractid_link")final  Long pcontractid_link,
 			@Param ("colorid_link")final  Long colorid_link);
 	
-	@Query(value = "select c from PContractBOM2SKU c where c.skuid_link = :skuid_link")
+	@Query(value = "select c from PContractBOM2SKU c where c.product_skuid_link = :skuid_link")
 	public List<PContractBOM2SKU> getMaterials_BySKUId(@Param ("skuid_link")final  Long skuid_link);
 	
 	@Query(value = "select c from PContractBOM2SKU c "

@@ -322,12 +322,12 @@ public class POrderBomAPI {
 				porderbomsku.setDescription(bom_sku.getDescription());
 				porderbomsku.setId(null);
 				porderbomsku.setLost_ratio(bom_sku.getLost_ratio());
-				porderbomsku.setMaterialid_link(bom_sku.getMaterialid_link());
+				porderbomsku.setMaterialid_link(bom_sku.getMaterial_skuid_link());
 				porderbomsku.setOrgrootid_link(orgrootid_link);
 				porderbomsku.setPcontractid_link(pcontractid_link);
 				porderbomsku.setPorderid_link(porderid_link);
 				porderbomsku.setProductid_link(productid_link);
-				porderbomsku.setSkuid_link(bom_sku.getSkuid_link());
+				porderbomsku.setSkuid_link(bom_sku.getProduct_skuid_link());
 				porderbomskuService.save(porderbomsku);
 			}
 			

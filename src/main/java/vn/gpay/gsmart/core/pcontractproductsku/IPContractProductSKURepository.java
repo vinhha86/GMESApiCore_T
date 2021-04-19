@@ -1,7 +1,6 @@
 package vn.gpay.gsmart.core.pcontractproductsku;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -134,7 +133,7 @@ public interface IPContractProductSKURepository extends JpaRepository<PContractP
 			+ "inner join PContractProductSKU c on a.skuid_link = c.skuid_link "
 			+ "where c.productid_link = :productid_link "
 			+ "and c.pcontractid_link = :pcontractid_link "
-			+ "and attributevalueid_link= :colorid_link "
+			+ "and (attributevalueid_link= :colorid_link or :colorid_link = 0) "
 			+ "group by a.skuid_link")
 	public List<Long> getskuid_bycolorid_link(
 			@Param ("productid_link")final  long productid_link, 

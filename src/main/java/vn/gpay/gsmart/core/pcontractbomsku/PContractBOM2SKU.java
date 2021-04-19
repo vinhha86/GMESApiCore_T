@@ -16,7 +16,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import vn.gpay.gsmart.core.product.Product;
+import vn.gpay.gsmart.core.sku.SKU;
 
 @Table(name="pcontract_bom2_sku")
 @Entity
@@ -29,9 +29,9 @@ public class PContractBOM2SKU implements Serializable {/**
 	@SequenceGenerator(name="pcontract_bom_sku_generator", sequenceName = "pcontract_bom_sku_id_seq", allocationSize=1)
 	private Long id;
 	
-	private Long skuid_link;
+	private Long product_skuid_link;
 	private Long productid_link;
-	private Long materialid_link;
+	private Long material_skuid_link;
 	private Float amount;
 	private Float lost_ratio;
 	private String description;
@@ -42,61 +42,61 @@ public class PContractBOM2SKU implements Serializable {/**
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="materialid_link",insertable=false,updatable =false)
-    private Product product;
+    @JoinColumn(name="material_skuid_link",insertable=false,updatable =false)
+    private SKU sku;
 	
 	@Transient
 	public String getMaterialName() {
-		if(product !=null) {
-			return product.getName();
+		if(sku !=null) {
+			return sku.getProduct_name();
 		}
 		return "";
 	}
 	
 	@Transient
 	public String getTenMauNPL() {
-		if(product !=null) {
-			return product.getTenMauNPL();
+		if(sku !=null) {
+			return sku.getColor_name();
 		}
 		return "";
 	}
 	
 	@Transient
 	public String getCoKho() {
-		if(product !=null) {
-			return product.getCoKho();
+		if(sku !=null) {
+			return sku.getSize_name();
 		}
 		return "";
 	}
 	
 	@Transient
 	public int getProduct_type() {
-		if(product != null) {
-			return (int)product.getProducttypeid_link();
+		if(sku != null) {
+			return (int)sku.getProducttypeid_link();
 		}
 		return 0;
 	}
 	
 	@Transient
 	public String getProduct_typeName() {
-		if(product != null) {
-			return product.getProducttype_name();
+		if(sku != null) {
+			return sku.getProducttype_name();
 		}
 		return "";
 	}
 	
 	@Transient
 	public String getThanhPhanVai() {
-		if(product !=null) {
-			return product.getThanhPhanVai();
+		if(sku !=null) {
+			return sku.getThanhPhanVai();
 		}
 		return "";
 	}
 	
 	@Transient
 	public String getUnitName() {
-		if(product !=null) {
-			return product.getUnitName();
+		if(sku !=null) {
+			return sku.getUnit_name();
 		}
 		return "";
 	}
@@ -109,28 +109,12 @@ public class PContractBOM2SKU implements Serializable {/**
 		this.id = id;
 	}
 
-	public Long getSkuid_link() {
-		return skuid_link;
-	}
-
-	public void setSkuid_link(Long skuid_link) {
-		this.skuid_link = skuid_link;
-	}
-
 	public Long getProductid_link() {
 		return productid_link;
 	}
 
 	public void setProductid_link(Long productid_link) {
 		this.productid_link = productid_link;
-	}
-
-	public Long getMaterialid_link() {
-		return materialid_link;
-	}
-
-	public void setMaterialid_link(Long materialid_link) {
-		this.materialid_link = materialid_link;
 	}
 
 	public Float getAmount() {
@@ -187,5 +171,21 @@ public class PContractBOM2SKU implements Serializable {/**
 
 	public void setPcontractid_link(Long pcontractid_link) {
 		this.pcontractid_link = pcontractid_link;
+	}
+
+	public Long getProduct_skuid_link() {
+		return product_skuid_link;
+	}
+
+	public void setProduct_skuid_link(Long product_skuid_link) {
+		this.product_skuid_link = product_skuid_link;
+	}
+
+	public Long getMaterial_skuid_link() {
+		return material_skuid_link;
+	}
+
+	public void setMaterial_skuid_link(Long material_skuid_link) {
+		this.material_skuid_link = material_skuid_link;
 	}
 }

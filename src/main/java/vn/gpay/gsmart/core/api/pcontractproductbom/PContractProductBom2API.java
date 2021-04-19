@@ -30,6 +30,7 @@ import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
 import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom2;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
+import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_Service;
 import vn.gpay.gsmart.core.sku.SKU;
@@ -168,6 +169,8 @@ public class PContractProductBom2API {
 			@RequestBody PContractProductBom2_update_request entity) {
 		ResponseBase response = new ResponseBase();
 		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
 			
 			ppbom2service.save(entity.data);
 			//Xóa trong bom_color và bom_sku
@@ -182,9 +185,44 @@ public class PContractProductBom2API {
 					ppbomcolor2service.delete(pContractBOMColor);
 				}
 				
+				//cap nhat lai vao bang bom-sku
+				float amount = entity.data.getAmount();
+				float lost_ratio = entity.data.getLost_ratio();
+				
+				long colorid_link = 0; //0 la lay tat ca cac co ko theo mau
+				List<PContractProductSKU> list_sku = ppskuService.getsku_bycolorid_link(pcontractid_link, productid_link, colorid_link);
+				for(PContractProductSKU sku : list_sku) {
+					long sizeid_link = sku.getSizeid_link();
+					long colorid = sku.getColor_id();
+					List<PContractBOM2SKU> list_pContractBOMSKU = ppbom2skuservice.getall_material_in_productBOMSKU(pcontractid_link, productid_link, sizeid_link, colorid, materialid_link);
+					PContractBOM2SKU bomsku = null;
+					
+					if(list_pContractBOMSKU.size() == 0) {
+						bomsku = new PContractBOM2SKU();
+						bomsku.setAmount(amount);
+						bomsku.setCreateddate(new Date());
+						bomsku.setCreateduserid_link(user.getId());
+						bomsku.setId(null);
+						bomsku.setLost_ratio(lost_ratio);
+						bomsku.setMaterial_skuid_link(materialid_link);
+						bomsku.setOrgrootid_link(user.getRootorgid_link());
+						bomsku.setPcontractid_link(pcontractid_link);
+						bomsku.setProduct_skuid_link(sku.getId());
+						bomsku.setProductid_link(productid_link);
+						
+					}
+					else {
+						bomsku = list_pContractBOMSKU.get(0);
+						bomsku.setAmount(amount);
+					}
+					
+					ppbom2skuservice.save(bomsku);
+				}
+				
 				List<PContractBOM2SKU> listsku = ppbom2skuservice.getcolor_bymaterial_in_productBOMSKU(pcontractid_link, productid_link, materialid_link);
 				for (PContractBOM2SKU pContractBOMSKU : listsku) {
-					ppbom2skuservice.delete(pContractBOMSKU);
+					pContractBOMSKU.setAmount(entity.data.getAmount());
+					ppbom2skuservice.save(pContractBOMSKU);
 				}
 			}
 			
@@ -308,12 +346,12 @@ public class PContractProductBom2API {
 				pContractBOMSKU.setCreateduserid_link(user.getId());
 				pContractBOMSKU.setDescription(entity.data.getDescription());
 				pContractBOMSKU.setId((long) 0);
-				pContractBOMSKU.setMaterialid_link(materialid_link);
+				pContractBOMSKU.setMaterial_skuid_link(materialid_link);
 				pContractBOMSKU.setOrgrootid_link(user.getRootorgid_link());
 				pContractBOMSKU.setPcontractid_link(pcontractid_link);
 				pContractBOMSKU.setProductid_link(productid_link);
 				pContractBOMSKU.setLost_ratio(entity.data.getLost_ratio());
-				pContractBOMSKU.setSkuid_link(skuid_link);   
+				pContractBOMSKU.setProduct_skuid_link(skuid_link);   
 			}
 			ppbom2skuservice.save(pContractBOMSKU);
 			
@@ -467,8 +505,8 @@ public class PContractProductBom2API {
 				for(Long size : List_size) {
 					List<PContractBOM2SKU> listbomsku_clone = new ArrayList<PContractBOM2SKU>(listbomsku);
 					long skuid_link = ppbom2skuservice.getskuid_link_by_color_and_size(colorid_link, size, productid_link);
-					listbomsku_clone.removeIf(c -> !c.getMaterialid_link().equals(pContractProductBom.getMaterialid_link()) || 
-							!c.getSkuid_link().equals(skuid_link));
+					listbomsku_clone.removeIf(c -> !c.getMaterial_skuid_link().equals(pContractProductBom.getMaterialid_link()) || 
+							!c.getProduct_skuid_link().equals(skuid_link));
 					Float amount_size = (float) 0;
 					if(listbomsku_clone.size() > 0)
 						amount_size = listbomsku_clone.get(0).getAmount();
@@ -571,8 +609,8 @@ public class PContractProductBom2API {
 					for(Long size : List_size) {
 						List<PContractBOM2SKU> listbomsku_clone = new ArrayList<PContractBOM2SKU>(listbomsku);
 						long skuid_link = ppbom2skuservice.getskuid_link_by_color_and_size(colorid, size, productid_link);
-						listbomsku_clone.removeIf(c -> !c.getMaterialid_link().equals(pContractProductBom.getMaterialid_link()) || 
-								!c.getSkuid_link().equals(skuid_link));
+						listbomsku_clone.removeIf(c -> !c.getMaterial_skuid_link().equals(pContractProductBom.getMaterialid_link()) || 
+								!c.getProduct_skuid_link().equals(skuid_link));
 						Float amount_size = (float) 0;
 						if(listbomsku_clone.size() > 0)
 							amount_size = listbomsku_clone.get(0).getAmount();
@@ -674,8 +712,8 @@ public class PContractProductBom2API {
 				for(Long size : List_size) {
 					List<PContractBOM2SKU> listbomsku_clone = new ArrayList<PContractBOM2SKU>(listbomsku);
 					long skuid_link = ppbom2skuservice.getskuid_link_by_color_and_size(colorid_link, size, productid_link);
-					listbomsku_clone.removeIf(c -> !c.getMaterialid_link().equals(pContractProductBom.getMaterialid_link()) || 
-							!c.getSkuid_link().equals(skuid_link));
+					listbomsku_clone.removeIf(c -> !c.getMaterial_skuid_link().equals(pContractProductBom.getMaterialid_link()) || 
+							!c.getProduct_skuid_link().equals(skuid_link));
 					Float amount_size = (float) 0;
 					if(listbomsku_clone.size() > 0)
 						amount_size = listbomsku_clone.get(0).getAmount();
