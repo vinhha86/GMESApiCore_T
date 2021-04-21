@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.porder_product_sku;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,5 +47,18 @@ public class POrder_Product_SKU_Service extends AbstractService<POrder_Product_S
 	public List<Long> getlist_colorid_byporder(Long porderid_link) {
 		// TODO Auto-generated method stub
 		return repo.get_colorid_byporder(porderid_link);
+	}
+	
+	@Override
+	public List<POrder_Product_SKU> getsumsku_byporder(long porderid_link) {
+		List<POrder_Product_SKU> result = new ArrayList<POrder_Product_SKU>();
+		List<Object[]> rs = repo.getsumsku_byporder(porderid_link);
+		for(Object[] record:rs){
+			POrder_Product_SKU sku = new POrder_Product_SKU();
+			sku.setSkuid_link((Long)record[0]);
+			sku.setPquantity_total(((Long)record[1]).intValue());
+			result.add(sku);
+		}
+		return result;
 	}
 }

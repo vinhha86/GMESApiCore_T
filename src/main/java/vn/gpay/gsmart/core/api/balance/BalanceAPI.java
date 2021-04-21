@@ -25,6 +25,10 @@ import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontractbomsku.PContractBOM2SKU;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
+import vn.gpay.gsmart.core.porder.IPOrder_Service;
+import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
+import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_Service;
 import vn.gpay.gsmart.core.sku.SKU;
@@ -38,6 +42,8 @@ public class BalanceAPI {
 	@Autowired IPContractProductSKUService po_SKU_Service;
 	@Autowired ISKU_Service skuService;
 	@Autowired PContractProductBom2API bom2Service;
+	@Autowired IPOrder_Product_SKU_Service pOrder_SKU_Service;
+	@Autowired IPOrder_Service porder_Service;
 	
 	@RequestMapping(value = "/cal_balance_bypo", method = RequestMethod.POST)
 	public ResponseEntity<Balance_Response> cal_balance_bypo(HttpServletRequest request,
@@ -228,58 +234,45 @@ public class BalanceAPI {
 	@RequestMapping(value = "/cal_balance_byporder", method = RequestMethod.POST)
 	public ResponseEntity<Balance_Response> cal_balance_byporder(HttpServletRequest request,
 			@RequestBody Balance_Request entity) {
-//		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Balance_Response response = new Balance_Response();
 		try {
-			List<Long> ls_productid = new ArrayList<Long>();
-			//Nếu có danh sách SP --> Chỉ tính các SP trong danh sách
-			if (null != entity.list_productid && entity.list_productid.length() > 0){
-				String[] s_productid = entity.list_productid.split(";"); 
-				for(String sID:s_productid){
-					Long lID = Long.valueOf(sID);
-					ls_productid.add(lID);
+			POrder thePorder =  porder_Service.findOne(entity.porderid_link);
+			if (null!=thePorder){
+				//Lay danh sách sku của porder
+				List<POrder_Product_SKU> ls_Product_SKU = pOrder_SKU_Service.getsumsku_byporder(entity.porderid_link);
+				
+				
+				List<Balance_Product_Data> ls_Product_Total = new ArrayList<Balance_Product_Data>();
+				
+				List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
+				for (POrder_Product_SKU thePContractSKU: ls_Product_SKU){
+					SKU theProduct_SKU = skuService.findOne(thePContractSKU.getSkuid_link());
+					cal_demand_bysku(ls_SKUBalance, entity.pcontractid_link, theProduct_SKU.getId(), thePContractSKU.getPquantity_total());
 				}
-			}
-			
-			//Check if PO exist
-			PContract_PO thePO = pcontract_POService.findOne(entity.pcontract_poid_link);
-			if (null!=thePO){
-				//1. Lay danh sach Product, Color va SL yeu cau SX theo PO 
-				//(Neu la PO cha thi lay tong yeu cau cua cac PO con)
-				List<Balance_Product_Data> ls_Product = get_BalanceProduct_List(entity.pcontract_poid_link, ls_productid);
-				if (null!=ls_Product){
-					//2. Lay tong hop BOM theo PContractid_link, Productid_link, Colorid_link
-					List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
-					for(Balance_Product_Data theProduct:ls_Product){
-						cal_demand(request, ls_SKUBalance, thePO.getPcontractid_link(), theProduct.productid_link,theProduct.colorid_link, theProduct.amount);
-					}
-		
-					//3. Tinh toan can doi cho tung nguyen phu lieu trong BOM
-					CountDownLatch latch = new CountDownLatch(ls_SKUBalance.size());
-					for(SKUBalance_Data mat_sku:ls_SKUBalance){
-						Balance_SKU theBalance =  new Balance_SKU(
-								ls_SKUBalance,
-								thePO.getPcontractid_link(),
-								thePO.getId(),
-								mat_sku,
-								request.getHeader("Authorization"),
-								latch);
-						theBalance.start();
-					}
-					latch.await();
-		            response.data = ls_SKUBalance;
-		            response.product_data = ls_Product;
-					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-					return new ResponseEntity<Balance_Response>(response, HttpStatus.OK);
-				} else {
-					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-					response.setMessage("Chưa khai báo chi tiết màu cỡ");
-					return new ResponseEntity<Balance_Response>(response, HttpStatus.BAD_REQUEST);
+				
+				//3. Tinh toan can doi cho tung nguyen phu lieu trong BOM
+				CountDownLatch latch = new CountDownLatch(ls_SKUBalance.size());
+	
+				for(SKUBalance_Data mat_sku:ls_SKUBalance){
+					Balance_SKU theBalance =  new Balance_SKU(
+							ls_SKUBalance,
+							thePorder.getPcontractid_link(),
+							null,
+							mat_sku,
+							request.getHeader("Authorization"),
+							latch);
+					theBalance.start();
 				}
+				latch.await();	
+				
+	            response.data = ls_SKUBalance;
+	            response.product_data = ls_Product_Total;
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<Balance_Response>(response, HttpStatus.OK);
 			} else {
 				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-				response.setMessage("PO Không tồn tại");
+				response.setMessage("Lệnh sản xuất không tồn tại");
 				return new ResponseEntity<Balance_Response>(response, HttpStatus.BAD_REQUEST);
 			}
 		} catch (Exception e) {

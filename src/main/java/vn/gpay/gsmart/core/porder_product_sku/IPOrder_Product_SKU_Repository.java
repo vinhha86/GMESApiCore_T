@@ -39,4 +39,10 @@ public interface IPOrder_Product_SKU_Repository extends JpaRepository<POrder_Pro
 			+ "group by b.id")
 	public List<Long> get_colorid_byporder(
 			@Param ("porderid_link")final  Long porderid_link);
+	
+	@Query(value = "select c.skuid_link as skuid_link, sum(c.pquantity_total) as pquantity_total from POrder_Product_SKU c "
+			+ "where porderid_link = :porderid_link "
+			+ "group by c.skuid_link")
+	public List<Object[]> getsumsku_byporder(
+			@Param ("porderid_link")final  long porderid_link);	
 }

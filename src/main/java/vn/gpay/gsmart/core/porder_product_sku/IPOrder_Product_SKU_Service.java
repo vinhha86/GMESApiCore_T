@@ -16,4 +16,6 @@ public interface IPOrder_Product_SKU_Service extends Operations<POrder_Product_S
 	public List<POrder_Product_SKU> getlist_sku_in_porder(Long orgrootid_link, Long porderid_link);
 	
 	List<Long> getlist_colorid_byporder(Long porderid_link);
+
+	List<POrder_Product_SKU> getsumsku_byporder(long porderid_link);
 }
