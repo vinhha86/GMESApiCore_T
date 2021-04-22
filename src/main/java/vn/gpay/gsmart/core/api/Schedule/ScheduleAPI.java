@@ -1645,11 +1645,14 @@ public class ScheduleAPI {
 				Long pcontract_poid_link = pOrderGrant_SKU.getPcontract_poid_link();
 				
 				POrderGrant_SKU sku = grantskuService.getPOrderGrant_SKUbySKUid_linkAndGrantId_andPO(skuid_link, pordergrantid_link, pcontract_poid_link);
-				if(pOrderGrant_SKU.getGrantamount() > sku.getGrantamount()) {
-					response.mes = "Bạn không được tách vượt quá số lượng đang được giao cho tổ!";
-					response.sku = grantskuService.getPOrderGrant_SKU(pOrderGrant_SKU.getPordergrantid_link());
-					break;
+				if(sku!=null) {
+					if(pOrderGrant_SKU.getGrantamount() > sku.getGrantamount()) {
+						response.mes = "Bạn không được tách vượt quá số lượng đang được giao cho tổ!";
+						response.sku = grantskuService.getPOrderGrant_SKU(pOrderGrant_SKU.getPordergrantid_link());
+						break;
+					}
 				}
+				
 			}
 			
 			if(response.mes == "") {
@@ -1788,6 +1791,7 @@ public class ScheduleAPI {
 					
 					POrderGrant_SKU sku_old = grantskuService.getPOrderGrant_SKUbySKUid_linkAndGrantId_andPO(
 							pOrderGrant_SKU.getSkuid_link(), pOrderGrant_SKU.getPordergrantid_link(), pOrderGrant_SKU.getPcontract_poid_link());
+					
 					sku_old.setGrantamount(sku_old.getGrantamount() - pOrderGrant_SKU.getGrantamount());
 					grantskuService.save(sku_old);
 				}
