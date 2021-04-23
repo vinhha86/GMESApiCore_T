@@ -432,4 +432,19 @@ public class ProductService extends AbstractService<Product> implements IProduct
 		// TODO Auto-generated method stub
 		return repo.getProductByLikeBuyercode("%"+buyercode+"%");
 	}
+
+	@Override
+	public List<Product> getby_code_type_description(Long orgrootid_link, String code, int type, String description) {
+		// TODO Auto-generated method stub
+		Specification<Product> specification = Specifications.<Product>and()
+				.eq(type != 0, "producttypeid_link", type)
+				.eq("status", 1)
+				.eq("orgrootid_link", orgrootid_link)
+				.eq(code != "" && code != null, "buyercode", code)
+				.eq(description != "" && description != null, "description", description)
+				.build();;
+		Sort sort = Sorts.builder().asc("buyercode").build();
+		List<Product> listNPL = repo.findAll(specification, sort);
+		return listNPL;
+	}
 }

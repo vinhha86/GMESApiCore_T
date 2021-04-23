@@ -23,6 +23,8 @@ public class ProductType {
     public static int SKU_TYPE_PACKINGTRIM_MIN    	= 40;
     public static int SKU_TYPE_PACKINGTRIM_MAX    	= 49;
     
+    public static int TICKET						= 60;
+    
     public static int SKU_TYPE_UNKNOWN   			= -1; //Không xác định
 
     public static String SKU_DESC_COMPLETEPRODUCT   = "Thành phẩm";

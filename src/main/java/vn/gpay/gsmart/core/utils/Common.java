@@ -841,7 +841,27 @@ public class Common  {
 			return "ChuaLam";
 		}
 	}
-	
+	public int gettype_npl_byname(String name) {
+		int type = 0;
+		switch (name) {
+		case "SEWING":
+			type = 30;
+			break;
+		case "PACKING":
+			type = 40;
+			break;
+		case "TICKET":
+			type = 60;
+			break;
+		case "FABRIC":
+			type = 20;
+			break;
+		case "THREAD":
+			type = 50;
+			break;
+		}
+		return type;
+	}
 	
 	public String getStringValue(Cell cell) {
 		if(cell == null) return "";
