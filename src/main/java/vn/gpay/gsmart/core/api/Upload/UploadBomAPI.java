@@ -32,7 +32,6 @@ import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
 import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom2;
 import vn.gpay.gsmart.core.product.IProductService;
 import vn.gpay.gsmart.core.product.Product;
-import vn.gpay.gsmart.core.product.ProductType;
 import vn.gpay.gsmart.core.productattributevalue.IProductAttributeService;
 import vn.gpay.gsmart.core.productattributevalue.ProductAttributeValue;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -234,9 +233,6 @@ public class UploadBomAPI {
 						s_sizename = s_sizename.equals("0") ? "" : s_sizename;
 						while (!s_sizename.equals("")) {
 							colNum = columnsize;
-							if(colNum==27) {
-								String a= "";
-							}
 							//lay gia tri dinh muc
 							Double amount = row.getCell(columnsize).getNumericCellValue();
 							if(amount != null && amount != 0) {
