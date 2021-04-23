@@ -18,6 +18,7 @@ import vn.gpay.gsmart.core.utils.AtributeFixValues;
 public class Balance_SKU implements Runnable{
 	private Thread t;
 	private Long pcontractid_link;
+	private Long stockid_link;
 	private Long poid_link;
 	private SKUBalance_Data mat_sku;
 
@@ -27,11 +28,13 @@ public class Balance_SKU implements Runnable{
 	Balance_SKU(
 			List<SKUBalance_Data> ls_skubalance,
 			Long pcontractid_link,
+			Long stockid_link,
 			Long poid_link,
 			SKUBalance_Data mat_sku,
 			String token,
 			CountDownLatch latch){
 		this.pcontractid_link = pcontractid_link;
+		this.stockid_link = stockid_link;
 		this.poid_link = poid_link;
 		this.mat_sku = mat_sku;
 		this.token =  token;
@@ -143,6 +146,7 @@ public class Balance_SKU implements Runnable{
             ObjectMapper objectMapper = new ObjectMapper();
             ObjectNode appParNode = objectMapper.createObjectNode();
             appParNode.put("pcontractid_link", pcontractid_link);
+            appParNode.put("stockid_link", stockid_link);
             appParNode.put("skuid_link", this.mat_sku.getMat_skuid_link());
             String jsonReq = objectMapper.writeValueAsString(appParNode);
             

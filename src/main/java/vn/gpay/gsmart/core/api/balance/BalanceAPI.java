@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.gpay.gsmart.core.api.pcontractproductbom.PContractProductBom2API;
 import vn.gpay.gsmart.core.api.pcontractproductbom.get_bom_by_product_request;
 import vn.gpay.gsmart.core.api.pcontractproductbom.get_bom_by_product_response;
+import vn.gpay.gsmart.core.org.IOrgService;
+import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract.IPContractService;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
@@ -32,6 +34,7 @@ import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_Service;
 import vn.gpay.gsmart.core.sku.SKU;
+import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -44,6 +47,7 @@ public class BalanceAPI {
 	@Autowired PContractProductBom2API bom2Service;
 	@Autowired IPOrder_Product_SKU_Service pOrder_SKU_Service;
 	@Autowired IPOrder_Service porder_Service;
+	@Autowired IOrgService orgService;
 	
 	@RequestMapping(value = "/cal_balance_bypo", method = RequestMethod.POST)
 	public ResponseEntity<Balance_Response> cal_balance_bypo(HttpServletRequest request,
@@ -79,6 +83,7 @@ public class BalanceAPI {
 						Balance_SKU theBalance =  new Balance_SKU(
 								ls_SKUBalance,
 								thePO.getPcontractid_link(),
+								null,
 								thePO.getId(),
 								mat_sku,
 								request.getHeader("Authorization"),
@@ -149,6 +154,7 @@ public class BalanceAPI {
 				Balance_SKU theBalance =  new Balance_SKU(
 						ls_SKUBalance,
 						entity.pcontractid_link,
+						null,
 						null,
 						mat_sku,
 						request.getHeader("Authorization"),
@@ -234,6 +240,7 @@ public class BalanceAPI {
 	@RequestMapping(value = "/cal_balance_byporder", method = RequestMethod.POST)
 	public ResponseEntity<Balance_Response> cal_balance_byporder(HttpServletRequest request,
 			@RequestBody Balance_Request entity) {
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Balance_Response response = new Balance_Response();
 		try {
 			POrder thePorder =  porder_Service.findOne(entity.porderid_link);
@@ -247,16 +254,21 @@ public class BalanceAPI {
 				List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
 				for (POrder_Product_SKU thePContractSKU: ls_Product_SKU){
 					SKU theProduct_SKU = skuService.findOne(thePContractSKU.getSkuid_link());
-					cal_demand_bysku(ls_SKUBalance, entity.pcontractid_link, theProduct_SKU.getId(), thePContractSKU.getPquantity_total());
+					cal_demand_bysku(ls_SKUBalance, thePorder.getPcontractid_link(), theProduct_SKU.getId(), thePContractSKU.getPquantity_total());
 				}
 				
 				//3. Tinh toan can doi cho tung nguyen phu lieu trong BOM
 				CountDownLatch latch = new CountDownLatch(ls_SKUBalance.size());
+				
+				//Lấy danh sách các kho nguyên liệu của phân xưởng
+				List<Org> ls_Stock = orgService.findChildByType(user.getRootorgid_link(), thePorder.getGranttoorgid_link(), OrgType.ORG_TYPE_STOCK_MAT);
 	
+				for(Org theStock: ls_Stock)
 				for(SKUBalance_Data mat_sku:ls_SKUBalance){
 					Balance_SKU theBalance =  new Balance_SKU(
 							ls_SKUBalance,
 							thePorder.getPcontractid_link(),
+							theStock.getId(),
 							null,
 							mat_sku,
 							request.getHeader("Authorization"),
