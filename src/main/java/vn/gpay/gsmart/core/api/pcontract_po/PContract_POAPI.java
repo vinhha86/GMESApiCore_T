@@ -1759,6 +1759,8 @@ public class PContract_POAPI {
 			return new ResponseEntity<PContract_pocreate_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	
 
 	private void updatePriceList(Long usercreatedid_link, Long orgrootid_link, Long pcontractid_link,
 			Long pcontract_poid_link, List<PContract_Price> list_price_new) {
@@ -1945,6 +1947,38 @@ public class PContract_POAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/getby_shipping", method = RequestMethod.POST)
+	public ResponseEntity<getby_shipping_response> getby_shipping(
+			@RequestBody getby_shipping_request entity, HttpServletRequest request) {
+		getby_shipping_response response = new getby_shipping_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgid_link = user.getOrgid_link();
+
+			List<Long> list_org = new ArrayList<Long>();
+			if(orgid_link != 0 && orgid_link != 1) {
+				for(GpayUserOrg userorg:userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY)){
+					list_org.add(userorg.getOrgid_link());
+				}
+				//Them chinh don vi cua user
+				if(!list_org.contains(orgid_link))
+					list_org.add(orgid_link);
+			}
+			Date shipdate_from = entity.shipdate_from;
+			Date shipdate_to = entity.shipdate_to;
+			
+			response.data = pcontract_POService.get_po_shipping(list_org, POType.PO_LINE_CONFIRMED, shipdate_from, shipdate_to, user.getRootorgid_link());
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getby_shipping_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<getby_shipping_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
 	

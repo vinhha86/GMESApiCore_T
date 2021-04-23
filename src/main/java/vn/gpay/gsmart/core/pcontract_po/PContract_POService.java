@@ -11,6 +11,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import vn.gpay.gsmart.core.base.AbstractService;
+import vn.gpay.gsmart.core.packingtype.IPackingTypeRepository;
+import vn.gpay.gsmart.core.packingtype.PackingType;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Repository;
 
 @Service
@@ -21,6 +23,7 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	IPContract_Price_Repository price_repo;
 	@Autowired
 	EntityManager em;
+	@Autowired IPackingTypeRepository packing_repo;
 
 	@Override
 	protected JpaRepository<PContract_PO, Long> getRepository() {
@@ -225,5 +228,89 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	public List<PContract_PO> getby_pcontract_and_type(Long pcontractid_link, List<Integer> type) {
 		// TODO Auto-generated method stub
 		return repo.getby_pcontract_and_type(type, pcontractid_link);
+	}
+
+	@Override
+	public List<PContractPO_Shipping> get_po_shipping(List<Long> orgs, int po_type, Date shipdate_from,
+			Date shipdate_to, Long orgrootid_link) {
+		// TODO Auto-generated method stub
+		orgs = orgs.size() == 0 ? null: orgs;
+		List<PContract_PO> list_po = repo.getby_process_shipping(shipdate_from, shipdate_to, orgs, po_type);
+		List<PContractPO_Shipping> list_shipping = new ArrayList<PContractPO_Shipping>();
+		for(PContract_PO po : list_po) {
+			PContractPO_Shipping ship = new PContractPO_Shipping();
+			ship.setActual_quantity(po.getActual_quantity());
+			ship.setActual_shipdate(po.getActual_shipdate());
+			ship.setCode(po.getCode());
+			ship.setComment(po.getComment());
+			ship.setCurrencyid_link(po.getCurrencyid_link());
+			ship.setDate_importdata(po.getDate_importdata());
+			ship.setDatecreated(po.getDatecreated());
+			ship.setEtm_avr(po.getEtm_avr());
+			ship.setEtm_from(po.getEtm_from());
+			ship.setEtm_to(po.getEtm_to());
+			ship.setExchangerate(po.getExchangerate());
+			ship.setId(po.getId());
+			ship.setIs_tbd(po.getIs_tbd());
+			ship.setIsauto_calculate(po.getIsauto_calculate());
+			ship.setMatdate(po.getMatdate());
+			ship.setMerchandiserid_link(po.getMerchandiserid_link());
+			ship.setOrgmerchandiseid_link(po.getOrgmerchandiseid_link());
+			ship.setOrgrootid_link(po.getOrgrootid_link());
+			ship.setPackingnotice(po.getPackingnotice());
+			ship.setParentpoid_link(po.getParentpoid_link());
+			ship.setPcontractid_link(po.getPcontractid_link());
+			ship.setPlan_linerequired(po.getPlan_linerequired());
+			ship.setPlan_productivity(po.getPlan_productivity());
+			ship.setPo_buyer(po.getPo_buyer());
+			ship.setPo_quantity(po.getPo_quantity());
+			ship.setPo_typeid_link(po.getPo_typeid_link());
+			ship.setPo_vendor(po.getPo_vendor());
+			ship.setPortfromid_link(po.getPortfromid_link());
+			ship.setPorttoid_link(po.getPorttoid_link());
+			ship.setPrice_add(po.getPrice_add());
+			ship.setPrice_cmp(po.getPrice_cmp());
+			ship.setPrice_commission(po.getPrice_commission());
+			ship.setPrice_fob(po.getPrice_fob());
+			ship.setPrice_sweingfact(po.getPrice_sweingfact());
+			ship.setPrice_sweingtarget(po.getPrice_sweingtarget());
+			ship.setProductid_link(po.getProductid_link());
+			ship.setProductiondate(po.getProductiondate());
+			ship.setProductiondays(po.getProductiondays());
+			ship.setProductiondays_ns(po.getProductiondays_ns());
+			ship.setQcorgid_link(po.getQcorgid_link());
+			ship.setQcorgname(po.getQcorgname());
+			ship.setSalaryfund(po.getSalaryfund());
+			ship.setSewtarget_percent(po.getSewtarget_percent());
+			ship.setShipdate(po.getShipdate());
+			ship.setShipmodeid_link(po.getShipmodeid_link());
+			ship.setStatus(po.getStatus());
+			ship.setUnitid_link(po.getUnitid_link());
+			ship.setUsercreatedid_link(po.getUsercreatedid_link());
+			ship.setProductbuyercode(po.getProductbuyercode());
+			ship.setPortFrom(po.getPortFrom());
+			
+			if(!po.getPackingnotice().equals("") && po.getPackingnotice()!= null) {
+				String[] arr_id = po.getPackingnotice().split(";");
+				List<Long> list_id = new ArrayList<Long>();
+				for(String id : arr_id) {
+					list_id.add(Long.parseLong(id));
+				}
+				List<PackingType> list_packing = packing_repo.getbylistid(orgrootid_link, list_id);
+				String packing_method = "";
+				for(PackingType packing : list_packing) {
+					if(packing_method!="") {
+						packing_method+= ", "+packing.getCode();
+					}
+					else {
+						packing_method = packing.getCode();
+					}
+				}
+				ship.setPacking_method(packing_method);
+			}
+			
+			list_shipping.add(ship);
+		}
+		return list_shipping;
 	}
 }
