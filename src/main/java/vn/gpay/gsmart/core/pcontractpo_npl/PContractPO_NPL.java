@@ -6,8 +6,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 
 @Table(name="pcontractpo_npl")
 @Entity
@@ -25,6 +33,17 @@ public class PContractPO_NPL implements Serializable {
 	private Long pcontractid_link;
 	private Long pcontract_poid_link;
 	private Long npl_skuid_link;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
+    private PContract_PO po;
+	
+	@Transient
+	public String getPO_Buyer() {
+		return po.getPo_buyer();
+	}
+	
 	public Long getId() {
 		return id;
 	}

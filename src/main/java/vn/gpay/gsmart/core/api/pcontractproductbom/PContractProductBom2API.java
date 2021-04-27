@@ -25,6 +25,8 @@ import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBom2ColorService;
 import vn.gpay.gsmart.core.pcontractbomcolor.PContractBom2Color;
 import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOM2SKUService;
 import vn.gpay.gsmart.core.pcontractbomsku.PContractBOM2SKU;
+import vn.gpay.gsmart.core.pcontractpo_npl.IPContractPO_npl_Service;
+import vn.gpay.gsmart.core.pcontractpo_npl.PContractPO_NPL;
 import vn.gpay.gsmart.core.pcontractproduct.IPContractProductService;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
@@ -59,6 +61,7 @@ public class PContractProductBom2API {
 	@Autowired ITask_Flow_Service commentService;
 	@Autowired ISKU_Service skuService;
 	@Autowired IAttributeValueService avService;
+	@Autowired IPContractPO_npl_Service po_npl_Service;
 	
 	@RequestMapping(value = "/create_pcontract_productbom", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> CreateProductBom(HttpServletRequest request,
@@ -585,6 +588,18 @@ public class PContractProductBom2API {
 				if(listbomcolorclone.size() > 0)
 					amount_color = listbomcolorclone.get(0).getAmount();
 				
+				//Lay ds poline cua sku
+				List<PContractPO_NPL> list_po = po_npl_Service.getby_pcontract_and_npl(pcontractid_link, pContractProductBom.getMaterialid_link());
+				String str_po = "";
+				for(PContractPO_NPL po_npl : list_po) {
+					if(str_po == "") {
+						str_po = po_npl.getPO_Buyer();
+					}
+					else {
+						str_po += ", "+ po_npl.getPO_Buyer();
+					}
+					
+				}
 				//Chay de lay tung mau san pham
 				for(Long colorid : list_colorid) {
 					Map<String, String> map = new HashMap<String, String>();
@@ -628,6 +643,8 @@ public class PContractProductBom2API {
 					map.put("unitid_link", "0"+pContractProductBom.getUnitid_link());
 					
 					map.put("colorid_link", "0"+colorid);
+					
+					map.put("po_line", str_po);
 					
 					Attributevalue value = avService.findOne(colorid);
 					String color_name = value.getValue();

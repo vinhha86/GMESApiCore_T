@@ -489,9 +489,7 @@ public class ReportAPI {
 		
 		return new ResponseEntity<report_quotation_response>(response, HttpStatus.OK);
 	}
-	
-	
-	
+
 	@RequestMapping(value = "/download_temp_chaogia", method = RequestMethod.POST)
 	public ResponseEntity<download_template_chaogia_response> DownloadChaoGia(HttpServletRequest request)
 	{
@@ -546,6 +544,93 @@ public class ReportAPI {
 	
 	@RequestMapping(value = "/download_temp_bom_candoi", method = RequestMethod.POST)
 	public ResponseEntity<down_temp_bom_response> DownloadBomCanDoi(HttpServletRequest request, @RequestBody down_temp_bom_request entity) throws IOException
+	{
+
+		down_temp_bom_response response = new down_temp_bom_response();
+		try {
+			String FolderPath = "TemplateUpload";
+			
+			// Thư mục gốc upload file.			
+			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+			
+			Date current_time = new Date();
+			File FileExport = new File(uploadRootPath+"/Template_Bom_CanDoi.xlsx");
+			File FileCopy = new File(uploadRootPath+"/Template_Bom_CanDoi_"+current_time.getTime()+".xlsx");
+			File file = new File(uploadRootPath+"/Bom_CanDoi_"+current_time.getTime()+".xlsx");
+			
+			com.google.common.io.Files.copy(FileExport, FileCopy);
+			FileInputStream is_filecopy = new FileInputStream(FileCopy);
+			
+			XSSFWorkbook workbook = new XSSFWorkbook(is_filecopy);
+			XSSFSheet sheet = workbook.getSheetAt(0);
+			
+			try {
+				//get tat ca co cua san pham trong don hang
+				Long pcontractid_link = entity.pcontractid_link;
+				Long productid_link = entity.productid_link;
+				List<String> list_size = ppskuService.getlistnamevalue_by_product(pcontractid_link, productid_link, AtributeFixValues.ATTR_SIZE);
+				
+				Row row_1 = sheet.getRow(0);
+				
+				Cell cellstyle_row1 = row_1.getCell(ColumnExcel.B);
+				CellStyle style_row1 = workbook.createCellStyle();
+				style_row1.cloneStyleFrom(cellstyle_row1.getCellStyle());
+				
+				int start = ColumnExcel.L;
+				int end = start+ list_size.size() - 1;
+				sheet.addMergedRegion(new CellRangeAddress( 0, 0,start , end));	
+								
+				Cell cell_ds = row_1.createCell(ColumnExcel.L);
+				cell_ds.setCellValue("Danh sách cỡ và định mức sử dụng NPL cho từng cỡ");
+				cell_ds.setCellStyle(style_row1);				
+
+				Row row_2 = sheet.getRow(1);
+				Cell cellstyle_row2 = row_2.getCell(ColumnExcel.B);
+				CellStyle style_row2 = workbook.createCellStyle();
+				style_row2.cloneStyleFrom(cellstyle_row2.getCellStyle());
+				
+				for(int i =0; i<list_size.size(); i++) {
+					Cell cell_size = row_2.createCell(ColumnExcel.L+ i);
+					cell_size.setCellValue(list_size.get(i));
+					cell_size.setCellStyle(style_row2);
+				}
+				
+				
+				//tra file ve dang byte[]
+				OutputStream outputstream = new FileOutputStream(file);
+				workbook.write(outputstream);
+				workbook.close();
+
+				outputstream.close();
+				
+				InputStream isimg = new FileInputStream(file);
+				response.data = IOUtils.toByteArray(isimg);
+				isimg.close();
+				
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			}
+			catch (Exception e) {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage(e.getMessage());
+			}
+			finally {
+				workbook.close();
+				FileCopy.delete();
+				file.delete();
+			}
+			
+			return new ResponseEntity<down_temp_bom_response>(response, HttpStatus.OK);			
+		}
+		catch(Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<down_temp_bom_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/download_temp_bom_candoi_sizeset", method = RequestMethod.POST)
+	public ResponseEntity<down_temp_bom_response> DownloadBomCanDoi_SizeSet(HttpServletRequest request, @RequestBody down_temp_bom_request entity) throws IOException
 	{
 
 		down_temp_bom_response response = new down_temp_bom_response();

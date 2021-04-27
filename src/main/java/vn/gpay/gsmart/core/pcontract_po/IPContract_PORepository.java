@@ -276,6 +276,16 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			@Param ("po_code")final String po_code);
 	
 	@Query(value = "select c from PContract_PO c "
+			+ "where (lower(c.po_buyer) = lower(concat(:po_code)) "
+			+ "and po_typeid_link = :type) "
+			+ "and pcontractid_link = :pcontractid_link"
+			)
+	public List<PContract_PO> getbycode_and_type(
+			@Param ("pcontractid_link")final Long pcontractid_link,
+			@Param ("po_code")final String po_code,
+			@Param ("type")final int type);
+	
+	@Query(value = "select c from PContract_PO c "
 			+ "inner join POrderGrant_SKU b on b.pcontract_poid_link = c.id "
 			+ "inner join POrderGrant a on a.id = b.pordergrantid_link "
 			+ "where a.porderid_link = :porderid_link "

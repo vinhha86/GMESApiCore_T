@@ -313,4 +313,10 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		}
 		return list_shipping;
 	}
+
+	@Override
+	public List<PContract_PO> getbycode_and_type(String po_no, int type, Long pcontractid_link) {
+		// TODO Auto-generated method stub
+		return repo.getbycode_and_type(pcontractid_link, po_no, type);
+	}
 }

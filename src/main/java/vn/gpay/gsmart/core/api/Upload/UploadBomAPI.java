@@ -3,6 +3,7 @@ package vn.gpay.gsmart.core.api.Upload;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -26,8 +27,12 @@ import vn.gpay.gsmart.core.attribute.IAttributeService;
 import vn.gpay.gsmart.core.attributevalue.Attributevalue;
 import vn.gpay.gsmart.core.attributevalue.IAttributeValueService;
 import vn.gpay.gsmart.core.base.ResponseBase;
+import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOM2SKUService;
 import vn.gpay.gsmart.core.pcontractbomsku.PContractBOM2SKU;
+import vn.gpay.gsmart.core.pcontractpo_npl.IPContractPO_npl_Service;
+import vn.gpay.gsmart.core.pcontractpo_npl.PContractPO_NPL;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
 import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom2;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
@@ -44,6 +49,7 @@ import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.ColumnTempBom;
 import vn.gpay.gsmart.core.utils.ColumnTemplate;
 import vn.gpay.gsmart.core.utils.Common;
+import vn.gpay.gsmart.core.utils.POType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -60,6 +66,8 @@ public class UploadBomAPI {
 	@Autowired IPContractBOM2SKUService bomskuService;
 	@Autowired IAttributeValueService attributevalueService;
 	@Autowired IPContractProductSKUService pcontractskuService;
+	@Autowired IPContract_POService poService;
+	@Autowired IPContractPO_npl_Service po_npl_Service;
 	
 	@RequestMapping(value = "/bom_candoi", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> BomCanDoi(HttpServletRequest request,
@@ -133,6 +141,27 @@ public class UploadBomAPI {
 							}
 							
 						}
+						
+						//Kiem tra xem so PO co dung voi trong he thong hay khong
+						colNum = ColumnTempBom.POLine;
+						String List_str_po = commonService.getStringValue(row.getCell(ColumnTempBom.POLine));
+						//List_str_po mà trống là dùng cho tất cả các line
+						if(!List_str_po.equals("")) {
+							String[] lst_po = List_str_po.split(",");
+							for(String po_no : lst_po) {
+								if(po_no.toLowerCase().equals("tbd")) {
+									mes_err = "Số PO không được để là TBD. Ở dòng "+(rowNum+1) +" và cột "+ (colNum+1);
+									break;
+								}
+								List<PContract_PO> listpo = poService.getbycode_and_type(po_no, POType.PO_LINE_CONFIRMED, pcontractid_link);
+								if(listpo.size() == 0) {
+									mes_err = "Số PO '"+po_no+"' ở dòng "+(rowNum+1) +" và cột "+ (colNum+1)+" không tồn tại trong hệ thống! Bạn hãy kiểm tra lại trong hệ thống trước khi upload!";
+									break;
+								}
+							}
+						}
+						
+						if(!mes_err.equals("")) break;
 						
 						//Chuyen sang row tiep theo neu con du lieu thi xu ly tiep khong thi dung lai
 						rowNum++;
@@ -271,6 +300,40 @@ public class UploadBomAPI {
 								bom_new.setProductid_link(productid_link);
 								
 								bomproductService.save(bom_new);
+							}
+							//kiem tra va them vao bang pcontractpo_npl
+							colNum = ColumnTempBom.POLine;
+							String list_po_no = commonService.getStringValue(row.getCell(ColumnTempBom.POLine));
+							if(!list_po_no.equals("")) {
+								String[] lst_po = list_po_no.split(",");
+								for(String po_no : lst_po) {
+									List<PContract_PO> listpo = poService.getbycode_and_type(po_no, POType.PO_LINE_CONFIRMED, pcontractid_link);
+									PContractPO_NPL po_npl = new PContractPO_NPL();
+									po_npl.setId(null);
+									po_npl.setNpl_skuid_link(material_skuid_link);
+									po_npl.setPcontract_poid_link(listpo.get(0).getId());
+									po_npl.setPcontractid_link(pcontractid_link);
+									
+									po_npl_Service.save(po_npl);
+								}
+							}
+							else {
+								List<Integer> type = new ArrayList<Integer>();
+								type.add(POType.PO_LINE_CONFIRMED);
+								
+								List<PContract_PO> list_po = poService.getby_pcontract_and_type(pcontractid_link, type);
+								for(PContract_PO po : list_po) {
+									List<PContractPO_NPL> po_npls = po_npl_Service.getby_po_and_npl(po.getId(), material_skuid_link);
+									if(po_npls.size() == 0) {
+										PContractPO_NPL po_npl = new PContractPO_NPL();
+										po_npl.setId(null);
+										po_npl.setNpl_skuid_link(material_skuid_link);
+										po_npl.setPcontract_poid_link(po.getId());
+										po_npl.setPcontractid_link(pcontractid_link);
+										
+										po_npl_Service.save(po_npl);
+									}
+								}
 							}
 							
 							//them vao trong bang pcontract-bom2_sku
