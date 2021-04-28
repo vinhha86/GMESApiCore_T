@@ -6,5 +6,6 @@ import java.util.Map;
 import vn.gpay.gsmart.core.base.ResponseBase;
 
 public class get_bom_by_product_response extends ResponseBase{
-	public List<Map<String, String>> data; 
+	public List<Map<String, String>> data;
+	public boolean isbomdone;
 }

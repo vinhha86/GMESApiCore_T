@@ -36,11 +36,8 @@ import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_Service;
 import vn.gpay.gsmart.core.sku.SKU;
 import vn.gpay.gsmart.core.task.ITask_Service;
-import vn.gpay.gsmart.core.task.Task;
 import vn.gpay.gsmart.core.task_checklist.ITask_CheckList_Service;
-import vn.gpay.gsmart.core.task_checklist.Task_CheckList;
 import vn.gpay.gsmart.core.task_flow.ITask_Flow_Service;
-import vn.gpay.gsmart.core.task_flow.Task_Flow;
 import vn.gpay.gsmart.core.task_object.ITask_Object_Service;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
@@ -120,41 +117,8 @@ public class PContractProductBom2API {
 			List<PContractProduct> list_pp = ppService.get_by_product_and_pcontract(orgrootid_link, productid_link, pcontractid_link);
 			if(list_pp.size()>0) {
 				PContractProduct pp = list_pp.get(0);
-				pp.setIsbomdone(true);
+				pp.setIsbom2done(true);
 				ppService.save(pp);
-			}
-			
-			//Danh dau cong viec da xong
-			List<Long> list_task = taskobjectService.getby_pcontract_and_product(pcontractid_link, productid_link, null);
-			for(Long taskid_link : list_task) {
-				//Lay checklist cua task
-				
-				long tasktype_checklits_id_link = 8;
-				List<Task_CheckList> list_sub = checklistService.getby_taskid_link_and_typechecklist(taskid_link, tasktype_checklits_id_link);
-				if(list_sub.size() > 0 ) {
-
-					Task task = taskService.findOne(taskid_link);
-					task.setDatefinished(new Date());
-					task.setStatusid_link(2);
-					taskService.save(task);
-					
-					Task_Flow flow = new Task_Flow();
-					flow.setDatecreated(new Date());
-					flow.setDescription("Đã xác nhận định mức");
-					flow.setFlowstatusid_link(3);
-					flow.setFromuserid_link(user.getId());
-					flow.setId(null);
-					flow.setOrgrootid_link(orgrootid_link);
-					flow.setTaskid_link(taskid_link);
-					flow.setTaskstatusid_link(2);
-					flow.setTouserid_link(task.getUsercreatedid_link());
-					commentService.save(flow);
-				}
-				
-				for(Task_CheckList checklist : list_sub) {
-					checklist.setDone(true);
-					checklistService.save(checklist);
-				}
 			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -563,8 +527,9 @@ public class PContractProductBom2API {
 			@RequestBody get_bom_by_product_request entity) {
 		get_bom_by_product_response response = new get_bom_by_product_response();
 		try {
-//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
-//					.getPrincipal();
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
 			long pcontractid_link = entity.pcontractid_link;
 			long productid_link = entity.productid_link;
 			long colorid_link = 0;
@@ -678,6 +643,12 @@ public class PContractProductBom2API {
 					
 					listdata.add(map);	
 				}
+			}
+			
+			//lay trang thai cua dinh muc
+			List<PContractProduct> list_product = ppService.get_by_product_and_pcontract(orgrootid_link, productid_link, pcontractid_link);
+			if(list_product.size() > 0) {
+				response.isbomdone = list_product.get(0).getIsbom2done() == null ? false : list_product.get(0).getIsbom2done();
 			}
 			
 			response.data = listdata;
