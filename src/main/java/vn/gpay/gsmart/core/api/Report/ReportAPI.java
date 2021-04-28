@@ -48,6 +48,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.gpay.gsmart.core.attributevalue.Attributevalue;
+import vn.gpay.gsmart.core.attributevalue.IAttributeValueService;
 import vn.gpay.gsmart.core.packingtype.IPackingTypeService;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
@@ -55,8 +57,12 @@ import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_DService;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Service;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price_D;
+import vn.gpay.gsmart.core.pcontractpo_npl.IPContractPO_npl_Service;
+import vn.gpay.gsmart.core.pcontractpo_npl.PContractPO_NPL;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProductService;
+import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
+import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom2;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.product.IProductService;
 import vn.gpay.gsmart.core.product.Product;
@@ -80,6 +86,9 @@ public class ReportAPI {
 	@Autowired IPContract_Price_DService fobpriceService;
 	@Autowired IPackingTypeService packingService;
 	@Autowired IPContractProductSKUService ppskuService;
+	@Autowired IPContractProductBom2Service bomService;
+	@Autowired IAttributeValueService avService;
+	@Autowired IPContractPO_npl_Service po_npl_Service;
 	
 	@RequestMapping(value = "/quatation", method = RequestMethod.POST)
 	public ResponseEntity<report_quotation_response> Quotation(HttpServletRequest request, @RequestBody report_quotation_request entity) throws IOException {
@@ -569,8 +578,9 @@ public class ReportAPI {
 				Long pcontractid_link = entity.pcontractid_link;
 				Long productid_link = entity.productid_link;
 				List<String> list_size = ppskuService.getlistnamevalue_by_product(pcontractid_link, productid_link, AtributeFixValues.ATTR_SIZE);
-				
-				Row row_1 = sheet.getRow(0);
+
+				int rowNum = 0;
+				Row row_1 = sheet.getRow(rowNum);
 				
 				Cell cellstyle_row1 = row_1.getCell(ColumnExcel.B);
 				CellStyle style_row1 = workbook.createCellStyle();
@@ -583,8 +593,9 @@ public class ReportAPI {
 				Cell cell_ds = row_1.createCell(ColumnExcel.L);
 				cell_ds.setCellValue("Danh sách cỡ và định mức sử dụng NPL cho từng cỡ");
 				cell_ds.setCellStyle(style_row1);				
-
-				Row row_2 = sheet.getRow(1);
+				
+				rowNum++;
+				Row row_2 = sheet.getRow(rowNum);
 				Cell cellstyle_row2 = row_2.getCell(ColumnExcel.B);
 				CellStyle style_row2 = workbook.createCellStyle();
 				style_row2.cloneStyleFrom(cellstyle_row2.getCellStyle());
@@ -593,6 +604,70 @@ public class ReportAPI {
 					Cell cell_size = row_2.createCell(ColumnExcel.L+ i);
 					cell_size.setCellValue(list_size.get(i));
 					cell_size.setCellStyle(style_row2);
+				}
+				
+				//Lay ds npl tu san pham cua don hang (neu co)
+				List<PContractProductBom2> list_bom = bomService.get_pcontract_productBOMbyid(productid_link, pcontractid_link);
+				List<Long> list_colorid = ppskuService.getlistvalue_by_product(pcontractid_link, productid_link, AtributeFixValues.ATTR_COLOR);
+				
+				for(PContractProductBom2 bom : list_bom) {
+					for(Long colorid : list_colorid) {
+						rowNum++;
+						Attributevalue value = avService.findOne(colorid);
+						String value_mau = value.getValue().replace(" ", "");
+						String[] str_mau= value_mau.split("\\(");
+						String color_name = str_mau[0];
+						String color_code = str_mau[1].replace("\\)", "");
+						
+						Row row_npl = sheet.createRow(rowNum);
+						//ghi noi dung vao tung cot
+						for(int i=ColumnExcel.A; i< ColumnExcel.L;i++) {
+							Cell cell_npl = row_npl.createCell(i);
+							if(i==ColumnExcel.A) {
+								cell_npl.setCellValue(rowNum-1);
+							}
+							else if(i==ColumnExcel.B) {
+								cell_npl.setCellValue(commonService.gettypename_npl_by_id(bom.getProduct_type()));
+							}
+							else if(i==ColumnExcel.C) {
+								cell_npl.setCellValue(bom.getMaterialName());
+							}
+							else if(i==ColumnExcel.D) {
+								cell_npl.setCellValue(bom.getMaterialCode());
+							}
+							else if(i==ColumnExcel.E) {
+								cell_npl.setCellValue(bom.getDescription());
+							}
+							else if(i==ColumnExcel.F) {
+								cell_npl.setCellValue(bom.getNhaCungCap());
+							}
+							else if(i==ColumnExcel.G) {
+								cell_npl.setCellValue(bom.getCoKho());
+							}
+							else if(i==ColumnExcel.H) {
+								List<PContractPO_NPL> list_po_npl = po_npl_Service.getby_pcontract_and_npl(pcontractid_link, bom.getMaterialid_link());
+								String po_line = "";
+								for(PContractPO_NPL po_npl : list_po_npl) {
+									if(po_line.equals("")) {
+										po_line = po_npl.getPO_Buyer();
+									}
+									else {
+										po_line += ", "+po_npl.getPO_Buyer();
+									}
+								}
+								cell_npl.setCellValue(po_line);
+							}
+							else if(i==ColumnExcel.I) {
+								cell_npl.setCellValue(color_name);
+							}
+							else if(i==ColumnExcel.J) {
+								cell_npl.setCellValue(color_code);
+							}
+							else if(i==ColumnExcel.K) {
+								cell_npl.setCellValue(bom.getLost_ratio());
+							}
+						}
+					}
 				}
 				
 				

@@ -199,6 +199,9 @@ public class UploadBomAPI {
 							colNum = ColumnTempBom.HaoHut;
 							double lost_ratio = row.getCell(ColumnTempBom.HaoHut).getNumericCellValue();
 							
+							colNum = ColumnTempBom.NhaCungCap;
+							String nhacungcap = commonService.getStringValue(row.getCell(ColumnTempBom.NhaCungCap));
+							
 							//kiem tra npl co chua thi sinh moi va them vao san pham
 							Long npl_id = null;
 
@@ -218,11 +221,12 @@ public class UploadBomAPI {
 								new_npl.setStatus(1);
 								new_npl.setTimecreate(current_time);
 								new_npl.setUsercreateid_link(user.getId());
+								new_npl.setPartnercode(nhacungcap);
 								
 								new_npl = productService.save(new_npl);
 								npl_id = new_npl.getId();
 								//sinh sku all cho npl
-								//Sinh thuoc tinh mac dinh cho san pham
+								//Sinh thuoc tinh mac dinh cho npl
 								List<Attribute> lstAttr = attrService.getList_attribute_forproduct(type_npl,orgrootid_link);
 								for (Attribute attribute : lstAttr) {
 									ProductAttributeValue pav = new ProductAttributeValue();
@@ -301,6 +305,7 @@ public class UploadBomAPI {
 								
 								bomproductService.save(bom_new);
 							}
+							
 							//kiem tra va them vao bang pcontractpo_npl
 							colNum = ColumnTempBom.POLine;
 							String list_po_no = commonService.getStringValue(row.getCell(ColumnTempBom.POLine));

@@ -863,6 +863,28 @@ public class Common  {
 		return type;
 	}
 	
+	public String gettypename_npl_by_id(int typeid) {
+		String type = "";
+		switch (typeid) {
+		case 30:
+			type = "SEWING";
+			break;
+		case 40:
+			type = "PACKING";
+			break;
+		case 60:
+			type = "TICKET";
+			break;
+		case 20:
+			type = "FABRIC";
+			break;
+		case 50:
+			type = "THREAD";
+			break;
+		}
+		return type;
+	}
+	
 	public String getStringValue(Cell cell) {
 		if(cell == null) return "";
 		try {
