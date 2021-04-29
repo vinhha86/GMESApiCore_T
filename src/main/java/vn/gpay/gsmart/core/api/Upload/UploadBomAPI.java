@@ -27,12 +27,14 @@ import vn.gpay.gsmart.core.attribute.IAttributeService;
 import vn.gpay.gsmart.core.attributevalue.Attributevalue;
 import vn.gpay.gsmart.core.attributevalue.IAttributeValueService;
 import vn.gpay.gsmart.core.base.ResponseBase;
+import vn.gpay.gsmart.core.pcontract_bom2_npl_poline.IPContract_bom2_npl_poline_Service;
+import vn.gpay.gsmart.core.pcontract_bom2_npl_poline.PContract_bom2_npl_poline;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOM2SKUService;
 import vn.gpay.gsmart.core.pcontractbomsku.PContractBOM2SKU;
-import vn.gpay.gsmart.core.pcontractpo_npl.IPContract_bom2_npl_poline_Service;
-import vn.gpay.gsmart.core.pcontractpo_npl.PContract_bom2_npl_poline;
+import vn.gpay.gsmart.core.pcontractproduct.IPContractProductService;
+import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
 import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom2;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
@@ -68,6 +70,7 @@ public class UploadBomAPI {
 	@Autowired IPContractProductSKUService pcontractskuService;
 	@Autowired IPContract_POService poService;
 	@Autowired IPContract_bom2_npl_poline_Service po_npl_Service;
+	@Autowired IPContractProductService ppService;
 	
 	@RequestMapping(value = "/bom_candoi", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> BomCanDoi(HttpServletRequest request,
@@ -305,6 +308,11 @@ public class UploadBomAPI {
 								
 								bomproductService.save(bom_new);
 							}
+							else {
+								PContractProductBom2 bom = list_bom.get(0);
+								bom.setLost_ratio((float)lost_ratio);
+								bomproductService.save(bom);
+							}
 							
 							//kiem tra va them vao bang pcontractpo_npl
 							colNum = ColumnTempBom.POLine;
@@ -457,6 +465,19 @@ public class UploadBomAPI {
 										
 										bomskuService.save(bom_sku_new);
 									}
+									else {
+										PContractBOM2SKU bom_sku = list_bom_sku.get(0);
+										bom_sku.setAmount(Float.parseFloat(amount.toString()));
+										bomskuService.save(bom_sku);
+									}
+									
+									//kiem tra dinh muc da chot chua thi them vao bang log
+									List<PContractProduct> list_pp = ppService.get_by_product_and_pcontract(orgrootid_link, productid_link, pcontractid_link);
+									if(list_pp.size() > 0) {
+										if(list_pp.get(0).getIsbom2done()) {
+											
+										}
+									}
 								}
 								
 								columnsize++;
@@ -512,4 +533,4 @@ public class UploadBomAPI {
 		String code = product.getBuyercode() + "_" + (a + 1);
 		return code;
 	}
-}
+	}

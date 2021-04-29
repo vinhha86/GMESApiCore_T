@@ -1,4 +1,4 @@
-package vn.gpay.gsmart.core.pcontractpo_npl;
+package vn.gpay.gsmart.core.pcontract_bom2_npl_poline;
 
 import java.util.List;
 
