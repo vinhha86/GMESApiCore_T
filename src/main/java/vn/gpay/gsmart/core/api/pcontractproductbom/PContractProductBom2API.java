@@ -25,8 +25,8 @@ import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBom2ColorService;
 import vn.gpay.gsmart.core.pcontractbomcolor.PContractBom2Color;
 import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOM2SKUService;
 import vn.gpay.gsmart.core.pcontractbomsku.PContractBOM2SKU;
-import vn.gpay.gsmart.core.pcontractpo_npl.IPContractPO_npl_Service;
-import vn.gpay.gsmart.core.pcontractpo_npl.PContractPO_NPL;
+import vn.gpay.gsmart.core.pcontractpo_npl.IPContract_bom2_npl_poline_Service;
+import vn.gpay.gsmart.core.pcontractpo_npl.PContract_bom2_npl_poline;
 import vn.gpay.gsmart.core.pcontractproduct.IPContractProductService;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
@@ -58,7 +58,7 @@ public class PContractProductBom2API {
 	@Autowired ITask_Flow_Service commentService;
 	@Autowired ISKU_Service skuService;
 	@Autowired IAttributeValueService avService;
-	@Autowired IPContractPO_npl_Service po_npl_Service;
+	@Autowired IPContract_bom2_npl_poline_Service po_npl_Service;
 	
 	@RequestMapping(value = "/create_pcontract_productbom", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> CreateProductBom(HttpServletRequest request,
@@ -554,9 +554,9 @@ public class PContractProductBom2API {
 					amount_color = listbomcolorclone.get(0).getAmount();
 				
 				//Lay ds poline cua sku
-				List<PContractPO_NPL> list_po = po_npl_Service.getby_pcontract_and_npl(pcontractid_link, pContractProductBom.getMaterialid_link());
+				List<PContract_bom2_npl_poline> list_po = po_npl_Service.getby_pcontract_and_npl(pcontractid_link, pContractProductBom.getMaterialid_link());
 				String str_po = "";
-				for(PContractPO_NPL po_npl : list_po) {
+				for(PContract_bom2_npl_poline po_npl : list_po) {
 					if(str_po == "") {
 						str_po = po_npl.getPO_Buyer();
 					}

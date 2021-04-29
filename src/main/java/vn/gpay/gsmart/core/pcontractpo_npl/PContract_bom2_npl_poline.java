@@ -17,9 +17,9 @@ import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 
-@Table(name="pcontractpo_npl")
+@Table(name="pcontract_bom2_npl_poline")
 @Entity
-public class PContractPO_NPL implements Serializable {
+public class PContract_bom2_npl_poline implements Serializable {
 
 	/**
 	 * 

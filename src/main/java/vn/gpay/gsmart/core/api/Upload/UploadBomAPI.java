@@ -31,8 +31,8 @@ import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOM2SKUService;
 import vn.gpay.gsmart.core.pcontractbomsku.PContractBOM2SKU;
-import vn.gpay.gsmart.core.pcontractpo_npl.IPContractPO_npl_Service;
-import vn.gpay.gsmart.core.pcontractpo_npl.PContractPO_NPL;
+import vn.gpay.gsmart.core.pcontractpo_npl.IPContract_bom2_npl_poline_Service;
+import vn.gpay.gsmart.core.pcontractpo_npl.PContract_bom2_npl_poline;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
 import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom2;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
@@ -67,7 +67,7 @@ public class UploadBomAPI {
 	@Autowired IAttributeValueService attributevalueService;
 	@Autowired IPContractProductSKUService pcontractskuService;
 	@Autowired IPContract_POService poService;
-	@Autowired IPContractPO_npl_Service po_npl_Service;
+	@Autowired IPContract_bom2_npl_poline_Service po_npl_Service;
 	
 	@RequestMapping(value = "/bom_candoi", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> BomCanDoi(HttpServletRequest request,
@@ -313,7 +313,7 @@ public class UploadBomAPI {
 								String[] lst_po = list_po_no.split(",");
 								for(String po_no : lst_po) {
 									List<PContract_PO> listpo = poService.getbycode_and_type(po_no, POType.PO_LINE_CONFIRMED, pcontractid_link);
-									PContractPO_NPL po_npl = new PContractPO_NPL();
+									PContract_bom2_npl_poline po_npl = new PContract_bom2_npl_poline();
 									po_npl.setId(null);
 									po_npl.setNpl_skuid_link(material_skuid_link);
 									po_npl.setPcontract_poid_link(listpo.get(0).getId());
@@ -328,9 +328,9 @@ public class UploadBomAPI {
 								
 								List<PContract_PO> list_po = poService.getby_pcontract_and_type(pcontractid_link, type);
 								for(PContract_PO po : list_po) {
-									List<PContractPO_NPL> po_npls = po_npl_Service.getby_po_and_npl(po.getId(), material_skuid_link);
+									List<PContract_bom2_npl_poline> po_npls = po_npl_Service.getby_po_and_npl(po.getId(), material_skuid_link);
 									if(po_npls.size() == 0) {
-										PContractPO_NPL po_npl = new PContractPO_NPL();
+										PContract_bom2_npl_poline po_npl = new PContract_bom2_npl_poline();
 										po_npl.setId(null);
 										po_npl.setNpl_skuid_link(material_skuid_link);
 										po_npl.setPcontract_poid_link(po.getId());

@@ -57,8 +57,8 @@ import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_DService;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Service;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price_D;
-import vn.gpay.gsmart.core.pcontractpo_npl.IPContractPO_npl_Service;
-import vn.gpay.gsmart.core.pcontractpo_npl.PContractPO_NPL;
+import vn.gpay.gsmart.core.pcontractpo_npl.IPContract_bom2_npl_poline_Service;
+import vn.gpay.gsmart.core.pcontractpo_npl.PContract_bom2_npl_poline;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProductService;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
@@ -88,7 +88,7 @@ public class ReportAPI {
 	@Autowired IPContractProductSKUService ppskuService;
 	@Autowired IPContractProductBom2Service bomService;
 	@Autowired IAttributeValueService avService;
-	@Autowired IPContractPO_npl_Service po_npl_Service;
+	@Autowired IPContract_bom2_npl_poline_Service po_npl_Service;
 	
 	@RequestMapping(value = "/quatation", method = RequestMethod.POST)
 	public ResponseEntity<report_quotation_response> Quotation(HttpServletRequest request, @RequestBody report_quotation_request entity) throws IOException {
@@ -645,9 +645,9 @@ public class ReportAPI {
 								cell_npl.setCellValue(bom.getCoKho());
 							}
 							else if(i==ColumnExcel.H) {
-								List<PContractPO_NPL> list_po_npl = po_npl_Service.getby_pcontract_and_npl(pcontractid_link, bom.getMaterialid_link());
+								List<PContract_bom2_npl_poline> list_po_npl = po_npl_Service.getby_pcontract_and_npl(pcontractid_link, bom.getMaterialid_link());
 								String po_line = "";
-								for(PContractPO_NPL po_npl : list_po_npl) {
+								for(PContract_bom2_npl_poline po_npl : list_po_npl) {
 									if(po_line.equals("")) {
 										po_line = po_npl.getPO_Buyer();
 									}

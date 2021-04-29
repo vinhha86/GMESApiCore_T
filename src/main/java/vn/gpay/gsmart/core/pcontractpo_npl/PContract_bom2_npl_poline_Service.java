@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service;
 import vn.gpay.gsmart.core.base.AbstractService;
 
 @Service
-public class PContractPO_npl_Service extends AbstractService<PContractPO_NPL> implements IPContractPO_npl_Service {
-	@Autowired IPContractpo_npl_repo repo;
+public class PContract_bom2_npl_poline_Service extends AbstractService<PContract_bom2_npl_poline> implements IPContract_bom2_npl_poline_Service {
+	@Autowired IPContract_bom2_npl_poline_repo repo;
 	@Override
-	protected JpaRepository<PContractPO_NPL, Long> getRepository() {
+	protected JpaRepository<PContract_bom2_npl_poline, Long> getRepository() {
 		// TODO Auto-generated method stub
 		return repo;
 	}
@@ -22,12 +22,12 @@ public class PContractPO_npl_Service extends AbstractService<PContractPO_NPL> im
 //		return repo.getby_po(pcontractpoid_link);
 //	}
 	@Override
-	public List<PContractPO_NPL> getby_po_and_npl(Long pcontractpoid_link, Long material_skuid_link) {
+	public List<PContract_bom2_npl_poline> getby_po_and_npl(Long pcontractpoid_link, Long material_skuid_link) {
 		// TODO Auto-generated method stub
 		return repo.getby_po_and_npl(pcontractpoid_link, material_skuid_link);
 	}
 	@Override
-	public List<PContractPO_NPL> getby_pcontract_and_npl(Long pcontractid_link, Long material_skuid_link) {
+	public List<PContract_bom2_npl_poline> getby_pcontract_and_npl(Long pcontractid_link, Long material_skuid_link) {
 		// TODO Auto-generated method stub
 		return repo.getby_pcontract_and_npl(pcontractid_link, material_skuid_link);
 	}
