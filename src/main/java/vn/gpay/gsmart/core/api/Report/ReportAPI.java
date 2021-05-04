@@ -617,7 +617,7 @@ public class ReportAPI {
 						String value_mau = value.getValue().replace(" ", "");
 						String[] str_mau= value_mau.split("\\(");
 						String color_name = str_mau[0];
-						String color_code = str_mau[1].replace("\\)", "");
+						String color_code = str_mau[1].replace(")", "");
 						
 						Row row_npl = sheet.createRow(rowNum);
 						//ghi noi dung vao tung cot

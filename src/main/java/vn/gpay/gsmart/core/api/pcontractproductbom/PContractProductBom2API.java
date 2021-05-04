@@ -577,7 +577,7 @@ public class PContractProductBom2API {
 					
 					map.put("createduserid_link", "0"+pContractProductBom.getCreateduserid_link());
 					
-					map.put("description", pContractProductBom.getDescription()+"");
+					map.put("description", pContractProductBom.getDescription_product()+"");
 					
 					map.put("id", "0"+pContractProductBom.getId());
 					

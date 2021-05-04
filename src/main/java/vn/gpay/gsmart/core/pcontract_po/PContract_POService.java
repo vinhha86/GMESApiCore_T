@@ -319,4 +319,10 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		// TODO Auto-generated method stub
 		return repo.getbycode_and_type(pcontractid_link, po_no, type);
 	}
+
+	@Override
+	public List<PContract_PO> getpo_notin_list(List<String> list_po, int type, Long pcontractid_link) {
+		// TODO Auto-generated method stub
+		return repo.getnotin_list_pono(pcontractid_link, list_po, type);
+	}
 }

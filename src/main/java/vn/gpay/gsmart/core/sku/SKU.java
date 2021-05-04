@@ -209,22 +209,26 @@ public class SKU implements Serializable {
     
     @Transient
     public String getCoSanPham() {
-    	String name ="";
-    	for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
-			if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZE) {
-				name = sku_Attribute_Value.getAttributeValueName();
-				break;
-			}
-			else if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) {
-				name = sku_Attribute_Value.getAttributeValueName();
-				break;
-			}
-			else if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_TEX) {
-				name = sku_Attribute_Value.getAttributeValueName();
-				break;
-			}
-		}
-    	return name;
+//    	String name ="";
+//    	for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
+//			if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZE) {
+//				name = sku_Attribute_Value.getAttributeValueName();
+//				break;
+//			}
+//			else if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) {
+//				name = sku_Attribute_Value.getAttributeValueName();
+//				break;
+//			}
+//			else if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_TEX) {
+//				name = sku_Attribute_Value.getAttributeValueName();
+//				break;
+//			}
+//		}
+//    	return name;
+    	if(product!=null) {
+    		return product.getCoKho();
+    	}
+    	return "";
     }
   
 	@Transient
@@ -266,6 +270,14 @@ public class SKU implements Serializable {
 	public String getProducttype_name() {
 		if(product != null) {
 			return product.getProducttype_name();
+		}
+		return null;
+	}
+	
+	@Transient
+	public String getDescription() {
+		if(product != null) {
+			return product.getDescription();
 		}
 		return null;
 	}

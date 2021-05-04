@@ -197,12 +197,12 @@ public class Product implements Serializable {/**
     public String getCoKho() {
     	String name ="";
     	for (ProductAttributeValue pav : listPAvalue) {
-			if(pav.getAttributeid_link() == 36) {
+			if(pav.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) {
 				if(pav.getAttributevalueid_link() != 0) {
 					if(name == "") {
 						name += pav.getAttributeValueName().replace(" ", "");
 					}else {
-						name += ", "+ pav.getAttributeValueName().replace(" ", "");;
+						name += ", "+ pav.getAttributeValueName().replace(" ", "");
 					}
 				}
 			}

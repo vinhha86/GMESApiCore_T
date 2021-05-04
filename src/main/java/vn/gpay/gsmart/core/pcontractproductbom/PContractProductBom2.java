@@ -56,6 +56,13 @@ public class PContractProductBom2 implements Serializable{/**
     private Unit unit;
 	
 	@Transient
+	public String getDescription_product() {
+		if(sku !=null) {
+			return sku.getDescription();
+		}
+		return "";
+	}
+	@Transient
 	public String getMaterialName() {
 		if(sku !=null) {
 			return sku.getName();

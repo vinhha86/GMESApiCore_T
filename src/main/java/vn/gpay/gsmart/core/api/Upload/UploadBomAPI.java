@@ -114,43 +114,48 @@ public class UploadBomAPI {
 				
 				Row row = sheet.getRow(rowNum);
 				Row rowheader = sheet.getRow(1);
-				
-				try {
+
+				List<Long> list_colorid_link = new ArrayList<Long>();
+				String ColorName = "", ColorCode = "";
+				String list_po_no = "";
+				try {					
 					String STT = "";
 					STT = commonService.getStringValue(row.getCell(ColumnTempBom.STT));
 					STT = STT.equals("0") ? "" : STT;
 					//kiem tra ten mau xem co ton tai trong chi tiet po hay chua roi moi xu ly
 					while (!STT.equals("")) {
 						colNum = ColumnTempBom.TenMauSP;
-						String ColorName = commonService.getStringValue(row.getCell(ColumnTempBom.TenMauSP));
+						ColorName = commonService.getStringValue(row.getCell(ColumnTempBom.TenMauSP));
 						
 						colNum = ColumnTempBom.MaMauSP;
-						String ColorCode = commonService.getStringValue(row.getCell(ColumnTempBom.MaMauSP));
-						
+						ColorCode = commonService.getStringValue(row.getCell(ColumnTempBom.MaMauSP));
+
 						if(!ColorName.toLowerCase().equals("All".toLowerCase())) {
-							Long colorid_link = null;
 							List<Attributevalue> listAttributevalue = attributevalueService.getByValue(ColorName+"("+ColorCode+")", AtributeFixValues.ATTR_COLOR);
 							if(listAttributevalue.size() == 0) {
 								mes_err = "Màu sản phẩm "+ ColorName + " chưa có trong chi tiết PO! Bạn hãy thêm vào chi tiết PO trước khi upload định mức";
 								break;
 							}
 							
-							colorid_link = listAttributevalue.get(0).getId();
+							list_colorid_link.add(listAttributevalue.get(0).getId());
 							
-							List<Long> list_sku = pcontractskuService.getsku_bycolor(pcontractid_link, productid_link, colorid_link);
+							List<Long> list_sku = pcontractskuService.getsku_bycolor(pcontractid_link, productid_link, listAttributevalue.get(0).getId());
 							if(list_sku.size() == 0) {
 								mes_err = "Màu sản phẩm '"+ ColorName + "' chưa có trong chi tiết PO! Bạn hãy thêm vào chi tiết PO trước khi upload định mức";
 								break;
 							}
-							
+						}
+						else {
+							list_colorid_link = pcontractskuService.getlistvalue_by_product(pcontractid_link, productid_link, AtributeFixValues.ATTR_COLOR);
 						}
 						
 						//Kiem tra xem so PO co dung voi trong he thong hay khong
 						colNum = ColumnTempBom.POLine;
-						String List_str_po = commonService.getStringValue(row.getCell(ColumnTempBom.POLine));
+						list_po_no = commonService.getStringValue(row.getCell(ColumnTempBom.POLine));
+						list_po_no = list_po_no.toLowerCase();
 						//List_str_po mà trống là dùng cho tất cả các line
-						if(!List_str_po.equals("")) {
-							String[] lst_po = List_str_po.split(",");
+						if(!list_po_no.equals("")) {
+							String[] lst_po = list_po_no.split(",");
 							for(String po_no : lst_po) {
 								if(po_no.toLowerCase().equals("tbd")) {
 									mes_err = "Số PO không được để là TBD. Ở dòng "+(rowNum+1) +" và cột "+ (colNum+1);
@@ -205,6 +210,30 @@ public class UploadBomAPI {
 							colNum = ColumnTempBom.NhaCungCap;
 							String nhacungcap = commonService.getStringValue(row.getCell(ColumnTempBom.NhaCungCap));
 							
+							colNum = ColumnTempBom.CoKho;
+							String str_CoKho = commonService.getStringValue(row.getCell(ColumnTempBom.CoKho));
+							
+							//Kiem tra co kho co trong db chua thi them vao bang attribute_value
+							List<Attributevalue> list_av = attributevalueService.getByValue(str_CoKho, AtributeFixValues.ATTR_SIZEWIDTH);
+							long sizewidthid_link = 0;
+							if(list_av.size() > 0) {
+								sizewidthid_link = list_av.get(0).getId();
+							}
+							else {
+								Attributevalue av_new = new Attributevalue();
+								av_new.setAttributeid_link(AtributeFixValues.ATTR_SIZEWIDTH);
+								av_new.setDatatype(0);
+								av_new.setId(null);
+								av_new.setIsdefault(false);
+								av_new.setOrgrootid_link(orgrootid_link);
+								av_new.setTimecreate(current_time);
+								av_new.setUsercreateid_link(user.getId());
+								av_new.setValue(str_CoKho);
+								
+								av_new = attributevalueService.save(av_new);
+								sizewidthid_link = av_new.getId();
+							}
+							
 							//kiem tra npl co chua thi sinh moi va them vao san pham
 							Long npl_id = null;
 
@@ -228,26 +257,42 @@ public class UploadBomAPI {
 								
 								new_npl = productService.save(new_npl);
 								npl_id = new_npl.getId();
+								
+								//Them vao bang product_attribute_value cho mau va co 
+								
 								//sinh sku all cho npl
 								//Sinh thuoc tinh mac dinh cho npl
 								List<Attribute> lstAttr = attrService.getList_attribute_forproduct(type_npl,orgrootid_link);
 								for (Attribute attribute : lstAttr) {
 									ProductAttributeValue pav = new ProductAttributeValue();
-									long value = 0;
 									
 									if(attribute.getId() == AtributeFixValues.ATTR_COLOR) {
-										value = AtributeFixValues.value_color_all;
+										for(Long colorid_link : list_colorid_link) {
+											pav.setId((long) 0);
+											pav.setProductid_link(npl_id);
+											pav.setAttributeid_link(attribute.getId());
+											pav.setAttributevalueid_link(colorid_link);
+											pav.setOrgrootid_link(user.getRootorgid_link());
+											pavService.save(pav);
+										}
+										
 									}
 									else if(attribute.getId() == AtributeFixValues.ATTR_SIZEWIDTH) {
-										value = AtributeFixValues.value_sizewidth_all;
+										pav.setId((long) 0);
+										pav.setProductid_link(npl_id);
+										pav.setAttributeid_link(attribute.getId());
+										pav.setAttributevalueid_link(sizewidthid_link);
+										pav.setOrgrootid_link(user.getRootorgid_link());
+										pavService.save(pav);
 									}
-									
-									pav.setId((long) 0);
-									pav.setProductid_link(npl_id);
-									pav.setAttributeid_link(attribute.getId());
-									pav.setAttributevalueid_link(value);
-									pav.setOrgrootid_link(user.getRootorgid_link());
-									pavService.save(pav);
+									else {
+										pav.setId((long) 0);
+										pav.setProductid_link(npl_id);
+										pav.setAttributeid_link(attribute.getId());
+										pav.setAttributevalueid_link((long)0);
+										pav.setOrgrootid_link(user.getRootorgid_link());
+										pavService.save(pav);
+									}
 								}
 								
 								//Sinh SKU cho mau all va co all
@@ -288,6 +333,19 @@ public class UploadBomAPI {
 							}
 							else {
 								npl_id = list_npl.get(0).getId();
+								for(Long colorid_link : list_colorid_link) {
+									List<ProductAttributeValue> pav_npl_mau = pavService.getOne_byproduct_and_value(productid_link, AtributeFixValues.ATTR_COLOR, colorid_link);
+									if(pav_npl_mau.size()  == 0) {
+										ProductAttributeValue pav_mau = new ProductAttributeValue();
+										pav_mau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
+										pav_mau.setAttributevalueid_link(colorid_link);
+										pav_mau.setId(null);
+										pav_mau.setOrgrootid_link(orgrootid_link);
+										pav_mau.setProductid_link(productid_link);
+										pavService.save(pav_mau);
+									}
+								}
+								
 								List<SKU> list_sku_npl = skuService.getlist_byProduct(npl_id);
 								material_skuid_link = list_sku_npl.get(0).getId();
 							}
@@ -316,10 +374,13 @@ public class UploadBomAPI {
 							
 							//kiem tra va them vao bang pcontractpo_npl
 							colNum = ColumnTempBom.POLine;
-							String list_po_no = commonService.getStringValue(row.getCell(ColumnTempBom.POLine));
+//							String list_po_no = commonService.getStringValue(row.getCell(ColumnTempBom.POLine));
 							if(!list_po_no.equals("")) {
+								list_po_no = list_po_no.toLowerCase();
 								String[] lst_po = list_po_no.split(",");
+								List<String> list_po_npl = new ArrayList<String>();
 								for(String po_no : lst_po) {
+									list_po_npl.add(po_no);
 									List<PContract_PO> listpo = poService.getbycode_and_type(po_no, POType.PO_LINE_CONFIRMED, pcontractid_link);
 									PContract_bom2_npl_poline po_npl = new PContract_bom2_npl_poline();
 									po_npl.setId(null);
@@ -328,6 +389,15 @@ public class UploadBomAPI {
 									po_npl.setPcontractid_link(pcontractid_link);
 									
 									po_npl_Service.save(po_npl);
+								}
+								
+								//xoa cac po khoong co trong danh sach
+								List<PContract_PO> listpo_del = poService.getpo_notin_list(list_po_npl, POType.PO_LINE_CONFIRMED, pcontractid_link);
+								for(PContract_PO po : listpo_del) {
+									List<PContract_bom2_npl_poline> po_npls = po_npl_Service.getby_po_and_npl(po.getId(), material_skuid_link);
+									if(po_npls.size() > 0) {
+										po_npl_Service.delete(po_npls.get(0));
+									}
 								}
 							}
 							else {
@@ -381,94 +451,69 @@ public class UploadBomAPI {
 										sizeid_link = list_size.get(0).getId();
 									}
 									
-									//kiem tra mau co trong db chua
-									colNum = ColumnTempBom.TenMauSP;
-									String ColorName = commonService.getStringValue(row.getCell(ColumnTempBom.TenMauSP));
-									
-									colNum = ColumnTempBom.MaMauSP;
-									String ColorCode = commonService.getStringValue(row.getCell(ColumnTempBom.MaMauSP));
-									
-									Long colorid_link = null;
-									List<Attributevalue> listAttributevalue = attributevalueService.getByValue(ColorName+"("+ColorCode+")", AtributeFixValues.ATTR_COLOR);
-									if(listAttributevalue.size() == 0) {
-										Attributevalue av = new Attributevalue();
-										av.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
-										av.setId(null);
-										av.setIsdefault(false);
-										av.setOrgrootid_link(orgrootid_link);
-										av.setSortvalue(attributevalueService.getMaxSortValue(AtributeFixValues.ATTR_COLOR));
-										av.setTimecreate(new Date());
-										av.setUsercreateid_link(user.getId());
-										av.setValue(ColorName+"("+ColorCode+")");
-										
-										av = attributevalueService.save(av);
-										colorid_link = av.getId();
-									}
-									else {
-										colorid_link = listAttributevalue.get(0).getId();
-									}
-									
 									
 									//get sku cua san pham theo mau va co
-									long product_skuid_link = skuattService.getsku_byproduct_and_valuemau_valueco(productid_link, colorid_link, sizeid_link);
-									if(product_skuid_link == 0) {
-										Product product = productService.findOne(productid_link);
+									for(Long colorid_link: list_colorid_link) {
+										long product_skuid_link = skuattService.getsku_byproduct_and_valuemau_valueco(productid_link, colorid_link, sizeid_link);
+										if(product_skuid_link == 0) {
+											Product product = productService.findOne(productid_link);
+											
+											SKU sku = new SKU();
+											sku.setId(null);
+											sku.setCode(genCodeSKU(product));
+											sku.setName(product.getBuyername());
+											sku.setProductid_link(productid_link);
+											sku.setOrgrootid_link(user.getRootorgid_link());
+											sku.setSkutypeid_link(vn.gpay.gsmart.core.utils.ProductType.SKU_TYPE_COMPLETEPRODUCT);
+
+											sku = skuService.save(sku);
+											product_skuid_link = sku.getId();
+											
+											// Them vao bang sku_attribute_value
+											SKU_Attribute_Value savMau = new SKU_Attribute_Value();
+											savMau.setId(null);
+											savMau.setAttributevalueid_link(colorid_link);
+											savMau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
+											savMau.setOrgrootid_link(orgrootid_link);
+											savMau.setSkuid_link(product_skuid_link);
+											savMau.setUsercreateid_link(user.getId());
+											savMau.setTimecreate(new Date());
+
+											skuattService.save(savMau);
+
+											SKU_Attribute_Value savCo = new SKU_Attribute_Value();
+											savCo.setId(null);
+											savCo.setAttributevalueid_link(sizeid_link);
+											savCo.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
+											savCo.setOrgrootid_link(orgrootid_link);
+											savCo.setSkuid_link(product_skuid_link);
+											savCo.setUsercreateid_link(user.getId());
+											savCo.setTimecreate(new Date());
+
+											skuattService.save(savCo);
+										}
 										
-										SKU sku = new SKU();
-										sku.setId(null);
-										sku.setCode(genCodeSKU(product));
-										sku.setName(product.getBuyername());
-										sku.setProductid_link(productid_link);
-										sku.setOrgrootid_link(user.getRootorgid_link());
-										sku.setSkutypeid_link(vn.gpay.gsmart.core.utils.ProductType.SKU_TYPE_COMPLETEPRODUCT);
-
-										sku = skuService.save(sku);
-										product_skuid_link = sku.getId();
-										
-										// Them vao bang sku_attribute_value
-										SKU_Attribute_Value savMau = new SKU_Attribute_Value();
-										savMau.setId(null);
-										savMau.setAttributevalueid_link(colorid_link);
-										savMau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
-										savMau.setOrgrootid_link(orgrootid_link);
-										savMau.setSkuid_link(product_skuid_link);
-										savMau.setUsercreateid_link(user.getId());
-										savMau.setTimecreate(new Date());
-
-										skuattService.save(savMau);
-
-										SKU_Attribute_Value savCo = new SKU_Attribute_Value();
-										savCo.setId(null);
-										savCo.setAttributevalueid_link(sizeid_link);
-										savCo.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
-										savCo.setOrgrootid_link(orgrootid_link);
-										savCo.setSkuid_link(product_skuid_link);
-										savCo.setUsercreateid_link(user.getId());
-										savCo.setTimecreate(new Date());
-
-										skuattService.save(savCo);
-									}
-									
-									List<PContractBOM2SKU> list_bom_sku = bomskuService.getall_material_in_productBOMSKU(pcontractid_link, productid_link, sizeid_link, colorid_link, material_skuid_link);
-									if(list_bom_sku.size() == 0) {
-										PContractBOM2SKU bom_sku_new = new PContractBOM2SKU();
-										bom_sku_new.setAmount(Float.parseFloat(amount.toString()));
-										bom_sku_new.setCreateddate(current_time);
-										bom_sku_new.setCreateduserid_link(user.getId());
-										bom_sku_new.setId(null);
-										bom_sku_new.setLost_ratio((float)lost_ratio);
-										bom_sku_new.setMaterial_skuid_link(material_skuid_link);
-										bom_sku_new.setOrgrootid_link(orgrootid_link);
-										bom_sku_new.setPcontractid_link(pcontractid_link);
-										bom_sku_new.setProduct_skuid_link(product_skuid_link);
-										bom_sku_new.setProductid_link(productid_link);
-										
-										bomskuService.save(bom_sku_new);
-									}
-									else {
-										PContractBOM2SKU bom_sku = list_bom_sku.get(0);
-										bom_sku.setAmount(Float.parseFloat(amount.toString()));
-										bomskuService.save(bom_sku);
+										List<PContractBOM2SKU> list_bom_sku = bomskuService.getall_material_in_productBOMSKU(pcontractid_link, productid_link, sizeid_link, colorid_link, material_skuid_link);
+										if(list_bom_sku.size() == 0) {
+											PContractBOM2SKU bom_sku_new = new PContractBOM2SKU();
+											bom_sku_new.setAmount(Float.parseFloat(amount.toString()));
+											bom_sku_new.setCreateddate(current_time);
+											bom_sku_new.setCreateduserid_link(user.getId());
+											bom_sku_new.setId(null);
+											bom_sku_new.setLost_ratio((float)lost_ratio);
+											bom_sku_new.setMaterial_skuid_link(material_skuid_link);
+											bom_sku_new.setOrgrootid_link(orgrootid_link);
+											bom_sku_new.setPcontractid_link(pcontractid_link);
+											bom_sku_new.setProduct_skuid_link(product_skuid_link);
+											bom_sku_new.setProductid_link(productid_link);
+											
+											bomskuService.save(bom_sku_new);
+										}
+										else {
+											PContractBOM2SKU bom_sku = list_bom_sku.get(0);
+											bom_sku.setAmount(Float.parseFloat(amount.toString()));
+											bomskuService.save(bom_sku);
+										}
 									}
 									
 									//kiem tra dinh muc da chot chua thi them vao bang log
