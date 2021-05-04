@@ -315,9 +315,9 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	}
 
 	@Override
-	public List<PContract_PO> getbycode_and_type(String po_no, int type, Long pcontractid_link) {
+	public List<PContract_PO> getbycode_and_type_and_product(String po_no, int type, Long pcontractid_link,Long productid_link) {
 		// TODO Auto-generated method stub
-		return repo.getbycode_and_type(pcontractid_link, po_no, type);
+		return repo.getbycode_and_type_and_product(pcontractid_link, po_no, type, productid_link);
 	}
 
 	@Override

@@ -31,6 +31,8 @@ import vn.gpay.gsmart.core.pcontract_bom2_npl_poline.IPContract_bom2_npl_poline_
 import vn.gpay.gsmart.core.pcontract_bom2_npl_poline.PContract_bom2_npl_poline;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
+import vn.gpay.gsmart.core.pcontract_product_bom_log.IPContract_bom2_sku_log_Service;
+import vn.gpay.gsmart.core.pcontract_product_bom_log.PContract_bom2_sku_log;
 import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOM2SKUService;
 import vn.gpay.gsmart.core.pcontractbomsku.PContractBOM2SKU;
 import vn.gpay.gsmart.core.pcontractproduct.IPContractProductService;
@@ -71,6 +73,7 @@ public class UploadBomAPI {
 	@Autowired IPContract_POService poService;
 	@Autowired IPContract_bom2_npl_poline_Service po_npl_Service;
 	@Autowired IPContractProductService ppService;
+	@Autowired IPContract_bom2_sku_log_Service bomlogService;
 	
 	@RequestMapping(value = "/bom_candoi", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> BomCanDoi(HttpServletRequest request,
@@ -161,7 +164,7 @@ public class UploadBomAPI {
 									mes_err = "Số PO không được để là TBD. Ở dòng "+(rowNum+1) +" và cột "+ (colNum+1);
 									break;
 								}
-								List<PContract_PO> listpo = poService.getbycode_and_type(po_no, POType.PO_LINE_CONFIRMED, pcontractid_link);
+								List<PContract_PO> listpo = poService.getbycode_and_type_and_product(po_no, POType.PO_LINE_CONFIRMED, pcontractid_link, productid_link);
 								if(listpo.size() == 0) {
 									mes_err = "Số PO '"+po_no+"' ở dòng "+(rowNum+1) +" và cột "+ (colNum+1)+" không tồn tại trong hệ thống! Bạn hãy kiểm tra lại trong hệ thống trước khi upload!";
 									break;
@@ -395,7 +398,7 @@ public class UploadBomAPI {
 								List<String> list_po_npl = new ArrayList<String>();
 								for(String po_no : lst_po) {
 									list_po_npl.add(po_no);
-									List<PContract_PO> listpo = poService.getbycode_and_type(po_no, POType.PO_LINE_CONFIRMED, pcontractid_link);
+									List<PContract_PO> listpo = poService.getbycode_and_type_and_product(po_no, POType.PO_LINE_CONFIRMED, pcontractid_link, productid_link);
 									PContract_bom2_npl_poline po_npl = new PContract_bom2_npl_poline();
 									po_npl.setId(null);
 									po_npl.setNpl_skuid_link(material_skuid_link);
@@ -437,6 +440,7 @@ public class UploadBomAPI {
 							int columnsize = ColumnTempBom.HaoHut + 1;
 							String s_sizename = commonService.getStringValue(rowheader.getCell(columnsize));
 							s_sizename = s_sizename.equals("0") ? "" : s_sizename;
+							
 							while (!s_sizename.equals("")) {
 								colNum = columnsize;
 								//lay gia tri dinh muc
@@ -468,6 +472,7 @@ public class UploadBomAPI {
 									
 									//get sku cua san pham theo mau va co
 									for(Long colorid_link: list_colorid_link) {
+										Float amount_old = (float)-1;
 										long product_skuid_link = skuattService.getsku_byproduct_and_valuemau_valueco(productid_link, colorid_link, sizeid_link);
 										if(product_skuid_link == 0) {
 											Product product = productService.findOne(productid_link);
@@ -525,18 +530,38 @@ public class UploadBomAPI {
 										}
 										else {
 											PContractBOM2SKU bom_sku = list_bom_sku.get(0);
+											//luu lai gia tri cu truoc khi update
+											amount_old = bom_sku.getAmount();
+											
 											bom_sku.setAmount(Float.parseFloat(amount.toString()));
 											bomskuService.save(bom_sku);
 										}
+										
+										//kiem tra dinh muc da chot chua thi them vao bang log
+										List<PContractProduct> list_pp = ppService.get_by_product_and_pcontract(orgrootid_link, productid_link, pcontractid_link);
+										if(list_pp.size() > 0) {
+											boolean check = list_pp.get(0).getIsbom2done() == null ? false: list_pp.get(0).getIsbom2done();
+											if(check) {
+												if(!amount_old.equals(Float.parseFloat(amount.toString()))) {
+													PContract_bom2_sku_log bom_log = new PContract_bom2_sku_log();
+													bom_log.setAmount(Float.parseFloat(amount.toString()));
+													bom_log.setAmount_old(amount_old);
+													bom_log.setId(null);
+													bom_log.setMaterial_skuid_link(material_skuid_link);
+													bom_log.setOrgrootid_link(orgrootid_link);
+													bom_log.setPcontractid_link(pcontractid_link);
+													bom_log.setProduct_skuid_link(product_skuid_link);
+													bom_log.setProductid_link(productid_link);
+													bom_log.setProductid_link(productid_link);
+													bom_log.setTimeupdate(current_time);
+													bom_log.setUserupdateid_link(user.getId());
+													
+													bomlogService.save(bom_log);
+												}
+//												
+											}
+										}
 									}
-									
-									//kiem tra dinh muc da chot chua thi them vao bang log
-//									List<PContractProduct> list_pp = ppService.get_by_product_and_pcontract(orgrootid_link, productid_link, pcontractid_link);
-//									if(list_pp.size() > 0) {
-//										if(list_pp.get(0).getIsbom2done()) {
-//											
-//										}
-//									}
 								}
 								
 								columnsize++;
