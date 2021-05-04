@@ -43,6 +43,7 @@ public interface IPContract_POService extends Operations<PContract_PO> {
 	
 	List<PContract_PO> getall_offers_by_org(List<Long> orgid_link);
 	List<PContract_PO> getby_pcontract_and_type(Long pcontractid_link, List<Integer> type);
+	List<PContract_PO> getby_pcontract_and_type_andproduct(Long pcontractid_link, List<Integer> type, Long productid_link);
 	List<PContractPO_Shipping> get_po_shipping(List<Long> orgs, int po_type, Date shipdate_from, Date shipdate_to, Long orgrootid_link);
 	List<PContract_PO> getbycode_and_type(String po_no, int type, Long pcontractid_link);
 	List<PContract_PO> getpo_notin_list(List<String> list_po, int type, Long pcontractid_link);

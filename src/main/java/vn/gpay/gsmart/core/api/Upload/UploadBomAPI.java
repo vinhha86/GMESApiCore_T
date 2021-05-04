@@ -133,7 +133,7 @@ public class UploadBomAPI {
 						if(!ColorName.toLowerCase().equals("All".toLowerCase())) {
 							List<Attributevalue> listAttributevalue = attributevalueService.getByValue(ColorName+"("+ColorCode+")", AtributeFixValues.ATTR_COLOR);
 							if(listAttributevalue.size() == 0) {
-								mes_err = "Màu sản phẩm "+ ColorName + " chưa có trong chi tiết PO! Bạn hãy thêm vào chi tiết PO trước khi upload định mức";
+								mes_err = "Màu sản phẩm '"+ ColorName + "("+ColorCode+")"+ "' chưa có trong chi tiết PO! Bạn hãy thêm vào chi tiết PO trước khi upload định mức";
 								break;
 							}
 							
@@ -212,6 +212,20 @@ public class UploadBomAPI {
 							
 							colNum = ColumnTempBom.CoKho;
 							String str_CoKho = commonService.getStringValue(row.getCell(ColumnTempBom.CoKho));
+							
+							colNum = ColumnTempBom.TenMauSP;
+							ColorName = commonService.getStringValue(row.getCell(ColumnTempBom.TenMauSP));
+							
+							colNum = ColumnTempBom.MaMauSP;
+							ColorCode = commonService.getStringValue(row.getCell(ColumnTempBom.MaMauSP));
+
+							if(!ColorName.toLowerCase().equals("All".toLowerCase())) {
+								List<Attributevalue> listAttributevalue = attributevalueService.getByValue(ColorName+"("+ColorCode+")", AtributeFixValues.ATTR_COLOR);								
+								list_colorid_link.add(listAttributevalue.get(0).getId());
+							}
+							else {
+								list_colorid_link = pcontractskuService.getlistvalue_by_product(pcontractid_link, productid_link, AtributeFixValues.ATTR_COLOR);
+							}
 							
 							//Kiem tra co kho co trong db chua thi them vao bang attribute_value
 							List<Attributevalue> list_av = attributevalueService.getByValue(str_CoKho, AtributeFixValues.ATTR_SIZEWIDTH);
@@ -404,7 +418,7 @@ public class UploadBomAPI {
 								List<Integer> type = new ArrayList<Integer>();
 								type.add(POType.PO_LINE_CONFIRMED);
 								
-								List<PContract_PO> list_po = poService.getby_pcontract_and_type(pcontractid_link, type);
+								List<PContract_PO> list_po = poService.getby_pcontract_and_type_andproduct(pcontractid_link, type, productid_link);
 								for(PContract_PO po : list_po) {
 									List<PContract_bom2_npl_poline> po_npls = po_npl_Service.getby_po_and_npl(po.getId(), material_skuid_link);
 									if(po_npls.size() == 0) {
@@ -517,12 +531,12 @@ public class UploadBomAPI {
 									}
 									
 									//kiem tra dinh muc da chot chua thi them vao bang log
-									List<PContractProduct> list_pp = ppService.get_by_product_and_pcontract(orgrootid_link, productid_link, pcontractid_link);
-									if(list_pp.size() > 0) {
-										if(list_pp.get(0).getIsbom2done()) {
-											
-										}
-									}
+//									List<PContractProduct> list_pp = ppService.get_by_product_and_pcontract(orgrootid_link, productid_link, pcontractid_link);
+//									if(list_pp.size() > 0) {
+//										if(list_pp.get(0).getIsbom2done()) {
+//											
+//										}
+//									}
 								}
 								
 								columnsize++;

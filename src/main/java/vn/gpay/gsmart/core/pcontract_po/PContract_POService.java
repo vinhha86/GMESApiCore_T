@@ -325,4 +325,11 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		// TODO Auto-generated method stub
 		return repo.getnotin_list_pono(pcontractid_link, list_po, type);
 	}
+
+	@Override
+	public List<PContract_PO> getby_pcontract_and_type_andproduct(Long pcontractid_link, List<Integer> type,
+			Long productid_link) {
+		// TODO Auto-generated method stub
+		return repo.getby_pcontract_and_type_and_product(type, pcontractid_link, productid_link);
+	}
 }
