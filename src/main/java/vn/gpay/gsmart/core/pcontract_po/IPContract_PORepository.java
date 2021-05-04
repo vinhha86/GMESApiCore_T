@@ -286,7 +286,7 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			@Param ("type")final int type);
 	
 	@Query(value = "select c from PContract_PO c "
-			+ "where po_typeid_link = :type) "
+			+ "where po_typeid_link = :type "
 			+ "and pcontractid_link = :pcontractid_link "
 			+ "and lower(c.po_buyer) not in :list_po_code"
 			)
