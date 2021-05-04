@@ -601,7 +601,7 @@ public class PContractProductBom2API {
 					
 					map.put("tenMauNPL", pContractProductBom.getTenMauNPL()+"");
 					
-					map.put("thanhPhanVai", pContractProductBom.getThanhPhanVai()+"");
+					map.put("thanhPhanVai", pContractProductBom.getDescription_product()+"");
 					
 					map.put("unitName", pContractProductBom.getUnitName()+"");
 					
