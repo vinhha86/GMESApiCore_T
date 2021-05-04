@@ -109,6 +109,14 @@ public class PContractBOM2SKU implements Serializable {/**
 		}
 		return "";
 	}
+	
+	@Transient
+	public String getDescription_product() {
+		if(sku !=null) {
+			return sku.getDescription();
+		}
+		return "";
+	}
 
 	public Long getId() {
 		return id;
