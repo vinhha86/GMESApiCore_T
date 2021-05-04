@@ -554,7 +554,7 @@ public class PContractProductBom2API {
 					amount_color = listbomcolorclone.get(0).getAmount();
 				
 				//Lay ds poline cua sku
-				List<PContract_bom2_npl_poline> list_po = po_npl_Service.getby_pcontract_and_npl(pcontractid_link, pContractProductBom.getMaterialid_link());
+				List<PContract_bom2_npl_poline> list_po = po_npl_Service.getby_product_and_npl(productid_link, pcontractid_link, pContractProductBom.getMaterialid_link());
 				String str_po = "";
 				for(PContract_bom2_npl_poline po_npl : list_po) {
 					if(str_po == "") {

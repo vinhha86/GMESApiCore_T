@@ -27,4 +27,15 @@ public interface IPContract_bom2_npl_poline_repo extends JpaRepository<PContract
 	public List<PContract_bom2_npl_poline> getby_pcontract_and_npl(
 			@Param ("pcontractid_link")final Long pcontractid_link,
 			@Param ("material_skuid_link")final Long material_skuid_link);
+	
+	@Query(value = "select c from PContract_bom2_npl_poline c "
+			+ "inner join PContract_PO a on c.pcontract_poid_link = a.id "
+			+ "where c.pcontractid_link = :pcontractid_link "
+			+ "and npl_skuid_link = :material_skuid_link "
+			+ "and productid_link = :productid_link"
+			)
+	public List<PContract_bom2_npl_poline> getby_product_and_npl(
+			@Param ("pcontractid_link")final Long pcontractid_link,
+			@Param ("material_skuid_link")final Long material_skuid_link,
+			@Param ("productid_link")final Long productid_link);
 }

@@ -39,6 +39,7 @@ import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.packingtype.IPackingTypeService;
 import vn.gpay.gsmart.core.packingtype.PackingType;
+import vn.gpay.gsmart.core.pcontract_bom2_npl_poline.IPContract_bom2_npl_poline_Service;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontract_po_productivity.IPContract_PO_Productivity_Service;
@@ -129,6 +130,7 @@ public class PContract_POAPI {
 	@Autowired IPContractProductSKUService ppskuService;
 	@Autowired IPOrderGrant_Service grantService;
 	@Autowired IPOrderGrant_SKUService grantskuService;
+	@Autowired IPContract_bom2_npl_poline_Service bomnplService;
 
 	@RequestMapping(value = "/upload_template", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadTemplate(HttpServletRequest request,
@@ -1957,10 +1959,13 @@ public class PContract_POAPI {
 		try {
 			Long pcontractid_link = entity.pcontractid_link;
 			Long productid_link = entity.productid_link;
+			Long material_skuid_link = entity.material_skuid_link;
+			
 			List<Integer> type = new ArrayList<Integer>();
 			type.add(POType.PO_LINE_CONFIRMED);
 			
 			response.data = pcontract_POService.getby_pcontract_and_type_andproduct(pcontractid_link, type, productid_link);
+			response.poline = bomnplService.getby_product_and_npl(productid_link, pcontractid_link, material_skuid_link);
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
