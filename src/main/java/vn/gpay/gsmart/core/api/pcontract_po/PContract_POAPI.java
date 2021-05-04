@@ -1950,6 +1950,28 @@ public class PContract_POAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/getby_product_and_type", method = RequestMethod.POST)
+	public ResponseEntity<getpo_by_product_response> getByProductAndType(
+			@RequestBody getpo_by_product_request entity, HttpServletRequest request) {
+		getpo_by_product_response response = new getpo_by_product_response();
+		try {
+			Long pcontractid_link = entity.pcontractid_link;
+			Long productid_link = entity.productid_link;
+			List<Integer> type = new ArrayList<Integer>();
+			type.add(POType.PO_LINE_CONFIRMED);
+			
+			response.data = pcontract_POService.getby_pcontract_and_type_andproduct(pcontractid_link, type, productid_link);
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getpo_by_product_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<getpo_by_product_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@RequestMapping(value = "/getby_shipping", method = RequestMethod.POST)
 	public ResponseEntity<getby_shipping_response> getby_shipping(
 			@RequestBody getby_shipping_request entity, HttpServletRequest request) {
