@@ -442,10 +442,10 @@ public class BalanceAPI {
 					
 					newSKUBalance.setMat_sku_code(bomdata.get("materialCode"));
 					newSKUBalance.setMat_sku_name(bomdata.get("materialName"));
-					newSKUBalance.setMat_sku_desc(bomdata.get("description"));
+					newSKUBalance.setMat_sku_desc(bomdata.get("thanhPhanVai"));
 					newSKUBalance.setMat_sku_unit_name(bomdata.get("unitName"));
 					newSKUBalance.setMat_sku_size_name(bomdata.get("coKho"));
-					newSKUBalance.setMat_sku_color_name(bomdata.get("tenMauNPL"));
+					newSKUBalance.setMat_sku_color_name(bomdata.get("color_name"));//Mau san pham
 					newSKUBalance.setMat_sku_product_typename(bomdata.get("product_typename"));
 					
 					newSKUBalance.setMat_sku_bom_lostratio(lostratio);
@@ -483,7 +483,7 @@ public class BalanceAPI {
 				
 				newSKUBalance.setMat_sku_code(skubom.getMaterialCode());
 				newSKUBalance.setMat_sku_name(skubom.getMaterialCode());
-				newSKUBalance.setMat_sku_desc(skubom.getDescription());
+				newSKUBalance.setMat_sku_desc(skubom.getDescription_product());
 				newSKUBalance.setMat_sku_unit_name(skubom.getUnitName());
 				newSKUBalance.setMat_sku_size_name(skubom.getCoKho());
 				newSKUBalance.setMat_sku_color_name(skubom.getTenMauNPL());

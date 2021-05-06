@@ -18,8 +18,14 @@ public class Jitin_Stockin_PkList_Data implements Serializable {
 	private Float ydsorigin;
 	private Float ydscheck;
     private Float width;
+    private Float width_check;
+    private Float width_yds;
+    private Float width_yds_check;
+    private Float width_met;
+    private Float width_met_check;
     private Float netweight;
     private Float grossweight;
+    private Float grossweight_check;
     private Float m3;
     private String epc;
 	private Integer skutypeid_link;	
@@ -30,12 +36,13 @@ public class Jitin_Stockin_PkList_Data implements Serializable {
 	private Date lasttimeupdate;
     private Integer status;
     private String comment;
-    private Float width_check;
-	private Float met_origin;
+
+    private Float met_origin;
 	private Float met_check;
 	private Float sample_check;
 	private Integer rssi;	
 	private String barcode;
+	private String spaceepc_link;
 	
 	//Transient
 	private String skucode;
@@ -280,6 +287,42 @@ public class Jitin_Stockin_PkList_Data implements Serializable {
 	}
 	public void setRssi(Integer rssi) {
 		this.rssi = rssi;
+	}
+	public Float getGrossweight_check() {
+		return grossweight_check;
+	}
+	public void setGrossweight_check(Float grossweight_check) {
+		this.grossweight_check = grossweight_check;
+	}
+	public Float getWidth_yds() {
+		return width_yds;
+	}
+	public void setWidth_yds(Float width_yds) {
+		this.width_yds = width_yds;
+	}
+	public Float getWidth_yds_check() {
+		return width_yds_check;
+	}
+	public void setWidth_yds_check(Float width_yds_check) {
+		this.width_yds_check = width_yds_check;
+	}
+	public Float getWidth_met() {
+		return width_met;
+	}
+	public void setWidth_met(Float width_met) {
+		this.width_met = width_met;
+	}
+	public Float getWidth_met_check() {
+		return width_met_check;
+	}
+	public void setWidth_met_check(Float width_met_check) {
+		this.width_met_check = width_met_check;
+	}
+	public String getSpaceepc_link() {
+		return spaceepc_link;
+	}
+	public void setSpaceepc_link(String spaceepc_link) {
+		this.spaceepc_link = spaceepc_link;
 	}
 	
 	
