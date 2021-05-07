@@ -33,6 +33,8 @@ import vn.gpay.gsmart.core.attribute.IAttributeService;
 import vn.gpay.gsmart.core.attributevalue.Attributevalue;
 import vn.gpay.gsmart.core.attributevalue.IAttributeValueService;
 import vn.gpay.gsmart.core.base.ResponseBase;
+import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.product.IProductBomService;
 import vn.gpay.gsmart.core.product.IProductService;
 import vn.gpay.gsmart.core.product.Product;
@@ -67,6 +69,7 @@ public class ProductAPI {
 	@Autowired Common commonService;
 	@Autowired IProductPairingService productPairingService;
 	@Autowired IAttributeValueService attributeValueService;
+	@Autowired IPContract_POService poService;
 
 	@RequestMapping(value = "/filter", method = RequestMethod.POST)
 	public ResponseEntity<Product_filter_response> Product_Filter(HttpServletRequest request,
@@ -1198,6 +1201,44 @@ public class ProductAPI {
 				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 				response.setMessage(e.getMessage());
 				return new ResponseEntity<get_description_response>(response, HttpStatus.BAD_REQUEST);
+			}
+		}
+		
+		@RequestMapping(value = "/getby_po", method = RequestMethod.POST)
+		public ResponseEntity<getby_po_response> GetByPO(HttpServletRequest request, @RequestBody getby_po_request entity) {
+			getby_po_response response = new getby_po_response();
+			try {
+				GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+						.getPrincipal();
+				long orgrootid_link = user.getRootorgid_link();
+				
+				long pcontract_poid_link = entity.pcontract_poid_link;
+				PContract_PO po = poService.findOne(pcontract_poid_link);
+				long pcontractid_link = po.getPcontractid_link();
+				
+				Product product = productService.findOne(po.getProductid_link());
+				List<Product> list_product = new ArrayList<Product>();
+				
+				if(product.getProducttypeid_link().equals(ProductType.SKU_TYPE_PRODUCT_PAIR)) {
+					List<ProductPairing> list_pair = productPairingService.getproduct_pairing_detail_bycontract(orgrootid_link, pcontractid_link, product.getId());
+					for(ProductPairing pair : list_pair) {
+						Product p = productService.findOne(pair.getProductid_link());
+						list_product.add(p);
+					}
+				}
+				else {
+					Product p = productService.findOne(product.getId());
+					list_product.add(p);
+				}
+				
+				response.data = list_product;
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<getby_po_response>(response, HttpStatus.OK);
+			} catch (Exception e) {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage(e.getMessage());
+				return new ResponseEntity<getby_po_response>(response, HttpStatus.BAD_REQUEST);
 			}
 		}
 		

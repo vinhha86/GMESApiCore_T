@@ -402,6 +402,14 @@ public class PContract_PO implements Serializable {/**
 	}
 	
 	@Transient
+	public int getProduct_typeid_link() {
+		if(product!=null) {
+			return product.getProducttypeid_link();
+		}
+		return 0;
+	}
+	
+	@Transient
     public int getAmount_org() {
     	int sum_product = 0;
     	if(parentpoid_link == null) {

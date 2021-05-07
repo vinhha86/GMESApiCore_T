@@ -17,11 +17,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.gpay.gsmart.core.api.pcontract_po.get_sku_by_line_request;
+import vn.gpay.gsmart.core.api.pcontract_po.get_sku_by_line_response;
 import vn.gpay.gsmart.core.attributevalue.Attributevalue;
 import vn.gpay.gsmart.core.attributevalue.IAttributeValueService;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.pcontract_bom2_npl_poline.IPContract_bom2_npl_poline_Service;
 import vn.gpay.gsmart.core.pcontract_bom2_npl_poline.PContract_bom2_npl_poline;
+import vn.gpay.gsmart.core.pcontract_bom2_npl_poline_sku.IPContract_bom2_npl_poline_sku_Service;
+import vn.gpay.gsmart.core.pcontract_bom2_npl_poline_sku.PContract_bom2_npl_poline_sku;
+import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontractattributevalue.IPContractProductAtrributeValueService;
 import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBom2ColorService;
 import vn.gpay.gsmart.core.pcontractbomcolor.PContractBom2Color;
@@ -32,6 +38,9 @@ import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
 import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom2;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
+import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
+import vn.gpay.gsmart.core.productpairing.IProductPairingService;
+import vn.gpay.gsmart.core.productpairing.ProductPairing;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_Service;
 import vn.gpay.gsmart.core.sku.SKU;
@@ -40,6 +49,7 @@ import vn.gpay.gsmart.core.task_checklist.ITask_CheckList_Service;
 import vn.gpay.gsmart.core.task_flow.ITask_Flow_Service;
 import vn.gpay.gsmart.core.task_object.ITask_Object_Service;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
+import vn.gpay.gsmart.core.utils.ProductType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 
@@ -59,6 +69,9 @@ public class PContractProductBom2API {
 	@Autowired ISKU_Service skuService;
 	@Autowired IAttributeValueService avService;
 	@Autowired IPContract_bom2_npl_poline_Service po_npl_Service;
+	@Autowired IPContract_bom2_npl_poline_sku_Service po_npl_sku_Service;
+	@Autowired IPContract_POService poService;
+	@Autowired IProductPairingService pairService;
 	
 	@RequestMapping(value = "/create_pcontract_productbom", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> CreateProductBom(HttpServletRequest request,
@@ -128,6 +141,138 @@ public class PContractProductBom2API {
 			response.setMessage(e.getMessage());
 		}
 		return new ResponseEntity<confim_bom2_response>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/select_poline", method = RequestMethod.POST)
+	public ResponseEntity<pcontractbom2_selectpoline_response> SelectPOLine(HttpServletRequest request,
+			@RequestBody pcontractbom2_selectpoline_request entity) {
+		pcontractbom2_selectpoline_response response = new pcontractbom2_selectpoline_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			long pcontractid_link = entity.pcontractid_link;
+			long pcontract_poid_link = entity.pcontract_poid_link;
+			long material_skuid_link = entity.material_skuid_link;
+			
+			PContract_PO po = poService.findOne(pcontract_poid_link);
+			List<Long> list_product = new ArrayList<Long>();
+			
+			if(po.getProduct_typeid_link() == ProductType.SKU_TYPE_PRODUCT_PAIR) {
+				List<ProductPairing> list_pair = pairService.getproduct_pairing_detail_bycontract(orgrootid_link, pcontractid_link, po.getProductid_link());
+				for(ProductPairing pair: list_pair) {
+					list_product.add(pair.getProductid_link());
+				}
+			}
+			else {
+				list_product.add(po.getProductid_link());
+			}
+			//them vao bang npl-poline
+			List<PContract_bom2_npl_poline> list_poline = po_npl_Service.getby_po_and_npl(pcontract_poid_link, material_skuid_link);
+			//kiem tra chua co trong db thi them vao 
+			if(list_poline.size() == 0) {
+				PContract_bom2_npl_poline poline = new PContract_bom2_npl_poline();
+				poline.setId(null);
+				poline.setNpl_skuid_link(material_skuid_link);
+				poline.setPcontract_poid_link(pcontract_poid_link);
+				poline.setPcontractid_link(pcontractid_link);
+				
+				po_npl_Service.save(poline);
+			}
+			
+			//them toan bo sku
+			List<PContractProductSKU> list_sku = ppskuService.getlistsku_bypo_and_pcontract(orgrootid_link, pcontract_poid_link, pcontractid_link);
+			for(Long productid_link : list_product) {
+				for(PContractProductSKU sku : list_sku) {
+					//kiem tra neu chua co thi them moi va neu co roi thi cap nhat lai so luong
+					Long product_skuid_link = sku.getSkuid_link();
+					List<PContract_bom2_npl_poline_sku> list_line_sku = po_npl_sku_Service.getby_po_and_sku(orgrootid_link, pcontract_poid_link, product_skuid_link, material_skuid_link);
+					if(list_line_sku.size() == 0) {
+						PContract_bom2_npl_poline_sku line_sku = new PContract_bom2_npl_poline_sku();
+						line_sku.setId(null);
+						line_sku.setMaterial_skuid_link(material_skuid_link);
+						line_sku.setOrgrootid_link(orgrootid_link);
+						line_sku.setPcontract_poid_link(pcontract_poid_link);
+						line_sku.setPcontractid_link(pcontractid_link);
+						line_sku.setProduct_skuid_link(product_skuid_link);
+						line_sku.setProductid_link(productid_link);
+						line_sku.setQuantity(sku.getPquantity_total());
+						
+						po_npl_sku_Service.save(line_sku);
+					}
+					else {
+						PContract_bom2_npl_poline_sku line_sku = list_line_sku.get(0);
+						line_sku.setQuantity(sku.getPquantity_total());
+						po_npl_sku_Service.save(line_sku);
+					}
+				}
+			}
+			
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<pcontractbom2_selectpoline_response>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/deselect_poline", method = RequestMethod.POST)
+	public ResponseEntity<pcontractbom2_selectpoline_response> DeSelectPOLine(HttpServletRequest request,
+			@RequestBody pcontractbom2_deselect_poline_request entity) {
+		pcontractbom2_selectpoline_response response = new pcontractbom2_selectpoline_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			long pcontract_poid_link = entity.pcontract_poid_link;
+			long material_skuid_link = entity.material_skuid_link;
+			
+			//them vao bang npl-poline
+			List<PContract_bom2_npl_poline> list_poline = po_npl_Service.getby_po_and_npl(pcontract_poid_link, material_skuid_link);
+			//kiem tra co trong db thi xoa di
+			for(PContract_bom2_npl_poline poline : list_poline) {
+				po_npl_Service.delete(poline);
+			}
+			
+			//xoa toan bo sku
+			Long productid_link = null; // null la lay het ko theo product
+			List<PContract_bom2_npl_poline_sku> list_line_sku = po_npl_sku_Service.getby_po(orgrootid_link, pcontract_poid_link, material_skuid_link, productid_link);
+			for(PContract_bom2_npl_poline_sku line_sku : list_line_sku) {
+				po_npl_sku_Service.delete(line_sku);
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<pcontractbom2_selectpoline_response>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/getsku_byline", method = RequestMethod.POST)
+	public ResponseEntity<get_sku_by_line_response> GetSKUByLine(HttpServletRequest request,
+			@RequestBody get_sku_by_line_request entity) {
+		get_sku_by_line_response response = new get_sku_by_line_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+			long material_skuid_link = entity.material_skuid_link;
+			long pcontract_poid_link = entity.pcontract_poid_link;
+			long productid_link = entity.productid_link;
+			
+			long orgrootid_link = user.getRootorgid_link();
+			response.data = po_npl_sku_Service.getby_po(orgrootid_link, pcontract_poid_link, material_skuid_link, productid_link);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<get_sku_by_line_response>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/update_pcontract_productbom", method = RequestMethod.POST)
@@ -387,6 +532,109 @@ public class PContractProductBom2API {
 			response.setMessage(e.getMessage());
 		}
 		return new ResponseEntity<PContractProductBOM2_getbyproduct_response>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/getpo_by_npl", method = RequestMethod.POST)
+	public ResponseEntity<pcontractbom_getpo_bynpl_response> GetPOByNpl(HttpServletRequest request,
+			@RequestBody pcontractbom_getpo_bynpl_request entity) {
+		pcontractbom_getpo_bynpl_response response = new pcontractbom_getpo_bynpl_response();
+		try {
+			long pcontractid_link = entity.pcontractid_link;
+			long productid_link = entity.productid_link;
+			long material_skuid_link = entity.material_skuid_link;
+			
+			response.data = po_npl_Service.getby_product_and_npl(productid_link, pcontractid_link, material_skuid_link);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<pcontractbom_getpo_bynpl_response>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/deselect_sku", method = RequestMethod.POST)
+	public ResponseEntity<pcontractbom2_deselect_sku_response> DeselectSKU(HttpServletRequest request,
+			@RequestBody pcontractbom2_deselect_sku_request entity) {
+		pcontractbom2_deselect_sku_response response = new pcontractbom2_deselect_sku_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			long pcontractid_link = entity.pcontractid_link;
+			long productid_link = entity.productid_link;
+			long material_skuid_link = entity.material_skuid_link;
+			Long pcontract_poid_link = entity.pcontract_poid_link;
+			Long product_skuid_link = entity.product_skuid_link;
+			
+			List<PContract_bom2_npl_poline_sku> list_line_sku = po_npl_sku_Service.getone_rec(orgrootid_link, pcontractid_link, productid_link,
+					pcontract_poid_link, product_skuid_link, material_skuid_link);
+			for(PContract_bom2_npl_poline_sku line_sku : list_line_sku) {
+				po_npl_sku_Service.delete(line_sku);
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<pcontractbom2_deselect_sku_response>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/select_sku", method = RequestMethod.POST)
+	public ResponseEntity<pcontractbom2_selectsku_response> SelectSKU(HttpServletRequest request,
+			@RequestBody pcontractbom2_selectsku_request entity) {
+		pcontractbom2_selectsku_response response = new pcontractbom2_selectsku_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			long pcontractid_link = entity.pcontractid_link;
+			long productid_link = entity.productid_link;
+			long material_skuid_link = entity.material_skuid_link;
+			Long pcontract_poid_link = entity.pcontract_poid_link;
+			Long product_skuid_link = entity.product_skuid_link;
+			int quantity = entity.quantity;
+			
+			//kiem tra xem du lieu ton tai hoac xoa thieu thi xoa truoc khi them vao lai
+			List<PContract_bom2_npl_poline_sku> list_line_sku = po_npl_sku_Service.getone_rec(orgrootid_link, pcontractid_link, productid_link,
+					pcontract_poid_link, product_skuid_link, material_skuid_link);
+			for(PContract_bom2_npl_poline_sku line_sku : list_line_sku) {
+				po_npl_sku_Service.delete(line_sku);
+			}
+			
+			//kiem tra xem line duoc chon chua thi them line vao bang poline-npl
+			List<PContract_bom2_npl_poline> list_line = po_npl_Service.getby_po_and_npl(pcontract_poid_link, material_skuid_link);
+			if(list_line.size() == 0) {
+				PContract_bom2_npl_poline line = new PContract_bom2_npl_poline();
+				line.setId(null);
+				line.setNpl_skuid_link(material_skuid_link);
+				line.setPcontract_poid_link(pcontract_poid_link);
+				line.setPcontractid_link(pcontractid_link);
+				po_npl_Service.save(line);
+			}
+			
+			//them sku vao bang line-sku
+			PContract_bom2_npl_poline_sku line_sku = new PContract_bom2_npl_poline_sku();
+			line_sku.setId(null);
+			line_sku.setMaterial_skuid_link(material_skuid_link);
+			line_sku.setOrgrootid_link(orgrootid_link);
+			line_sku.setPcontract_poid_link(pcontract_poid_link);
+			line_sku.setPcontractid_link(pcontractid_link);
+			line_sku.setProduct_skuid_link(product_skuid_link);
+			line_sku.setProductid_link(productid_link);
+			line_sku.setQuantity(quantity);
+			po_npl_sku_Service.save(line_sku);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<pcontractbom2_selectsku_response>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/deletematerial", method = RequestMethod.POST)

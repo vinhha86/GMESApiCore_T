@@ -1959,13 +1959,13 @@ public class PContract_POAPI {
 		try {
 			Long pcontractid_link = entity.pcontractid_link;
 			Long productid_link = entity.productid_link;
-			Long material_skuid_link = entity.material_skuid_link;
+//			Long material_skuid_link = entity.material_skuid_link;
 			
 			List<Integer> type = new ArrayList<Integer>();
 			type.add(POType.PO_LINE_CONFIRMED);
 			
 			response.data = pcontract_POService.getby_pcontract_and_type_andproduct(pcontractid_link, type, productid_link);
-			response.poline = bomnplService.getby_product_and_npl(productid_link, pcontractid_link, material_skuid_link);
+//			response.poline = bomnplService.getby_product_and_npl(productid_link, pcontractid_link, material_skuid_link);
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
