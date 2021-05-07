@@ -253,9 +253,9 @@ public class PContractProductBom2API {
 	}
 	
 	@RequestMapping(value = "/getsku_byline", method = RequestMethod.POST)
-	public ResponseEntity<get_sku_by_line_response> GetSKUByLine(HttpServletRequest request,
+	public ResponseEntity<pcontractbom2_getsku_byline_response> GetSKUByLine(HttpServletRequest request,
 			@RequestBody get_sku_by_line_request entity) {
-		get_sku_by_line_response response = new get_sku_by_line_response();
+		pcontractbom2_getsku_byline_response response = new pcontractbom2_getsku_byline_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
 					.getPrincipal();
@@ -272,7 +272,7 @@ public class PContractProductBom2API {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		}
-		return new ResponseEntity<get_sku_by_line_response>(response, HttpStatus.OK);
+		return new ResponseEntity<pcontractbom2_getsku_byline_response>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/update_pcontract_productbom", method = RequestMethod.POST)
