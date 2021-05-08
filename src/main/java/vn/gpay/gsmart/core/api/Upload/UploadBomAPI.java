@@ -256,16 +256,19 @@ public class UploadBomAPI {
 							//Chay tung mau san pham de sinh nguyen lieu va day vao trong db
 							for(Long colorid_link : list_colorid_link) {
 								Long npl_id = null;
-
-								long material_skuid_link = 0;
+								String color_code_npl = attributevalueService.findOne(colorid_link).getValue();
+								String[] str_mau= color_code_npl.split("\\(");
+								String color_code = str_mau[1].replace(")", "");
 								
-								List<Product> list_npl = productService.getby_code_type_description_and_color_and_size(orgrootid_link, ma_npl, type_npl, description, colorid_link, sizewidthid_link);
+								long material_skuid_link = 0;
+								String ma_npl_code = ma_npl+"("+color_code+")";
+								List<Product> list_npl = productService.getby_code_type_description_and_color_and_size(orgrootid_link, ma_npl_code, type_npl, description, colorid_link, sizewidthid_link);
 								
 								if(list_npl.size() == 0) {
 									Product new_npl = new Product();
-									new_npl.setBuyercode(ma_npl);
+									new_npl.setBuyercode(ma_npl_code);
 									new_npl.setBuyername(name_npl);
-									new_npl.setCode(ma_npl);
+									new_npl.setCode(ma_npl_code);
 									new_npl.setDescription(description);
 									new_npl.setId(null);
 									new_npl.setName(name_npl);
