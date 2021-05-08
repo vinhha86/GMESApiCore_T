@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.api.pcontract_po.get_sku_by_line_request;
-import vn.gpay.gsmart.core.api.pcontract_po.get_sku_by_line_response;
 import vn.gpay.gsmart.core.attributevalue.Attributevalue;
 import vn.gpay.gsmart.core.attributevalue.IAttributeValueService;
 import vn.gpay.gsmart.core.base.ResponseBase;
@@ -28,6 +27,8 @@ import vn.gpay.gsmart.core.pcontract_bom2_npl_poline_sku.IPContract_bom2_npl_pol
 import vn.gpay.gsmart.core.pcontract_bom2_npl_poline_sku.PContract_bom2_npl_poline_sku;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
+import vn.gpay.gsmart.core.pcontract_product_bom_log.IPContract_bom2_sku_log_Service;
+import vn.gpay.gsmart.core.pcontract_product_bom_log.PContract_bom2_sku_log;
 import vn.gpay.gsmart.core.pcontractattributevalue.IPContractProductAtrributeValueService;
 import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBom2ColorService;
 import vn.gpay.gsmart.core.pcontractbomcolor.PContractBom2Color;
@@ -72,6 +73,7 @@ public class PContractProductBom2API {
 	@Autowired IPContract_bom2_npl_poline_sku_Service po_npl_sku_Service;
 	@Autowired IPContract_POService poService;
 	@Autowired IProductPairingService pairService;
+	@Autowired IPContract_bom2_sku_log_Service bomlogService;
 	
 	@RequestMapping(value = "/create_pcontract_productbom", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> CreateProductBom(HttpServletRequest request,
@@ -467,14 +469,17 @@ public class PContractProductBom2API {
 			long sizeid_link = entity.sizeid_link;
 			long colorid_link = entity.colorid_link;
 			long skuid_link = ppbom2skuservice.getskuid_link_by_color_and_size(colorid_link, sizeid_link, productid_link);
+			long orgrootid_link = user.getRootorgid_link();
 			
 			//Kiem tra neu chua co thi insert neu co roi thi update
 			List<PContractBOM2SKU> list_sku = ppbom2skuservice.getall_material_in_productBOMSKU(pcontractid_link, productid_link,
 					sizeid_link, colorid_link, materialid_link);
 			
-
+			float amount_old = 0;
 			PContractBOM2SKU pContractBOMSKU = new PContractBOM2SKU();
 			if(list_sku.size() > 0) {
+				amount_old = list_sku.get(0).getAmount();
+				
 				pContractBOMSKU = list_sku.get(0);
 				pContractBOMSKU.setAmount(entity.value);
 			}
@@ -504,7 +509,27 @@ public class PContractProductBom2API {
 			
 			for (PContractBom2Color pColor : listcolor) {
 				ppbomcolor2service.delete(pColor);
-			}			
+			}	
+			
+			//kiem tra xem da chot dinh muc hay chua thi day vao bang log
+			List<PContractProduct> list_pp = ppService.get_by_product_and_pcontract(orgrootid_link, productid_link, pcontractid_link);
+			if(list_pp.size() > 0) {
+				if(list_pp.get(0).getIsbom2done()) {
+					PContract_bom2_sku_log bom_log = new PContract_bom2_sku_log();
+					bom_log.setAmount(entity.value);
+					bom_log.setAmount_old(amount_old);
+					bom_log.setId(null);
+					bom_log.setMaterial_skuid_link(materialid_link);
+					bom_log.setOrgrootid_link(orgrootid_link);
+					bom_log.setPcontractid_link(pcontractid_link);
+					bom_log.setProduct_skuid_link(skuid_link);
+					bom_log.setProductid_link(productid_link);
+					bom_log.setTimeupdate(new Date());
+					bom_log.setUserupdateid_link(user.getId());
+					
+					bomlogService.save(bom_log);
+				}
+			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

@@ -34,6 +34,7 @@ import vn.gpay.gsmart.core.pcontractproductpairing.IPContractProductPairingRepos
 import vn.gpay.gsmart.core.pcontractproductpairing.PContractProductPairing;
 import vn.gpay.gsmart.core.productattributevalue.IProductAttributeRepository;
 import vn.gpay.gsmart.core.productattributevalue.ProductAttributeValue;
+import vn.gpay.gsmart.core.utils.AtributeFixValues;
 
 @Service
 public class ProductService extends AbstractService<Product> implements IProductService {
@@ -434,17 +435,15 @@ public class ProductService extends AbstractService<Product> implements IProduct
 	}
 
 	@Override
-	public List<Product> getby_code_type_description(Long orgrootid_link, String code, int type, String description) {
+	public List<Product> getby_code_type_description_and_color_and_size(Long orgrootid_link, String code, int type, String description, Long colorid_link, Long sizeid_link) {
 		// TODO Auto-generated method stub
-		Specification<Product> specification = Specifications.<Product>and()
-				.eq(type != 0, "producttypeid_link", type)
-				.eq("status", 1)
-				.eq("orgrootid_link", orgrootid_link)
-				.eq(code != "" && code != null, "buyercode", code)
-				.eq(description != "" && description != null, "description", description)
-				.build();;
-		Sort sort = Sorts.builder().asc("buyercode").build();
-		List<Product> listNPL = repo.findAll(specification, sort);
-		return listNPL;
+		List<Product> list_color = repo.getby_code_type_description_and_value(orgrootid_link, code, description, colorid_link, AtributeFixValues.ATTR_COLOR, type);
+		List<Product> list_size = repo.getby_code_type_description_and_value(orgrootid_link, code, description, sizeid_link, AtributeFixValues.ATTR_SIZEWIDTH, type);
+		if(list_color.size() > 0 && list_size.size() > 0) {
+			if(list_color.get(0).getId().equals(list_size.get(0).getId()))
+				return list_color;
+		}
+		
+		return new ArrayList<Product>();
 	}
 }
