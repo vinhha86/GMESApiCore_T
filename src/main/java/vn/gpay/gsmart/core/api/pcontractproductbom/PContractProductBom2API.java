@@ -725,10 +725,11 @@ public class PContractProductBom2API {
 				listbomcolorclone.removeIf(c -> !c.getMaterialid_link().equals(pContractProductBom.getMaterialid_link()));
 				
 				Float amount_color = (float) 0;
+				float amount = pContractProductBom.getAmount() == null ? 0 : pContractProductBom.getAmount();
 				if(listbomcolorclone.size() > 0)
 					amount_color = listbomcolorclone.get(0).getAmount();
 				
-				map.put("amount", "0"+pContractProductBom.getAmount());
+				map.put("amount", amount+"");
 				
 				map.put("amount_color", "0"+amount_color);
 				
@@ -768,7 +769,7 @@ public class PContractProductBom2API {
 				
 				map.put("unitid_link", "0"+pContractProductBom.getUnitid_link());
 				
-				if(pContractProductBom.getAmount() == 0 && amount_color == 0) {
+				if(amount == 0  && amount_color == 0) {
 					for(Long size : List_size) {
 						List<PContractBOM2SKU> listbomsku_clone = new ArrayList<PContractBOM2SKU>(listbomsku);
 						long skuid_link = ppbom2skuservice.getskuid_link_by_color_and_size(colorid_link, size, productid_link);
