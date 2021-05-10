@@ -38,4 +38,11 @@ public class SizeSetService extends AbstractService<SizeSet> implements ISizeSet
 		return list.size() > 0 ? list.get(0).getId() : 0 ;
 	}
 
+	@Override
+	public Long getbyname_and_po(String name, Long pcontractid_link, Long productid_link) {
+		// TODO Auto-generated method stub
+		List<SizeSet> list = repo.getbyname_and_po(name, pcontractid_link, productid_link);
+		return list.size() == 0 ? 0 : list.get(0).getId();
+	}
+
 }

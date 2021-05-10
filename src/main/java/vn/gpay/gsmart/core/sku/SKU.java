@@ -127,6 +127,14 @@ public class SKU implements Serializable {
     }
     
     @Transient
+    public String getMauSanPham_product() {
+    	if(product!=null) {
+    		return product.getTenMauNPL();
+    	}
+    	return "";
+    }
+    
+    @Transient
 	public Long getColorid_link() {
 		long ID_Mau =0;
 		for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
@@ -229,6 +237,14 @@ public class SKU implements Serializable {
 //    		return product.getCoKho();
 //    	}
 //    	return "";
+    }
+    
+    @Transient
+    public String getCoSanPham_product() {
+    	if(product!=null) {
+    		return product.getCoKho();
+    	}
+    	return "";
     }
   
 	@Transient

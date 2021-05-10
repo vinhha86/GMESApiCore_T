@@ -175,9 +175,26 @@ public interface IPContractProductSKURepository extends JpaRepository<PContractP
 			+ "inner join SizeSet e on e.id = d.sizesetid_link "
 			+ "where c.productid_link = :productid_link "
 			+ "and c.pcontractid_link = :pcontractid_link "
-			+ "group by e.name, e.sortvalue")
+			+ "group by e.name, e.sortvalue "
+			+ "order by e.sortvalue")
 	public List<String> getlist_sizeset_by_product(
 			@Param ("productid_link")final  long productid_link, 
 			@Param ("pcontractid_link")final  long pcontractid_link);
+	
+	@Query(value = "select d.attributevalueid_link "
+			+ "from PContractProductSKU c "
+			+ "inner join SKU_Attribute_Value a on a.skuid_link = c.skuid_link "
+			+ "inner join SizeSetAttributeValue d on d.attributevalueid_link = a.attributevalueid_link "
+			+ "inner join Attributevalue f on f.id = d.attributevalueid_link "
+			+ "inner join SizeSet e on e.id = d.sizesetid_link "
+			+ "where c.productid_link = :productid_link "
+			+ "and c.pcontractid_link = :pcontractid_link "
+			+ "and e.id = :sizesetid_link "
+			+ "group by d.attributevalueid_link, f.sortvalue "
+			+ "order by f.sortvalue ")
+	public List<Long> getlist_size_by_product_and_sizeset(
+			@Param ("productid_link")final  long productid_link, 
+			@Param ("pcontractid_link")final  long pcontractid_link,
+			@Param ("sizesetid_link")final  long sizesetid_link);
 	
 }

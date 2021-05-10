@@ -221,4 +221,10 @@ public class PContractProductSKUService extends AbstractService<PContractProduct
 		// TODO Auto-generated method stub
 		return repo.getlist_sizeset_by_product(productid_link, pcontractid_link);
 	}
+	@Override
+	public List<Long> getlist_size_by_product_and_sizeset(Long pcontractid_link, Long productid_link,
+			Long sizesetid_link) {
+		// TODO Auto-generated method stub
+		return repo.getlist_size_by_product_and_sizeset(productid_link, pcontractid_link, sizesetid_link);
+	}
 }

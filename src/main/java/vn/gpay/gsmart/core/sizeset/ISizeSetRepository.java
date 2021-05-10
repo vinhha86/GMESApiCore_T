@@ -20,4 +20,17 @@ public interface ISizeSetRepository extends JpaRepository<SizeSet, Long>, JpaSpe
 	
 	@Query(value = "select max(sortvalue) from SizeSet c")	
 	public int getMaxSortValue();
+	
+	@Query(value = "select c from SizeSet c "
+			+ "inner join SizeSetAttributeValue a on c.id = a.sizesetid_link "
+			+ "inner join SKU_Attribute_Value b on b.attributevalueid_link = a.attributevalueid_link "
+			+ "inner join PContractProductSKU d on d.skuid_link = b.skuid_link "
+			+ "where lower(c.name) = lower(:name) "
+			+ "and d.productid_link = :productid_link "
+			+ "and d.pcontractid_link = :pcontractid_link "
+			+ "group by c")
+	public List<SizeSet> getbyname_and_po(
+			@Param ("name")final  String name,
+			@Param ("pcontractid_link")final  Long pcontractid_link,
+			@Param ("productid_link")final  Long productid_link);
 }
