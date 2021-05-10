@@ -586,6 +586,10 @@ public class ReportAPI {
 				CellStyle style_row1 = workbook.createCellStyle();
 				style_row1.cloneStyleFrom(cellstyle_row1.getCellStyle());
 				
+				Cell cell_sizeset = row_1.createCell(0);
+				cell_sizeset.setCellValue("Size");
+				cell_sizeset.setCellStyle(style_row1);
+				
 				int start = ColumnExcel.L;
 				int end = start+ list_size.size() - 1;
 				sheet.addMergedRegion(new CellRangeAddress( 0, 0,start , end));	
@@ -730,7 +734,7 @@ public class ReportAPI {
 				//get tat ca co cua san pham trong don hang
 				Long pcontractid_link = entity.pcontractid_link;
 				Long productid_link = entity.productid_link;
-				List<String> list_size = ppskuService.getlistnamevalue_by_product(pcontractid_link, productid_link, AtributeFixValues.ATTR_SIZE);
+				List<String> list_size_set = ppskuService.getlist_sizeset_by_product(pcontractid_link, productid_link);
 				
 				Row row_1 = sheet.getRow(0);
 				
@@ -738,22 +742,27 @@ public class ReportAPI {
 				CellStyle style_row1 = workbook.createCellStyle();
 				style_row1.cloneStyleFrom(cellstyle_row1.getCellStyle());
 				
+				//sinh cot dai co va merger lai
 				int start = ColumnExcel.L;
-				int end = start+ list_size.size() - 1;
+				int end = start+ list_size_set.size() - 1;
 				sheet.addMergedRegion(new CellRangeAddress( 0, 0,start , end));	
 								
 				Cell cell_ds = row_1.createCell(ColumnExcel.L);
-				cell_ds.setCellValue("Danh sách cỡ và định mức sử dụng NPL cho từng cỡ");
-				cell_ds.setCellStyle(style_row1);				
+				cell_ds.setCellValue("Danh sách dải cỡ và định mức sử dụng NPL cho từng cỡ");
+				cell_ds.setCellStyle(style_row1);	
+				
+				Cell cell_sizeset = row_1.createCell(0);
+				cell_sizeset.setCellValue("Sizeset");
+				cell_sizeset.setCellStyle(style_row1);
 
 				Row row_2 = sheet.getRow(1);
 				Cell cellstyle_row2 = row_2.getCell(ColumnExcel.B);
 				CellStyle style_row2 = workbook.createCellStyle();
 				style_row2.cloneStyleFrom(cellstyle_row2.getCellStyle());
 				
-				for(int i =0; i<list_size.size(); i++) {
+				for(int i =0; i<list_size_set.size(); i++) {
 					Cell cell_size = row_2.createCell(ColumnExcel.L+ i);
-					cell_size.setCellValue(list_size.get(i));
+					cell_size.setCellValue(list_size_set.get(i));
 					cell_size.setCellStyle(style_row2);
 				}
 				
