@@ -56,6 +56,10 @@ public class PContractProductSKU implements Serializable {/**
     private Product product;
 	
 	@Transient
+	public Integer getPquantity() {
+		return pquantity_total;
+	}
+	@Transient
 	public String getProductcode() {
 		if(product!=null)
 			return product.getBuyercode();

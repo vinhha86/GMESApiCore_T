@@ -14,8 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.gpay.gsmart.core.api.pcontract_po.pcontractsku_getby_po_product_mat_request;
 import vn.gpay.gsmart.core.api.pcontract_po.pcontractsku_getby_po_product_request;
 import vn.gpay.gsmart.core.base.ResponseBase;
+import vn.gpay.gsmart.core.pcontract_bom2_npl_poline_sku.IPContract_bom2_npl_poline_sku_Service;
+import vn.gpay.gsmart.core.pcontract_bom2_npl_poline_sku.PContract_bom2_npl_poline_sku;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontractattributevalue.IPContractProductAtrributeValueService;
@@ -47,6 +50,7 @@ public class PContractskuAPI {
 	@Autowired Common commonService;
 	@Autowired IPContract_POService poService;
 	@Autowired IPOrderGrant_SKUService porderGrantSkuService;
+	@Autowired IPContract_bom2_npl_poline_sku_Service po_npl_sku_Service;
 	
 	@RequestMapping(value = "/getbyporder",method = RequestMethod.POST)
 	public ResponseEntity<get_sku_by_porder_response> GetByPOrder
@@ -98,10 +102,44 @@ public class PContractskuAPI {
 		PContractSKU_getbyproduct_response response = new PContractSKU_getbyproduct_response();
 		try {
 //			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//			long orgrootid_link = user.getRootorgid_link();
+			
 			long pcontract_poid_link = entity.pcontract_poid_link;
 			long productid_link = entity.productid_link;
 			
 			response.data = pskuservice.getbypo_and_product(pcontract_poid_link ,productid_link);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		}
+		catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		
+		return new ResponseEntity<PContractSKU_getbyproduct_response>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/getby_po_product_linesku",method = RequestMethod.POST)
+	public ResponseEntity<PContractSKU_getbyproduct_response> SKU_GetbyProduct_and_PO_andMaterial
+	(HttpServletRequest request, @RequestBody pcontractsku_getby_po_product_mat_request entity ) {
+		PContractSKU_getbyproduct_response response = new PContractSKU_getbyproduct_response();
+		try {
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//			long orgrootid_link = user.getRootorgid_link();
+			
+			long pcontract_poid_link = entity.pcontract_poid_link;
+			long productid_link = entity.productid_link;
+//			long material_skuid_link = entity.material_skuid_link;
+			
+			response.data = pskuservice.getbypo_and_product(pcontract_poid_link ,productid_link);
+//			List<PContract_bom2_npl_poline_sku> list_poline_sku = po_npl_sku_Service.getby_po(orgrootid_link, pcontract_poid_link, material_skuid_link, productid_link);
+//			for(PContractProductSKU sku : response.data) {
+//				for(PContract_bom2_npl_poline_sku npl_sku : list_poline_sku) {
+//					if(npl_sku.getProduct_skuid_link().equals(sku.getSkuid_link())) {
+//						sku.setPquantity_total(npl_sku.getQuantity());
+//					}
+//				}
+//			}
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 		}
