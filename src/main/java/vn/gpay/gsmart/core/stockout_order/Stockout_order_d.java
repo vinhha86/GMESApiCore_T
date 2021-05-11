@@ -50,6 +50,8 @@ public class Stockout_order_d implements Serializable {
 	private Date timecreate;
 	private Long lastuserupdateid_link;
 	private Date lasttimeupdate;
+	private Float totalmet;
+	private Float totalmetcheck;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -229,6 +231,22 @@ public class Stockout_order_d implements Serializable {
 	}
 	public void setOrgrootid_link(Long orgrootid_link) {
 		this.orgrootid_link = orgrootid_link;
+	}
+
+	public Float getTotalmet() {
+		return totalmet;
+	}
+
+	public void setTotalmet(Float totalmet) {
+		this.totalmet = totalmet;
+	}
+
+	public Float getTotalmetcheck() {
+		return totalmetcheck;
+	}
+
+	public void setTotalmetcheck(Float totalmetcheck) {
+		this.totalmetcheck = totalmetcheck;
 	}
 	
 	
