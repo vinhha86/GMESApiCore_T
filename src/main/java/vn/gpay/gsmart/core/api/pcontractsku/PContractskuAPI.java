@@ -18,7 +18,6 @@ import vn.gpay.gsmart.core.api.pcontract_po.pcontractsku_getby_po_product_mat_re
 import vn.gpay.gsmart.core.api.pcontract_po.pcontractsku_getby_po_product_request;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.pcontract_bom2_npl_poline_sku.IPContract_bom2_npl_poline_sku_Service;
-import vn.gpay.gsmart.core.pcontract_bom2_npl_poline_sku.PContract_bom2_npl_poline_sku;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontractattributevalue.IPContractProductAtrributeValueService;

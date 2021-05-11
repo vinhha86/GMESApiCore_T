@@ -894,6 +894,7 @@ public class PContractProductBom2API {
 					if(amount_color == 0) {
 						
 					}
+					boolean check = false;
 					for(Long size : List_size) {
 						List<PContractBOM2SKU> listbomsku_clone = new ArrayList<PContractBOM2SKU>(listbomsku);
 						long skuid_link = ppbom2skuservice.getskuid_link_by_color_and_size(colorid, size, productid_link);
@@ -905,6 +906,7 @@ public class PContractProductBom2API {
 						map.put(""+size, amount_size+"");
 						
 						if (amount_size>0){
+							check = true;
 							total_amount += amount_size;
 							total_size++;
 						}
@@ -914,8 +916,8 @@ public class PContractProductBom2API {
 						map.put("amount", "0"+(total_amount/total_size));
 					else
 						map.put("amount", "0");
-					
-					listdata.add(map);	
+					if(check)
+						listdata.add(map);	
 				}
 			}
 			
