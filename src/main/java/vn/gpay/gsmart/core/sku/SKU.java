@@ -250,7 +250,7 @@ public class SKU implements Serializable {
 	@Transient
     public String getThanhPhanVai() {
     	if(product!=null)
-    		return product.getThanhPhanVai();
+    		return product.getDescription();
     	return "";
     }
 	@NotFound(action = NotFoundAction.IGNORE)

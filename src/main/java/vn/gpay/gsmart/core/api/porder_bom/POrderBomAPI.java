@@ -400,12 +400,12 @@ public class POrderBomAPI {
 				Float amount_color = (float) 0;
 				if(listbomcolorclone.size() > 0)
 					amount_color = listbomcolorclone.get(0).getAmount();
-				
-				map.put("amount", pContractProductBom.getAmount().toString());
+				String amount = pContractProductBom.getAmount() == null ? "0" : pContractProductBom.getAmount().toString();
+				map.put("amount", amount);
 				
 				map.put("amount_color", amount_color.toString());
 				
-				map.put("coKho", pContractProductBom.getCoKho().toString());
+				map.put("coKho", pContractProductBom.getCoKho_product().toString());
 				
 				map.put("createddate", pContractProductBom.getCreateddate().toString());
 				
@@ -433,7 +433,7 @@ public class POrderBomAPI {
 				
 				map.put("productid_link", pContractProductBom.getProductid_link().toString());
 				
-				map.put("tenMauNPL", pContractProductBom.getTenMauNPL().toString());
+				map.put("tenMauNPL", pContractProductBom.getTenMauNPL_product());
 				
 				map.put("thanhPhanVai", pContractProductBom.getThanhPhanVai().toString());
 				

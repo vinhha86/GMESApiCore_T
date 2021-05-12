@@ -59,6 +59,14 @@ public class POrderBomProduct implements Serializable {
 	}
 	
 	@Transient
+	public String getCoKho_product() {
+		if(sku !=null) {
+			return sku.getCoSanPham_product();
+		}
+		return "";
+	}
+	
+	@Transient
 	public String getMaterialName() {
 		if(sku !=null) {
 			return sku.getProduct_name();
@@ -102,6 +110,14 @@ public class POrderBomProduct implements Serializable {
 	public String getTenMauNPL() {
 		if(sku !=null) {
 			return sku.getMauSanPham();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getTenMauNPL_product() {
+		if(sku !=null) {
+			return sku.getMauSanPham_product();
 		}
 		return "";
 	}
