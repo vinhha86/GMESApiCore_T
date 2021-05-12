@@ -110,6 +110,7 @@ public class Warehouse implements Serializable {
 	
 	private long sizeid_link;
 	private Float met;
+	private Integer status;
 	
 	
 
@@ -412,6 +413,14 @@ public class Warehouse implements Serializable {
 
 	public void setMet(Float met) {
 		this.met = met;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
 	
 	
