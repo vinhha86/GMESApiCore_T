@@ -77,21 +77,21 @@ public class POrderBOMSKU_Service extends AbstractService<POrderBOMSKU> implemen
 	}
 
 	@Override
-	public List<POrderBOMSKU> getby_porder_and_material_and_color_and_size(Long porderid_link, Long productid_link, 
-			Long materialid_link, long colorid_link,long sizeid_link) {
+	public List<POrderBOMSKU> getby_porder_and_material_and_color_and_size_and_type(Long porderid_link, Long productid_link, 
+			Long materialid_link, long colorid_link,long sizeid_link, int type) {
 		// TODO Auto-generated method stub
 		List<Long> list_sku = sku_att_repo.getskuid_by_valueMau_and_valueCo(colorid_link, sizeid_link, productid_link);
 		long skuid_link = 0;
 		if(list_sku.size() > 0) {
 			skuid_link = list_sku.get(0);
 		}
-		return repo.getByPOrder_and_material_and_sku(porderid_link, materialid_link, skuid_link);
+		return repo.getByPOrder_and_material_and_sku_and_type(porderid_link, materialid_link, skuid_link, type);
 	}
 
 	@Override
-	public List<POrderBOMSKU> getby_porder_and_material_and_sku(Long porderid_link,
-			Long materialid_link, long skuid_link) {
+	public List<POrderBOMSKU> getby_porder_and_material_and_sku_and_type(Long porderid_link,
+			Long materialid_link, long skuid_link, int type) {
 		// TODO Auto-generated method stub
-		return repo.getByPOrder_and_material_and_sku(porderid_link, materialid_link, skuid_link);
+		return repo.getByPOrder_and_material_and_sku_and_type(porderid_link, materialid_link, skuid_link, type);
 	}
 }

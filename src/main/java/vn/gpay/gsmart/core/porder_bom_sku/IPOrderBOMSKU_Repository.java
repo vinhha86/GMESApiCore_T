@@ -34,11 +34,13 @@ public interface IPOrderBOMSKU_Repository extends JpaRepository<POrderBOMSKU, Lo
 	@Query("SELECT c FROM POrderBOMSKU c "
 			+ "where c.porderid_link = :porderid_link"
 			+ " and c.materialid_link = :materialid_link"
-			+ " and c.skuid_link = :skuid_link")
-	public List<POrderBOMSKU> getByPOrder_and_material_and_sku(
+			+ " and c.skuid_link = :skuid_link "
+			+ "and c.type = :type")
+	public List<POrderBOMSKU> getByPOrder_and_material_and_sku_and_type(
 			@Param ("porderid_link")final Long porderid_link,
 			@Param ("materialid_link")final Long materialid_link,
-			@Param ("skuid_link")final Long skuid_link);
+			@Param ("skuid_link")final Long skuid_link,
+			@Param ("type")final int type);
 	
 	@Query("SELECT c FROM POrderBOMSKU c "
 			+ "inner join SKU_Attribute_Value d on c.skuid_link = d.skuid_link "

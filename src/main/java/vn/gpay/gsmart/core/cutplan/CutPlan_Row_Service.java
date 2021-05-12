@@ -20,6 +20,7 @@ import vn.gpay.gsmart.core.porder_bom_sku.IPOrderBOMSKU_Service;
 import vn.gpay.gsmart.core.porder_bom_sku.POrderBOMSKU;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.CutPlanRowType;
+import vn.gpay.gsmart.core.utils.POrderBomType;
 
 @Service
 public class CutPlan_Row_Service extends AbstractService<CutPlan_Row> implements ICutPlan_Row_Service{
@@ -89,7 +90,7 @@ public class CutPlan_Row_Service extends AbstractService<CutPlan_Row> implements
 			bom = bom_avg * size_percent;
 			bom = (float)Math.ceil((bom*10000))/10000;
 					
-			List<POrderBOMSKU> list_bomsku = porderbomskuService.getby_porder_and_material_and_sku(porderid_link, material_skuid_link, product_skuid_link);
+			List<POrderBOMSKU> list_bomsku = porderbomskuService.getby_porder_and_material_and_sku_and_type(porderid_link, material_skuid_link, product_skuid_link, POrderBomType.Kythuat);
 			
 			//neu co dinh muc roi thi cap nhat chua co thi them vao
 			if(list_bomsku.size() > 0) {
@@ -187,7 +188,7 @@ public class CutPlan_Row_Service extends AbstractService<CutPlan_Row> implements
 			bom = bom_avg * size_percent;
 			bom = (float)Math.ceil((bom*10000))/10000;
 					
-			List<POrderBOMSKU> list_bomsku = porderbomskuService.getby_porder_and_material_and_sku(porderid_link, material_skuid_link, product_skuid_link);
+			List<POrderBOMSKU> list_bomsku = porderbomskuService.getby_porder_and_material_and_sku_and_type(porderid_link, material_skuid_link, product_skuid_link, POrderBomType.Kythuat);
 			
 			//neu co dinh muc roi thi cap nhat chua co thi them vao
 			if(list_bomsku.size() > 0) {

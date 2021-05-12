@@ -36,6 +36,7 @@ import vn.gpay.gsmart.core.porder_bom_sku.POrderBOMSKU;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
+import vn.gpay.gsmart.core.utils.POrderBomType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -202,7 +203,8 @@ public class POrderBomAPI {
 			long skuid_link = skuavService.getsku_byproduct_and_valuemau_valueco(productid_link, colorid_link, sizeid_link);
 			
 			//Kiem tra neu chua co thi insert neu co roi thi update
-			List<POrderBOMSKU> list_sku = porderbomskuService.getby_porder_and_material_and_color_and_size(porderid_link, productid_link, materialid_link, colorid_link, sizeid_link);
+			List<POrderBOMSKU> list_sku = porderbomskuService.getby_porder_and_material_and_color_and_size_and_type(porderid_link, productid_link, 
+					materialid_link, colorid_link, sizeid_link, POrderBomType.CanDoi);
 			
 
 			POrderBOMSKU pContractBOMSKU = new POrderBOMSKU();
@@ -259,76 +261,103 @@ public class POrderBomAPI {
 			long porderid_link = entity.porderid_link;
 			
 			//Xoa porder_bom_product cu
-			List<POrderBomProduct> list_porder_bom_product = porderbomproductService.getby_porder(porderid_link);
-			for(POrderBomProduct porder_bom_product : list_porder_bom_product) {
-				porderbomproductService.delete(porder_bom_product);
-			}
+//			List<POrderBomProduct> list_porder_bom_product = porderbomproductService.getby_porder(porderid_link);
+//			for(POrderBomProduct porder_bom_product : list_porder_bom_product) {
+//				porderbomproductService.delete(porder_bom_product);
+//			}
 			 
 			// dong bo tu pcontract_bom_product
 			List<PContractProductBom2> list_bom_product = pcontractbomproductService.get_pcontract_productBOMbyid(productid_link, pcontractid_link);
 			for(PContractProductBom2 bom_product : list_bom_product) {
-				POrderBomProduct porder_bom_product = new POrderBomProduct();
-				porder_bom_product.setAmount(bom_product.getAmount());
-				porder_bom_product.setCreateddate(new Date());
-				porder_bom_product.setCreateduserid_link(user.getId());
-				porder_bom_product.setId(null);
-				porder_bom_product.setLost_ratio(bom_product.getLost_ratio());
-				porder_bom_product.setMaterialid_link(bom_product.getMaterialid_link());
-				porder_bom_product.setOrgrootid_link(orgrootid_link);
-				porder_bom_product.setPcontractid_link(pcontractid_link);
-				porder_bom_product.setPorderid_link(porderid_link);
-				porder_bom_product.setProductid_link(bom_product.getProductid_link());
-				porder_bom_product.setUnitid_link(bom_product.getUnitid_link());
-				
-				porderbomproductService.save(porder_bom_product);
+				//kiem tra npl co chua thi them vao bang pcontract_bom_product
+				List<POrderBomProduct> list_porder_bom_product = porderbomproductService.getby_porder_and_material(porderid_link, bom_product.getMaterialid_link());
+				if(list_porder_bom_product.size() == 0) {
+					POrderBomProduct porder_bom_product = new POrderBomProduct();
+					porder_bom_product.setAmount(bom_product.getAmount());
+					porder_bom_product.setCreateddate(new Date());
+					porder_bom_product.setCreateduserid_link(user.getId());
+					porder_bom_product.setId(null);
+					porder_bom_product.setLost_ratio(bom_product.getLost_ratio());
+					porder_bom_product.setMaterialid_link(bom_product.getMaterialid_link());
+					porder_bom_product.setOrgrootid_link(orgrootid_link);
+					porder_bom_product.setPcontractid_link(pcontractid_link);
+					porder_bom_product.setPorderid_link(porderid_link);
+					porder_bom_product.setProductid_link(bom_product.getProductid_link());
+					porder_bom_product.setUnitid_link(bom_product.getUnitid_link());
+					
+					porderbomproductService.save(porder_bom_product);
+				}
+				else {
+					POrderBomProduct porder_bom_product = list_porder_bom_product.get(0);
+					porder_bom_product.setAmount(bom_product.getAmount());
+					porderbomproductService.save(porder_bom_product);
+				}
 			}
 			
 			//Xoa porder_bom_color
-			List<PorderBomColor> list_porder_bom_color = porderbomcolorService.getby_porder(porderid_link);
-			for(PorderBomColor porderbomcolor : list_porder_bom_color) {
-				porderbomcolorService.delete(porderbomcolor);
-			}
+//			List<PorderBomColor> list_porder_bom_color = porderbomcolorService.getby_porder(porderid_link);
+//			for(PorderBomColor porderbomcolor : list_porder_bom_color) {
+//				porderbomcolorService.delete(porderbomcolor);
+//			}
 			
 			//dong bo tu pcontract_bom_color
 			List<PContractBom2Color> list_bom_color = pcontractbomcolorService.getall_byproduct(pcontractid_link, productid_link);
 			for(PContractBom2Color bom_color: list_bom_color) {
-				PorderBomColor porderbomcolor =  new PorderBomColor();
-				porderbomcolor.setAmount(bom_color.getAmount());
-				porderbomcolor.setColorid_link(bom_color.getColorid_link());
-				porderbomcolor.setCreateddate(new Date());
-				porderbomcolor.setDescription(bom_color.getDescription());
-				porderbomcolor.setId(null);
-				porderbomcolor.setMaterialid_link(bom_color.getMaterialid_link());
-				porderbomcolor.setOrgrootid_link(orgrootid_link);
-				porderbomcolor.setPcontractid_link(pcontractid_link);
-				porderbomcolor.setPorderid_link(porderid_link);
-				porderbomcolor.setProductid_link(productid_link);
-				porderbomcolorService.save(porderbomcolor);
+				List<PorderBomColor> list_porder_bom_color = porderbomcolorService.getby_porder_and_material_and_color(porderid_link, bom_color.getMaterialid_link(), bom_color.getColorid_link());
+				if(list_porder_bom_color.size() == 0) {
+					PorderBomColor porderbomcolor =  new PorderBomColor();
+					porderbomcolor.setAmount(bom_color.getAmount());
+					porderbomcolor.setColorid_link(bom_color.getColorid_link());
+					porderbomcolor.setCreateddate(new Date());
+					porderbomcolor.setDescription(bom_color.getDescription());
+					porderbomcolor.setId(null);
+					porderbomcolor.setMaterialid_link(bom_color.getMaterialid_link());
+					porderbomcolor.setOrgrootid_link(orgrootid_link);
+					porderbomcolor.setPcontractid_link(pcontractid_link);
+					porderbomcolor.setPorderid_link(porderid_link);
+					porderbomcolor.setProductid_link(productid_link);
+					porderbomcolorService.save(porderbomcolor);
+				}
+				else {
+					PorderBomColor porderbomcolor = list_porder_bom_color.get(0);
+					porderbomcolor.setAmount(bom_color.getAmount());
+					porderbomcolorService.save(porderbomcolor);
+				}
 			}
 			
 			//Xoa porder_bom_sku
-			List<POrderBOMSKU> list_bom_sku = porderbomskuService.getByPOrderID(porderid_link);
-			for(POrderBOMSKU bom_sku : list_bom_sku) {
-				porderbomskuService.delete(bom_sku);
-			}
+//			List<POrderBOMSKU> list_bom_sku = porderbomskuService.getByPOrderID(porderid_link);
+//			for(POrderBOMSKU bom_sku : list_bom_sku) {
+//				porderbomskuService.delete(bom_sku);
+//			}
 			
 			//dong bo tu pcontract_bom_sku
 			List<PContractBOM2SKU> list_p_bom_sku = pcontractbomskuService.getbypcontract_and_product(pcontractid_link, productid_link);
 			for(PContractBOM2SKU bom_sku : list_p_bom_sku) {
-				POrderBOMSKU porderbomsku = new POrderBOMSKU();
-				porderbomsku.setAmount(bom_sku.getAmount());
-				porderbomsku.setCreateddate(new Date());
-				porderbomsku.setCreateduserid_link(user.getId());
-				porderbomsku.setDescription(bom_sku.getDescription());
-				porderbomsku.setId(null);
-				porderbomsku.setLost_ratio(bom_sku.getLost_ratio());
-				porderbomsku.setMaterialid_link(bom_sku.getMaterial_skuid_link());
-				porderbomsku.setOrgrootid_link(orgrootid_link);
-				porderbomsku.setPcontractid_link(pcontractid_link);
-				porderbomsku.setPorderid_link(porderid_link);
-				porderbomsku.setProductid_link(productid_link);
-				porderbomsku.setSkuid_link(bom_sku.getProduct_skuid_link());
-				porderbomskuService.save(porderbomsku);
+				List<POrderBOMSKU> list_porder_bom_sku = porderbomskuService.getby_porder_and_material_and_sku_and_type(porderid_link,
+						bom_sku.getMaterial_skuid_link(), bom_sku.getProduct_skuid_link(), POrderBomType.CanDoi);
+				if(list_porder_bom_sku.size() == 0) {
+					POrderBOMSKU porderbomsku = new POrderBOMSKU();
+					porderbomsku.setAmount(bom_sku.getAmount());
+					porderbomsku.setCreateddate(new Date());
+					porderbomsku.setCreateduserid_link(user.getId());
+					porderbomsku.setDescription(bom_sku.getDescription());
+					porderbomsku.setId(null);
+					porderbomsku.setLost_ratio(bom_sku.getLost_ratio());
+					porderbomsku.setMaterialid_link(bom_sku.getMaterial_skuid_link());
+					porderbomsku.setOrgrootid_link(orgrootid_link);
+					porderbomsku.setPcontractid_link(pcontractid_link);
+					porderbomsku.setPorderid_link(porderid_link);
+					porderbomsku.setProductid_link(productid_link);
+					porderbomsku.setSkuid_link(bom_sku.getProduct_skuid_link());
+					porderbomsku.setType(POrderBomType.CanDoi);
+					porderbomskuService.save(porderbomsku);
+				}
+				else {
+					POrderBOMSKU porderbomsku = list_porder_bom_sku.get(0);
+					porderbomsku.setAmount(bom_sku.getAmount());
+					porderbomskuService.save(porderbomsku);
+				}
 			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

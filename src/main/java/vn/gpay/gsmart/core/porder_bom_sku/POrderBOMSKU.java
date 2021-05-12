@@ -65,6 +65,20 @@ public class POrderBOMSKU implements Serializable {/**
 	@Column(name = "productcolor_name")
 	private String productcolor_name;
 	
+	private Integer type;
+	
+	
+	
+	public Integer getType() {
+		return type;
+	}
+
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
+
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="materialid_link",insertable=false,updatable =false)
