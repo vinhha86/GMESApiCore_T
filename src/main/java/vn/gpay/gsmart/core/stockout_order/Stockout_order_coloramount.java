@@ -15,7 +15,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import vn.gpay.gsmart.core.attributevalue.Attributevalue;
+import vn.gpay.gsmart.core.sku.SKU;
 
 @Table(name="stockout_order_color_amount")
 @Entity
@@ -30,18 +30,25 @@ public class Stockout_order_coloramount implements Serializable {
 	@SequenceGenerator(name="stockout_order_color_amount_generator", sequenceName = "stockout_order_color_amount_id_seq", allocationSize=1)
 	private Long id;
 	private Long stockoutorderid_link;
-	private Long colorid_link;
+	private Long skuid_link;
 	private Integer amount;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="colorid_link",insertable=false,updatable =false)
-    private Attributevalue color;
+    @JoinColumn(name="skuid_link",insertable=false,updatable =false)
+    private SKU sku;
 	
 	@Transient
 	public String getColor_name() {
-		if(color!=null)
-			return color.getValue();
+		if(sku!=null)
+			return sku.getColor_name();
+		return "";
+	}
+	
+	@Transient
+	public String getSize_name() {
+		if(sku!=null)
+			return sku.getSize_name();
 		return "";
 	}
 	
@@ -57,12 +64,14 @@ public class Stockout_order_coloramount implements Serializable {
 	public void setStockoutorderid_link(Long stockoutorderid_link) {
 		this.stockoutorderid_link = stockoutorderid_link;
 	}
-	public Long getColorid_link() {
-		return colorid_link;
+	public Long getSkuid_link() {
+		return skuid_link;
 	}
-	public void setColorid_link(Long colorid_link) {
-		this.colorid_link = colorid_link;
+
+	public void setSkuid_link(Long skuid_link) {
+		this.skuid_link = skuid_link;
 	}
+
 	public Integer getAmount() {
 		return amount;
 	}

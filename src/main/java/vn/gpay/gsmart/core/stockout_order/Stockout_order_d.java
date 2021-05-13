@@ -69,10 +69,19 @@ public class Stockout_order_d implements Serializable {
 	private List<Stockout_order_pkl>  stockout_order_pkl  = new ArrayList<Stockout_order_pkl>();
 	
 	@Transient
-	public Float gettotalyds_lock() {
+	public Float gettotalmet_lock() {
 		float sum = 0;
 		for(Stockout_order_pkl pkl : stockout_order_pkl) {
 			sum += pkl.getMet();
+		}
+		return sum;
+	}
+	
+	@Transient
+	public Float gettotalyds_lock() {
+		float sum = 0;
+		for(Stockout_order_pkl pkl : stockout_order_pkl) {
+			sum += pkl.getYdsorigin();
 		}
 		return sum;
 	}
@@ -125,14 +134,14 @@ public class Stockout_order_d implements Serializable {
 	@Transient
 	public String getTenMauNPL() {
 		if(sku!=null)
-			return sku.getColor_name();
+			return sku.getMauSanPham_product();
 		return "";
 	}
 	
 	@Transient
 	public String getCoKho() {
 		if(sku!=null)
-			return sku.getSize_name();
+			return sku.getCoSanPham_product();
 		return "";
 	}
 	

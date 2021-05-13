@@ -57,7 +57,18 @@ public class Stockout_order implements Serializable {
 	private Date lasttimeupdate;
 	private Long porderid_link;
 	private String stockout_order_code;
+	private Long unitid_link;
 	
+	
+	
+	public Long getUnitid_link() {
+		return unitid_link;
+	}
+
+	public void setUnitid_link(Long unitid_link) {
+		this.unitid_link = unitid_link;
+	}
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="orgid_from_link",insertable=false,updatable =false)

@@ -21,5 +21,10 @@ public class Stockout_order_coloramount_Service extends AbstractService<Stockout
 		// TODO Auto-generated method stub
 		return repo.getby_stockout_order(stockoutorderid_link);
 	}
+	@Override
+	public List<Stockout_order_coloramount> getby_stockoutorder_and_sku(Long stockoutorderid_link, Long skuid_link) {
+		// TODO Auto-generated method stub
+		return repo.getby_stockout_order_and_sku(stockoutorderid_link, skuid_link);
+	}
 
 }

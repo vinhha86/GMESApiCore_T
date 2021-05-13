@@ -119,6 +119,14 @@ public class Org implements Serializable {
 	}
 	
 	@Transient
+	public String getName_andParent() {
+		if(parent!=null) {
+			return name+" - "+ parent.getName();
+		}
+		return name;
+	}
+	
+	@Transient
 	public boolean checked;
 	
 	@Transient

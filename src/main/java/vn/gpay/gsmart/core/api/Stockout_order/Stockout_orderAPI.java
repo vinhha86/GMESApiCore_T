@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder_bom_color.IPOrderBomColor_Service;
-import vn.gpay.gsmart.core.porder_bom_color.PorderBomColor;
+import vn.gpay.gsmart.core.porder_bom_sku.IPOrderBOMSKU_Service;
+import vn.gpay.gsmart.core.porder_bom_sku.POrderBOMSKU;
 import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
+import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.stockout_order.IStockout_order_coloramount_Service;
 import vn.gpay.gsmart.core.stockout_order.IStockout_order_d_service;
@@ -27,6 +29,7 @@ import vn.gpay.gsmart.core.stockout_order.Stockout_order;
 import vn.gpay.gsmart.core.stockout_order.Stockout_order_coloramount;
 import vn.gpay.gsmart.core.stockout_order.Stockout_order_d;
 import vn.gpay.gsmart.core.stockout_order.Stockout_order_pkl;
+import vn.gpay.gsmart.core.utils.POrderBomType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 import vn.gpay.gsmart.core.warehouse.Warehouse;
 
@@ -40,6 +43,7 @@ public class Stockout_orderAPI {
 	@Autowired IPOrder_Product_SKU_Service porderskuService;
 	@Autowired IPOrder_Service porderService;
 	@Autowired IPOrderBomColor_Service bomcolorService;
+	@Autowired IPOrderBOMSKU_Service bomskuService;
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ResponseEntity<create_order_response> Create(HttpServletRequest request,
@@ -64,6 +68,7 @@ public class Stockout_orderAPI {
 			
 			for(Stockout_order_d detail : entity.detail) {
 				detail.setStockoutorderid_link(stockout_orderid_link);
+				detail.setUnitid_link(order.getUnitid_link());
 				if(detail.getId() == null) {
 					detail.setTimecreate(current_time);
 					detail.setUsercreateid_link(user.getId());
@@ -95,14 +100,15 @@ public class Stockout_orderAPI {
 			}
 			
 			//kiem tra bang color_amout co chua? chua co thi them so luong = 0 vao cho cac mau
-			List<Stockout_order_coloramount> list_amout_color = amount_color_Service.getby_stockout_Order(stockout_orderid_link);
-			if(list_amout_color.size() == 0) {
-				Long porderid_link = order.getPorderid_link();
-				List<Long> list_colorid = porderskuService.getlist_colorid_byporder(porderid_link);
-				for(Long colorid_link : list_colorid) {
+			Long porderid_link = order.getPorderid_link();
+			List<POrder_Product_SKU> list_porder_sku = porderskuService.getlist_sku_in_porder(orgrootid_link, porderid_link);
+			
+			for(POrder_Product_SKU porder_sku : list_porder_sku) {
+				List<Stockout_order_coloramount> list_amout_sku = amount_color_Service.getby_stockoutorder_and_sku(stockout_orderid_link, porder_sku.getSkuid_link());
+				if(list_amout_sku.size() == 0) {
 					Stockout_order_coloramount color_amout = new Stockout_order_coloramount();
 					color_amout.setAmount(0);
-					color_amout.setColorid_link(colorid_link);
+					color_amout.setSkuid_link(porder_sku.getSkuid_link());
 					color_amout.setId(null);
 					color_amout.setStockoutorderid_link(stockout_orderid_link);
 					
@@ -142,6 +148,21 @@ public class Stockout_orderAPI {
 			response.setMessage(e.getMessage());
 		}
 		return new ResponseEntity<getby_id_response>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/update_stockout_orderd", method = RequestMethod.POST)
+	public ResponseEntity<update_stockout_orderd_response> StockoutOrderD(HttpServletRequest request,
+			@RequestBody update_stockout_orderd_request entity) {
+		update_stockout_orderd_response response = new update_stockout_orderd_response();
+		try {
+			stockout_order_d_Service.save(entity.data);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<update_stockout_orderd_response>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/delete_detail", method = RequestMethod.POST)
@@ -226,10 +247,13 @@ public class Stockout_orderAPI {
 			for(Stockout_order_d detail : list_detail) {
 				float amount_req = 0;
 				for(Stockout_order_coloramount color : list_color_amount) {
-					List<PorderBomColor> list_bom_color = bomcolorService.getby_porder_and_material_and_color(order.getPorderid_link(), detail.getMaterial_skuid_link(), color.getColorid_link());
-					if(list_bom_color.size() > 0) {
+					List<POrderBOMSKU> list_bom_sku = bomskuService.getby_porder_and_material_and_sku_and_type(order.getPorderid_link(), 
+							detail.getMaterial_skuid_link(), color.getSkuid_link(), POrderBomType.CanDoi);
+//					List<PorderBomColor> list_bom_color = bomcolorService.getby_porder_and_material_and_color(order.getPorderid_link(), 
+//							detail.getMaterial_skuid_link(), color.getColorid_link());
+					if(list_bom_sku.size() > 0) {
 						int amount = color.getAmount() == null ? 0 : color.getAmount();
-						float bom = list_bom_color.get(0).getAmount() == null ? 0 : list_bom_color.get(0).getAmount();
+						float bom = list_bom_sku.get(0).getAmount() == null ? 0 : list_bom_sku.get(0).getAmount();
 						amount_req += amount * bom;
 					}
 				}
