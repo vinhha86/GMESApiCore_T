@@ -262,7 +262,8 @@ public class Stockout_orderAPI {
 						}
 					}
 				}
-				detail.setTotalyds(amount_req);
+				detail.setTotalyds((float)(amount_req * commonUnit.yardTomet));
+				detail.setTotalmet(amount_req);
 				stockout_order_d_Service.save(detail);
 			}
 			
