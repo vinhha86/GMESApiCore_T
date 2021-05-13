@@ -1859,6 +1859,7 @@ public class PContract_POAPI {
 			if (pcontract_po.getId() == null || pcontract_po.getId() == 0) {
 				pcontract_po.setUsercreatedid_link(usercreatedid_link);
 				pcontract_po.setDatecreated(new Date());
+				pcontract_po.setOrgrootid_link(orgrootid_link);
 			}
 
 			pcontract_po = pcontract_POService.save(pcontract_po);
