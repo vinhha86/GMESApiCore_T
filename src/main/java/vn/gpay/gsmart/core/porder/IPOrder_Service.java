@@ -46,4 +46,5 @@ public interface IPOrder_Service extends Operations<POrder> {
 			Long buyerid, Long vendorid, Long factoryid, 
 			String pobuyer, String stylebuyer, String contractcode, Long granttoorgid_link,
 			Date golivedatefrom, Date golivedateto);
+	List<POrder> getby_offer_and_orgs(Long pcontract_poid_link, List<Long> orgs);
 }

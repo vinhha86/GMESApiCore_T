@@ -496,4 +496,10 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 		// TODO Auto-generated method stub
 		return repo.getby_offer(orgid_link, pcontract_poid_link, productid_link);
 	}
+
+	@Override
+	public List<POrder> getby_offer_and_orgs(Long pcontract_poid_link, List<Long> orgs) {
+		// TODO Auto-generated method stub
+		return repo.getall_by_offer_and_orgs(pcontract_poid_link, orgs);
+	}
 }

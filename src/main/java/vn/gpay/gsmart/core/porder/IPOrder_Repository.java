@@ -187,4 +187,14 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 			@Param ("orgid_link")final Long orgid_link,
 			@Param ("pcontract_poid_link")final Long pcontract_poid_link,
 			@Param ("productid_link")final Long productid_link);
+	
+	@Query(value = "select a from POrder a "
+			+ "inner join PContract_PO b on a.pcontract_poid_link = b.id "
+			+ "where a.granttoorgid_link in :orgs "
+			+ "and b.parentpoid_link = :parentid_link "
+			+ "order by b.shipdate asc"
+			)
+	public List<POrder> getall_by_offer_and_orgs(
+			@Param ("parentid_link")final Long parentid_link,
+			@Param ("orgs")final List<Long> orgs);
 }

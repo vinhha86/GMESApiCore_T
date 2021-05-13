@@ -51,6 +51,8 @@ import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
+import vn.gpay.gsmart.core.porders_poline.IPOrder_POLine_Service;
+import vn.gpay.gsmart.core.porders_poline.POrder_POLine;
 import vn.gpay.gsmart.core.product.IProductService;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -101,6 +103,7 @@ public class POrderAPI {
 	@Autowired IAttributeValueService attValService;
 	@Autowired private Common commonService;
 	@Autowired IGpayUserOrgService userOrgService;
+	@Autowired IPOrder_POLine_Service porder_line_Service;
     ObjectMapper mapper = new ObjectMapper();
 	
 	@RequestMapping(value = "/getone",method = RequestMethod.POST)
@@ -117,6 +120,54 @@ public class POrderAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<POrderGetByIDResponse>(response, HttpStatus.OK);
+		}
+	}    
+	
+	@RequestMapping(value = "/getby_po_line",method = RequestMethod.POST)
+	public ResponseEntity<getby_poline_response> GetByPOline(@RequestBody getby_poline_request entity,HttpServletRequest request ) {
+		getby_poline_response response = new getby_poline_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long orgid_link = user.getOrgid_link();
+			Long pcontract_poid_link = entity.pcontract_poid_link;
+			PContract_PO po_line = pcontract_POService.findOne(pcontract_poid_link);
+			List<Long> orgs = new ArrayList<Long>();
+			
+			List<String> orgTypes = new ArrayList<String>();
+			orgTypes.add("13");
+			
+			orgs.add(orgid_link);
+			List<Org> lsOrgChild = orgService.getorgChildrenbyOrg(orgid_link,orgTypes);
+			
+			for(Org theOrg:lsOrgChild){
+				if(!orgs.contains(theOrg.getId())){
+					orgs.add(theOrg.getId());
+				}
+			}
+			
+			if(orgid_link != 1) {
+				List<GpayUserOrg> list_user_org = userOrgService.getall_byuser(user.getId());
+				for (GpayUserOrg userorg : list_user_org) {
+					if(!orgs.contains(userorg.getOrgid_link())){
+						orgs.add(userorg.getOrgid_link());
+					}
+				}
+			}
+			
+			//Lay nhung porder da map voi po line de remove khoi list
+			List<Long> list_porder_line = porder_line_Service.get_porderid_by_line(pcontract_poid_link);
+			List<POrder> list_porder = porderService.getby_offer_and_orgs(po_line.getParentpoid_link(), orgs);
+			list_porder.removeIf(c-> list_porder_line.contains(c.getId()));
+			
+			response.data = list_porder;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getby_poline_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<getby_poline_response>(response, HttpStatus.OK);
 		}
 	}    
 	
