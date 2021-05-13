@@ -6,7 +6,7 @@ import vn.gpay.gsmart.core.base.Operations;
 
 public interface IPOrderBOMSKU_Service extends Operations<POrderBOMSKU>{
 
-	List<POrderBOMSKU> getByPOrderID(Long porderid_link);
+	List<POrderBOMSKU> getByPOrderID_and_type(Long porderid_link, int type);
 
 	List<POrderBOMSKU_By_Product> getByPOrderID_GroupByProduct(Long porderid_link);
 

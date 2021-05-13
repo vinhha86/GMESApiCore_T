@@ -20,8 +20,8 @@ public class POrderBOMSKU_Service extends AbstractService<POrderBOMSKU> implemen
 	}
 	
 	@Override
-	public List<POrderBOMSKU> getByPOrderID(Long porderid_link){
-		return repo.getByPOrderID(porderid_link);
+	public List<POrderBOMSKU> getByPOrderID_and_type(Long porderid_link, int type){
+		return repo.getByPOrderID(porderid_link, type);
 	}
 	
 	@Override

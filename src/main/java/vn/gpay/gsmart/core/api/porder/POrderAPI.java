@@ -119,6 +119,24 @@ public class POrderAPI {
 		    return new ResponseEntity<POrderGetByIDResponse>(response, HttpStatus.OK);
 		}
 	}    
+	
+	@RequestMapping(value = "/getsku_by_porder",method = RequestMethod.POST)
+	public ResponseEntity<get_pordersku_by_porder_response> GetPOrderSku(@RequestBody get_pordersku_by_porder_request entity,HttpServletRequest request ) {
+		get_pordersku_by_porder_response response = new get_pordersku_by_porder_response();
+		try {
+			Long porderid_link = entity.porderid_link;
+			response.data = porderskuService.getby_porder(porderid_link);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<get_pordersku_by_porder_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<get_pordersku_by_porder_response>(response, HttpStatus.OK);
+		}
+	}    
+	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	@Transactional(rollbackFor = RuntimeException.class)
 	public ResponseEntity<POrder_Create_response> Create(HttpServletRequest request,

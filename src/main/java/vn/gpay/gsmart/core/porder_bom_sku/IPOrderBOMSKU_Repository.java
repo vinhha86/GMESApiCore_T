@@ -13,8 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 public interface IPOrderBOMSKU_Repository extends JpaRepository<POrderBOMSKU, Long>, JpaSpecificationExecutor<POrderBOMSKU> {
-	@Query("SELECT c FROM POrderBOMSKU c where c.porderid_link = :porderid_link")
-	public List<POrderBOMSKU> getByPOrderID(@Param ("porderid_link")final Long porderid_link);
+	@Query("SELECT c FROM POrderBOMSKU c "
+			+ "where c.porderid_link = :porderid_link "
+			+ "and type = :type")
+	public List<POrderBOMSKU> getByPOrderID(
+			@Param ("porderid_link")final Long porderid_link,
+			@Param ("type")final int type);
 	
 	@Query("SELECT c FROM POrderBOMSKU c "
 			+ "inner join SKU_Attribute_Value d on c.skuid_link = d.skuid_link "

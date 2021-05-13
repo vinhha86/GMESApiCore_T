@@ -61,4 +61,9 @@ public class POrder_Product_SKU_Service extends AbstractService<POrder_Product_S
 		}
 		return result;
 	}
+	@Override
+	public List<Long> getvalue_by_attribute(Long porderid_link, Long attributeid_link) {
+		// TODO Auto-generated method stub
+		return repo.getvaluesize_in_product(porderid_link, attributeid_link);
+	}
 }

@@ -59,6 +59,14 @@ public class POrderBomProduct implements Serializable {
 	}
 	
 	@Transient
+	public String getDescription_product() {
+		if(sku !=null) {
+			return sku.getDescription();
+		}
+		return "";
+	}
+	
+	@Transient
 	public String getCoKho_product() {
 		if(sku !=null) {
 			return sku.getCoSanPham_product();

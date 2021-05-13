@@ -812,7 +812,7 @@ public class PContractProductBom2API {
 			List<Long> list_colorid = ppskuService.getlistvalue_by_product(pcontractid_link, productid_link, AtributeFixValues.ATTR_COLOR);
 			
 			List<PContractProductBom2> listbom = ppbom2service.get_pcontract_productBOMbyid(productid_link, pcontractid_link);
-			List<PContractBom2Color> listbomcolor = ppbomcolor2service.getall_material_in_productBOMColor(pcontractid_link, productid_link, colorid_link, (long)0);
+//			List<PContractBom2Color> listbomcolor = ppbomcolor2service.getall_material_in_productBOMColor(pcontractid_link, productid_link, colorid_link, (long)0);
 			List<PContractBOM2SKU> listbomsku = ppbom2skuservice.getmaterial_bycolorid_link(pcontractid_link, productid_link, colorid_link, 0);
 			
 			List<Long> List_size = ppskuService.getlistvalue_by_product(pcontractid_link, productid_link, (long)30);
@@ -820,12 +820,6 @@ public class PContractProductBom2API {
 					//ppbomskuservice.getsize_bycolor(pcontractid_link, productid_link, colorid_link);
 			
 			for (PContractProductBom2 pContractProductBom : listbom) {
-				List<PContractBom2Color> listbomcolorclone = new ArrayList<PContractBom2Color>(listbomcolor);
-				listbomcolorclone.removeIf(c -> !c.getMaterialid_link().equals(pContractProductBom.getMaterialid_link()));
-				
-				Float amount_color = (float) 0;
-				if(listbomcolorclone.size() > 0)
-					amount_color = listbomcolorclone.get(0).getAmount();
 				
 				//Lay ds poline cua sku
 				List<PContract_bom2_npl_poline> list_po = po_npl_Service.getby_product_and_npl(productid_link, pcontractid_link, pContractProductBom.getMaterialid_link());
@@ -842,9 +836,7 @@ public class PContractProductBom2API {
 				//Chay de lay tung mau san pham
 				for(Long colorid : list_colorid) {
 					Map<String, String> map = new HashMap<String, String>();
-					
-					map.put("amount_color", "0"+amount_color);
-					
+										
 					map.put("coKho", pContractProductBom.getCoKho()+"");
 					
 					map.put("createddate", pContractProductBom.getCreateddate()+"");
@@ -891,9 +883,7 @@ public class PContractProductBom2API {
 					
 					Float total_amount = (float) 0;
 					int total_size=0;
-					if(amount_color == 0) {
-						
-					}
+					
 					boolean check = false;
 					for(Long size : List_size) {
 						List<PContractBOM2SKU> listbomsku_clone = new ArrayList<PContractBOM2SKU>(listbomsku);

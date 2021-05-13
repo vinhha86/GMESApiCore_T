@@ -45,4 +45,15 @@ public interface IPOrder_Product_SKU_Repository extends JpaRepository<POrder_Pro
 			+ "group by c.skuid_link")
 	public List<Object[]> getsumsku_byporder(
 			@Param ("porderid_link")final  long porderid_link);	
+	
+	@Query(value = "select b.id from SKU_Attribute_Value a "
+			+ "inner join POrder_Product_SKU c on a.skuid_link = c.skuid_link "
+			+ "inner join Attributevalue b on b.id = a.attributevalueid_link "
+			+ "where c.porderid_link = :porderid_link "
+			+ " and a.attributeid_link= :attributeid_link "
+			+ "group by b.id, b.sortvalue "
+			+ "order by b.sortvalue asc")
+	public List<Long> getvaluesize_in_product(
+			@Param ("porderid_link")final  long porderid_link, 
+			@Param ("attributeid_link")final long attributeid_link);
 }
