@@ -87,6 +87,11 @@ public class Stockout_order_d implements Serializable {
 	}
 	
 	@Transient
+	public Integer getSocaygiu() {
+		return stockout_order_pkl.size();
+	}
+	
+	@Transient
 	public String getUnitName() {
 		if(unit!=null)
 			return unit.getName();

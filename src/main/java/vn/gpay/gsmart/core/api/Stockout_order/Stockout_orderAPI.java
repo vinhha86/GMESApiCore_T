@@ -31,6 +31,7 @@ import vn.gpay.gsmart.core.stockout_order.Stockout_order_d;
 import vn.gpay.gsmart.core.stockout_order.Stockout_order_pkl;
 import vn.gpay.gsmart.core.utils.POrderBomType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
+import vn.gpay.gsmart.core.utils.commonUnit;
 import vn.gpay.gsmart.core.warehouse.Warehouse;
 
 @RestController
@@ -204,6 +205,7 @@ public class Stockout_orderAPI {
 		GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Long orgid_link = user.getOrgid_link();
 		try {
+//			Stockout_order order = stockout_order_Service.findOne(entity.stockoutorderid_link);
 			for(Warehouse wh : entity.data) {
 				Stockout_order_pkl pkl = new Stockout_order_pkl();
 				pkl.setColorid_link(wh.getColorid_link());
@@ -215,11 +217,12 @@ public class Stockout_orderAPI {
 				pkl.setOrgid_link(orgid_link);
 				pkl.setPackageid(wh.getPackageid());
 				pkl.setSkuid_link(wh.getSkuid_link());
-				pkl.setStockoutorderdid_link(entity.stockoutorderid_link);
+				pkl.setStockoutorderdid_link(entity.stockoutorderdid_link);
 				pkl.setStockoutorderid_link(entity.stockoutorderid_link);
 				pkl.setTimecreate(new Date());
 				pkl.setUsercreateid_link(user.getId());
 				pkl.setWidth(wh.getWidth());
+				pkl.setYdsorigin((float)(wh.getMet()* commonUnit.yardTomet));
 				
 				stockout_pkl_Service.save(pkl);
 			}
@@ -253,8 +256,10 @@ public class Stockout_orderAPI {
 //							detail.getMaterial_skuid_link(), color.getColorid_link());
 					if(list_bom_sku.size() > 0) {
 						int amount = color.getAmount() == null ? 0 : color.getAmount();
-						float bom = list_bom_sku.get(0).getAmount() == null ? 0 : list_bom_sku.get(0).getAmount();
-						amount_req += amount * bom;
+						if(amount> 0) {
+							float bom = list_bom_sku.get(0).getAmount() == null ? 0 : list_bom_sku.get(0).getAmount();
+							amount_req += amount * bom;
+						}
 					}
 				}
 				detail.setTotalyds(amount_req);
