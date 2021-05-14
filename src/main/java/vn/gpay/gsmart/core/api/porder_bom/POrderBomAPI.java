@@ -569,6 +569,9 @@ public class POrderBomAPI {
 						map.put("amount", "0");
 					if(check)
 						listdata.add(map);	
+					else {
+						int t = 1;
+					}
 				}
 			}
 			
