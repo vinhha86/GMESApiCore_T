@@ -22,4 +22,5 @@ public interface IWarehouseService extends StringOperations<Warehouse>{
 	
 	
 	public List<Warehouse> inv_getbyid(long stockid_link);
+	String getspaces_bysku(Long stockid_link, Long skuid_link);
 }

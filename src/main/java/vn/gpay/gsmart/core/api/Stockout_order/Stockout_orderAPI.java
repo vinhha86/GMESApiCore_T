@@ -32,6 +32,7 @@ import vn.gpay.gsmart.core.stockout_order.Stockout_order_pkl;
 import vn.gpay.gsmart.core.utils.POrderBomType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 import vn.gpay.gsmart.core.utils.commonUnit;
+import vn.gpay.gsmart.core.warehouse.IWarehouseService;
 import vn.gpay.gsmart.core.warehouse.Warehouse;
 
 @RestController
@@ -45,6 +46,7 @@ public class Stockout_orderAPI {
 	@Autowired IPOrder_Service porderService;
 	@Autowired IPOrderBomColor_Service bomcolorService;
 	@Autowired IPOrderBOMSKU_Service bomskuService;
+	@Autowired IWarehouseService warehouseService;
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ResponseEntity<create_order_response> Create(HttpServletRequest request,
@@ -313,7 +315,13 @@ public class Stockout_orderAPI {
 			@RequestBody get_detail_by_order_request entity) {
 		get_detail_by_order_response response = new get_detail_by_order_response();
 		try {
+			Stockout_order stockout_order = stockout_order_Service.findOne(entity.id);
+			
 			response.data = stockout_order_d_Service.getby_Stockout_order(entity.id);
+			for(Stockout_order_d item : response.data) {
+				String data_spaces = warehouseService.getspaces_bysku(stockout_order.getOrgid_from_link(), item.getMaterial_skuid_link());
+				item.setData_spaces(data_spaces);
+			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

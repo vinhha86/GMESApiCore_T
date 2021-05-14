@@ -4,7 +4,13 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 
 @Table(name="Stockspace")
@@ -26,8 +32,20 @@ public class Stockspace implements Serializable {
     private Long rowid_link;
 	
 	@Column(name ="floorid")
-    private Long floorid;
+    private Integer floorid;
 
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="rowid_link",insertable=false,updatable =false)
+    private Stockrow stockrow; 
+	
+	@Transient
+	public String getStockrow_code() {
+		if(stockrow != null)
+			return stockrow.getCode();
+		return "";
+	}
+	
 	public String getSpaceepc() {
 		return spaceepc;
 	}
@@ -60,11 +78,11 @@ public class Stockspace implements Serializable {
 		this.rowid_link = rowid_link;
 	}
 
-	public Long getFloorid() {
+	public Integer getFloorid() {
 		return floorid;
 	}
 
-	public void setFloorid(Long floorid) {
+	public void setFloorid(Integer floorid) {
 		this.floorid = floorid;
 	}
 	

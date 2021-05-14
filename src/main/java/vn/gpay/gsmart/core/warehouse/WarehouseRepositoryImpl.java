@@ -11,12 +11,14 @@ import org.springframework.stereotype.Service;
 import vn.gpay.gsmart.core.base.StringAbstractService;
 import vn.gpay.gsmart.core.invcheck.InvcheckEpc;
 import vn.gpay.gsmart.core.invcheck.InvcheckSku;
+import vn.gpay.gsmart.core.stock.IStockspaceService;
+import vn.gpay.gsmart.core.stock.Stockspace;
 
 @Service
 public class WarehouseRepositoryImpl extends StringAbstractService<Warehouse> implements IWarehouseService{
 
-	@Autowired
-	WarehouseRepository repositoty;
+	@Autowired WarehouseRepository repositoty;
+	@Autowired IStockspaceService stockSpaceService;
 
 	@Override
 	protected JpaRepository<Warehouse, String> getRepository() {
@@ -116,4 +118,37 @@ public class WarehouseRepositoryImpl extends StringAbstractService<Warehouse> im
 		return repositoty.inv_getby_stockinid_link(stockid_link);
 	}
 
+	@Override
+	public String getspaces_bysku(Long stockid_link, Long skuid_link) {
+		String sSpaces = "";
+		try {
+			List<Object[]> lsSpaces = repositoty.getspaces_bysku(skuid_link);
+			int i=0;
+			for(Object[] theSpace: lsSpaces){
+				//Lay thong tin space
+				String space_epc = (String)theSpace[0];
+				Long item_count = (Long)theSpace[1];
+				Double item_total = (Double)theSpace[2];
+				List<Stockspace> lsSpaceEpc = stockSpaceService.findStockspaceByEpc(stockid_link, space_epc);
+				if (lsSpaceEpc.size()>0){
+					Stockspace theSpaceEpc = lsSpaceEpc.get(0);
+					sSpaces += "D-" + theSpaceEpc.getStockrow_code() + "|"
+							+ "H-" + theSpaceEpc.getSpacename() + "|"
+							+ "T-" + theSpaceEpc.getFloorid().toString() + "|" 
+							+ "(" + item_count.toString() + ")" 
+							+ "(" + item_total.toString() + ")";
+				} else {
+					sSpaces += "KXD "
+							+ "(" + item_count.toString() + ")" 
+							+ "(" + item_total.toString() + ")";
+				}
+				i++;
+				if (i<lsSpaces.size())sSpaces += "; ";
+			}
+			return sSpaces == ""?"Không có thông tin":sSpaces;
+		} catch(Exception ex){
+			ex.printStackTrace();
+			return "Lỗi tính toán vị trí khoang";
+		}
+	}
 }

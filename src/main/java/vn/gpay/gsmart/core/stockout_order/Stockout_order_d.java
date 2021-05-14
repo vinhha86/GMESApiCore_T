@@ -53,6 +53,9 @@ public class Stockout_order_d implements Serializable {
 	private Float totalmet;
 	private Float totalmetcheck;
 	
+	@Transient
+	private String data_spaces; //  danh sách khoang
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="material_skuid_link",insertable=false,updatable =false)
@@ -263,5 +266,11 @@ public class Stockout_order_d implements Serializable {
 		this.totalmetcheck = totalmetcheck;
 	}
 	
-	
+	public String getData_spaces() {
+		return data_spaces;
+	}
+
+	public void setData_spaces(String data_spaces) {
+		this.data_spaces = data_spaces;
+	}
 }

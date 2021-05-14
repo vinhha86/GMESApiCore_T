@@ -50,4 +50,10 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, String>{
 	@Modifying
 	@Query(value = "delete from Warehouse c where stockid_link =:stockid_link and epc=:epc")
 	public void deleteByEpc(@Param ("epc")final String epc,@Param ("stockid_link")final long stockid_link);
+	
+	@Query(value = "select a.spaceepc_link as spaceepc_link, count(a.id) as itemcount, sum(a.met) as itemtotal from Warehouse a "
+			+ "where a.skuid_link = :skuid_link "
+			+ "group by spaceepc_link")
+	List<Object[]> getspaces_bysku(
+			@Param ("skuid_link")final Long skuid_link) ;
 }
