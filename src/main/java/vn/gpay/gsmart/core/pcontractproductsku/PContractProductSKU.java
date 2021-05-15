@@ -37,13 +37,14 @@ public class PContractProductSKU implements Serializable {/**
 	private Integer pquantity_porder;//SL don
 	private Integer pquantity_total;//SL tong sx
 	
-	@Transient
-	private Integer pquantity_lenhsx = 0;//SL da tao lenh sx
 	
 	private Integer pquantity_granted;//SL da phan chuyen
 	
 	private Integer pquantity_production;//SL yeu cau sx
 	private Long pcontract_poid_link;
+	
+	@Transient
+	private Integer pquantity_lenhsx = 0;//SL da tao lenh sx
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne

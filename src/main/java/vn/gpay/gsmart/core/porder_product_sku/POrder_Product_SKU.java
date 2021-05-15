@@ -43,6 +43,8 @@ public class POrder_Product_SKU implements Serializable {
 	private Integer pquantity_total;
 	private Integer pquantity_granted;
 	private Integer pquantity_production;
+	private Long pcontract_poid_link;
+	
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -277,6 +279,12 @@ public class POrder_Product_SKU implements Serializable {
 	}
 	public void setPquantity_production(Integer pquantity_production) {
 		this.pquantity_production = pquantity_production;
+	}
+	public Long getPcontract_poid_link() {
+		return pcontract_poid_link;
+	}
+	public void setPcontract_poid_link(Long pcontract_poid_link) {
+		this.pcontract_poid_link = pcontract_poid_link;
 	}
 	
 }

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import vn.gpay.gsmart.core.base.AbstractService;
+import vn.gpay.gsmart.core.porder.POrder;
 
 @Service
 public class POrder_POLine_Service extends AbstractService<POrder_POLine> implements IPOrder_POLine_Service{
@@ -20,6 +21,11 @@ public class POrder_POLine_Service extends AbstractService<POrder_POLine> implem
 	public List<Long> get_porderid_by_line(Long pcontract_poid_link) {
 		// TODO Auto-generated method stub
 		return repo.get_porderid_by_line(pcontract_poid_link);
+	}
+	@Override
+	public List<POrder> getporder_by_po(Long pcontract_poid_link) {
+		// TODO Auto-generated method stub
+		return repo.get_porder_by_line(pcontract_poid_link);
 	}
 
 }

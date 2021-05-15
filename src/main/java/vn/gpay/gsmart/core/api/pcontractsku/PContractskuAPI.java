@@ -161,6 +161,8 @@ public class PContractskuAPI {
 			long pcontract_poid_link = entity.pcontract_poid_link;
 			
 			response.data = pskuservice.getlistsku_bypo_and_pcontract(orgrootid_link, pcontract_poid_link, pcontractid_link);
+			
+			//cap nhat lai so luong da phan lenh
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 		}
@@ -416,4 +418,5 @@ public class PContractskuAPI {
 		
 		return new ResponseEntity<PContractSKU_binding_response>(response, HttpStatus.OK);
 	}
+	
 }

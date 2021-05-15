@@ -415,6 +415,7 @@ public class POrderListAPI {
 			Long orgrootid_link = user.getRootorgid_link();
 			Long porderid_link = entity.porderid_link;
 			Long productid_link = entity.productid_link;
+			Long pcontract_poid_link = entity.pcontract_poid_link;
 			
 			// save to porder_sku
 			for(POLineSKU line_sku : entity.list_sku) {
@@ -434,6 +435,7 @@ public class POrderListAPI {
 					sku_new.setPquantity_total(line_sku.getPquantity_production() + line_sku.getPquantity_sample());
 					sku_new.setProductid_link(productid_link);
 					sku_new.setSkuid_link(line_sku.getSkuid_link());
+					sku_new.setPcontract_poid_link(pcontract_poid_link);
 					
 					porderskuService.save(sku_new);
 				}
