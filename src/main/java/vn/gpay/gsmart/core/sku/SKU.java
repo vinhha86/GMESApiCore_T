@@ -417,7 +417,14 @@ public class SKU implements Serializable {
 //	}
 
 	public Long getUnitid_link() {
-		return unitid_link != null ? unitid_link :  product.getUnitid_link();
+		if (null!=unitid_link)
+			return unitid_link;
+		else {
+			if (null!=product)
+				return product.getUnitid_link();
+			else
+				return null;
+		}
 	}
 
 	public void setUnitid_link(Long unitid_link) {
