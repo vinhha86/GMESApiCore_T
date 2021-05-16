@@ -72,4 +72,10 @@ public class POrder_Product_SKU_Service extends AbstractService<POrder_Product_S
 		Integer qty = repo.get_qty_by_po_and_sku(pcontract_poid_link, skuid_link);
 		return qty == null ? 0 : qty;
 	}
+	@Override
+	public List<POrder_Product_SKU> getby_porderandsku_and_po(Long porderid_link, Long skuid_link,
+			Long pcontract_poid_link) {
+		// TODO Auto-generated method stub
+		return repo.getby_porderandsku_and_po(porderid_link, pcontract_poid_link, skuid_link);
+	}
 }

@@ -16,6 +16,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
@@ -50,6 +51,16 @@ public class POrder_Product_SKU implements Serializable {
 	@ManyToOne
     @JoinColumn(name="skuid_link",insertable=false,updatable =false)
     private SKU sku;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
+    private PContract_PO po;
+	
+	@Transient
+	public String getPo_buyer() {
+		return po.getPo_buyer();
+	}
 	
 	@Transient
 	public Integer getpquantity_ungranted() {

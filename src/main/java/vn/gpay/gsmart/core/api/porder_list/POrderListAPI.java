@@ -420,10 +420,10 @@ public class POrderListAPI {
 			// save to porder_sku
 			for(PContractProductSKU line_sku : entity.list_sku) {
 				//kiem tra sku co chua thi them vao khong thi chi cong so luong
-				List<POrder_Product_SKU> porder_skus = porderskuService.getby_porderandsku(porderid_link, line_sku.getSkuid_link());
+				List<POrder_Product_SKU> porder_skus = porderskuService.getby_porderandsku_and_po(porderid_link, line_sku.getSkuid_link(), pcontract_poid_link);
 				if(porder_skus.size()> 0) {
 					POrder_Product_SKU porder_sku = porder_skus.get(0);
-					porder_sku.setPquantity_total(porder_sku.getPquantity_total() + line_sku.getPquantity_production() + line_sku.getPquantity_sample());
+					porder_sku.setPquantity_total(porder_sku.getPquantity_total() + line_sku.getPquantity_total() - line_sku.getPquantity_lenhsx());
 					porderskuService.save(porder_sku);
 				}
 				else {

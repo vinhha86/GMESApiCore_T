@@ -8,6 +8,7 @@ public interface IPOrder_Product_SKU_Service extends Operations<POrder_Product_S
 	public List<POrder_Product_SKU> getby_productid_link(Long productid_link);
 
 	public List<POrder_Product_SKU> getby_porderandsku(Long porderid_link, Long skuid_link);
+	public List<POrder_Product_SKU> getby_porderandsku_and_po(Long porderid_link, Long skuid_link, Long pcontract_poid_link);
 
 	public List<POrder_Product_SKU> getby_porder(Long porderid_link);
 	
