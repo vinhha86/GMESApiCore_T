@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.pcontract.IPContractService;
 import vn.gpay.gsmart.core.pcontract.PContract;
-import vn.gpay.gsmart.core.pcontractproductsku.POLineSKU;
+import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
@@ -418,7 +418,7 @@ public class POrderListAPI {
 			Long pcontract_poid_link = entity.pcontract_poid_link;
 			
 			// save to porder_sku
-			for(POLineSKU line_sku : entity.list_sku) {
+			for(PContractProductSKU line_sku : entity.list_sku) {
 				//kiem tra sku co chua thi them vao khong thi chi cong so luong
 				List<POrder_Product_SKU> porder_skus = porderskuService.getby_porderandsku(porderid_link, line_sku.getSkuid_link());
 				if(porder_skus.size()> 0) {
@@ -432,7 +432,7 @@ public class POrderListAPI {
 					sku_new.setOrgrootid_link(orgrootid_link);
 					sku_new.setPorderid_link(porderid_link);
 					sku_new.setPquantity_granted(0);
-					sku_new.setPquantity_total(line_sku.getPquantity_production() + line_sku.getPquantity_sample());
+					sku_new.setPquantity_total(line_sku.getPquantity_total() - line_sku.getPquantity_lenhsx());
 					sku_new.setProductid_link(productid_link);
 					sku_new.setSkuid_link(line_sku.getSkuid_link());
 					sku_new.setPcontract_poid_link(pcontract_poid_link);

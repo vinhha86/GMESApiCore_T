@@ -29,6 +29,7 @@ import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
+import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.porder_product_sku.get_sku_by_porder_requets;
 import vn.gpay.gsmart.core.porder_product_sku.get_sku_by_porder_response;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -50,6 +51,7 @@ public class PContractskuAPI {
 	@Autowired IPContract_POService poService;
 	@Autowired IPOrderGrant_SKUService porderGrantSkuService;
 	@Autowired IPContract_bom2_npl_poline_sku_Service po_npl_sku_Service;
+	@Autowired IPOrder_Product_SKU_Service pordersku_Service;
 	
 	@RequestMapping(value = "/getbyporder",method = RequestMethod.POST)
 	public ResponseEntity<get_sku_by_porder_response> GetByPOrder
@@ -163,6 +165,11 @@ public class PContractskuAPI {
 			response.data = pskuservice.getlistsku_bypo_and_pcontract(orgrootid_link, pcontract_poid_link, pcontractid_link);
 			
 			//cap nhat lai so luong da phan lenh
+			for(PContractProductSKU p_sku : response.data) {
+				int pquantity_lenhsx = pordersku_Service.getPquantity_by_po_and_sku(pcontract_poid_link, p_sku.getSkuid_link());
+				p_sku.setPquantity_lenhsx(pquantity_lenhsx);
+			}
+			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 		}

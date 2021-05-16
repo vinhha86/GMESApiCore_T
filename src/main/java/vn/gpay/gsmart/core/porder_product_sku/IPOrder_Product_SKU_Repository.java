@@ -56,4 +56,11 @@ public interface IPOrder_Product_SKU_Repository extends JpaRepository<POrder_Pro
 	public List<Long> getvaluesize_in_product(
 			@Param ("porderid_link")final  long porderid_link, 
 			@Param ("attributeid_link")final long attributeid_link);
+	
+	@Query(value = "select sum(a.pquantity_total) from POrder_Product_SKU a "
+			+ "where a.pcontract_poid_link = :pcontract_poid_link "
+			+ " and a.skuid_link= :skuid_link")
+	public Integer get_qty_by_po_and_sku(
+			@Param ("pcontract_poid_link")final  long pcontract_poid_link, 
+			@Param ("skuid_link")final long skuid_link);
 }

@@ -66,4 +66,10 @@ public class POrder_Product_SKU_Service extends AbstractService<POrder_Product_S
 		// TODO Auto-generated method stub
 		return repo.getvaluesize_in_product(porderid_link, attributeid_link);
 	}
+	@Override
+	public int getPquantity_by_po_and_sku(Long pcontract_poid_link, Long skuid_link) {
+		// TODO Auto-generated method stub
+		Integer qty = repo.get_qty_by_po_and_sku(pcontract_poid_link, skuid_link);
+		return qty == null ? 0 : qty;
+	}
 }
