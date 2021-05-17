@@ -42,7 +42,6 @@ public class POrder_Product_SKU implements Serializable {
 	private Integer pquantity_sample;
 	private Integer pquantity_porder;
 	private Integer pquantity_total;
-	private Integer pquantity_granted;
 	private Integer pquantity_production;
 	private Long pcontract_poid_link;
 	
@@ -63,9 +62,8 @@ public class POrder_Product_SKU implements Serializable {
 	}
 	
 	@Transient
-	public Integer getpquantity_ungranted() {
-		return pquantity_total - pquantity_granted;
-	}
+	public Integer getpquantity_ungranted;
+	
 	@Transient
 	public int getSort_size() {
 		if(sku!=null)
@@ -279,12 +277,6 @@ public class POrder_Product_SKU implements Serializable {
 	public void setSku(SKU sku) {
 		this.sku = sku;
 	}
-	public Integer getPquantity_granted() {
-		return pquantity_granted;
-	}
-	public void setPquantity_granted(Integer pquantity_granted) {
-		this.pquantity_granted = pquantity_granted;
-	}
 	public Integer getPquantity_production() {
 		return pquantity_production;
 	}
@@ -296,6 +288,14 @@ public class POrder_Product_SKU implements Serializable {
 	}
 	public void setPcontract_poid_link(Long pcontract_poid_link) {
 		this.pcontract_poid_link = pcontract_poid_link;
+	}
+
+	public Integer getGetpquantity_ungranted() {
+		return getpquantity_ungranted;
+	}
+
+	public void setGetpquantity_ungranted(Integer getpquantity_ungranted) {
+		this.getpquantity_ungranted = getpquantity_ungranted;
 	}
 	
 }
