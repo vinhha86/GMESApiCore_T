@@ -265,7 +265,20 @@ public class SKU implements Serializable {
 		}
 		return null;
 	}
-	
+	@Transient
+	public String getProduct_color() {
+		if(product != null) {
+			return product.getTenMauNPL();
+		}
+		return null;
+	}
+	@Transient
+	public String getProduct_desc() {
+		if(product != null) {
+			return product.getDescription();
+		}
+		return null;
+	}
 	@Transient
 	public String getProduct_name() {
 		if(product!=null) {

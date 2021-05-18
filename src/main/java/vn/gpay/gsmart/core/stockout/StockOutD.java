@@ -8,7 +8,6 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -169,6 +168,27 @@ public class StockOutD implements Serializable {
 	public String getSkuname() {
 		if(sku!=null) {
 			return sku.getName();
+		}
+		return "";
+	}
+	@Transient
+	public String getSku_product_code() {
+		if(sku != null) {
+			return sku.getProduct_code();
+		}
+		return "";
+	}
+	@Transient
+	public String getSku_product_color() {
+		if(sku != null) {
+			return sku.getProduct_color();
+		}
+		return "";
+	}
+	@Transient
+	public String getSku_product_desc() {
+		if(sku != null) {
+			return sku.getProduct_desc();
 		}
 		return "";
 	}
