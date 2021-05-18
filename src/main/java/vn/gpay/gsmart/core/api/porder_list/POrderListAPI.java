@@ -357,8 +357,14 @@ public class POrderListAPI {
 	public ResponseEntity<POrderList_getProductSKUbyPorder_response> getAllProductSKUbyPorder(@RequestBody POrderList_getProductSKUbyPorder_request entity, HttpServletRequest request ) {
 		POrderList_getProductSKUbyPorder_response response = new POrderList_getProductSKUbyPorder_response();
 		try {
-			response.data = new ArrayList<POrder_Product_SKU>();
+			Long porderid_link = entity.porderid;
 			List<POrder_Product_SKU> porderProductSkus = porderskuService.getby_porder(entity.porderid);
+			
+			for(POrder_Product_SKU sku : porderProductSkus) {
+				Long skuid_link = sku.getSkuid_link();
+				Long pcontract_poid_link = sku.getPcontract_poid_link();
+				sku.setPquantity_granted(pordergrantskuService.porder_get_qty_grant(porderid_link, skuid_link, pcontract_poid_link));
+			}
 			
 			response.data = porderProductSkus;
 			
@@ -457,61 +463,54 @@ public class POrderListAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long orgrootid_link = user.getRootorgid_link();
 			Long pcontract_poid_link = entity.pcontract_poid_link;
-			
+			Long porderid_link = entity.idPOrder;
 			POrderGrant grant = pordergrantService.findOne(entity.idGrant);
-			POrder porder = porderService.findOne(entity.idPOrder);
+			POrder porder = porderService.findOne(porderid_link);
 			
 			// save to porder_grant_sku
 			for(POrder_Product_SKU pps : entity.porderSku) {
-				POrderGrant_SKU pgs = null;
-				
-//				pgs = pordergrantskuService.getPOrderGrant_SKUbySKUid_linkAndGrantId( pps.getSkuid_link(),  entity.idGrant);
-				pgs = pordergrantskuService.getPOrderGrant_SKUbySKUAndGrantAndPcontractPo(
+				POrderGrant_SKU pgs = pordergrantskuService.getPOrderGrant_SKUbySKUAndGrantAndPcontractPo(
 						pps.getSkuid_link(), entity.idGrant, pcontract_poid_link
 						);
 				
-				List<POrderGrant_SKU> listPorderGrantSku = pordergrantskuService.getByPContractPOAndSKU(
-						null, pps.getSkuid_link()
-						);
-				Integer granted = 0;
-				for(POrderGrant_SKU porderGrantSku : listPorderGrantSku) {
-					//tru grant hien tai ra con dau cong vao
-					if(!porderGrantSku.getPordergrantid_link().equals(entity.idGrant))
-						granted += porderGrantSku.getGrantamount();
-				}
+//				List<POrderGrant_SKU> listPorderGrantSku = pordergrantskuService.getByPContractPOAndSKU(
+//						null, pps.getSkuid_link()
+//						);
+//				Long skuid_link = pps.getSkuid_link();
+//				Integer granted = pordergrantskuService.porder_get_qty_grant(porderid_link, skuid_link, pcontract_poid_link);
+//				for(POrderGrant_SKU porderGrantSku : listPorderGrantSku) {
+//					//tru grant hien tai ra con dau cong vao
+//					if(!porderGrantSku.getPordergrantid_link().equals(entity.idGrant))
+//						granted += porderGrantSku.getGrantamount();
+//				}
 				
 				if(pgs == null) {
 					pgs = new POrderGrant_SKU();
-					pgs.setId(0L);
+					pgs.setId(null);
 					pgs.setOrgrootid_link(user.getRootorgid_link());
 					pgs.setPordergrantid_link(entity.idGrant);
 					pgs.setSkuid_link(pps.getSkuid_link());
-					pgs.setGrantamount(pps.getPquantity_total() - granted);
+					pgs.setGrantamount(pps.getPquantity_total());
 					pgs.setPcontract_poid_link(null);
 					pgs.setPcontract_poid_link(pcontract_poid_link);
 					pordergrantskuService.save(pgs);
 				}else {
-					pgs.setGrantamount(pgs.getGrantamount() + pps.getpquantity_ungranted);
+					pgs.setGrantamount(pps.getPquantity_total());
 					pordergrantskuService.save(pgs);
 				}
 			}
 			
 			// re-calculate porder_grant grant_amount
-			List<POrderGrant> pglist = pordergrantService.getByOrderId(entity.idPOrder);
-			
-			for(POrderGrant pg : pglist) {
-				Integer grantamountSum = 0;
-				
-				List<POrderGrant_SKU> pgslist = pordergrantskuService.getPOrderGrant_SKU(pg.getId());
-				for(POrderGrant_SKU pgs : pgslist) {
-					grantamountSum+=pgs.getGrantamount();
-				}
-				
-				//kiem tra xem so luong bang 0 hay khong. Neu bang = thi lay so luong ban dau
-				grantamountSum = grantamountSum == 0 ? pg.getTotalamount_tt() : grantamountSum;
-				pg.setGrantamount(grantamountSum);
-				pordergrantService.save(pg);
+			List<POrderGrant_SKU> pgslist = pordergrantskuService.getPOrderGrant_SKU(grant.getId());
+			int grantamountSum = 0;
+			for(POrderGrant_SKU pgs : pgslist) {
+				grantamountSum+=pgs.getGrantamount() == null ? 0 : pgs.getGrantamount();
 			}
+			
+			//kiem tra xem so luong bang 0 hay khong. Neu bang = thi lay so luong ban dau
+			grantamountSum = grantamountSum == 0 ? grant.getTotalamount_tt() : grantamountSum;
+			grant.setGrantamount(grantamountSum);
+			pordergrantService.save(grant);
 			
 			String name = "";
 			int total = grant.getGrantamount() == null ? 0 : grant.getGrantamount();

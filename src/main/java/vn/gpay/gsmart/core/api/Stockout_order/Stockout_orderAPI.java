@@ -262,21 +262,20 @@ public class Stockout_orderAPI {
 			Stockout_order order = stockout_order_Service.findOne(entity.id);
 			//Lay danh sach cac mau cua lenh
 			List<Stockout_order_coloramount> list_color_amount = amount_color_Service.getby_stockout_Order(entity.id);
+			list_color_amount.removeIf(c->c.getAmount().equals(0) || c.getAmount().equals(null));
 			//lay nhung npl cua detail
 			List<Stockout_order_d> list_detail = stockout_order_d_Service.getby_Stockout_order(entity.id);
 			
 			for(Stockout_order_d detail : list_detail) {
 				float amount_req = 0;
 				for(Stockout_order_coloramount color : list_color_amount) {
+					int amount = color.getAmount() == null ? 0 : color.getAmount();
 					List<POrderBOMSKU> list_bom_sku = bomskuService.getby_porder_and_material_and_sku_and_type(order.getPorderid_link(), 
 							detail.getMaterial_skuid_link(), color.getSkuid_link(), POrderBomType.CanDoi);
 					if(list_bom_sku.size() > 0) {
-						int amount = color.getAmount() == null ? 0 : color.getAmount();
-						if(amount> 0) {
-							float bom = list_bom_sku.get(0).getAmount() == null ? 0 : list_bom_sku.get(0).getAmount();
-							amount_req += amount * bom;
-						}
-					}
+						float bom = list_bom_sku.get(0).getAmount() == null ? 0 : list_bom_sku.get(0).getAmount();
+						amount_req += amount * bom;
+					}	
 				}
 				detail.setTotalyds((float)(amount_req * commonUnit.yardTomet));
 				detail.setTotalmet(amount_req);

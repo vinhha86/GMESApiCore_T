@@ -21,4 +21,5 @@ public interface IPOrderGrant_SKUService extends Operations<POrderGrant_SKU>{
 			);
 
 	String getProductionLines(Long pcontract_poid_link);
+	Integer porder_get_qty_grant(Long porderid_link, Long skuid_link,Long pcontract_poid_link);
 }

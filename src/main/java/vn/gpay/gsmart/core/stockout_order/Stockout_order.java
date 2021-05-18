@@ -89,11 +89,11 @@ public class Stockout_order implements Serializable {
     @JoinColumn(name="porderid_link",insertable=false,updatable =false)
     private POrder porder;
 	
-	@NotFound(action = NotFoundAction.IGNORE)
-	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
-	//@BatchSize(size=10)
-	@JoinColumn( name="stockoutorderid_link", referencedColumnName="id")
-	private List<Stockout_order_d>  stockout_order_d  = new ArrayList<Stockout_order_d>();
+//	@NotFound(action = NotFoundAction.IGNORE)
+//	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
+//	//@BatchSize(size=10)
+//	@JoinColumn( name="stockoutorderid_link", referencedColumnName="id")
+//	private List<Stockout_order_d>  stockout_order_d  = new ArrayList<Stockout_order_d>();
 	
 	@Transient
 	public String getUsercreate_name() {
@@ -256,13 +256,13 @@ public class Stockout_order implements Serializable {
 		this.orgrootid_link = orgrootid_link;
 	}
 
-	public List<Stockout_order_d> getStockout_order_d() {
-		return stockout_order_d;
-	}
-
-	public void setStockout_order_d(List<Stockout_order_d> stockout_order_d) {
-		this.stockout_order_d = stockout_order_d;
-	}
+//	public List<Stockout_order_d> getStockout_order_d() {
+//		return stockout_order_d;
+//	}
+//
+//	public void setStockout_order_d(List<Stockout_order_d> stockout_order_d) {
+//		this.stockout_order_d = stockout_order_d;
+//	}
 	
 	
 }

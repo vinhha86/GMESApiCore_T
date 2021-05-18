@@ -60,9 +60,8 @@ public class POrder_Product_SKU implements Serializable {
 	public String getPo_buyer() {
 		return po.getPo_buyer();
 	}
-	
 	@Transient
-	public Integer getpquantity_ungranted;
+	public Integer pquantity_granted;
 	
 	@Transient
 	public int getSort_size() {
@@ -290,12 +289,12 @@ public class POrder_Product_SKU implements Serializable {
 		this.pcontract_poid_link = pcontract_poid_link;
 	}
 
-	public Integer getGetpquantity_ungranted() {
-		return getpquantity_ungranted;
+	public Integer getPquantity_granted() {
+		return pquantity_granted;
 	}
 
-	public void setGetpquantity_ungranted(Integer getpquantity_ungranted) {
-		this.getpquantity_ungranted = getpquantity_ungranted;
+	public void setPquantity_granted(Integer pquantity_granted) {
+		this.pquantity_granted = pquantity_granted;
 	}
 	
 }

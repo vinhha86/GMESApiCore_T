@@ -95,4 +95,17 @@ public interface IPOrderGrant_SKURepository extends JpaRepository<POrderGrant_SK
 		public List<String>getlistco(
 				@Param ("porderid_link")final Long porderid_link
 				);
+	
+	@Query(value = "select sum(a.grantamount) from "
+			+ "POrderGrant_SKU a "
+			+ "inner join POrderGrant b on a.pordergrantid_link = b.id "
+			+ "where b.porderid_link = :porderid_link "
+			+ "and a.skuid_link = :skuid_link "
+			+ "and a.pcontract_poid_link = :pcontract_poid_link"
+			)
+		public Integer porder_get_qty_grant(
+				@Param ("porderid_link")final Long porderid_link,
+				@Param ("skuid_link")final Long skuid_link,
+				@Param ("pcontract_poid_link")final Long pcontract_poid_link
+				);
 }
