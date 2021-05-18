@@ -18,7 +18,8 @@ public interface IPContractProductSKURepository extends JpaRepository<PContractP
 			+ "where a.orgrootid_link = :orgrootid_link "
 			+ "and productid_link = :productid_link "
 			+ "and pcontractid_link = :pcontractid_link "
-			+ "group by a")
+			+ "group by a, b.sortvalue "
+			+ "order by b.sortvalue")
 	public List<PContractProductSKU> getlistsku_byproduct_and_pcontract(
 			@Param ("orgrootid_link")final  Long orgrootid_link,
 			@Param ("productid_link")final  long productid_link, 

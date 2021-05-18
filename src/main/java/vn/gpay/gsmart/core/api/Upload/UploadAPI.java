@@ -11,7 +11,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -373,14 +373,14 @@ public class UploadAPI {
 									
 								}
 								else if (s_shipdate != ""){
-									if(HSSFDateUtil.isCellDateFormatted(row.getCell(colNum))) {
+									if(DateUtil.isCellDateFormatted(row.getCell(colNum))) {
 										ShipDate = row.getCell(colNum).getDateCellValue();
 									}
 								}
 								
 							}
 							catch (Exception e) {
-								if(HSSFDateUtil.isCellDateFormatted(row.getCell(colNum))) {
+								if(DateUtil.isCellDateFormatted(row.getCell(colNum))) {
 									ShipDate = row.getCell(colNum).getDateCellValue();
 								}
 							}
@@ -415,14 +415,14 @@ public class UploadAPI {
 										
 									}
 									else if (s_shipdate2 != "") {
-										if(HSSFDateUtil.isCellDateFormatted(row.getCell(colNum))) {
+										if(DateUtil.isCellDateFormatted(row.getCell(colNum))) {
 											shipdate2 = row.getCell(colNum).getDateCellValue();
 										}
 									}
 									
 								}
 								catch (Exception e) {
-									if(HSSFDateUtil.isCellDateFormatted(row.getCell(colNum))) {
+									if(DateUtil.isCellDateFormatted(row.getCell(colNum))) {
 										shipdate2 = row.getCell(colNum).getDateCellValue();
 									}
 								}
@@ -500,14 +500,14 @@ public class UploadAPI {
 									
 								}
 								else {
-									if(HSSFDateUtil.isCellDateFormatted(row.getCell(ColumnTempNew.matdate))) {
+									if(DateUtil.isCellDateFormatted(row.getCell(ColumnTempNew.matdate))) {
 										matdate = row.getCell(ColumnTempNew.matdate).getDateCellValue();
 									}
 								}
 								
 							}
 							catch (Exception e) {
-								if(HSSFDateUtil.isCellDateFormatted(row.getCell(ColumnTempNew.matdate))) {
+								if(DateUtil.isCellDateFormatted(row.getCell(ColumnTempNew.matdate))) {
 									matdate = row.getCell(ColumnTempNew.matdate).getDateCellValue();
 								}
 							}
