@@ -433,6 +433,11 @@ public class PContractProductAPI {
 			String FolderPath = AtributeFixValues.folder_upload+"/product";
 			
 			for (PContractProduct pContractProduct : lst) {
+				if (null!=entity.ls_productid_link && entity.ls_productid_link.size() > 0){
+					if (!entity.ls_productid_link.contains(pContractProduct.getProductid_link())){
+						continue;
+					}
+				}
 				PContractProductBinding binding = new PContractProductBinding();
 				binding.setId(pContractProduct.getId());
 				binding.setOrgrootid_link(orgrootid_link);

@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import vn.gpay.gsmart.core.stockin.StockinLot;
+
 public class Jitin_Stockin_D_Data implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Long id;
@@ -45,10 +49,13 @@ public class Jitin_Stockin_D_Data implements Serializable {
     private Long sku_product_id;
     private String sku_product_code;
     private String sku_product_desc;
+    private String sku_product_color;
     private String size_name;
     private String stockinDLot;
 
     private List<Jitin_Stockin_PkList_Data> stockin_packinglist = new ArrayList<>();
+    @JsonIgnoreProperties
+    private List<Jitin_StockinLot>  stockin_lot  = new ArrayList<Jitin_StockinLot>();
 
 	public Long getId() {
 		return id;
@@ -360,6 +367,24 @@ public class Jitin_Stockin_D_Data implements Serializable {
 
 	public void setStockinDLot(String stockinDLot) {
 		this.stockinDLot = stockinDLot;
+	}
+
+
+
+	public List<Jitin_StockinLot> getStockin_lot() {
+		return stockin_lot;
+	}
+
+	public void setStockin_lot(List<Jitin_StockinLot> stockin_lot) {
+		this.stockin_lot = stockin_lot;
+	}
+
+	public String getSku_product_color() {
+		return sku_product_color;
+	}
+
+	public void setSku_product_color(String sku_product_color) {
+		this.sku_product_color = sku_product_color;
 	}
     
 }
