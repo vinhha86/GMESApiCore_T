@@ -125,7 +125,7 @@ public class POrderBomProduct implements Serializable {
 	@Transient
 	public String getTenMauNPL_product() {
 		if(sku !=null) {
-			return sku.getMauSanPham();
+			return sku.getMauSanPham_product();
 		}
 		return "";
 	}

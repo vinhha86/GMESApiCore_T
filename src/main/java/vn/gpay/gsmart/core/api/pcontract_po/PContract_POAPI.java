@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -387,14 +387,14 @@ public class PContract_POAPI {
 								
 							}
 							else {
-								if(HSSFDateUtil.isCellDateFormatted(row.getCell(ColumnTemplate.shipdate))) {
+								if(DateUtil.isCellDateFormatted(row.getCell(ColumnTemplate.shipdate))) {
 									ShipDate = row.getCell(ColumnTemplate.shipdate).getDateCellValue();
 								}
 							}
 							
 						}
 						catch (Exception e) {
-							if(HSSFDateUtil.isCellDateFormatted(row.getCell(ColumnTemplate.shipdate))) {
+							if(DateUtil.isCellDateFormatted(row.getCell(ColumnTemplate.shipdate))) {
 								ShipDate = row.getCell(ColumnTemplate.shipdate).getDateCellValue();
 							}
 						}
@@ -446,14 +446,14 @@ public class PContract_POAPI {
 								
 							}
 							else {
-								if(HSSFDateUtil.isCellDateFormatted(row.getCell(ColumnTemplate.matdate))) {
+								if(DateUtil.isCellDateFormatted(row.getCell(ColumnTemplate.matdate))) {
 									matdate = row.getCell(ColumnTemplate.matdate).getDateCellValue();
 								}
 							}
 							
 						}
 						catch (Exception e) {
-							if(HSSFDateUtil.isCellDateFormatted(row.getCell(ColumnTemplate.matdate))) {
+							if(DateUtil.isCellDateFormatted(row.getCell(ColumnTemplate.matdate))) {
 								matdate = row.getCell(ColumnTemplate.matdate).getDateCellValue();
 							}
 						}
@@ -1161,14 +1161,14 @@ public class PContract_POAPI {
 								
 							}
 							else {
-								if(HSSFDateUtil.isCellDateFormatted(row.getCell(ColumnPO.Shipdate))) {
+								if(DateUtil.isCellDateFormatted(row.getCell(ColumnPO.Shipdate))) {
 									ShipDate = row.getCell(ColumnPO.Shipdate).getDateCellValue();
 								}
 							}
 							
 						}
 						catch (Exception e) {
-							if(HSSFDateUtil.isCellDateFormatted(row.getCell(ColumnPO.Shipdate))) {
+							if(DateUtil.isCellDateFormatted(row.getCell(ColumnPO.Shipdate))) {
 								ShipDate = row.getCell(ColumnPO.Shipdate).getDateCellValue();
 							}
 						}
@@ -1869,8 +1869,8 @@ public class PContract_POAPI {
 			for (PContract_PO_Productivity pContract_PO_Productivity : list_productivity) {
 				if(pContract_PO_Productivity.getId() == null) {
 					pContract_PO_Productivity.setOrgrootid_link(orgrootid_link);
-					pContract_PO_Productivity.setPcontract_poid_link(pcontract_po.getId());
 				}
+				pContract_PO_Productivity.setPcontract_poid_link(pcontract_po.getId());
 				productivityService.save(pContract_PO_Productivity);
 			}
 			

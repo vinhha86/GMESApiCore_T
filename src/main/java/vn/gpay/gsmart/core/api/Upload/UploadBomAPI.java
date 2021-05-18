@@ -431,22 +431,22 @@ public class UploadBomAPI {
 										}
 									}
 									else {
-										List<Integer> type = new ArrayList<Integer>();
-										type.add(POType.PO_LINE_CONFIRMED);
-										
-										List<PContract_PO> list_po = poService.getby_pcontract_and_type_andproduct(pcontractid_link, type, productid_link);
-										for(PContract_PO po : list_po) {
-											List<PContract_bom2_npl_poline> po_npls = po_npl_Service.getby_po_and_npl(po.getId(), material_skuid_link);
-											if(po_npls.size() == 0) {
-												PContract_bom2_npl_poline po_npl = new PContract_bom2_npl_poline();
-												po_npl.setId(null);
-												po_npl.setNpl_skuid_link(material_skuid_link);
-												po_npl.setPcontract_poid_link(po.getId());
-												po_npl.setPcontractid_link(pcontractid_link);
-												
-												po_npl_Service.save(po_npl);
-											}
-										}
+//										List<Integer> type = new ArrayList<Integer>();
+//										type.add(POType.PO_LINE_CONFIRMED);
+//										
+//										List<PContract_PO> list_po = poService.getby_pcontract_and_type_andproduct(pcontractid_link, type, productid_link);
+//										for(PContract_PO po : list_po) {
+//											List<PContract_bom2_npl_poline> po_npls = po_npl_Service.getby_po_and_npl(po.getId(), material_skuid_link);
+//											if(po_npls.size() == 0) {
+//												PContract_bom2_npl_poline po_npl = new PContract_bom2_npl_poline();
+//												po_npl.setId(null);
+//												po_npl.setNpl_skuid_link(material_skuid_link);
+//												po_npl.setPcontract_poid_link(po.getId());
+//												po_npl.setPcontractid_link(pcontractid_link);
+//												
+//												po_npl_Service.save(po_npl);
+//											}
+//										}
 									}
 									
 									

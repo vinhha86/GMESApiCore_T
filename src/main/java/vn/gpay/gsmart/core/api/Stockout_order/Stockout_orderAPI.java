@@ -153,6 +153,22 @@ public class Stockout_orderAPI {
 		return new ResponseEntity<getby_id_response>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/delete", method = RequestMethod.POST)
+	public ResponseEntity<delete_stockout_order_response> Delete(HttpServletRequest request,
+			@RequestBody delete_stockout_order_request entity) {
+		delete_stockout_order_response response = new delete_stockout_order_response();
+		try {
+			stockout_order_Service.deleteById(entity.id);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<delete_stockout_order_response>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/update_stockout_orderd", method = RequestMethod.POST)
 	public ResponseEntity<update_stockout_orderd_response> StockoutOrderD(HttpServletRequest request,
 			@RequestBody update_stockout_orderd_request entity) {
@@ -254,8 +270,6 @@ public class Stockout_orderAPI {
 				for(Stockout_order_coloramount color : list_color_amount) {
 					List<POrderBOMSKU> list_bom_sku = bomskuService.getby_porder_and_material_and_sku_and_type(order.getPorderid_link(), 
 							detail.getMaterial_skuid_link(), color.getSkuid_link(), POrderBomType.CanDoi);
-//					List<PorderBomColor> list_bom_color = bomcolorService.getby_porder_and_material_and_color(order.getPorderid_link(), 
-//							detail.getMaterial_skuid_link(), color.getColorid_link());
 					if(list_bom_sku.size() > 0) {
 						int amount = color.getAmount() == null ? 0 : color.getAmount();
 						if(amount> 0) {
