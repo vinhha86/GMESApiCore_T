@@ -240,7 +240,7 @@ public class Stockout_orderAPI {
 				pkl.setTimecreate(new Date());
 				pkl.setUsercreateid_link(user.getId());
 				pkl.setWidth(wh.getWidth());
-				pkl.setYdsorigin((float)(wh.getMet()* commonUnit.yardTomet));
+				pkl.setYdsorigin((float)(wh.getMet()* commonUnit.metToyead));
 				
 				stockout_pkl_Service.save(pkl);
 			}
@@ -277,7 +277,7 @@ public class Stockout_orderAPI {
 						amount_req += amount * bom;
 					}	
 				}
-				detail.setTotalyds((float)(amount_req * commonUnit.yardTomet));
+				detail.setTotalyds((float)(amount_req * commonUnit.metToyead));
 				detail.setTotalmet(amount_req);
 				stockout_order_d_Service.save(detail);
 			}
