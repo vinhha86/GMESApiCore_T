@@ -14,9 +14,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 public interface IPOrderGrant_SKURepository extends JpaRepository<POrderGrant_SKU, Long>, JpaSpecificationExecutor<POrderGrant_SKU>{
-	@Query(value = "select a from POrderGrant_SKU a where a.pordergrantid_link = :pordergrantid_link "
+	@Query(value = "select a from POrderGrant_SKU a "
+			+ "where a.pordergrantid_link = :pordergrantid_link "
 			)
-	public List<POrderGrant_SKU>getPOrderGrant_SKU(@Param ("pordergrantid_link")final Long pordergrantid_link);
+	public List<POrderGrant_SKU>getPOrderGrant_SKU(
+			@Param ("pordergrantid_link")final Long pordergrantid_link);
+	
+	@Query(value = "select a from POrderGrant_SKU a "
+			+ "where a.pordergrantid_link = :pordergrantid_link "
+			+ "and pcontract_poid_link = :pcontract_poid_link"
+			)
+	public List<POrderGrant_SKU>getgrantsku_by_grant_and_po(
+			@Param ("pordergrantid_link")final Long pordergrantid_link,
+			@Param ("pcontract_poid_link")final Long pcontract_poid_link);
 	
 	@Query(value = "select distinct b.granttoorgid_link from POrderGrant_SKU a "
 			+ "inner join POrderGrant b on a.pordergrantid_link = b.id "

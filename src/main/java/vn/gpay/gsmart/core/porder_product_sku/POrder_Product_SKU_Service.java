@@ -78,4 +78,9 @@ public class POrder_Product_SKU_Service extends AbstractService<POrder_Product_S
 		// TODO Auto-generated method stub
 		return repo.getby_porderandsku_and_po(porderid_link, pcontract_poid_link, skuid_link);
 	}
+	@Override
+	public List<POrder_Product_SKU> getby_porder_and_po(Long porderid_link, Long pcontract_poid_link) {
+		// TODO Auto-generated method stub
+		return repo.getby_porder_and_po(porderid_link, pcontract_poid_link);
+	}
 }

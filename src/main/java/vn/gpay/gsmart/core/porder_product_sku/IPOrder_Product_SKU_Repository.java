@@ -29,7 +29,15 @@ public interface IPOrder_Product_SKU_Repository extends JpaRepository<POrder_Pro
 			@Param ("skuid_link")final  Long skuid_link);
 
 	@Query(value = "select c from POrder_Product_SKU c where porderid_link = :porderid_link")
-	public List<POrder_Product_SKU> getby_porder(@Param ("porderid_link")final  Long porderid_link);
+	public List<POrder_Product_SKU> getby_porder(
+			@Param ("porderid_link")final  Long porderid_link);
+	
+	@Query(value = "select c from POrder_Product_SKU c "
+			+ "where porderid_link = :porderid_link "
+			+ "and (c.pcontract_poid_link = :pcontract_poid_link or :pcontract_poid_link is null)")
+	public List<POrder_Product_SKU> getby_porder_and_po(
+			@Param ("porderid_link")final  Long porderid_link,
+			@Param ("pcontract_poid_link")final  Long pcontract_poid_link);
 	
 	@Query(value = "select c from POrder_Product_SKU c "
 			+ "where c.skuid_link = :skuid_link "

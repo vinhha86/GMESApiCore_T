@@ -324,6 +324,23 @@ public class POrderListAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/getgrantskubygrantid_and_po",method = RequestMethod.POST)
+	public ResponseEntity<getgrantsku_by_grant_po_response> getGrantSKUByGrantIdAndPO(@RequestBody getgrantsku_by_grant_po_request entity,
+			HttpServletRequest request ) {
+		getgrantsku_by_grant_po_response response = new getgrantsku_by_grant_po_response();
+		try {
+			response.data = pordergrantskuService.getGrantSKUByGrantAndPO(entity.pordergrantid_link, entity.pcontract_poid_link);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getgrantsku_by_grant_po_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<getgrantsku_by_grant_po_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@RequestMapping(value = "/getproductskubyporder",method = RequestMethod.POST)
 	public ResponseEntity<POrderList_getProductSKUbyPorder_response> getProductSKUbyPorder(@RequestBody POrderList_getProductSKUbyPorder_request entity, HttpServletRequest request ) {
 		POrderList_getProductSKUbyPorder_response response = new POrderList_getProductSKUbyPorder_response();
@@ -476,8 +493,8 @@ public class POrderListAPI {
 //				List<POrderGrant_SKU> listPorderGrantSku = pordergrantskuService.getByPContractPOAndSKU(
 //						null, pps.getSkuid_link()
 //						);
-//				Long skuid_link = pps.getSkuid_link();
-//				Integer granted = pordergrantskuService.porder_get_qty_grant(porderid_link, skuid_link, pcontract_poid_link);
+				Long skuid_link = pps.getSkuid_link();
+				Integer granted = pordergrantskuService.porder_get_qty_grant(porderid_link, skuid_link, pcontract_poid_link);
 //				for(POrderGrant_SKU porderGrantSku : listPorderGrantSku) {
 //					//tru grant hien tai ra con dau cong vao
 //					if(!porderGrantSku.getPordergrantid_link().equals(entity.idGrant))
@@ -490,12 +507,12 @@ public class POrderListAPI {
 					pgs.setOrgrootid_link(user.getRootorgid_link());
 					pgs.setPordergrantid_link(entity.idGrant);
 					pgs.setSkuid_link(pps.getSkuid_link());
-					pgs.setGrantamount(pps.getPquantity_total());
+					pgs.setGrantamount(pps.getPquantity_total() - granted);
 					pgs.setPcontract_poid_link(null);
 					pgs.setPcontract_poid_link(pcontract_poid_link);
 					pordergrantskuService.save(pgs);
 				}else {
-					pgs.setGrantamount(pps.getPquantity_total());
+					pgs.setGrantamount(pgs.getGrantamount() +  pps.getPquantity_total() - granted);
 					pordergrantskuService.save(pgs);
 				}
 			}

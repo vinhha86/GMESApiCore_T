@@ -92,6 +92,13 @@ public class POrderGrant_SKUService extends AbstractService<POrderGrant_SKU> imp
 	@Override
 	public Integer porder_get_qty_grant(Long porderid_link, Long skuid_link,Long pcontract_poid_link) {
 		// TODO Auto-generated method stub
-		return repo.porder_get_qty_grant(porderid_link, skuid_link, pcontract_poid_link);
+		Integer qty = repo.porder_get_qty_grant(porderid_link, skuid_link, pcontract_poid_link);
+		return qty == null ? 0 : qty;
+	}
+
+	@Override
+	public List<POrderGrant_SKU> getGrantSKUByGrantAndPO(Long pordergrantid_link, Long pcontract_poid_link) {
+		// TODO Auto-generated method stub
+		return repo.getgrantsku_by_grant_and_po(pordergrantid_link, pcontract_poid_link);
 	}
 }
