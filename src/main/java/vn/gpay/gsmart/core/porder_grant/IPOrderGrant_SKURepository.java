@@ -22,7 +22,7 @@ public interface IPOrderGrant_SKURepository extends JpaRepository<POrderGrant_SK
 	
 	@Query(value = "select a from POrderGrant_SKU a "
 			+ "where a.pordergrantid_link = :pordergrantid_link "
-			+ "and pcontract_poid_link = :pcontract_poid_link"
+			+ "and (pcontract_poid_link = :pcontract_poid_link or :pcontract_poid_link is null)"
 			)
 	public List<POrderGrant_SKU>getgrantsku_by_grant_and_po(
 			@Param ("pordergrantid_link")final Long pordergrantid_link,

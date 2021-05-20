@@ -639,33 +639,33 @@ public class POrderListAPI {
 			POrder porder = porderService.findOne(entity.idPOrder);
 			// save to porder_grant_sku
 			POrderGrant_SKU pordergrantsku = entity.data;
-			POrderGrant_SKU original = pordergrantskuService.findOne(pordergrantsku.getId());
 			
 			Long skuid_link = pordergrantsku.getSkuid_link();
 			
-			List<POrder_Product_SKU> porder_skus = porderskuService.getby_porderandsku(entity.idPOrder, skuid_link);
+			List<POrder_Product_SKU> porder_skus = porderskuService.getby_porderandsku_and_po(entity.idPOrder, skuid_link, pordergrantsku.getPcontract_poid_link());
 			POrder_Product_SKU porder_sku = porder_skus.get(0);
 			
 			List<POrderGrant_SKU> listPorderGrantSku = pordergrantskuService.getByPContractPOAndSKU(
-					null, porder_sku.getSkuid_link()
+					pordergrantsku.getPcontract_poid_link(), porder_sku.getSkuid_link()
 					);
+			//lay suong luong da phan vao to cua sku
 			Integer granted = 0;
 			for(POrderGrant_SKU porderGrantSku : listPorderGrantSku) {
 				if(!porderGrantSku.getPordergrantid_link().equals(grant.getId()))
 					granted += porderGrantSku.getGrantamount();
 			}
 			
-			Integer ungranted = porder_sku.getPquantity_total() - granted - pordergrantsku.getGrantamount();
+			Integer ungranted = porder_sku.getPquantity_total() - granted;
 			
 			
 			if(pordergrantsku.getGrantamount() == 0) {
-				// delete
-				System.out.println(pordergrantsku.getId());
 				pordergrantskuService.deleteById(pordergrantsku.getId());
 				response.setMessage("Xóa thành công");
 			}else {
-				if(ungranted < pordergrantsku.getGrantamount() - original.getGrantamount()) {
+				if(ungranted < pordergrantsku.getGrantamount()) {
 					response.setMessage("Vượt quá số lượng chưa vào chuyền");
+					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+					return new ResponseEntity<addskutogrant_response>(response,HttpStatus.OK);
 				}else {
 					pordergrantskuService.save(pordergrantsku);
 					

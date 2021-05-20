@@ -568,7 +568,14 @@ public class POrderAPI {
 			Long porderid_link = entity.porderid_link;
 			Long pcontract_poid_link = entity.pcontract_poid_link;
 			
-			response.data = porderskuService.getby_porder_and_po(porderid_link, pcontract_poid_link);
+			List<POrder_Product_SKU> list = porderskuService.getby_porder_and_po(porderid_link, pcontract_poid_link);
+			
+			for(POrder_Product_SKU sku: list) {
+				Long skuid_link = sku.getSkuid_link();
+				sku.setPquantity_granted(porderskuService.getPquantity_by_po_and_sku(sku.getPcontract_poid_link(), skuid_link));
+			}
+			
+			response.data = list;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<get_sku_by_porder_and_po_response>(response, HttpStatus.OK);
