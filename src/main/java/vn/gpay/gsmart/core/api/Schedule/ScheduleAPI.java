@@ -793,6 +793,7 @@ public class ScheduleAPI {
 				pgSKU.setSkuid_link(pSKU.getSkuid_link());
 				pgSKU.setGrantamount(pSKU.getPquantity_total());
 				pgSKU.setPordergrantid_link(pg.getId());
+				pgSKU.setPcontract_poid_link(pSKU.getPcontract_poid_link());
 				grantskuService.save(pgSKU);
 			}
 			

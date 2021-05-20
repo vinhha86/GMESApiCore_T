@@ -834,6 +834,7 @@ public class UploadAPI {
 										}
 									}
 									else {
+										//từ đợt thứ 2 thì ngày bắt đầu = ngày giao hàng đợt trước đó - 2
 										production_date_line = commonService.Date_Add_with_holiday(list_ngaygiao.get(i-1), -2, orgrootid_link);
 										production_day_line = commonService.getDuration(production_date_line, ngaygiao, orgrootid_link);
 										plan_linerequired_line = (float)productiondays_ns_line/(float)production_day_line;

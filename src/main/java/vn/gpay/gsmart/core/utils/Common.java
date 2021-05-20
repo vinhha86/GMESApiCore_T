@@ -682,6 +682,13 @@ public class Common  {
 					amount--;
 				}
 			}
+			
+			while(amount < 0) {
+				_date.add(Calendar.DATE, -1);
+				if(!check_dayoff(_date, orgrootid_link)) {
+					amount++;
+				}
+			}
 		}
 		
 		_date.set(Calendar.HOUR_OF_DAY, 0);
