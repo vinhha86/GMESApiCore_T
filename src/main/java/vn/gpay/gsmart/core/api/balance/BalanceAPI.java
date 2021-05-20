@@ -480,6 +480,7 @@ public class BalanceAPI {
 			} else {
 				SKUBalance_Data newSKUBalance = new SKUBalance_Data();
 				newSKUBalance.setMat_skuid_link(skubom.getMaterial_skuid_link());
+				newSKUBalance.setMat_sku_product_total(p_amount);
 				
 				newSKUBalance.setMat_sku_code(skubom.getMaterialCode());
 				newSKUBalance.setMat_sku_name(skubom.getMaterialCode());
