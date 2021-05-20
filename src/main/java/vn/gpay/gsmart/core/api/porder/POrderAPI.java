@@ -42,6 +42,7 @@ import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder.POrderBinding;
 import vn.gpay.gsmart.core.porder.POrderFilter;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_product.IPOrder_Product_Service;
 import vn.gpay.gsmart.core.porder_product.POrder_Product;
@@ -103,6 +104,8 @@ public class POrderAPI {
 	@Autowired private Common commonService;
 	@Autowired IGpayUserOrgService userOrgService;
 	@Autowired IPOrder_POLine_Service porder_line_Service;
+	@Autowired IPOrderGrant_SKUService grantskuService;
+	
     ObjectMapper mapper = new ObjectMapper();
 	
 	@RequestMapping(value = "/getone",method = RequestMethod.POST)
@@ -572,7 +575,7 @@ public class POrderAPI {
 			
 			for(POrder_Product_SKU sku: list) {
 				Long skuid_link = sku.getSkuid_link();
-				sku.setPquantity_granted(porderskuService.getPquantity_by_po_and_sku(sku.getPcontract_poid_link(), skuid_link));
+				sku.setPquantity_granted(grantskuService.porder_get_qty_grant(porderid_link, skuid_link, sku.getPcontract_poid_link()));
 			}
 			
 			response.data = list;
