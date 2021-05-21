@@ -6,9 +6,6 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import vn.gpay.gsmart.core.stockin.StockinLot;
-
 public class Jitin_Stockin_D_Data implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Long id;

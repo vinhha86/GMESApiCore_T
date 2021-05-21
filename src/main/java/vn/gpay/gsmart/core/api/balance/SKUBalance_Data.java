@@ -27,6 +27,7 @@ public class SKUBalance_Data implements Serializable {
 	private Float mat_sku_invoice;
 	private Date mat_sku_invoice_date;
 	private Float mat_sku_stockin;
+	private Float mat_sku_stockout_order;
 	private Float mat_sku_stockout;
 	private Float mat_sku_dif;
 	public Long getMat_skuid_link() {
@@ -136,6 +137,12 @@ public class SKUBalance_Data implements Serializable {
 	}
 	public void setMat_sku_product_total(Integer mat_sku_product_total) {
 		this.mat_sku_product_total = mat_sku_product_total;
+	}
+	public Float getMat_sku_stockout_order() {
+		return mat_sku_stockout_order;
+	}
+	public void setMat_sku_stockout_order(Float mat_sku_stockout_order) {
+		this.mat_sku_stockout_order = mat_sku_stockout_order;
 	}
 
 }

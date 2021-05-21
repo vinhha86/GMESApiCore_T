@@ -22,6 +22,9 @@ import vn.gpay.gsmart.core.api.pcontractproductbom.get_bom_by_product_response;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract.IPContractService;
+import vn.gpay.gsmart.core.pcontract_bom2_npl_poline.IPContract_bom2_npl_poline_Service;
+import vn.gpay.gsmart.core.pcontract_bom2_npl_poline.PContract_bom2_npl_poline;
+import vn.gpay.gsmart.core.pcontract_bom2_npl_poline_sku.IPContract_bom2_npl_poline_sku_Service;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontractbomsku.PContractBOM2SKU;
@@ -48,6 +51,9 @@ public class BalanceAPI {
 	@Autowired IPOrder_Product_SKU_Service pOrder_SKU_Service;
 	@Autowired IPOrder_Service porder_Service;
 	@Autowired IOrgService orgService;
+	
+	@Autowired IPContract_bom2_npl_poline_Service bomPOLine_Service;
+	@Autowired IPContract_bom2_npl_poline_sku_Service bomPOLine_SKU_Service;
 	
 	@RequestMapping(value = "/cal_balance_bypo", method = RequestMethod.POST)
 	public ResponseEntity<Balance_Response> cal_balance_bypo(HttpServletRequest request,
@@ -115,11 +121,12 @@ public class BalanceAPI {
 	@RequestMapping(value = "/cal_balance_bycontract", method = RequestMethod.POST)
 	public ResponseEntity<Balance_Response> cal_balance_bycontract_new(HttpServletRequest request,
 			@RequestBody Balance_Request entity) {
-//		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Balance_Response response = new Balance_Response();
 		try {
-			//Lay danh sách sku của pcontract (có SKU nghĩa là đã chốt)
-			List<PContractProductSKU> ls_Product_SKU = po_SKU_Service.getsumsku_bypcontract(entity.pcontractid_link);
+			//Lay danh sách sku của pcontract (có SKU nghĩa là đã chốt và có PO chi tiết)
+//			List<PContractProductSKU> ls_Product_SKU = po_SKU_Service.getsumsku_bypcontract(entity.pcontractid_link);
+			List<PContractProductSKU> ls_Product_SKU = po_SKU_Service.getlistsku_bypcontract(user.getRootorgid_link(),entity.pcontractid_link);
 			
 			List<Balance_Product_Data> ls_Product_Total = new ArrayList<Balance_Product_Data>();
 //			List<SKUBalance_Data> ls_SKUBalance_Total = new ArrayList<SKUBalance_Data>();
@@ -134,13 +141,15 @@ public class BalanceAPI {
 				}
 			}
 			
+			//Duyệt qua từng màu, cỡ của sản phẩm (SKU) để tính nhu cầu NPL cho màu, cỡ đó
 			List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
 			for (PContractProductSKU thePContractSKU: ls_Product_SKU){
-				SKU theProduct_SKU = skuService.findOne(thePContractSKU.getSkuid_link());
+//				SKU theProduct_SKU = skuService.findOne(thePContractSKU.getSkuid_link());
 				//Chỉ tính các sku của SP trong danh sách chọn
-				if (ls_productid.contains(theProduct_SKU.getProductid_link())){
-				
-					cal_demand_bysku(ls_SKUBalance, entity.pcontractid_link, theProduct_SKU.getId(), thePContractSKU.getPquantity_total());
+				if (ls_productid.contains(thePContractSKU.getProductid_link())){
+//					System.out.println(thePContractSKU.getProductcode() + "-" + thePContractSKU.getMauSanPham() + "-" + thePContractSKU.getCoSanPham()
+//					+ "-" + thePContractSKU.getPcontract_poid_link() + "-" + thePContractSKU.getPquantity_total());
+					cal_demand_bysku(ls_SKUBalance, entity.pcontractid_link,thePContractSKU.getPcontract_poid_link(), thePContractSKU.getProductid_link(), thePContractSKU.getSkuid_link(), thePContractSKU.getPquantity_total());
 					
 //					ls_SKUBalance_Total.addAll(ls_SKUBalance);
 //		            ls_Product_Total.addAll(ls_Product);
@@ -254,7 +263,7 @@ public class BalanceAPI {
 				List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
 				for (POrder_Product_SKU thePContractSKU: ls_Product_SKU){
 					SKU theProduct_SKU = skuService.findOne(thePContractSKU.getSkuid_link());
-					cal_demand_bysku(ls_SKUBalance, thePorder.getPcontractid_link(), theProduct_SKU.getId(), thePContractSKU.getPquantity_total());
+					cal_demand_bysku(ls_SKUBalance, thePorder.getPcontractid_link(), thePorder.getPcontract_poid_link(), thePorder.getProductid_link(), theProduct_SKU.getId(), thePContractSKU.getPquantity_total());
 				}
 				
 				//3. Tinh toan can doi cho tung nguyen phu lieu trong BOM
@@ -460,10 +469,32 @@ public class BalanceAPI {
 			}
 		}
 	}
-	private void cal_demand_bysku(List<SKUBalance_Data> ls_SKUBalance, Long pcontractid_link, Long skuid_link, Integer p_amount){
+	private void cal_demand_bysku(List<SKUBalance_Data> ls_SKUBalance, 
+			Long pcontractid_link, 
+			Long pcontract_poid_link, 
+			Long productid_link, 
+			Long product_skuid_link, 
+			Integer p_amount){
 	
-		List<PContractBOM2SKU> bom_response = bom2Service.getBOM_By_PContractSKU(pcontractid_link, skuid_link);
+		List<PContractBOM2SKU> bom_response = bom2Service.getBOM_By_PContractSKU(pcontractid_link, product_skuid_link);
 		for (PContractBOM2SKU skubom:bom_response){
+			//Kiểm tra xem NPL có trong danh sách giới hạn PO không (pcontract_bom2_npl_poline)?
+			//Nếu có, kiểm tra tiếp xem có giới hạn áp dụng cụ thể cho từng product_sku ko? SL áp dụng là bao nhiêu
+			List<PContract_bom2_npl_poline> ls_poline = bomPOLine_Service.getby_product_and_npl(productid_link, pcontractid_link, skubom.getMaterial_skuid_link());
+			if (ls_poline.size() > 0){
+				boolean isfound = false;
+				//Check nếu poline gửi vào ko có trong danh sách --> Bỏ qua NPL này
+				for(PContract_bom2_npl_poline thebom_poline: ls_poline){
+					if (pcontract_poid_link.equals(thebom_poline.getPcontract_poid_link())){
+						isfound = true;
+						//Kiem tra tiep xem có giới hạn sâu hơn trong pcontract_bom2_npl_poline_sku ko?
+						
+					}
+				}
+				//Bo qua NPL
+				if (!isfound) continue;
+			}
+			
 			SKUBalance_Data theSKUBalance = ls_SKUBalance.stream().filter(sku -> sku.getMat_skuid_link().equals(skubom.getMaterial_skuid_link())).findAny().orElse(null);
 			if (null!=theSKUBalance){
 				//Tinh tong dinh muc
@@ -471,7 +502,7 @@ public class BalanceAPI {
 				Float f_lost = (f_skudemand*skubom.getLost_ratio())/100;
 				
 				theSKUBalance.setMat_sku_demand(theSKUBalance.getMat_sku_demand() + f_skudemand + f_lost);
-				
+				theSKUBalance.setMat_sku_product_total(theSKUBalance.getMat_sku_product_total() + p_amount);
 //				System.out.println("p_sku:" + skuid_link.toString() + "-" + p_amount + 
 //						"/Amount:" + skubom.getAmount() + 
 //						"/Lost:" + skubom.getLost_ratio() + 
