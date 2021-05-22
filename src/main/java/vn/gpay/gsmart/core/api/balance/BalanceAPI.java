@@ -91,6 +91,7 @@ public class BalanceAPI {
 								thePO.getPcontractid_link(),
 								null,
 								thePO.getId(),
+								null,
 								mat_sku,
 								request.getHeader("Authorization"),
 								latch);
@@ -163,6 +164,7 @@ public class BalanceAPI {
 				Balance_SKU theBalance =  new Balance_SKU(
 						ls_SKUBalance,
 						entity.pcontractid_link,
+						null,
 						null,
 						null,
 						mat_sku,
@@ -255,15 +257,16 @@ public class BalanceAPI {
 			POrder thePorder =  porder_Service.findOne(entity.porderid_link);
 			if (null!=thePorder){
 				//Lay danh sách sku của porder
-				List<POrder_Product_SKU> ls_Product_SKU = pOrder_SKU_Service.getsumsku_byporder(entity.porderid_link);
+//				List<POrder_Product_SKU> ls_Product_SKU = pOrder_SKU_Service.getsumsku_byporder(entity.porderid_link);
+				List<POrder_Product_SKU> ls_Product_SKU = pOrder_SKU_Service.getlist_sku_in_porder(user.getRootorgid_link(), entity.porderid_link);
 				
 				
 				List<Balance_Product_Data> ls_Product_Total = new ArrayList<Balance_Product_Data>();
 				
 				List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
 				for (POrder_Product_SKU thePContractSKU: ls_Product_SKU){
-					SKU theProduct_SKU = skuService.findOne(thePContractSKU.getSkuid_link());
-					cal_demand_bysku(ls_SKUBalance, thePorder.getPcontractid_link(), thePorder.getPcontract_poid_link(), thePorder.getProductid_link(), theProduct_SKU.getId(), thePContractSKU.getPquantity_total());
+//					SKU theProduct_SKU = skuService.findOne(thePContractSKU.getSkuid_link());
+					cal_demand_bysku(ls_SKUBalance, thePorder.getPcontractid_link(), thePorder.getPcontract_poid_link(), thePorder.getProductid_link(), thePContractSKU.getSkuid_link(), thePContractSKU.getPquantity_total());
 				}
 				
 				//3. Tinh toan can doi cho tung nguyen phu lieu trong BOM
@@ -279,6 +282,7 @@ public class BalanceAPI {
 							thePorder.getPcontractid_link(),
 							theStock.getId(),
 							null,
+							thePorder.getId(),
 							mat_sku,
 							request.getHeader("Authorization"),
 							latch);
