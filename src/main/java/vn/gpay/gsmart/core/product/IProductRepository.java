@@ -33,6 +33,20 @@ public interface IProductRepository extends JpaRepository<Product, Long>, JpaSpe
 			@Param ("code")final  String code,
 			@Param ("producttypeid_link")final  int producttypeid_link);
 	
+	@Query(value = "select c from Product c "
+			+ "where c.orgrootid_link = :orgrootid_link "
+			+ "and c.status = 1 "
+			+ "and (:code is not null or :code is null) "
+			+ "and (:name is not null or :name is null) "
+			+ "and producttypeid_link >= :producttypeid_link_from "
+			+ "and producttypeid_link <= :producttypeid_link_to")
+	public List<Product> get_product_by_type(
+			@Param ("orgrootid_link")final  Long orgrootid_link,
+			@Param ("name")final  String name,
+			@Param ("code")final  String code,
+			@Param ("producttypeid_link_from")final  int producttypeid_link_from,
+			@Param ("producttypeid_link_to")final  int producttypeid_link_to);
+	
 	@Query(value = "select c from Product c where c.producttypeid_link >9 and c.producttypeid_link<20 and c.status = 1")
 	public Page<Product> getall_products(@Nullable Specification<Product> spec, Pageable pageable);
 	

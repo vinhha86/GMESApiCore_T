@@ -68,4 +68,13 @@ public class SKU_AttributeValue_Service extends AbstractService<SKU_Attribute_Va
 		return repo.get_bycolorid_link(productid_link, pcontractid_link, colorid_link);
 	}
 
+	@Override
+	public long get_npl_sku_byproduct_and_valuemau_valueco(long productid_link, long valuemau, long valueco) {
+		// TODO Auto-generated method stub
+		List<Long> list = repo.get_npl_skuid_by_valueMau_and_valueCo(valuemau, valueco, productid_link);
+		if(list.size() >0)
+			return list.get(0);
+		return 0;
+	}
+
 }

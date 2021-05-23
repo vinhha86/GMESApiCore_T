@@ -49,6 +49,18 @@ public interface ISKU_AttValue_Repository extends JpaRepository<SKU_Attribute_Va
 			@Param ("value_co")final  Long value_co,
 			@Param ("productid_link")final  Long productid_link);
 	
+	@Query(value = "select c.skuid_link from SKU_Attribute_Value c "
+			+ "inner join SKU d on c.skuid_link = d.id "
+			+ "where ((c.attributeid_link = 4 and c.attributevalueid_link = :value_mau) "
+			+ "or (c.attributeid_link = 36 and c.attributevalueid_link = :value_co)) "
+			+ "and d.productid_link = :productid_link "
+			+ "group by c.skuid_link "
+			+ "having count(c.skuid_link) = 2")
+	public List<Long> get_npl_skuid_by_valueMau_and_valueCo(
+			@Param ("value_mau")final  Long value_mau,
+			@Param ("value_co")final  Long value_co,
+			@Param ("productid_link")final  Long productid_link);
+	
 	@Query(value = "select c from SKU_Attribute_Value c "
 			+ "where skuid_link = :skuid_link")
 	public List<SKU_Attribute_Value> getby_skuid_link(

@@ -17,4 +17,6 @@ public interface ISKU_AttributeValue_Service extends Operations<SKU_Attribute_Va
 	public long getsku_byproduct_and_valuemau_valueco(long productid_link, long valuemau, long valueco);
 	
 	public List<SKU_Attribute_Value> get_bycolor(long pcontractid_link, long productid_link, long colorid_link);
+	
+	public long get_npl_sku_byproduct_and_valuemau_valueco(long productid_link, long valuemau, long valueco);
 }	

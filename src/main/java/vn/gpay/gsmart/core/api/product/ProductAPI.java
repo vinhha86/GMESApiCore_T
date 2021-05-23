@@ -285,8 +285,8 @@ public class ProductAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
 					.getPrincipal();
-			Page<Product> pProduct = productService.getall_mainmaterials(user.getRootorgid_link(), entity);
-			List<Product> lstproduct = pProduct.getContent();
+//			Page<Product> pProduct = productService.getall_mainmaterials(user.getRootorgid_link(), entity);
+			List<Product> lstproduct = productService.getall_materials(user.getRootorgid_link(), entity);
 			List<ProductBinding> lstdata = new ArrayList<>();
 			String FolderPath = AtributeFixValues.folder_upload+"/material";
 			
@@ -311,7 +311,6 @@ public class ProductAPI {
 			}
 			
 			response.pagedata = lstdata;
-			response.totalCount = pProduct.getTotalElements();
 			response.data = productService.getall_by_orgrootid(user.getRootorgid_link(),
 					entity.product_type);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -227,9 +226,13 @@ public class ProductService extends AbstractService<Product> implements IProduct
 		String code = request.code;
 		Specification<Product> specification = Specifications.<Product>and()
 //	            .eq("product_type", request.product_type)
-				.eq("status", 1).eq("orgrootid_link", orgrootid_link)
+				.eq("status", 1)
+				.eq("orgrootid_link", orgrootid_link)
 				.like(name != "" && name != null, "name", "%" + name + "%")
-				.like(code != "" && code != null, "code", "%" + code + "%").eq("producttypeid_link", 20).build();
+				.like(code != "" && code != null, "code", "%" + code + "%")
+				.ge("producttypeid_link", 20)
+				.le("producttypeid_link", 29)
+				.build();
 		Sort sort = Sorts.builder().asc("name").build();
 
 		Page<Product> lst = repo.findAll(specification, PageRequest.of(request.page - 1, request.limit, sort));
@@ -288,15 +291,10 @@ public class ProductService extends AbstractService<Product> implements IProduct
 	@Override
 	public List<Product> getall_materials(Long orgrootid_link, Product_getall_request request) {
 		// TODO Auto-generated method stub
-		String name = request.name;
-		String code = request.code;
-		Specification<Product> specification = Specifications.<Product>and()
-				.eq(Objects.nonNull(request.product_type), "product_type", request.product_type).eq("status", 1)
-				.eq("orgrootid_link", orgrootid_link).like(name != "" && name != null, "name", "%" + name + "%")
-				.like(code != "" && code != null, "code", "%" + code + "%").between("producttypeid_link", 20, 29)
-				.build();
+		String name = request.name.equals("") ? null : request.name;
+		String code = request.code.equals("") ? null : request.code;
 
-		List<Product> lst = repo.findAll(specification);
+		List<Product> lst = repo.get_product_by_type(orgrootid_link, name, code, vn.gpay.gsmart.core.utils.ProductType.SKU_TYPE_MATERIAL_MIN, vn.gpay.gsmart.core.utils.ProductType.SKU_TYPE_MATERIAL_MAX);
 //		List<Product> lst = repo.findAllIgnoreCase(specification);
 		return lst;
 	}

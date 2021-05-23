@@ -80,7 +80,7 @@ public class SKU_Attribute_Value implements Serializable {
 	@Transient
 	public int getSort_Size() {
 		if(attributevalue!=null)
-			return attributevalue.getSortvalue();
+			return attributevalue.getSortvalue() == null ? 0 : attributevalue.getSortvalue();
 		return 0;
 	}
 	@Transient
