@@ -148,8 +148,8 @@ public class BalanceAPI {
 //				SKU theProduct_SKU = skuService.findOne(thePContractSKU.getSkuid_link());
 				//Chỉ tính các sku của SP trong danh sách chọn
 				if (ls_productid.contains(thePContractSKU.getProductid_link())){
-//					System.out.println(thePContractSKU.getProductcode() + "-" + thePContractSKU.getMauSanPham() + "-" + thePContractSKU.getCoSanPham()
-//					+ "-" + thePContractSKU.getPcontract_poid_link() + "-" + thePContractSKU.getPquantity_total());
+					System.out.println(thePContractSKU.getProductcode() + "-" + thePContractSKU.getMauSanPham() + "-" + thePContractSKU.getCoSanPham()
+					+ "-" + thePContractSKU.getPcontract_poid_link() + "-" + thePContractSKU.getPquantity_total());
 					cal_demand_bysku(ls_SKUBalance, entity.pcontractid_link,thePContractSKU.getPcontract_poid_link(), thePContractSKU.getProductid_link(), thePContractSKU.getSkuid_link(), thePContractSKU.getPquantity_total());
 					
 //					ls_SKUBalance_Total.addAll(ls_SKUBalance);
@@ -482,6 +482,9 @@ public class BalanceAPI {
 	
 		List<PContractBOM2SKU> bom_response = bom2Service.getBOM_By_PContractSKU(pcontractid_link, product_skuid_link);
 		for (PContractBOM2SKU skubom:bom_response){
+			if (skubom.getMaterialCode().contains("CXI55020")){
+				System.out.println(skubom.getMaterial_skuid_link() + "/" + skubom.getMaterialCode() + "-" + p_amount);
+			}
 			//Kiểm tra xem NPL có trong danh sách giới hạn PO không (pcontract_bom2_npl_poline)?
 			//Nếu có, kiểm tra tiếp xem có giới hạn áp dụng cụ thể cho từng product_sku ko? SL áp dụng là bao nhiêu
 			List<PContract_bom2_npl_poline> ls_poline = bomPOLine_Service.getby_product_and_npl(productid_link, pcontractid_link, skubom.getMaterial_skuid_link());

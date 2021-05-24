@@ -225,8 +225,10 @@ public class SKU implements Serializable {
 				break;
 			}
 			else if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) {
-				name = product.getCoKho();
-				name = name.equals("ALL") ? "" : name;
+				if (null!=product){
+					name = product.getCoKho();
+					name = name.equals("ALL") ? "" : name;
+				}
 				break;
 			}
 			else if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_TEX) {
@@ -314,7 +316,10 @@ public class SKU implements Serializable {
 	
 	@Transient
 	public String getPartnercode_product() {
-		return product.getPartnercode();
+		if(product != null)
+			return product.getPartnercode();
+		else
+			return null;
 	}
 	
 	@Transient
