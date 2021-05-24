@@ -1263,9 +1263,8 @@ public class PContract_POAPI {
 									
 									pcontractpoid_link = po_new.getId();
 									
-									//Thêm màu cỡ vào PO
-									//Kiem tra mau 
-									
+									//khi tim thay po moi thi de lai so luong ve 0 
+									amount_po = 0;
 								}
 								else {
 									pcontractpoid_link = list_po.get(0).getId();

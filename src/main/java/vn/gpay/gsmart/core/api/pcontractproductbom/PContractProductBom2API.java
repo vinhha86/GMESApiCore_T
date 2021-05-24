@@ -837,7 +837,7 @@ public class PContractProductBom2API {
 				for(Long colorid : list_colorid) {
 					Map<String, String> map = new HashMap<String, String>();
 										
-					map.put("coKho", pContractProductBom.getCoKho()+"");
+					map.put("coKho", pContractProductBom.getCoKho().replace("ALL, ", "").replace(", ALL", "").replace("ALL", "")+"");
 					
 					map.put("createddate", pContractProductBom.getCreateddate()+"");
 					
@@ -874,6 +874,8 @@ public class PContractProductBom2API {
 					map.put("unitid_link", "0"+pContractProductBom.getUnitid_link());
 					
 					map.put("colorid_link", "0"+colorid);
+					
+					map.put("nhacungcap", "0"+pContractProductBom.getNhaCungCap());
 					
 					map.put("po_line", str_po);
 					
