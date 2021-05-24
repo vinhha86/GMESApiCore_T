@@ -1132,6 +1132,7 @@ public class PContract_POAPI {
 				// Kiem tra header
 				int rowNum = 1;
 				int colNum = 0;
+				int amount_po = 0;
 				String mes_err = "";
 				Row rowheader = sheet.getRow(0);
 				Row row = sheet.getRow(rowNum);
@@ -1241,7 +1242,6 @@ public class PContract_POAPI {
 								String s_po  = Line.equals("") ? PO_No : PO_No+"-"+Line;
 								List<PContract_PO> list_po = pcontract_POService.check_exist_po_children(s_po, ShipDate, shipmodeid_link, pcontractid_link, parentid_link);
 
-								int amount_po = 0;
 								if(list_po.size() == 0) {
 									
 									PContract_PO po_new = new PContract_PO();
@@ -1300,6 +1300,7 @@ public class PContract_POAPI {
 								s_sizename = s_sizename.equals("0") ? "" : s_sizename;
 								while (!s_sizename.equals("")) {
 									colNum = columnsize;
+									//han che viec de qua nhieu cot co thi khong xu ly nua
 									if(colNum == 50) break;
 									
 									Long sizeid_link = null;
@@ -1500,7 +1501,6 @@ public class PContract_POAPI {
 											}
 										}
 									}
-									
 									
 									columnsize++;
 									
