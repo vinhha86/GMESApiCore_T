@@ -875,7 +875,7 @@ public class PContractProductBom2API {
 					
 					map.put("colorid_link", "0"+colorid);
 					
-					map.put("nhacungcap", "0"+pContractProductBom.getNhaCungCap());
+					map.put("nhacungcap", pContractProductBom.getNhaCungCap());
 					
 					map.put("po_line", str_po);
 					
