@@ -332,4 +332,10 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		// TODO Auto-generated method stub
 		return repo.getby_pcontract_and_type_and_product(type, pcontractid_link, productid_link);
 	}
+
+	@Override
+	public List<PContract_PO> getpo_byid(Long pcontractpoid_link) {
+		// TODO Auto-generated method stub
+		return repo.getbyId(pcontractpoid_link);
+	}
 }

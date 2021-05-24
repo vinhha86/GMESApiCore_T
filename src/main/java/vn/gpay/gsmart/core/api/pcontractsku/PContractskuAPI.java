@@ -232,18 +232,26 @@ public class PContractskuAPI {
 		PContractSKU_update_response response = new PContractSKU_update_response();
 		try {
 			PContractProductSKU sku = entity.data;
-			if(entity.isupdte_amount) {
-				sku.setPquantity_production(commonService.Calculate_pquantity_production(sku.getPquantity_porder()));
-				sku.setPquantity_total(sku.getPquantity_production() + sku.getPquantity_sample());
+			//kiem tra po co ton tai haykhong roi moi update vao db
+			List<PContract_PO> pos = poService.getpo_byid(sku.getPcontract_poid_link());
+			if(pos.size() > 0) {
+				if(entity.isupdte_amount) {
+					sku.setPquantity_production(commonService.Calculate_pquantity_production(sku.getPquantity_porder()));
+					sku.setPquantity_total(sku.getPquantity_production() + sku.getPquantity_sample());
+				}
+				sku = pskuservice.save(sku);
+				response.amount = sku.getPquantity_production();
+				
+				PContract_PO po = pos.get(0);
+				response.checkamount = po.getCheckamount();
+				
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			}
-			sku = pskuservice.save(sku);
-			response.amount = sku.getPquantity_production();
-			
-			PContract_PO po = poService.findOne(sku.getPcontract_poid_link());
-			response.checkamount = po.getCheckamount();
-			
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			else {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage("PO không tồn tại");
+			}
 		}
 		catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);

@@ -47,4 +47,5 @@ public interface IPContract_POService extends Operations<PContract_PO> {
 	List<PContractPO_Shipping> get_po_shipping(List<Long> orgs, int po_type, Date shipdate_from, Date shipdate_to, Long orgrootid_link);
 	List<PContract_PO> getbycode_and_type_and_product(String po_no, int type, Long pcontractid_link, Long productid_link);
 	List<PContract_PO> getpo_notin_list(List<String> list_po, int type, Long pcontractid_link);
+	List<PContract_PO> getpo_byid(Long pcontractpoid_link);
 }

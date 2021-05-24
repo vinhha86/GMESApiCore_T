@@ -26,6 +26,11 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			@Param ("userid_link")final  Long userid_link);
 	
 	@Query(value = "select c from PContract_PO c "
+			+ "where id = :pcontractpoid_link")
+	public List<PContract_PO> getbyId(
+			@Param ("pcontractpoid_link")final  Long pcontractpoid_link);
+	
+	@Query(value = "select c from PContract_PO c "
 			+ "where c.orgrootid_link = :orgrootid_link "
 			+ "and c.parentpoid_link = null "
 			+ "and c.pcontractid_link = :pcontractid_link "
