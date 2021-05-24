@@ -2089,6 +2089,12 @@ public class PContract_POAPI {
 				pcontract_POService.save(line);
 			}
 			
+			//Xoa SKU cua po 
+			List<PContractProductSKU> list_sku = ppskuService.getlistsku_bypo(pcontract_poid_link);
+			for(PContractProductSKU sku : list_sku) {
+				ppskuService.delete(sku);
+			}
+			
 			//Cap nhat trang thai cua chao gia
 			PContract_PO offer = pcontract_POService.findOne(pcontract_poid_link);
 			offer.setStatus(POStatus.PO_STATUS_UNCONFIRM);
