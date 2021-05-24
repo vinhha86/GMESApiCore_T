@@ -76,7 +76,7 @@ public class PContractProduct implements Serializable {/**
 	@Transient
 	public String getProductName() {
 		if(product!=null) {
-			return product.getName();
+			return product.getBuyername();
 		}
 		return "";
 	}
@@ -84,7 +84,7 @@ public class PContractProduct implements Serializable {/**
 	@Transient
 	public String getProductCode() {
 		if(product!=null) {
-			return product.getCode();
+			return product.getBuyercode();
 		}
 		return "";
 	}
