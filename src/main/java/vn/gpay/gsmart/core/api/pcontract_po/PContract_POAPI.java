@@ -1272,7 +1272,7 @@ public class PContract_POAPI {
 									PContract_PO po = list_po.get(0);
 									po.setStatus(POStatus.PO_STATUS_CONFIRMED);
 									
-									amount_po = po.getPo_quantity();
+//									amount_po = po.getPo_quantity();
 								}
 								
 								Long colorid_link = null;
