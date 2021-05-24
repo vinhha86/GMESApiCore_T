@@ -279,7 +279,7 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			+ "inner join PContractProductSKU a on c.id = a.pcontract_poid_link "
 			+ "where (lower(c.po_buyer) = lower(concat(:po_code)) "
 			+ "and po_typeid_link = :type) "
-			+ "and pcontractid_link = :pcontractid_link "
+			+ "and c.pcontractid_link = :pcontractid_link "
 			+ "and a.productid_link = :productid_link"
 			)
 	public List<PContract_PO> getbycode_and_type_and_product(
