@@ -52,15 +52,6 @@ public class Stockout_order_d implements Serializable {
 	private Date lasttimeupdate;
 	private Float totalmet;
 	private Float totalmetcheck;
-	private Integer roll_request;
-	
-	public Integer getRoll_request() {
-		return roll_request;
-	}
-
-	public void setRoll_request(Integer roll_request) {
-		this.roll_request = roll_request;
-	}
 
 	@Transient
 	private String data_spaces; //  danh sách khoang
