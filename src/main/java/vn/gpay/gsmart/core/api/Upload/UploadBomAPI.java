@@ -339,12 +339,14 @@ public class UploadBomAPI {
 											
 											if(attribute.getId() == AtributeFixValues.ATTR_COLOR) {
 												//them mau npl
-												pav.setId(null);
-												pav.setProductid_link(npl_id);
-												pav.setAttributeid_link(attribute.getId());
-												pav.setAttributevalueid_link(colorid_link);
-												pav.setOrgrootid_link(user.getRootorgid_link());
-												pavService.save(pav);
+												if(npl_colorid_link != AtributeFixValues.value_color_all) {
+													pav.setId(null);
+													pav.setProductid_link(npl_id);
+													pav.setAttributeid_link(attribute.getId());
+													pav.setAttributevalueid_link(npl_colorid_link);
+													pav.setOrgrootid_link(user.getRootorgid_link());
+													pavService.save(pav);
+												}
 												
 												//them mau all
 												ProductAttributeValue pav_mauall = new ProductAttributeValue();
@@ -357,12 +359,14 @@ public class UploadBomAPI {
 											}
 											else if(attribute.getId() == AtributeFixValues.ATTR_SIZEWIDTH) {
 												//them co kho npl
-												pav.setId(null);
-												pav.setProductid_link(npl_id);
-												pav.setAttributeid_link(attribute.getId());
-												pav.setAttributevalueid_link(sizewidthid_link);
-												pav.setOrgrootid_link(user.getRootorgid_link());
-												pavService.save(pav);
+												if(sizewidthid_link != AtributeFixValues.value_sizewidth_all) {
+													pav.setId(null);
+													pav.setProductid_link(npl_id);
+													pav.setAttributeid_link(attribute.getId());
+													pav.setAttributevalueid_link(sizewidthid_link);
+													pav.setOrgrootid_link(user.getRootorgid_link());
+													pavService.save(pav);
+												}
 												
 												//them co kho all
 												ProductAttributeValue pav_coall = new ProductAttributeValue();
@@ -471,9 +475,6 @@ public class UploadBomAPI {
 										}
 										
 										material_skuid_link = skuattService.get_npl_sku_byproduct_and_valuemau_valueco(npl_id, npl_colorid_link, sizewidthid_link);
-										if(material_skuid_link == 0) {
-											String a = "";
-										}
 									}
 									
 									//them npl vao trong bang pcontract_product_bom2

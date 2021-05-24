@@ -58,6 +58,8 @@ import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_DService;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Service;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price_D;
+import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOM2SKUService;
+import vn.gpay.gsmart.core.pcontractbomsku.PContractBOM2SKU;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProductService;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
@@ -88,6 +90,7 @@ public class ReportAPI {
 	@Autowired IPContractProductBom2Service bomService;
 	@Autowired IAttributeValueService avService;
 	@Autowired IPContract_bom2_npl_poline_Service po_npl_Service;
+	@Autowired IPContractBOM2SKUService bomskuService;
 	
 	@RequestMapping(value = "/quatation", method = RequestMethod.POST)
 	public ResponseEntity<report_quotation_response> Quotation(HttpServletRequest request, @RequestBody report_quotation_request entity) throws IOException {
@@ -589,11 +592,11 @@ public class ReportAPI {
 				cell_sizeset.setCellValue("Size");
 				cell_sizeset.setCellStyle(style_row1);
 				
-				int start = ColumnExcel.L;
+				int start = ColumnExcel.N;
 				int end = start+ list_size.size() - 1;
 				sheet.addMergedRegion(new CellRangeAddress( 0, 0,start , end));	
 								
-				Cell cell_ds = row_1.createCell(ColumnExcel.L);
+				Cell cell_ds = row_1.createCell(ColumnExcel.N);
 				cell_ds.setCellValue("Danh sách cỡ và định mức sử dụng NPL cho từng cỡ");
 				cell_ds.setCellStyle(style_row1);				
 				
@@ -604,72 +607,100 @@ public class ReportAPI {
 				style_row2.cloneStyleFrom(cellstyle_row2.getCellStyle());
 				
 				for(int i =0; i<list_size.size(); i++) {
-					Cell cell_size = row_2.createCell(ColumnExcel.L+ i);
+					Cell cell_size = row_2.createCell(ColumnExcel.N+ i);
 					cell_size.setCellValue(list_size.get(i));
 					cell_size.setCellStyle(style_row2);
 				}
 				
 				//Lay ds npl tu san pham cua don hang (neu co)
 				List<PContractProductBom2> list_bom = bomService.get_pcontract_productBOMbyid(productid_link, pcontractid_link);
-//				List<Long> list_colorid = ppskuService.getlistvalue_by_product(pcontractid_link, productid_link, AtributeFixValues.ATTR_COLOR);
+				List<Long> list_colorid = ppskuService.getlistvalue_by_product(pcontractid_link, productid_link, AtributeFixValues.ATTR_COLOR);
 				
 				for(PContractProductBom2 bom : list_bom) {
-					rowNum++;
-					String value_mau = bom.getTenMauNPL_product(); 
-					String[] str_mau= value_mau.split("\\(");
-					String color_name = str_mau[0];
-					String color_code = str_mau[1].replace(")", "");
-					
-					Row row_npl = sheet.createRow(rowNum);
-					//ghi noi dung vao tung cot
-					for(int i=ColumnExcel.A; i< ColumnExcel.L;i++) {
-						Cell cell_npl = row_npl.createCell(i);
-						if(i==ColumnExcel.A) {
-							cell_npl.setCellValue(rowNum-1);
-						}
-						else if(i==ColumnExcel.B) {
-							cell_npl.setCellValue(commonService.gettypename_npl_by_id(bom.getProduct_type()));
-						}
-						else if(i==ColumnExcel.C) {
-							cell_npl.setCellValue(bom.getMaterialName());
-						}
-						else if(i==ColumnExcel.D) {
-							String code_npl = bom.getMaterialCode();
-							String[] str_code_npl= code_npl.split("\\(");
-							code_npl = str_code_npl[0];
-							
-							cell_npl.setCellValue(code_npl);
-						}
-						else if(i==ColumnExcel.E) {
-							cell_npl.setCellValue(bom.getDescription_product());
-						}
-						else if(i==ColumnExcel.F) {
-							cell_npl.setCellValue(bom.getNhaCungCap());
-						}
-						else if(i==ColumnExcel.G) {
-							cell_npl.setCellValue(bom.getCoKho_product());
-						}
-						else if(i==ColumnExcel.H) {
-							List<PContract_bom2_npl_poline> list_po_npl = po_npl_Service.getby_pcontract_and_npl(pcontractid_link, bom.getMaterialid_link());
-							String po_line = "";
-							for(PContract_bom2_npl_poline po_npl : list_po_npl) {
-								if(po_line.equals("")) {
-									po_line = po_npl.getPO_Buyer();
-								}
-								else {
-									po_line += ", "+po_npl.getPO_Buyer();
-								}
+					for(Long colorid_link : list_colorid) {
+						//kiem tra npl va mau sp co dinh muc thi in ra
+						Long materialid_link = bom.getMaterialid_link();
+						List<PContractBOM2SKU> list_bom_sku = bomskuService.getmaterial_bycolorid_link(pcontractid_link, productid_link, colorid_link, materialid_link);
+						if(list_bom_sku.size() > 0) {
+							rowNum++;
+							String value_mau = avService.findOne(colorid_link).getValue();
+							String[] str_mau= value_mau.split("\\(");
+							String color_name = str_mau[0];
+							String color_code = "";
+							if(str_mau.length > 1) {
+								color_code = str_mau[1].replace(")", "");
 							}
-							cell_npl.setCellValue(po_line);
-						}
-						else if(i==ColumnExcel.I) {
-							cell_npl.setCellValue(color_name);
-						}
-						else if(i==ColumnExcel.J) {
-							cell_npl.setCellValue(color_code);
-						}
-						else if(i==ColumnExcel.K) {
-							cell_npl.setCellValue(bom.getLost_ratio());
+							
+							Row row_npl = sheet.createRow(rowNum);
+							//ghi noi dung vao tung cot
+							for(int i=ColumnExcel.A; i< ColumnExcel.N;i++) {
+								Cell cell_npl = row_npl.createCell(i);
+								if(i==ColumnExcel.A) {
+									cell_npl.setCellValue(rowNum-1);
+								}
+								else if(i==ColumnExcel.B) {
+									cell_npl.setCellValue(commonService.gettypename_npl_by_id(bom.getProduct_type()));
+								}
+								else if(i==ColumnExcel.C) {
+									cell_npl.setCellValue(bom.getMaterialName());
+								}
+								else if(i==ColumnExcel.D) {
+									String code_npl = bom.getMaterialCode();
+									String[] str_code_npl= code_npl.split("\\(");
+									code_npl = str_code_npl[0];
+									
+									cell_npl.setCellValue(code_npl);
+								}
+								else if(i==ColumnExcel.E) {
+									cell_npl.setCellValue(bom.getDescription_product());
+								}
+								else if(i==ColumnExcel.F) {
+									cell_npl.setCellValue(bom.getNhaCungCap());
+								}
+								else if(i==ColumnExcel.G) {
+									String mau_npl = bom.getTenMauNPL();
+									String[] str_mau_npl= mau_npl.split("\\(");
+									mau_npl = str_mau_npl[0].toLowerCase().equals("all") ? "" : str_mau_npl[0];
+									
+									cell_npl.setCellValue(mau_npl);
+								}
+								else if(i==ColumnExcel.H) {
+									String mau_npl = bom.getTenMauNPL();
+									String[] str_mau_npl= mau_npl.split("\\(");
+									String code_mau_npl = "";
+									if(str_mau_npl.length > 1) {
+										code_mau_npl = str_mau_npl[1].replace(")", "");
+									}
+									
+									cell_npl.setCellValue(code_mau_npl);
+								}
+								else if(i==ColumnExcel.I) {
+									String cokho = bom.getCoKho().replace("ALL, ", "").replace(", ALL", "").replace("ALL", "");
+									cell_npl.setCellValue(cokho);
+								}
+								else if(i==ColumnExcel.J) {
+									List<PContract_bom2_npl_poline> list_po_npl = po_npl_Service.getby_pcontract_and_npl(pcontractid_link, bom.getMaterialid_link());
+									String po_line = "";
+									for(PContract_bom2_npl_poline po_npl : list_po_npl) {
+										if(po_line.equals("")) {
+											po_line = po_npl.getPO_Buyer();
+										}
+										else {
+											po_line += ", "+po_npl.getPO_Buyer();
+										}
+									}
+									cell_npl.setCellValue(po_line);
+								}
+								else if(i==ColumnExcel.K) {
+									cell_npl.setCellValue(color_name);
+								}
+								else if(i==ColumnExcel.L) {
+									cell_npl.setCellValue(color_code);
+								}
+								else if(i==ColumnExcel.M) {
+									cell_npl.setCellValue(bom.getLost_ratio());
+								}
+							}		
 						}
 					}
 				}
@@ -743,11 +774,11 @@ public class ReportAPI {
 				style_row1.cloneStyleFrom(cellstyle_row1.getCellStyle());
 				
 				//sinh cot dai co va merger lai
-				int start = ColumnExcel.L;
+				int start = ColumnExcel.N;
 				int end = start+ list_size_set.size() - 1;
 				sheet.addMergedRegion(new CellRangeAddress( 0, 0,start , end));	
 								
-				Cell cell_ds = row_1.createCell(ColumnExcel.L);
+				Cell cell_ds = row_1.createCell(ColumnExcel.N);
 				cell_ds.setCellValue("Danh sách dải cỡ và định mức sử dụng NPL cho từng cỡ");
 				cell_ds.setCellStyle(style_row1);	
 				
@@ -763,72 +794,99 @@ public class ReportAPI {
 				style_row2.cloneStyleFrom(cellstyle_row2.getCellStyle());
 				
 				for(int i =0; i<list_size_set.size(); i++) {
-					Cell cell_size = row_2.createCell(ColumnExcel.L+ i);
+					Cell cell_size = row_2.createCell(ColumnExcel.N+ i);
 					cell_size.setCellValue(list_size_set.get(i));
 					cell_size.setCellStyle(style_row2);
 				}
 				
 				//Lay ds npl tu san pham cua don hang (neu co)
 				List<PContractProductBom2> list_bom = bomService.get_pcontract_productBOMbyid(productid_link, pcontractid_link);
-//				List<Long> list_colorid = ppskuService.getlistvalue_by_product(pcontractid_link, productid_link, AtributeFixValues.ATTR_COLOR);
+				List<Long> list_colorid = ppskuService.getlistvalue_by_product(pcontractid_link, productid_link, AtributeFixValues.ATTR_COLOR);
 				
 				for(PContractProductBom2 bom : list_bom) {
-					rowNum++;
-					String value_mau = bom.getTenMauNPL_product();
-					String[] str_mau= value_mau.split("\\(");
-					String color_name = str_mau[0];
-					String color_code = str_mau[1].replace(")", "");
-					
-					Row row_npl = sheet.createRow(rowNum);
-					//ghi noi dung vao tung cot
-					for(int i=ColumnExcel.A; i< ColumnExcel.L;i++) {
-						Cell cell_npl = row_npl.createCell(i);
-						if(i==ColumnExcel.A) {
-							cell_npl.setCellValue(rowNum-1);
-						}
-						else if(i==ColumnExcel.B) {
-							cell_npl.setCellValue(commonService.gettypename_npl_by_id(bom.getProduct_type()));
-						}
-						else if(i==ColumnExcel.C) {
-							cell_npl.setCellValue(bom.getMaterialName());
-						}
-						else if(i==ColumnExcel.D) {
-							String code_npl = bom.getMaterialCode();
-							String[] str_code_npl= code_npl.split("\\(");
-							code_npl = str_code_npl[0];
+					for(Long colorid_link : list_colorid) {
+						Long materialid_link = bom.getMaterialid_link();
+						List<PContractBOM2SKU> list_bom_sku = bomskuService.getmaterial_bycolorid_link(pcontractid_link, productid_link, colorid_link, materialid_link);
+						if(list_bom_sku.size() > 0) {
+							rowNum++;
+							String value_mau = avService.findOne(colorid_link).getValue();
+							String[] str_mau= value_mau.split("\\(");
+							String color_name = str_mau[0];
+							String color_code = "";
+							if(str_mau.length > 1) {
+								color_code = str_mau[1].replace(")", "");
+							}
 							
-							cell_npl.setCellValue(code_npl);
-						}
-						else if(i==ColumnExcel.E) {
-							cell_npl.setCellValue(bom.getDescription_product());
-						}
-						else if(i==ColumnExcel.F) {
-							cell_npl.setCellValue(bom.getNhaCungCap());
-						}
-						else if(i==ColumnExcel.G) {
-							cell_npl.setCellValue(bom.getCoKho_product());
-						}
-						else if(i==ColumnExcel.H) {
-							List<PContract_bom2_npl_poline> list_po_npl = po_npl_Service.getby_pcontract_and_npl(pcontractid_link, bom.getMaterialid_link());
-							String po_line = "";
-							for(PContract_bom2_npl_poline po_npl : list_po_npl) {
-								if(po_line.equals("")) {
-									po_line = po_npl.getPO_Buyer();
+							Row row_npl = sheet.createRow(rowNum);
+							//ghi noi dung vao tung cot
+							for(int i=ColumnExcel.A; i< ColumnExcel.N;i++) {
+								Cell cell_npl = row_npl.createCell(i);
+								if(i==ColumnExcel.A) {
+									cell_npl.setCellValue(rowNum-1);
 								}
-								else {
-									po_line += ", "+po_npl.getPO_Buyer();
+								else if(i==ColumnExcel.B) {
+									cell_npl.setCellValue(commonService.gettypename_npl_by_id(bom.getProduct_type()));
+								}
+								else if(i==ColumnExcel.C) {
+									cell_npl.setCellValue(bom.getMaterialName());
+								}
+								else if(i==ColumnExcel.D) {
+									String code_npl = bom.getMaterialCode();
+									String[] str_code_npl= code_npl.split("\\(");
+									code_npl = str_code_npl[0];
+									
+									cell_npl.setCellValue(code_npl);
+								}
+								else if(i==ColumnExcel.E) {
+									cell_npl.setCellValue(bom.getDescription_product());
+								}
+								else if(i==ColumnExcel.F) {
+									cell_npl.setCellValue(bom.getNhaCungCap());
+								}
+								else if(i==ColumnExcel.G) {
+									String mau_npl = bom.getTenMauNPL();
+									String[] str_mau_npl= mau_npl.split("\\(");
+									mau_npl = str_mau_npl[0];
+									
+									cell_npl.setCellValue(mau_npl);
+								}
+								else if(i==ColumnExcel.H) {
+									String mau_npl = bom.getTenMauNPL();
+									String[] str_mau_npl= mau_npl.split("\\(");
+									String code_mau_npl = "";
+									if(str_mau_npl.length > 1) {
+										code_mau_npl = str_mau_npl[1].replace(")", "");
+									}
+									
+									cell_npl.setCellValue(code_mau_npl);
+								}
+								else if(i==ColumnExcel.I) {
+									String cokho = bom.getCoKho().replace("ALL, ", "").replace(", ALL", "").replace("ALL", "");
+									cell_npl.setCellValue(cokho);
+								}
+								else if(i==ColumnExcel.J) {
+									List<PContract_bom2_npl_poline> list_po_npl = po_npl_Service.getby_pcontract_and_npl(pcontractid_link, bom.getMaterialid_link());
+									String po_line = "";
+									for(PContract_bom2_npl_poline po_npl : list_po_npl) {
+										if(po_line.equals("")) {
+											po_line = po_npl.getPO_Buyer();
+										}
+										else {
+											po_line += ", "+po_npl.getPO_Buyer();
+										}
+									}
+									cell_npl.setCellValue(po_line);
+								}
+								else if(i==ColumnExcel.K) {
+									cell_npl.setCellValue(color_name);
+								}
+								else if(i==ColumnExcel.L) {
+									cell_npl.setCellValue(color_code);
+								}
+								else if(i==ColumnExcel.M) {
+									cell_npl.setCellValue(bom.getLost_ratio());
 								}
 							}
-							cell_npl.setCellValue(po_line);
-						}
-						else if(i==ColumnExcel.I) {
-							cell_npl.setCellValue(color_name);
-						}
-						else if(i==ColumnExcel.J) {
-							cell_npl.setCellValue(color_code);
-						}
-						else if(i==ColumnExcel.K) {
-							cell_npl.setCellValue(bom.getLost_ratio());
 						}
 					}
 				}

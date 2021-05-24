@@ -50,10 +50,10 @@ public class PContractProductBom2 implements Serializable{/**
     @JoinColumn(name="materialid_link",insertable=false,updatable =false)
     private SKU sku;
 	
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne
-    @JoinColumn(name="productid_link",insertable=false,updatable =false)
-    private SKU sku_product;
+//	@NotFound(action = NotFoundAction.IGNORE)
+//	@ManyToOne
+//    @JoinColumn(name="productid_link",insertable=false,updatable =false)
+//    private SKU sku_product;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -86,7 +86,7 @@ public class PContractProductBom2 implements Serializable{/**
 	@Transient
 	public String getNhaCungCap() {
 		if(sku!=null)
-			return sku.getPartnercode();
+			return sku.getPartnercode_product();
 		return "";
 	}
 	
@@ -152,13 +152,6 @@ public class PContractProductBom2 implements Serializable{/**
 			return unit.getCode();
 		}
 		return "";
-	}
-	
-	@Transient
-	public Long getColorid_link() {
-		if(sku_product!=null)
-			return sku_product.getColor_id(); 
-		return (long)0;
 	}
 
 	public Long getId() {

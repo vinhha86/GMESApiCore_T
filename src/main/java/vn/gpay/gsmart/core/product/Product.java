@@ -198,7 +198,7 @@ public class Product implements Serializable {/**
     	String name ="";
     	for (ProductAttributeValue pav : listPAvalue) {
 			if(pav.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) {
-				if(pav.getAttributevalueid_link() != 0) {
+				if(!pav.getAttributevalueid_link().equals((long)0)) {
 					if(name == "") {
 						name += pav.getAttributeValueName().replace(" ", "");
 					}else {

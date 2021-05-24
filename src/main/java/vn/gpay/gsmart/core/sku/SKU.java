@@ -120,6 +120,7 @@ public class SKU implements Serializable {
     	for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
 			if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_COLOR) {
 				name = sku_Attribute_Value.getAttributeValueName();
+				name = name.equals("ALL") ? "" : name;
 				break;
 			}
 		}
@@ -138,11 +139,11 @@ public class SKU implements Serializable {
 	public Long getColorid_link() {
 		long ID_Mau =0;
 		for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
-			if(sku_Attribute_Value.getAttributeid_link() == 4) {
+			if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_COLOR) {
 				ID_Mau = sku_Attribute_Value.getAttributevalueid_link();
 				break;
 			}
-			else if(sku_Attribute_Value.getAttributeid_link() == 36) {
+			else if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) {
 				ID_Mau = sku_Attribute_Value.getAttributevalueid_link();
 				break;
 			}
@@ -225,6 +226,7 @@ public class SKU implements Serializable {
 			}
 			else if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) {
 				name = product.getCoKho();
+				name = name.equals("ALL") ? "" : name;
 				break;
 			}
 			else if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_TEX) {
@@ -308,6 +310,11 @@ public class SKU implements Serializable {
 			return product.getDescription();
 		}
 		return null;
+	}
+	
+	@Transient
+	public String getPartnercode_product() {
+		return product.getPartnercode();
 	}
 	
 	@Transient
