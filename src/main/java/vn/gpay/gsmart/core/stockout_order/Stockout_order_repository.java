@@ -15,4 +15,12 @@ public interface Stockout_order_repository extends JpaRepository<Stockout_order,
 	@Query(value = "select c from Stockout_order c where porderid_link = :porderid_link ")
 	public List<Stockout_order> getby_porder(
 			@Param ("porderid_link")final  long porderid_link);
+	
+	@Query(value = "select c from Stockout_order c "
+			+ "inner join Stockout_order_d a on c.id = a.stockoutorderid_link "
+			+ "where porderid_link = :porderid_link and a.material_skuid_link = :material_skuid_link "
+			+ "group by c")
+	public List<Stockout_order> getby_porder_npl(
+			@Param ("porderid_link")final  long porderid_link,
+			@Param ("material_skuid_link")final  long material_skuid_link);
 }

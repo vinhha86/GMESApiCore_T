@@ -54,4 +54,9 @@ public class Stockout_order_service extends AbstractService<Stockout_order> impl
 		if(stockoutorderdate_from!=null && stockoutorderdate_to!=null) return true;
 		return false;
 	}
+	@Override
+	public List<Stockout_order> getby_porder_npl(Long porderid_link, Long material_skuid_link) {
+		// TODO Auto-generated method stub
+		return repo.getby_porder_npl(porderid_link, material_skuid_link);
+	}
 }

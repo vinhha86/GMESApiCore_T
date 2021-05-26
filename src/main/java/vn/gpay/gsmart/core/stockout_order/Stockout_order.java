@@ -54,8 +54,8 @@ public class Stockout_order implements Serializable {
 	private Long porderid_link;
 	private String stockout_order_code;
 	private Long unitid_link;
-	
-	
+	private Long pcontractid_link;
+	private Long pcontract_poid_link;
 	
 	public Long getUnitid_link() {
 		return unitid_link;
@@ -110,13 +110,6 @@ public class Stockout_order implements Serializable {
 		if(orgTo!=null) 
 			return orgTo.getName();
 		return "";
-	}
-	
-	@Transient
-	public Long getPcontractid_link() {
-		if(porder!=null) 
-			return porder.getPcontractid_link();
-		return null;
 	}
 	
 	public Long getId() {
@@ -250,6 +243,22 @@ public class Stockout_order implements Serializable {
 	}
 	public void setOrgrootid_link(Long orgrootid_link) {
 		this.orgrootid_link = orgrootid_link;
+	}
+
+	public Long getPcontract_poid_link() {
+		return pcontract_poid_link;
+	}
+
+	public void setPcontract_poid_link(Long pcontract_poid_link) {
+		this.pcontract_poid_link = pcontract_poid_link;
+	}
+
+	public void setPcontractid_link(Long pcontractid_link) {
+		this.pcontractid_link = pcontractid_link;
+	}
+
+	public Long getPcontractid_link() {
+		return pcontractid_link;
 	}
 
 //	public List<Stockout_order_d> getStockout_order_d() {

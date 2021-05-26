@@ -361,6 +361,25 @@ public class Stockout_orderAPI {
 		return new ResponseEntity<getby_porder_response>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/getby_porder_npl", method = RequestMethod.POST)
+	public ResponseEntity<getby_porder_response> GetByPorderNPL(HttpServletRequest request,
+			@RequestBody getby_porder_npl_request entity) {
+		getby_porder_response response = new getby_porder_response();
+		try {
+			Long porderid_link = entity.porderid_link;
+			Long material_skuid_link = entity.material_skuid_link;
+			
+			response.data = stockout_order_Service.getby_porder_npl(porderid_link, material_skuid_link);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<getby_porder_response>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/getStockoutorder", method = RequestMethod.POST)
 	public ResponseEntity<Stockout_order_response> getStockoutorder(HttpServletRequest request,
 			@RequestBody Stockout_order_getBySearch_request entity) {
