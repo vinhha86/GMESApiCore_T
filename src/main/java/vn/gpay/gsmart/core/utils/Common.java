@@ -560,7 +560,7 @@ public class Common  {
 		return false;
 	}
 	
-	public void ReCalculate(Long porder_grant_id_link, Long orgrootid_link) {
+	public Date ReCalculate(Long porder_grant_id_link, Long orgrootid_link) {
 		POrderGrant grant = grantService.findOne(porder_grant_id_link);
 		int amount = grant.getGrantamount();
 		int productivity = grant.getProductivity();
@@ -572,6 +572,7 @@ public class Common  {
 		grant.setDuration(duration);
 		grant.setFinish_date_plan(dateend);
 		grantService.save(grant);
+		return dateend;
 	}
 
 	public int getDuration(Date startdate, Date enddate, long orgrootid_link) {

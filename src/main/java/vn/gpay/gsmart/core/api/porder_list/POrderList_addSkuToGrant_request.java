@@ -9,5 +9,5 @@ public class POrderList_addSkuToGrant_request extends RequestBase {
 	public List<POrder_Product_SKU> porderSku;
 	public Long idGrant;
 	public Long idPOrder;
-	public Long pcontract_poid_link;
+//	public Long pcontract_poid_link;
 }

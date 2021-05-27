@@ -479,13 +479,14 @@ public class POrderListAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long orgrootid_link = user.getRootorgid_link();
-			Long pcontract_poid_link = entity.pcontract_poid_link;
+//			Long pcontract_poid_link = entity.pcontract_poid_link;
 			Long porderid_link = entity.idPOrder;
 			POrderGrant grant = pordergrantService.findOne(entity.idGrant);
 			POrder porder = porderService.findOne(porderid_link);
 			
 			// save to porder_grant_sku
 			for(POrder_Product_SKU pps : entity.porderSku) {
+				Long pcontract_poid_link = pps.getPcontract_poid_link();
 				POrderGrant_SKU pgs = pordergrantskuService.getPOrderGrant_SKUbySKUAndGrantAndPcontractPo(
 						pps.getSkuid_link(), entity.idGrant, pcontract_poid_link
 						);
@@ -546,8 +547,9 @@ public class POrderListAPI {
 			Date startDate = grant.getStart_date_plan();
 			Calendar calDate = Calendar.getInstance();
 			calDate.setTime(startDate);
-			commonService.ReCalculate(grant.getId(), orgrootid_link);
+			Date endDate = commonService.ReCalculate(grant.getId(), orgrootid_link);
 			
+			response.endDate = endDate;
 			response.porderinfo = name;
 			response.amount = total;
 			
@@ -616,6 +618,8 @@ public class POrderListAPI {
 			calDate.setTime(startDate);
 			commonService.ReCalculate(grant.getId(), orgrootid_link);
 			
+			Date endDate = grant.getFinish_date_plan();
+			response.endDate = endDate;
 			response.porderinfo = name;
 			response.amount = total;
 			
@@ -675,22 +679,18 @@ public class POrderListAPI {
 			}
 			
 			// re-calculate porder_grant grant_amount
-			List<POrderGrant> pglist = pordergrantService.getByOrderId(entity.idPOrder);
+			Integer grantamountSum = 0;
 			
-			for(POrderGrant pg : pglist) {
-				Integer grantamountSum = 0;
-				
-				List<POrderGrant_SKU> pgslist = pordergrantskuService.getPOrderGrant_SKU(pg.getId());
-				for(POrderGrant_SKU pgs : pgslist) {
-					grantamountSum+=pgs.getGrantamount();
-				}
-				
-				//kiem tra xem so luong bang 0 hay khong. Neu bang = thi lay so luong ban dau
-				grantamountSum = grantamountSum == 0 ? pg.getTotalamount_tt() : grantamountSum;
-				
-				pg.setGrantamount(grantamountSum);
-				pordergrantService.save(pg);
+			List<POrderGrant_SKU> pgslist = pordergrantskuService.getPOrderGrant_SKU(grant.getId());
+			for(POrderGrant_SKU pgs : pgslist) {
+				grantamountSum+=pgs.getGrantamount();
 			}
+			
+			//kiem tra xem so luong bang 0 hay khong. Neu bang = thi lay so luong ban dau
+			grantamountSum = grantamountSum == 0 ? grant.getTotalamount_tt() : grantamountSum;
+			
+			grant.setGrantamount(grantamountSum);
+			pordergrantService.save(grant);
 			
 			String name = "";
 			int total = grant.getGrantamount() == null ? 0 : grant.getGrantamount();
@@ -712,8 +712,10 @@ public class POrderListAPI {
 			commonService.ReCalculate(grant.getId(), orgrootid_link);
 //			System.out.println(grant.getId());
 //			System.out.println(orgrootid_link);
-//			System.out.println(calDate.get(Calendar.YEAR));
+//			System.out.println(calDate.get(Calendar.YEAR));;
 			
+			Date endDate = grant.getFinish_date_plan();
+			response.endDate = endDate;
 			response.porderinfo = name;
 			response.amount = total;
 			
