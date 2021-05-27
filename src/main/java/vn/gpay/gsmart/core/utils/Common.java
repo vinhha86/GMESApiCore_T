@@ -495,7 +495,7 @@ public class Common  {
 	
 	public String getInvoiceNumber() {
 		String invoice_number = "";
-		Stocking_UniqueCode stocking = stockingService.getby_type(3);
+		Stocking_UniqueCode stocking = stockingService.getby_type(4);
 		String prefix = stocking.getStocking_prefix();
 		Integer max = stocking.getStocking_max() + 1;
 		String STT = max.toString();
@@ -505,6 +505,20 @@ public class Common  {
 		}
 		invoice_number = prefix + "_" + STT;
 		return invoice_number;
+	}
+	
+	public String getStockout_order_code() {
+		String stockout_order_code = "";
+		Stocking_UniqueCode stocking = stockingService.getby_type(3);
+		String prefix = stocking.getStocking_prefix();
+		Integer max = stocking.getStocking_max() + 1;
+		String STT = max.toString();
+		
+		while(STT.toString().length() < 5) {
+			STT = "0"+STT;
+		}
+		stockout_order_code = prefix + "_" + STT;
+		return stockout_order_code;
 	}
 	
 	public static void copyFile(File source, File dest) throws IOException {

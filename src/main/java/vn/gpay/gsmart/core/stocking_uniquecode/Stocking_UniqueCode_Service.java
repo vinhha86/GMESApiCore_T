@@ -1,5 +1,7 @@
 package vn.gpay.gsmart.core.stocking_uniquecode;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -17,7 +19,8 @@ public class Stocking_UniqueCode_Service extends AbstractService<Stocking_Unique
 	@Override
 	public Stocking_UniqueCode getby_type(Integer type) {
 		// TODO Auto-generated method stub
-		return repo.getby_type(type).get(0);
+		List<Stocking_UniqueCode> lst = repo.getby_type(type);
+		return lst.get(0);
 	}
 
 }

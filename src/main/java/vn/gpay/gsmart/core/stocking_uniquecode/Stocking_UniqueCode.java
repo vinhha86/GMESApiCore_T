@@ -18,10 +18,11 @@ public class Stocking_UniqueCode implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	@Id
-	//@GeneratedValue(strategy=GenerationType.AUTO)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "stocking_uniquecode_generator")
 	@SequenceGenerator(name="stocking_uniquecode_generator", sequenceName = "stocking_uniquecode_id_seq", allocationSize=1)
-	protected Long stocking_inout;
+	private Long id;
+	
+	private Long stocking_inout;
 	
 	private Integer stocking_type;
 	private String stocking_prefix;
@@ -49,6 +50,12 @@ public class Stocking_UniqueCode implements Serializable {
 	}
 	public void setStocking_max(Integer stocking_max) {
 		this.stocking_max = stocking_max;
+	}
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
 	}
 	
 	

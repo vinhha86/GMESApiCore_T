@@ -21,6 +21,8 @@ import vn.gpay.gsmart.core.porder_bom_sku.POrderBOMSKU;
 import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.stocking_uniquecode.IStocking_UniqueCode_Service;
+import vn.gpay.gsmart.core.stocking_uniquecode.Stocking_UniqueCode;
 import vn.gpay.gsmart.core.stockout_order.IStockout_order_coloramount_Service;
 import vn.gpay.gsmart.core.stockout_order.IStockout_order_d_service;
 import vn.gpay.gsmart.core.stockout_order.IStockout_order_pkl_Service;
@@ -29,6 +31,7 @@ import vn.gpay.gsmart.core.stockout_order.Stockout_order;
 import vn.gpay.gsmart.core.stockout_order.Stockout_order_coloramount;
 import vn.gpay.gsmart.core.stockout_order.Stockout_order_d;
 import vn.gpay.gsmart.core.stockout_order.Stockout_order_pkl;
+import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.POrderBomType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 import vn.gpay.gsmart.core.utils.commonUnit;
@@ -47,6 +50,8 @@ public class Stockout_orderAPI {
 	@Autowired IPOrderBomColor_Service bomcolorService;
 	@Autowired IPOrderBOMSKU_Service bomskuService;
 	@Autowired IWarehouseService warehouseService;
+	@Autowired Common commonService;
+	@Autowired IStocking_UniqueCode_Service stockingService;
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ResponseEntity<create_order_response> Create(HttpServletRequest request,
@@ -58,14 +63,30 @@ public class Stockout_orderAPI {
 			Long orgrootid_link = user.getRootorgid_link();
 			Date current_time = new Date();
 			Stockout_order order = entity.data;
+			boolean isNew = false;
+			
 			if(order.getId() == null) {
+				isNew = true;
+				String stockout_order_code = commonService.getStockout_order_code();
+				
 				order.setOrgrootid_link(orgrootid_link);
 				order.setTimecreate(current_time);
 				order.setUsercreateid_link(user.getId());
+				order.setStockout_order_code(stockout_order_code);
 				order.setStatus(0);
+				
+				
 			}
 			
 			order = stockout_order_Service.save(order);
+			
+			//kiem tra neu them moi thi cap nhat lai bang stocking_unique
+			if(isNew) {
+				Stocking_UniqueCode unique = stockingService.getby_type(3);
+				Integer max = unique.getStocking_max();
+				unique.setStocking_max(max+1);
+				stockingService.save(unique);
+			}
 			
 			Long stockout_orderid_link = order.getId();
 			

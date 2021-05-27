@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public interface IStocking_Unique_Repository extends JpaRepository<Stocking_UniqueCode, Long> {
 	@Query(value = "select c from Stocking_UniqueCode c "
-			+ "where stocking_type =:stocking_type")
+			+ "where stocking_type = :stocking_type")
 	public List<Stocking_UniqueCode> getby_type(
 			@Param ("stocking_type")final Integer stocking_type);
 }
