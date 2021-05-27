@@ -99,14 +99,15 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			@Param ("pcontractid_link")final  Long pcontractid_link,
 			@Param ("productid_link")final  Long productid_link);
 	
-	@Query(value = "select c from PContract_PO c "
-			+ "inner join POrder_Req a on c.id = a.pcontract_poid_link "
-			+ "where c.pcontractid_link = :pcontractid_link "
-			+ "and (:productid_link is null or c.productid_link = :productid_link) "
-			+ "and c.parentpoid_link is null "
-			+ "and c.status = 0 "
+	@Query(value = "select parent from PContract_PO parent "
+			+ "inner join PContract_PO chil on parent.id = chil.parentpoid_link "
+			+ "inner join POrder_Req a on parent.id = chil.parentpoid_link "
+			+ "where parent.pcontractid_link = :pcontractid_link "
+			+ "and (:productid_link is null or parent.productid_link = :productid_link) "
+			+ "and parent.parentpoid_link is null "
+			+ "and parent.status = 0 "
 			+ "and a.granttoorgid_link in :orgid_link "
-			+ "group by c")
+			+ "group by parent")
 	public List<PContract_PO> getPO_Offer_Accept_ByPContract_AndOrg(
 			@Param ("pcontractid_link")final  Long pcontractid_link,
 			@Param ("productid_link")final  Long productid_link,
