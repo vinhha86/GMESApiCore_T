@@ -508,6 +508,10 @@ public class BalanceAPI {
 				Float f_skudemand =skubom.getAmount()*p_amount;
 				Float f_lost = (f_skudemand*skubom.getLost_ratio())/100;
 				
+				//Tinh trung binh dinh muc
+				Float f_skubomamount = (theSKUBalance.getMat_sku_bom_amount() + skubom.getAmount())/2;
+				theSKUBalance.setMat_sku_bom_amount(f_skubomamount);
+				
 				theSKUBalance.setMat_sku_demand(theSKUBalance.getMat_sku_demand() + f_skudemand + f_lost);
 				theSKUBalance.setMat_sku_product_total(theSKUBalance.getMat_sku_product_total() + p_amount);
 //				System.out.println("p_sku:" + skuid_link.toString() + "-" + p_amount + 

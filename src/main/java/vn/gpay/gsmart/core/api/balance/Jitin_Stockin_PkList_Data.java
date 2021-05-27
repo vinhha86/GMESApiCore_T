@@ -53,6 +53,12 @@ public class Jitin_Stockin_PkList_Data implements Serializable {
 	private String unitname;
 	private String warning;
 	private String color_name;
+	
+	private Float yds_beforecheck;
+	private Float met_beforecheck;
+	private Float width_yds_beforecheck;
+	private Float width_met_beforecheck;
+	private Float grossweight_beforecheck;
 
 	public Long getId() {
 		return id;
@@ -323,6 +329,36 @@ public class Jitin_Stockin_PkList_Data implements Serializable {
 	}
 	public void setSpaceepc_link(String spaceepc_link) {
 		this.spaceepc_link = spaceepc_link;
+	}
+	public Float getYds_beforecheck() {
+		return yds_beforecheck;
+	}
+	public void setYds_beforecheck(Float yds_beforecheck) {
+		this.yds_beforecheck = yds_beforecheck;
+	}
+	public Float getMet_beforecheck() {
+		return met_beforecheck;
+	}
+	public void setMet_beforecheck(Float met_beforecheck) {
+		this.met_beforecheck = met_beforecheck;
+	}
+	public Float getWidth_yds_beforecheck() {
+		return width_yds_beforecheck;
+	}
+	public void setWidth_yds_beforecheck(Float width_yds_beforecheck) {
+		this.width_yds_beforecheck = width_yds_beforecheck;
+	}
+	public Float getWidth_met_beforecheck() {
+		return width_met_beforecheck;
+	}
+	public void setWidth_met_beforecheck(Float width_met_beforecheck) {
+		this.width_met_beforecheck = width_met_beforecheck;
+	}
+	public Float getGrossweight_beforecheck() {
+		return grossweight_beforecheck;
+	}
+	public void setGrossweight_beforecheck(Float grossweight_beforecheck) {
+		this.grossweight_beforecheck = grossweight_beforecheck;
 	}
 	
 	
