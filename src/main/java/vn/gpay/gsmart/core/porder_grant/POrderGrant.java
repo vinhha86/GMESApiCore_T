@@ -322,6 +322,14 @@ public class POrderGrant implements Serializable {
 		return "";
 	}
 	
+	@Transient
+	public String getGranttoorgcode() {
+		if(org != null) {
+			return org.getCode();
+		}
+		return "";
+	}
+	
 	public Long getId() {
 		return id;
 	}

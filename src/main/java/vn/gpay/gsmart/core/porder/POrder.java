@@ -137,6 +137,17 @@ public class POrder implements Serializable {
     private List<POrderGrant> list_pordergrant = new ArrayList<POrderGrant>();
 	
 	@Transient
+	public String getGrantName() {
+		String name = "";
+		for(POrderGrant grant : list_pordergrant) {
+			if(name=="")
+				name = grant.getGranttoorgcode();
+			else 
+				name += ", "+grant.getGranttoorgcode();
+		}
+		return name;
+	}
+	@Transient
 	public Long getPOParentid_link() {
 		if(pcontract_po!=null)
 			return pcontract_po.getParentpoid_link();
