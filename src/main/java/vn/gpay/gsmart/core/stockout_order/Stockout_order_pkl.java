@@ -48,6 +48,7 @@ public class Stockout_order_pkl implements Serializable{
 	private Date lasttimeupdate;
 	private String spaceepc_link;
 	private Float met;
+	private Integer status;
 	
 	public Float getMet() {
 		return met;
@@ -200,6 +201,14 @@ public class Stockout_order_pkl implements Serializable{
 	}
 	public void setSpaceepc_link(String spaceepc_link) {
 		this.spaceepc_link = spaceepc_link;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
 	
 	

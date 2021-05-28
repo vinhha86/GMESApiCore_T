@@ -96,7 +96,6 @@ public class CutPlan_Row_Service extends AbstractService<CutPlan_Row> implements
 			if(list_bomsku.size() > 0) {
 				
 				POrderBOMSKU bomsku = list_bomsku.get(0);
-				bomsku.setAmount(bom);
 				porderbomskuService.save(bomsku);
 			}
 			else {
@@ -111,6 +110,7 @@ public class CutPlan_Row_Service extends AbstractService<CutPlan_Row> implements
 				bomsku.setPorderid_link(porderid_link);
 				bomsku.setProductid_link(productid_link);
 				bomsku.setSkuid_link(product_skuid_link);
+				bomsku.setType(POrderBomType.Kythuat);
 
 				porderbomskuService.save(bomsku);
 				

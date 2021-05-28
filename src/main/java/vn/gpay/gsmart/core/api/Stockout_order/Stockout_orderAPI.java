@@ -262,6 +262,7 @@ public class Stockout_orderAPI {
 				pkl.setUsercreateid_link(user.getId());
 				pkl.setWidth(wh.getWidth());
 				pkl.setYdsorigin((float)(wh.getMet()* commonUnit.metToyead));
+				pkl.setStatus(wh.getStatus());
 				
 				stockout_pkl_Service.save(pkl);
 			}
