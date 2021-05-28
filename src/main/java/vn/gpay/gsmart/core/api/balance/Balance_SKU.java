@@ -243,7 +243,7 @@ public class Balance_SKU implements Runnable{
             	
             	Float met_stockout_order = (float) 0;
             	for(Jitin_Stockout_order_d_Data stockout_OrderD: ls_stockout_orderd.data){
-            		System.out.println(this.mat_sku.getMat_skuid_link() + "-" + stockout_OrderD.getTotalmet());
+//            		System.out.println(this.mat_sku.getMat_skuid_link() + "-" + stockout_OrderD.getTotalmet());
             		met_stockout_order+=null!=stockout_OrderD.getTotalmet()?stockout_OrderD.getTotalmet():0;
             	}
             	mat_sku.setMat_sku_stockout_order(met_stockout_order);

@@ -535,6 +535,9 @@ public class BalanceAPI {
 				product_d.setP_sku_color(product_sku_color);
 				product_d.setP_sku_size(product_sku_size);
 				product_d.setP_amount(p_amount);
+				product_d.setP_bom_amount(skubom.getAmount());
+				product_d.setP_bom_lostratio(skubom.getLost_ratio());
+				product_d.setP_bom_demand(f_skudemand+f_lost);
 				theSKUBalance.getProduct_d().add(product_d);
 				
 			} else {
@@ -564,6 +567,9 @@ public class BalanceAPI {
 				product_d.setP_sku_color(product_sku_color);
 				product_d.setP_sku_size(product_sku_size);
 				product_d.setP_amount(p_amount);
+				product_d.setP_bom_amount(skubom.getAmount());
+				product_d.setP_bom_lostratio(skubom.getLost_ratio());
+				product_d.setP_bom_demand(f_skudemand+f_lost);
 				newSKUBalance.getProduct_d().add(product_d);
 				
 				ls_SKUBalance.add(newSKUBalance);

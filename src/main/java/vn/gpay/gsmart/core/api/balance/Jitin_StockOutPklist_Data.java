@@ -50,6 +50,8 @@ public class Jitin_StockOutPklist_Data implements Serializable {
 	private Integer checked;
 	private String warning;
 	private String unitname;
+	private Integer warehousestatus;
+	
 	public Long getId() {
 		return id;
 	}
@@ -307,6 +309,12 @@ public class Jitin_StockOutPklist_Data implements Serializable {
 	}
 	public void setUnitname(String unitname) {
 		this.unitname = unitname;
+	}
+	public Integer getWarehousestatus() {
+		return warehousestatus;
+	}
+	public void setWarehousestatus(Integer warehousestatus) {
+		this.warehousestatus = warehousestatus;
 	}
 
 }

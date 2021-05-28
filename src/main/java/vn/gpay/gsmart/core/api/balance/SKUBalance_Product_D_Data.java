@@ -11,6 +11,10 @@ public class SKUBalance_Product_D_Data implements Serializable {
 	private String p_sku_color;
 	private String p_sku_size;
 	private Integer p_amount;
+	private Float p_bom_amount;
+	private Float p_bom_lostratio;
+	private Float p_bom_demand;
+	
 	public Long getP_skuid_link() {
 		return p_skuid_link;
 	}
@@ -52,6 +56,24 @@ public class SKUBalance_Product_D_Data implements Serializable {
 	}
 	public void setP_sku_size(String p_sku_size) {
 		this.p_sku_size = p_sku_size;
+	}
+	public Float getP_bom_amount() {
+		return p_bom_amount;
+	}
+	public void setP_bom_amount(Float p_bom_amount) {
+		this.p_bom_amount = p_bom_amount;
+	}
+	public Float getP_bom_lostratio() {
+		return p_bom_lostratio;
+	}
+	public void setP_bom_lostratio(Float p_bom_lostratio) {
+		this.p_bom_lostratio = p_bom_lostratio;
+	}
+	public Float getP_bom_demand() {
+		return p_bom_demand;
+	}
+	public void setP_bom_demand(Float p_bom_demand) {
+		this.p_bom_demand = p_bom_demand;
 	}
 
 
