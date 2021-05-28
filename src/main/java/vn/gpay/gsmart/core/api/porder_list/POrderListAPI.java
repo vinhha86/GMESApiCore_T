@@ -548,7 +548,7 @@ public class POrderListAPI {
 			Calendar calDate = Calendar.getInstance();
 			calDate.setTime(startDate);
 			Date endDate = commonService.ReCalculate(grant.getId(), orgrootid_link);
-			
+			response.duration = commonService.getDuration_byProductivity(total, grant.getProductivity());
 			response.endDate = endDate;
 			response.porderinfo = name;
 			response.amount = total;
@@ -619,6 +619,7 @@ public class POrderListAPI {
 			commonService.ReCalculate(grant.getId(), orgrootid_link);
 			
 			Date endDate = grant.getFinish_date_plan();
+			response.duration = commonService.getDuration_byProductivity(total, grant.getProductivity());
 			response.endDate = endDate;
 			response.porderinfo = name;
 			response.amount = total;
@@ -713,7 +714,7 @@ public class POrderListAPI {
 //			System.out.println(grant.getId());
 //			System.out.println(orgrootid_link);
 //			System.out.println(calDate.get(Calendar.YEAR));;
-			
+			response.duration = commonService.getDuration_byProductivity(total, grant.getProductivity());
 			Date endDate = grant.getFinish_date_plan();
 			response.endDate = endDate;
 			response.porderinfo = name;
