@@ -491,6 +491,7 @@ public class POrderBomAPI {
 			
 			List<POrderBomProduct> listbom = porderbomproductService.getby_porder(porderid_link);
 			List<POrderBOMSKU> listbomsku = porderbomskuService.getByPOrderID_and_type(porderid_link, POrderBomType.CanDoi);
+			List<POrderBOMSKU> listbomsku_kythuat = porderbomskuService.getByPOrderID_and_type(porderid_link, POrderBomType.Kythuat);
 			
 			List<Long> List_size = porder_sku_Service.getvalue_by_attribute(porderid_link, AtributeFixValues.ATTR_SIZE);
 			
@@ -548,15 +549,27 @@ public class POrderBomAPI {
 					boolean check = false;
 					for(Long size : List_size) {
 						List<POrderBOMSKU> listbomsku_clone = new ArrayList<POrderBOMSKU>(listbomsku);
+						List<POrderBOMSKU> listbomsku_kt_clone = new ArrayList<POrderBOMSKU>(listbomsku_kythuat);
+						
 						long skuid_link = skuavService.getsku_byproduct_and_valuemau_valueco(productid_link, colorid, size);
 						listbomsku_clone.removeIf(c -> !c.getMaterialid_link().equals(pContractProductBom.getMaterialid_link()) || 
 								!c.getSkuid_link().equals(skuid_link));
+						listbomsku_kt_clone.removeIf(c-> !c.getMaterialid_link().equals(pContractProductBom.getMaterialid_link()) || 
+								!c.getSkuid_link().equals(skuid_link));
+						
+						Float amount_size_kt = (float)0;
 						Float amount_size = (float) 0;
+						
 						if(listbomsku_clone.size() > 0)
 							amount_size = listbomsku_clone.get(0).getAmount();
-						map.put(""+size, amount_size+"");
 						
-						if (amount_size>0){
+						if(listbomsku_kt_clone.size() > 0)
+							amount_size_kt = listbomsku_kt_clone.get(0).getAmount();
+						
+						map.put(""+size, amount_size+"");
+						map.put(size+"_KT", amount_size_kt+"");
+						
+						if (amount_size>0 || amount_size_kt > 0){
 							check = true;
 							total_amount += amount_size;
 							total_size++;

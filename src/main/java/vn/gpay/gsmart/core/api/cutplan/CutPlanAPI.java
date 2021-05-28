@@ -446,10 +446,10 @@ public class CutPlanAPI {
 			for(CutPlan_Size size: list_sodo) {
 				if(size.getAmount() >0) {
 					if(name=="") {
-						name = size.getAmount()+size.getSizeName();
+						name = size.getAmount()+"("+size.getSizeName()+")";
 					}
 					else {
-						name+= " - "+size.getAmount()+size.getSizeName();
+						name+= " - "+size.getAmount()+"("+size.getSizeName()+")";
 					}
 				}
 				

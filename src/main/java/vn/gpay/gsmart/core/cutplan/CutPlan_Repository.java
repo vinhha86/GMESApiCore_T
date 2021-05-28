@@ -28,7 +28,7 @@ public interface CutPlan_Repository extends JpaRepository<CutPlan_Size, Long>, J
 			+ "where a.material_skuid_link = :material_skuid_link " 
 			+ "and a.porderid_link = :porderid_link "
 			+ "and c.orgrootid_link = :orgrootid_link "
-			+ "and b.attributevalueid_link = :colorid_link and b.attributeid_link = 4")
+			+ "and b.attributevalueid_link = :colorid_link and b.attributeid_link = 4 ")
 	public List<CutPlan_Size> getby_sku_and_porder_color(
 			@Param("material_skuid_link") final Long material_skuid_link,
 			@Param("porderid_link") final Long porderid_link,

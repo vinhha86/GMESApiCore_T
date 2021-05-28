@@ -1,7 +1,9 @@
 package vn.gpay.gsmart.core.cutplan;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -61,11 +63,17 @@ public class CutPlan_Row_Service extends AbstractService<CutPlan_Row> implements
 		
 		//tinh tong so luong san pham trong tat ca cac so do
 		List<CutPlan_Size> list_sodo = cutplan_size_Service.getby_sku_and_porder_and_color(material_skuid_link, porderid_link, orgrootid_link, colorid_link);
+		Map<Long, Float> map = new HashMap<Long, Float>();
 		for(CutPlan_Size sodo : list_sodo) {
 			CutPlan_Row cut_row = cutrow_Service.findOne(sodo.getCutplanrowid_link());
-			if(cut_row.getType() == CutPlanRowType.sodocat) {
+			if(cut_row.getType().equals(CutPlanRowType.sodocat)) {
 				tongsl_sp += (sodo.getAmount() == null ? 0 : sodo.getAmount()) * cut_row.getLa_vai();
-				sl_vai += cut_row.getSl_vai();
+				if(map.get(sodo.getCutplanrowid_link()) == null) {
+					float f_slvai = cut_row.getSl_vai();
+					sl_vai += f_slvai;
+					map.put(sodo.getCutplanrowid_link(), f_slvai);
+				}
+				
 			}
 		}
 		
@@ -93,9 +101,9 @@ public class CutPlan_Row_Service extends AbstractService<CutPlan_Row> implements
 			List<POrderBOMSKU> list_bomsku = porderbomskuService.getby_porder_and_material_and_sku_and_type(porderid_link, material_skuid_link, product_skuid_link, POrderBomType.Kythuat);
 			
 			//neu co dinh muc roi thi cap nhat chua co thi them vao
-			if(list_bomsku.size() > 0) {
-				
+			if(list_bomsku.size() > 0) {				
 				POrderBOMSKU bomsku = list_bomsku.get(0);
+				bomsku.setAmount(bom);
 				porderbomskuService.save(bomsku);
 			}
 			else {
