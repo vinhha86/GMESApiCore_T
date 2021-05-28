@@ -54,6 +54,7 @@ public class Jitin_StockOutD_Data implements Serializable {
 	public String hscode;
 	public String hsname;
 	public String unit_name;
+	private String data_spaces;
 	
 	private List<Jitin_StockOutPklist_Data>  stockout_packinglist  = new ArrayList<>();
 
@@ -423,6 +424,14 @@ public class Jitin_StockOutD_Data implements Serializable {
 
 	public void setStockout_packinglist(List<Jitin_StockOutPklist_Data> stockout_packinglist) {
 		this.stockout_packinglist = stockout_packinglist;
+	}
+
+	public String getData_spaces() {
+		return data_spaces;
+	}
+
+	public void setData_spaces(String data_spaces) {
+		this.data_spaces = data_spaces;
 	}
 	
 }

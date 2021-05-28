@@ -150,7 +150,12 @@ public class BalanceAPI {
 				if (ls_productid.contains(thePContractSKU.getProductid_link())){
 //					System.out.println(thePContractSKU.getProductcode() + "-" + thePContractSKU.getMauSanPham() + "-" + thePContractSKU.getCoSanPham()
 //					+ "-" + thePContractSKU.getPcontract_poid_link() + "-" + thePContractSKU.getPquantity_total());
-					cal_demand_bysku(ls_SKUBalance, entity.pcontractid_link,thePContractSKU.getPcontract_poid_link(), thePContractSKU.getProductid_link(), thePContractSKU.getSkuid_link(), thePContractSKU.getPquantity_total());
+					cal_demand_bysku(ls_SKUBalance, entity.pcontractid_link,thePContractSKU.getPcontract_poid_link(), thePContractSKU.getProductid_link(), 
+							thePContractSKU.getSkuid_link(),
+							thePContractSKU.getSkuCode(),
+							thePContractSKU.getMauSanPham(),
+							thePContractSKU.getCoSanPham(),
+							thePContractSKU.getPquantity_total());
 					
 //					ls_SKUBalance_Total.addAll(ls_SKUBalance);
 //		            ls_Product_Total.addAll(ls_Product);
@@ -266,7 +271,12 @@ public class BalanceAPI {
 				List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
 				for (POrder_Product_SKU thePContractSKU: ls_Product_SKU){
 //					SKU theProduct_SKU = skuService.findOne(thePContractSKU.getSkuid_link());
-					cal_demand_bysku(ls_SKUBalance, thePorder.getPcontractid_link(), thePorder.getPcontract_poid_link(), thePorder.getProductid_link(), thePContractSKU.getSkuid_link(), thePContractSKU.getPquantity_total());
+					cal_demand_bysku(ls_SKUBalance, thePorder.getPcontractid_link(), thePorder.getPcontract_poid_link(), thePorder.getProductid_link(), 
+							thePContractSKU.getSkuid_link(), 
+							thePContractSKU.getSkucode(),
+							thePContractSKU.getMauSanPham(),
+							thePContractSKU.getCoSanPham(),
+							thePContractSKU.getPquantity_total());
 				}
 				
 				//3. Tinh toan can doi cho tung nguyen phu lieu trong BOM
@@ -478,6 +488,9 @@ public class BalanceAPI {
 			Long pcontract_poid_link, 
 			Long productid_link, 
 			Long product_skuid_link, 
+			String product_sku_code, 
+			String product_sku_color, 
+			String product_sku_size, 
 			Integer p_amount){
 	
 		List<PContractBOM2SKU> bom_response = bom2Service.getBOM_By_PContractSKU(pcontractid_link, product_skuid_link);
@@ -514,11 +527,16 @@ public class BalanceAPI {
 				
 				theSKUBalance.setMat_sku_demand(theSKUBalance.getMat_sku_demand() + f_skudemand + f_lost);
 				theSKUBalance.setMat_sku_product_total(theSKUBalance.getMat_sku_product_total() + p_amount);
-//				System.out.println("p_sku:" + skuid_link.toString() + "-" + p_amount + 
-//						"/Amount:" + skubom.getAmount() + 
-//						"/Lost:" + skubom.getLost_ratio() + 
-//						"/Demand:" + theSKUBalance.getMat_sku_demand()
-//						);		
+
+				//Thong tin chi tiet mau co
+				SKUBalance_Product_D_Data product_d = new SKUBalance_Product_D_Data();
+				product_d.setP_skuid_link(product_skuid_link);
+				product_d.setP_sku_code(product_sku_code);
+				product_d.setP_sku_color(product_sku_color);
+				product_d.setP_sku_size(product_sku_size);
+				product_d.setP_amount(p_amount);
+				theSKUBalance.getProduct_d().add(product_d);
+				
 			} else {
 				SKUBalance_Data newSKUBalance = new SKUBalance_Data();
 				newSKUBalance.setMat_skuid_link(skubom.getMaterial_skuid_link());
@@ -539,13 +557,14 @@ public class BalanceAPI {
 				Float f_lost = (f_skudemand*skubom.getLost_ratio())/100;
 				newSKUBalance.setMat_sku_demand(f_skudemand + f_lost);
 				
-//				if(skubom.getMaterialid_link() ==  750){
-//					System.out.println("p_sku:" + skuid_link.toString() + "-" + p_amount + 
-//							"/Amount:" + skubom.getAmount() + 
-//							"/Lost:" + skubom.getLost_ratio() + 
-//							"/Demand:" + newSKUBalance.getMat_sku_demand()
-//							);
-//				}
+				//Thong tin chi tiet mau co
+				SKUBalance_Product_D_Data product_d = new SKUBalance_Product_D_Data();
+				product_d.setP_skuid_link(product_skuid_link);
+				product_d.setP_sku_code(product_sku_code);
+				product_d.setP_sku_color(product_sku_color);
+				product_d.setP_sku_size(product_sku_size);
+				product_d.setP_amount(p_amount);
+				newSKUBalance.getProduct_d().add(product_d);
 				
 				ls_SKUBalance.add(newSKUBalance);
 			}			
