@@ -437,9 +437,16 @@ public class ProductService extends AbstractService<Product> implements IProduct
 		// TODO Auto-generated method stub
 		List<Product> list_color = repo.getby_code_type_description_and_value(orgrootid_link, code, description, colorid_link, AtributeFixValues.ATTR_COLOR, type);
 		List<Product> list_size = repo.getby_code_type_description_and_value(orgrootid_link, code, description, sizeid_link, AtributeFixValues.ATTR_SIZEWIDTH, type);
-		if(list_color.size() > 0 && list_size.size() > 0) {
-			if(list_color.get(0).getId().equals(list_size.get(0).getId()))
+		
+		Map<Long, Long> map_color = new HashMap<>();
+		for(Product p_color : list_color) {
+			map_color.put(p_color.getId(), p_color.getId());
+		}
+		
+		for(Product p_size : list_size) {
+			if(map_color.get(p_size.getId())!=null) {
 				return list_color;
+			}
 		}
 		
 		return new ArrayList<Product>();

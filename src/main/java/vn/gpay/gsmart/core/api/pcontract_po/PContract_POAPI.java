@@ -82,7 +82,6 @@ import vn.gpay.gsmart.core.sku.ISKU_Service;
 import vn.gpay.gsmart.core.sku.SKU;
 import vn.gpay.gsmart.core.sku.SKU_Attribute_Value;
 import vn.gpay.gsmart.core.task_object.ITask_Object_Service;
-import vn.gpay.gsmart.core.task_object.Task_Object;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.ColumnPO;
 import vn.gpay.gsmart.core.utils.ColumnTemplate;
@@ -94,7 +93,6 @@ import vn.gpay.gsmart.core.utils.POrderReqStatus;
 import vn.gpay.gsmart.core.utils.POrderStatus;
 import vn.gpay.gsmart.core.utils.ProductType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
-import vn.gpay.gsmart.core.utils.TaskObjectType_Name;
 
 @RestController
 @RequestMapping("/api/v1/pcontract_po")
@@ -1701,36 +1699,36 @@ public class PContract_POAPI {
 			        porder_req.setPlandate_required(c.getTime());
 			        
 					// Save to DB
-					long porder_req_id_link = porder_req_Service.savePOrder_Req(porder_req);
+					porder_req_Service.savePOrder_Req(porder_req);
 
 					// Create taskboard
-					long orgid_link = porder.getGranttoorgid_link();
-					long tasktypeid_link = 0;
-					List<Task_Object> list_object = new ArrayList<Task_Object>();
-
-					Task_Object object_pcontract = new Task_Object();
-					object_pcontract.setId(null);
-					object_pcontract.setObjectid_link(pcontractid_link);
-					object_pcontract.setOrgrootid_link(orgrootid_link);
-					object_pcontract.setTaskobjecttypeid_link((long) TaskObjectType_Name.DonHang);
-					list_object.add(object_pcontract);
-
-					Task_Object object_pcontractpo = new Task_Object();
-					object_pcontractpo.setId(null);
-					object_pcontractpo.setObjectid_link(pcontract_poid_link);
-					object_pcontractpo.setOrgrootid_link(orgrootid_link);
-					object_pcontractpo.setTaskobjecttypeid_link((long) TaskObjectType_Name.DonHangPO);
-					list_object.add(object_pcontractpo);
-
-					Task_Object object_porder_req = new Task_Object();
-					object_porder_req.setId(null);
-					object_porder_req.setObjectid_link(porder_req_id_link);
-					object_porder_req.setOrgrootid_link(orgrootid_link);
-					object_porder_req.setTaskobjecttypeid_link((long) TaskObjectType_Name.YeuCauSanXuat);
-					list_object.add(object_porder_req);
-
-					commonService.CreateTask(orgrootid_link, orgid_link, usercreatedid_link, tasktypeid_link,
-							list_object, null);
+//					long orgid_link = porder.getGranttoorgid_link();
+//					long tasktypeid_link = 0;
+//					List<Task_Object> list_object = new ArrayList<Task_Object>();
+//
+//					Task_Object object_pcontract = new Task_Object();
+//					object_pcontract.setId(null);
+//					object_pcontract.setObjectid_link(pcontractid_link);
+//					object_pcontract.setOrgrootid_link(orgrootid_link);
+//					object_pcontract.setTaskobjecttypeid_link((long) TaskObjectType_Name.DonHang);
+//					list_object.add(object_pcontract);
+//
+//					Task_Object object_pcontractpo = new Task_Object();
+//					object_pcontractpo.setId(null);
+//					object_pcontractpo.setObjectid_link(pcontract_poid_link);
+//					object_pcontractpo.setOrgrootid_link(orgrootid_link);
+//					object_pcontractpo.setTaskobjecttypeid_link((long) TaskObjectType_Name.DonHangPO);
+//					list_object.add(object_pcontractpo);
+//
+//					Task_Object object_porder_req = new Task_Object();
+//					object_porder_req.setId(null);
+//					object_porder_req.setObjectid_link(porder_req_id_link);
+//					object_porder_req.setOrgrootid_link(orgrootid_link);
+//					object_porder_req.setTaskobjecttypeid_link((long) TaskObjectType_Name.YeuCauSanXuat);
+//					list_object.add(object_porder_req);
+//
+//					commonService.CreateTask(orgrootid_link, orgid_link, usercreatedid_link, tasktypeid_link,
+//							list_object, null);
 				} else {
 					porder_req = porder_req_Service.findOne(porder.getId());
 					porder_req.setTotalorder(porder.getTotalorder());
@@ -2606,7 +2604,11 @@ public class PContract_POAPI {
 					pcontractpriceService.delete(thePrice);
 				}
 				
-				
+				//xoa producttivity
+				List<PContract_PO_Productivity> list_productivity = productivityService.getbypo(thePO.getId());
+				for (PContract_PO_Productivity productivity: list_productivity) {
+					productivityService.delete(productivity);
+				}
 
 				// Delete PO
 				pcontract_POService.delete(thePO);
