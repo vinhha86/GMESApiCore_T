@@ -1,6 +1,8 @@
 package vn.gpay.gsmart.core.sku;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -71,9 +73,19 @@ public class SKU_AttributeValue_Service extends AbstractService<SKU_Attribute_Va
 	@Override
 	public long get_npl_sku_byproduct_and_valuemau_valueco(long productid_link, long valuemau, long valueco) {
 		// TODO Auto-generated method stub
-		List<Long> list = repo.get_npl_skuid_by_valueMau_and_valueCo(valuemau, valueco, productid_link);
-		if(list.size() >0)
-			return list.get(0);
+		List<SKU_Attribute_Value> list_color = repo.getone_byproduct_and_value(productid_link, valuemau);
+		Map<Long, Long> map = new HashMap<Long, Long>();
+		for(SKU_Attribute_Value av : list_color) {
+			map.put(av.getSkuid_link(), av.getSkuid_link());
+		}
+		
+		List<SKU_Attribute_Value> list_size = repo.getone_byproduct_and_value(productid_link, valueco);
+		for(SKU_Attribute_Value av : list_size) {
+			if(map.get(av.getSkuid_link()) != null) {
+				return av.getSkuid_link();
+			}
+		}
+		
 		return 0;
 	}
 

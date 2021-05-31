@@ -84,7 +84,8 @@ public interface IProductRepository extends JpaRepository<Product, Long>, JpaSpe
 	public List<Product> getProductByLikeBuyercode(@Param ("buyercode")final  String buyercode);
 	
 	@Query(value = "select c from Product c "
-			+ "inner join ProductAttributeValue a on a.productid_link = c.id "
+			+ "inner join SKU b on c.id = b.productid_link "
+			+ "inner join SKU_Attribute_Value a on a.skuid_link = c.id "
 			+ "where LOWER(c.buyercode) = LOWER(:code) "
 			+ "and c.orgrootid_link = :orgrootid_link "
 			+ "and c.status = 1 "
