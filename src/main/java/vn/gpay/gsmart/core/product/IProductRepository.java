@@ -84,15 +84,14 @@ public interface IProductRepository extends JpaRepository<Product, Long>, JpaSpe
 	public List<Product> getProductByLikeBuyercode(@Param ("buyercode")final  String buyercode);
 	
 	@Query(value = "select c from Product c "
-			+ "inner join SKU b on c.id = b.productid_link "
-			+ "inner join SKU_Attribute_Value a on a.skuid_link = c.id "
+			+ "inner join ProductAttributeValue b on c.id = b.productid_link "
 			+ "where LOWER(c.buyercode) = LOWER(:code) "
 			+ "and c.orgrootid_link = :orgrootid_link "
 			+ "and c.status = 1 "
 			+ "and c.description = :description "
 			+ "and c.producttypeid_link = :type "
-			+ "and a.attributeid_link = :attributeid_link "
-			+ "and a.attributevalueid_link = :attributevalueid_link "
+			+ "and b.attributeid_link = :attributeid_link "
+			+ "and b.attributevalueid_link = :attributevalueid_link "
 			+ "group by c")
 	public List<Product> getby_code_type_description_and_value(
 			@Param ("orgrootid_link")final  Long orgrootid_link,
@@ -100,6 +99,18 @@ public interface IProductRepository extends JpaRepository<Product, Long>, JpaSpe
 			@Param ("description")final  String description,
 			@Param ("attributevalueid_link")final  Long attributevalueid_link,
 			@Param ("attributeid_link")final  Long attributeid_link,
+			@Param ("type")final  int type);
+	
+	@Query(value = "select c from Product c "
+			+ "where LOWER(c.buyercode) = LOWER(:code) "
+			+ "and c.orgrootid_link = :orgrootid_link "
+			+ "and c.status = 1 "
+			+ "and c.description = :description "
+			+ "and c.producttypeid_link = :type")
+	public List<Product> getby_code_type_description(
+			@Param ("orgrootid_link")final  Long orgrootid_link,
+			@Param ("code")final  String code,
+			@Param ("description")final  String description,
 			@Param ("type")final  int type);
 
 }

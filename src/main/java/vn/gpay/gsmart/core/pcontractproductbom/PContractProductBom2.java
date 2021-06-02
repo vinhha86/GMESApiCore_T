@@ -109,7 +109,7 @@ public class PContractProductBom2 implements Serializable{/**
 	@Transient
 	public String getCoKho() {
 		if(sku !=null) {
-			return sku.getCoSanPham();
+			return sku.getCoKho();
 		}
 		return "";
 	}

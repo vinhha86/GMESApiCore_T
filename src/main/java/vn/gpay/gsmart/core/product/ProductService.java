@@ -451,4 +451,10 @@ public class ProductService extends AbstractService<Product> implements IProduct
 		
 		return new ArrayList<Product>();
 	}
+
+	@Override
+	public List<Product> getby_code_type_description(Long orgrootid_link, String code, int type, String description) {
+		// TODO Auto-generated method stub
+		return repo.getby_code_type_description(orgrootid_link, code, description, type);
+	}
 }
