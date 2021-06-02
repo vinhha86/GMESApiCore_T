@@ -474,7 +474,7 @@ public class UploadBomAPI {
 											pav_mau.setAttributevalueid_link(npl_colorid_link);
 											pav_mau.setId(null);
 											pav_mau.setOrgrootid_link(orgrootid_link);
-											pav_mau.setProductid_link(productid_link);
+											pav_mau.setProductid_link(npl_id);
 											pavService.save(pav_mau);
 											
 											
@@ -487,7 +487,7 @@ public class UploadBomAPI {
 											pav_co.setAttributevalueid_link(sizewidthid_link);
 											pav_co.setId(null);
 											pav_co.setOrgrootid_link(orgrootid_link);
-											pav_co.setProductid_link(productid_link);
+											pav_co.setProductid_link(npl_id);
 											pavService.save(pav_co);
 										}
 										
@@ -1170,7 +1170,7 @@ public class UploadBomAPI {
 										//kiem tra thuoc tinh mau va co cua dong dang doc co trong db hay chua
 										
 										List<ProductAttributeValue> pav_npl_mau = pavService.getOne_byproduct_and_value(npl_id, AtributeFixValues.ATTR_COLOR, npl_colorid_link);
-										if(pav_npl_mau.size()  == 0) {
+										if(pav_npl_mau.size() == 0) {
 											ProductAttributeValue pav_mau = new ProductAttributeValue();
 											pav_mau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
 											pav_mau.setAttributevalueid_link(npl_colorid_link);
@@ -1183,7 +1183,7 @@ public class UploadBomAPI {
 										}
 										
 										List<ProductAttributeValue> pav_npl_co = pavService.getOne_byproduct_and_value(npl_id, AtributeFixValues.ATTR_SIZEWIDTH, sizewidthid_link);
-										if(pav_npl_co.size()  == 0) {
+										if(pav_npl_co.size() == 0) {
 											ProductAttributeValue pav_co = new ProductAttributeValue();
 											pav_co.setAttributeid_link(AtributeFixValues.ATTR_SIZEWIDTH);
 											pav_co.setAttributevalueid_link(sizewidthid_link);
