@@ -620,6 +620,23 @@ public class OrgAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/getOrgByTypeKho",method = RequestMethod.POST)
+	public ResponseEntity<?> getOrgByTypeKho(@RequestBody getOrgForContractBuyerBuyerList_request entity, HttpServletRequest request) {//@RequestParam("type") 
+		OrgResponse response = new OrgResponse();
+		try {
+			response.data = orgService.findOrgByTypeKho();
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<OrgResponse>(response,HttpStatus.OK);
+		}catch (RuntimeException e) {
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(e.getMessage());
+		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 	@RequestMapping(value = "/getOrgForVendorStoreByBuyerId",method = RequestMethod.POST)
 	public ResponseEntity<?> getOrgForVendorStoreByBuyerId(@RequestBody GetOrgById_request entity, HttpServletRequest request) {//@RequestParam("type") 
 		OrgResponse response = new OrgResponse();

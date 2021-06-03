@@ -345,4 +345,9 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 		// TODO Auto-generated method stub
 		return repositoty.getOrgReqbyPO(pcontract_poid_link);
 	}
+
+	@Override
+	public List<Org> findOrgByTypeKho() {
+		return repositoty.findOrgByTypeKho();
+	}
 }

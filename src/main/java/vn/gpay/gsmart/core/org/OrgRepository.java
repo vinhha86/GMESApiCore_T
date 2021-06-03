@@ -102,4 +102,7 @@ public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecification
 			@Param ("buyerid_link")final Long buyerid_link
 			);
 	
+	@Query(value = "select c from Org c where c.orgtypeid_link in(3,8,19) order by c.orgtypeid_link, c.name asc")
+	public List<Org> findOrgByTypeKho();
+	
 }
