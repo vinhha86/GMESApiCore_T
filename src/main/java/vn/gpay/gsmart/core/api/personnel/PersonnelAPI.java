@@ -13,6 +13,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,6 +38,10 @@ import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.porder_grant_balance.IPOrderGrantBalanceService;
 import vn.gpay.gsmart.core.porder_grant_balance.POrderGrantBalance;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.security.GpayUserOrg;
+import vn.gpay.gsmart.core.security.IGpayUserOrgService;
+import vn.gpay.gsmart.core.security.IGpayUserService;
+import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -47,6 +53,9 @@ public class PersonnelAPI {
 	@Autowired IPOrderGrant_Service pordergrantService;
 	@Autowired IPOrderGrantBalanceService pordergrantBalanceService;
 	@Autowired IPersonnel_notmap_Service personnelNotmapService;
+	@Autowired Common commonService;
+	@Autowired IGpayUserService userService;
+	@Autowired IGpayUserOrgService userOrgService;
 	
 	@RequestMapping(value = "/gettype",method = RequestMethod.POST)
 	public ResponseEntity<gettype_response> getType(HttpServletRequest request ) {
@@ -63,6 +72,8 @@ public class PersonnelAPI {
 		    return new ResponseEntity<gettype_response>(response,HttpStatus.OK);
 		}
 	}
+	
+	
 	
 	@RequestMapping(value = "/getby_org",method = RequestMethod.POST)
 	public ResponseEntity<getperson_byorg_response> getType(HttpServletRequest request, @RequestBody getperson_byorgmanager_request entity ) {
@@ -99,6 +110,44 @@ public class PersonnelAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/getperson_by_user",method = RequestMethod.POST)
+	public ResponseEntity<getperson_by_userid_response> getOrgByUser(HttpServletRequest request, @RequestBody getperson_by_userid_request entity ) {
+		getperson_by_userid_response response = new getperson_by_userid_response();
+		try {
+			GpayUser user = userService.findOne(entity.userid_link);
+			Long orgid_link = user.getOrgid_link();
+			
+			Long orgrootid_link = user.getRootorgid_link();
+			
+			List<Personel> list = new ArrayList<Personel>();
+			if(orgid_link == orgrootid_link) {
+				list = personService.findAll();
+			}
+			else {
+				List<Long> orgs = new ArrayList<Long>();
+				orgs.add(orgid_link);
+				List<GpayUserOrg> list_user_org = userOrgService.getall_byuser(entity.userid_link);
+				for (GpayUserOrg userorg : list_user_org) {
+					if(!orgs.contains(userorg.getOrgid_link())){
+						orgs.add(userorg.getOrgid_link());
+					}
+				}
+				
+				list = personService.getby_orgs(orgs, orgrootid_link);
+			}
+			
+			
+			response.data = list;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getperson_by_userid_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<getperson_by_userid_response>(response,HttpStatus.OK);
+		}
+	}
+	
 	@RequestMapping(value = "/viewimage",method = RequestMethod.POST)
 	public ResponseEntity<personnel_viewimage_response> getType(HttpServletRequest request, @RequestBody personnel_viewimage_request entity ) {
 		personnel_viewimage_response response = new personnel_viewimage_response();
@@ -118,6 +167,28 @@ public class PersonnelAPI {
 		    return new ResponseEntity<personnel_viewimage_response>(response,HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/getimage",method = RequestMethod.GET)
+	public ResponseEntity<byte[]> getImage(HttpServletRequest request, @RequestParam("id") Long id ) {
+		try {
+			Personel person = personService.findOne(id);
+			String uploadRootPath = request.getServletContext().getRealPath("upload/personnel");
+			String filePath = uploadRootPath+"/"+ person.getImage_name();
+			Path path = Paths.get(filePath);
+			byte[] data = Files.readAllBytes(path);
+			
+			HttpHeaders headers = new HttpHeaders();
+		    headers.setCacheControl(CacheControl.noCache().getHeaderValue());
+		    
+
+			ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(data, headers, HttpStatus.OK);
+		    return responseEntity;
+		}catch (Exception e) {
+			return null;
+		}
+	}
+	
+	
 	
 	@RequestMapping(value = "/create_his",method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> CreateHis(HttpServletRequest request, @RequestBody personnel_create_his_request entity ) {
@@ -299,9 +370,14 @@ public class PersonnelAPI {
 				person.setOrgrootid_link(orgrootid_link);
 				person.setStatus(0);//0-dang hoat dong;-1-da nghi viec
 			}
+			 
+			if(person.getIsbike()) {
+				person.setBike_number(commonService.get_BikeNUmber());
+			}
 			person = personService.save(person);
 			
 			response.id = person.getId();
+			response.bike_number = person.getBike_number();
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

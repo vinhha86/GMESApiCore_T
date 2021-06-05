@@ -56,6 +56,9 @@ public class Personel implements Serializable {
 	private Long levelid_link;
 	private Long saltypeid_link;
 	private Long sallevelid_link;
+	private String bike_number;
+	private Boolean isbike;
+	
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -121,6 +124,11 @@ public class Personel implements Serializable {
 			return orgManage.getName();
 		}
 		return "";
+	}
+	
+	@Transient
+	public String getOrgGrantName() {
+		return orgManage.getCode() + " - "+ org.getCode();
 	}
 	
 	
@@ -297,6 +305,18 @@ public class Personel implements Serializable {
 
 	public void setSallevelid_link(Long sallevelid_link) {
 		this.sallevelid_link = sallevelid_link;
+	}
+	public String getBike_number() {
+		return bike_number;
+	}
+	public void setBike_number(String bike_number) {
+		this.bike_number = bike_number;
+	}
+	public Boolean getIsbike() {
+		return isbike;
+	}
+	public void setIsbike(Boolean isbike) {
+		this.isbike = isbike;
 	}
 	
 	

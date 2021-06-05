@@ -61,5 +61,17 @@ public class Personnel_Service extends AbstractService<Personel> implements IPer
 	public List<Personel> getForPProcessingProductivity(Long orgid_link, Integer shifttypeid_link, Date workingdate) {
 		return repo.getForPProcessingProductivity(orgid_link, shifttypeid_link, workingdate);
 	}
+	@Override
+	public List<Personel> getby_orgs(List<Long> orgid_link, long orgrootid_link) {
+		// TODO Auto-generated method stub
+		Specification<Personel> specification = Specifications.<Personel>and()
+				.in("orgid_link", orgid_link.toArray())
+				.eq("orgrootid_link", orgrootid_link)
+				.build();
+
+		Sort sort = Sorts.builder().asc("code").build();
+		List<Personel> lst = repo.findAll(specification, sort);
+		return lst;
+	}
 
 }

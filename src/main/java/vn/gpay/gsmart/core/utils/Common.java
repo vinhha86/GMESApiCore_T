@@ -507,6 +507,20 @@ public class Common  {
 		return invoice_number;
 	}
 	
+	public String get_BikeNUmber() {
+		String bike_number = "";
+		Stocking_UniqueCode stocking = stockingService.getby_type(5);
+		String prefix = stocking.getStocking_prefix();
+		Integer max = stocking.getStocking_max() + 1;
+		String STT = max.toString();
+		
+		while(STT.toString().length() < 7) {
+			STT = "0"+STT;
+		}
+		bike_number = prefix + "-" + STT;
+		return bike_number;
+	}
+	
 	public String getStockout_order_code() {
 		String stockout_order_code = "";
 		Stocking_UniqueCode stocking = stockingService.getby_type(3);
