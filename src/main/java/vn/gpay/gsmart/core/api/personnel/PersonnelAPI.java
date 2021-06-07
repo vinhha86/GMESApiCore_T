@@ -115,6 +115,7 @@ public class PersonnelAPI {
 		getperson_by_userid_response response = new getperson_by_userid_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long userid_link = user.getId();
 			Long orgid_link = user.getOrgid_link();
 			
 			Long orgrootid_link = user.getRootorgid_link();
@@ -126,7 +127,7 @@ public class PersonnelAPI {
 			else {
 				List<Long> orgs = new ArrayList<Long>();
 				orgs.add(orgid_link);
-				List<GpayUserOrg> list_user_org = userOrgService.getall_byuser(entity.userid_link);
+				List<GpayUserOrg> list_user_org = userOrgService.getall_byuser(userid_link);
 				for (GpayUserOrg userorg : list_user_org) {
 					if(!orgs.contains(userorg.getOrgid_link())){
 						orgs.add(userorg.getOrgid_link());
