@@ -23,11 +23,11 @@ public class Personnel_inout implements Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "personnel_inout_generator")
 	@SequenceGenerator(name="personnel_inout_generator", sequenceName = "personnel_inout_id_seq", allocationSize=1)
 	protected Long id;
-	private Long personnelid_link;
-	private Date time_in;
-	private Date time_out;
-	private String bike_number_out;
-	private Long usercheck_checkout;
+	private Long personnelid_link; //Id nhân viên
+	private Date time_in; //giờ đi xe vào
+	private Date time_out; //giờ lấy xe về
+	private String bike_number_out; //biển số xe trong trường hợp không khớp với biển số trong hồ sơ
+	private Long usercheck_checkout; //id tài khoản của bảo về đăng nhập
 	
 	 
 	
