@@ -114,7 +114,7 @@ public class PersonnelAPI {
 	public ResponseEntity<getperson_by_userid_response> getOrgByUser(HttpServletRequest request, @RequestBody getperson_by_userid_request entity ) {
 		getperson_by_userid_response response = new getperson_by_userid_response();
 		try {
-			GpayUser user = userService.findOne(entity.userid_link);
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long orgid_link = user.getOrgid_link();
 			
 			Long orgrootid_link = user.getRootorgid_link();
