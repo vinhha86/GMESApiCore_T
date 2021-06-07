@@ -27,7 +27,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.personel.IPersonnel_Service;
+import vn.gpay.gsmart.core.personel.IPersonnel_inout_Service;
 import vn.gpay.gsmart.core.personel.Personel;
+import vn.gpay.gsmart.core.personel.Personnel_inout;
 import vn.gpay.gsmart.core.personnel_history.IPersonnel_His_Service;
 import vn.gpay.gsmart.core.personnel_history.Personnel_His;
 import vn.gpay.gsmart.core.personnel_notmap.IPersonnel_notmap_Service;
@@ -56,6 +58,7 @@ public class PersonnelAPI {
 	@Autowired Common commonService;
 	@Autowired IGpayUserService userService;
 	@Autowired IGpayUserOrgService userOrgService;
+	@Autowired IPersonnel_inout_Service person_inout_Service;
 	
 	@RequestMapping(value = "/gettype",method = RequestMethod.POST)
 	public ResponseEntity<gettype_response> getType(HttpServletRequest request ) {
@@ -503,4 +506,38 @@ public class PersonnelAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/upadtetime_inout",method = RequestMethod.POST)
+	public ResponseEntity<personnel_updatetime_inout_response> getForPProcessingProductivity(@RequestBody personnel_updatetime_inout_request entity,HttpServletRequest request) {
+		personnel_updatetime_inout_response response = new personnel_updatetime_inout_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			for(Personnel_inout person: entity.data) {
+				
+				//kiem tra trong DB co chua thi them vao 
+				List<Personnel_inout> person_check = person_inout_Service.getby_person(person.getId(), new Date());
+				if(person_check.size() == 0) {
+					Personnel_inout personnew = new Personnel_inout();
+					personnew.setBike_number_out("");
+					personnew.setId(null);
+					personnew.setPersonnelid_link(person.getId());
+					personnew.setTime_in(person.getTime_in());
+					personnew.setTime_out(person.getTime_out());
+					person_inout_Service.save(personnew);
+				}
+				else {
+					person.setUsercheck_checkout(user.getId());
+					person_inout_Service.save(person);
+				}
+			}
+			
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<personnel_updatetime_inout_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<personnel_updatetime_inout_response>(response,HttpStatus.OK);
+		}
+	}
 }

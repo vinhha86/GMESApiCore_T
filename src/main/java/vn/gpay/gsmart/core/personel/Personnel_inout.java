@@ -26,6 +26,11 @@ public class Personnel_inout implements Serializable {
 	private Long personnelid_link;
 	private Date time_in;
 	private Date time_out;
+	private String bike_number_out;
+	private Long usercheck_checkout;
+	
+	 
+	
 	public Long getId() {
 		return id;
 	}
@@ -49,6 +54,18 @@ public class Personnel_inout implements Serializable {
 	}
 	public void setTime_out(Date time_out) {
 		this.time_out = time_out;
+	}
+	public String getBike_number_out() {
+		return bike_number_out;
+	}
+	public void setBike_number_out(String bike_number_out) {
+		this.bike_number_out = bike_number_out;
+	}
+	public Long getUsercheck_checkout() {
+		return usercheck_checkout;
+	}
+	public void setUsercheck_checkout(Long usercheck_checkout) {
+		this.usercheck_checkout = usercheck_checkout;
 	}
 	
 	
