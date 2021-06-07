@@ -366,6 +366,8 @@ public class PersonnelAPI {
 			Long orgrootid_link = user.getRootorgid_link();
 			
 			Personel person = entity.data;
+			Boolean isbike = person.getIsbike() == null ? false : person.getIsbike();
+			person.setIsbike(isbike);
 			if(person.getId() == null) {
 				person.setOrgrootid_link(orgrootid_link);
 				person.setStatus(0);//0-dang hoat dong;-1-da nghi viec
