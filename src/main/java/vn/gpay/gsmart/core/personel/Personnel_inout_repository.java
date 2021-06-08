@@ -22,4 +22,12 @@ public interface Personnel_inout_repository extends JpaRepository<Personnel_inou
 			@Param ("date_from")final Date date_from,
 			@Param ("date_to")final Date date_to
 			);
+	
+	@Query(value = "select c from Personnel_inout c "
+			+ "where (timein >= :date_from and timein <= :date_to) or (timeout >= :date_from and timeout <= :date_to)"
+			)
+	public List<Personnel_inout> GetPersonInOut(
+			@Param ("date_from")final Date date_from,
+			@Param ("date_to")final Date date_to
+			);
 }

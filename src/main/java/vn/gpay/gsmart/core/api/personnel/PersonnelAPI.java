@@ -540,4 +540,21 @@ public class PersonnelAPI {
 		    return new ResponseEntity<personnel_updatetime_inout_response>(response,HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/gettime_inout",method = RequestMethod.POST)
+	public ResponseEntity<gettime_inout_response> GetTimeInOut(HttpServletRequest request) {
+		gettime_inout_response response = new gettime_inout_response();
+		try {
+			response.data = person_inout_Service.getPersonInout(new Date());
+			
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<gettime_inout_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<gettime_inout_response>(response,HttpStatus.OK);
+		}
+	}
 }
