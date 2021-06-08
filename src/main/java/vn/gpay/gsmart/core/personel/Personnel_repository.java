@@ -36,4 +36,13 @@ public interface Personnel_repository extends JpaRepository<Personel, Long>,JpaS
 			@Param ("shifttypeid_link")final Integer shifttypeid_link,
 			@Param ("workingdate")final Date workingdate
 			);
+	
+	@Query("SELECT c FROM Personel c "
+			+ "where c.orgid_link in :orgid_link "
+			+ "and c.orgrootid_link = :orgrootid_link "
+			+ "and (:ishas_bikenumber = false or (bike_number is not null and bike_number != ''))")
+	public List<Personel> getperson_and_bikenumber(
+			@Param ("orgid_link")final List<Long> orgid_link,
+			@Param ("ishas_bikenumber")final Boolean ishas_bikenumber,
+			@Param ("orgrootid_link")final Long orgrootid_link);
 }

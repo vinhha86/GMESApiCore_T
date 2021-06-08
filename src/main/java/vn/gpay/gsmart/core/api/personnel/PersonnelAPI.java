@@ -137,7 +137,7 @@ public class PersonnelAPI {
 					}
 				}
 				
-				list = personService.getby_orgs(orgs, orgrootid_link);
+				list = personService.getby_orgs(orgs, orgrootid_link, true);
 			}
 			
 			
