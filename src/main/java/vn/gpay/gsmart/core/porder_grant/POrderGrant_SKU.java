@@ -43,6 +43,11 @@ public class POrderGrant_SKU implements Serializable {
     @JsonProperty("pcontract_poid_link")
     private Long pcontract_poid_link;
     
+    @Transient
+    public Integer amount_break;
+    
+    
+    
     @NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
@@ -154,6 +159,12 @@ public class POrderGrant_SKU implements Serializable {
 
 	public void setPcontract_poid_link(Long pcontract_poid_link) {
 		this.pcontract_poid_link = pcontract_poid_link;
+	}
+	public Integer getAmount_break() {
+		return amount_break;
+	}
+	public void setAmount_break(Integer amount_break) {
+		this.amount_break = amount_break;
 	}	
 
 	

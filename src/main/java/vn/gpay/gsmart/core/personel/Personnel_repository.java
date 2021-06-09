@@ -38,7 +38,8 @@ public interface Personnel_repository extends JpaRepository<Personel, Long>,JpaS
 			);
 	
 	@Query("SELECT c FROM Personel c "
-			+ "where c.orgid_link in :orgid_link "
+			+ "inner join Org a on c.orgid_link = a.id "
+			+ "where a.parentid_link in :orgid_link "
 			+ "and c.orgrootid_link = :orgrootid_link "
 			+ "and (:ishas_bikenumber = false or (bike_number is not null and bike_number != ''))")
 	public List<Personel> getperson_and_bikenumber(

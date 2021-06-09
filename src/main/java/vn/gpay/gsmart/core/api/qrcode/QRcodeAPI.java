@@ -51,9 +51,9 @@ public class QRcodeAPI {
 		try {
 			if(text!= "") {
 				GenQrCode qrcode = new GenQrCode();
-				while(text.length() < 10) {
-					text += " ";
-				}
+//				while(text.length() < 10) {
+//					text += " ";
+//				}
 				
 				HttpHeaders headers = new HttpHeaders();
 			    byte[] media = qrcode.getQRCodeImage(text, 500, 500);
