@@ -43,6 +43,8 @@ import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.security.GpayUserOrg;
 import vn.gpay.gsmart.core.security.IGpayUserOrgService;
 import vn.gpay.gsmart.core.security.IGpayUserService;
+import vn.gpay.gsmart.core.stocking_uniquecode.IStocking_UniqueCode_Service;
+import vn.gpay.gsmart.core.stocking_uniquecode.Stocking_UniqueCode;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -59,6 +61,7 @@ public class PersonnelAPI {
 	@Autowired IGpayUserService userService;
 	@Autowired IGpayUserOrgService userOrgService;
 	@Autowired IPersonnel_inout_Service person_inout_Service;
+	@Autowired IStocking_UniqueCode_Service stockingService;
 	
 	@RequestMapping(value = "/gettype",method = RequestMethod.POST)
 	public ResponseEntity<gettype_response> getType(HttpServletRequest request ) {
@@ -368,6 +371,7 @@ public class PersonnelAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long orgrootid_link = user.getRootorgid_link();
+			boolean isUpdateBikeNumber = false;
 			
 			Personel person = entity.data;
 			Boolean isbike = person.getIsbike() == null ? false : person.getIsbike();
@@ -375,12 +379,29 @@ public class PersonnelAPI {
 			if(person.getId() == null) {
 				person.setOrgrootid_link(orgrootid_link);
 				person.setStatus(0);//0-dang hoat dong;-1-da nghi viec
+				
+				if(person.getIsbike()) {
+					person.setBike_number(commonService.get_BikeNUmber());
+				}
+			}
+			else {
+				Personel person_old = personService.findOne(person.getId());
+				
+				if(person.getIsbike() && !person_old.getIsbike()) {
+					person.setBike_number(commonService.get_BikeNUmber());
+					isUpdateBikeNumber = true;
+				}
 			}
 			 
-			if(person.getIsbike()) {
-				person.setBike_number(commonService.get_BikeNUmber());
-			}
+			
 			person = personService.save(person);
+			
+			if(isUpdateBikeNumber) {
+				Stocking_UniqueCode stocking = stockingService.getby_type(5);
+				int stocking_max = stocking.getStocking_max();
+				stocking.setStocking_max(stocking_max+1);
+				stockingService.save(stocking);
+			}
 			
 			response.id = person.getId();
 			response.bike_number = person.getBike_number();

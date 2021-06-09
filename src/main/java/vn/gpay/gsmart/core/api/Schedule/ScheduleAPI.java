@@ -1782,7 +1782,7 @@ public class ScheduleAPI {
 				
 				for (POrderGrant_SKU pOrderGrant_SKU : list_sku) {
 					POrderGrant_SKU sku = new POrderGrant_SKU();
-					sku.setGrantamount(pOrderGrant_SKU.getGrantamount());
+					sku.setGrantamount(pOrderGrant_SKU.getAmount_break());
 					sku.setId(null);
 					sku.setOrgrootid_link(orgrootid_link);
 					sku.setPordergrantid_link(grant.getId());
@@ -1793,7 +1793,7 @@ public class ScheduleAPI {
 					POrderGrant_SKU sku_old = grantskuService.getPOrderGrant_SKUbySKUid_linkAndGrantId_andPO(
 							pOrderGrant_SKU.getSkuid_link(), pOrderGrant_SKU.getPordergrantid_link(), pOrderGrant_SKU.getPcontract_poid_link());
 					
-					sku_old.setGrantamount(sku_old.getGrantamount() - pOrderGrant_SKU.getGrantamount());
+					sku_old.setGrantamount(sku_old.getGrantamount() - pOrderGrant_SKU.getAmount_break());
 					grantskuService.save(sku_old);
 				}
 			}
