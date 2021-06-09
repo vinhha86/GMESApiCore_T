@@ -59,6 +59,10 @@ public class Jitin_Stockin_PkList_Data implements Serializable {
 	private Float width_yds_beforecheck;
 	private Float width_met_beforecheck;
 	private Float grossweight_beforecheck;
+	
+	private String row;
+	private String space;
+	private Integer floor;
 
 	public Long getId() {
 		return id;
@@ -359,6 +363,24 @@ public class Jitin_Stockin_PkList_Data implements Serializable {
 	}
 	public void setGrossweight_beforecheck(Float grossweight_beforecheck) {
 		this.grossweight_beforecheck = grossweight_beforecheck;
+	}
+	public String getRow() {
+		return row;
+	}
+	public void setRow(String row) {
+		this.row = row;
+	}
+	public String getSpace() {
+		return space;
+	}
+	public void setSpace(String space) {
+		this.space = space;
+	}
+	public Integer getFloor() {
+		return floor;
+	}
+	public void setFloor(Integer floor) {
+		this.floor = floor;
 	}
 	
 	
