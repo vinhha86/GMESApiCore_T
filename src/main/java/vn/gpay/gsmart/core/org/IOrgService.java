@@ -2,6 +2,8 @@ package vn.gpay.gsmart.core.org;
 
 import java.util.List;
 
+import org.springframework.data.repository.query.Param;
+
 import vn.gpay.gsmart.core.base.Operations;
 import vn.gpay.gsmart.core.org.Org;
 
@@ -50,4 +52,8 @@ public interface IOrgService extends Operations<Org>{
 	List<Org> findChildByListType(long orgrootid_link, long parentid_link, List<String> list_typeid);
 	
 	List<Org> findOrgByTypeKho();
+	
+	List<Org> findOrgByOrgType(List<Integer> orgtypestring);
+
+	List<Org> findOrgByOrgType(List<Integer> orgtypestring, Long parentid_link);
 }

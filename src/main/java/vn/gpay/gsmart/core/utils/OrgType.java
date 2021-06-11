@@ -8,6 +8,7 @@ public class OrgType {
 	public static int ORG_TYPE_LINE    			= 14;//to chuyen
 	public static int ORG_TYPE_STOCK_MAT		= 3;//Kho nguyen lieu
 	public static int ORG_TYPE_STOCK_PRODUCT	= 8;//Kho nguyen lieu
+	public static int ORG_TYPE_HEADQUARTER		= 1;//Tru so chinh
 
     public static int ORG_TYPE_UNKNOWN   		= -1; //Không xác định
 }

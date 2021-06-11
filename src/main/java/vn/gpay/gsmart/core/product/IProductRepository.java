@@ -36,8 +36,10 @@ public interface IProductRepository extends JpaRepository<Product, Long>, JpaSpe
 	@Query(value = "select c from Product c "
 			+ "where c.orgrootid_link = :orgrootid_link "
 			+ "and c.status = 1 "
-			+ "and (:code is not null or :code is null) "
-			+ "and (:name is not null or :name is null) "
+//			+ "and (:code is not null or :code is null) "
+//			+ "and (:name is not null or :name is null) "
+			+ "and (:code is null or lower(cast(c.code as text)) like lower(concat('%',cast(:code as text),'%'))) "
+			+ "and (:name is null or lower(cast(c.name as text)) like lower(concat('%',cast(:name as text),'%'))) "
 			+ "and producttypeid_link >= :producttypeid_link_from "
 			+ "and producttypeid_link <= :producttypeid_link_to")
 	public List<Product> get_product_by_type(
