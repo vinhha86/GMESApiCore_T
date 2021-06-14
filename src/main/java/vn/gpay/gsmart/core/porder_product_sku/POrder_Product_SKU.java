@@ -58,7 +58,9 @@ public class POrder_Product_SKU implements Serializable {
 	
 	@Transient
 	public String getPo_buyer() {
+		if(po!=null)
 		return po.getPo_buyer();
+		return "";
 	}
 	@Transient
 	public Integer pquantity_granted;
