@@ -151,4 +151,9 @@ public class WarehouseRepositoryImpl extends StringAbstractService<Warehouse> im
 			return "Lỗi tính toán vị trí khoang";
 		}
 	}
+
+	@Override
+	public List<Warehouse> findMaterialByEPC(String epc) {
+		return repositoty.findMaterialByEPC(epc);
+	}
 }

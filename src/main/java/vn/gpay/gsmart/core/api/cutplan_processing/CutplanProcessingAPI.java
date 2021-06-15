@@ -30,6 +30,9 @@ import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
+import vn.gpay.gsmart.core.utils.WareHouseStatus;
+import vn.gpay.gsmart.core.warehouse.IWarehouseService;
+import vn.gpay.gsmart.core.warehouse.Warehouse;
 
 @RestController
 @RequestMapping("/api/v1/cutplan_processing")
@@ -41,6 +44,7 @@ public class CutplanProcessingAPI {
 	@Autowired IOrgService orgService;
 	@Autowired IPOrder_Service porderService;
 	@Autowired ICutPlan_Row_Service cutplanrowService;
+	@Autowired IWarehouseService warehouseService;
 	
 	@RequestMapping(value = "/cutplan_processing_create",method = RequestMethod.POST)
 	@Transactional(rollbackFor = RuntimeException.class)
@@ -54,12 +58,8 @@ public class CutplanProcessingAPI {
 				Long orgrootid_link = user.getRootorgid_link();
 				
 				if (user != null) {
-					//Nếu thêm mới isNew = true
-//					boolean isNew = false;
-					
 					CutplanProcessing cutplanProcessing =entity.data.get(0);
 				    if(cutplanProcessing.getId()==null || cutplanProcessing.getId()==0) {
-//				    	isNew = true;
 				    	cutplanProcessing.setOrgrootid_link(user.getRootorgid_link());
 				    	cutplanProcessing.setUsercreatedid_link(user.getId());
 				    	cutplanProcessing.setTimecreated(new Date());
@@ -73,6 +73,15 @@ public class CutplanProcessingAPI {
 				    	if(cutplanProcessingD.getId()==null || cutplanProcessingD.getId()==0) {
 				    		cutplanProcessingD.setOrgrootid_link(user.getRootorgid_link());
 				    		cutplanProcessingD.setTimecreated(new Date());
+				    		
+				    		// update status warehouse thanh da cat
+				    		String epc = cutplanProcessingD.getEpc();
+				    		Long warehouseid_link = cutplanProcessingD.getWarehouseid_link();
+				    		List<Warehouse> warehouseList = warehouseService.findMaterialByEPC(epc);
+				    		if(warehouseList.size() > 0) {
+				    			Warehouse warehouse = warehouseList.get(0);
+				    			warehouse.setStatus(WareHouseStatus.WAREHOUSE_STATUS_CUT);
+				    		}
 				    	}
 				    	tong_so_la += cutplanProcessingD.getLa_vai();
 			    	};

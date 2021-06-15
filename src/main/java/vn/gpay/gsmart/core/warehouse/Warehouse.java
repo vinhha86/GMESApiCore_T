@@ -108,7 +108,7 @@ public class Warehouse implements Serializable {
 	@Column(name ="lasttimeupdate")
 	private Date lasttimeupdate;
 	
-	private long sizeid_link;
+	private Long sizeid_link;
 	private Float met;
 	private Integer status;
 	
@@ -395,7 +395,7 @@ public class Warehouse implements Serializable {
 		return sizeid_link;
 	}
 
-	public void setSizeid_link(long sizeid_link) {
+	public void setSizeid_link(Long sizeid_link) {
 		this.sizeid_link = sizeid_link;
 	}
 

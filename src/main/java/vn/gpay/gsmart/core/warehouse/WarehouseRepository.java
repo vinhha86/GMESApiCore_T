@@ -10,6 +10,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import vn.gpay.gsmart.core.warehouse.Warehouse;
+
 
 @Repository
 @Transactional
@@ -56,4 +58,8 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, String>{
 			+ "group by spaceepc_link")
 	List<Object[]> getspaces_bysku(
 			@Param ("skuid_link")final Long skuid_link) ;
+	
+	@Query(value = "select c from Warehouse c where epc =:epc")
+	public List<Warehouse> findMaterialByEPC(
+			@Param ("epc")final String epc);
 }
