@@ -686,4 +686,43 @@ public class OrgAPI {
 		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@RequestMapping(value = "/getOrgByTypeBanCatAndUser",method = RequestMethod.POST)
+	public ResponseEntity<?> getOrgByTypeBanCatAndUser(@RequestBody Org_getbyType_request entity, HttpServletRequest request) {//@RequestParam("type") 
+		OrgResponse response = new OrgResponse();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			List<Integer> orgtypeList = entity.orgtypeList;
+			//
+			Long orgid_link = user.getOrgid_link();
+			Long org_grant_id_link = user.getOrg_grant_id_link();
+			Org org = orgService.findOne(orgid_link);
+			
+			if(org.getOrgtypeid_link().equals(OrgType.ORG_TYPE_HEADQUARTER)) {
+				// nếu là trụ sở chính -> lấy hết
+				response.data = orgService.findOrgByTypeBanCat(null);
+			}else if(org.getOrgtypeid_link().equals(OrgType.ORG_TYPE_FACTORY)){
+				if(org_grant_id_link == null) {
+					response.data = orgService.findOrgByTypeBanCat(null);
+				}else {
+					Org orgGrant = orgService.findOne(org_grant_id_link);
+					if(orgGrant.getOrgtypeid_link().equals(OrgType.ORG_TYPE_CAT)) {
+						response.data = orgService.findOrgByTypeBanCat(orgGrant.getId());
+					}else {
+						response.data = orgService.findOrgByTypeBanCat(null);
+					}
+				}
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<OrgResponse>(response,HttpStatus.OK);
+		}catch (RuntimeException e) {
+			e.printStackTrace();
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(e.getMessage());
+		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

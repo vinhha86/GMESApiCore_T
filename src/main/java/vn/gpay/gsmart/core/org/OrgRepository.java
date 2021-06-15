@@ -115,12 +115,22 @@ public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecification
 	@Query(value = "select c from Org c "
 			+ "where c.orgtypeid_link in (:orgtypestring) "
 			+ "and c.status > -1 "
-			+ "and c.parentid_link = :parentid_link "
+			+ "and (c.parentid_link = :parentid_link or :parentid_link is null) "
 			+ "and :orgtypestring = :orgtypestring "
 			+ "order by c.name asc "
 			)
 	public List<Org> findOrgByOrgType(
 			@Param ("orgtypestring")final List<Integer> orgtypestring,
+			@Param ("parentid_link")final Long parentid_link
+			);
+	
+	@Query(value = "select c from Org c "
+			+ "where c.status > -1 "
+			+ "and (c.parentid_link = :parentid_link or :parentid_link is null) "
+			+ "and c.orgtypeid_link = 28 "
+			+ "order by c.name asc "
+			)
+	public List<Org> findOrgByTypeBanCat(
 			@Param ("parentid_link")final Long parentid_link
 			);
 }

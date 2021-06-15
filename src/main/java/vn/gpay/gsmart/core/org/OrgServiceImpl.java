@@ -360,4 +360,9 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 	public List<Org> findOrgByOrgType(List<Integer> orgtypestring, Long parentid_link) {
 		return repositoty.findOrgByOrgType(orgtypestring, parentid_link);
 	}
+
+	@Override
+	public List<Org> findOrgByTypeBanCat(Long parentid_link) {
+		return repositoty.findOrgByTypeBanCat(parentid_link);
+	}
 }
