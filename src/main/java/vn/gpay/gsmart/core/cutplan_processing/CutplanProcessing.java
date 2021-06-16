@@ -21,6 +21,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.attributevalue.Attributevalue;
 import vn.gpay.gsmart.core.cutplan.CutPlan_Row;
 import vn.gpay.gsmart.core.org.Org;
 
@@ -88,11 +89,19 @@ public class CutplanProcessing implements Serializable {
 	}
 	
 	@Transient
+	public Float getDai_so_do() {
+		if(cutPlanRow != null) {
+			return cutPlanRow.getDai_so_do();
+		}
+		return null;
+	}
+	
+	@Transient
 	public String getMaSP() {
 		if(cutPlanRow != null) {
 			return cutPlanRow.getMaSP();
 		}
-		return "cutPlanRow null";
+		return "";
 	}
 	
 	
@@ -101,7 +110,7 @@ public class CutplanProcessing implements Serializable {
 		if(cutPlanRow != null) {
 			return cutPlanRow.getPordercode();
 		}
-		return "cutPlanRow null";
+		return "";
 	}
 	
 	@Transient
@@ -129,12 +138,33 @@ public class CutplanProcessing implements Serializable {
 	}
 	
 	@Transient
+	public String getCutPlanRowName() {
+		if(cutPlanRow != null) {
+			return cutPlanRow.getName();
+		}
+		return "";
+	}
+	
+	@Transient
 	public int getLa_vai() {
 		int sum = 0;
 		for(CutplanProcessingD detail : cutplanProcessingD) {
 			sum += detail.getLa_vai() == null ? 0 : detail.getLa_vai();
 		}
 		return sum;
+	}
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="colorid_link",insertable=false,updatable =false)
+    private Attributevalue attMau;
+	
+	@Transient
+	public String getColor_name() {
+		if(attMau != null) {
+			return attMau.getValue();
+		}
+		return "";
 	}
 
 	public Long getId() {
@@ -235,6 +265,30 @@ public class CutplanProcessing implements Serializable {
 
 	public void setMaterial_skuid_link(Long material_skuid_link) {
 		this.material_skuid_link = material_skuid_link;
+	}
+
+	public CutPlan_Row getCutPlanRow() {
+		return cutPlanRow;
+	}
+
+	public void setCutPlanRow(CutPlan_Row cutPlanRow) {
+		this.cutPlanRow = cutPlanRow;
+	}
+
+	public Org getCutorg() {
+		return cutorg;
+	}
+
+	public void setCutorg(Org cutorg) {
+		this.cutorg = cutorg;
+	}
+
+	public Attributevalue getAttMau() {
+		return attMau;
+	}
+
+	public void setAttMau(Attributevalue attMau) {
+		this.attMau = attMau;
 	}
 	
 	

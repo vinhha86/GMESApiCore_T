@@ -8,8 +8,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.warehouse.Warehouse;
 
 @Table(name="cutplan_processing_d")
 @Entity
@@ -59,6 +67,26 @@ public class CutplanProcessingD implements Serializable  {
 	
 	@Column(name = "timecreated")
 	private Date timecreated;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="warehouseid_link",updatable =false,insertable =false)
+	private Warehouse warehouse;
+	
+	@Transient
+	public String getSkucode() {
+		if(warehouse != null) {
+			return warehouse.getSkucode();
+		}
+		return "";
+	}
+	@Transient
+	public String getSkuname() {
+		if(warehouse != null) {
+			return warehouse.getSkuname();
+		}
+		return "";
+	}
 
 	public Long getId() {
 		return id;
@@ -171,6 +199,5 @@ public class CutplanProcessingD implements Serializable  {
 	public void setTimecreated(Date timecreated) {
 		this.timecreated = timecreated;
 	}
-	
 	
 }
