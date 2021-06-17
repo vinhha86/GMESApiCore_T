@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +32,7 @@ import vn.gpay.gsmart.core.personel.IPersonnel_Service;
 import vn.gpay.gsmart.core.personel.IPersonnel_inout_Service;
 import vn.gpay.gsmart.core.personel.Personel;
 import vn.gpay.gsmart.core.personel.Personnel_inout;
+import vn.gpay.gsmart.core.personel.Personnel_moto;
 import vn.gpay.gsmart.core.personnel_history.IPersonnel_His_Service;
 import vn.gpay.gsmart.core.personnel_history.Personnel_His;
 import vn.gpay.gsmart.core.personnel_notmap.IPersonnel_notmap_Service;
@@ -143,8 +146,29 @@ public class PersonnelAPI {
 				list = personService.getby_orgs(orgs, orgrootid_link, true);
 			}
 			
+			//lay danh sách nhân viên và biển số xe tương ứng và giờ vào ngày hôm nay nếu có
+			List<Personnel_moto> list_moto = new ArrayList<>();
+			for(Personel person : list) {
+				Personnel_moto moto = new Personnel_moto();
+				moto.setBike_number(person.getBike_number());
+				moto.setCode(person.getCode());
+				moto.setId(person.getId());
+				
+				List<Personnel_inout> person_inout = person_inout_Service.getby_person(person.getId(), new Date());
+				if(person_inout.size() > 0) {
+					DateFormat dateformat = new SimpleDateFormat ("dd/MM/yyyy");
+					String entrydate = dateformat.format(person_inout.get(0).getTime_in());
+					moto.setEntrydate(entrydate);
+				}
+				else {
+					moto.setEntrydate("");
+				}
+				
+			}
 			
-			response.data = list;
+			//Cập nhật vào database giờ vào giờ ra các xe trong ngày
+			
+			response.data = list_moto;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<getperson_by_userid_response>(response,HttpStatus.OK);

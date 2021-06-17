@@ -23,25 +23,18 @@ public class Personnel_inout implements Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "personnel_inout_generator")
 	@SequenceGenerator(name="personnel_inout_generator", sequenceName = "personnel_inout_id_seq", allocationSize=1)
 	protected Long id;
-	private Long personnelid_link; //Id nhân viên
+	private Long personnelid_link_out; //Id nhân viên
 	private Date time_in; //giờ đi xe vào
 	private Date time_out; //giờ lấy xe về
-	private String bike_number_out; //biển số xe trong trường hợp không khớp với biển số trong hồ sơ
+	private String bike_number; //biển số xe trong trường hợp không khớp với biển số trong hồ sơ
 	private Long usercheck_checkout; //id tài khoản của bảo về đăng nhập
-	
-	 
+	private String personnel_code;	 
 	
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
-	}
-	public Long getPersonnelid_link() {
-		return personnelid_link;
-	}
-	public void setPersonnelid_link(Long personnelid_link) {
-		this.personnelid_link = personnelid_link;
 	}
 	public Date getTime_in() {
 		return time_in;
@@ -55,17 +48,29 @@ public class Personnel_inout implements Serializable {
 	public void setTime_out(Date time_out) {
 		this.time_out = time_out;
 	}
-	public String getBike_number_out() {
-		return bike_number_out;
-	}
-	public void setBike_number_out(String bike_number_out) {
-		this.bike_number_out = bike_number_out;
-	}
 	public Long getUsercheck_checkout() {
 		return usercheck_checkout;
 	}
 	public void setUsercheck_checkout(Long usercheck_checkout) {
 		this.usercheck_checkout = usercheck_checkout;
+	}
+	public Long getPersonnelid_link_out() {
+		return personnelid_link_out;
+	}
+	public void setPersonnelid_link_out(Long personnelid_link_out) {
+		this.personnelid_link_out = personnelid_link_out;
+	}
+	public String getBike_number() {
+		return bike_number;
+	}
+	public void setBike_number(String bike_number) {
+		this.bike_number = bike_number;
+	}
+	public String getPersonnel_code() {
+		return personnel_code;
+	}
+	public void setPersonnel_code(String personnel_code) {
+		this.personnel_code = personnel_code;
 	}
 	
 	

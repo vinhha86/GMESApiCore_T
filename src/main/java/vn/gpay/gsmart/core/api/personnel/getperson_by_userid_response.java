@@ -3,8 +3,8 @@ package vn.gpay.gsmart.core.api.personnel;
 import java.util.List;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
-import vn.gpay.gsmart.core.personel.Personel;
+import vn.gpay.gsmart.core.personel.Personnel_moto;
 
 public class getperson_by_userid_response extends ResponseBase{
-	public List<Personel> data;
+	public List<Personnel_moto> data;
 }
