@@ -29,6 +29,9 @@ public class Personnel_inout implements Serializable {
 	private String bike_number; //biển số xe trong trường hợp không khớp với biển số trong hồ sơ
 	private Long usercheck_checkout; //id tài khoản của bảo về đăng nhập
 	private String personnel_code;	 
+	private Date ngay;
+	
+	
 	
 	public Long getId() {
 		return id;
@@ -71,6 +74,12 @@ public class Personnel_inout implements Serializable {
 	}
 	public void setPersonnel_code(String personnel_code) {
 		this.personnel_code = personnel_code;
+	}
+	public Date getNgay() {
+		return ngay;
+	}
+	public void setNgay(Date ngay) {
+		this.ngay = ngay;
 	}
 	
 	
