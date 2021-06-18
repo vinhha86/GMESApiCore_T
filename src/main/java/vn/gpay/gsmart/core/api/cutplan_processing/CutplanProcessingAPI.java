@@ -201,4 +201,22 @@ public class CutplanProcessingAPI {
 		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@RequestMapping(value = "/cutplan_processing_delete",method = RequestMethod.POST)
+	public ResponseEntity<?> cutplan_processing_delete(@RequestBody CutplanProcessingByIDRequest entity, HttpServletRequest request ) {
+		CutplanProcessingByIDResponse response = new CutplanProcessingByIDResponse();
+		try {
+			CutplanProcessing cutplanProcessing = cutplanProcessingService.findOne(entity.id);
+			cutplanProcessingService.delete(cutplanProcessing);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<CutplanProcessingByIDResponse>(response,HttpStatus.OK);
+		}catch (RuntimeException e) {
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(e.getMessage());
+		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }
