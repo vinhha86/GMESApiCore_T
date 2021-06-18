@@ -207,7 +207,54 @@ public class CutplanProcessingAPI {
 		CutplanProcessingByIDResponse response = new CutplanProcessingByIDResponse();
 		try {
 			CutplanProcessing cutplanProcessing = cutplanProcessingService.findOne(entity.id);
+			
+			// tìm cây vải warehouse và chuyển status từ đã cắt -> đã tở
+			List<CutplanProcessingD> cutplanProcessingD_list = cutplanProcessing.getCutplanProcessingD();
+			for(CutplanProcessingD item : cutplanProcessingD_list) {
+				String epc = item.getEpc();
+				if(epc != null) {
+					List<Warehouse> warehouse_list = warehouseService.findMaterialByEPC(epc);
+					if(warehouse_list.size() > 0) {
+						Warehouse warehouse = warehouse_list.get(0);
+						warehouse.setStatus(WareHouseStatus.WAREHOUSE_STATUS_CHECKED);
+						warehouseService.save(warehouse);
+					}
+				}
+			}
+			
+			// xoá
 			cutplanProcessingService.delete(cutplanProcessing);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<CutplanProcessingByIDResponse>(response,HttpStatus.OK);
+		}catch (RuntimeException e) {
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(e.getMessage());
+		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@RequestMapping(value = "/cutplan_processing_d_delete",method = RequestMethod.POST)
+	public ResponseEntity<?> cutplan_processing_d_delete(@RequestBody CutplanProcessingByIDRequest entity, HttpServletRequest request ) {
+		CutplanProcessingByIDResponse response = new CutplanProcessingByIDResponse();
+		try {
+			CutplanProcessingD cutplanProcessingD = cutplanProcessingDService.findOne(entity.id);
+			
+			// tìm cây vải warehouse và chuyển status từ đã cắt -> đã tở
+			String epc = cutplanProcessingD.getEpc();
+			if(epc != null) {
+				List<Warehouse> warehouse_list = warehouseService.findMaterialByEPC(epc);
+				if(warehouse_list.size() > 0) {
+					Warehouse warehouse = warehouse_list.get(0);
+					warehouse.setStatus(WareHouseStatus.WAREHOUSE_STATUS_CHECKED);
+					warehouseService.save(warehouse);
+				}
+			}
+			
+			// xoá
+			cutplanProcessingDService.delete(cutplanProcessingD);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
