@@ -163,7 +163,7 @@ public class PersonnelAPI {
 				else {
 					moto.setEntrydate("");
 				}
-				
+				list_moto.add(moto);
 			}
 			
 			//Cập nhật vào database giờ vào giờ ra các xe trong ngày
