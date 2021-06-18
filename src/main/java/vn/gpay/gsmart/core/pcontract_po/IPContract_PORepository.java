@@ -36,7 +36,7 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			+ "and c.pcontractid_link = :pcontractid_link "
 			+ "and (c.productid_link = :productid_link or 0 = :productid_link) "
 			+ "and (:userid_link is null or c.merchandiserid_link = :userid_link) "
-			+ "and (c.po_typeid_link = 0 or c.po_typeid_link = 1 or c.po_typeid_link = 10)")
+			+ "and c.po_typeid_link in (0,1,10)")
 	public List<PContract_PO> getPO_Chaogia(@Param ("orgrootid_link")final  Long orgrootid_link,
 			@Param ("pcontractid_link")final  Long pcontractid_link,
 			@Param ("productid_link")final  Long productid_link,

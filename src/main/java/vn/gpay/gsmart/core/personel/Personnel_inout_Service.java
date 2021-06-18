@@ -23,17 +23,13 @@ public class Personnel_inout_Service extends AbstractService<Personnel_inout> im
 	@Override
 	public List<Personnel_inout> getby_person(Long personnelid_link, Date today) {
 		// TODO Auto-generated method stub
-		Date date_from = commonService.getBeginOfDate(today);
-		Date date_to = commonService.getEndOfDate(today);
 		
-		return repo.getby_person(personnelid_link, date_from, date_to);
+		return repo.getby_person(personnelid_link, today);
 	}
 	@Override
 	public List<Personnel_inout> getPersonInout(Date today) {
 		// TODO Auto-generated method stub
-		Date date_from = commonService.getBeginOfDate(today);
-		Date date_to = commonService.getEndOfDate(today);
-		return repo.GetPersonInOut(date_from, date_to);
+		return repo.GetPersonInOut(today);
 	}
 
 }

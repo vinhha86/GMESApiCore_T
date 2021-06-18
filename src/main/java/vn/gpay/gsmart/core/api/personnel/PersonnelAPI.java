@@ -119,7 +119,7 @@ public class PersonnelAPI {
 		}
 	}
 	
-	@RequestMapping(value = "/getperson_by_user",method = RequestMethod.POST)
+	@RequestMapping(value = "/sync_up",method = RequestMethod.POST)
 	public ResponseEntity<getperson_by_userid_response> getOrgByUser(HttpServletRequest request, @RequestBody getperson_by_userid_request entity ) {
 		getperson_by_userid_response response = new getperson_by_userid_response();
 		try {
@@ -163,7 +163,7 @@ public class PersonnelAPI {
 				else {
 					moto.setEntrydate("");
 				}
-				
+				list_moto.add(moto);
 			}
 			
 			//Cập nhật vào database giờ vào giờ ra các xe trong ngày
