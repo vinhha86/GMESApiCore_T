@@ -561,13 +561,13 @@ public class PersonnelAPI {
 				//kiem tra trong DB co chua thi them vao 
 				List<Personnel_inout> person_check = person_inout_Service.getby_person(person.getId(), new Date());
 				if(person_check.size() == 0) {
-					Personnel_inout personnew = new Personnel_inout();
-					personnew.setBike_number_out("");
-					personnew.setId(null);
-					personnew.setPersonnelid_link(person.getId());
-					personnew.setTime_in(person.getTime_in());
-					personnew.setTime_out(person.getTime_out());
-					person_inout_Service.save(personnew);
+//					Personnel_inout personnew = new Personnel_inout();
+//					personnew.setBike_number_out("");
+//					personnew.setId(null);
+//					personnew.setPersonnelid_link(person.getId());
+//					personnew.setTime_in(person.getTime_in());
+//					personnew.setTime_out(person.getTime_out());
+//					person_inout_Service.save(personnew);
 				}
 				else {
 					person.setUsercheck_checkout(user.getId());
