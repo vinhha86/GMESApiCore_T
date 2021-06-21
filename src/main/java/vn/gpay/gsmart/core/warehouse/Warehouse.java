@@ -111,8 +111,17 @@ public class Warehouse implements Serializable {
 	private Long sizeid_link;
 	private Float met;
 	private Integer status;
+	private Float met_err;
 	
 	
+
+	public Float getMet_err() {
+		return met_err;
+	}
+
+	public void setMet_err(Float met_err) {
+		this.met_err = met_err;
+	}
 
 	public String getSkucode() {
 		return skucode;

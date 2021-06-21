@@ -68,6 +68,9 @@ public class CutplanProcessingD implements Serializable  {
 	@Column(name = "timecreated")
 	private Date timecreated;
 	
+	@Column(name = "met_err")
+	private Float met_err;
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="warehouseid_link",updatable =false,insertable =false)
@@ -198,6 +201,12 @@ public class CutplanProcessingD implements Serializable  {
 
 	public void setTimecreated(Date timecreated) {
 		this.timecreated = timecreated;
+	}
+	public Float getMet_err() {
+		return met_err;
+	}
+	public void setMet_err(Float met_err) {
+		this.met_err = met_err;
 	}
 	
 }

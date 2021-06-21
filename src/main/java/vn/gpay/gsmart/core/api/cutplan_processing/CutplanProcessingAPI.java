@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.base.ResponseError;
+import vn.gpay.gsmart.core.cutplan.CutPlan_Row;
 import vn.gpay.gsmart.core.cutplan.ICutPlan_Row_Service;
 import vn.gpay.gsmart.core.cutplan.ICutPlan_Size_Service;
 import vn.gpay.gsmart.core.cutplan_processing.CutplanProcessing;
@@ -80,25 +81,27 @@ public class CutplanProcessingAPI {
 				    		List<Warehouse> warehouseList = warehouseService.findMaterialByEPC(epc);
 				    		if(warehouseList.size() > 0) {
 				    			Warehouse warehouse = warehouseList.get(0);
-				    			warehouse.setStatus(WareHouseStatus.WAREHOUSE_STATUS_CUT);
+				    			warehouse.setMet(cutplanProcessingD.getCon_lai()); // update vải còn trong kho = số đầu tấm
+				    			if(warehouse.getStatus().equals(WareHouseStatus.WAREHOUSE_STATUS_UNCHECKED)
+				    					|| warehouse.getStatus().equals(WareHouseStatus.WAREHOUSE_STATUS_CHECKED)
+				    					) {
+				    				// set status đã cắt
+				    				// ko set thành đã cắt nữa vì lưu lại giá trị đầu tấm vào warehouse -> cây vải dùng tiếp
+//					    			warehouse.setStatus(WareHouseStatus.WAREHOUSE_STATUS_CUT);
+				    			}
 				    		}
 				    	}
 				    	tong_so_la += cutplanProcessingD.getLa_vai();
 			    	};
 			    	
 			    	//Tính số lượng amount_cut dựa trên sơ đồ cắt và tổng số lá
-			    	Integer total_size_amount = cutplan_SizeService.getTotalAmount_By_CutPlanRow(cutplanProcessing.getCutplanrowid_link());
-			    	cutplanProcessing.setAmountcut(total_size_amount*tong_so_la);
+			    	cutplanProcessing = reCalculateAmountCut(cutplanProcessing);
 			    	
-			    	cutplanProcessing = cutplanProcessingService.save(cutplanProcessing);
+			    	Long cutplanrowid_link = cutplanProcessing.getCutplanrowid_link();
+			    	Long material_skuid_link = cutplanProcessing.getMaterial_skuid_link();
+			    	Long colorid_link = cutplanProcessing.getColorid_link();
+			    	sync_porder_bom(cutplanrowid_link, material_skuid_link, colorid_link);
 			    	
-			    	Long porderid_link = entity.porderid_link;
-			    	POrder porder = porderService.findOne(porderid_link);
-			    	Long material_skuid_link = entity.material_skuid_link;
-			    	Long colorid_link = entity.colorid_link;
-			    	
-					cutplanrowService.sync_porder_bom_from_cutprocesing(material_skuid_link, porder, colorid_link, user.getId(), orgrootid_link);
-					
 					response.data = cutplanProcessing;
 					response.id = cutplanProcessing.getId();
 					
@@ -216,14 +219,21 @@ public class CutplanProcessingAPI {
 					List<Warehouse> warehouse_list = warehouseService.findMaterialByEPC(epc);
 					if(warehouse_list.size() > 0) {
 						Warehouse warehouse = warehouse_list.get(0);
-						warehouse.setStatus(WareHouseStatus.WAREHOUSE_STATUS_CHECKED);
+						warehouse.setMet(item.getMet());
+						warehouse.setYds((float) (item.getMet() / 0.9144));
+//						warehouse.setStatus(WareHouseStatus.WAREHOUSE_STATUS_CHECKED);
 						warehouseService.save(warehouse);
 					}
 				}
 			}
 			
 			// xoá
+			Long cutplanrowid_link = cutplanProcessing.getCutplanrowid_link();
+	    	Long material_skuid_link = cutplanProcessing.getMaterial_skuid_link();
+	    	Long colorid_link = cutplanProcessing.getColorid_link();
+	    	
 			cutplanProcessingService.delete(cutplanProcessing);
+	    	sync_porder_bom(cutplanrowid_link, material_skuid_link, colorid_link);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -241,6 +251,8 @@ public class CutplanProcessingAPI {
 		CutplanProcessingByIDResponse response = new CutplanProcessingByIDResponse();
 		try {
 			CutplanProcessingD cutplanProcessingD = cutplanProcessingDService.findOne(entity.id);
+			Long cutplan_processingid_link = cutplanProcessingD.getCutplan_processingid_link();
+			CutplanProcessing cutplanProcessing = cutplanProcessingService.findOne(cutplan_processingid_link);
 			
 			// tìm cây vải warehouse và chuyển status từ đã cắt -> đã tở
 			String epc = cutplanProcessingD.getEpc();
@@ -248,13 +260,22 @@ public class CutplanProcessingAPI {
 				List<Warehouse> warehouse_list = warehouseService.findMaterialByEPC(epc);
 				if(warehouse_list.size() > 0) {
 					Warehouse warehouse = warehouse_list.get(0);
-					warehouse.setStatus(WareHouseStatus.WAREHOUSE_STATUS_CHECKED);
+					warehouse.setMet(cutplanProcessingD.getMet());
+					warehouse.setYds((float) (cutplanProcessingD.getMet() / 0.9144));
+//					warehouse.setStatus(WareHouseStatus.WAREHOUSE_STATUS_CHECKED);
 					warehouseService.save(warehouse);
 				}
 			}
 			
 			// xoá
 			cutplanProcessingDService.delete(cutplanProcessingD);
+			
+			reCalculateAmountCut(cutplanProcessing);
+			
+			Long cutplanrowid_link = cutplanProcessing.getCutplanrowid_link();
+	    	Long material_skuid_link = cutplanProcessing.getMaterial_skuid_link();
+	    	Long colorid_link = cutplanProcessing.getColorid_link();
+	    	sync_porder_bom(cutplanrowid_link, material_skuid_link, colorid_link);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -265,5 +286,35 @@ public class CutplanProcessingAPI {
 			errorBase.setMessage(e.getMessage());
 		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+	
+	public CutplanProcessing reCalculateAmountCut(CutplanProcessing cutplanProcessing) {
+		//Tính số lượng amount_cut dựa trên sơ đồ cắt và tổng số lá
+		GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+    	Integer total_size_amount = cutplan_SizeService.getTotalAmount_By_CutPlanRow(cutplanProcessing.getCutplanrowid_link());
+    	Integer tong_so_la = 0;
+    	
+    	List<CutplanProcessingD> cutplanProcessingDs = cutplanProcessing.getCutplanProcessingD();
+    	for (CutplanProcessingD cutplanProcessingD : cutplanProcessingDs) {
+	    	tong_so_la += cutplanProcessingD.getLa_vai();
+    	};
+    	cutplanProcessing.setAmountcut(total_size_amount*tong_so_la);
+    	cutplanProcessing = cutplanProcessingService.save(cutplanProcessing);
+		
+		return cutplanProcessing;
+	}
+	
+	public void sync_porder_bom(Long cutplanrowid_link, Long material_skuid_link, Long colorid_link) {
+		GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Long orgrootid_link = user.getRootorgid_link();
+
+//		Long cutplanrowid_link =  cutplanProcessing.getCutplanrowid_link();
+    	CutPlan_Row cutPlan_Row = cutplanRowService.findOne(cutplanrowid_link);
+    	Long porderid_link = cutPlan_Row.getPorderid_link();
+    	POrder porder = porderService.findOne(porderid_link);
+//    	Long material_skuid_link = cutplanProcessing.getMaterial_skuid_link();
+//    	Long colorid_link = cutplanProcessing.getColorid_link();
+		cutplanrowService.sync_porder_bom_from_cutprocesing(material_skuid_link, porder, colorid_link, user.getId(), orgrootid_link);
 	}
 }
