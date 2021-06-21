@@ -15,17 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 public interface Personnel_inout_repository extends JpaRepository<Personnel_inout, Long>,JpaSpecificationExecutor<Personnel_inout> {
 	@Query(value = "select c from Personnel_inout c "
 			+ "where personnelid_link_out = :personnelid_link "
-			+ "and ngay = :ngay"
+			+ "and  time_out is null"
 			)
 	public List<Personnel_inout> getby_person(
-			@Param ("personnelid_link")final Long personnelid_link,
-			@Param ("ngay")final Date ngay
+			@Param ("personnelid_link")final Long personnelid_link
 			);
 	
-	@Query(value = "select c from Personnel_inout c "
-			+ "where ngay = :ngay"
-			)
-	public List<Personnel_inout> GetPersonInOut(
-			@Param ("ngay")final Date ngay
-			);
 }

@@ -97,7 +97,7 @@ public class CutplanProcessingAPI {
 			    	Long material_skuid_link = entity.material_skuid_link;
 			    	Long colorid_link = entity.colorid_link;
 			    	
-					cutplanrowService.sync_porder_bom(material_skuid_link, porder, colorid_link, user.getId(), orgrootid_link);
+					cutplanrowService.sync_porder_bom_from_cutprocesing(material_skuid_link, porder, colorid_link, user.getId(), orgrootid_link);
 					
 					response.data = cutplanProcessing;
 					response.id = cutplanProcessing.getId();

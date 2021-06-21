@@ -196,7 +196,7 @@ public class CutPlan_Row_Service extends AbstractService<CutPlan_Row> implements
 			bom = bom_avg * size_percent;
 			bom = (float)Math.ceil((bom*10000))/10000;
 					
-			List<POrderBOMSKU> list_bomsku = porderbomskuService.getby_porder_and_material_and_sku_and_type(porderid_link, material_skuid_link, product_skuid_link, POrderBomType.Kythuat);
+			List<POrderBOMSKU> list_bomsku = porderbomskuService.getby_porder_and_material_and_sku_and_type(porderid_link, material_skuid_link, product_skuid_link, POrderBomType.SanXuat);
 			
 			//neu co dinh muc roi thi cap nhat chua co thi them vao
 			if(list_bomsku.size() > 0) {

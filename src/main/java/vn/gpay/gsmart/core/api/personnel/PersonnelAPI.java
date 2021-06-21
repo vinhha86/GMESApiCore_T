@@ -151,19 +151,16 @@ public class PersonnelAPI {
 			for(Personel person : list) {
 				Personnel_moto moto = new Personnel_moto();
 				moto.setBike_number(person.getBike_number());
-				moto.setCode(person.getCode());
+				moto.setCode_personnel(person.getCode());
 				moto.setId(person.getId());
 				
-				List<Personnel_inout> person_inout = person_inout_Service.getby_person(person.getId(), new Date());
+				List<Personnel_inout> person_inout = person_inout_Service.getby_person(person.getId());
 				if(person_inout.size() > 0) {
-					DateFormat dateformat = new SimpleDateFormat ("dd/MM/yyyy");
-					String entrydate = dateformat.format(person_inout.get(0).getTime_in());
-					moto.setEntrydate(entrydate);
+					DateFormat dateformat_timein = new SimpleDateFormat ("dd/MM/yyyy");
+					String giovao = dateformat_timein.format(person_inout.get(0).getTime_in());
+					moto.setGiovao(giovao);
+					list_moto.add(moto);
 				}
-				else {
-					moto.setEntrydate("");
-				}
-				list_moto.add(moto);
 			}
 			
 			//Cập nhật vào database giờ vào giờ ra các xe trong ngày
@@ -559,7 +556,7 @@ public class PersonnelAPI {
 			for(Personnel_inout person: entity.data) {
 				
 				//kiem tra trong DB co chua thi them vao 
-				List<Personnel_inout> person_check = person_inout_Service.getby_person(person.getId(), new Date());
+				List<Personnel_inout> person_check = person_inout_Service.getby_person(person.getId());
 				if(person_check.size() == 0) {
 //					Personnel_inout personnew = new Personnel_inout();
 //					personnew.setBike_number_out("");
@@ -583,23 +580,6 @@ public class PersonnelAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<personnel_updatetime_inout_response>(response,HttpStatus.OK);
-		}
-	}
-	
-	@RequestMapping(value = "/gettime_inout",method = RequestMethod.POST)
-	public ResponseEntity<gettime_inout_response> GetTimeInOut(HttpServletRequest request) {
-		gettime_inout_response response = new gettime_inout_response();
-		try {
-			response.data = person_inout_Service.getPersonInout(new Date());
-			
-			
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<gettime_inout_response>(response,HttpStatus.OK);
-		}catch (Exception e) {
-			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-			response.setMessage(e.getMessage());
-		    return new ResponseEntity<gettime_inout_response>(response,HttpStatus.OK);
 		}
 	}
 }
