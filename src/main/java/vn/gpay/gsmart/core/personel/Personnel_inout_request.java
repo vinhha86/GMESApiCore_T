@@ -1,31 +1,14 @@
 package vn.gpay.gsmart.core.personel;
 
-import java.io.Serializable;
-import java.util.Date;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-
-@Table(name="personnel_inout")
-@Entity
-public class Personnel_inout implements Serializable {
+public class Personnel_inout_request{
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "personnel_inout_generator")
-	@SequenceGenerator(name="personnel_inout_generator", sequenceName = "personnel_inout_id_seq", allocationSize=1)
-	protected Long id;
+	private Long id;
 	private String personnel_code;	//Ma nhan vien gui xe
-	private Date time_in; //giờ đi xe vào
-	private Date time_out; //giờ lấy xe về
+	private String time_in; //giờ đi xe vào
+	private String time_out; //giờ lấy xe về
 	private String bike_number; //biển số xe trong trường hợp không khớp với biển số trong hồ sơ
 	private Long usercheck_checkout; //id tài khoản của bảo về đăng nhập
 	private String personnel_code_out; //Ma nhân viên lay xe ra
@@ -37,16 +20,16 @@ public class Personnel_inout implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public Date getTime_in() {
+	public String getTime_in() {
 		return time_in;
 	}
-	public void setTime_in(Date time_in) {
+	public void setTime_in(String time_in) {
 		this.time_in = time_in;
 	}
-	public Date getTime_out() {
+	public String getTime_out() {
 		return time_out;
 	}
-	public void setTime_out(Date time_out) {
+	public void setTime_out(String time_out) {
 		this.time_out = time_out;
 	}
 	public Long getUsercheck_checkout() {

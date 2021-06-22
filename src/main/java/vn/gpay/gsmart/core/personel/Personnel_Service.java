@@ -75,5 +75,10 @@ public class Personnel_Service extends AbstractService<Personel> implements IPer
 //		List<Personel> lst = repo.findAll(specification, sort);
 		return repo.getperson_and_bikenumber(orgid_link, ishas_bikenumber, orgrootid_link);
 	}
+	@Override
+	public List<Personel> getby_bikenumber(String bike_number) {
+		// TODO Auto-generated method stub
+		return repo.getby_bikenumber(bike_number);
+	}
 
 }

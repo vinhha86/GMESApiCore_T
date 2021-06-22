@@ -21,10 +21,15 @@ public class Personnel_inout_Service extends AbstractService<Personnel_inout> im
 		return repo;
 	}
 	@Override
-	public List<Personnel_inout> getby_person(Long personnelid_link) {
+	public List<Personnel_inout> getlist_not_checkout(String personnel_code) {
 		// TODO Auto-generated method stub
 		
-		return repo.getby_person(personnelid_link);
+		return repo.getlist_not_checkout(personnel_code);
+	}
+	@Override
+	public List<Personnel_inout> getby_bikenumber_and_timein(String bike_number, Date timein) {
+		// TODO Auto-generated method stub
+		return repo.getby_bikenumber_and_timein(bike_number, timein);
 	}
 
 }

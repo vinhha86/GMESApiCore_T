@@ -32,7 +32,7 @@ import vn.gpay.gsmart.core.personel.IPersonnel_Service;
 import vn.gpay.gsmart.core.personel.IPersonnel_inout_Service;
 import vn.gpay.gsmart.core.personel.Personel;
 import vn.gpay.gsmart.core.personel.Personnel_inout;
-import vn.gpay.gsmart.core.personel.Personnel_moto;
+import vn.gpay.gsmart.core.personel.Personnel_inout_request;
 import vn.gpay.gsmart.core.personnel_history.IPersonnel_His_Service;
 import vn.gpay.gsmart.core.personnel_history.Personnel_His;
 import vn.gpay.gsmart.core.personnel_notmap.IPersonnel_notmap_Service;
@@ -129,6 +129,28 @@ public class PersonnelAPI {
 			
 			Long orgrootid_link = user.getRootorgid_link();
 			
+			//Cập nhật vào database giờ vào giờ ra các xe trong ngày
+			if(entity.data != null) {
+				for(Personnel_inout_request person_inout : entity.data) {
+					DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+					List<Personnel_inout> persons = person_inout_Service.getby_bikenumber_and_timein(person_inout.getBike_number(),df.parse(person_inout.getTime_in()));
+					if(persons.size() == 0) {
+						Personnel_inout new_inout = new Personnel_inout();
+						new_inout.setId(null);
+						new_inout.setTime_in(df.parse(person_inout.getTime_in()));
+						new_inout.setPersonnel_code(person_inout.getPersonnel_code());
+						new_inout.setBike_number(person_inout.getBike_number());
+						person_inout_Service.save(new_inout);
+					}
+					else {
+						Personnel_inout person = persons.get(0);
+						person.setTime_out(df.parse(person_inout.getTime_out()));
+						person.setPersonnel_code_out(person_inout.getPersonnel_code_out());
+						person.setUsercheck_checkout(person_inout.getUsercheck_checkout());
+					}
+				}
+			}
+			
 			List<Personel> list = new ArrayList<Personel>();
 			if(orgid_link == orgrootid_link) {
 				list = personService.findAll();
@@ -147,23 +169,21 @@ public class PersonnelAPI {
 			}
 			
 			//lay danh sách nhân viên và biển số xe tương ứng và giờ vào ngày hôm nay nếu có
-			List<Personnel_moto> list_moto = new ArrayList<>();
+			List<Personnel_inout_request> list_moto = new ArrayList<>();
 			for(Personel person : list) {
-				Personnel_moto moto = new Personnel_moto();
+				Personnel_inout_request moto = new Personnel_inout_request();
 				moto.setBike_number(person.getBike_number());
-				moto.setCode_personnel(person.getCode());
-				moto.setId(person.getId());
+				moto.setPersonnel_code(person.getCode());
 				
-				List<Personnel_inout> person_inout = person_inout_Service.getby_person(person.getId());
+				List<Personnel_inout> person_inout = person_inout_Service.getlist_not_checkout(person.getCode());
 				if(person_inout.size() > 0) {
 					DateFormat dateformat_timein = new SimpleDateFormat ("dd/MM/yyyy");
 					String giovao = dateformat_timein.format(person_inout.get(0).getTime_in());
-					moto.setGiovao(giovao);
-					list_moto.add(moto);
+					moto.setTime_in(giovao);
 				}
+				list_moto.add(moto);
 			}
 			
-			//Cập nhật vào database giờ vào giờ ra các xe trong ngày
 			
 			response.data = list_moto;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -545,41 +565,6 @@ public class PersonnelAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		    return new ResponseEntity<getperson_byorg_response>(response,HttpStatus.OK);
-		}
-	}
-	
-	@RequestMapping(value = "/upadtetime_inout",method = RequestMethod.POST)
-	public ResponseEntity<personnel_updatetime_inout_response> getForPProcessingProductivity(@RequestBody personnel_updatetime_inout_request entity,HttpServletRequest request) {
-		personnel_updatetime_inout_response response = new personnel_updatetime_inout_response();
-		try {
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			for(Personnel_inout person: entity.data) {
-				
-				//kiem tra trong DB co chua thi them vao 
-				List<Personnel_inout> person_check = person_inout_Service.getby_person(person.getId());
-				if(person_check.size() == 0) {
-//					Personnel_inout personnew = new Personnel_inout();
-//					personnew.setBike_number_out("");
-//					personnew.setId(null);
-//					personnew.setPersonnelid_link(person.getId());
-//					personnew.setTime_in(person.getTime_in());
-//					personnew.setTime_out(person.getTime_out());
-//					person_inout_Service.save(personnew);
-				}
-				else {
-					person.setUsercheck_checkout(user.getId());
-					person_inout_Service.save(person);
-				}
-			}
-			
-			
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<personnel_updatetime_inout_response>(response,HttpStatus.OK);
-		}catch (Exception e) {
-			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-			response.setMessage(e.getMessage());
-		    return new ResponseEntity<personnel_updatetime_inout_response>(response,HttpStatus.OK);
 		}
 	}
 }

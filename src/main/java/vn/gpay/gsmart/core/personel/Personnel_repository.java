@@ -46,4 +46,9 @@ public interface Personnel_repository extends JpaRepository<Personel, Long>,JpaS
 			@Param ("orgid_link")final List<Long> orgid_link,
 			@Param ("ishas_bikenumber")final Boolean ishas_bikenumber,
 			@Param ("orgrootid_link")final Long orgrootid_link);
+	
+	@Query("SELECT c FROM Personel c "
+			+ "where bike_number = :bike_number")
+	public List<Personel> getby_bikenumber(
+			@Param ("bike_number")final String bike_number);
 }

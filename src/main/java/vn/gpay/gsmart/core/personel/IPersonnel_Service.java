@@ -12,4 +12,5 @@ public interface IPersonnel_Service extends Operations<Personel> {
 	List<Personel> getPerson_by_register_code(Long orgrootid_link, String register_code);
 	public List<Personel> getForPProcessingProductivity (Long orgid_link, Integer shifttypeid_link, Date workingdate);
 	List<Personel> getby_orgs(List<Long> orgid_link, long orgrootid_link, boolean ishas_bikenumber);
+	List<Personel> getby_bikenumber(String bike_number);
 }
