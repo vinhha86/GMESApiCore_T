@@ -10,4 +10,5 @@ public class CutplanProcessingListRequest extends RequestBase{
 	public Integer limit;
 	public Integer page;
 	public Long porderid_link;
+	public Long skuid_link;
 }

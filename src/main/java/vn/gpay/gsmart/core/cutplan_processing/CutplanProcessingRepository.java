@@ -1,6 +1,5 @@
 package vn.gpay.gsmart.core.cutplan_processing;
 
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,10 +20,12 @@ public interface CutplanProcessingRepository extends JpaRepository<CutplanProces
 			+ "from CutplanProcessing a "
 			+ "inner join CutPlan_Row b on a.cutplanrowid_link = b.id "
 			+ "where b.porderid_link = :porderid_link "
+			+ "and a.material_skuid_link = :skuid_link "
 			+ "group by a.processingdate "
 			+ "order by a.processingdate "
 			)
 	public List<Object[]> getForChart_TienDoCat(
-			@Param ("porderid_link")final Long porderid_link
+			@Param ("porderid_link")final Long porderid_link,
+			@Param ("skuid_link")final Long skuid_link
 			);
 }

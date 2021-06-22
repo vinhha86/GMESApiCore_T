@@ -147,7 +147,7 @@ public class CutplanProcessingAPI {
 			
 			Page<CutplanProcessing> pageToReturn = cutplanProcessingService.cutplanProcessing_page(
 					entity.processingdate_from, entity.processingdate_to, 
-					entity.limit, entity.page, entity.porderid_link);
+					entity.limit, entity.page, entity.porderid_link, entity.skuid_link);
 			response.data = pageToReturn.getContent();
 			response.totalCount = pageToReturn.getTotalElements();
 			
@@ -170,7 +170,8 @@ public class CutplanProcessingAPI {
 		CutplanProcessingListResponse response = new CutplanProcessingListResponse();
 		try {
 			Long porderid_link = entity.porderid_link;
-			List<CutplanProcessing> data = cutplanProcessingService.getForChart_TienDoCat(porderid_link);
+			Long skuid_link = entity.skuid_link;
+			List<CutplanProcessing> data = cutplanProcessingService.getForChart_TienDoCat(porderid_link, skuid_link);
 			response.data = data;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -310,7 +311,6 @@ public class CutplanProcessingAPI {
 	
 	public CutplanProcessing reCalculateAmountCut(CutplanProcessing cutplanProcessing) {
 		//Tính số lượng amount_cut dựa trên sơ đồ cắt và tổng số lá
-		GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
     	Integer total_size_amount = cutplan_SizeService.getTotalAmount_By_CutPlanRow(cutplanProcessing.getCutplanrowid_link());
     	Integer tong_so_la = 0;

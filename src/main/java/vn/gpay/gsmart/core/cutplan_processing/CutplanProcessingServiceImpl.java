@@ -34,7 +34,7 @@ public class CutplanProcessingServiceImpl extends AbstractService<CutplanProcess
 	
 	@Override
 	public Page<CutplanProcessing> cutplanProcessing_page(Date processingdate_from, Date processingdate_to, 
-			int limit, int page, Long porderid_link) {
+			int limit, int page, Long porderid_link, Long skuid_link) {
 		// TODO Auto-generated method stub
 		Specification<CutplanProcessing> specification = Specifications.<CutplanProcessing>and()
 //	            .ge((stockindate_from!=null && stockindate_to==null),"stockindate",DateFormat.atStartOfDay(stockindate_from))
@@ -42,6 +42,7 @@ public class CutplanProcessingServiceImpl extends AbstractService<CutplanProcess
                 .between((processingdate_from!=null && processingdate_to!=null),"processingdate", GPAYDateFormat.atStartOfDay(processingdate_from), GPAYDateFormat.atEndOfDay(processingdate_to))
 //                .ne("status", -1)
                 .eq(porderid_link != null, "cutPlanRow.porderid_link", porderid_link)
+                .eq(skuid_link != null, "material_skuid_link", skuid_link)
 	            .build();
 		Sort sort = Sorts.builder()
 		        .desc("processingdate")
@@ -56,10 +57,10 @@ public class CutplanProcessingServiceImpl extends AbstractService<CutplanProcess
 	}
 
 	@Override
-	public List<CutplanProcessing> getForChart_TienDoCat(Long porderid_link) {
+	public List<CutplanProcessing> getForChart_TienDoCat(Long porderid_link, Long skuid_link) {
 		System.out.println(1);
 		List<CutplanProcessing> data = new ArrayList<CutplanProcessing>();
-		List<Object[]> objects = repo.getForChart_TienDoCat(porderid_link);
+		List<Object[]> objects = repo.getForChart_TienDoCat(porderid_link, skuid_link);
 		
 		System.out.println(2);
 		for(Object[] row : objects) {
