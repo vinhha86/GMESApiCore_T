@@ -135,7 +135,7 @@ public class PersonnelAPI {
 					DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 					List<Personnel_inout> persons = person_inout_Service.getby_bikenumber_and_timein(person_inout.getBike_number(),df.parse(person_inout.getTime_in()));
 					if(persons.size() == 0) {
-						Personnel_inout new_inout = new Personnel_inout();
+						Personnel_inout new_inout = new Personnel_inout(); 
 						new_inout.setId(null);
 						new_inout.setTime_in(df.parse(person_inout.getTime_in()));
 						new_inout.setPersonnel_code(person_inout.getPersonnel_code());
@@ -144,7 +144,14 @@ public class PersonnelAPI {
 					}
 					else {
 						Personnel_inout person = persons.get(0);
-						person.setTime_out(df.parse(person_inout.getTime_out()));
+						Date timeout = null;
+						try {
+							timeout = df.parse(person_inout.getTime_out());
+							person.setTime_out(timeout);
+						}
+						catch (Exception e) {
+							e.printStackTrace();
+						}
 						person.setPersonnel_code_out(person_inout.getPersonnel_code_out());
 						person.setUsercheck_checkout(person_inout.getUsercheck_checkout());
 					}
@@ -177,7 +184,7 @@ public class PersonnelAPI {
 				
 				List<Personnel_inout> person_inout = person_inout_Service.getlist_not_checkout(person.getCode());
 				if(person_inout.size() > 0) {
-					DateFormat dateformat_timein = new SimpleDateFormat ("dd/MM/yyyy");
+					DateFormat dateformat_timein = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
 					String giovao = dateformat_timein.format(person_inout.get(0).getTime_in());
 					moto.setTime_in(giovao);
 				}
