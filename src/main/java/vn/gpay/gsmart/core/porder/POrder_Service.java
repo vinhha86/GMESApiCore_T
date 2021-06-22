@@ -480,26 +480,35 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 	@Override
 	public List<POrder> getPOrderBySearch(Long buyerid, Long vendorid, Long factoryid, String pobuyer,
 			String stylebuyer, String contractcode, Long granttoorgid_link, Date golivedatefrom, Date golivedateto) {
-		// TODO Auto-generated method stub
 		return repo.getPOrderBySearch(buyerid, vendorid, factoryid, pobuyer, stylebuyer, contractcode, granttoorgid_link, golivedatefrom, golivedateto);
 	}
 
 	@Override
 	public List<POrder> get_free_bygolivedate_groupby_product(Date golivedate_from, Date golivedate_to,
 			Long granttoorgid_link, String PO_code, Long orgbuyerid_link, Long orgvendorid_link) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<POrder> getby_offer(Long pcontract_poid_link, Long productid_link, Long orgid_link) {
-		// TODO Auto-generated method stub
 		return repo.getby_offer(orgid_link, pcontract_poid_link, productid_link);
 	}
 
 	@Override
 	public List<POrder> getby_offer_and_orgs(Long pcontract_poid_link, List<Long> orgs) {
-		// TODO Auto-generated method stub
 		return repo.getall_by_offer_and_orgs(pcontract_poid_link, orgs);
+	}
+	
+	
+
+	@Override
+	public List<POrder> getPorderByOrdercodeAndOrg(String ordercode, Long granttoorgid_link) {
+		return repo.getPorderByOrdercodeAndOrg(ordercode, granttoorgid_link);
+	}
+
+	@Override
+	public List<POrder> getPOrderByOrderCodeAndProductBuyerCode(Long granttoorgid_link, String ordercode,
+			String buyercode) {
+		return repo.getPOrderByOrderCodeAndProductBuyerCode(granttoorgid_link, ordercode, buyercode);
 	}
 }

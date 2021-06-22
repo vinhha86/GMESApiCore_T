@@ -197,4 +197,28 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 	public List<POrder> getall_by_offer_and_orgs(
 			@Param ("parentid_link")final Long parentid_link,
 			@Param ("orgs")final List<Long> orgs);
+	
+	@Query(value = "select a from POrder a "
+			+ "inner join Product b on a.productid_link = b.id "
+			+ "where (TRIM(LOWER(a.ordercode)) like TRIM(LOWER(concat('%',:ordercode,'%'))) ) "
+			+ "and (TRIM(LOWER(b.buyercode)) like TRIM(LOWER(concat('%',:buyercode,'%'))) ) "
+			+ "and :granttoorgid_link = a.granttoorgid_link " 
+			+ "order by a.ordercode asc "
+			)
+	public List<POrder> getPOrderByOrderCodeAndProductBuyerCode(
+			@Param ("granttoorgid_link")final Long granttoorgid_link,
+			@Param ("ordercode")final String ordercode,
+			@Param ("buyercode")final String buyercode
+			);
+	
+	@Query(value = "select c from POrder c "
+			+ "where lower(c.ordercode) like lower(concat('%',:ordercode,'%')) "
+			+ "and c.granttoorgid_link = :granttoorgid_link "
+			+ "and c.status > 0"
+			+ "and c.status < 5"
+			)
+	public List<POrder> getPorderByOrdercodeAndOrg(
+			@Param ("ordercode")final String ordercode,
+			@Param ("granttoorgid_link")final Long granttoorgid_link
+			);
 }

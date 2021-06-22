@@ -8,6 +8,7 @@ import vn.gpay.gsmart.core.api.product.Product_getall_request;
 import vn.gpay.gsmart.core.attribute.Attribute;
 import vn.gpay.gsmart.core.base.Operations;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProductBinding;
+import vn.gpay.gsmart.core.porder.POrder;
 
 
 public interface IProductService extends Operations<Product> {
@@ -30,4 +31,6 @@ public interface IProductService extends Operations<Product> {
 	List<Product> getProductByLikeBuyercode(String buyercode);
 	List<Product> getby_code_type_description_and_color_and_size(Long orgrootid_link, String code, int type, String description, Long colorid_link, Long sizeid_link);
 	List<Product> getby_code_type_description(Long orgrootid_link, String code, int type, String description);
+	List<Long> getByBuyerCode(String buyercode);
+	List<Product> getByBuyerCodeAndType(String buyercode, Integer producttypeid_link);
 }
