@@ -31,6 +31,7 @@ import vn.gpay.gsmart.core.pcontractproduct.PContractProductBinding;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBomRepository;
 import vn.gpay.gsmart.core.pcontractproductpairing.IPContractProductPairingRepository;
 import vn.gpay.gsmart.core.pcontractproductpairing.PContractProductPairing;
+import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.productattributevalue.IProductAttributeRepository;
 import vn.gpay.gsmart.core.productattributevalue.ProductAttributeValue;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
@@ -454,7 +455,16 @@ public class ProductService extends AbstractService<Product> implements IProduct
 
 	@Override
 	public List<Product> getby_code_type_description(Long orgrootid_link, String code, int type, String description) {
-		// TODO Auto-generated method stub
 		return repo.getby_code_type_description(orgrootid_link, code, description, type);
+	}
+
+	@Override
+	public List<Long> getByBuyerCode(String buyercode) {
+		return repo.getByBuyerCode(buyercode);
+	}
+
+	@Override
+	public List<Product> getByBuyerCodeAndType(String buyercode, Integer producttypeid_link) {
+		return repo.getByBuyerCodeAndType(buyercode, producttypeid_link);
 	}
 }

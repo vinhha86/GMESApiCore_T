@@ -19,4 +19,7 @@ public class POrderList_getlist_request extends RequestBase{
 	public List<Integer> status;
 	public int limit;
 	public int page;
+	
+	public Long granttoorgid_link;
+	public String buyercode;
 }

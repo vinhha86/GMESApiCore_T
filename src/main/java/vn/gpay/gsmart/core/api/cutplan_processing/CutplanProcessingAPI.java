@@ -147,11 +147,31 @@ public class CutplanProcessingAPI {
 			
 			Page<CutplanProcessing> pageToReturn = cutplanProcessingService.cutplanProcessing_page(
 					entity.processingdate_from, entity.processingdate_to, 
-					entity.limit, entity.page);
+					entity.limit, entity.page, entity.porderid_link);
 			response.data = pageToReturn.getContent();
 			response.totalCount = pageToReturn.getTotalElements();
 			
 //			response.data = cutplanProcessingService.findAll();
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<CutplanProcessingListResponse>(response,HttpStatus.OK);
+		}catch (RuntimeException e) {
+			e.printStackTrace();
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(e.getMessage());
+		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@RequestMapping(value = "/cutplan_processing_list_chart",method = RequestMethod.POST)
+	public ResponseEntity<?> CutplanProcessingList_Chart(@RequestBody CutplanProcessingListRequest entity, HttpServletRequest request ) {
+		CutplanProcessingListResponse response = new CutplanProcessingListResponse();
+		try {
+			Long porderid_link = entity.porderid_link;
+			List<CutplanProcessing> data = cutplanProcessingService.getForChart_TienDoCat(porderid_link);
+			response.data = data;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -317,4 +337,6 @@ public class CutplanProcessingAPI {
 //    	Long colorid_link = cutplanProcessing.getColorid_link();
 		cutplanrowService.sync_porder_bom_from_cutprocesing(material_skuid_link, porder, colorid_link, user.getId(), orgrootid_link);
 	}
+	
+	
 }

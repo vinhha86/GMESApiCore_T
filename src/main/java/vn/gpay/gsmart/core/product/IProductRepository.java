@@ -13,6 +13,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import vn.gpay.gsmart.core.porder.POrder;
+
 @Repository
 @Transactional
 public interface IProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
@@ -114,5 +116,21 @@ public interface IProductRepository extends JpaRepository<Product, Long>, JpaSpe
 			@Param ("code")final  String code,
 			@Param ("description")final  String description,
 			@Param ("type")final  int type);
+	
+	@Query(value = "select distinct c.id from Product c "
+			+ "where (TRIM(LOWER(buyercode)) like TRIM(LOWER(concat('%',:buyercode,'%'))) or :buyercode is null)"
+			)
+	public List<Long> getByBuyerCode(
+			@Param ("buyercode")final String buyercode);
+	
+	@Query(value = "select c from Product c "
+			+ "where lower(c.buyercode) like lower(concat('%',:buyercode,'%')) "
+			+ "and c.producttypeid_link = :producttypeid_link "
+			+ "and c.status = 1"
+			)
+	public List<Product> getByBuyerCodeAndType(
+			@Param ("buyercode")final String buyercode,
+			@Param ("producttypeid_link")final Integer producttypeid_link
+			);
 
 }

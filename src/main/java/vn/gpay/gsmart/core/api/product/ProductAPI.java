@@ -1337,4 +1337,25 @@ public class ProductAPI {
 				return new ResponseEntity<Product_getOne_Response>(response, HttpStatus.OK);
 			}
 		}
+		
+		@RequestMapping(value = "/getByBuyerCodeAndType", method = RequestMethod.POST)
+		public ResponseEntity<Product_getall_response> getByBuyerCodeAndType(HttpServletRequest request,
+				@RequestBody Product_getall_request entity) {
+			Product_getall_response response = new Product_getall_response();
+			try {
+				String buyercode = entity.buyercode;
+				Integer producttypeid_link = entity.producttypeid_link;
+				
+				List<Product> list = productService.getByBuyerCodeAndType(buyercode, producttypeid_link);
+				response.data = list;
+				
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<Product_getall_response>(response, HttpStatus.OK);
+			} catch (Exception e) {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage(e.getMessage());
+				return new ResponseEntity<Product_getall_response>(response, HttpStatus.OK);
+			}
+		}
 }

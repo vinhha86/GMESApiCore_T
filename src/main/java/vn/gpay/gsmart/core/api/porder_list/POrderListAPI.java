@@ -224,6 +224,41 @@ public class POrderListAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/getallbysearch_for_cutplanprocessing",method = RequestMethod.POST)
+	public ResponseEntity<POrderList_getlist_response> POrderGetAllBySearch_for_cutplanprocessing(@RequestBody POrderList_getlist_request entity, HttpServletRequest request ) {
+		POrderList_getlist_response response = new POrderList_getlist_response();
+		try {
+			
+			Long granttoorgid_link = entity.granttoorgid_link;
+			String ordercode = entity.ordercode;
+			String buyercode = entity.buyercode;
+			if(ordercode != null) {
+				ordercode = ordercode.trim().toLowerCase();
+			}else {
+				ordercode = "";
+			}
+			if(buyercode != null) {
+				buyercode = buyercode.trim().toLowerCase();
+			}else {
+				buyercode = "";
+			}
+			
+			List<POrder> porder_list = porderService.getPOrderByOrderCodeAndProductBuyerCode(granttoorgid_link, ordercode, buyercode);
+			
+			response.data = porder_list;
+//			System.out.println("porder_list: " + porder_list.size());
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<POrderList_getlist_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			e.printStackTrace();
+		    return new ResponseEntity<POrderList_getlist_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@RequestMapping(value = "/getallbuyername",method = RequestMethod.POST)
 	public ResponseEntity<POrderList_getListString_response> POrderGetAllBuyer(HttpServletRequest request ) {
 		POrderList_getListString_response response = new POrderList_getListString_response();
@@ -760,6 +795,27 @@ public class POrderListAPI {
 				return new ResponseEntity<POrderList_getlist_response>(response,HttpStatus.OK);
 			}
 			response.data = list;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<POrderList_getlist_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<POrderList_getlist_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/getPorderByOrdercodeAndOrg",method = RequestMethod.POST)
+	public ResponseEntity<POrderList_getlist_response> getPorderByOrdercodeAndOrg(@RequestBody POrderList_getbypordercode_request entity,HttpServletRequest request ) {
+		POrderList_getlist_response response = new POrderList_getlist_response();
+		try {
+			
+			String ordercode = entity.ordercode;
+			Long granttoorgid_link = entity.granttoorgid_link;
+			
+			List<POrder> list = porderService.getPorderByOrdercodeAndOrg(ordercode, granttoorgid_link);
+			response.data = list;
+			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<POrderList_getlist_response>(response,HttpStatus.OK);
