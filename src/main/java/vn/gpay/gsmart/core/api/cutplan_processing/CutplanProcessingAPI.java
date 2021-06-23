@@ -241,8 +241,13 @@ public class CutplanProcessingAPI {
 					List<Warehouse> warehouse_list = warehouseService.findMaterialByEPC(epc);
 					if(warehouse_list.size() > 0) {
 						Warehouse warehouse = warehouse_list.get(0);
-						warehouse.setMet(item.getMet());
-						warehouse.setYds((float) (item.getMet() / 0.9144));
+						// update lại độ dài cây vải trong warehouse = dài warehouse + (dài cutplan_processing_d - đầu tấm cutplan_processing_d)
+						Float met_Warehouse = warehouse.getMet() == null ? 0 : warehouse.getMet();
+						Float met_CutplanProcessingD = item.getMet() == null ? 0 : item.getMet();
+						Float con_lai_CutplanProcessingD = item.getCon_lai() == null ? 0 : item.getCon_lai();
+						met_Warehouse = met_Warehouse + (met_CutplanProcessingD - con_lai_CutplanProcessingD);
+						warehouse.setMet(met_Warehouse);
+						warehouse.setYds((float) (met_Warehouse / 0.9144));
 //						warehouse.setStatus(WareHouseStatus.WAREHOUSE_STATUS_CHECKED);
 						warehouseService.save(warehouse);
 					}
@@ -282,8 +287,13 @@ public class CutplanProcessingAPI {
 				List<Warehouse> warehouse_list = warehouseService.findMaterialByEPC(epc);
 				if(warehouse_list.size() > 0) {
 					Warehouse warehouse = warehouse_list.get(0);
-					warehouse.setMet(cutplanProcessingD.getMet());
-					warehouse.setYds((float) (cutplanProcessingD.getMet() / 0.9144));
+					// update lại độ dài cây vải trong warehouse = dài warehouse + (dài cutplan_processing_d - đầu tấm cutplan_processing_d)
+					Float met_Warehouse = warehouse.getMet() == null ? 0 : warehouse.getMet();
+					Float met_CutplanProcessingD = cutplanProcessingD.getMet() == null ? 0 : cutplanProcessingD.getMet();
+					Float con_lai_CutplanProcessingD = cutplanProcessingD.getCon_lai() == null ? 0 : cutplanProcessingD.getCon_lai();
+					met_Warehouse = met_Warehouse + (met_CutplanProcessingD - con_lai_CutplanProcessingD);
+					warehouse.setMet(met_Warehouse);
+					warehouse.setYds((float) (met_Warehouse / 0.9144));
 //					warehouse.setStatus(WareHouseStatus.WAREHOUSE_STATUS_CHECKED);
 					warehouseService.save(warehouse);
 				}
