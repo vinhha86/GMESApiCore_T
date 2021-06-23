@@ -82,6 +82,7 @@ public class CutplanProcessingAPI {
 				    		if(warehouseList.size() > 0) {
 				    			Warehouse warehouse = warehouseList.get(0);
 				    			warehouse.setMet(cutplanProcessingD.getCon_lai()); // update vải còn trong kho = số đầu tấm
+				    			warehouse.setYds((float) (cutplanProcessingD.getCon_lai() / 0.9144)); // update vải còn trong kho = số đầu tấm
 				    			if(warehouse.getStatus().equals(WareHouseStatus.WAREHOUSE_STATUS_UNCHECKED)
 				    					|| warehouse.getStatus().equals(WareHouseStatus.WAREHOUSE_STATUS_CHECKED)
 				    					) {

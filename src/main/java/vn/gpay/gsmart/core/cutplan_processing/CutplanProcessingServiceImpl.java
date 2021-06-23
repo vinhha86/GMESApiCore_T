@@ -58,11 +58,9 @@ public class CutplanProcessingServiceImpl extends AbstractService<CutplanProcess
 
 	@Override
 	public List<CutplanProcessing> getForChart_TienDoCat(Long porderid_link, Long skuid_link) {
-		System.out.println(1);
 		List<CutplanProcessing> data = new ArrayList<CutplanProcessing>();
 		List<Object[]> objects = repo.getForChart_TienDoCat(porderid_link, skuid_link);
 		
-		System.out.println(2);
 		for(Object[] row : objects) {
 			Long amountcut = (Long) row[0];
 			Date processingdate = (Date) row[1];
@@ -74,7 +72,6 @@ public class CutplanProcessingServiceImpl extends AbstractService<CutplanProcess
 			temp.setProcessingdate(processingdate);
 			data.add(temp);
 		}
-		System.out.println(3);
 		Collections.sort(data, new Comparator<CutplanProcessing>() {
 			  public int compare(CutplanProcessing o1, CutplanProcessing o2) {
 			      return o1.getProcessingdate().compareTo(o2.getProcessingdate());
