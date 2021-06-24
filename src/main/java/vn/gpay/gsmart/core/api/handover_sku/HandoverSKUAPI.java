@@ -148,10 +148,9 @@ public class HandoverSKUAPI {
 					for(POrderGrant pordergrant : pOrderGrants) { // System.out.println("id" + pordergrant.getId());
 						if(true) {
 							List<POrderGrant_SKU> porder_grant_skus = pordergrantskuService.getPOrderGrant_SKU(pordergrant.getId());
-							
 							for(POrderGrant_SKU porderGrantSku : porder_grant_skus) {
 								HandoverSKU newHandoverSKU = new HandoverSKU();
-								newHandoverSKU.setId(0L);
+//								newHandoverSKU.setId(0L);
 								newHandoverSKU.setOrgrootid_link(user.getRootorgid_link());
 								newHandoverSKU.setProductid_link(entity.productid_link);
 								newHandoverSKU.setTotalpackage(0);
@@ -191,10 +190,9 @@ public class HandoverSKUAPI {
 					for(POrderGrant pordergrant : pOrderGrants) { // System.out.println("id" + pordergrant.getId());
 						if(entity.orgid_to_link.equals(pordergrant.getGranttoorgid_link())) {
 							List<POrderGrant_SKU> porder_grant_skus = pordergrantskuService.getPOrderGrant_SKU(pordergrant.getId());
-							
 							for(POrderGrant_SKU porderGrantSku : porder_grant_skus) {
 								HandoverSKU newHandoverSKU = new HandoverSKU();
-								newHandoverSKU.setId(0L);
+//								newHandoverSKU.setId(0L);
 								newHandoverSKU.setOrgrootid_link(user.getRootorgid_link());
 								newHandoverSKU.setProductid_link(entity.productid_link);
 								newHandoverSKU.setTotalpackage(0);
@@ -234,10 +232,9 @@ public class HandoverSKUAPI {
 					for(POrderGrant pordergrant : pOrderGrants) { // System.out.println("id" + pordergrant.getId());
 						if(entity.orgid_from_link.equals(pordergrant.getGranttoorgid_link())) {
 							List<POrderGrant_SKU> porder_grant_skus = pordergrantskuService.getPOrderGrant_SKU(pordergrant.getId());
-							
 							for(POrderGrant_SKU porderGrantSku : porder_grant_skus) {
 								HandoverSKU newHandoverSKU = new HandoverSKU();
-								newHandoverSKU.setId(0L);
+//								newHandoverSKU.setId(0L);
 								newHandoverSKU.setOrgrootid_link(user.getRootorgid_link());
 								newHandoverSKU.setProductid_link(entity.productid_link);
 								newHandoverSKU.setTotalpackage(0);
