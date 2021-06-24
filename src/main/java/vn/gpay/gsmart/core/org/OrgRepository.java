@@ -37,7 +37,7 @@ public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecification
 	public List<Org> findAllOrgbyType(@Param ("orgrootid")final long orgrootid,
 			@Param ("orgtypeid_link")final Integer orgtypeid_link);
 	
-	@Query(value = "select c from Org c where c.orgtypeid_link in(1,3,8,9,13,14,17,19,21,28) order by c.id asc")
+	@Query(value = "select c from Org c where c.orgtypeid_link in(1,3,8,9,13,14,17,19,21,28,29,30,31,32,33,34,35,36,37,38,39) order by c.id asc")
 //	@Query(value = "select c from Org c where c.orgtypeid_link in(1,8,9,13,14,21) order by c.orgtypeid_link, c.is_manufacturer, c.code asc")
 	public List<Org> findOrgByTypeForMenuOrg();
 	
@@ -127,7 +127,7 @@ public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecification
 	@Query(value = "select c from Org c "
 			+ "where c.status > -1 "
 			+ "and (c.parentid_link = :parentid_link or :parentid_link is null) "
-			+ "and c.orgtypeid_link = 28 "
+			+ "and c.orgtypeid_link = 39 "
 			+ "order by c.name asc "
 			)
 	public List<Org> findOrgByTypeBanCat(

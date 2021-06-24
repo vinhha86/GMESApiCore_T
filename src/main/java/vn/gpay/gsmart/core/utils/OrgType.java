@@ -35,7 +35,18 @@ public class OrgType {
 	public static int ORG_TYPE_THANHPHOTINH	 	= 25;
 	public static int ORG_TYPE_QUANHUYEN 		= 26;
 	public static int ORG_TYPE_XA 				= 27;
-	public static int ORG_TYPE_BANCAT 			= 28;
+	public static int ORG_TYPE_TOCODIEN 		= 28;
+	public static int ORG_TYPE_KHONPL 			= 29;
+	public static int ORG_TYPE_TOKYTHUAT 		= 30;
+	public static int ORG_TYPE_TOVESINH 		= 31;
+	public static int ORG_TYPE_VANPHONGXUONG 	= 32;
+	public static int ORG_TYPE_TOCODONG 		= 33;
+	public static int ORG_TYPE_FOB 				= 34;
+	public static int ORG_TYPE_DONVIQA 			= 35;
+	public static int ORG_TYPE_TOBAOVE 			= 36;
+	public static int ORG_TYPE_KCS 				= 37;
+	public static int ORG_TYPE_LAIXE 			= 38;
+	public static int ORG_TYPE_BANCAT 			= 39;
 
     public static int ORG_TYPE_UNKNOWN   		= -1; //Không xác định
 }
