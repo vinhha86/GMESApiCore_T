@@ -24,4 +24,14 @@ public class POrderStatus {
     public static int PORDER_SHORTVALUE_DONE       = 1; //Đã sản xuất xong, chưa nhập kho TP hết
     public static int PORDER_SHORTVALUE_FINISHED   = 0; //Đã hoàn thành mã hàng
     public static int PORDER_SHORTVALUE_SUBPROCESS = 3; //Đang thực hiện công đoạn phụ (may trc 1 số bước khó) trước khi vào chuyền
+    
+    //Mầu hiện trên biểu đồ
+    //Xanh lá đậm (064420): Hàng đã xong --> Trạng thái 6 (Nhập kho thành phẩm đủ SL yêu cầu của lệnh)
+    //Xanh lá vừa (66DE93): Hàng đang sản xuất --> Trạng thái 4 và 5
+    //Xanh lá nhạt (B3E283): Hàng đã phân chuyền --> Trạng thái 1
+    //Vàng: Đang triển khai đơn hàng --> Trạng thái 0
+    //Đỏ đậm (DA0037): Chậm giao hàng (Ngày giao hàng - Ngày kết thúc của lệnh <0)
+    //Đỏ vừa (D83A56): Chậm giao hàng (Ngày giao hàng - Ngày kết thúc của lệnh <5)
+    //Đỏ nhạt (FF616D): Chậm giao hàng (Ngày giao hàng - Ngày kết thúc của lệnh <10)
+    
 }
