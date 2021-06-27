@@ -98,13 +98,12 @@ public class HandoverAPI {
 						if(type.equals(5L)) {
 							handover.setHandover_code(handoverAutoIdService.getLastID("LPR_" + porder.getOrdercode()));
 						}
-					}else {
 						// Xuất từ hoàn thiện lên kho TP : PS
 						if(type.equals(9L)) {
-							handover.setHandover_code(handoverAutoIdService.getLastID("PS"));
-						}else {
-							handover.setHandover_code(handoverAutoIdService.getLastID("UNKNOWN"));
+							handover.setHandover_code(handoverAutoIdService.getLastID("PS_" + porder.getOrdercode()));
 						}
+					}else {
+						handover.setHandover_code(handoverAutoIdService.getLastID("UNKNOWN"));
 					}
 				}else {
 					// check existed

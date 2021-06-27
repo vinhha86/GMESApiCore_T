@@ -275,10 +275,10 @@ public class StockInAPI {
 	}
 	
 	@RequestMapping(value = "/gettype",method = RequestMethod.POST)
-	public ResponseEntity<?> Gettype(HttpServletRequest request ) {
+	public ResponseEntity<?> Gettype(@RequestBody StockinGettypeRequest entity, HttpServletRequest request ) {
 		Stockin_gettype_response response = new Stockin_gettype_response();
 		try {
-			response.data = stockintypeService.findAll();
+			response.data = stockintypeService.findType(entity.typeFrom, entity.typeTo);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<Stockin_gettype_response>(response,HttpStatus.OK);
