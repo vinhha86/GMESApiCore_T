@@ -68,6 +68,29 @@ public class QRcodeAPI {
 			return null;
 		}
 	}
+	
+	@RequestMapping(value = "/getqr_demo", method = RequestMethod.GET)
+	public ResponseEntity<byte[]> GetQRDemo(HttpServletRequest request, @RequestParam("code") String code) {
+		try {
+			if(code!= "") {
+				GenQrCode qrcode = new GenQrCode();
+//				while(text.length() < 10) {
+//					text += " ";
+//				}
+				
+				HttpHeaders headers = new HttpHeaders();
+			    byte[] media = qrcode.getQRCodeImage(code, 500, 500);
+			    headers.setCacheControl(CacheControl.noCache().getHeaderValue());			    
+
+				ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(media, headers, HttpStatus.OK);
+			    return responseEntity;
+			}
+			return null;
+		}
+		catch(Exception e) {
+			return null;
+		}
+	}
 
 	@RequestMapping(value = "/getlogo", method = RequestMethod.GET)
 	public ResponseEntity<byte[]> GetLoGo(HttpServletRequest request) {
