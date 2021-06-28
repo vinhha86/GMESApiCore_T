@@ -592,9 +592,12 @@ public class ReportAPI {
 				cell_sizeset.setCellValue("Size");
 				cell_sizeset.setCellStyle(style_row1);
 				
-				int start = ColumnExcel.N;
-				int end = start+ list_size.size() - 1;
-				sheet.addMergedRegion(new CellRangeAddress( 0, 0,start , end));	
+				if(list_size.size() > 0) {
+					int start = ColumnExcel.N;
+					int end = start+ list_size.size() - 1;
+					sheet.addMergedRegion(new CellRangeAddress( 0, 0,start , end));	
+				}
+				
 								
 				Cell cell_ds = row_1.createCell(ColumnExcel.N);
 				cell_ds.setCellValue("Danh sách cỡ và định mức sử dụng NPL cho từng cỡ");

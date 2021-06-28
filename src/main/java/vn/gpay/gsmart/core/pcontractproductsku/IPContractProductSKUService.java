@@ -2,6 +2,7 @@ package vn.gpay.gsmart.core.pcontractproductsku;
 
 import java.util.List;
 
+import vn.gpay.gsmart.core.attributevalue.Attributevalue;
 import vn.gpay.gsmart.core.base.Operations;
 
 
@@ -42,4 +43,5 @@ public interface IPContractProductSKUService extends Operations<PContractProduct
 	List<PContractProductSKU> getsumsku_bypcontract(long pcontractid_link);
 	List<String> getlist_sizeset_by_product(Long pcontractid_link, Long productid_link);
 	List<Long> getlist_size_by_product_and_sizeset(Long pcontractid_link, Long productid_link, Long sizesetid_link);
+	List<Attributevalue> getmausanpham_by_pcontract(Long pcontractid_link);
 }

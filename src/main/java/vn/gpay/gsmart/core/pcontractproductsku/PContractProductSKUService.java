@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import vn.gpay.gsmart.core.attributevalue.Attributevalue;
 import vn.gpay.gsmart.core.base.AbstractService;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
@@ -226,5 +227,10 @@ public class PContractProductSKUService extends AbstractService<PContractProduct
 			Long sizesetid_link) {
 		// TODO Auto-generated method stub
 		return repo.getlist_size_by_product_and_sizeset(productid_link, pcontractid_link, sizesetid_link);
+	}
+	@Override
+	public List<Attributevalue> getmausanpham_by_pcontract(Long pcontractid_link) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
