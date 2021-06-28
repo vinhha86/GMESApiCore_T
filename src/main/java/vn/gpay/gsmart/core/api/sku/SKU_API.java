@@ -130,7 +130,10 @@ public class SKU_API {
 	public ResponseEntity<SKU_getbyproduct_response> getSkuByCode(HttpServletRequest request, @RequestBody SKU_getSkuByCode_request entity ) {
 		SKU_getbyproduct_response response = new SKU_getbyproduct_response();
 		try {
-			response.data = skuService.getSkuByCode(entity.code);
+//			response.data = skuService.getSkuByCode(entity.code);
+			if(entity.typeFrom == null) entity.typeFrom = 20;
+			if(entity.typeTo == null) entity.typeTo = 30;
+			response.data = skuService.getSkuByCodeAndType(entity.code, entity.typeFrom, entity.typeTo); //ex: typeFrom: 20, typeTo: 30
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<SKU_getbyproduct_response>(response,HttpStatus.OK);

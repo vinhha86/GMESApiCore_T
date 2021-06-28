@@ -88,7 +88,11 @@ public class SKU_Service extends AbstractService<SKU> implements ISKU_Service {
 
 	@Override
 	public List<SKU> getSkuByCode(String code) {
-		// TODO Auto-generated method stub
 		return repo.getSkuByCode(code);
+	}
+
+	@Override
+	public List<SKU> getSkuByCodeAndType(String code, Integer typeFrom, Integer typeTo) {
+		return repo.getSkuByCodeAndType(code, typeFrom, typeTo);
 	}
 }

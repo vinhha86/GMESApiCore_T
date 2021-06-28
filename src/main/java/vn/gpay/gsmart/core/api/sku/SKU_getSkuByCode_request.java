@@ -4,4 +4,6 @@ import vn.gpay.gsmart.core.base.RequestBase;
 
 public class SKU_getSkuByCode_request extends RequestBase{
 	public String code;
+	public Integer typeFrom;
+	public Integer typeTo;
 }
