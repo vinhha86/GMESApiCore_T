@@ -346,9 +346,11 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			);
 	
 	@Query(value = "select a from PContract_PO a "
-			+ "where pcontractid_link = :pcontractid_link "
+			+ "inner join PContractProductSKU b on a.id = b.pcontract_poid_link "
+			+ "where b.pcontractid_link = :pcontractid_link "
 			+ "and po_typeid_link in :type "
-			+ "and productid_link = :productid_link"
+			+ "and b.productid_link = :productid_link "
+			+ "group by a"
 			)
 	public List<PContract_PO> getby_pcontract_and_type_and_product(
 			@Param ("type")final  List<Integer> type,
