@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.gpay.gsmart.core.api.attributevalue.getmausanpham_by_pcontract_request;
+import vn.gpay.gsmart.core.api.attributevalue.getmausanpham_by_pcontract_response;
 import vn.gpay.gsmart.core.api.pcontract_po.pcontractsku_getby_po_product_mat_request;
 import vn.gpay.gsmart.core.api.pcontract_po.pcontractsku_getby_po_product_request;
 import vn.gpay.gsmart.core.base.ResponseBase;
@@ -434,4 +436,22 @@ public class PContractskuAPI {
 		return new ResponseEntity<PContractSKU_binding_response>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/getmausanpham",method = RequestMethod.POST)
+	public ResponseEntity<getmausanpham_by_pcontract_response> getMauSanPhamByPContract
+	(HttpServletRequest request, @RequestBody getmausanpham_by_pcontract_request entity ) {
+		getmausanpham_by_pcontract_response response = new getmausanpham_by_pcontract_response();
+		try {
+			Long pcontractid_link = entity.pcontractid_link;
+			
+			response.data = pskuservice.getmausanpham_by_pcontract(pcontractid_link);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		}
+		catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		
+		return new ResponseEntity<getmausanpham_by_pcontract_response>(response, HttpStatus.OK);
+	}
 }

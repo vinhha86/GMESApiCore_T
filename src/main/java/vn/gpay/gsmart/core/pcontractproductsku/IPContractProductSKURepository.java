@@ -8,6 +8,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import vn.gpay.gsmart.core.attributevalue.Attributevalue;
+
 
 @Repository
 @Transactional
@@ -180,6 +182,17 @@ public interface IPContractProductSKURepository extends JpaRepository<PContractP
 			+ "order by e.sortvalue")
 	public List<String> getlist_sizeset_by_product(
 			@Param ("productid_link")final  long productid_link, 
+			@Param ("pcontractid_link")final  long pcontractid_link);
+	
+	@Query(value = "select d "
+			+ "from PContractProductSKU c "
+			+ "inner join SKU_Attribute_Value a on a.skuid_link = c.skuid_link "
+			+ "inner join Attributevalue d on d.id = a.attributevalueid_link "
+			+ "where d.attributeid_link = 4 "
+			+ "and c.pcontractid_link = :pcontractid_link "
+			+ "group by d "
+			+ "order by d.sortvalue")
+	public List<Attributevalue> getmausanpham_by_pcontract(
 			@Param ("pcontractid_link")final  long pcontractid_link);
 	
 	@Query(value = "select d.attributevalueid_link "

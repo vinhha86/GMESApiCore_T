@@ -231,6 +231,6 @@ public class PContractProductSKUService extends AbstractService<PContractProduct
 	@Override
 	public List<Attributevalue> getmausanpham_by_pcontract(Long pcontractid_link) {
 		// TODO Auto-generated method stub
-		return null;
+		return repo.getmausanpham_by_pcontract(pcontractid_link);
 	}
 }
