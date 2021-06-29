@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -179,6 +180,29 @@ public class UploadBomAPI {
 										break;
 									}
 								}
+							}
+							
+							//Kiem tra dinh dang so cua cot tieu hao 
+							if(row.getCell(ColumnTempBom.HaoHut).getCellType() != CellType.NUMERIC) {
+								mes_err = "Cột "+ ColumnTempBom.HaoHut + " dòng "+ (rowNum+1) + "Không đúng định dạng số";
+							}	
+							
+							int columnsize = ColumnTempBom.HaoHut + 1;
+							String s_sizename = commonService.getStringValue(rowheader.getCell(columnsize));
+							s_sizename = s_sizename.equals("0") ? "" : s_sizename;
+							
+							while (!s_sizename.equals("")) {
+								try {
+									Double a = row.getCell(columnsize).getNumericCellValue();
+								}
+								catch(Exception e) {
+									mes_err = "Cột "+ ColumnTempBom.HaoHut + " dòng "+ (rowNum+1) + " Không đúng định dạng số";
+									break;
+								}
+								
+								columnsize++;
+								s_sizename = commonService.getStringValue(rowheader.getCell(columnsize));
+								s_sizename = s_sizename.equals("0") ? "" : s_sizename;
 							}
 							
 							if(!mes_err.equals("")) break;
