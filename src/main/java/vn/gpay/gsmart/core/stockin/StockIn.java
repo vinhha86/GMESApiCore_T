@@ -135,6 +135,7 @@ public class StockIn implements Serializable {
 	@Column(name ="lasttimeupdate")
 	private Date lasttimeupdate;
 	
+	private Long porder_grantid_link;
 
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
@@ -490,7 +491,13 @@ public class StockIn implements Serializable {
 	public void setVat_date(Date vat_date) {
 		this.vat_date = vat_date;
 	}
-	
-	
+
+	public Long getPorder_grantid_link() {
+		return porder_grantid_link;
+	}
+
+	public void setPorder_grantid_link(Long porder_grantid_link) {
+		this.porder_grantid_link = porder_grantid_link;
+	}
 	
 }

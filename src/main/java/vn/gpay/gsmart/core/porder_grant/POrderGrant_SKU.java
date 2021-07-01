@@ -85,6 +85,46 @@ public class POrderGrant_SKU implements Serializable {
 	}
 	
 	@Transient
+	public String getSku_product_code() {
+		if(sku != null) {
+			return sku.getProduct_code();
+		}
+		return "";
+	}
+	
+	@Transient
+	public Long getProductid_link() {
+		if(sku != null) {
+			return sku.getProductid_link();
+		}
+		return (long)0;
+	}
+	
+	@Transient
+	public Long getColorid_link() {
+		if(sku != null) {
+			return sku.getColorid_link();
+		}
+		return (long)0;
+	}
+	
+	@Transient
+	public Long getSize_id() {
+		if(sku != null) {
+			return sku.getSize_id();
+		}
+		return (long)0;
+	}
+	
+	@Transient
+	public String getProduct_name() {
+		if(sku != null) {
+			return sku.getProduct_name();
+		}
+		return "";
+	}
+	
+	@Transient
 	@JsonProperty("skucode")
 	public String getSkucode() {
 		if(sku!=null) {
