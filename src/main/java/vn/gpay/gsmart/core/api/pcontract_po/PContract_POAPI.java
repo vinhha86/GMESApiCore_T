@@ -177,6 +177,7 @@ public class PContract_POAPI {
 					STT = STT.equals("0") ? "" : STT;
 					while (!STT.equals("")) {
 						// Kiểm tra sản phẩm có chưa thì sinh id sản phẩm
+						
 						long productid_link = 0;
 						colNum = ColumnTemplate.Style + 1;
 						String product_code = commonService.getStringValue(row.getCell(ColumnTemplate.Style));
@@ -2719,7 +2720,9 @@ public class PContract_POAPI {
 		PContract_getbycontractproduct_response response = new PContract_getbycontractproduct_response();
 		try {
 			Long pcontract_poid_link = entity.pcontract_poid_link;
-			List<PContract_PO> listPContractPO = pcontract_POService.get_by_parent_and_type(pcontract_poid_link, POType.PO_LINE_CONFIRMED);
+			Long mausanphamid_link = entity.mausanphamid_link == 0 ? null : entity.mausanphamid_link;
+			
+			List<PContract_PO> listPContractPO = pcontract_POService.get_by_parent_and_type_and_MauSP(pcontract_poid_link, POType.PO_LINE_CONFIRMED, mausanphamid_link);
 			
 			//Update danh sach to chuyen duoc giao sx cho PO Line
 			for (PContract_PO thePoline: listPContractPO){

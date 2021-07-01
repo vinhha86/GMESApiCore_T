@@ -161,7 +161,12 @@ public class UploadAPI {
 							//Lay thong tin PO kiem tra xem PO da ton tai trong he thong hay chua
 							//Neu la san pham don chiec thi kiem tra masp, ngay giao, vendor target
 							//Neu la san pham bo thi kiem tra masp bo, ngay giao
-							
+//							if(rowNum == 14) {
+//								String a = "";
+//							}
+//							else if(rowNum == 15) {
+//								String a = "";
+//							}
 							//Kiem tra san pham co chua thi them san pham vao trong he thong
 							long productid_link = 0;
 							colNum = ColumnTempNew.MaSP + 1;

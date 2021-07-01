@@ -73,6 +73,19 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 	public List<PContract_PO> getby_parent_and_type(
 			@Param ("parentid_link")final  Long parentid_link,
 			@Param ("po_typeid_link")final  Integer po_typeid_link);
+	
+	@Query(value = "select c from PContract_PO c "
+			+ "inner join PContractProductSKU a on c.id = a.pcontract_poid_link "
+			+ "inner join SKU_Attribute_Value b on b.skuid_link = a.skuid_link "
+			+ "where c.parentpoid_link = :parentid_link "
+			+ "and c.po_typeid_link =:po_typeid_link "
+			+ "and (b.attributevalueid_link = :mausanphamid_link or :mausanphamid_link is null) "
+			+ "group by c "
+			+ "order by c.shipdate asc")
+	public List<PContract_PO> getby_parent_and_type_and_mausp(
+			@Param ("parentid_link")final  Long parentid_link,
+			@Param ("mausanphamid_link")final  Long mausanphamid_link,
+			@Param ("po_typeid_link")final  Integer po_typeid_link);
 		
 	
 	@Query(value = "select c from PContract_PO c "

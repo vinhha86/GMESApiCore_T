@@ -338,4 +338,11 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		// TODO Auto-generated method stub
 		return repo.getbyId(pcontractpoid_link);
 	}
+
+	@Override
+	public List<PContract_PO> get_by_parent_and_type_and_MauSP(Long pcontractpo_parentid_link, int po_typeid_link,
+			Long mausanphamid_link) {
+		// TODO Auto-generated method stub
+		return repo.getby_parent_and_type_and_mausp(pcontractpo_parentid_link, mausanphamid_link, po_typeid_link);
+	}
 }
