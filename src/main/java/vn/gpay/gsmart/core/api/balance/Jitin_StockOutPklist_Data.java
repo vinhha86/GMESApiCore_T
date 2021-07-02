@@ -52,6 +52,11 @@ public class Jitin_StockOutPklist_Data implements Serializable {
 	private String unitname;
 	private Integer warehousestatus;
 	
+	private Float met_remain;
+	private Float yds_remain;
+	private Float met_remain_and_check;
+	private Float yds_remain_and_check;
+	
 	public Long getId() {
 		return id;
 	}
@@ -315,6 +320,30 @@ public class Jitin_StockOutPklist_Data implements Serializable {
 	}
 	public void setWarehousestatus(Integer warehousestatus) {
 		this.warehousestatus = warehousestatus;
+	}
+	public Float getMet_remain() {
+		return met_remain;
+	}
+	public void setMet_remain(Float met_remain) {
+		this.met_remain = met_remain;
+	}
+	public Float getYds_remain() {
+		return yds_remain;
+	}
+	public void setYds_remain(Float yds_remain) {
+		this.yds_remain = yds_remain;
+	}
+	public Float getMet_remain_and_check() {
+		return met_remain_and_check;
+	}
+	public void setMet_remain_and_check(Float met_remain_and_check) {
+		this.met_remain_and_check = met_remain_and_check;
+	}
+	public Float getYds_remain_and_check() {
+		return yds_remain_and_check;
+	}
+	public void setYds_remain_and_check(Float yds_remain_and_check) {
+		this.yds_remain_and_check = yds_remain_and_check;
 	}
 
 }

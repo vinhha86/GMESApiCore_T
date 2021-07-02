@@ -40,6 +40,9 @@ import vn.gpay.gsmart.core.sku.SKU;
 import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 @RestController
 @RequestMapping("/api/v1/balance")
 public class BalanceAPI {
@@ -492,88 +495,161 @@ public class BalanceAPI {
 			String product_sku_color, 
 			String product_sku_size, 
 			Integer p_amount){
-	
-		List<PContractBOM2SKU> bom_response = bom2Service.getBOM_By_PContractSKU(pcontractid_link, product_skuid_link);
-		for (PContractBOM2SKU skubom:bom_response){
-//			if (skubom.getMaterialCode().contains("CXI55020")){
-//				System.out.println(skubom.getMaterial_skuid_link() + "/" + skubom.getMaterialCode() + "-" + p_amount);
-//			}
-			//Kiểm tra xem NPL có trong danh sách giới hạn PO không (pcontract_bom2_npl_poline)?
-			//Nếu có, kiểm tra tiếp xem có giới hạn áp dụng cụ thể cho từng product_sku ko? SL áp dụng là bao nhiêu
-			List<PContract_bom2_npl_poline> ls_poline = bomPOLine_Service.getby_product_and_npl(productid_link, pcontractid_link, skubom.getMaterial_skuid_link());
-			if (ls_poline.size() > 0){
-				boolean isfound = false;
-				//Check nếu poline gửi vào ko có trong danh sách --> Bỏ qua NPL này
-				for(PContract_bom2_npl_poline thebom_poline: ls_poline){
-					if (pcontract_poid_link.equals(thebom_poline.getPcontract_poid_link())){
-						isfound = true;
-						//Kiem tra tiep xem có giới hạn sâu hơn trong pcontract_bom2_npl_poline_sku ko?
-						
-					}
-				}
-				//Bo qua NPL
-				if (!isfound) continue;
-			}
+		try {
+			List<PContractBOM2SKU> bom_response = bom2Service.getBOM_By_PContractSKU(pcontractid_link, product_skuid_link);
 			
-			SKUBalance_Data theSKUBalance = ls_SKUBalance.stream().filter(sku -> sku.getMat_skuid_link().equals(skubom.getMaterial_skuid_link())).findAny().orElse(null);
-			if (null!=theSKUBalance){
-				//Tinh tong dinh muc
-				Float f_skudemand =skubom.getAmount()*p_amount;
-				Float f_lost = (f_skudemand*skubom.getLost_ratio())/100;
+			ExecutorService executor = Executors.newFixedThreadPool(bom_response.size());
+			for (PContractBOM2SKU skubom:bom_response){
+				Runnable demand = new calDemand(
+						skubom,
+						ls_SKUBalance,
+						pcontractid_link,
+						pcontract_poid_link,
+						productid_link,
+						product_skuid_link,
+						product_sku_code,
+						product_sku_color,
+						product_sku_size,
+						p_amount,
+						bomPOLine_Service					
+					);
+				executor.execute(demand);
+			}
+			executor.shutdown();
+			// Wait until all threads are finish
+			while (!executor.isTerminated()) {
+	 
+			}
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public static class calDemand implements Runnable {
+		private final PContractBOM2SKU skubom;
+		private final List<SKUBalance_Data> ls_SKUBalance;
+		private final Long pcontractid_link;
+		private final Long pcontract_poid_link;
+		private final Long productid_link;
+		private final Long product_skuid_link;
+		private final String product_sku_code;
+		private final String product_sku_color;
+		private final String product_sku_size;
+		private final Integer p_amount;
+		
+		private final IPContract_bom2_npl_poline_Service bomPOLine_Service;
+		
+		calDemand(
+			PContractBOM2SKU skubom,
+			List<SKUBalance_Data> ls_SKUBalance,
+			Long pcontractid_link,
+			Long pcontract_poid_link,
+			Long productid_link,
+			Long product_skuid_link,
+			String product_sku_code,
+			String product_sku_color,
+			String product_sku_size,
+			Integer p_amount,
+			IPContract_bom2_npl_poline_Service bomPOLine_Service
+		) {
+			this.skubom = skubom;
+			this.ls_SKUBalance = ls_SKUBalance;
+			this.pcontractid_link = pcontractid_link;
+			this.pcontract_poid_link = pcontract_poid_link;
+			this.productid_link = productid_link;
+			this.product_skuid_link = product_skuid_link;
+			this.product_sku_code = product_sku_code;
+			this.product_sku_color = product_sku_color;
+			this.product_sku_size = product_sku_size;
+			this.p_amount = p_amount;
+			this.bomPOLine_Service = bomPOLine_Service;
+		}
+ 
+		@Override
+		public void run() {
+			try {
+				//			if (skubom.getMaterialCode().contains("CXI55020")){
+				//			System.out.println(skubom.getMaterial_skuid_link() + "/" + skubom.getMaterialCode() + "-" + p_amount);
+				//		}
+				//Kiểm tra xem NPL có trong danh sách giới hạn PO không (pcontract_bom2_npl_poline)?
+				//Nếu có, kiểm tra tiếp xem có giới hạn áp dụng cụ thể cho từng product_sku ko? SL áp dụng là bao nhiêu
+				List<PContract_bom2_npl_poline> ls_poline = bomPOLine_Service.getby_product_and_npl(productid_link, pcontractid_link, skubom.getMaterial_skuid_link());
+				if (ls_poline.size() > 0){
+					boolean isfound = false;
+					//Check nếu poline gửi vào ko có trong danh sách --> Bỏ qua NPL này
+					for(PContract_bom2_npl_poline thebom_poline: ls_poline){
+						if (pcontract_poid_link.equals(thebom_poline.getPcontract_poid_link())){
+							isfound = true;
+							//Kiem tra tiep xem có giới hạn sâu hơn trong pcontract_bom2_npl_poline_sku ko?
+							
+						}
+					}
+					//Bo qua NPL
+					if (!isfound) return;
+				}
 				
-				//Tinh trung binh dinh muc
-				Float f_skubomamount = (theSKUBalance.getMat_sku_bom_amount() + skubom.getAmount())/2;
-				theSKUBalance.setMat_sku_bom_amount(f_skubomamount);
-				
-				theSKUBalance.setMat_sku_demand(theSKUBalance.getMat_sku_demand() + f_skudemand + f_lost);
-				theSKUBalance.setMat_sku_product_total(theSKUBalance.getMat_sku_product_total() + p_amount);
-
-				//Thong tin chi tiet mau co
-				SKUBalance_Product_D_Data product_d = new SKUBalance_Product_D_Data();
-				product_d.setP_skuid_link(product_skuid_link);
-				product_d.setP_sku_code(product_sku_code);
-				product_d.setP_sku_color(product_sku_color);
-				product_d.setP_sku_size(product_sku_size);
-				product_d.setP_amount(p_amount);
-				product_d.setP_bom_amount(skubom.getAmount());
-				product_d.setP_bom_lostratio(skubom.getLost_ratio());
-				product_d.setP_bom_demand(f_skudemand+f_lost);
-				theSKUBalance.getProduct_d().add(product_d);
-				
-			} else {
-				SKUBalance_Data newSKUBalance = new SKUBalance_Data();
-				newSKUBalance.setMat_skuid_link(skubom.getMaterial_skuid_link());
-				newSKUBalance.setMat_sku_product_total(p_amount);
-				
-				newSKUBalance.setMat_sku_code(skubom.getMaterialCode());
-				newSKUBalance.setMat_sku_name(skubom.getMaterialCode());
-				newSKUBalance.setMat_sku_desc(skubom.getDescription_product());
-				newSKUBalance.setMat_sku_unit_name(skubom.getUnitName());
-				newSKUBalance.setMat_sku_size_name(skubom.getCoKho());
-				newSKUBalance.setMat_sku_color_name(skubom.getTenMauNPL());
-				newSKUBalance.setMat_sku_product_typename(skubom.getProduct_typeName());
-				
-				newSKUBalance.setMat_sku_bom_lostratio(skubom.getLost_ratio());
-				newSKUBalance.setMat_sku_bom_amount(skubom.getAmount());
-				
-				Float f_skudemand =skubom.getAmount()*p_amount;
-				Float f_lost = (f_skudemand*skubom.getLost_ratio())/100;
-				newSKUBalance.setMat_sku_demand(f_skudemand + f_lost);
-				
-				//Thong tin chi tiet mau co
-				SKUBalance_Product_D_Data product_d = new SKUBalance_Product_D_Data();
-				product_d.setP_skuid_link(product_skuid_link);
-				product_d.setP_sku_code(product_sku_code);
-				product_d.setP_sku_color(product_sku_color);
-				product_d.setP_sku_size(product_sku_size);
-				product_d.setP_amount(p_amount);
-				product_d.setP_bom_amount(skubom.getAmount());
-				product_d.setP_bom_lostratio(skubom.getLost_ratio());
-				product_d.setP_bom_demand(f_skudemand+f_lost);
-				newSKUBalance.getProduct_d().add(product_d);
-				
-				ls_SKUBalance.add(newSKUBalance);
-			}			
+				SKUBalance_Data theSKUBalance = ls_SKUBalance.stream().filter(sku -> sku.getMat_skuid_link().equals(skubom.getMaterial_skuid_link())).findAny().orElse(null);
+				if (null!=theSKUBalance){
+					//Tinh tong dinh muc
+					Float f_skudemand =skubom.getAmount()*p_amount;
+					Float f_lost = (f_skudemand*skubom.getLost_ratio())/100;
+					
+					//Tinh trung binh dinh muc
+					Float f_skubomamount = (theSKUBalance.getMat_sku_bom_amount() + skubom.getAmount())/2;
+					theSKUBalance.setMat_sku_bom_amount(f_skubomamount);
+					
+					theSKUBalance.setMat_sku_demand(theSKUBalance.getMat_sku_demand() + f_skudemand + f_lost);
+					theSKUBalance.setMat_sku_product_total(theSKUBalance.getMat_sku_product_total() + p_amount);
+		
+					//Thong tin chi tiet mau co
+					SKUBalance_Product_D_Data product_d = new SKUBalance_Product_D_Data();
+					product_d.setP_skuid_link(product_skuid_link);
+					product_d.setP_sku_code(product_sku_code);
+					product_d.setP_sku_color(product_sku_color);
+					product_d.setP_sku_size(product_sku_size);
+					product_d.setP_amount(p_amount);
+					product_d.setP_bom_amount(skubom.getAmount());
+					product_d.setP_bom_lostratio(skubom.getLost_ratio());
+					product_d.setP_bom_demand(f_skudemand+f_lost);
+					theSKUBalance.getProduct_d().add(product_d);
+					
+				} else {
+					SKUBalance_Data newSKUBalance = new SKUBalance_Data();
+					newSKUBalance.setMat_skuid_link(skubom.getMaterial_skuid_link());
+					newSKUBalance.setMat_sku_product_total(p_amount);
+					
+					newSKUBalance.setMat_sku_code(skubom.getMaterialCode());
+					newSKUBalance.setMat_sku_name(skubom.getMaterialCode());
+					newSKUBalance.setMat_sku_desc(skubom.getDescription_product());
+					newSKUBalance.setMat_sku_unit_name(skubom.getUnitName());
+					newSKUBalance.setMat_sku_size_name(skubom.getCoKho());
+					newSKUBalance.setMat_sku_color_name(skubom.getTenMauNPL());
+					newSKUBalance.setMat_sku_product_typename(skubom.getProduct_typeName());
+					
+					newSKUBalance.setMat_sku_bom_lostratio(skubom.getLost_ratio());
+					newSKUBalance.setMat_sku_bom_amount(skubom.getAmount());
+					
+					Float f_skudemand =skubom.getAmount()*p_amount;
+					Float f_lost = (f_skudemand*skubom.getLost_ratio())/100;
+					newSKUBalance.setMat_sku_demand(f_skudemand + f_lost);
+					
+					//Thong tin chi tiet mau co
+					SKUBalance_Product_D_Data product_d = new SKUBalance_Product_D_Data();
+					product_d.setP_skuid_link(product_skuid_link);
+					product_d.setP_sku_code(product_sku_code);
+					product_d.setP_sku_color(product_sku_color);
+					product_d.setP_sku_size(product_sku_size);
+					product_d.setP_amount(p_amount);
+					product_d.setP_bom_amount(skubom.getAmount());
+					product_d.setP_bom_lostratio(skubom.getLost_ratio());
+					product_d.setP_bom_demand(f_skudemand+f_lost);
+					newSKUBalance.getProduct_d().add(product_d);
+					
+					ls_SKUBalance.add(newSKUBalance);
+				}	
+			}catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		}
 	}
 }
