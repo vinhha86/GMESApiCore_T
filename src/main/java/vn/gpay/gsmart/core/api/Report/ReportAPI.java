@@ -72,6 +72,7 @@ import vn.gpay.gsmart.core.productpairing.ProductPairing;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.ColumnExcel;
+import vn.gpay.gsmart.core.utils.ColumnTempBom;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -584,7 +585,7 @@ public class ReportAPI {
 				int rowNum = 0;
 				Row row_1 = sheet.getRow(rowNum);
 				
-				Cell cellstyle_row1 = row_1.getCell(ColumnExcel.B);
+				Cell cellstyle_row1 = row_1.getCell(ColumnTempBom.Type);
 				CellStyle style_row1 = workbook.createCellStyle();
 				style_row1.cloneStyleFrom(cellstyle_row1.getCellStyle());
 				
@@ -593,24 +594,25 @@ public class ReportAPI {
 				cell_sizeset.setCellStyle(style_row1);
 				
 				if(list_size.size() > 0) {
-					int start = ColumnExcel.N;
+					int start = ColumnTempBom.HaoHut + 1;
 					int end = start+ list_size.size() - 1;
-					sheet.addMergedRegion(new CellRangeAddress( 0, 0,start , end));	
+					if(start < end)
+						sheet.addMergedRegion(new CellRangeAddress( 0, 0,start , end));	
 				}
 				
 								
-				Cell cell_ds = row_1.createCell(ColumnExcel.N);
+				Cell cell_ds = row_1.createCell(ColumnTempBom.HaoHut + 1);
 				cell_ds.setCellValue("Danh sách cỡ và định mức sử dụng NPL cho từng cỡ");
 				cell_ds.setCellStyle(style_row1);				
 				
 				rowNum++;
 				Row row_2 = sheet.getRow(rowNum);
-				Cell cellstyle_row2 = row_2.getCell(ColumnExcel.B);
+				Cell cellstyle_row2 = row_2.getCell(ColumnTempBom.Type);
 				CellStyle style_row2 = workbook.createCellStyle();
 				style_row2.cloneStyleFrom(cellstyle_row2.getCellStyle());
 				
 				for(int i =0; i<list_size.size(); i++) {
-					Cell cell_size = row_2.createCell(ColumnExcel.N+ i);
+					Cell cell_size = row_2.createCell(ColumnTempBom.HaoHut + 1+ i);
 					cell_size.setCellValue(list_size.get(i));
 					cell_size.setCellStyle(style_row2);
 				}
@@ -636,38 +638,38 @@ public class ReportAPI {
 							
 							Row row_npl = sheet.createRow(rowNum);
 							//ghi noi dung vao tung cot
-							for(int i=ColumnExcel.A; i< ColumnExcel.N;i++) {
+							for(int i=ColumnTempBom.STT; i<= ColumnTempBom.HaoHut;i++) {
 								Cell cell_npl = row_npl.createCell(i);
-								if(i==ColumnExcel.A) {
+								if(i==ColumnTempBom.STT) {
 									cell_npl.setCellValue(rowNum-1);
 								}
-								else if(i==ColumnExcel.B) {
+								else if(i==ColumnTempBom.Type) {
 									cell_npl.setCellValue(commonService.gettypename_npl_by_id(bom.getProduct_type()));
 								}
-								else if(i==ColumnExcel.C) {
+								else if(i==ColumnTempBom.TenNPL) {
 									cell_npl.setCellValue(bom.getMaterialName());
 								}
-								else if(i==ColumnExcel.D) {
+								else if(i==ColumnTempBom.MaNPL) {
 									String code_npl = bom.getMaterialCode();
 									String[] str_code_npl= code_npl.split("\\(");
 									code_npl = str_code_npl[0];
 									
 									cell_npl.setCellValue(code_npl);
 								}
-								else if(i==ColumnExcel.E) {
+								else if(i==ColumnTempBom.Description) {
 									cell_npl.setCellValue(bom.getDescription_product());
 								}
-								else if(i==ColumnExcel.F) {
+								else if(i==ColumnTempBom.NhaCungCap) {
 									cell_npl.setCellValue(bom.getNhaCungCap());
 								}
-								else if(i==ColumnExcel.G) {
+								else if(i==ColumnTempBom.TenMauNPL) {
 									String mau_npl = bom.getTenMauNPL();
 									String[] str_mau_npl= mau_npl.split("\\(");
 									mau_npl = str_mau_npl[0].toLowerCase().equals("all") ? "" : str_mau_npl[0];
 									
 									cell_npl.setCellValue(mau_npl);
 								}
-								else if(i==ColumnExcel.H) {
+								else if(i==ColumnTempBom.MaMauNPL) {
 									String mau_npl = bom.getTenMauNPL();
 									String[] str_mau_npl= mau_npl.split("\\(");
 									String code_mau_npl = "";
@@ -677,11 +679,11 @@ public class ReportAPI {
 									
 									cell_npl.setCellValue(code_mau_npl);
 								}
-								else if(i==ColumnExcel.I) {
+								else if(i==ColumnTempBom.CoKho) {
 									String cokho = bom.getCoKho().replace("ALL, ", "").replace(", ALL", "").replace("ALL", "");
 									cell_npl.setCellValue(cokho);
 								}
-								else if(i==ColumnExcel.J) {
+								else if(i==ColumnTempBom.POLine) {
 									List<PContract_bom2_npl_poline> list_po_npl = po_npl_Service.getby_pcontract_and_npl(pcontractid_link, bom.getMaterialid_link());
 									String po_line = "";
 									for(PContract_bom2_npl_poline po_npl : list_po_npl) {
@@ -694,13 +696,13 @@ public class ReportAPI {
 									}
 									cell_npl.setCellValue(po_line);
 								}
-								else if(i==ColumnExcel.K) {
+								else if(i==ColumnTempBom.TenMauSP) {
 									cell_npl.setCellValue(color_name);
 								}
-								else if(i==ColumnExcel.L) {
+								else if(i==ColumnTempBom.MaMauSP) {
 									cell_npl.setCellValue(color_code);
 								}
-								else if(i==ColumnExcel.M) {
+								else if(i==ColumnTempBom.HaoHut) {
 									cell_npl.setCellValue(bom.getLost_ratio());
 								}
 							}		
@@ -772,16 +774,20 @@ public class ReportAPI {
 				
 				int rowNum = 0;
 				Row row_1 = sheet.getRow(rowNum);
-				Cell cellstyle_row1 = row_1.getCell(ColumnExcel.B);
+				Cell cellstyle_row1 = row_1.getCell(ColumnTempBom.Type);
 				CellStyle style_row1 = workbook.createCellStyle();
 				style_row1.cloneStyleFrom(cellstyle_row1.getCellStyle());
 				
 				//sinh cot dai co va merger lai
-				int start = ColumnExcel.N;
-				int end = start+ list_size_set.size() - 1;
-				sheet.addMergedRegion(new CellRangeAddress( 0, 0,start , end));	
+				if(list_size_set.size() > 0) {
+					int start = ColumnTempBom.HaoHut + 1;
+					int end = start+ list_size_set.size() - 1;
+					if(end > start)
+						sheet.addMergedRegion(new CellRangeAddress( 0, 0,start , end));	
+				}
+				
 								
-				Cell cell_ds = row_1.createCell(ColumnExcel.N);
+				Cell cell_ds = row_1.createCell(ColumnTempBom.HaoHut + 1);
 				cell_ds.setCellValue("Danh sách dải cỡ và định mức sử dụng NPL cho từng cỡ");
 				cell_ds.setCellStyle(style_row1);	
 				
@@ -792,12 +798,12 @@ public class ReportAPI {
 				
 				rowNum++;
 				Row row_2 = sheet.getRow(rowNum);
-				Cell cellstyle_row2 = row_2.getCell(ColumnExcel.B);
+				Cell cellstyle_row2 = row_2.getCell(ColumnTempBom.Type);
 				CellStyle style_row2 = workbook.createCellStyle();
 				style_row2.cloneStyleFrom(cellstyle_row2.getCellStyle());
 				
 				for(int i =0; i<list_size_set.size(); i++) {
-					Cell cell_size = row_2.createCell(ColumnExcel.N+ i);
+					Cell cell_size = row_2.createCell(ColumnTempBom.HaoHut + 1+ i);
 					cell_size.setCellValue(list_size_set.get(i));
 					cell_size.setCellStyle(style_row2);
 				}
@@ -822,38 +828,38 @@ public class ReportAPI {
 							
 							Row row_npl = sheet.createRow(rowNum);
 							//ghi noi dung vao tung cot
-							for(int i=ColumnExcel.A; i< ColumnExcel.N;i++) {
+							for(int i=ColumnTempBom.STT; i <= ColumnTempBom.HaoHut; i++) {
 								Cell cell_npl = row_npl.createCell(i);
-								if(i==ColumnExcel.A) {
+								if(i==ColumnTempBom.STT) {
 									cell_npl.setCellValue(rowNum-1);
 								}
-								else if(i==ColumnExcel.B) {
+								else if(i==ColumnTempBom.Type) {
 									cell_npl.setCellValue(commonService.gettypename_npl_by_id(bom.getProduct_type()));
 								}
-								else if(i==ColumnExcel.C) {
+								else if(i==ColumnTempBom.TenNPL) {
 									cell_npl.setCellValue(bom.getMaterialName());
 								}
-								else if(i==ColumnExcel.D) {
+								else if(i==ColumnTempBom.MaNPL) {
 									String code_npl = bom.getMaterialCode();
 									String[] str_code_npl= code_npl.split("\\(");
 									code_npl = str_code_npl[0];
 									
 									cell_npl.setCellValue(code_npl);
 								}
-								else if(i==ColumnExcel.E) {
+								else if(i==ColumnTempBom.Description) {
 									cell_npl.setCellValue(bom.getDescription_product());
 								}
-								else if(i==ColumnExcel.F) {
+								else if(i==ColumnTempBom.NhaCungCap) {
 									cell_npl.setCellValue(bom.getNhaCungCap());
 								}
-								else if(i==ColumnExcel.G) {
+								else if(i==ColumnTempBom.TenMauNPL) {
 									String mau_npl = bom.getTenMauNPL();
 									String[] str_mau_npl= mau_npl.split("\\(");
 									mau_npl = str_mau_npl[0];
 									
 									cell_npl.setCellValue(mau_npl);
 								}
-								else if(i==ColumnExcel.H) {
+								else if(i==ColumnTempBom.MaMauNPL) {
 									String mau_npl = bom.getTenMauNPL();
 									String[] str_mau_npl= mau_npl.split("\\(");
 									String code_mau_npl = "";
@@ -863,11 +869,11 @@ public class ReportAPI {
 									
 									cell_npl.setCellValue(code_mau_npl);
 								}
-								else if(i==ColumnExcel.I) {
+								else if(i==ColumnTempBom.CoKho) {
 									String cokho = bom.getCoKho().replace("ALL, ", "").replace(", ALL", "").replace("ALL", "");
 									cell_npl.setCellValue(cokho);
 								}
-								else if(i==ColumnExcel.J) {
+								else if(i==ColumnTempBom.POLine) {
 									List<PContract_bom2_npl_poline> list_po_npl = po_npl_Service.getby_pcontract_and_npl(pcontractid_link, bom.getMaterialid_link());
 									String po_line = "";
 									for(PContract_bom2_npl_poline po_npl : list_po_npl) {
@@ -880,13 +886,13 @@ public class ReportAPI {
 									}
 									cell_npl.setCellValue(po_line);
 								}
-								else if(i==ColumnExcel.K) {
+								else if(i==ColumnTempBom.TenMauSP) {
 									cell_npl.setCellValue(color_name);
 								}
-								else if(i==ColumnExcel.L) {
+								else if(i==ColumnTempBom.MaMauSP) {
 									cell_npl.setCellValue(color_code);
 								}
-								else if(i==ColumnExcel.M) {
+								else if(i==ColumnTempBom.HaoHut) {
 									cell_npl.setCellValue(bom.getLost_ratio());
 								}
 							}

@@ -130,5 +130,15 @@ public interface IProductRepository extends JpaRepository<Product, Long>, JpaSpe
 			@Param ("buyercode")final String buyercode,
 			@Param ("producttypeid_link")final Integer producttypeid_link
 			);
+	
+	@Query(value = "select c from Product c "
+			+ "where lower(c.buyercode) = lower(LTRIM(:buyercode)) "
+			+ "and c.producttypeid_link = :producttypeid_link "
+			+ "and c.status = 1"
+			)
+	public List<Product> getByBuyerCodeAndTypeNotLike(
+			@Param ("buyercode")final String buyercode,
+			@Param ("producttypeid_link")final Integer producttypeid_link
+			);
 
 }
