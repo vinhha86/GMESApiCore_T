@@ -54,6 +54,8 @@ public class PContractPO_Shipping {
 	private String productbuyercode;
 	private String portFrom;
 	private String packing_method;
+	private String shipmode_name;
+	
 	
 	
 	
@@ -363,6 +365,12 @@ public class PContractPO_Shipping {
 	}
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+	public String getShipmode_name() {
+		return shipmode_name;
+	}
+	public void setShipmode_name(String shipmode_name) {
+		this.shipmode_name = shipmode_name;
 	}
 	
 	
