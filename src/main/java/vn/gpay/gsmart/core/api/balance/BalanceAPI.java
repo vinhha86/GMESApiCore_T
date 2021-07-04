@@ -498,7 +498,7 @@ public class BalanceAPI {
 		try {
 			List<PContractBOM2SKU> bom_response = bom2Service.getBOM_By_PContractSKU(pcontractid_link, product_skuid_link);
 			
-			ExecutorService executor = Executors.newFixedThreadPool(bom_response.size());
+			ExecutorService executor = Executors.newFixedThreadPool(bom_response.size()+1);
 			for (PContractBOM2SKU skubom:bom_response){
 				Runnable demand = new calDemand(
 						skubom,
