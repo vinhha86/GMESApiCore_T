@@ -1198,7 +1198,9 @@ public class ScheduleAPI {
 			for(POrder porder : list_porder) {
 				Date startDate = null;
 				if(start_before == null) {
-					startDate = commonService.getBeginOfDate(porder.getProductiondate_plan());
+					Date productiondate_plan = porder.getProductiondate_plan();
+					productiondate_plan = productiondate_plan == null ? commonService.Date_Add_with_holiday(porder.getFinishdate_plan(), -30, orgrootid_link) : productiondate_plan;
+					startDate = commonService.getBeginOfDate(productiondate_plan);
 					Calendar c_startdate = Calendar.getInstance();
 					c_startdate.setTime(startDate);
 					if(commonService.check_dayoff(c_startdate, orgrootid_link)) {
