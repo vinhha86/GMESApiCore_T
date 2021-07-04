@@ -112,7 +112,7 @@ public class Warehouse implements Serializable {
 	private Float met;
 	private Integer status;
 	private Float met_err;
-	
+	private Boolean is_freeze;
 	
 
 	public Float getMet_err() {
@@ -430,6 +430,14 @@ public class Warehouse implements Serializable {
 
 	public void setStatus(Integer status) {
 		this.status = status;
+	}
+
+	public Boolean getIs_freeze() {
+		return is_freeze;
+	}
+
+	public void setIs_freeze(Boolean is_freeze) {
+		this.is_freeze = is_freeze;
 	}
 	
 	
