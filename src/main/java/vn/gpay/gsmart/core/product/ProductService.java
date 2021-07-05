@@ -209,9 +209,11 @@ public class ProductService extends AbstractService<Product> implements IProduct
 		String code = request.code;
 		Specification<Product> specification = Specifications.<Product>and()
 //	            .eq("product_type", request.product_type)
-				.eq("status", 1).eq("orgrootid_link", orgrootid_link)
-				.like(name != "" && name != null, "name", "%" + name + "%")
-				.like(code != "" && code != null, "buyercode", "%" + code + "%").between("producttypeid_link", 10, 19)
+				.eq("status", 1)
+				.eq("orgrootid_link", orgrootid_link)
+				.like(name != "" && name != null, "buyername", "%" + name + "%")
+				.like(code != "" && code != null, "buyercode", "%" + code + "%")
+				.between("producttypeid_link", 10, 19)
 				.build();
 		Sort sort = Sorts.builder().asc("buyercode").build();
 
@@ -469,7 +471,13 @@ public class ProductService extends AbstractService<Product> implements IProduct
 
 	@Override
 	public List<Product> getByBuyerCodeAndTypeNotLike(String buyercode, Integer producttypeid_link) {
-		// TODO Auto-generated method stub
 		return repo.getByBuyerCodeAndTypeNotLike(buyercode, producttypeid_link);
+	}
+
+	@Override
+	public List<Product> getAllProduct(Long orgrootid_link, String buyercode, String buyername) {
+		if(buyercode == null) buyercode = "";
+		if(buyername == null) buyername = "";
+		return repo.getAllProduct(orgrootid_link, buyercode, buyername);
 	}
 }

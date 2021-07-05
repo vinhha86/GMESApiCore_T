@@ -141,4 +141,17 @@ public interface IProductRepository extends JpaRepository<Product, Long>, JpaSpe
 			@Param ("producttypeid_link")final Integer producttypeid_link
 			);
 
+	@Query(value = "select c from Product c "
+			+ "where lower(c.buyercode) like lower(concat('%',:buyercode,'%')) "
+			+ "and lower(c.buyername) like lower(concat('%',:buyername,'%')) "
+			+ "and c.orgrootid_link = :orgrootid_link "
+			+ "and c.producttypeid_link >= 10 "
+			+ "and c.producttypeid_link <= 19 "
+			+ "and c.status = 1"
+			)
+	public List<Product> getAllProduct(
+			@Param ("orgrootid_link")final Long orgrootid_link,
+			@Param ("buyercode")final String buyercode,
+			@Param ("buyername")final String buyername
+			);
 }

@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +35,7 @@ import vn.gpay.gsmart.core.attribute.IAttributeService;
 import vn.gpay.gsmart.core.attributevalue.Attributevalue;
 import vn.gpay.gsmart.core.attributevalue.IAttributeValueService;
 import vn.gpay.gsmart.core.base.ResponseBase;
+import vn.gpay.gsmart.core.contractbuyer.ContractBuyer;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.product.IProductBomService;
@@ -238,8 +241,21 @@ public class ProductAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
 					.getPrincipal();
-			Page<Product> pProduct = productService.getall_products(user.getRootorgid_link(), entity);
-			List<Product> lstproduct = pProduct.getContent();
+//			Page<Product> pProduct = productService.getall_products(user.getRootorgid_link(), entity);
+//			List<Product> lstproduct = pProduct.getContent();
+			
+			List<Product> list = productService.getAllProduct(
+					user.getRootorgid_link(),
+					entity.code,
+					entity.name
+					);
+			
+			PageRequest page = PageRequest.of(entity.page - 1, entity.limit);
+			int start = (int) page.getOffset();
+			int end = (start + page.getPageSize()) > list.size() ? list.size() : (start + page.getPageSize());
+			Page<Product> pageToReturn = new PageImpl<Product>(list.subList(start, end), page, list.size()); 
+			List<Product> lstproduct = pageToReturn.getContent();
+			
 			List<ProductBinding> lstdata = new ArrayList<>();
 			String FolderPath = AtributeFixValues.folder_upload+"/product";
 			
@@ -265,7 +281,8 @@ public class ProductAPI {
 			}
 			
 			response.pagedata = lstdata;
-			response.totalCount = pProduct.getTotalElements();
+//			response.totalCount = pProduct.getTotalElements();
+			response.totalCount = list.size();
 			response.data = productService.getall_by_orgrootid(user.getRootorgid_link(),
 					entity.product_type);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -286,7 +303,16 @@ public class ProductAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
 					.getPrincipal();
 //			Page<Product> pProduct = productService.getall_mainmaterials(user.getRootorgid_link(), entity);
-			List<Product> lstproduct = productService.getall_materials(user.getRootorgid_link(), entity);
+//			List<Product> lstproduct = productService.getall_materials(user.getRootorgid_link(), entity);
+			
+			List<Product> list = productService.getall_materials(user.getRootorgid_link(), entity);
+			
+			PageRequest page = PageRequest.of(entity.page - 1, entity.limit);
+			int start = (int) page.getOffset();
+			int end = (start + page.getPageSize()) > list.size() ? list.size() : (start + page.getPageSize());
+			Page<Product> pageToReturn = new PageImpl<Product>(list.subList(start, end), page, list.size()); 
+			List<Product> lstproduct = pageToReturn.getContent();
+			
 			List<ProductBinding> lstdata = new ArrayList<>();
 			String FolderPath = AtributeFixValues.folder_upload+"/material";
 			
@@ -311,6 +337,7 @@ public class ProductAPI {
 			}
 			
 			response.pagedata = lstdata;
+			response.totalCount = list.size();
 			response.data = productService.getall_by_orgrootid(user.getRootorgid_link(),
 					entity.product_type);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

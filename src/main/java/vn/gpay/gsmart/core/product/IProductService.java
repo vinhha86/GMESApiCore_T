@@ -33,4 +33,5 @@ public interface IProductService extends Operations<Product> {
 	List<Long> getByBuyerCode(String buyercode);
 	List<Product> getByBuyerCodeAndType(String buyercode, Integer producttypeid_link);
 	List<Product> getByBuyerCodeAndTypeNotLike(String buyercode, Integer producttypeid_link);
+	List<Product> getAllProduct(Long orgrootid_link, String buyercode, String buyername);
 }
