@@ -153,7 +153,21 @@ public interface IPOrderProcessing_Repository extends JpaRepository<POrderProces
 	@Query(value = "select a from POrderProcessing a where a.porderid_link = :porderid_link and a.pordergrantid_link = :pordergrantid_link order by a.processingdate desc")
 	public List<POrderProcessing>getByPOrderAndPOrderGrant(
 			@Param ("porderid_link")final Long porderid_link,
-			@Param ("pordergrantid_link")final Long pordergrantid_link);	
+			@Param ("pordergrantid_link")final Long pordergrantid_link);
+	
+	@Query(value = "select a from POrderProcessing a "
+			+ "where a.porderid_link = :porderid_link " 
+			+ "and a.pordergrantid_link = :pordergrantid_link " 
+			+ "and a.processingdate = "
+			+ "("
+			+ "select max(processingdate) from POrderProcessing b " 
+			+ "where b.porderid_link = :porderid_link "
+			+ "and a.pordergrantid_link = :pordergrantid_link "
+			+ ") "
+			)
+	public List<POrderProcessing>getByPOrderAndPOrderGrantAndMaxDate(
+			@Param ("porderid_link")final Long porderid_link,
+			@Param ("pordergrantid_link")final Long pordergrantid_link);
 	
 	@Query(value = "select a from POrderProcessing a "
 			+ "inner join POrder b on a.porderid_link = b.id "

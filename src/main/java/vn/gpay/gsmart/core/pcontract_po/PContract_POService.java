@@ -14,6 +14,12 @@ import vn.gpay.gsmart.core.base.AbstractService;
 import vn.gpay.gsmart.core.packingtype.IPackingTypeRepository;
 import vn.gpay.gsmart.core.packingtype.PackingType;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Repository;
+import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant;
+import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
+import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
+import vn.gpay.gsmart.core.porders_poline.IPOrder_POLine_Service;
 
 @Service
 public class PContract_POService extends AbstractService<PContract_PO> implements IPContract_POService {
@@ -24,6 +30,9 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	@Autowired
 	EntityManager em;
 	@Autowired IPackingTypeRepository packing_repo;
+	@Autowired IPOrder_POLine_Service porder_line_Service;
+	@Autowired IPOrderGrant_Service porderGrantService;
+	@Autowired IPOrderProcessing_Service pprocessRepository;
 
 	@Override
 	protected JpaRepository<PContract_PO, Long> getRepository() {
@@ -309,6 +318,36 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 				}
 				ship.setPacking_method(packing_method);
 			}
+			
+			Long pcontract_poid_link = po.getId();
+			// Cắt
+			//// code here
+			
+			// Vào chuyền, Ra chuyền, Đóng gói
+			Integer amountinputsum = 0;
+			Integer amountoutputsum = 0;
+			Integer amountpackedsum = 0;
+			List<POrder> porder_list = porder_line_Service.getporder_by_po(pcontract_poid_link);
+			if(porder_list.size() > 0) {
+				POrder porder = porder_list.get(0);
+				Long porderid_link = porder.getId();
+				List<POrderGrant> porderGrant_list = porderGrantService.getByOrderId(porderid_link);
+				for(POrderGrant porderGrant : porderGrant_list) {
+					List<POrderProcessing> porderProcessing_list = pprocessRepository.getByPOrderAndPOrderGrantAndMaxDate(porderid_link, porderGrant.getId());
+					if(porderProcessing_list.size() > 0) {
+						POrderProcessing porderProcessing = porderProcessing_list.get(0);
+						amountinputsum += porderProcessing.getAmountinputsum() == null ? 0 : porderProcessing.getAmountinputsum();
+						amountoutputsum += porderProcessing.getAmountoutputsum() == null ? 0 : porderProcessing.getAmountoutputsum();
+						amountpackedsum += porderProcessing.getAmountpackedsum() == null ? 0 : porderProcessing.getAmountpackedsum();
+					}
+				}
+			}
+			ship.setAmountinputsum(amountinputsum);
+			ship.setAmountoutputsum(amountoutputsum);
+			ship.setAmountpackedsum(amountpackedsum);
+			
+			// Giao hàng
+			//// code here
 			
 			list_shipping.add(ship);
 		}

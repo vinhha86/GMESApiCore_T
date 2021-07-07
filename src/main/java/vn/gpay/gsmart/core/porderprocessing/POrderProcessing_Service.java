@@ -295,4 +295,9 @@ public class POrderProcessing_Service extends AbstractService<POrderProcessing> 
 	public List<POrderProcessing> getByPOrderAndLineAndDate(Long porderid_link, Long orgid_to_link, Date receive_date) {
 		return repo.getByPOrderAndLineAndDate(porderid_link, orgid_to_link, receive_date);
 	}
+
+	@Override
+	public List<POrderProcessing> getByPOrderAndPOrderGrantAndMaxDate(Long porderid_link, Long pordergrantid_link) {
+		return repo.getByPOrderAndPOrderGrantAndMaxDate(porderid_link, pordergrantid_link);
+	}
 }
