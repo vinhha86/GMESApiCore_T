@@ -320,27 +320,35 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 			}
 			
 			Long pcontract_poid_link = po.getId();
-			// Cắt
-			//// code here
+			List<POrder> porder_list = porder_line_Service.getporder_by_po(pcontract_poid_link);
+			// SL Cắt
+			Integer amountcut = 0;
+			if(porder_list.size() > 0) {
+				for(POrder porder : porder_list) {
+					Long porderid_link = porder.getId();
+					
+				}
+			}
 			
-			// Vào chuyền, Ra chuyền, Hoàn thiện ,Đóng gói
+			// SL Vào chuyền, Ra chuyền, Hoàn thiện ,Đóng gói
 			Integer amountinputsum = 0;
 			Integer amountoutputsum = 0;
 			Integer amountpackstockedsum = 0;
 			Integer amountpackedsum = 0;
-			List<POrder> porder_list = porder_line_Service.getporder_by_po(pcontract_poid_link);
 			if(porder_list.size() > 0) {
-				POrder porder = porder_list.get(0);
-				Long porderid_link = porder.getId();
-				List<POrderGrant> porderGrant_list = porderGrantService.getByOrderId(porderid_link);
-				for(POrderGrant porderGrant : porderGrant_list) {
-					List<POrderProcessing> porderProcessing_list = pprocessRepository.getByPOrderAndPOrderGrantAndMaxDate(porderid_link, porderGrant.getId());
-					if(porderProcessing_list.size() > 0) {
-						POrderProcessing porderProcessing = porderProcessing_list.get(0);
-						amountinputsum += porderProcessing.getAmountinputsum() == null ? 0 : porderProcessing.getAmountinputsum();
-						amountoutputsum += porderProcessing.getAmountoutputsum() == null ? 0 : porderProcessing.getAmountoutputsum();
-						amountpackstockedsum += porderProcessing.getAmountpackstockedsum() == null ? 0 : porderProcessing.getAmountpackstockedsum();
-						amountpackedsum += porderProcessing.getAmountpackedsum() == null ? 0 : porderProcessing.getAmountpackedsum();
+//				POrder porder = porder_list.get(0);
+				for(POrder porder : porder_list) {
+					Long porderid_link = porder.getId();
+					List<POrderGrant> porderGrant_list = porderGrantService.getByOrderId(porderid_link);
+					for(POrderGrant porderGrant : porderGrant_list) {
+						List<POrderProcessing> porderProcessing_list = pprocessRepository.getByPOrderAndPOrderGrantAndMaxDate(porderid_link, porderGrant.getId());
+						if(porderProcessing_list.size() > 0) {
+							POrderProcessing porderProcessing = porderProcessing_list.get(0);
+							amountinputsum += porderProcessing.getAmountinputsum() == null ? 0 : porderProcessing.getAmountinputsum();
+							amountoutputsum += porderProcessing.getAmountoutputsum() == null ? 0 : porderProcessing.getAmountoutputsum();
+							amountpackstockedsum += porderProcessing.getAmountpackstockedsum() == null ? 0 : porderProcessing.getAmountpackstockedsum();
+							amountpackedsum += porderProcessing.getAmountpackedsum() == null ? 0 : porderProcessing.getAmountpackedsum();
+						}
 					}
 				}
 			}
@@ -349,7 +357,7 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 			ship.setAmountpackstockedsum(amountpackstockedsum);
 			ship.setAmountpackedsum(amountpackedsum);
 			
-			// Giao hàng
+			// SL Giao hàng
 			//// code here
 			
 			list_shipping.add(ship);
