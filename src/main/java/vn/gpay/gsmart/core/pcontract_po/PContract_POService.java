@@ -323,9 +323,10 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 			// Cắt
 			//// code here
 			
-			// Vào chuyền, Ra chuyền, Đóng gói
+			// Vào chuyền, Ra chuyền, Hoàn thiện ,Đóng gói
 			Integer amountinputsum = 0;
 			Integer amountoutputsum = 0;
+			Integer amountpackstockedsum = 0;
 			Integer amountpackedsum = 0;
 			List<POrder> porder_list = porder_line_Service.getporder_by_po(pcontract_poid_link);
 			if(porder_list.size() > 0) {
@@ -338,12 +339,14 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 						POrderProcessing porderProcessing = porderProcessing_list.get(0);
 						amountinputsum += porderProcessing.getAmountinputsum() == null ? 0 : porderProcessing.getAmountinputsum();
 						amountoutputsum += porderProcessing.getAmountoutputsum() == null ? 0 : porderProcessing.getAmountoutputsum();
+						amountpackstockedsum += porderProcessing.getAmountpackstockedsum() == null ? 0 : porderProcessing.getAmountpackstockedsum();
 						amountpackedsum += porderProcessing.getAmountpackedsum() == null ? 0 : porderProcessing.getAmountpackedsum();
 					}
 				}
 			}
 			ship.setAmountinputsum(amountinputsum);
 			ship.setAmountoutputsum(amountoutputsum);
+			ship.setAmountpackstockedsum(amountpackstockedsum);
 			ship.setAmountpackedsum(amountpackedsum);
 			
 			// Giao hàng

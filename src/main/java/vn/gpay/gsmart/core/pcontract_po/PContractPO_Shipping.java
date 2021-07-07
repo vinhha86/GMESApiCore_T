@@ -56,10 +56,11 @@ public class PContractPO_Shipping {
 	private String packing_method;
 	private String shipmode_name;
 	
-	// cắt, vào chuyền, ra chuyền, đóng gói, giao hàng
+	// cắt, vào chuyền, ra chuyền, đóng gói, hoàn thiện ,giao hàng
 	private Integer amountcut;
 	private Integer amountinputsum;
 	private Integer amountoutputsum;
+	private Integer amountpackstockedsum;
 	private Integer amountpackedsum;
 	
 	public String getPacking_method() {
@@ -391,6 +392,12 @@ public class PContractPO_Shipping {
 	}
 	public void setAmountoutputsum(Integer amountoutputsum) {
 		this.amountoutputsum = amountoutputsum;
+	}
+	public Integer getAmountpackstockedsum() {
+		return amountpackstockedsum;
+	}
+	public void setAmountpackstockedsum(Integer amountpackstockedsum) {
+		this.amountpackstockedsum = amountpackstockedsum;
 	}
 	public Integer getAmountpackedsum() {
 		return amountpackedsum;
