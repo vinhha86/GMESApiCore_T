@@ -10,6 +10,7 @@ public class POrderStatus {
     public static int PORDER_STATUS_RUNNING    = 4; //Đang sản xuất
     public static int PORDER_STATUS_DONE       = 5; //Đã sản xuất xong, chưa nhập kho TP hết
     public static int PORDER_STATUS_FINISHED   = 6; //Đã hoàn thành mã hàng
+    public static int PORDER_STATUS_HasMapPOLine = 7; //Đã map với PO Line
 
     public static int PORDER_STATUS_CUTTING    		= 20; //Bắt đầu cắt
     public static int PORDER_STATUS_NUMBERING  		= 21; //Đánh số

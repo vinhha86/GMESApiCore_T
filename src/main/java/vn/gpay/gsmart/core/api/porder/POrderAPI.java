@@ -157,9 +157,9 @@ public class POrderAPI {
 			}
 			
 			//Lay nhung porder da map voi po line de remove khoi list
-			List<Long> list_porder_line = porder_line_Service.get_porderid_by_line(pcontract_poid_link);
+//			List<Long> list_porder_line = porder_line_Service.get_porderid_by_line(pcontract_poid_link);
 			List<POrder> list_porder = porderService.getby_offer_and_orgs(po_line.getParentpoid_link(), orgs);
-			list_porder.removeIf(c-> list_porder_line.contains(c.getId()));
+//			list_porder.removeIf(c-> list_porder_line.contains(c.getId()));
 			
 			response.data = list_porder;
 			

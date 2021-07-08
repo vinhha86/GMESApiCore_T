@@ -93,6 +93,8 @@ public class PContract_PO implements Serializable {/**
 	private Float plan_linerequired;
 	private Integer po_typeid_link;
 	private String comment;
+	private Boolean ismap;
+	
 	
 	
 	public Integer getPo_typeid_link() {
@@ -862,6 +864,14 @@ public class PContract_PO implements Serializable {/**
 
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+
+	public Boolean getIsmap() {
+		return ismap;
+	}
+
+	public void setIsmap(Boolean ismap) {
+		this.ismap = ismap;
 	}
 	
 	

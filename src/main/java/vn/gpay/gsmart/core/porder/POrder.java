@@ -94,6 +94,7 @@ public class POrder implements Serializable {
 	private Integer plan_productivity;
 	private Integer plan_duration;
 	private Float plan_linerequired;
+	private Boolean ismap;
 //	private Long porder_statusid_link;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -792,6 +793,12 @@ public class POrder implements Serializable {
 
 	public void setPlan_duration(Integer plan_duration) {
 		this.plan_duration = plan_duration;
+	}
+	public Boolean getIsMap() {
+		return ismap;
+	}
+	public void setIsMap(Boolean isMap) {
+		this.ismap = isMap;
 	}
 	
 	

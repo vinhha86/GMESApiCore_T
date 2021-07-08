@@ -27,5 +27,10 @@ public class POrder_POLine_Service extends AbstractService<POrder_POLine> implem
 		// TODO Auto-generated method stub
 		return repo.get_porder_by_line(pcontract_poid_link);
 	}
+	@Override
+	public List<POrder_POLine> get_porderline_by_po(Long pcontract_poid_link) {
+		// TODO Auto-generated method stub
+		return repo.get_porderline_by_line(pcontract_poid_link);
+	}
 
 }

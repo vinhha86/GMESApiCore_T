@@ -25,4 +25,10 @@ public interface POrder_POLine_Repo extends JpaRepository<POrder_POLine, Long>,J
 			+ "where c.pcontract_poid_link = :pcontract_poid_link")
 	public List<POrder> get_porder_by_line(
 			@Param("pcontract_poid_link") final Long pcontract_poid_link);
+	
+	@Query(value = "select c "
+			+ "from POrder_POLine c "
+			+ "where c.pcontract_poid_link = :pcontract_poid_link")
+	public List<POrder_POLine> get_porderline_by_line(
+			@Param("pcontract_poid_link") final Long pcontract_poid_link);
 }
