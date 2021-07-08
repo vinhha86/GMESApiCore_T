@@ -46,10 +46,7 @@ public class StockOutD implements Serializable {
     private String pordercode;
 	
 	@Column(name ="stockoutdate")
-    private Date stockoutdate;	
-	
-	@Column(name ="mainskucode", length=50)
-    private String mainskucode;
+    private Date stockoutdate;
 	
 	@Column(name ="skuid_link")
     private Long skuid_link;
@@ -281,12 +278,6 @@ public class StockOutD implements Serializable {
 	}
 	public void setStockoutdate(Date stockoutdate) {
 		this.stockoutdate = stockoutdate;
-	}
-	public String getMainskucode() {
-		return mainskucode;
-	}
-	public void setMainskucode(String mainskucode) {
-		this.mainskucode = mainskucode;
 	}
 	public Long getSkuid_link() {
 		return skuid_link;

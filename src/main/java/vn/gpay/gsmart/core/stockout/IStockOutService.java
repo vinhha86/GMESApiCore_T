@@ -25,4 +25,6 @@ public interface IStockOutService extends Operations<StockOut>{
 	
 	public  Page<StockOut> stockout_list_page(Long orgrootid_link,Integer stockouttypeid_link,String stockoutcode, Long orgid_from_link,Long orgid_to_link, Date stockoutdate_from,
 				Date stockoutdate_to,int page, int limit);
+	
+	List<StockOut> findByPO_Type_Status(Long pcontract_poid_link, Integer stockouttypeid_link, Integer status);
 }

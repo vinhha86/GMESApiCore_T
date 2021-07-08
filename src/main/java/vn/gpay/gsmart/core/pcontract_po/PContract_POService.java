@@ -20,6 +20,12 @@ import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.porders_poline.IPOrder_POLine_Service;
+import vn.gpay.gsmart.core.stockout.StockOut;
+import vn.gpay.gsmart.core.stockout.StockOutD;
+import vn.gpay.gsmart.core.stockout.StockOutPklist;
+import vn.gpay.gsmart.core.utils.StockoutStatus;
+import vn.gpay.gsmart.core.utils.StockoutTypes;
+import vn.gpay.gsmart.core.stockout.IStockOutService;
 
 @Service
 public class PContract_POService extends AbstractService<PContract_PO> implements IPContract_POService {
@@ -33,6 +39,7 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	@Autowired IPOrder_POLine_Service porder_line_Service;
 	@Autowired IPOrderGrant_Service porderGrantService;
 	@Autowired IPOrderProcessing_Service pprocessRepository;
+	@Autowired IStockOutService stockOutService;
 
 	@Override
 	protected JpaRepository<PContract_PO, Long> getRepository() {
@@ -326,7 +333,7 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 			if(porder_list.size() > 0) {
 				for(POrder porder : porder_list) {
 					Long porderid_link = porder.getId();
-					
+					// code here
 				}
 			}
 			
@@ -358,7 +365,20 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 			ship.setAmountpackedsum(amountpackedsum);
 			
 			// SL Giao hàng
-			//// code here
+			Integer amountgiaohang = 0;
+			List<StockOut> stockOut_list = stockOutService.findByPO_Type_Status(
+					po.getId(), StockoutTypes.STOCKOUT_TYPE_TP_PO, StockoutStatus.STOCKOUT_STATUS_APPROVED
+					);
+			for(StockOut stockout : stockOut_list) {
+				List<StockOutD> StockOutD_list = stockout.getStockoutd();
+				for(StockOutD stockOutD : StockOutD_list) {
+					List<StockOutPklist> stockOutPklist_list = stockOutD.getStockout_packinglist();
+					if(stockOutPklist_list != null) {
+						amountgiaohang += stockOutPklist_list.size();
+					}
+				}
+			}
+			ship.setAmountgiaohang(amountgiaohang);
 			
 			list_shipping.add(ship);
 		}

@@ -62,6 +62,7 @@ public class PContractPO_Shipping {
 	private Integer amountoutputsum;
 	private Integer amountpackstockedsum;
 	private Integer amountpackedsum;
+	private Integer amountgiaohang;
 	
 	public String getPacking_method() {
 		return packing_method;
@@ -404,6 +405,12 @@ public class PContractPO_Shipping {
 	}
 	public void setAmountpackedsum(Integer amountpackedsum) {
 		this.amountpackedsum = amountpackedsum;
+	}
+	public Integer getAmountgiaohang() {
+		return amountgiaohang;
+	}
+	public void setAmountgiaohang(Integer amountgiaohang) {
+		this.amountgiaohang = amountgiaohang;
 	}
 	
 }

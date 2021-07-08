@@ -47,5 +47,17 @@ public interface StockOutRepository extends JpaRepository<StockOut, Long>,JpaSpe
 	
 	@Modifying
 	@Query(value = "update StockOut set status = 1 where id=:id")
-	public void updateStatusById(@Param ("id")final long id);	
+	public void updateStatusById(@Param ("id")final long id);
+	
+	@Query(value = "select c from StockOut c " 
+			+ "where c.pcontract_poid_link = :pcontract_poid_link "
+			+ "and c.stockouttypeid_link = :stockouttypeid_link "
+			+ "and c.status = :status "
+			)
+	public List<StockOut> findByPO_Type_Status(
+			@Param ("pcontract_poid_link")final Long pcontract_poid_link,
+			@Param ("stockouttypeid_link")final Integer stockouttypeid_link, 
+			@Param ("status")final Integer status
+			);
+	
 }

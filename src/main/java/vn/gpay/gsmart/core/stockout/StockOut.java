@@ -168,6 +168,9 @@ public class StockOut implements Serializable {
 	@Column(name ="lasttimeupdate")
 	private Date lasttimeupdate;
 	
+	@Column(name ="pcontract_poid_link")
+	private Long pcontract_poid_link;
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
 	@JoinColumn( name="stockoutid_link", referencedColumnName="id")
@@ -662,6 +665,14 @@ public class StockOut implements Serializable {
 	}
 	public void setVat_exchangerate(Float vat_exchangerate) {
 		this.vat_exchangerate = vat_exchangerate;
+	}
+
+	public Long getPcontract_poid_link() {
+		return pcontract_poid_link;
+	}
+
+	public void setPcontract_poid_link(Long pcontract_poid_link) {
+		this.pcontract_poid_link = pcontract_poid_link;
 	}
 	
 }

@@ -111,5 +111,9 @@ public class StockOutServiceImpl extends AbstractService<StockOut> implements IS
 		if(stockoutdate_from!=null && stockoutdate_to!=null) return true;
 		return false;
 	}
+	@Override
+	public List<StockOut> findByPO_Type_Status(Long pcontract_poid_link, Integer stockouttypeid_link, Integer status) {
+		return repository.findByPO_Type_Status(pcontract_poid_link, stockouttypeid_link, status);
+	}
 	
 }

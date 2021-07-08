@@ -66,9 +66,6 @@ public class StockOutPklist implements Serializable {
 	@Column(name="ydscheck")
 	private Float ydscheck;
 	
-	@Column(name="width")
-	private Float width;
-	
 	@Transient
     private Float ydscheckold;	
 	
@@ -385,12 +382,6 @@ public class StockOutPklist implements Serializable {
 	}
 	public void setStatus(Integer status) {
 		this.status = status;
-	}
-	public Float getWidth() {
-		return width;
-	}
-	public void setWidth(Float width) {
-		this.width = width;
 	}
 	public Integer getSkutypeid_link() {
 		return skutypeid_link;
