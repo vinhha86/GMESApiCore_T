@@ -104,6 +104,28 @@ public class POrderPOLineAPI {
 			Long pcontract_poid_link = entity.pcontract_poid_link;
 			List<POrder_POLine> list_porder = porder_line_Service.get_porderline_by_po(pcontract_poid_link);
 			for(POrder_POLine porder_line : list_porder) {
+				//cap nhat lai trang thai cua poline thuc te
+				PContract_PO linett = poService.findOne(porder_line.getPcontract_poid_link());
+				linett.setIsmap(false);
+				poService.save(linett);
+				
+				//Cap nhat lai thong tin lenh san xuat
+				POrder porder = porderService.findOne(porder_line.getPorderid_link());
+				PContract_PO linekh = poService.findOne(porder.getPcontract_poid_link());
+				porder.setIsMap(false);
+				porder.setTotalorder(linekh.getPo_quantity());
+				porder.setGolivedate(linekh.getShipdate());
+				porderService.save(porder);
+				
+				//Xoa het porder-sku
+				List<POrder_Product_SKU> list_porder_sku = porderskuService.getby_porder(porder.getId());
+				for(POrder_Product_SKU porder_sku : list_porder_sku) {
+					porderskuService.delete(porder_sku);
+				}
+				
+				//xoa trong bang porder-poline
+				porder_line_Service.delete(porder_line);
+				
 				
 			}
 			
