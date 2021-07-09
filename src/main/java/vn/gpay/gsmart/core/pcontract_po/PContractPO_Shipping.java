@@ -417,6 +417,7 @@ public class PContractPO_Shipping {
 	}
 	public void setIsmap(Boolean ismap) {
 		this.ismap = ismap;
+	}
 	public Integer getAmountstockedsum() {
 		return amountstockedsum;
 	}

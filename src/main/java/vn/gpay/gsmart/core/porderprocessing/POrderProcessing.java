@@ -199,6 +199,8 @@ public class POrderProcessing implements Serializable {
 	private Integer iscuttt;
 	@Transient
 	private Boolean isstockouttocut;
+	@Transient
+	private Integer amountgiaohang;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -981,6 +983,11 @@ public class POrderProcessing implements Serializable {
 	public void setPordergrantid_link(Long pordergrantid_link) {
 		this.pordergrantid_link = pordergrantid_link;
 	}
-	
-	
+	public Integer getAmountgiaohang() {
+		return amountgiaohang;
+	}
+
+	public void setAmountgiaohang(Integer amountgiaohang) {
+		this.amountgiaohang = amountgiaohang;
+	}
 }

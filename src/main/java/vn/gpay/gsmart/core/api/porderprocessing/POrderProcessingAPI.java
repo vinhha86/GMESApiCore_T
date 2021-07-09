@@ -46,9 +46,13 @@ import vn.gpay.gsmart.core.porderprocessing.POrderProcessingBinding;
 import vn.gpay.gsmart.core.porderprocessing.TVSOrgStatusShow;
 import vn.gpay.gsmart.core.porders_poline.IPOrder_POLine_Service;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.stockout.IStockOutService;
+import vn.gpay.gsmart.core.stockout.StockOut;
 import vn.gpay.gsmart.core.utils.GPAYDateFormat;
 import vn.gpay.gsmart.core.utils.POrderStatus;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
+import vn.gpay.gsmart.core.utils.StockoutStatus;
+import vn.gpay.gsmart.core.utils.StockoutTypes;
 
 @RestController
 @RequestMapping("/api/v1/pprocess")
@@ -59,6 +63,7 @@ public class POrderProcessingAPI {
     @Autowired private IPOrderGrant_Service pordergrantRepository;
 //    @Autowired private IActionLogs_Service actionLogsRepository;
     @Autowired IPOrder_POLine_Service porder_line_Service;
+	@Autowired IStockOutService stockOutService;
     ObjectMapper mapper = new ObjectMapper();
     
     @GetMapping("/getall")
@@ -431,6 +436,58 @@ public class POrderProcessingAPI {
 //					map.put(processingdate, newPOrderProcessing);
 //				}
 //			}
+			
+			List<POrderProcessing> result = new ArrayList<>(map.values());
+			Comparator<POrderProcessing> compareByProcessingDate = (POrderProcessing obj1, POrderProcessing obj2) -> obj1.getProcessingdate().compareTo(obj2.getProcessingdate());
+			Collections.sort(result, compareByProcessingDate);
+			
+			response.data=result;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
+			return new ResponseEntity<POrderProcessingResponse>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());			
+		    return new ResponseEntity<POrderProcessingResponse>(HttpStatus.BAD_REQUEST);
+		}    			
+	}
+	
+	@RequestMapping(value = "/get_slgiaohang_by_pcontract_po",method = RequestMethod.POST)
+	public ResponseEntity<POrderProcessingResponse> get_slgiaohang_by_pcontract_po(@RequestBody PProcessByOrderIdRequest entity, HttpServletRequest request) {
+		POrderProcessingResponse response = new POrderProcessingResponse();
+		try {
+			Long pcontract_poid_link = entity.pcontract_poid_link;
+			Map<Date, POrderProcessing> map = new HashMap<Date, POrderProcessing>();
+			List<StockOut> stockOut_list = stockOutService.findByPO_Type_Status(
+					pcontract_poid_link, StockoutTypes.STOCKOUT_TYPE_TP_PO, StockoutStatus.STOCKOUT_STATUS_APPROVED
+					);
+			for(StockOut stockout : stockOut_list) {
+				Date approveDate = stockout.getApprove_date();
+				Calendar calendar = GregorianCalendar.getInstance();
+				calendar.setTime(approveDate);
+//			    calendar.set(Calendar.DAY_OF_MONTH, 5);
+//			    calendar.set(Calendar.MONTH, 7);
+//			    calendar.set(Calendar.YEAR, 2015);
+			    calendar.set(Calendar.MILLISECOND, 0);
+			    calendar.set(Calendar.SECOND, 0);
+			    calendar.set(Calendar.MINUTE, 0);
+			    calendar.set(Calendar.HOUR_OF_DAY, 0);
+				Date date = calendar.getTime();
+				
+				if(map.containsKey(date)) {
+					POrderProcessing porderProcessing = map.get(date);
+					Integer amountgiaohangOld = porderProcessing.getAmountgiaohang();
+					Integer amountgiaohangNew = stockout.getTotalpackagecheck();
+					porderProcessing.setAmountgiaohang(amountgiaohangOld + amountgiaohangNew);
+					map.put(date, porderProcessing);
+				}else {
+					POrderProcessing newPOrderProcessing = new POrderProcessing();
+					newPOrderProcessing.setProcessingdate(date);
+					Integer amountgiaohangNew = stockout.getTotalpackagecheck();
+					newPOrderProcessing.setAmountgiaohang(amountgiaohangNew);
+					map.put(date, newPOrderProcessing);
+				}
+			}
 			
 			List<POrderProcessing> result = new ArrayList<>(map.values());
 			Comparator<POrderProcessing> compareByProcessingDate = (POrderProcessing obj1, POrderProcessing obj2) -> obj1.getProcessingdate().compareTo(obj2.getProcessingdate());

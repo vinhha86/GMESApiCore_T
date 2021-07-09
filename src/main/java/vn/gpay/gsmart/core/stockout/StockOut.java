@@ -78,6 +78,8 @@ public class StockOut implements Serializable {
 	private Date vat_date;
 	private Long vat_currencyid_link;
 	private Float vat_exchangerate;
+	private Date approve_date;
+	private Date receive_date;
 	
 	@Column(name = "totalpackage")
     private Integer totalpackage; 
@@ -673,6 +675,22 @@ public class StockOut implements Serializable {
 
 	public void setPcontract_poid_link(Long pcontract_poid_link) {
 		this.pcontract_poid_link = pcontract_poid_link;
+	}
+
+	public Date getApprove_date() {
+		return approve_date;
+	}
+
+	public void setApprove_date(Date approve_date) {
+		this.approve_date = approve_date;
+	}
+
+	public Date getReceive_date() {
+		return receive_date;
+	}
+
+	public void setReceive_date(Date receive_date) {
+		this.receive_date = receive_date;
 	}
 	
 }
