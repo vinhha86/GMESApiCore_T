@@ -511,4 +511,9 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 			String buyercode) {
 		return repo.getPOrderByOrderCodeAndProductBuyerCode(granttoorgid_link, ordercode, buyercode);
 	}
+
+	@Override
+	public List<POrder> getByPcontractPO(Long pcontract_poid_link) {
+		return repo.getByPcontractPO(pcontract_poid_link);
+	}
 }

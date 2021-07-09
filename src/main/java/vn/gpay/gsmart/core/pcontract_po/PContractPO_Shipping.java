@@ -56,12 +56,12 @@ public class PContractPO_Shipping {
 	private String packing_method;
 	private String shipmode_name;
 	private Boolean ismap;
-	// cắt, vào chuyền, ra chuyền, đóng gói, hoàn thiện ,giao hàng
 	private Integer amountcut;
 	private Integer amountinputsum;
 	private Integer amountoutputsum;
 	private Integer amountpackstockedsum;
 	private Integer amountpackedsum;
+	private Integer amountstockedsum;
 	private Integer amountgiaohang;
 	
 	public String getPacking_method() {
@@ -417,6 +417,11 @@ public class PContractPO_Shipping {
 	}
 	public void setIsmap(Boolean ismap) {
 		this.ismap = ismap;
+	public Integer getAmountstockedsum() {
+		return amountstockedsum;
+	}
+	public void setAmountstockedsum(Integer amountstockedsum) {
+		this.amountstockedsum = amountstockedsum;
 	}
 	
 }

@@ -222,4 +222,7 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 			@Param ("ordercode")final String ordercode,
 			@Param ("granttoorgid_link")final Long granttoorgid_link
 			);
+	
+	@Query("SELECT c FROM POrder c where c.pcontract_poid_link = :pcontract_poid_link")
+	public List<POrder> getByPcontractPO(@Param ("pcontract_poid_link")final Long pcontract_poid_link);
 }
