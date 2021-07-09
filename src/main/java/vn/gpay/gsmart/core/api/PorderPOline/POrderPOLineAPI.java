@@ -19,6 +19,10 @@ import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
 import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porders_poline.IPOrder_POLine_Service;
@@ -34,6 +38,8 @@ public class POrderPOLineAPI {
 	@Autowired IPContract_POService poService;
 	@Autowired IPOrder_Product_SKU_Service porderskuService;
 	@Autowired IPContractProductSKUService pcontractskuService;
+	@Autowired IPOrderGrant_Service grantService;
+	@Autowired IPOrderGrant_SKUService grantskuService;
 	
 	@RequestMapping(value = "/add_porder",method = RequestMethod.POST)
 	public ResponseEntity<add_porder_response> AddPorder(@RequestBody add_porder_request entity,HttpServletRequest request ) {
@@ -77,6 +83,7 @@ public class POrderPOLineAPI {
 					pordersku.setPquantity_total(pcontractsku.getPquantity_total());
 					pordersku.setProductid_link(pcontractsku.getProductid_link());
 					pordersku.setSkuid_link(pcontractsku.getSkuid_link());
+					porderskuService.save(pordersku);
 					
 					total += pcontractsku.getPquantity_total() == null ? 0 : pcontractsku.getPquantity_total();
 				}
@@ -121,6 +128,15 @@ public class POrderPOLineAPI {
 				List<POrder_Product_SKU> list_porder_sku = porderskuService.getby_porder(porder.getId());
 				for(POrder_Product_SKU porder_sku : list_porder_sku) {
 					porderskuService.delete(porder_sku);
+				}
+				
+				//xoa het trong porder_grant_sku
+				List<POrderGrant> list_grant = grantService.getByOrderId(porder.getId());
+				for(POrderGrant grant : list_grant) {
+					List<POrderGrant_SKU> list_grant_sku = grantskuService.getPOrderGrant_SKU(grant.getId());
+					for(POrderGrant_SKU grantsku : list_grant_sku) {
+						grantskuService.delete(grantsku);
+					}
 				}
 				
 				//xoa trong bang porder-poline

@@ -306,6 +306,7 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 			ship.setProductbuyercode(po.getProductbuyercode());
 			ship.setPortFrom(po.getPortFrom());
 			ship.setShipmode_name(po.getShipMode());
+			ship.setIsmap(po.getIsmap());
 			
 			if(!po.getPackingnotice().equals("") && !po.getPackingnotice().equals("null") && !po.getPackingnotice().equals(null)) {
 				String[] arr_id = po.getPackingnotice().split(";");
