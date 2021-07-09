@@ -60,6 +60,11 @@ public class StockOutPklist implements Serializable {
 	
 	@Column(name="ydsorigin")
 	private Float ydsorigin;
+	
+	private Float widthorigin;
+	private Float widthcheck;
+	private Float widthprocessed;
+	
 	@Transient
     private Float ydsoriginold;		
 	
@@ -406,6 +411,24 @@ public class StockOutPklist implements Serializable {
 	}
 	public void setMet_processed(Float met_processed) {
 		this.met_processed = met_processed;
+	}
+	public Float getWidthorigin() {
+		return widthorigin;
+	}
+	public void setWidthorigin(Float widthorigin) {
+		this.widthorigin = widthorigin;
+	}
+	public Float getWidthcheck() {
+		return widthcheck;
+	}
+	public void setWidthcheck(Float widthcheck) {
+		this.widthcheck = widthcheck;
+	}
+	public Float getWidthprocessed() {
+		return widthprocessed;
+	}
+	public void setWidthprocessed(Float widthprocessed) {
+		this.widthprocessed = widthprocessed;
 	}
 	
 	

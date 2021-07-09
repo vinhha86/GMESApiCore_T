@@ -288,7 +288,7 @@ public class StockOutAPI {
 	    				stockin_ws.setStockinid_link(null);
 	    				stockin_ws.setTimecreate(epc.getTimecreate());
 		    			stockin_ws.setUsercreateid_link(epc.getUsercreateid_link());
-		    			stockin_ws.setWidth(epc.getWidth());
+		    			stockin_ws.setWidth(epc.getWidthorigin());
 		    			
 		    			warehouseService.save(stockin_ws);
 					}
