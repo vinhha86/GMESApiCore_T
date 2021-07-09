@@ -5,6 +5,8 @@ import javax.validation.Valid;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -29,7 +31,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-//import vn.gpay.gsmart.core.actionlog.IActionLogs_Service;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
@@ -43,6 +44,7 @@ import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessingBinding;
 import vn.gpay.gsmart.core.porderprocessing.TVSOrgStatusShow;
+import vn.gpay.gsmart.core.porders_poline.IPOrder_POLine_Service;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.GPAYDateFormat;
 import vn.gpay.gsmart.core.utils.POrderStatus;
@@ -56,6 +58,7 @@ public class POrderProcessingAPI {
 //    @Autowired private IOrgService orgsRepository;
     @Autowired private IPOrderGrant_Service pordergrantRepository;
 //    @Autowired private IActionLogs_Service actionLogsRepository;
+    @Autowired IPOrder_POLine_Service porder_line_Service;
     ObjectMapper mapper = new ObjectMapper();
     
     @GetMapping("/getall")
@@ -339,6 +342,101 @@ public class POrderProcessingAPI {
 			List<POrderProcessing> pprocessList = pprocessRepository.getByOrderId(entity.porderid_link);
 			
 			response.data=pprocessList;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
+			return new ResponseEntity<POrderProcessingResponse>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());			
+		    return new ResponseEntity<POrderProcessingResponse>(HttpStatus.BAD_REQUEST);
+		}    			
+	}
+	
+	@RequestMapping(value = "/getby_pcontract_poid_link",method = RequestMethod.POST)
+	public ResponseEntity<POrderProcessingResponse> getby_pcontract_poid_link(@RequestBody PProcessByOrderIdRequest entity, HttpServletRequest request) {
+		POrderProcessingResponse response = new POrderProcessingResponse();
+		try {
+			Long pcontract_poid_link = entity.pcontract_poid_link; // System.out.println(pcontract_poid_link);
+//			List<POrder> porder_list = pordersRepository.getByPcontractPO(pcontract_poid_link);
+			List<POrder> porder_list = porder_line_Service.getporder_by_po(pcontract_poid_link);		
+//			System.out.println(porder_list.size());
+			
+			Map<Date, POrderProcessing> map = new HashMap<Date, POrderProcessing>();
+			for(POrder porder : porder_list) {
+				List<POrderProcessing> pprocessList = pprocessRepository.getByOrderId(porder.getId());
+				for(POrderProcessing item : pprocessList) {
+					Date processingdate = item.getProcessingdate();
+					if(map.containsKey(processingdate)) {
+						POrderProcessing porderProcessing = map.get(processingdate);
+						// vào chuyền, ra chuyền, hoàn thiện
+						Integer amountinputOld = porderProcessing.getAmountinput() == null ? 0 : porderProcessing.getAmountinput();
+						Integer amountoutputOld = porderProcessing.getAmountoutput() == null ? 0 : porderProcessing.getAmountoutput();
+						Integer amountpackstockedOld = porderProcessing.getAmountpackstocked() == null ? 0 : porderProcessing.getAmountpackstocked();
+						Integer amountstockedOld = porderProcessing.getAmountstocked() == null ? 0 : porderProcessing.getAmountstocked();
+						Integer amountinputNew = item.getAmountinput() == null ? 0 : item.getAmountinput();
+						Integer amountoutputNew = item.getAmountoutput() == null ? 0 : item.getAmountoutput();
+						Integer amountpackstockedNew = item.getAmountpackstocked() == null ? 0 : item.getAmountpackstocked();
+						Integer amountstockedNew = item.getAmountstocked() == null ? 0 : item.getAmountstocked();
+						porderProcessing.setAmountinput(amountinputOld + amountinputNew);
+						porderProcessing.setAmountoutput(amountoutputOld + amountoutputNew);
+						porderProcessing.setAmountpackstocked(amountpackstockedOld + amountpackstockedNew);
+						porderProcessing.setAmountstocked(amountstockedOld + amountstockedNew);
+						map.put(processingdate, porderProcessing);
+					}else {
+						POrderProcessing newPOrderProcessing = new POrderProcessing();
+						newPOrderProcessing.setProcessingdate(processingdate);
+						Integer amountinputNew = item.getAmountinput() == null ? 0 : item.getAmountinput();
+						Integer amountoutputNew = item.getAmountoutput() == null ? 0 : item.getAmountoutput();
+						Integer amountpackstockedNew = item.getAmountpackstocked() == null ? 0 : item.getAmountpackstocked();
+						Integer amountstockedNew = item.getAmountstocked() == null ? 0 : item.getAmountstocked();
+						newPOrderProcessing.setAmountinput(amountinputNew);
+						newPOrderProcessing.setAmountoutput(amountoutputNew);
+						newPOrderProcessing.setAmountpackstocked(amountpackstockedNew);
+						newPOrderProcessing.setAmountstocked(amountstockedNew);
+						map.put(processingdate, newPOrderProcessing);
+					}
+				}
+			}
+			
+//			List<POrderProcessing> pprocessList = pprocessRepository.getByOrderId(4020L);
+//			for(POrderProcessing item : pprocessList) {
+//				Date processingdate = item.getProcessingdate();
+//				if(map.containsKey(processingdate)) {
+//					POrderProcessing porderProcessing = map.get(processingdate);
+//					// vào chuyền, ra chuyền, hoàn thiện
+//					Integer amountinputOld = porderProcessing.getAmountinput() == null ? 0 : porderProcessing.getAmountinput();
+//					Integer amountoutputOld = porderProcessing.getAmountoutput() == null ? 0 : porderProcessing.getAmountoutput();
+//					Integer amountpackstockedOld = porderProcessing.getAmountpackstocked() == null ? 0 : porderProcessing.getAmountpackstocked();
+//					Integer amountstockedOld = porderProcessing.getAmountstocked() == null ? 0 : porderProcessing.getAmountstocked();
+//					Integer amountinputNew = item.getAmountinput() == null ? 0 : item.getAmountinput();
+//					Integer amountoutputNew = item.getAmountoutput() == null ? 0 : item.getAmountoutput();
+//					Integer amountpackstockedNew = item.getAmountpackstocked() == null ? 0 : item.getAmountpackstocked();
+//					Integer amountstockedNew = item.getAmountstocked() == null ? 0 : item.getAmountstocked();
+//					porderProcessing.setAmountinput(amountinputOld + amountinputNew);
+//					porderProcessing.setAmountoutput(amountoutputOld + amountoutputNew);
+//					porderProcessing.setAmountpackstocked(amountpackstockedOld + amountpackstockedNew);
+//					porderProcessing.setAmountstocked(amountstockedOld + amountstockedNew);
+//					map.put(processingdate, porderProcessing);
+//				}else {
+//					POrderProcessing newPOrderProcessing = new POrderProcessing();
+//					newPOrderProcessing.setProcessingdate(processingdate);
+//					Integer amountinputNew = item.getAmountinput() == null ? 0 : item.getAmountinput();
+//					Integer amountoutputNew = item.getAmountoutput() == null ? 0 : item.getAmountoutput();
+//					Integer amountpackstockedNew = item.getAmountpackstocked() == null ? 0 : item.getAmountpackstocked();
+//					Integer amountstockedNew = item.getAmountstocked() == null ? 0 : item.getAmountstocked();
+//					newPOrderProcessing.setAmountinput(amountinputNew);
+//					newPOrderProcessing.setAmountoutput(amountoutputNew);
+//					newPOrderProcessing.setAmountpackstocked(amountpackstockedNew);
+//					newPOrderProcessing.setAmountstocked(amountstockedNew);
+//					map.put(processingdate, newPOrderProcessing);
+//				}
+//			}
+			
+			List<POrderProcessing> result = new ArrayList<>(map.values());
+			Comparator<POrderProcessing> compareByProcessingDate = (POrderProcessing obj1, POrderProcessing obj2) -> obj1.getProcessingdate().compareTo(obj2.getProcessingdate());
+			Collections.sort(result, compareByProcessingDate);
+			
+			response.data=result;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
 			return new ResponseEntity<POrderProcessingResponse>(response,HttpStatus.OK);

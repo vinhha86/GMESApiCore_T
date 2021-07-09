@@ -337,11 +337,12 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 				}
 			}
 			
-			// SL Vào chuyền, Ra chuyền, Hoàn thiện ,Đóng gói
+			// SL Vào chuyền, Ra chuyền, Hoàn thiện ,Đóng gói, Thành phẩm
 			Integer amountinputsum = 0;
 			Integer amountoutputsum = 0;
 			Integer amountpackstockedsum = 0;
 			Integer amountpackedsum = 0;
+			Integer amountstockedsum = 0;
 			if(porder_list.size() > 0) {
 //				POrder porder = porder_list.get(0);
 				for(POrder porder : porder_list) {
@@ -355,6 +356,7 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 							amountoutputsum += porderProcessing.getAmountoutputsum() == null ? 0 : porderProcessing.getAmountoutputsum();
 							amountpackstockedsum += porderProcessing.getAmountpackstockedsum() == null ? 0 : porderProcessing.getAmountpackstockedsum();
 							amountpackedsum += porderProcessing.getAmountpackedsum() == null ? 0 : porderProcessing.getAmountpackedsum();
+							amountstockedsum += porderProcessing.getAmountstockedsum() == null ? 0 : porderProcessing.getAmountstockedsum();
 						}
 					}
 				}
@@ -363,6 +365,7 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 			ship.setAmountoutputsum(amountoutputsum);
 			ship.setAmountpackstockedsum(amountpackstockedsum);
 			ship.setAmountpackedsum(amountpackedsum);
+			ship.setAmountstockedsum(amountstockedsum);
 			
 			// SL Giao hàng
 			Integer amountgiaohang = 0;
