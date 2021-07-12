@@ -36,17 +36,22 @@ import vn.gpay.gsmart.core.pcontract.IPContractService;
 import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
+import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
+import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
+import vn.gpay.gsmart.core.porder_plan.Porder_Plan;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
+import vn.gpay.gsmart.core.porders_poline.IPOrder_POLine_Service;
+import vn.gpay.gsmart.core.porders_poline.POrder_POLine;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.security.GpayUserOrg;
@@ -80,6 +85,8 @@ public class ScheduleAPI {
 	@Autowired ITask_CheckList_Service checklistService;
 	@Autowired ITask_Service taskService;
 	@Autowired IPOrderGrant_SKUService grantskuService;
+	@Autowired IPContractProductSKUService poskuService;
+	@Autowired IPOrder_POLine_Service porderlineService;
 	
 	@Autowired IGpayUserOrgService userOrgService;
 	
@@ -1385,6 +1392,75 @@ public class ScheduleAPI {
 		}
 	} 
 	
+	@RequestMapping(value = "/duration_change",method = RequestMethod.POST)
+	public ResponseEntity<duration_change_response> DurationChange(HttpServletRequest request,
+			@RequestBody duration_change_request entity) {
+		duration_change_response response = new duration_change_response();
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		long orgrootid_link = user.getRootorgid_link();
+		
+		try {
+			Date _enddate = commonService.Date_Add_with_holiday(entity.startdate, entity.duration, orgrootid_link);
+			response.enddate = commonService.getEndOfDate(_enddate);
+			response.productivity = commonService.getProductivity(entity.quantity, entity.duration);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<duration_change_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<duration_change_response>(response, HttpStatus.OK);
+		}
+	} 
+	
+	@RequestMapping(value = "/productivity_change",method = RequestMethod.POST)
+	public ResponseEntity<productivity_change_response> ProductivityChange(HttpServletRequest request,
+			@RequestBody productivity_change_request entity) {
+		productivity_change_response response = new productivity_change_response();
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		long orgrootid_link = user.getRootorgid_link();
+		
+		try {
+			response.duration = commonService.getDuration_byProductivity(entity.quantity, entity.productivity);
+			
+			Date _enddate = commonService.Date_Add_with_holiday(entity.startdate, response.duration, orgrootid_link);
+			response.enddate = commonService.getEndOfDate(_enddate);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<productivity_change_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<productivity_change_response>(response, HttpStatus.OK);
+		}
+	} 
+	
+	@RequestMapping(value = "/get_duration_and_productivity",method = RequestMethod.POST)
+	public ResponseEntity<get_duration_and_productivity_response> GetDurationAndProductivity(HttpServletRequest request,
+			@RequestBody get_duration_and_productivity_request entity) {
+		get_duration_and_productivity_response response = new get_duration_and_productivity_response();
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		long orgrootid_link = user.getRootorgid_link();
+		
+		try {
+			int duration = commonService.getDuration(entity.startdate, entity.enddate, orgrootid_link);
+			int productivity = commonService.getProductivity(entity.quantity, duration);
+			
+			response.duration = duration;
+			response.productivity = productivity;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<get_duration_and_productivity_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<get_duration_and_productivity_response>(response, HttpStatus.OK);
+		}
+	} 
+	
 	@RequestMapping(value = "/update_duration",method = RequestMethod.POST)
 	public ResponseEntity<update_duration_porder_response> UpdatDuration(HttpServletRequest request,
 			@RequestBody update_duration_porder_request entity) {
@@ -1628,6 +1704,143 @@ public class ScheduleAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<cancel_pordergrant_response>(response, HttpStatus.OK);
+		}
+	} 
+	
+	@RequestMapping(value = "/create_porder_and_grant",method = RequestMethod.POST)
+	public ResponseEntity<CreatePorder_andGrant_response> CreatePorderAndGrant(HttpServletRequest request,
+			@RequestBody CreatePorder_andGrant_request entity) {
+		CreatePorder_andGrant_response response = new CreatePorder_andGrant_response();
+		
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			PContract_PO po = poService.findOne(entity.pcontract_poid_link);
+			
+			//tao porder
+			String po_code = null!=po.getPo_vendor()&&po.getPo_vendor().length() > 0?po.getPo_vendor():po.getPo_buyer();
+			
+			POrder porder = new POrder();
+			porder.setFinishdate_plan(entity.enddate);
+			porder.setGolivedate(po.getShipdate());
+			porder.setGranttoorgid_link(entity.orgid_link);
+			porder.setId(null);
+			porder.setIsMap(true);
+			porder.setOrderdate(new Date());
+			porder.setOrgrootid_link(orgrootid_link);
+			porder.setPcontract_poid_link(entity.pcontract_poid_link);
+			porder.setPcontractid_link(po.getPcontractid_link());
+			porder.setPlan_duration(entity.duration);
+			porder.setPlan_linerequired(po.getPlan_linerequired());
+			porder.setPlan_productivity(entity.productivity);
+			porder.setProductid_link(po.getProductid_link());
+			porder.setProductiondate(entity.startdate);
+			porder.setStatus(POrderStatus.PORDER_STATUS_GRANTED);
+			porder.setTimecreated(new Date());
+			porder.setTotalorder(entity.quantity);
+			porder.setUsercreatedid_link(user.getId());
+			
+			porder = porderService.savePOrder(porder, po_code);
+			Long porderid_link = porder.getId();
+			//lay sku sang porder_sku
+			Long pcontract_poid_link = po.getId();
+			List<PContractProductSKU> list_po_sku = poskuService.getlistsku_bypo(pcontract_poid_link);
+			for(PContractProductSKU po_sku : list_po_sku) {
+				POrder_Product_SKU porder_sku = new POrder_Product_SKU();
+				porder_sku.setId(null);
+				porder_sku.setOrgrootid_link(orgrootid_link);
+				porder_sku.setPcontract_poid_link(pcontract_poid_link);
+				porder_sku.setPorderid_link(porderid_link);
+				porder_sku.setPquantity_production(po_sku.getPquantity_production());
+				porder_sku.setPquantity_sample(po_sku.getPquantity_sample());
+				porder_sku.setPquantity_total(po_sku.getPquantity_total());
+				porder_sku.setProductid_link(po_sku.getProductid_link());
+				porder_sku.setSkuid_link(po_sku.getSkuid_link());
+				
+				poskuService.save(po_sku);
+			}
+			
+			// tao porder_grant
+			POrderGrant grant = new POrderGrant();
+			grant.setGranttoorgid_link(entity.orggrantid_link);
+			grant.setId(null);
+			grant.setOrdercode(porder.getOrdercode());
+			grant.setOrgrootid_link(orgrootid_link);
+			grant.setPorderid_link(porderid_link);
+			grant.setTimecreated(new Date());
+			grant.setUsercreatedid_link(user.getId());
+			grant.setGrantdate(new Date());
+			grant.setGrantamount(entity.quantity);
+			grant.setStatus(1);
+			grant.setOrgrootid_link(orgrootid_link);
+			grant.setStart_date_plan(entity.startdate);
+			grant.setFinish_date_plan(entity.enddate);
+			grant.setProductivity(entity.productivity);
+			grant.setDuration(entity.duration);
+			grant.setType(0); //0 la chua qua ngay giao hang
+			grant.setTotalamount_tt(entity.quantity);
+			grant = granttService.save(grant);
+			Long pordergrantid_link = grant.getId();
+			
+			//them grant_sku
+			for(PContractProductSKU po_sku : list_po_sku) {
+				POrderGrant_SKU grant_sku = new POrderGrant_SKU();
+				grant_sku.setId(null);
+				grant_sku.setOrgrootid_link(orgrootid_link);
+				grant_sku.setPcontract_poid_link(pcontract_poid_link);
+				grant_sku.setGrantamount(po_sku.getPquantity_total());
+				grant_sku.setSkuid_link(po_sku.getSkuid_link());
+				grant_sku.setPordergrantid_link(pordergrantid_link);
+				
+				grantskuService.save(grant_sku);
+			}
+			
+			//danh dau po da map
+			POrder_POLine porder_poline = new POrder_POLine();
+			porder_poline.setId(null);
+			porder_poline.setPcontract_poid_link(pcontract_poid_link);
+			porder_poline.setPorderid_link(porderid_link);
+			porderlineService.save(porder_poline);
+			
+			//danh dau po da map
+			po.setIsmap(true);
+			poService.save(po);
+			
+			//tao Schedule_porder de tra len giao dien
+			Schedule_porder sch = new Schedule_porder();
+			sch.setDuration(entity.duration);
+			sch.setProductivity(entity.productivity);
+			sch.setBuyername(porder.getBuyername());
+			sch.setCls(porder.getCls());
+			sch.setEndDate(entity.enddate);
+			sch.setId_origin(porder.getId());
+			sch.setMahang(porder.getMaHang());
+			sch.setName(porder.getMaHang());
+			sch.setParentid_origin(entity.orgid_link);
+			sch.setPordercode(porder.getOrdercode());
+			sch.setResourceId(entity.orgid_link);
+			sch.setStartDate(entity.startdate);
+			sch.setStatus(1);
+			sch.setTotalpackage(porder.getTotalorder());
+			sch.setVendorname(porder.getVendorname());
+			sch.setPorder_grantid_link(pordergrantid_link);
+			sch.setProductivity_po(porder.getProductivity_po());
+			sch.setProductivity_porder(0);
+			sch.setPcontract_poid_link(porder.getPcontract_poid_link());
+			sch.setPcontractid_link(porder.getPcontractid_link());
+			sch.setProductbuyercode(porder.getProductcode());
+			sch.setPorderid_link(porder.getId());
+			sch.setGrant_type(0);
+			
+			response.data = sch;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<CreatePorder_andGrant_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<CreatePorder_andGrant_response>(response, HttpStatus.OK);
 		}
 	} 
 	

@@ -63,6 +63,9 @@ public class PContractPO_Shipping {
 	private Integer amountpackedsum;
 	private Integer amountstockedsum;
 	private Integer amountgiaohang;
+	private String ordercode;
+	
+	
 	
 	public String getPacking_method() {
 		return packing_method;
@@ -423,6 +426,12 @@ public class PContractPO_Shipping {
 	}
 	public void setAmountstockedsum(Integer amountstockedsum) {
 		this.amountstockedsum = amountstockedsum;
+	}
+	public String getOrdercode() {
+		return ordercode;
+	}
+	public void setOrdercode(String ordercode) {
+		this.ordercode = ordercode;
 	}
 	
 }

@@ -31,6 +31,7 @@ import vn.gpay.gsmart.core.pcontract_po_productivity.PContract_PO_Productivity;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
+import vn.gpay.gsmart.core.porders_poline.POrder_POLine;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.POType;
@@ -112,6 +113,19 @@ public class PContract_PO implements Serializable {/**
 	@OneToMany
     @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
 	private List<PContractProductSKU> pcontractProductSKUs = new ArrayList<>();
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
+	private List<POrder_POLine> list_porder_poline = new ArrayList<>();
+	
+	@Transient
+	public String getOrdercode() {
+		if(list_porder_poline.size()>0) {
+			return list_porder_poline.get(0).getOrderCode();
+		}
+		return "";
+	}
 	
 	@Transient
 	public Integer getPcontractPoProductSkuQuantityTotal() { // sl sp sku trong po line

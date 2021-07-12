@@ -20,12 +20,12 @@ import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.porders_poline.IPOrder_POLine_Service;
+import vn.gpay.gsmart.core.stockout.IStockOutService;
 import vn.gpay.gsmart.core.stockout.StockOut;
 import vn.gpay.gsmart.core.stockout.StockOutD;
 import vn.gpay.gsmart.core.stockout.StockOutPklist;
 import vn.gpay.gsmart.core.utils.StockoutStatus;
 import vn.gpay.gsmart.core.utils.StockoutTypes;
-import vn.gpay.gsmart.core.stockout.IStockOutService;
 
 @Service
 public class PContract_POService extends AbstractService<PContract_PO> implements IPContract_POService {
@@ -307,6 +307,7 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 			ship.setPortFrom(po.getPortFrom());
 			ship.setShipmode_name(po.getShipMode());
 			ship.setIsmap(po.getIsmap());
+			ship.setOrdercode(po.getOrdercode());
 			
 			if(!po.getPackingnotice().equals("") && !po.getPackingnotice().equals("null") && !po.getPackingnotice().equals(null)) {
 				String[] arr_id = po.getPackingnotice().split(";");
@@ -330,13 +331,13 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 			Long pcontract_poid_link = po.getId();
 			List<POrder> porder_list = porder_line_Service.getporder_by_po(pcontract_poid_link);
 			// SL Cắt
-			Integer amountcut = 0;
-			if(porder_list.size() > 0) {
-				for(POrder porder : porder_list) {
-					Long porderid_link = porder.getId();
-					// code here
-				}
-			}
+//			Integer amountcut = 0;
+//			if(porder_list.size() > 0) {
+//				for(POrder porder : porder_list) {
+//					Long porderid_link = porder.getId();
+//					// code here
+//				}
+//			}
 			
 			// SL Vào chuyền, Ra chuyền, Hoàn thiện ,Đóng gói, Thành phẩm
 			Integer amountinputsum = 0;

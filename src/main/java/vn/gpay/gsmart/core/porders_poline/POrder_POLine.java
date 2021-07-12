@@ -6,8 +6,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.porder.POrder;
 
 @Table(name="porders_poline")
 @Entity
@@ -23,6 +31,19 @@ public class POrder_POLine implements Serializable{
 	protected Long id;
 	private Long porderid_link;
 	private Long pcontract_poid_link;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="porderid_link",insertable=false,updatable =false)
+	private POrder porder;
+	
+	@Transient
+	public String getOrderCode() {
+		if(porder!=null)
+			return porder.getOrdercode();
+		return "";
+	}
+	
 	public Long getId() {
 		return id;
 	}
