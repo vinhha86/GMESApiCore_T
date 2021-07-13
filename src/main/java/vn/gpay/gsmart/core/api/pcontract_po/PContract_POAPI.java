@@ -1141,12 +1141,14 @@ public class PContract_POAPI {
 					STT = STT.equals("0") ? "" : STT;
 					while (!STT.equals("")) {
 //						String a  = commonService.getStringValue(row.getCell(ColumnPO.STT));
-						colNum++;
+						colNum = ColumnPO.PO;
 						String PO_No = commonService.getStringValue(row.getCell(ColumnPO.PO));
-						colNum++;
+						
+						colNum = ColumnPO.Line;
 						String Line = commonService.getStringValue(row.getCell(ColumnPO.Line));
 						Line = Line.equals("0") ? "" : Line;
-						colNum++;
+						
+						colNum = ColumnPO.Shipdate;
 						Date ShipDate = null;
 						try {
 							String s_shipdate = commonService.getStringValue(row.getCell(ColumnPO.Shipdate));
@@ -1177,21 +1179,25 @@ public class PContract_POAPI {
 							throw new Exception();
 						}
 						
-						colNum++;
+						colNum = ColumnPO.Shipmode;
 						String Shipmode = row.getCell(ColumnPO.Shipmode).getStringCellValue();
 						Shipmode = Shipmode.equals("0") ? "" : Shipmode;
 						
-						colNum++;
+						colNum = ColumnPO.PackingMethod;
 						String PackingMethod = row.getCell(ColumnPO.PackingMethod).getStringCellValue();
 						PackingMethod = PackingMethod.equals("0") ? "" : PackingMethod;
 						
-						colNum++;
+						colNum = ColumnPO.Colorname;
 						String ColorName = commonService.getStringValue(row.getCell(ColumnPO.Colorname));
 						ColorName = ColorName.equals("0") ? "" : ColorName;
 						
-						colNum++;
+						colNum = ColumnPO.Colorcode;
 						String ColorCode = commonService.getStringValue(row.getCell(ColumnPO.Colorcode));
 						ColorCode = ColorCode.equals("0") ? "" : ColorCode;
+						
+						colNum = ColumnPO.Style;
+						String Style = commonService.getStringValue(row.getCell(ColumnPO.Style));
+						Style = Style.equals("0") ? "" : Style;
 						
 						//Kiem tra Shipmode da ton tai hay chua
 						Long shipmodeid_link = null;
@@ -1257,6 +1263,7 @@ public class PContract_POAPI {
 									po_new.setPlan_linerequired(parent.getPlan_linerequired());
 									po_new.setStatus(POStatus.PO_STATUS_CONFIRMED);
 									po_new.setPo_typeid_link(POType.PO_LINE_CONFIRMED);
+									po_new.setComment(Style);
 									
 									po_new = pcontract_POService.save(po_new);
 									
@@ -1269,7 +1276,7 @@ public class PContract_POAPI {
 									pcontractpoid_link = list_po.get(0).getId();
 									PContract_PO po = list_po.get(0);
 									po.setStatus(POStatus.PO_STATUS_CONFIRMED);
-									
+									po.setComment(Style);
 //									amount_po = po.getPo_quantity();
 								}
 								
