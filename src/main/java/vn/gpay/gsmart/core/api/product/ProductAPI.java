@@ -35,7 +35,6 @@ import vn.gpay.gsmart.core.attribute.IAttributeService;
 import vn.gpay.gsmart.core.attributevalue.Attributevalue;
 import vn.gpay.gsmart.core.attributevalue.IAttributeValueService;
 import vn.gpay.gsmart.core.base.ResponseBase;
-import vn.gpay.gsmart.core.contractbuyer.ContractBuyer;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.product.IProductBomService;

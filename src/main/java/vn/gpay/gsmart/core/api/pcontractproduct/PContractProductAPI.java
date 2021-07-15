@@ -455,7 +455,12 @@ public class PContractProductAPI {
 				
 				String uploadRootPath = request.getServletContext().getRealPath("");
 				File uploadRootDir = new File(uploadRootPath);
-				binding.setImgproduct(getimg(pContractProduct.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath));
+				try {
+					binding.setImgproduct(getimg(pContractProduct.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath));
+				}
+				catch (Exception e) {
+					// TODO: handle exception
+				}
 				
 				data.add(binding);
 			}
@@ -504,7 +509,13 @@ public class PContractProductAPI {
 				
 				String uploadRootPath = request.getServletContext().getRealPath("");
 				File uploadRootDir = new File(uploadRootPath);
-				binding.setImgproduct(getimg(pContractProduct.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath));
+				try {
+					binding.setImgproduct(getimg(pContractProduct.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath));
+				}
+				catch (Exception e) {
+					// TODO: handle exception
+				}
+				
 				
 				data.add(binding);
 			}
@@ -625,10 +636,11 @@ public class PContractProductAPI {
 	
 	
 	private byte[] getimg(String filename, String uploadRootPath) {
-		String filePath = uploadRootPath+"/"+ filename;
-		Path path = Paths.get(filePath);
+		
 		byte[] data;
 		try {
+			String filePath = uploadRootPath+"/"+ filename;
+			Path path = Paths.get(filePath);
 			data = Files.readAllBytes(path);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
