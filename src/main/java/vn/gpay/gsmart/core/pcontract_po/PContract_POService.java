@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.pcontract_po;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -11,12 +12,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import vn.gpay.gsmart.core.base.AbstractService;
+import vn.gpay.gsmart.core.cutplan_processing.ICutplanProcessingService;
 import vn.gpay.gsmart.core.packingtype.IPackingTypeRepository;
 import vn.gpay.gsmart.core.packingtype.PackingType;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Repository;
 import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.porder_bom_sku.IPOrderBOMSKU_Service;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
+import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
+import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.porders_poline.IPOrder_POLine_Service;
@@ -24,6 +29,7 @@ import vn.gpay.gsmart.core.stockout.IStockOutService;
 import vn.gpay.gsmart.core.stockout.StockOut;
 import vn.gpay.gsmart.core.stockout.StockOutD;
 import vn.gpay.gsmart.core.stockout.StockOutPklist;
+import vn.gpay.gsmart.core.utils.SkuType;
 import vn.gpay.gsmart.core.utils.StockoutStatus;
 import vn.gpay.gsmart.core.utils.StockoutTypes;
 
@@ -40,6 +46,9 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	@Autowired IPOrderGrant_Service porderGrantService;
 	@Autowired IPOrderProcessing_Service pprocessRepository;
 	@Autowired IStockOutService stockOutService;
+	@Autowired IPOrder_Product_SKU_Service porderskuService;
+	@Autowired IPOrderBOMSKU_Service porderBOMSKU_Service;
+	@Autowired ICutplanProcessingService cutplanProcessingService;
 
 	@Override
 	protected JpaRepository<PContract_PO, Long> getRepository() {
@@ -330,14 +339,53 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 			
 			Long pcontract_poid_link = po.getId();
 			List<POrder> porder_list = porder_line_Service.getporder_by_po(pcontract_poid_link);
+			
 			// SL Cắt
-//			Integer amountcut = 0;
-//			if(porder_list.size() > 0) {
-//				for(POrder porder : porder_list) {
-//					Long porderid_link = porder.getId();
-//					// code here
-//				}
-//			}
+			// Tính theo sl vải chính đã cắt được cho bao nhiêu sản phẩm
+			// Nếu sp dùng 2 vải chính trở lên thì lấy số lượng loại vải chính đã cắt cho sp bé nhất
+			Integer totalamountcut = 0;
+			if(porder_list.size() > 0) {
+				for(POrder porder : porder_list) {
+					Long porderid_link = porder.getId();
+					// Lấy danh sách sku của Porder
+					List<POrder_Product_SKU> porderProductSkus = porderskuService.getby_porder(porderid_link);
+					for(POrder_Product_SKU porderProductSKU : porderProductSkus) {
+						// Tìm xem sku này đã cắt được bao nhiêu chiếc
+						Long product_skuid_link = porderProductSKU.getSkuid_link();
+						
+						// Tìm danh sách các loại vải chính dùng cho sku này
+						List<Long> material_skuid_link_list = porderBOMSKU_Service.getMaterialList_By_Porder_Sku(
+								porderid_link, product_skuid_link, SkuType.SKU_TYPE_VAI
+								);
+						
+//						System.out.println("line 365: " + porderid_link + " " +  product_skuid_link + " " + SkuType.SKU_TYPE_VAI);
+//						
+//						if(porderid_link.equals(4020L)) {
+////							System.out.println("pcontract po ser line 361");
+////							System.out.println(material_skuid_link_list.size());
+//						}
+						
+						// Mỗi loại vải dùng cho sku đã cắt được bao nhiêu chiếc, 
+						// lưu vào amountList sau đố lấy số nhỏ nhất
+						// vd sp1 vải 1 cắt 10, vải 2 cắt 5 thì tính là cắt được 5 chiếc
+						List<Integer> amountList = new ArrayList<Integer>();
+						for(Long material_skuid_link : material_skuid_link_list) {
+							Integer amountcut = cutplanProcessingService.getSlCat_by_product_material_porder(
+									product_skuid_link, material_skuid_link, porderid_link );
+							amountList.add(amountcut);
+						}
+						if(amountList.size() > 0) {
+							Integer min = Collections.min(amountList);
+							totalamountcut += min;
+						}
+						if(porderid_link.equals(4020L)) {
+//							System.out.println("pcontract po ser line 375");
+//							System.out.println(amountList);
+						}
+					}
+				}
+			}
+			ship.setAmountcut(totalamountcut);
 			
 			// SL Vào chuyền, Ra chuyền, Hoàn thiện ,Đóng gói, Thành phẩm
 			Integer amountinputsum = 0;

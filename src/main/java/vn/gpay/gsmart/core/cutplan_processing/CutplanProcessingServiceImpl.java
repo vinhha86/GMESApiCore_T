@@ -81,4 +81,22 @@ public class CutplanProcessingServiceImpl extends AbstractService<CutplanProcess
 		return data;
 	}
 
+	@Override
+	public Integer getSlCat_by_product_material_porder(Long product_skuid_link, Long material_skuid_link,
+			Long porderid_link) {
+		List<Object[]> objList = repo.getSlCat_by_product_material_porder(product_skuid_link, material_skuid_link, porderid_link);
+		
+		Integer amountcut = 0;
+		
+		// a.amount, a.product_skuid_link, a.cutplanrowid_link,
+		// b.material_skuid_link, c.processingdate, d.la_vai
+		for(Object[] row : objList) {
+			Integer amount = row[0] == null ? 0 : Integer.parseInt(row[0].toString());
+			Integer la_vai = row[5] == null ? 0 : Integer.parseInt(row[5].toString());
+			amountcut += amount * la_vai;
+		}
+		
+		return amountcut;
+	}
+
 }

@@ -64,4 +64,16 @@ public interface IPOrderBOMSKU_Repository extends JpaRepository<POrderBOMSKU, Lo
 	
 	@Query("SELECT c.productcolor_name, c.materialid_link, sum(c.amount) as amount FROM POrderBOMSKU c where c.porderid_link = :porderid_link group by c.productcolor_name, c.materialid_link")
 	public List<Object[]> getByPOrderID_GroupByColor(@Param ("porderid_link")final Long porderid_link);
+	
+	@Query("SELECT distinct c.materialid_link FROM POrderBOMSKU c "
+			+ "inner join SKU b on c.materialid_link = b.id "
+			+ "where c.porderid_link = :porderid_link "
+			+ "and c.skuid_link = :skuid_link "
+			+ "and b.skutypeid_link = :skutypeid_link "
+			)
+	public List<Long> getMaterialList_By_Porder_Sku(
+			@Param ("porderid_link")final Long porderid_link,
+			@Param ("skuid_link")final Long skuid_link,
+			@Param ("skutypeid_link")final Integer skutypeid_link
+			);
 }
