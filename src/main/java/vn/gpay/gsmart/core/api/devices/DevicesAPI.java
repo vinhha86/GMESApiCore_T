@@ -87,7 +87,7 @@ public class DevicesAPI {
 		DevicesResponse response = new DevicesResponse();
 		try {
 			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
-			List<Devices> listdata = devicesService.device_govern(user.getOrgId(),entity.type);
+			List<Devices> listdata = devicesService.device_govern(user.getRootorgid_link(),entity.type);
 			/*
 			String url = "http://gpay.vn:9091/service/devicestate";
 			
