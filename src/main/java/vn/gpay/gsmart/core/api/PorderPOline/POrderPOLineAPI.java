@@ -48,6 +48,11 @@ public class POrderPOLineAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long orgrootid_link = user.getRootorgid_link();
 			Long pcontract_poid_link = entity.pcontract_poid_link;
+			boolean onlyGrant = false;
+			boolean onlyPorder = false;
+			
+			if(entity.data.size() == 1)
+				onlyPorder = true;
 			
 			for(POrder porder : entity.data) {
 				POrder_POLine porder_line = new POrder_POLine();
@@ -61,32 +66,52 @@ public class POrderPOLineAPI {
 				PContract_PO po = poService.findOne(pcontract_poid_link);
 				po.setIsmap(true);
 				poService.save(po);
-				
-				//Cap nhat lai so luong mau co trong porder_sku
-				List<POrder_Product_SKU> list_porder_sku = porderskuService.getby_porder(porder.getId());
-				for(POrder_Product_SKU pordersku : list_porder_sku) {
-					porderskuService.delete(pordersku);
-				}
-				
-				List<PContractProductSKU> list_pcontract_sku = pcontractskuService.getlistsku_bypo(pcontract_poid_link);
+
 				int total = 0;
-				for(PContractProductSKU pcontractsku : list_pcontract_sku) {
-					POrder_Product_SKU pordersku = new POrder_Product_SKU();
-					pordersku.setId(null);
-					pordersku.setOrgrootid_link(orgrootid_link);
-					pordersku.setPcontract_poid_link(pcontract_poid_link);
-					pordersku.setPorderid_link(porder.getId());
-					pordersku.setPquantity_granted(0);
-					pordersku.setPquantity_porder(pcontractsku.getPquantity_porder());
-					pordersku.setPquantity_production(pcontractsku.getPquantity_production());
-					pordersku.setPquantity_sample(pcontractsku.getPquantity_sample());
-					pordersku.setPquantity_total(pcontractsku.getPquantity_total());
-					pordersku.setProductid_link(pcontractsku.getProductid_link());
-					pordersku.setSkuid_link(pcontractsku.getSkuid_link());
-					porderskuService.save(pordersku);
+				if(onlyPorder) {
+					//Cap nhat lai so luong mau co trong porder_sku
+					List<POrder_Product_SKU> list_porder_sku = porderskuService.getby_porder(porder.getId());
+					for(POrder_Product_SKU pordersku : list_porder_sku) {
+						porderskuService.delete(pordersku);
+					}
 					
-					total += pcontractsku.getPquantity_total() == null ? 0 : pcontractsku.getPquantity_total();
+					//kiem tra neu có 1 to thi lay luon mau co vao to do
+					List<POrderGrant> list_grant = grantService.getByOrderId(porder.getId());
+					if(list_grant.size() == 1) {
+						onlyGrant = true;
+					}
+					
+					List<PContractProductSKU> list_pcontract_sku = pcontractskuService.getlistsku_bypo(pcontract_poid_link);
+					for(PContractProductSKU pcontractsku : list_pcontract_sku) {
+						POrder_Product_SKU pordersku = new POrder_Product_SKU();
+						pordersku.setId(null);
+						pordersku.setOrgrootid_link(orgrootid_link);
+						pordersku.setPcontract_poid_link(pcontract_poid_link);
+						pordersku.setPorderid_link(porder.getId());
+						pordersku.setPquantity_granted(0);
+						pordersku.setPquantity_porder(pcontractsku.getPquantity_porder());
+						pordersku.setPquantity_production(pcontractsku.getPquantity_production());
+						pordersku.setPquantity_sample(pcontractsku.getPquantity_sample());
+						pordersku.setPquantity_total(pcontractsku.getPquantity_total());
+						pordersku.setProductid_link(pcontractsku.getProductid_link());
+						pordersku.setSkuid_link(pcontractsku.getSkuid_link());
+						porderskuService.save(pordersku);
+						
+						total += pcontractsku.getPquantity_total() == null ? 0 : pcontractsku.getPquantity_total();
+						
+						if(onlyGrant) {
+							POrderGrant_SKU grant_sku = new POrderGrant_SKU();
+							grant_sku.setId(null);
+							grant_sku.setOrgrootid_link(orgrootid_link);
+							grant_sku.setPcontract_poid_link(pcontract_poid_link);
+							grant_sku.setPordergrantid_link(list_grant.get(0).getId());
+							grant_sku.setGrantamount(pcontractsku.getPquantity_total());
+							grant_sku.setSkuid_link(pcontractsku.getSkuid_link());
+							grantskuService.save(grant_sku);
+						}
+					}
 				}
+				
 				
 				//Cap nhat trang thai porder sang da map voi poline
 				porder.setIsMap(true);

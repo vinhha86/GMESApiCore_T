@@ -1715,6 +1715,7 @@ public class ScheduleAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
 			PContract_PO po = poService.findOne(entity.pcontract_poid_link);
+//			entity.orggrantid_link = entity.orggrantid_link == 0 ? null : entity.orggrantid_link;
 			
 			//tao porder
 			String po_code = null!=po.getPo_vendor()&&po.getPo_vendor().length() > 0?po.getPo_vendor():po.getPo_buyer();
@@ -1734,7 +1735,7 @@ public class ScheduleAPI {
 			porder.setPlan_productivity(entity.productivity);
 			porder.setProductid_link(po.getProductid_link());
 			porder.setProductiondate(entity.startdate);
-			porder.setStatus(POrderStatus.PORDER_STATUS_GRANTED);
+			porder.setStatus(entity.orggrantid_link != null ? POrderStatus.PORDER_STATUS_GRANTED : POrderStatus.PORDER_STATUS_FREE);
 			porder.setTimecreated(new Date());
 			porder.setTotalorder(entity.quantity);
 			porder.setUsercreatedid_link(user.getId());
@@ -1759,40 +1760,71 @@ public class ScheduleAPI {
 				poskuService.save(po_sku);
 			}
 			
-			// tao porder_grant
-			POrderGrant grant = new POrderGrant();
-			grant.setGranttoorgid_link(entity.orggrantid_link);
-			grant.setId(null);
-			grant.setOrdercode(porder.getOrdercode());
-			grant.setOrgrootid_link(orgrootid_link);
-			grant.setPorderid_link(porderid_link);
-			grant.setTimecreated(new Date());
-			grant.setUsercreatedid_link(user.getId());
-			grant.setGrantdate(new Date());
-			grant.setGrantamount(entity.quantity);
-			grant.setStatus(1);
-			grant.setOrgrootid_link(orgrootid_link);
-			grant.setStart_date_plan(entity.startdate);
-			grant.setFinish_date_plan(entity.enddate);
-			grant.setProductivity(entity.productivity);
-			grant.setDuration(entity.duration);
-			grant.setType(0); //0 la chua qua ngay giao hang
-			grant.setTotalamount_tt(entity.quantity);
-			grant = granttService.save(grant);
-			Long pordergrantid_link = grant.getId();
-			
-			//them grant_sku
-			for(PContractProductSKU po_sku : list_po_sku) {
-				POrderGrant_SKU grant_sku = new POrderGrant_SKU();
-				grant_sku.setId(null);
-				grant_sku.setOrgrootid_link(orgrootid_link);
-				grant_sku.setPcontract_poid_link(pcontract_poid_link);
-				grant_sku.setGrantamount(po_sku.getPquantity_total());
-				grant_sku.setSkuid_link(po_sku.getSkuid_link());
-				grant_sku.setPordergrantid_link(pordergrantid_link);
+			if(entity.orggrantid_link != null) {
+				// tao porder_grant
+				POrderGrant grant = new POrderGrant();
+				grant.setGranttoorgid_link(entity.orggrantid_link);
+				grant.setId(null);
+				grant.setOrdercode(porder.getOrdercode());
+				grant.setOrgrootid_link(orgrootid_link);
+				grant.setPorderid_link(porderid_link);
+				grant.setTimecreated(new Date());
+				grant.setUsercreatedid_link(user.getId());
+				grant.setGrantdate(new Date());
+				grant.setGrantamount(entity.quantity);
+				grant.setStatus(1);
+				grant.setOrgrootid_link(orgrootid_link);
+				grant.setStart_date_plan(entity.startdate);
+				grant.setFinish_date_plan(entity.enddate);
+				grant.setProductivity(entity.productivity);
+				grant.setDuration(entity.duration);
+				grant.setType(0); //0 la chua qua ngay giao hang
+				grant.setTotalamount_tt(entity.quantity);
+				grant = granttService.save(grant);
+				Long pordergrantid_link = grant.getId();
 				
-				grantskuService.save(grant_sku);
+				//them grant_sku
+				for(PContractProductSKU po_sku : list_po_sku) {
+					POrderGrant_SKU grant_sku = new POrderGrant_SKU();
+					grant_sku.setId(null);
+					grant_sku.setOrgrootid_link(orgrootid_link);
+					grant_sku.setPcontract_poid_link(pcontract_poid_link);
+					grant_sku.setGrantamount(po_sku.getPquantity_total());
+					grant_sku.setSkuid_link(po_sku.getSkuid_link());
+					grant_sku.setPordergrantid_link(pordergrantid_link);
+					
+					grantskuService.save(grant_sku);
+				}
+				
+				//tao Schedule_porder de tra len giao dien
+				Schedule_porder sch = new Schedule_porder();
+				sch.setDuration(entity.duration);
+				sch.setProductivity(entity.productivity);
+				sch.setBuyername(porder.getBuyername());
+				sch.setCls(porder.getCls());
+				sch.setEndDate(entity.enddate);
+				sch.setId_origin(porder.getId());
+				sch.setMahang(porder.getMaHang());
+				sch.setName(porder.getMaHang());
+				sch.setParentid_origin(entity.orgid_link);
+				sch.setPordercode(porder.getOrdercode());
+				sch.setResourceId(entity.orgid_link);
+				sch.setStartDate(entity.startdate);
+				sch.setStatus(1);
+				sch.setTotalpackage(porder.getTotalorder());
+				sch.setVendorname(porder.getVendorname());
+				sch.setPorder_grantid_link(pordergrantid_link);
+				sch.setProductivity_po(porder.getProductivity_po());
+				sch.setProductivity_porder(0);
+				sch.setPcontract_poid_link(porder.getPcontract_poid_link());
+				sch.setPcontractid_link(porder.getPcontractid_link());
+				sch.setProductbuyercode(porder.getProductcode());
+				sch.setPorderid_link(porder.getId());
+				sch.setGrant_type(0);
+				
+				response.data = sch;
 			}
+			
 			
 			//danh dau po da map
 			POrder_POLine porder_poline = new POrder_POLine();
@@ -1804,35 +1836,7 @@ public class ScheduleAPI {
 			//danh dau po da map
 			po.setIsmap(true);
 			poService.save(po);
-			
-			//tao Schedule_porder de tra len giao dien
-			Schedule_porder sch = new Schedule_porder();
-			sch.setDuration(entity.duration);
-			sch.setProductivity(entity.productivity);
-			sch.setBuyername(porder.getBuyername());
-			sch.setCls(porder.getCls());
-			sch.setEndDate(entity.enddate);
-			sch.setId_origin(porder.getId());
-			sch.setMahang(porder.getMaHang());
-			sch.setName(porder.getMaHang());
-			sch.setParentid_origin(entity.orgid_link);
-			sch.setPordercode(porder.getOrdercode());
-			sch.setResourceId(entity.orgid_link);
-			sch.setStartDate(entity.startdate);
-			sch.setStatus(1);
-			sch.setTotalpackage(porder.getTotalorder());
-			sch.setVendorname(porder.getVendorname());
-			sch.setPorder_grantid_link(pordergrantid_link);
-			sch.setProductivity_po(porder.getProductivity_po());
-			sch.setProductivity_porder(0);
-			sch.setPcontract_poid_link(porder.getPcontract_poid_link());
-			sch.setPcontractid_link(porder.getPcontractid_link());
-			sch.setProductbuyercode(porder.getProductcode());
-			sch.setPorderid_link(porder.getId());
-			sch.setGrant_type(0);
-			
-			response.data = sch;
-			
+						
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<CreatePorder_andGrant_response>(response, HttpStatus.OK);
