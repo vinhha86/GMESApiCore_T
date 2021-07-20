@@ -2,10 +2,7 @@ package vn.gpay.gsmart.core.org;
 
 import java.util.List;
 
-import org.springframework.data.repository.query.Param;
-
 import vn.gpay.gsmart.core.base.Operations;
-import vn.gpay.gsmart.core.org.Org;
 
 public interface IOrgService extends Operations<Org>{
 

@@ -29,8 +29,9 @@ public interface IPContractProductSKURepository extends JpaRepository<PContractP
 	
 	
 	@Query(value = "select c from PContractProductSKU c "
+			+ "inner join PContract_PO a on a.id = c.pcontract_poid_link "
 			+ "where c.orgrootid_link = :orgrootid_link "
-			+ "and pcontractid_link = :pcontractid_link")
+			+ "and c.pcontractid_link = :pcontractid_link and a.pcontractid_link = :pcontractid_link")
 	public List<PContractProductSKU> getlistsku_bypcontract(
 			@Param ("orgrootid_link")final  Long orgrootid_link,
 			@Param ("pcontractid_link")final  long pcontractid_link);	

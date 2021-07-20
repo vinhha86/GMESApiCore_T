@@ -14,6 +14,10 @@ public class SKUBalance_Product_D_Data implements Serializable {
 	private Float p_bom_amount;
 	private Float p_bom_lostratio;
 	private Float p_bom_demand;
+	private String po_buyer;
+	private Integer p_amount_dh;
+	
+	
 	
 	public Long getP_skuid_link() {
 		return p_skuid_link;
@@ -74,6 +78,18 @@ public class SKUBalance_Product_D_Data implements Serializable {
 	}
 	public void setP_bom_demand(Float p_bom_demand) {
 		this.p_bom_demand = p_bom_demand;
+	}
+	public String getPo_buyer() {
+		return po_buyer;
+	}
+	public void setPo_buyer(String po_buyer) {
+		this.po_buyer = po_buyer;
+	}
+	public Integer getP_amount_dh() {
+		return p_amount_dh;
+	}
+	public void setP_amount_dh(Integer p_amount_dh) {
+		this.p_amount_dh = p_amount_dh;
 	}
 
 

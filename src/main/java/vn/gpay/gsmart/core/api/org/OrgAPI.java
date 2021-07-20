@@ -693,7 +693,7 @@ public class OrgAPI {
 		OrgResponse response = new OrgResponse();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			List<Integer> orgtypeList = entity.orgtypeList;
+//			List<Integer> orgtypeList = entity.orgtypeList;
 			//
 			Long orgid_link = user.getOrgid_link();
 			Long org_grant_id_link = user.getOrg_grant_id_link();

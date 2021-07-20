@@ -32,6 +32,9 @@ public class SKUBalance_Data implements Serializable {
 	private Float mat_sku_stockout_order;
 	private Float mat_sku_stockout;
 	private Float mat_sku_dif;
+	private Integer mat_sku_product;
+	
+	
 	
 	private List<SKUBalance_Product_D_Data> product_d = new ArrayList<SKUBalance_Product_D_Data>();
 	
@@ -154,6 +157,12 @@ public class SKUBalance_Data implements Serializable {
 	}
 	public void setProduct_d(List<SKUBalance_Product_D_Data> product_d) {
 		this.product_d = product_d;
+	}
+	public Integer getMat_sku_product() {
+		return mat_sku_product;
+	}
+	public void setMat_sku_product(Integer mat_sku_product) {
+		this.mat_sku_product = mat_sku_product;
 	}
 
 }
