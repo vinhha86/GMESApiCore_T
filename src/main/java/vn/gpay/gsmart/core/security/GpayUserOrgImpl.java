@@ -32,6 +32,12 @@ public class GpayUserOrgImpl  extends AbstractService<GpayUserOrg> implements IG
 	}
 	
 	@Override
+	public List<GpayUserOrg> getall_byuser_andtypelist(Long userid_link, List<Integer> orgtypeid_link_list) {
+		// TODO Auto-generated method stub
+		return repository.getall_byuser_andtypelist(userid_link, orgtypeid_link_list);
+	}
+	
+	@Override
 	public List<GpayUserOrg> getby_user_org(Long userid_link, Long orgid_link) {
 		// TODO Auto-generated method stub
 		return repository.getby_user_org(userid_link, orgid_link);

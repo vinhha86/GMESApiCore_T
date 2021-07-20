@@ -24,6 +24,14 @@ public interface GpayUserOrgRepository extends JpaRepository<GpayUserOrg, Long>,
 			@Param ("userid_link")final  Long userid_link,
 			@Param ("orgtypeid_link")final  Integer orgtypeid_link);
 	
+	@Query(value = "select c from GpayUserOrg c "
+			+ " inner join Org d on c.orgid_link = d.id"
+			+ " where c.userid_link = :userid_link"
+			+ " and d.orgtypeid_link in :orgtypeid_link_list")
+	public List<GpayUserOrg> getall_byuser_andtypelist(
+			@Param ("userid_link")final  Long userid_link,
+			@Param ("orgtypeid_link_list")final  List<Integer> orgtypeid_link_list);
+	
 	@Query(value = "select c from GpayUserOrg c where c.userid_link = :userid_link and c.orgid_link = :orgid_link")
 	public List<GpayUserOrg> getby_user_org(@Param ("userid_link")final  Long userid_link, @Param ("orgid_link")final  Long orgid_link);
 }
