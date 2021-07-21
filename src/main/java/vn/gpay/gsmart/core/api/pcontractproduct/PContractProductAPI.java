@@ -453,14 +453,14 @@ public class PContractProductAPI {
 				binding.setProductBuyerCode(pContractProduct.getProductBuyerCode());
 				binding.setProductinfo(pContractProduct.getProductinfo());
 				
-				String uploadRootPath = request.getServletContext().getRealPath("");
-				File uploadRootDir = new File(uploadRootPath);
-				try {
-					binding.setImgproduct(getimg(pContractProduct.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath));
-				}
-				catch (Exception e) {
-					// TODO: handle exception
-				}
+//				String uploadRootPath = request.getServletContext().getRealPath("");
+//				File uploadRootDir = new File(uploadRootPath);
+//				try {
+//					binding.setImgproduct(getimg(pContractProduct.getImgurl1(),uploadRootDir.getParent()+"/"+FolderPath));
+//				}
+//				catch (Exception e) {
+//					// TODO: handle exception
+//				}
 				
 				data.add(binding);
 			}
