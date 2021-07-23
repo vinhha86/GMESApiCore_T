@@ -28,6 +28,7 @@ import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porders_poline.IPOrder_POLine_Service;
 import vn.gpay.gsmart.core.porders_poline.POrder_POLine;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.utils.POType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -144,11 +145,22 @@ public class POrderPOLineAPI {
 				
 				//Cap nhat lai thong tin lenh san xuat
 				POrder porder = porderService.findOne(porder_line.getPorderid_link());
+				List<POrderGrant> list_grant = grantService.getByOrderId(porder.getId());
+				//neu lenh tu sinh thi xoa di con ko thi cap nhat lai trang thai
 				PContract_PO linekh = poService.findOne(porder.getPcontract_poid_link());
-				porder.setIsMap(false);
-				porder.setTotalorder(linekh.getPo_quantity());
-				porder.setGolivedate(linekh.getShipdate());
-				porderService.save(porder);
+				if(linekh.getPo_typeid_link() == POType.PO_LINE_PLAN) {
+					porder.setIsMap(false);
+					porder.setTotalorder(linekh.getPo_quantity());
+					porder.setGolivedate(linekh.getShipdate());
+					porderService.save(porder);
+				}
+				else {
+					//kiem tra xem co line tren bieu do chua thi xoa line tren bieu do 
+					for(POrderGrant grant : list_grant) {
+						grantService.delete(grant);
+					}
+					porderService.delete(porder);
+				}
 				
 				//Xoa het porder-sku
 				List<POrder_Product_SKU> list_porder_sku = porderskuService.getby_porder(porder.getId());
@@ -157,7 +169,7 @@ public class POrderPOLineAPI {
 				}
 				
 				//xoa het trong porder_grant_sku
-				List<POrderGrant> list_grant = grantService.getByOrderId(porder.getId());
+				
 				for(POrderGrant grant : list_grant) {
 					List<POrderGrant_SKU> list_grant_sku = grantskuService.getPOrderGrant_SKU(grant.getId());
 					for(POrderGrant_SKU grantsku : list_grant_sku) {

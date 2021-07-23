@@ -95,6 +95,8 @@ public class POrder implements Serializable {
 	private Integer plan_duration;
 	private Float plan_linerequired;
 	private Boolean ismap;
+	
+	
 //	private Long porder_statusid_link;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
