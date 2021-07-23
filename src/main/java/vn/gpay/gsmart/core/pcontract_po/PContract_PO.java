@@ -114,18 +114,18 @@ public class PContract_PO implements Serializable {/**
     @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
 	private List<PContractProductSKU> pcontractProductSKUs = new ArrayList<>();
 	
-	@NotFound(action = NotFoundAction.IGNORE)
-	@OneToMany
-    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
-	private List<POrder_POLine> list_porder_poline = new ArrayList<>();
-	
-	@Transient
-	public String getOrdercode() {
-		if(list_porder_poline.size()>0) {
-			return list_porder_poline.get(0).getOrderCode();
-		}
-		return "";
-	}
+//	@NotFound(action = NotFoundAction.IGNORE)
+//	@OneToMany
+//    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
+//	private List<POrder_POLine> list_porder_poline = new ArrayList<>();
+//	
+//	@Transient
+//	public String getOrdercode() {
+//		if(list_porder_poline.size()>0) {
+//			return list_porder_poline.get(0).getOrderCode();
+//		}
+//		return "";
+//	}
 	
 	@Transient
 	public Integer getPcontractPoProductSkuQuantityTotal() { // sl sp sku trong po line

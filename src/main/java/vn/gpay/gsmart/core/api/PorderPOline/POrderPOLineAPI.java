@@ -135,6 +135,7 @@ public class POrderPOLineAPI {
 		try {
 			Long pcontract_poid_link = entity.pcontract_poid_link;
 			List<POrder_POLine> list_porder = porder_line_Service.get_porderline_by_po(pcontract_poid_link);
+			
 			for(POrder_POLine porder_line : list_porder) {
 				//cap nhat lai trang thai cua poline thuc te
 				PContract_PO linett = poService.findOne(porder_line.getPcontract_poid_link());
