@@ -2002,8 +2002,9 @@ public class PContract_POAPI {
 			}
 			Date shipdate_from = entity.shipdate_from;
 			Date shipdate_to = entity.shipdate_to;
+			Boolean ismap = entity.ismap;
 			
-			response.data = pcontract_POService.get_po_shipping(list_org, POType.PO_LINE_CONFIRMED, shipdate_from, shipdate_to, user.getRootorgid_link());
+			response.data = pcontract_POService.get_po_shipping(list_org, POType.PO_LINE_CONFIRMED, shipdate_from, shipdate_to, user.getRootorgid_link(),ismap);
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

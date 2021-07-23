@@ -257,10 +257,12 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 
 	@Override
 	public List<PContractPO_Shipping> get_po_shipping(List<Long> orgs, int po_type, Date shipdate_from,
-			Date shipdate_to, Long orgrootid_link) {
+			Date shipdate_to, Long orgrootid_link, Boolean ismap) {
 		// TODO Auto-generated method stub
 		orgs = orgs.size() == 0 ? null: orgs;
-		List<PContract_PO> list_po = repo.getby_process_shipping(shipdate_from, shipdate_to, orgs, po_type);
+		ismap = ismap == false ? null :  true;
+		
+		List<PContract_PO> list_po = repo.getby_process_shipping(shipdate_from, shipdate_to, orgs, po_type, ismap);
 		List<PContractPO_Shipping> list_shipping = new ArrayList<PContractPO_Shipping>();
 		for(PContract_PO po : list_po) {
 			PContractPO_Shipping ship = new PContractPO_Shipping();

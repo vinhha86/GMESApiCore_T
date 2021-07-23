@@ -5,5 +5,6 @@ import java.util.Date;
 public class getby_shipping_request {
 	public Date shipdate_from;
 	public Date shipdate_to;
+	public Boolean ismap;
 	
 }

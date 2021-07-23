@@ -278,6 +278,7 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			+ "and c.po_typeid_link =:po_type "
 			+ "and c.shipdate >= :shipdate_from "
 			+ "and c.shipdate <= :shipdate_to "
+			+ "and (c.ismap = :ismap or :ismap is null) "
 			+ "group by c "
 			+ "order by c.shipdate ASC "
 			)
@@ -285,7 +286,8 @@ public interface IPContract_PORepository extends JpaRepository<PContract_PO, Lon
 			@Param ("shipdate_from")final  Date shipdate_from,
 			@Param ("shipdate_to")final  Date shipdate_to,
 			@Param ("orgs")final List<Long> orgs,
-			@Param ("po_type")final Integer po_type);
+			@Param ("po_type")final Integer po_type,
+			@Param ("ismap")final Boolean ismap);
 	
 	@Query(value = "select c from PContract_PO c "
 			+ "left join POrder_Req b on b.pcontract_poid_link = c.id "
