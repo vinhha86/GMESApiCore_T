@@ -118,6 +118,41 @@ public class PContractProductBom2API {
 		}
 	}
 	
+	@RequestMapping(value = "/copy_poline", method = RequestMethod.POST)
+	public ResponseEntity<copy_poline_response> CopyPoline(HttpServletRequest request,
+			@RequestBody copy_poline_request entity) {
+		copy_poline_response response = new copy_poline_response();
+		try {
+			long pcontractid_link = entity.pcontractid_link;
+			long material_skuid_link = entity.material_skuid_link;
+			long material_skuid_link_des = entity.material_skuid_link_des;
+			
+			List<PContract_bom2_npl_poline> list_po = po_npl_Service.getby_pcontract_and_npl(pcontractid_link, material_skuid_link);
+			//xoa het po-line truocn khi paste
+			List<PContract_bom2_npl_poline> list_po_des = po_npl_Service.getby_pcontract_and_npl(pcontractid_link, material_skuid_link_des);
+			for(PContract_bom2_npl_poline poline : list_po_des) {
+				po_npl_Service.delete(poline);
+			}
+			
+			for(PContract_bom2_npl_poline poline : list_po) {
+				PContract_bom2_npl_poline poline_new = new PContract_bom2_npl_poline();
+				poline_new.setId(null);
+				poline_new.setNpl_skuid_link(material_skuid_link_des);
+				poline_new.setPcontract_poid_link(poline.getPcontract_poid_link());
+				poline_new.setPcontractid_link(pcontractid_link);
+				po_npl_Service.save(poline_new);
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<copy_poline_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<copy_poline_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@RequestMapping(value = "/confim_bom2", method = RequestMethod.POST)
 	public ResponseEntity<confim_bom2_response> ConfimBom2(HttpServletRequest request,
 			@RequestBody confim_bom1_request entity) {
