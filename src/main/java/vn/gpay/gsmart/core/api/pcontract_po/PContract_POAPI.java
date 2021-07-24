@@ -1218,7 +1218,7 @@ public class PContract_POAPI {
 						
 						
 						//Kiem tra PackingMethod
-						Long packingmethođi_link = null;
+						Long packingmethodid_link = null;
 						if(!PackingMethod.equals("")) {
 							List<PackingType> list_packing = packingService.getbyname(PackingMethod, orgrootid_link);
 							if(list_packing.size() == 0) {
@@ -1229,10 +1229,10 @@ public class PContract_POAPI {
 								pk.setOrgrootid_link(orgrootid_link);
 								pk = packingService.save(pk);
 								
-								packingmethođi_link = pk.getId();
+								packingmethodid_link = pk.getId();
 							}
 							else {
-								packingmethođi_link = list_packing.get(0).getId();
+								packingmethodid_link = list_packing.get(0).getId();
 							}
 						}
 						
@@ -1243,6 +1243,7 @@ public class PContract_POAPI {
 							//Kiem tra so PO va so PO cha
 //							List<PContract_PO> list_po_parent = pcontract_POService.check_exist_PONo(PO_No, pcontractid_link);
 //							if(list_po_parent.size() > 0) {
+							
 								//Kiem tra xem PO con da ton tai hay chua
 								String s_po  = Line.equals("") ? PO_No : PO_No+"-"+Line;
 								List<PContract_PO> list_po = pcontract_POService.check_exist_po_children(s_po, ShipDate, shipmodeid_link, pcontractid_link, parentid_link);
@@ -1257,7 +1258,7 @@ public class PContract_POAPI {
 									po_new.setPcontractid_link(pcontractid_link);
 									po_new.setParentpoid_link(parentid_link);
 									po_new.setOrgrootid_link(orgrootid_link);
-									po_new.setPackingnotice(packingmethođi_link+"");
+									po_new.setPackingnotice(packingmethodid_link+"");
 									po_new.setProductid_link(parent.getProductid_link());
 									po_new.setPlan_productivity(parent.getPlan_productivity());
 									po_new.setPlan_linerequired(parent.getPlan_linerequired());
