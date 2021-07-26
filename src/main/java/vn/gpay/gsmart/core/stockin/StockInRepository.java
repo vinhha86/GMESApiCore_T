@@ -39,4 +39,15 @@ public interface StockInRepository extends JpaRepository<StockIn, Long>,JpaSpeci
 			)
 	public List<StockIn> stockin_list(@Param ("orgid_link")final Long orgid_link ,@Param ("stockintypeid_link")final long stockintypeid_link,@Param ("stockincode")final String stockincode,@Param ("orgid_from_link")final Long orgid_from_link, 
 			@Param ("orgid_to_link")final Long orgid_to_link,@Param ("stockindate_from")final Date stockindate_from,@Param ("stockindate_to")final Date stockindate_to);
+
+	@Query(value = "select c from StockIn c " 
+			+ "where c.pcontract_poid_link = :pcontract_poid_link "
+			+ "and c.stockintypeid_link = :stockintypeid_link "
+			+ "and c.status = :status "
+			)
+	public List<StockIn> findByPO_Type_Status(
+			@Param ("pcontract_poid_link")final Long pcontract_poid_link,
+			@Param ("stockintypeid_link")final Integer stockintypeid_link, 
+			@Param ("status")final Integer status
+			);
 }

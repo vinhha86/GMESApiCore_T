@@ -25,11 +25,15 @@ import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.porders_poline.IPOrder_POLine_Service;
+import vn.gpay.gsmart.core.stockin.IStockInService;
+import vn.gpay.gsmart.core.stockin.StockIn;
 import vn.gpay.gsmart.core.stockout.IStockOutService;
 import vn.gpay.gsmart.core.stockout.StockOut;
 import vn.gpay.gsmart.core.stockout.StockOutD;
 import vn.gpay.gsmart.core.stockout.StockOutPklist;
 import vn.gpay.gsmart.core.utils.SkuType;
+import vn.gpay.gsmart.core.utils.StockinStatus;
+import vn.gpay.gsmart.core.utils.StockinType;
 import vn.gpay.gsmart.core.utils.StockoutStatus;
 import vn.gpay.gsmart.core.utils.StockoutTypes;
 
@@ -46,6 +50,7 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	@Autowired IPOrderGrant_Service porderGrantService;
 	@Autowired IPOrderProcessing_Service pprocessRepository;
 	@Autowired IStockOutService stockOutService;
+	@Autowired IStockInService stockInService;
 	@Autowired IPOrder_Product_SKU_Service porderskuService;
 	@Autowired IPOrderBOMSKU_Service porderBOMSKU_Service;
 	@Autowired ICutplanProcessingService cutplanProcessingService;
@@ -360,13 +365,6 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 								porderid_link, product_skuid_link, SkuType.SKU_TYPE_VAI
 								);
 						
-//						System.out.println("line 365: " + porderid_link + " " +  product_skuid_link + " " + SkuType.SKU_TYPE_VAI);
-//						
-//						if(porderid_link.equals(4020L)) {
-////							System.out.println("pcontract po ser line 361");
-////							System.out.println(material_skuid_link_list.size());
-//						}
-						
 						// Mỗi loại vải dùng cho sku đã cắt được bao nhiêu chiếc, 
 						// lưu vào amountList sau đố lấy số nhỏ nhất
 						// vd sp1 vải 1 cắt 10, vải 2 cắt 5 thì tính là cắt được 5 chiếc
@@ -389,12 +387,12 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 			}
 			ship.setAmountcut(totalamountcut);
 			
-			// SL Vào chuyền, Ra chuyền, Hoàn thiện ,Đóng gói, Thành phẩm
+			// SL Vào chuyền, Ra chuyền, Hoàn thiện ,Đóng gói, 
 			Integer amountinputsum = 0;
 			Integer amountoutputsum = 0;
 			Integer amountpackstockedsum = 0;
 			Integer amountpackedsum = 0;
-			Integer amountstockedsum = 0;
+//			Integer amountstockedsum = 0;
 			if(porder_list.size() > 0) {
 //				POrder porder = porder_list.get(0);
 				for(POrder porder : porder_list) {
@@ -408,7 +406,7 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 							amountoutputsum += porderProcessing.getAmountoutputsum() == null ? 0 : porderProcessing.getAmountoutputsum();
 							amountpackstockedsum += porderProcessing.getAmountpackstockedsum() == null ? 0 : porderProcessing.getAmountpackstockedsum();
 							amountpackedsum += porderProcessing.getAmountpackedsum() == null ? 0 : porderProcessing.getAmountpackedsum();
-							amountstockedsum += porderProcessing.getAmountstockedsum() == null ? 0 : porderProcessing.getAmountstockedsum();
+//							amountstockedsum += porderProcessing.getAmountstockedsum() == null ? 0 : porderProcessing.getAmountstockedsum();
 						}
 					}
 				}
@@ -417,6 +415,18 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 			ship.setAmountoutputsum(amountoutputsum);
 			ship.setAmountpackstockedsum(amountpackstockedsum);
 			ship.setAmountpackedsum(amountpackedsum);
+//			ship.setAmountstockedsum(amountstockedsum);
+			
+			// Thành phẩm
+			Integer amountstockedsum = 0;
+			List<StockIn> stockin_list = stockInService.findByPO_Type_Status(
+					po.getId(), StockinType.STOCKIN_TYPE_TP_NEW, StockinStatus.STOCKIN_STATUS_APPROVED
+					);
+			if(stockin_list.size() > 0) {
+				for(StockIn stockin : stockin_list) {
+					amountstockedsum += stockin.getTotalpackage();
+				}
+			}
 			ship.setAmountstockedsum(amountstockedsum);
 			
 			// SL Giao hàng

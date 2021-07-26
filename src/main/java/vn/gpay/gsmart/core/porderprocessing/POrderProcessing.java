@@ -88,7 +88,7 @@ public class POrderProcessing implements Serializable {
     private Integer amounttolinesumprev ;		
 	
 //Sản xuất	
-    private Integer amountcut ;
+    private Integer amountcut;
 	@Transient
     private Integer amountcutold;	
 	

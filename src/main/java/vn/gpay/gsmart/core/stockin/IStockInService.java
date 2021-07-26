@@ -21,4 +21,6 @@ public interface IStockInService extends Operations<StockIn>{
 	
 	public Page<StockIn> stockin_page(Long orgrootid_link,Long stockintypeid_link,Long orgid_from_link,
 			Long orgid_to_link,Date stockindate_from,Date stockindate_to, int limit, int page);
+	
+	List<StockIn> findByPO_Type_Status(Long pcontract_poid_link, Integer stockintypeid_link, Integer status);
 }

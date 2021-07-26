@@ -101,5 +101,9 @@ public class StockInServiceImpl extends AbstractService<StockIn> implements ISto
 		        .build();
 	    return repository.findAll(specification,PageRequest.of(page - 1, limit, sort));
 	}
+	@Override
+	public List<StockIn> findByPO_Type_Status(Long pcontract_poid_link, Integer stockintypeid_link, Integer status) {
+		return repository.findByPO_Type_Status(pcontract_poid_link, stockintypeid_link, status);
+	}
 	
 }

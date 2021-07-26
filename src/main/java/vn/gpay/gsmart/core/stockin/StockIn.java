@@ -136,6 +136,8 @@ public class StockIn implements Serializable {
 	private Date lasttimeupdate;
 	
 	private Long porder_grantid_link;
+	private Long pcontract_poid_link;
+	private Long pcontractid_link;
 
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
@@ -498,6 +500,22 @@ public class StockIn implements Serializable {
 
 	public void setPorder_grantid_link(Long porder_grantid_link) {
 		this.porder_grantid_link = porder_grantid_link;
+	}
+
+	public Long getPcontract_poid_link() {
+		return pcontract_poid_link;
+	}
+
+	public void setPcontract_poid_link(Long pcontract_poid_link) {
+		this.pcontract_poid_link = pcontract_poid_link;
+	}
+
+	public Long getPcontractid_link() {
+		return pcontractid_link;
+	}
+
+	public void setPcontractid_link(Long pcontractid_link) {
+		this.pcontractid_link = pcontractid_link;
 	}
 	
 }
