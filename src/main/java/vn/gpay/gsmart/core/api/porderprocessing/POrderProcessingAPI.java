@@ -1412,6 +1412,8 @@ public class POrderProcessingAPI {
 		        		if ((null==pprocess.getAmountpackstockedsum()?0:pprocess.getAmountpackstockedsum()) 
 		        				>= (null==pprocess.getTotalorder()?0:pprocess.getTotalorder())){
 		        			pprocess.setStatus(POrderStatus.PORDER_STATUS_DONE);
+		        		}else {
+		        			pprocess.setStatus(POrderStatus.PORDER_STATUS_RUNNING);
 		        		}
 		        		if ((null==pprocess.getAmountstockedsum()?0:pprocess.getAmountstockedsum()) 
 		        				>= (null==pprocess.getTotalorder()?0:pprocess.getTotalorder())){
@@ -1479,6 +1481,8 @@ public class POrderProcessingAPI {
 				        		if ((null==pprocessAfter.getAmountpackstockedsum()?0:pprocessAfter.getAmountpackstockedsum()) 
 				        				>= (null==pprocessAfter.getTotalorder()?0:pprocessAfter.getTotalorder())){
 				        			pprocessAfter.setStatus(POrderStatus.PORDER_STATUS_DONE);
+				        		}else {
+				        			pprocessAfter.setStatus(POrderStatus.PORDER_STATUS_RUNNING);
 				        		}
 				        		if ((null==pprocessAfter.getAmountstockedsum()?0:pprocessAfter.getAmountstockedsum()) 
 				        				>= (null==pprocessAfter.getTotalorder()?0:pprocessAfter.getTotalorder())){
