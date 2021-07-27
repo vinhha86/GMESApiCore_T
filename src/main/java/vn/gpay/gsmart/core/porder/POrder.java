@@ -2,9 +2,13 @@ package vn.gpay.gsmart.core.porder;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -32,6 +36,7 @@ import vn.gpay.gsmart.core.porder_product.POrder_Product;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porder_status.POrder_Status;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
+import vn.gpay.gsmart.core.porders_poline.POrder_POLine;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.sizeset.SizeSet;
 import vn.gpay.gsmart.core.utils.GPAYDateFormat;
@@ -488,7 +493,36 @@ public class POrder implements Serializable {
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
 	@JoinColumn( name="porderid_link", referencedColumnName="id")
-	private List<POrderBOMSKU>  porder_bom_sku  = new ArrayList<>();	
+	private List<POrderBOMSKU>  porder_bom_sku  = new ArrayList<>();
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+    @JoinColumn(name="porderid_link",insertable=false,updatable =false)
+    private List<POrder_POLine> porder_poline_list;
+	
+    @Transient
+    public Date getNgayGiaoHang() {
+    	if(porder_poline_list != null && porder_poline_list.size() > 0) {
+    		POrder_POLine porder_poline = porder_poline_list.get(0);
+    		return porder_poline.getPcontractPOShipdate();
+    	}
+    	return null;
+    }
+	@Transient
+	public Long getSoNgayChamGiaoHang() {
+		if(porder_poline_list != null && porder_poline_list.size() > 0) {
+			POrder_POLine porder_poline = porder_poline_list.get(0);
+			Date shipdate = porder_poline.getPcontractPOShipdate();
+			Date finishdate = finishdate_fact;
+			if(shipdate!= null && finishdate != null) {
+//				Long diffInMillies = Math.abs(finishdate.getTime() - shipdate.getTime());
+				Long diffInMillies = shipdate.getTime() - finishdate.getTime();
+				Long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+				return diff;
+			}
+		}
+		return null;
+	}
 	
 	public List<POrder_Product_SKU> getPorder_product_sku() {
 		return porder_product_sku;

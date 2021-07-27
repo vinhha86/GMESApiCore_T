@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.porders_poline;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,6 +16,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.porder.POrder;
 
 @Table(name="porders_poline")
@@ -42,6 +44,21 @@ public class POrder_POLine implements Serializable{
 		if(porder!=null)
 			return porder.getOrdercode();
 		return "";
+	}
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
+	private PContract_PO pcontract_po;
+	
+	@Transient
+	public Date getPcontractPOShipdate() {
+		if(pcontract_po!=null) {
+			if(pcontract_po.getShipdate() != null) {
+				return pcontract_po.getShipdate();
+			}
+		}
+		return null;
 	}
 	
 	public Long getId() {
