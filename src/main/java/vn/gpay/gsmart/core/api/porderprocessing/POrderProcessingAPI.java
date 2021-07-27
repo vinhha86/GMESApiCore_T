@@ -274,47 +274,51 @@ public class POrderProcessingAPI {
 				
 				if (GPAYDateFormat.atStartOfDay(pprocess.getProcessingdate()).before(GPAYDateFormat.atStartOfDay(entity.processingdate_to))){
 					
-					porderProcessing.setProcessingdate(entity.processingdate_to);
-					
-					porderProcessing.setAmountcutsumprev(pprocess.getAmountcutsum());
-					porderProcessing.setAmountcut(0);
-					porderProcessing.setAmountcutsum(pprocess.getAmountcutsum());
-					
-					porderProcessing.setAmountinputsumprev(pprocess.getAmountinputsum());
-					porderProcessing.setAmountinput(0);
-					porderProcessing.setAmountinputsum(pprocess.getAmountinputsum());
-					
-					porderProcessing.setAmountoutputsumprev(pprocess.getAmountoutputsum());
-					porderProcessing.setAmountoutput(0);
-					porderProcessing.setAmountoutputsum(pprocess.getAmountoutputsum());
-					
-					porderProcessing.setAmounterrorsumprev(pprocess.getAmounterrorsum());
-					porderProcessing.setAmounterror(0);
-					porderProcessing.setAmounterrorsum(pprocess.getAmounterrorsum());
-					
-					porderProcessing.setAmountkcssumprev(pprocess.getAmountkcssum());
-					porderProcessing.setAmountkcs(0);
-					porderProcessing.setAmountkcssum(pprocess.getAmountkcssum());	
-					
-					porderProcessing.setAmountpackedsumprev(pprocess.getAmountpackedsum());
-					porderProcessing.setAmountpacked(0);
-					porderProcessing.setAmountpackedsum(pprocess.getAmountpackedsum());		
-					
-					porderProcessing.setAmountpackstockedsumprev(pprocess.getAmountpackstockedsum());
-					porderProcessing.setAmountpackstocked(0);
-					porderProcessing.setAmountpackstockedsum(pprocess.getAmountpackstockedsum());		
-					
-					porderProcessing.setAmountstockedsumprev(pprocess.getAmountstockedsum());
-					porderProcessing.setAmountstocked(0);
-					porderProcessing.setAmountstockedsum(pprocess.getAmountstockedsum());
-					
-					porderProcessing.setAmounttarget(0);
-					porderProcessing.setAmounttargetprev(pprocess.getAmounttarget());
-					
-					porderProcessing.setAmountkcsreg(0);
-					porderProcessing.setAmountkcsregprev(pprocess.getAmountkcsreg());
-					
-					porderProcessing.setComment("");
+					if(pprocess.getStatus() < POrderStatus.PORDER_STATUS_FINISHED) {
+						porderProcessing.setProcessingdate(entity.processingdate_to);
+						
+						porderProcessing.setAmountcutsumprev(pprocess.getAmountcutsum());
+						porderProcessing.setAmountcut(0);
+						porderProcessing.setAmountcutsum(pprocess.getAmountcutsum());
+						
+						porderProcessing.setAmountinputsumprev(pprocess.getAmountinputsum());
+						porderProcessing.setAmountinput(0);
+						porderProcessing.setAmountinputsum(pprocess.getAmountinputsum());
+						
+						porderProcessing.setAmountoutputsumprev(pprocess.getAmountoutputsum());
+						porderProcessing.setAmountoutput(0);
+						porderProcessing.setAmountoutputsum(pprocess.getAmountoutputsum());
+						
+						porderProcessing.setAmounterrorsumprev(pprocess.getAmounterrorsum());
+						porderProcessing.setAmounterror(0);
+						porderProcessing.setAmounterrorsum(pprocess.getAmounterrorsum());
+						
+						porderProcessing.setAmountkcssumprev(pprocess.getAmountkcssum());
+						porderProcessing.setAmountkcs(0);
+						porderProcessing.setAmountkcssum(pprocess.getAmountkcssum());	
+						
+						porderProcessing.setAmountpackedsumprev(pprocess.getAmountpackedsum());
+						porderProcessing.setAmountpacked(0);
+						porderProcessing.setAmountpackedsum(pprocess.getAmountpackedsum());		
+						
+						porderProcessing.setAmountpackstockedsumprev(pprocess.getAmountpackstockedsum());
+						porderProcessing.setAmountpackstocked(0);
+						porderProcessing.setAmountpackstockedsum(pprocess.getAmountpackstockedsum());		
+						
+						porderProcessing.setAmountstockedsumprev(pprocess.getAmountstockedsum());
+						porderProcessing.setAmountstocked(0);
+						porderProcessing.setAmountstockedsum(pprocess.getAmountstockedsum());
+						
+						porderProcessing.setAmounttarget(0);
+						porderProcessing.setAmounttargetprev(pprocess.getAmounttarget());
+						
+						porderProcessing.setAmountkcsreg(0);
+						porderProcessing.setAmountkcsregprev(pprocess.getAmountkcsreg());
+						
+						porderProcessing.setComment("");
+						
+						result.add(porderProcessing);
+					}
 					
 				} else {
 	    			List<POrderProcessing> pprocessList_BeforeDate = pprocessRepository.getByBeforeDateAndOrderGrantID(pprocess.getPordergrantid_link(), entity.processingdate_to);
@@ -323,8 +327,8 @@ public class POrderProcessingAPI {
 	    				porderProcessing.setAmountkcsregprev(pprocess_beforedate.getAmountkcsreg());
 	    				porderProcessing.setAmounttargetprev(pprocess_beforedate.getAmounttarget());
 	    			}
+					result.add(porderProcessing);
 				}
-				result.add(porderProcessing);
 			}
 			
 			response.data=result;
@@ -1512,7 +1516,10 @@ public class POrderProcessingAPI {
 		        	porder_grant.setStatus(pprocess.getStatus());
 		        	pordergrantRepository.save(porder_grant);	
 		        }
-
+		        
+		        // Update status cho lệnh sản xuất (porder)
+		        Long porderid_link = pprocess.getPorderid_link();
+		        updatePOrderStatus(porderid_link);
 		        
 		        //Return sum to interface
 		        response.amountcutsum = pprocess.getAmountcutsum();
@@ -1540,7 +1547,37 @@ public class POrderProcessingAPI {
 			response.setMessage(e.getMessage());			
 		    return new ResponseEntity<PProcessUpdateResponse>(response,HttpStatus.BAD_REQUEST);
 		}    			
-	}	
+	}
+	
+	public void updatePOrderStatus(Long porderid_link) {
+		try {
+			// update status
+			POrder porder = pordersRepository.findOne(porderid_link);
+			List<POrderGrant> porderGrant_list = pordergrantRepository.getByOrderId(porderid_link);
+			Boolean isComplete = true;
+			for(POrderGrant porderGrant : porderGrant_list) {
+				if(!porderGrant.getStatus().equals(POrderStatus.PORDER_STATUS_FINISHED)) { // 6
+					isComplete = false;
+					break;
+				}
+			}
+			if(porderGrant_list.size() > 0) {
+				if(isComplete) {
+					Date date = new Date();
+					porder.setStatus(POrderStatus.PORDER_STATUS_FINISHED);
+					porder.setFinishdate_fact(date);
+				}else {
+					porder.setStatus(POrderStatus.PORDER_STATUS_RUNNING);
+					porder.setFinishdate_fact(null);
+				}
+				pordersRepository.save(porder);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("POrderProcessingAPI: updatePOrderStatus: Exception");
+		}    			
+	}
+	
 	//Grant POrder to Org for processing
 	@RequestMapping(value = "/grant",method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> grantPProcess(@RequestBody POrderGrantRequest entity, HttpServletRequest request) {
