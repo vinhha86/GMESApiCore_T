@@ -2,9 +2,6 @@ package vn.gpay.gsmart.core.porder;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -567,7 +564,16 @@ public class POrder implements Serializable {
 		this.pcontractid_link = pcontractid_link;
 	}
 	public Integer getTotalorder() {
-		return totalorder;
+		int total = 0;
+		if(porder_product_sku.size() > 0) {
+			for(POrder_Product_SKU sku : porder_product_sku) {
+				total += sku.getPquantity_total();
+			}
+		}
+		else {
+			total = totalorder;
+		}
+		return total;
 	}
 	public void setTotalorder(Integer totalorder) {
 		this.totalorder = totalorder;
