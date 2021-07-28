@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.porder;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -23,6 +24,9 @@ import com.github.wenhao.jpa.Sorts;
 import com.github.wenhao.jpa.Specifications;
 
 import vn.gpay.gsmart.core.base.AbstractService;
+import vn.gpay.gsmart.core.org.IOrgService;
+import vn.gpay.gsmart.core.org.Org;
+import vn.gpay.gsmart.core.org.OrgServiceImpl;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontract_po_productivity.IPContract_PO_Productivity_Service;
@@ -32,6 +36,7 @@ import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.GPAYDateFormat;
+import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.POStatus;
 import vn.gpay.gsmart.core.utils.POType;
 import vn.gpay.gsmart.core.utils.POrderStatus;
@@ -45,6 +50,8 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 //	@Autowired private IPOrder_Req_Service porder_reqService;
 	@Autowired private Common commonService;
 	@Autowired private IProductService productService;
+	@Autowired private IOrgService orgService;
+	
 	@Override
 	protected JpaRepository<POrder, Long> getRepository() {
 		// TODO Auto-generated method stub
@@ -453,6 +460,139 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 			      return o1.getOrgId().compareTo(o2.getOrgId());
 			  }
 			});
+		return data;
+	}
+	
+	@Override
+	public List<POrderBinding> getPOrderStatusChart() {
+		List<POrderBinding> data = new ArrayList<POrderBinding>();
+		
+		// ds trang thai lenh
+		data = addPOrderBinding_TrangThai(data);
+		
+		// ds phan xuong
+		List<Integer> orgtype = new ArrayList<Integer>();
+		orgtype.add(OrgType.ORG_TYPE_FACTORY);
+		List<Org> px_list = orgService.findOrgByOrgType(orgtype); // System.out.println("px_list " + px_list.size());
+		
+		// lenh sx truoc 6 thang -> hien tai -> sau 1 thang
+		Calendar calfrom = Calendar.getInstance();
+		calfrom.add(Calendar.MONTH, -6);
+		calfrom.set(Calendar.DAY_OF_MONTH, 1);
+		Date dateFrom = GPAYDateFormat.atStartOfDay(calfrom.getTime());
+		Calendar calto = Calendar.getInstance();
+		calto.add(Calendar.MONTH, +2);
+		calto.set(Calendar.DAY_OF_MONTH, 1);
+		Date dateTo = GPAYDateFormat.atStartOfDay(calto.getTime());
+		
+//		List<POrder> porder_list = repo.findByGolivedate(dateFrom, dateTo); System.out.println("porder_list " + porder_list.size());
+		
+		for(Org px : px_list) {
+			List<Integer> statuses = new ArrayList<Integer>();
+			// free
+			statuses.add(POrderStatus.PORDER_STATUS_FREE);
+			Long sum_free = repo.findTotalByGolivedate(dateFrom, dateTo, px.getId(), statuses);
+			
+			// granted
+			statuses = new ArrayList<Integer>();
+			statuses.add(POrderStatus.PORDER_STATUS_GRANTED);
+			Long sum_granted = repo.findTotalByGolivedate(dateFrom, dateTo, px.getId(), statuses);
+			
+			// running
+			statuses = new ArrayList<Integer>();
+			statuses.add(POrderStatus.PORDER_STATUS_RUNNING);
+			statuses.add(POrderStatus.PORDER_STATUS_DONE);
+			Long sum_running = repo.findTotalByGolivedate(dateFrom, dateTo, px.getId(), statuses);
+			
+			// finished
+			statuses = new ArrayList<Integer>();
+			statuses.add(POrderStatus.PORDER_STATUS_FINISHED);
+			Long sum_finished = repo.findTotalByGolivedate(dateFrom, dateTo, px.getId(), statuses);
+			
+			for(POrderBinding porderBinding : data) {
+				List<POrderBinding> porderBinding_list = porderBinding.getPorderBinding_list();
+				Long sum = porderBinding.getSum();
+				POrderBinding newPOrderBinding = new POrderBinding();
+				Integer status = porderBinding.getStatus();
+				switch (status) {
+					case 0:
+						newPOrderBinding.setOrgName(px.getName());
+						newPOrderBinding.setSum(sum_free);
+						sum+=sum_free;
+						break;
+					case 1:
+						newPOrderBinding.setOrgName(px.getName());
+						newPOrderBinding.setSum(sum_granted);
+						sum+=sum_granted;
+						break;
+					case 4:
+						newPOrderBinding.setOrgName(px.getName());
+						newPOrderBinding.setSum(sum_running);
+						sum+=sum_running;
+						break;
+					case 6:
+						newPOrderBinding.setOrgName(px.getName());
+						newPOrderBinding.setSum(sum_finished);
+						sum+=sum_finished;
+						break;
+				}
+				porderBinding_list.add(newPOrderBinding);
+				porderBinding.setSum(sum);
+			}
+		}
+		
+		return data;
+	}
+	
+	public List<POrderBinding> addPOrderBinding_TrangThai(List<POrderBinding> data){
+		POrderBinding statusFree = new POrderBinding();
+		POrderBinding statusGranted = new POrderBinding();
+		POrderBinding statusRunning = new POrderBinding();
+		POrderBinding statusFinished = new POrderBinding();
+//		POrderBinding statusSlow_small = new POrderBinding();
+//		POrderBinding statusSlow_medium = new POrderBinding();
+//		POrderBinding statusSlow_big = new POrderBinding();
+		
+		statusFree.setPorderBinding_list(new ArrayList<POrderBinding>());
+		statusFree.setStatus(POrderStatus.PORDER_STATUS_FREE);
+		statusFree.setStatusName("Chưa phân chuyền");
+		statusFree.setSum((long) 0);
+		
+		statusGranted.setPorderBinding_list(new ArrayList<POrderBinding>());
+		statusGranted.setStatus(POrderStatus.PORDER_STATUS_GRANTED);
+		statusGranted.setStatusName("Đã phân chuyền");
+		statusGranted.setSum((long) 0);
+		
+		statusRunning.setPorderBinding_list(new ArrayList<POrderBinding>());
+		statusRunning.setStatus(POrderStatus.PORDER_STATUS_RUNNING);
+		statusRunning.setStatusName("Đang sản xuất");
+		statusRunning.setSum((long) 0);
+		
+		statusFinished.setPorderBinding_list(new ArrayList<POrderBinding>());
+		statusFinished.setStatus(POrderStatus.PORDER_STATUS_FINISHED);
+		statusFinished.setStatusName("Đã hoàn thành");
+		statusFinished.setSum((long) 0);
+		
+//		statusSlow_small.setPorderBinding_list(new ArrayList<POrderBinding>());
+//		statusSlow_small.setStatus(POrderStatus.PORDER_STATUS_FINISHED);
+//		statusSlow_small.setStatusName("Chậm giao hàng ít");
+//		
+//		statusSlow_medium.setPorderBinding_list(new ArrayList<POrderBinding>());
+//		statusSlow_medium.setStatus(POrderStatus.PORDER_STATUS_FINISHED);
+//		statusSlow_medium.setStatusName("Chậm giao hàng vừa");
+//		
+//		statusSlow_big.setPorderBinding_list(new ArrayList<POrderBinding>());
+//		statusSlow_big.setStatus(POrderStatus.PORDER_STATUS_FINISHED);
+//		statusSlow_big.setStatusName("Chậm giao hàng nhiều");
+		
+		data.add(statusFree);
+		data.add(statusGranted);
+		data.add(statusRunning);
+		data.add(statusFinished);
+//		data.add(statusSlow_small);
+//		data.add(statusSlow_medium);
+//		data.add(statusSlow_big);
+		
 		return data;
 	}
 

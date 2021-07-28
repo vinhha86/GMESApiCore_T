@@ -2037,8 +2037,6 @@ public class POrderProcessingAPI {
 			Long diffInMillies = Math.abs(now.getTime() - dateFrom.getTime());
 			Long dayDifference = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS) + 1; // +1 de tinh them nay hien tai
 			
-			System.out.println(dayDifference);
-			
 			response.data = pprocessRepository.getAmountOutputForChart(dateFrom, dateTo, dayDifference);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

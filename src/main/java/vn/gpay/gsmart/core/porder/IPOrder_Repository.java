@@ -225,4 +225,27 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 	
 	@Query("SELECT c FROM POrder c where c.pcontract_poid_link = :pcontract_poid_link")
 	public List<POrder> getByPcontractPO(@Param ("pcontract_poid_link")final Long pcontract_poid_link);
+	
+	@Query(value = "select a from POrder a "
+			+ "where (CAST(:golivedatefrom AS date) IS NULL or a.golivedate >= :golivedatefrom) "
+			+ "and (CAST(:golivedateto AS date) IS NULL or a.golivedate <= :golivedateto) "
+			+ "and a.status >= 0 "
+			)
+	public List<POrder> findByGolivedate(
+			@Param ("golivedatefrom")final Date golivedatefrom,
+			@Param ("golivedateto")final Date golivedateto
+			);
+	
+	@Query(value = "select count(a.id) from POrder a "
+			+ "where (CAST(:golivedatefrom AS date) IS NULL or a.golivedate >= :golivedatefrom) "
+			+ "and (CAST(:golivedateto AS date) IS NULL or a.golivedate <= :golivedateto) "
+			+ "and a.granttoorgid_link = :granttoorgid_link "
+			+ "and a.status in :statuses "
+			)
+	public Long findTotalByGolivedate(
+			@Param ("golivedatefrom")final Date golivedatefrom,
+			@Param ("golivedateto")final Date golivedateto,
+			@Param ("granttoorgid_link")final Long granttoorgid_link,
+			@Param ("statuses")final List<Integer> statuses
+			);
 }

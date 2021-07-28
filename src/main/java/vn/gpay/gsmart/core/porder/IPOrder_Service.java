@@ -35,6 +35,7 @@ public interface IPOrder_Service extends Operations<POrder> {
 	public List<POrder> getPOrderByExactOrdercode(String ordercode);
 	
 	public List<POrderBinding> getForNotInProductionChart();
+	public List<POrderBinding> getPOrderStatusChart();
 	POrder createPOrder(POrder_Req porder_req, GpayUser user);
 	List<POrder> getby_offer(Long pcontract_poid_link, Long productid_link, Long orgid_link);
 	public List<POrder> getPOrderBySearch(

@@ -1323,6 +1323,23 @@ public class POrderAPI {
 		}    			
 	}
 	
+	@RequestMapping(value = "/getPOrderStatusChart",method = RequestMethod.POST)
+	public ResponseEntity<POrder_getForChart_response> getPOrderStatusChart(HttpServletRequest request) {
+		POrder_getForChart_response response = new POrder_getForChart_response();
+		try {
+			List<POrderBinding> list = porderService.getPOrderStatusChart();
+			response.data = list;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
+			return new ResponseEntity<POrder_getForChart_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());			
+		    return new ResponseEntity<POrder_getForChart_response>(HttpStatus.OK);
+		}    			
+	}
+	
 //	@RequestMapping(value = "/getcolor_by_porder",method = RequestMethod.POST)
 //	public ResponseEntity<get_color_by_porder_response> GetColorByPOrder(HttpServletRequest request, @RequestBody get_color_by_porder_request entity) {
 //		get_color_by_porder_response response = new get_color_by_porder_response();
