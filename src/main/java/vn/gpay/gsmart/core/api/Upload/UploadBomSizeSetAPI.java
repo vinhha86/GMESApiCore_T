@@ -174,7 +174,7 @@ public class UploadBomSizeSetAPI {
 										mes_err = "Số PO không được để là TBD. Ở dòng "+(rowNum+1) +" và cột "+ (colNum+1);
 										break;
 									}
-									List<PContract_PO> listpo = poService.getbycode_and_type_and_product(po_no, POType.PO_LINE_CONFIRMED, pcontractid_link, productid_link);
+									List<PContract_PO> listpo = poService.getbycode_and_type_and_product(po_no.trim(), POType.PO_LINE_CONFIRMED, pcontractid_link, productid_link);
 									if(listpo.size() == 0) {
 										mes_err = "Số PO '"+po_no+"' ở dòng "+(rowNum+1) +" và cột "+ (colNum+1)+" không tồn tại trong hệ thống! Bạn hãy kiểm tra lại trong hệ thống trước khi upload!";
 										break;
@@ -183,7 +183,8 @@ public class UploadBomSizeSetAPI {
 							}
 							
 							//Kiem tra ma san pham xem có trong đơn hàng hay không
-							String arr_masanpham = row.getCell(ColumnTempBom.MaSanPham).getStringCellValue();
+							colNum = ColumnTempBom.MaSanPham;
+							String arr_masanpham = commonService.getStringValue(row.getCell(ColumnTempBom.MaSanPham));
 							if(!arr_masanpham.equals("")) {
 								String[] lst_masp = arr_masanpham.split(",");
 								for(String masp : lst_masp) {
@@ -811,7 +812,7 @@ public class UploadBomSizeSetAPI {
 						}
 					}
 					catch (Exception e) {
-						mes_err = "Có lỗi ở dòng " +(rowNum+1)+" và cột "+ colNum +": "+ mes_err; 
+						mes_err = "Có lỗi ở dòng " +(rowNum+1)+" và cột "+ (colNum+1) +": "+ mes_err; 
 					}
 					finally {
 						workbook.close();
