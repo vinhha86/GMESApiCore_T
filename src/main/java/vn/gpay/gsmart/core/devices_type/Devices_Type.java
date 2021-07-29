@@ -22,6 +22,7 @@ public class Devices_Type implements Serializable{
 	private Long id;
 	private String code;
 	private String name;
+	private Boolean is_rfid;
 	public Long getId() {
 		return id;
 	}
@@ -40,6 +41,11 @@ public class Devices_Type implements Serializable{
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	
+	public Boolean getIs_rfid() {
+		return is_rfid;
+	}
+	public void setIs_rfid(Boolean is_rfid) {
+		this.is_rfid = is_rfid;
+	}
+
 }
