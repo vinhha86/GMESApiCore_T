@@ -477,11 +477,11 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 		
 		// lenh sx truoc 6 thang -> hien tai -> sau 1 thang
 		Calendar calfrom = Calendar.getInstance();
-		calfrom.add(Calendar.MONTH, -12);
+		calfrom.add(Calendar.MONTH, -1);
 //		calfrom.set(Calendar.DAY_OF_MONTH, 1);
 		Date dateFrom = GPAYDateFormat.atStartOfDay(calfrom.getTime());
 		Calendar calto = Calendar.getInstance();
-		calto.add(Calendar.MONTH, +1);
+		calto.add(Calendar.MONTH, +12);
 //		calto.set(Calendar.DAY_OF_MONTH, 1);
 		Date dateTo = GPAYDateFormat.atEndOfDay(calto.getTime());
 		
