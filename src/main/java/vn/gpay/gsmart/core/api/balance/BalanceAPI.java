@@ -161,7 +161,8 @@ public class BalanceAPI {
 							thePContractSKU.getCoSanPham(),
 							thePContractSKU.getPquantity_total(),
 							thePContractSKU.getPo_buyer(),
-							thePContractSKU.getPquantity_porder());
+							thePContractSKU.getPquantity_porder(),
+							entity.balance_limit);
 					
 //					ls_SKUBalance_Total.addAll(ls_SKUBalance);
 //		            ls_Product_Total.addAll(ls_Product);
@@ -284,7 +285,8 @@ public class BalanceAPI {
 							thePContractSKU.getCoSanPham(),
 							thePContractSKU.getPquantity_total(),
 							"", // tinh cho lenh thi khong can group theo po_buyer
-							thePContractSKU.getPquantity_porder()
+							thePContractSKU.getPquantity_porder(),
+							entity.balance_limit
 							);
 				}
 				
@@ -502,12 +504,19 @@ public class BalanceAPI {
 			String product_sku_size, 
 			Integer p_amount,
 			String po_buyer,
-			Integer p_amount_dh){
+			Integer p_amount_dh,
+			Integer balance_limit){
 		try {
 			List<PContractBOM2SKU> bom_response = bom2Service.getBOM_By_PContractSKU(pcontractid_link, product_skuid_link);
 			
 			ExecutorService executor = Executors.newFixedThreadPool(bom_response.size()+1);
 			for (PContractBOM2SKU skubom:bom_response){
+				if (balance_limit == 1) {//Chi tinh nguyen lieu
+					if (skubom.getProduct_type() >= 30 || skubom.getProduct_type() < 20) continue;
+				}
+				if (balance_limit == 2) {//Chi tinh phu lieu
+					if (skubom.getProduct_type() < 30 || skubom.getProduct_type() > 50) continue;
+				}
 				Runnable demand = new calDemand(
 						skubom,
 						ls_SKUBalance,
@@ -645,6 +654,7 @@ public class BalanceAPI {
 					newSKUBalance.setMat_sku_size_name(skubom.getCoKho());
 					newSKUBalance.setMat_sku_color_name(skubom.getTenMauNPL());
 					newSKUBalance.setMat_sku_product_typename(skubom.getProduct_typeName());
+					newSKUBalance.setMat_sku_product_typeid_link(skubom.getProduct_type());
 					
 					newSKUBalance.setMat_sku_bom_lostratio(skubom.getLost_ratio());
 					newSKUBalance.setMat_sku_bom_amount(skubom.getAmount());

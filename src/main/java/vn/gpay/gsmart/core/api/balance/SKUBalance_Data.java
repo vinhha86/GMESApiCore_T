@@ -22,6 +22,7 @@ public class SKUBalance_Data implements Serializable {
 	private String mat_sku_size_name;
 	private String mat_sku_unit_name;
 	private String mat_sku_product_typename;
+	private Integer mat_sku_product_typeid_link;
 	
 	private Float mat_sku_bom_amount;
 	private Float mat_sku_bom_lostratio;
@@ -163,6 +164,12 @@ public class SKUBalance_Data implements Serializable {
 	}
 	public void setMat_sku_product(Integer mat_sku_product) {
 		this.mat_sku_product = mat_sku_product;
+	}
+	public Integer getMat_sku_product_typeid_link() {
+		return mat_sku_product_typeid_link;
+	}
+	public void setMat_sku_product_typeid_link(Integer mat_sku_product_typeid_link) {
+		this.mat_sku_product_typeid_link = mat_sku_product_typeid_link;
 	}
 
 }
