@@ -477,13 +477,13 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 		
 		// lenh sx truoc 6 thang -> hien tai -> sau 1 thang
 		Calendar calfrom = Calendar.getInstance();
-		calfrom.add(Calendar.MONTH, -6);
-		calfrom.set(Calendar.DAY_OF_MONTH, 1);
+		calfrom.add(Calendar.MONTH, -12);
+//		calfrom.set(Calendar.DAY_OF_MONTH, 1);
 		Date dateFrom = GPAYDateFormat.atStartOfDay(calfrom.getTime());
 		Calendar calto = Calendar.getInstance();
-		calto.add(Calendar.MONTH, +2);
-		calto.set(Calendar.DAY_OF_MONTH, 1);
-		Date dateTo = GPAYDateFormat.atStartOfDay(calto.getTime());
+		calto.add(Calendar.MONTH, +1);
+//		calto.set(Calendar.DAY_OF_MONTH, 1);
+		Date dateTo = GPAYDateFormat.atEndOfDay(calto.getTime());
 		
 //		List<POrder> porder_list = repo.findByGolivedate(dateFrom, dateTo); System.out.println("porder_list " + porder_list.size());
 		
@@ -514,6 +514,7 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 				Long sum = porderBinding.getSum();
 				POrderBinding newPOrderBinding = new POrderBinding();
 				Integer status = porderBinding.getStatus();
+				String statusName = porderBinding.getStatusName();
 				switch (status) {
 					case 0:
 						newPOrderBinding.setOrgName(px.getName());
@@ -531,6 +532,33 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 						sum+=sum_running;
 						break;
 					case 6:
+						if(statusName.equals("Chậm GH (ít)")) {
+							statuses = new ArrayList<Integer>();
+							statuses.add(POrderStatus.PORDER_STATUS_FINISHED);
+							Long sum_slow = repo.findTotalByGolivedate_SlowSmall(dateFrom, dateTo, px.getId(), statuses);
+							newPOrderBinding.setOrgName(px.getName());
+							newPOrderBinding.setSum(sum_slow);
+							sum+=sum_slow;
+							break;
+						}
+						if(statusName.equals("Chậm GH (vừa)")) {
+							statuses = new ArrayList<Integer>();
+							statuses.add(POrderStatus.PORDER_STATUS_FINISHED);
+							Long sum_slow = repo.findTotalByGolivedate_SlowMedium(dateFrom, dateTo, px.getId(), statuses);
+							newPOrderBinding.setOrgName(px.getName());
+							newPOrderBinding.setSum(sum_slow);
+							sum+=sum_slow;
+							break;
+						}
+						if(statusName.equals("Chậm GH (nhiều)")) {
+							statuses = new ArrayList<Integer>();
+							statuses.add(POrderStatus.PORDER_STATUS_FINISHED);
+							Long sum_slow = repo.findTotalByGolivedate_SlowBig(dateFrom, dateTo, px.getId(), statuses);
+							newPOrderBinding.setOrgName(px.getName());
+							newPOrderBinding.setSum(sum_slow);
+							sum+=sum_slow;
+							break;
+						}
 						newPOrderBinding.setOrgName(px.getName());
 						newPOrderBinding.setSum(sum_finished);
 						sum+=sum_finished;
@@ -549,9 +577,9 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 		POrderBinding statusGranted = new POrderBinding();
 		POrderBinding statusRunning = new POrderBinding();
 		POrderBinding statusFinished = new POrderBinding();
-//		POrderBinding statusSlow_small = new POrderBinding();
-//		POrderBinding statusSlow_medium = new POrderBinding();
-//		POrderBinding statusSlow_big = new POrderBinding();
+		POrderBinding statusSlow_small = new POrderBinding();
+		POrderBinding statusSlow_medium = new POrderBinding();
+		POrderBinding statusSlow_big = new POrderBinding();
 		
 		statusFree.setPorderBinding_list(new ArrayList<POrderBinding>());
 		statusFree.setStatus(POrderStatus.PORDER_STATUS_FREE);
@@ -573,25 +601,28 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 		statusFinished.setStatusName("Đã hoàn thành");
 		statusFinished.setSum((long) 0);
 		
-//		statusSlow_small.setPorderBinding_list(new ArrayList<POrderBinding>());
-//		statusSlow_small.setStatus(POrderStatus.PORDER_STATUS_FINISHED);
-//		statusSlow_small.setStatusName("Chậm giao hàng ít");
-//		
-//		statusSlow_medium.setPorderBinding_list(new ArrayList<POrderBinding>());
-//		statusSlow_medium.setStatus(POrderStatus.PORDER_STATUS_FINISHED);
-//		statusSlow_medium.setStatusName("Chậm giao hàng vừa");
-//		
-//		statusSlow_big.setPorderBinding_list(new ArrayList<POrderBinding>());
-//		statusSlow_big.setStatus(POrderStatus.PORDER_STATUS_FINISHED);
-//		statusSlow_big.setStatusName("Chậm giao hàng nhiều");
+		statusSlow_small.setPorderBinding_list(new ArrayList<POrderBinding>());
+		statusSlow_small.setStatus(POrderStatus.PORDER_STATUS_FINISHED);
+		statusSlow_small.setStatusName("Chậm GH (ít)");
+		statusSlow_small.setSum((long) 0);
+		
+		statusSlow_medium.setPorderBinding_list(new ArrayList<POrderBinding>());
+		statusSlow_medium.setStatus(POrderStatus.PORDER_STATUS_FINISHED);
+		statusSlow_medium.setStatusName("Chậm GH (vừa)");
+		statusSlow_medium.setSum((long) 0);
+		
+		statusSlow_big.setPorderBinding_list(new ArrayList<POrderBinding>());
+		statusSlow_big.setStatus(POrderStatus.PORDER_STATUS_FINISHED);
+		statusSlow_big.setStatusName("Chậm GH (nhiều)");
+		statusSlow_big.setSum((long) 0);
 		
 		data.add(statusFree);
 		data.add(statusGranted);
 		data.add(statusRunning);
 		data.add(statusFinished);
-//		data.add(statusSlow_small);
-//		data.add(statusSlow_medium);
-//		data.add(statusSlow_big);
+		data.add(statusSlow_small);
+		data.add(statusSlow_medium);
+		data.add(statusSlow_big);
 		
 		return data;
 	}

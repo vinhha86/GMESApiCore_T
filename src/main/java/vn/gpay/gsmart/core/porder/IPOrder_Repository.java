@@ -248,4 +248,57 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 			@Param ("granttoorgid_link")final Long granttoorgid_link,
 			@Param ("statuses")final List<Integer> statuses
 			);
+	
+	@Query(value = "select count(a.id) from POrder a "
+			+ "inner join POrder_POLine b on b.porderid_link = a.id "
+			+ "inner join PContract_PO c on b.pcontract_poid_link = c.id "
+			+ "where (CAST(:golivedatefrom AS date) IS NULL or a.golivedate >= :golivedatefrom) "
+			+ "and (CAST(:golivedateto AS date) IS NULL or a.golivedate <= :golivedateto) "
+			+ "and a.granttoorgid_link = :granttoorgid_link "
+			+ "and a.status in :statuses "
+//			+ "and (c.shipdate IS NOT NULL and a.finishdate_fact IS NOT NULL) "
+			+ "and c.shipdate - a.finishdate_fact < 10 "
+			+ "and c.shipdate - a.finishdate_fact >= 5 "
+			)
+	public Long findTotalByGolivedate_SlowSmall(
+			@Param ("golivedatefrom")final Date golivedatefrom,
+			@Param ("golivedateto")final Date golivedateto,
+			@Param ("granttoorgid_link")final Long granttoorgid_link,
+			@Param ("statuses")final List<Integer> statuses
+			);
+	
+	@Query(value = "select count(a.id) from POrder a "
+			+ "inner join POrder_POLine b on b.porderid_link = a.id "
+			+ "inner join PContract_PO c on b.pcontract_poid_link = c.id "
+			+ "where (CAST(:golivedatefrom AS date) IS NULL or a.golivedate >= :golivedatefrom) "
+			+ "and (CAST(:golivedateto AS date) IS NULL or a.golivedate <= :golivedateto) "
+			+ "and a.granttoorgid_link = :granttoorgid_link "
+			+ "and a.status in :statuses "
+//			+ "and (c.shipdate IS NOT NULL and a.finishdate_fact IS NOT NULL) "
+			+ "and c.shipdate - a.finishdate_fact < 5 "
+			+ "and c.shipdate - a.finishdate_fact >= 0 "
+			)
+	public Long findTotalByGolivedate_SlowMedium(
+			@Param ("golivedatefrom")final Date golivedatefrom,
+			@Param ("golivedateto")final Date golivedateto,
+			@Param ("granttoorgid_link")final Long granttoorgid_link,
+			@Param ("statuses")final List<Integer> statuses
+			);
+	
+	@Query(value = "select count(a.id) from POrder a "
+			+ "inner join POrder_POLine b on b.porderid_link = a.id "
+			+ "inner join PContract_PO c on b.pcontract_poid_link = c.id "
+			+ "where (CAST(:golivedatefrom AS date) IS NULL or a.golivedate >= :golivedatefrom) "
+			+ "and (CAST(:golivedateto AS date) IS NULL or a.golivedate <= :golivedateto) "
+			+ "and a.granttoorgid_link = :granttoorgid_link "
+			+ "and a.status in :statuses "
+//			+ "and (c.shipdate IS NOT NULL and a.finishdate_fact IS NOT NULL) "
+			+ "and c.shipdate - a.finishdate_fact < 0 "
+			)
+	public Long findTotalByGolivedate_SlowBig(
+			@Param ("golivedatefrom")final Date golivedatefrom,
+			@Param ("golivedateto")final Date golivedateto,
+			@Param ("granttoorgid_link")final Long granttoorgid_link,
+			@Param ("statuses")final List<Integer> statuses
+			);
 }
