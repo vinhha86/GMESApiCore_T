@@ -64,6 +64,8 @@ public class PContractPO_Shipping {
 	private Integer amountstockedsum;
 	private Integer amountgiaohang;
 	private String ordercode;
+	private Integer totalpair;
+	
 	
 	
 	
@@ -432,6 +434,12 @@ public class PContractPO_Shipping {
 	}
 	public void setOrdercode(String ordercode) {
 		this.ordercode = ordercode;
+	}
+	public Integer getTotalpair() {
+		return totalpair;
+	}
+	public void setTotalpair(Integer totalpair) {
+		this.totalpair = totalpair;
 	}
 	
 }

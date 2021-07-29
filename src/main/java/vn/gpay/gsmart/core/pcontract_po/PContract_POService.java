@@ -25,6 +25,11 @@ import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.porders_poline.IPOrder_POLine_Service;
+import vn.gpay.gsmart.core.product.IProductRepository;
+import vn.gpay.gsmart.core.product.IProductService;
+import vn.gpay.gsmart.core.product.Product;
+import vn.gpay.gsmart.core.productpairing.IProductPairingService;
+import vn.gpay.gsmart.core.productpairing.ProductPairing;
 import vn.gpay.gsmart.core.stockin.IStockInService;
 import vn.gpay.gsmart.core.stockin.StockIn;
 import vn.gpay.gsmart.core.stockout.IStockOutService;
@@ -54,6 +59,8 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	@Autowired IPOrder_Product_SKU_Service porderskuService;
 	@Autowired IPOrderBOMSKU_Service porderBOMSKU_Service;
 	@Autowired ICutplanProcessingService cutplanProcessingService;
+	@Autowired IProductService productService;
+	@Autowired IProductPairingService pairService;
 
 	@Override
 	protected JpaRepository<PContract_PO, Long> getRepository() {
@@ -325,6 +332,16 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 			ship.setIsmap(po.getIsmap());
 //			ship.setOrdercode(po.getOrdercode());
 			
+			List<ProductPairing> p = pairService.getproduct_pairing_detail_bycontract(orgrootid_link, po.getPcontractid_link(), po.getProductid_link());
+			int total = 1;
+			if(p.size()>0) {
+				total = 0;
+				for(ProductPairing pair : p) {
+					total += pair.getAmount();
+				}
+			}
+			ship.setTotalpair(total);
+			
 			if(!po.getPackingnotice().equals("") && !po.getPackingnotice().equals("null") && !po.getPackingnotice().equals(null)) {
 				String[] arr_id = po.getPackingnotice().split(";");
 				List<Long> list_id = new ArrayList<Long>();
@@ -344,106 +361,106 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 				ship.setPacking_method(packing_method);
 			}
 			
-			Long pcontract_poid_link = po.getId();
-			List<POrder> porder_list = porder_line_Service.getporder_by_po(pcontract_poid_link);
+//			Long pcontract_poid_link = po.getId();
+//			List<POrder> porder_list = porder_line_Service.getporder_by_po(pcontract_poid_link);
 			
 			// SL Cắt
 			// Tính theo sl vải chính đã cắt được cho bao nhiêu sản phẩm
 			// Nếu sp dùng 2 vải chính trở lên thì lấy số lượng loại vải chính đã cắt cho sp bé nhất
-			Integer totalamountcut = 0;
-			if(porder_list.size() > 0) {
-				for(POrder porder : porder_list) {
-					Long porderid_link = porder.getId();
-					// Lấy danh sách sku của Porder
-					List<POrder_Product_SKU> porderProductSkus = porderskuService.getby_porder(porderid_link);
-					for(POrder_Product_SKU porderProductSKU : porderProductSkus) {
-						// Tìm xem sku này đã cắt được bao nhiêu chiếc
-						Long product_skuid_link = porderProductSKU.getSkuid_link();
-						
-						// Tìm danh sách các loại vải chính dùng cho sku này
-						List<Long> material_skuid_link_list = porderBOMSKU_Service.getMaterialList_By_Porder_Sku(
-								porderid_link, product_skuid_link, SkuType.SKU_TYPE_VAI
-								);
-						
-						// Mỗi loại vải dùng cho sku đã cắt được bao nhiêu chiếc, 
-						// lưu vào amountList sau đố lấy số nhỏ nhất
-						// vd sp1 vải 1 cắt 10, vải 2 cắt 5 thì tính là cắt được 5 chiếc
-						List<Integer> amountList = new ArrayList<Integer>();
-						for(Long material_skuid_link : material_skuid_link_list) {
-							Integer amountcut = cutplanProcessingService.getSlCat_by_product_material_porder(
-									product_skuid_link, material_skuid_link, porderid_link );
-							amountList.add(amountcut);
-						}
-						if(amountList.size() > 0) {
-							Integer min = Collections.min(amountList);
-							totalamountcut += min;
-						}
-						if(porderid_link.equals(4020L)) {
-//							System.out.println("pcontract po ser line 375");
-//							System.out.println(amountList);
-						}
-					}
-				}
-			}
-			ship.setAmountcut(totalamountcut);
-			
-			// SL Vào chuyền, Ra chuyền, Hoàn thiện ,Đóng gói, 
-			Integer amountinputsum = 0;
-			Integer amountoutputsum = 0;
-			Integer amountpackstockedsum = 0;
-			Integer amountpackedsum = 0;
+//			Integer totalamountcut = 0;
+//			if(porder_list.size() > 0) {
+//				for(POrder porder : porder_list) {
+//					Long porderid_link = porder.getId();
+//					// Lấy danh sách sku của Porder
+//					List<POrder_Product_SKU> porderProductSkus = porderskuService.getby_porder(porderid_link);
+//					for(POrder_Product_SKU porderProductSKU : porderProductSkus) {
+//						// Tìm xem sku này đã cắt được bao nhiêu chiếc
+//						Long product_skuid_link = porderProductSKU.getSkuid_link();
+//						
+//						// Tìm danh sách các loại vải chính dùng cho sku này
+//						List<Long> material_skuid_link_list = porderBOMSKU_Service.getMaterialList_By_Porder_Sku(
+//								porderid_link, product_skuid_link, SkuType.SKU_TYPE_VAI
+//								);
+//						
+//						// Mỗi loại vải dùng cho sku đã cắt được bao nhiêu chiếc, 
+//						// lưu vào amountList sau đố lấy số nhỏ nhất
+//						// vd sp1 vải 1 cắt 10, vải 2 cắt 5 thì tính là cắt được 5 chiếc
+//						List<Integer> amountList = new ArrayList<Integer>();
+//						for(Long material_skuid_link : material_skuid_link_list) {
+//							Integer amountcut = cutplanProcessingService.getSlCat_by_product_material_porder(
+//									product_skuid_link, material_skuid_link, porderid_link );
+//							amountList.add(amountcut);
+//						}
+//						if(amountList.size() > 0) {
+//							Integer min = Collections.min(amountList);
+//							totalamountcut += min;
+//						}
+//						if(porderid_link.equals(4020L)) {
+////							System.out.println("pcontract po ser line 375");
+////							System.out.println(amountList);
+//						}
+//					}
+//				}
+//			}
+//			ship.setAmountcut(totalamountcut);
+//			
+//			// SL Vào chuyền, Ra chuyền, Hoàn thiện ,Đóng gói, 
+//			Integer amountinputsum = 0;
+//			Integer amountoutputsum = 0;
+//			Integer amountpackstockedsum = 0;
+//			Integer amountpackedsum = 0;
+////			Integer amountstockedsum = 0;
+//			if(porder_list.size() > 0) {
+////				POrder porder = porder_list.get(0);
+//				for(POrder porder : porder_list) {
+//					Long porderid_link = porder.getId();
+//					List<POrderGrant> porderGrant_list = porderGrantService.getByOrderId(porderid_link);
+//					for(POrderGrant porderGrant : porderGrant_list) {
+//						List<POrderProcessing> porderProcessing_list = pprocessRepository.getByPOrderAndPOrderGrantAndMaxDate(porderid_link, porderGrant.getId());
+//						if(porderProcessing_list.size() > 0) {
+//							POrderProcessing porderProcessing = porderProcessing_list.get(0);
+//							amountinputsum += porderProcessing.getAmountinputsum() == null ? 0 : porderProcessing.getAmountinputsum();
+//							amountoutputsum += porderProcessing.getAmountoutputsum() == null ? 0 : porderProcessing.getAmountoutputsum();
+//							amountpackstockedsum += porderProcessing.getAmountpackstockedsum() == null ? 0 : porderProcessing.getAmountpackstockedsum();
+//							amountpackedsum += porderProcessing.getAmountpackedsum() == null ? 0 : porderProcessing.getAmountpackedsum();
+////							amountstockedsum += porderProcessing.getAmountstockedsum() == null ? 0 : porderProcessing.getAmountstockedsum();
+//						}
+//					}
+//				}
+//			}
+//			ship.setAmountinputsum(amountinputsum);
+//			ship.setAmountoutputsum(amountoutputsum);
+//			ship.setAmountpackstockedsum(amountpackstockedsum);
+//			ship.setAmountpackedsum(amountpackedsum);
+////			ship.setAmountstockedsum(amountstockedsum);
+//			
+//			// Thành phẩm
 //			Integer amountstockedsum = 0;
-			if(porder_list.size() > 0) {
-//				POrder porder = porder_list.get(0);
-				for(POrder porder : porder_list) {
-					Long porderid_link = porder.getId();
-					List<POrderGrant> porderGrant_list = porderGrantService.getByOrderId(porderid_link);
-					for(POrderGrant porderGrant : porderGrant_list) {
-						List<POrderProcessing> porderProcessing_list = pprocessRepository.getByPOrderAndPOrderGrantAndMaxDate(porderid_link, porderGrant.getId());
-						if(porderProcessing_list.size() > 0) {
-							POrderProcessing porderProcessing = porderProcessing_list.get(0);
-							amountinputsum += porderProcessing.getAmountinputsum() == null ? 0 : porderProcessing.getAmountinputsum();
-							amountoutputsum += porderProcessing.getAmountoutputsum() == null ? 0 : porderProcessing.getAmountoutputsum();
-							amountpackstockedsum += porderProcessing.getAmountpackstockedsum() == null ? 0 : porderProcessing.getAmountpackstockedsum();
-							amountpackedsum += porderProcessing.getAmountpackedsum() == null ? 0 : porderProcessing.getAmountpackedsum();
-//							amountstockedsum += porderProcessing.getAmountstockedsum() == null ? 0 : porderProcessing.getAmountstockedsum();
-						}
-					}
-				}
-			}
-			ship.setAmountinputsum(amountinputsum);
-			ship.setAmountoutputsum(amountoutputsum);
-			ship.setAmountpackstockedsum(amountpackstockedsum);
-			ship.setAmountpackedsum(amountpackedsum);
+//			List<StockIn> stockin_list = stockInService.findByPO_Type_Status(
+//					po.getId(), StockinType.STOCKIN_TYPE_TP_NEW, StockinStatus.STOCKIN_STATUS_APPROVED
+//					);
+//			if(stockin_list.size() > 0) {
+//				for(StockIn stockin : stockin_list) {
+//					amountstockedsum += stockin.getTotalpackage();
+//				}
+//			}
 //			ship.setAmountstockedsum(amountstockedsum);
-			
-			// Thành phẩm
-			Integer amountstockedsum = 0;
-			List<StockIn> stockin_list = stockInService.findByPO_Type_Status(
-					po.getId(), StockinType.STOCKIN_TYPE_TP_NEW, StockinStatus.STOCKIN_STATUS_APPROVED
-					);
-			if(stockin_list.size() > 0) {
-				for(StockIn stockin : stockin_list) {
-					amountstockedsum += stockin.getTotalpackage();
-				}
-			}
-			ship.setAmountstockedsum(amountstockedsum);
-			
-			// SL Giao hàng
-			Integer amountgiaohang = 0;
-			List<StockOut> stockOut_list = stockOutService.findByPO_Type_Status(
-					po.getId(), StockoutTypes.STOCKOUT_TYPE_TP_PO, StockoutStatus.STOCKOUT_STATUS_APPROVED
-					);
-			for(StockOut stockout : stockOut_list) {
-				List<StockOutD> StockOutD_list = stockout.getStockoutd();
-				for(StockOutD stockOutD : StockOutD_list) {
-					List<StockOutPklist> stockOutPklist_list = stockOutD.getStockout_packinglist();
-					if(stockOutPklist_list != null) {
-						amountgiaohang += stockOutPklist_list.size();
-					}
-				}
-			}
-			ship.setAmountgiaohang(amountgiaohang);
+//			
+//			// SL Giao hàng
+//			Integer amountgiaohang = 0;
+//			List<StockOut> stockOut_list = stockOutService.findByPO_Type_Status(
+//					po.getId(), StockoutTypes.STOCKOUT_TYPE_TP_PO, StockoutStatus.STOCKOUT_STATUS_APPROVED
+//					);
+//			for(StockOut stockout : stockOut_list) {
+//				List<StockOutD> StockOutD_list = stockout.getStockoutd();
+//				for(StockOutD stockOutD : StockOutD_list) {
+//					List<StockOutPklist> stockOutPklist_list = stockOutD.getStockout_packinglist();
+//					if(stockOutPklist_list != null) {
+//						amountgiaohang += stockOutPklist_list.size();
+//					}
+//				}
+//			}
+//			ship.setAmountgiaohang(amountgiaohang);
 			
 			list_shipping.add(ship);
 		}
