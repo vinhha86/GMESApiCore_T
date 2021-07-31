@@ -51,4 +51,9 @@ public interface Personnel_repository extends JpaRepository<Personel, Long>,JpaS
 			+ "where bike_number = :bike_number")
 	public List<Personel> getby_bikenumber(
 			@Param ("bike_number")final String bike_number);
+	
+	//tim personel theo ma
+	@Query("select c from Personel c where c.code = :personnel_code")
+	public Personel getPersonelBycode (
+			@Param ("personnel_code") final String personnel_code);
 }

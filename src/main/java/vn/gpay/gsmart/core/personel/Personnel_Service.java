@@ -80,5 +80,10 @@ public class Personnel_Service extends AbstractService<Personel> implements IPer
 		// TODO Auto-generated method stub
 		return repo.getby_bikenumber(bike_number);
 	}
+	@Override
+	public Personel getPersonelBycode(String personnel_code) {
+		// TODO Auto-generated method stub
+		return repo.getPersonelBycode(personnel_code);
+	}
 
 }

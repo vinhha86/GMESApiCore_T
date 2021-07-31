@@ -67,6 +67,9 @@ public class GpayUser implements UserDetails {
 	private String tel_office;
 	private Long org_grant_id_link;
 	
+	//them truong
+	private String personnel_code;
+	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
 	//@BatchSize(size=10
@@ -357,5 +360,13 @@ public class GpayUser implements UserDetails {
 
 	public void setOrg_grant_id_link(Long org_grant_id_link) {
 		this.org_grant_id_link = org_grant_id_link;
+	}
+
+	public String getPersonnel_code() {
+		return personnel_code;
+	}
+
+	public void setPersonnel_code(String personnel_code) {
+		this.personnel_code = personnel_code;
 	}
 }

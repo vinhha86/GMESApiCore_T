@@ -94,4 +94,9 @@ public class GpayUserImpl  extends AbstractService<GpayUser> implements IGpayUse
 		List<GpayUser> list = repository.findAll(specification,sort);
 	    return list;
 	}
+	@Override
+	public List<GpayUser> getUserBycode_Personel(String personnel_code, Long id) {
+		// TODO Auto-generated method stub
+		return repository.getUserBycode_Personel(personnel_code, id);
+	}
 }

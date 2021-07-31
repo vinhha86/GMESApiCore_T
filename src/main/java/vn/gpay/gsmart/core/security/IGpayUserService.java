@@ -17,4 +17,7 @@ public interface IGpayUserService extends Operations<GpayUser>{
     		String username, Long groupuserid_link);
 
 	List<GpayUser> getUserinOrgid(List<Org> listorg);
+	
+	//lấy danh sách user theo mã nhân viên, không chứa id truyền vào
+	public  List<GpayUser> getUserBycode_Personel(String personnel_code, Long id);
 }

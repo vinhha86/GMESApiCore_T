@@ -44,6 +44,8 @@ import vn.gpay.gsmart.core.menu.UserMenu;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract.IPContractService;
+import vn.gpay.gsmart.core.personel.IPersonnel_Service;
+import vn.gpay.gsmart.core.personel.Personel;
 import vn.gpay.gsmart.core.security.GpayAuthentication;
 import vn.gpay.gsmart.core.security.GpayRole;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -70,6 +72,7 @@ public class UserAPI {
 	@Autowired IAppFunctionService appfuncService;
 	@Autowired IPContractService pcontractService;
 	@Autowired IGpayUserOrgService userOrgService;
+	@Autowired IPersonnel_Service personnelService;
 	
 	@RequestMapping(value = "/user_create",method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> GetSkuByCode( @RequestBody UserCreateRequest entity,HttpServletRequest request ) {
@@ -338,7 +341,32 @@ public class UserAPI {
 	public ResponseEntity<UserResponse> UserUpdatet( @RequestBody User_update_request entity,HttpServletRequest request ) {
 		UserResponse response = new UserResponse();
 		try {
+			
 			GpayUser appuser = userDetailsService.findOne(entity.user.getId());
+			
+		
+			//TH mã trường nhân viên ngoài view có dữ liệu
+			String personel_code = entity.user.getPersonnel_code();
+			if(personel_code != null ) {
+				//kiểm tra mã nhân viên đã bị trùng trong bảng app_user không
+				//danh sách user theo mã nhân viên và không chứa id truyền vào
+				List<GpayUser> lstuser = userDetailsService.getUserBycode_Personel(personel_code, entity.user.getId());
+				//nếu có phần tử trong danh sách thì không được thêm return luôn
+				if(lstuser.size() != 0) {
+					response.setMessage("Mã nhân viên đã trùng!");
+					return new ResponseEntity<UserResponse>(response,HttpStatus.OK);
+				}
+				//kiểm tra mã nhân viên có tồn tại trong bảng personnel không
+				// nhân viên theo mã nhân viên truyền vào
+				Personel personel = personnelService.getPersonelBycode(personel_code);
+				//nếu trống thì -> mã nhân viên không tồn tại return
+				if (personel == null) {
+					response.setMessage("Mã nhân viên không tồn tại!");
+					return new ResponseEntity<UserResponse>(response,HttpStatus.OK);
+				}
+			}
+			
+			
 			appuser.setEmail(entity.user.getEmail());
 			appuser.setFirstname(entity.user.getFirstname());
 			appuser.setMiddlename(entity.user.getMiddlename());
@@ -348,7 +376,7 @@ public class UserAPI {
 			appuser.setTel_office(entity.user.getTel_office());
 			appuser.setStatus(entity.user.getStatus());
 			appuser.setOrg_grant_id_link(entity.user.getOrg_grant_id_link());
-			
+			appuser.setPersonnel_code(personel_code);
 			//update lai Orgtype cua User
 			Org userorg = orgService.findOne(null!=entity.user.getOrg_grant_id_link()?entity.user.getOrg_grant_id_link():entity.user.getOrgid_link());
 			if (null != userorg){
