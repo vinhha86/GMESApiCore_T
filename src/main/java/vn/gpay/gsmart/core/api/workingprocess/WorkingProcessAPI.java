@@ -118,4 +118,20 @@ public class WorkingProcessAPI {
 		    return new ResponseEntity<create_workingprocess_response>(response, HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/delete",method = RequestMethod.POST)
+	public ResponseEntity<workingprocess_delete_response> Delete(HttpServletRequest request, @RequestBody workingprocess_delete_reques entity ) {
+		workingprocess_delete_response response = new workingprocess_delete_response();
+		try {
+			workingprocessService.deleteById(entity.id);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<workingprocess_delete_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<workingprocess_delete_response>(response, HttpStatus.OK);
+		}
+	}
 }
