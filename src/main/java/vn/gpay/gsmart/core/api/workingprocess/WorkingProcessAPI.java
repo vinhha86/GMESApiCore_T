@@ -98,10 +98,14 @@ public class WorkingProcessAPI {
 			long orgrootid_link = user.getRootorgid_link();
 			
 			WorkingProcess wp = entity.data;
-			wp.setUsercreatedid_link(user.getId());
-			wp.setTimecreated(new Date());
-			wp.setOrgrootid_link(orgrootid_link);
-			wp.setProcess_type(1);
+			
+			if(wp.getId() == null) {
+				wp.setUsercreatedid_link(user.getId());
+				wp.setTimecreated(new Date());
+				wp.setOrgrootid_link(orgrootid_link);
+				wp.setProcess_type(1);
+			}
+			
 			
 			response.data = workingprocessService.save(wp);
 			
