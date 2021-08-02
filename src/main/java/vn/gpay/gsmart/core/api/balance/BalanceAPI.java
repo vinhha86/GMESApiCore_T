@@ -616,16 +616,18 @@ public class BalanceAPI {
 				SKUBalance_Data theSKUBalance = ls_SKUBalance.stream().filter(sku -> sku.getMat_skuid_link().equals(skubom.getMaterial_skuid_link())).findAny().orElse(null);
 				if (null!=theSKUBalance){
 					//Tinh tong dinh muc
-					Float f_skudemand =skubom.getAmount()*p_amount;
-					Float f_lost = (f_skudemand*skubom.getLost_ratio())/100;
+					Float f_skudemand =skubom.getAmount()*p_amount*skubom.getLost_ratio();
+					Float f_skudemand_dh =skubom.getAmount()*p_amount_dh*skubom.getLost_ratio();
+//					Float f_lost = (f_skudemand*skubom.getLost_ratio())/100;
 					
 					//Tinh trung binh dinh muc
 					Float f_skubomamount = (theSKUBalance.getMat_sku_bom_amount() + skubom.getAmount())/2;
 					theSKUBalance.setMat_sku_bom_amount(f_skubomamount);
 					
-					theSKUBalance.setMat_sku_demand(theSKUBalance.getMat_sku_demand() + f_skudemand + f_lost);
+					theSKUBalance.setMat_sku_demand(theSKUBalance.getMat_sku_demand() + f_skudemand);
 					theSKUBalance.setMat_sku_product_total(theSKUBalance.getMat_sku_product_total() + p_amount);
 					theSKUBalance.setMat_sku_product(theSKUBalance.getMat_sku_product()+ p_amount_dh);
+					theSKUBalance.setMat_sku_demand_dh(theSKUBalance.getMat_sku_demand_dh() + f_skudemand_dh);
 					
 					//Thong tin chi tiet mau co
 					SKUBalance_Product_D_Data product_d = new SKUBalance_Product_D_Data();
@@ -636,7 +638,8 @@ public class BalanceAPI {
 					product_d.setP_amount(p_amount);
 					product_d.setP_bom_amount(skubom.getAmount());
 					product_d.setP_bom_lostratio(skubom.getLost_ratio());
-					product_d.setP_bom_demand(f_skudemand+f_lost);
+					product_d.setP_bom_demand(f_skudemand);
+					product_d.setP_bom_demand_dh(f_skudemand_dh);
 					product_d.setPo_buyer(po_buyer);
 					product_d.setP_amount_dh(p_amount_dh);
 					theSKUBalance.getProduct_d().add(product_d);
@@ -659,9 +662,11 @@ public class BalanceAPI {
 					newSKUBalance.setMat_sku_bom_lostratio(skubom.getLost_ratio());
 					newSKUBalance.setMat_sku_bom_amount(skubom.getAmount());
 					
-					Float f_skudemand =skubom.getAmount()*p_amount;
-					Float f_lost = (f_skudemand*skubom.getLost_ratio())/100;
-					newSKUBalance.setMat_sku_demand(f_skudemand + f_lost);
+					Float f_skudemand =skubom.getAmount()*p_amount*skubom.getLost_ratio();
+					Float f_skudemand_dh = skubom.getAmount()*p_amount_dh*skubom.getLost_ratio();
+//					Float f_lost = (f_skudemand*skubom.getLost_ratio())/100;
+					newSKUBalance.setMat_sku_demand(f_skudemand);
+					newSKUBalance.setMat_sku_demand_dh(f_skudemand_dh);
 					
 					//Thong tin chi tiet mau co
 					SKUBalance_Product_D_Data product_d = new SKUBalance_Product_D_Data();
@@ -672,7 +677,8 @@ public class BalanceAPI {
 					product_d.setP_amount(p_amount);
 					product_d.setP_bom_amount(skubom.getAmount());
 					product_d.setP_bom_lostratio(skubom.getLost_ratio());
-					product_d.setP_bom_demand(f_skudemand+f_lost);
+					product_d.setP_bom_demand(f_skudemand);
+					product_d.setP_bom_demand_dh(f_skudemand_dh);
 					product_d.setPo_buyer(po_buyer);
 					product_d.setP_amount_dh(p_amount_dh);
 					newSKUBalance.getProduct_d().add(product_d);

@@ -16,6 +16,8 @@ public class SKUBalance_Product_D_Data implements Serializable {
 	private Float p_bom_demand;
 	private String po_buyer;
 	private Integer p_amount_dh;
+	private Float p_bom_demand_dh;
+	
 	
 	
 	
@@ -90,6 +92,12 @@ public class SKUBalance_Product_D_Data implements Serializable {
 	}
 	public void setP_amount_dh(Integer p_amount_dh) {
 		this.p_amount_dh = p_amount_dh;
+	}
+	public Float getP_bom_demand_dh() {
+		return p_bom_demand_dh;
+	}
+	public void setP_bom_demand_dh(Float p_bom_demand_dh) {
+		this.p_bom_demand_dh = p_bom_demand_dh;
 	}
 
 

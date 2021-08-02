@@ -34,6 +34,8 @@ public class SKUBalance_Data implements Serializable {
 	private Float mat_sku_stockout;
 	private Float mat_sku_dif;
 	private Integer mat_sku_product;
+	private Float mat_sku_demand_dh;
+	
 	
 	
 	
@@ -170,6 +172,12 @@ public class SKUBalance_Data implements Serializable {
 	}
 	public void setMat_sku_product_typeid_link(Integer mat_sku_product_typeid_link) {
 		this.mat_sku_product_typeid_link = mat_sku_product_typeid_link;
+	}
+	public Float getMat_sku_demand_dh() {
+		return mat_sku_demand_dh;
+	}
+	public void setMat_sku_demand_dh(Float mat_sku_demand_dh) {
+		this.mat_sku_demand_dh = mat_sku_demand_dh;
 	}
 
 }
