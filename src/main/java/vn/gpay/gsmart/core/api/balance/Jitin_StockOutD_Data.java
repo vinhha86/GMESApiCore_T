@@ -55,6 +55,7 @@ public class Jitin_StockOutD_Data implements Serializable {
 	public String hsname;
 	public String unit_name;
 	private String data_spaces;
+	private Boolean isPklistNotInStore;
 	
 	private List<Jitin_StockOutPklist_Data>  stockout_packinglist  = new ArrayList<>();
 
@@ -432,6 +433,14 @@ public class Jitin_StockOutD_Data implements Serializable {
 
 	public void setData_spaces(String data_spaces) {
 		this.data_spaces = data_spaces;
+	}
+
+	public Boolean getIsPklistNotInStore() {
+		return isPklistNotInStore;
+	}
+
+	public void setIsPklistNotInStore(Boolean isPklistNotInStore) {
+		this.isPklistNotInStore = isPklistNotInStore;
 	}
 	
 }

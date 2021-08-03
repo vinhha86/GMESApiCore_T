@@ -49,6 +49,7 @@ public class Jitin_Stockin_D_Data implements Serializable {
     private String sku_product_color;
     private String size_name;
     private String stockinDLot;
+    private Boolean isPklistInStore;
 
     private List<Jitin_Stockin_PkList_Data> stockin_packinglist = new ArrayList<>();
     @JsonIgnoreProperties
@@ -382,6 +383,14 @@ public class Jitin_Stockin_D_Data implements Serializable {
 
 	public void setSku_product_color(String sku_product_color) {
 		this.sku_product_color = sku_product_color;
+	}
+
+	public Boolean getIsPklistInStore() {
+		return isPklistInStore;
+	}
+
+	public void setIsPklistInStore(Boolean isPklistInStore) {
+		this.isPklistInStore = isPklistInStore;
 	}
     
 }
