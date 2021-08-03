@@ -128,7 +128,10 @@ public class Personel implements Serializable {
 	
 	@Transient
 	public String getOrgGrantName() {
-		return orgManage.getCode() + " - "+ org.getCode();
+		if(orgManage!=null && org != null) {
+			return orgManage.getCode() + " - "+ org.getCode();
+		}
+		return "";
 	}
 	
 	
