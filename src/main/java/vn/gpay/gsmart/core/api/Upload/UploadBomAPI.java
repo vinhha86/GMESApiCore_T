@@ -182,7 +182,8 @@ public class UploadBomAPI {
 							}
 							
 							//Kiem tra ma san pham xem có trong đơn hàng hay không
-							String arr_masanpham = row.getCell(ColumnTempBom.MaSanPham).getStringCellValue();
+							colNum = ColumnTempBom.MaSanPham;
+							String arr_masanpham = commonService.getStringValue(row.getCell(ColumnTempBom.MaSanPham));
 							if(!arr_masanpham.equals("")) {
 								String[] lst_masp = arr_masanpham.split(",");
 								for(String masp : lst_masp) {
@@ -799,7 +800,7 @@ public class UploadBomAPI {
 						}
 					}
 					catch (Exception e) {
-						mes_err = "Có lỗi ở dòng " +(rowNum+1)+" và cột "+ colNum +": "+ mes_err; 
+						mes_err = "Có lỗi ở dòng " +(rowNum+1)+" và cột "+ (colNum+1) +": "+ mes_err; 
 					}
 					finally {
 						workbook.close();

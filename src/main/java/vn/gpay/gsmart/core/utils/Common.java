@@ -900,7 +900,7 @@ public class Common  {
 	}
 	
 	public String gettypename_npl_by_id(int typeid) {
-		String type = "";
+		String type = "Other";
 		switch (typeid) {
 		case 30:
 			type = "SEWING";
