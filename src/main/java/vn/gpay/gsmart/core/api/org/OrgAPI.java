@@ -114,6 +114,7 @@ public class OrgAPI {
 			list.add("14");
 			list.add("17");
 			list.add("4");
+			list.add("19");
 			
 			List<Org> ls_tosx = orgService.findChildByListType(user.getRootorgid_link(),entity.id,list);
 	    	
