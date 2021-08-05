@@ -95,7 +95,7 @@ public class PContract_PO implements Serializable {/**
 	private Integer po_typeid_link;
 	private String comment;
 	private Boolean ismap;
-	
+	private String dc;
 	
 	
 	public Integer getPo_typeid_link() {
@@ -886,6 +886,14 @@ public class PContract_PO implements Serializable {/**
 
 	public void setIsmap(Boolean ismap) {
 		this.ismap = ismap;
+	}
+
+	public String getDc() {
+		return dc;
+	}
+
+	public void setDc(String dc) {
+		this.dc = dc;
 	}
 	
 	
