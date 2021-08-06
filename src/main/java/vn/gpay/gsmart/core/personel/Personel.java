@@ -58,6 +58,19 @@ public class Personel implements Serializable {
 	private Long sallevelid_link;
 	private String bike_number;
 	private Boolean isbike;
+	private Date date_startworking; //ngày vào công ty
+	private Date date_endworking; // ngày nghỉ việc
+	private String reason; // lý do nghỉ việc
+	private Date date_probation_contract; //ngày kí hợp đồng thử việc
+	private Date date_limit_contract; //ngày kí hợp đồng có thời hạn
+	private Date date_unlimit_contract; // ngày kí hợp đồng không có thời hạn
+	private Date date_insurance; //ngày đóng bảo hiểm
+	private String village; //Thôn. xóm
+	private Date dateof_idnumber;//ngày cấp chứng minh thư
+	private String place_idnumber; //nơi cấp chứng minh thư
+	private String healthinfo;// loại sức khỏe
+	private String insurance_number;//số sổ bảo hiểm
+	
 	
 	
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -320,6 +333,78 @@ public class Personel implements Serializable {
 	}
 	public void setIsbike(Boolean isbike) {
 		this.isbike = isbike;
+	}
+	public Date getDate_startworking() {
+		return date_startworking;
+	}
+	public void setDate_startworking(Date date_startworking) {
+		this.date_startworking = date_startworking;
+	}
+	public Date getDate_endworking() {
+		return date_endworking;
+	}
+	public void setDate_endworking(Date date_endworking) {
+		this.date_endworking = date_endworking;
+	}
+	public String getReason() {
+		return reason;
+	}
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
+	public Date getDate_probation_contract() {
+		return date_probation_contract;
+	}
+	public void setDate_probation_contract(Date date_probation_contract) {
+		this.date_probation_contract = date_probation_contract;
+	}
+	public Date getDate_limit_contract() {
+		return date_limit_contract;
+	}
+	public void setDate_limit_contract(Date date_limit_contract) {
+		this.date_limit_contract = date_limit_contract;
+	}
+	public Date getDate_unlimit_contract() {
+		return date_unlimit_contract;
+	}
+	public void setDate_unlimit_contract(Date date_unlimit_contract) {
+		this.date_unlimit_contract = date_unlimit_contract;
+	}
+	public Date getDate_insurance() {
+		return date_insurance;
+	}
+	public void setDate_insurance(Date date_insurance) {
+		this.date_insurance = date_insurance;
+	}
+	public String getVillage() {
+		return village;
+	}
+	public void setVillage(String village) {
+		this.village = village;
+	}
+	public Date getDateof_idnumber() {
+		return dateof_idnumber;
+	}
+	public void setDateof_idnumber(Date dateof_idnumber) {
+		this.dateof_idnumber = dateof_idnumber;
+	}
+	public String getHealthinfo() {
+		return healthinfo;
+	}
+	public void setHealthinfo(String healthinfo) {
+		this.healthinfo = healthinfo;
+	}
+	public String getInsurance_number() {
+		return insurance_number;
+	}
+	public void setInsurance_number(String insurance_number) {
+		this.insurance_number = insurance_number;
+	}
+	public String getPlace_idnumber() {
+		return place_idnumber;
+	}
+	public void setPlace_idnumber(String place_idnumber) {
+		this.place_idnumber = place_idnumber;
 	}
 	
 	

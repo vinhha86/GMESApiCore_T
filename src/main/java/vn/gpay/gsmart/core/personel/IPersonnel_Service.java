@@ -15,4 +15,7 @@ public interface IPersonnel_Service extends Operations<Personel> {
 	List<Personel> getby_bikenumber(String bike_number);
 	//lay personel theo ma
 	public Personel getPersonelBycode(String personnel_code);
+	//lấy danh sách nhân viên theo mã nhân viên,không chứa id truyền vào
+	public List<Personel> getPersonelByCode_Id_Personel(String code,Long id);
+	
 }

@@ -85,5 +85,12 @@ public class Personnel_Service extends AbstractService<Personel> implements IPer
 		// TODO Auto-generated method stub
 		return repo.getPersonelBycode(personnel_code);
 	}
+	
+	//lấy danh sách nhân viên không chưa id truyền vào,theo mã nhân viên
+	@Override
+	public List<Personel> getPersonelByCode_Id_Personel(String code, Long id) {
+		// TODO Auto-generated method stub
+		return repo.getPersonelByCode_Id_Personel(code, id);
+	}
 
 }

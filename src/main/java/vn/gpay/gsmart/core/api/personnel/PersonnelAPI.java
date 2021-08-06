@@ -422,6 +422,15 @@ public class PersonnelAPI {
 			boolean isUpdateBikeNumber = false;
 			
 			Personel person = entity.data;
+			
+			//kiểm tra trùng mã nhân viên trước khi lưu
+			Long id = person.getId() == null ? 0 : person.getId();
+			List<Personel> lst = personService.getPersonelByCode_Id_Personel(person.getCode(),id);
+			if( lst.size() != 0) {
+				response.setMessage("Mã nhân viên đã có sẵn.Mời nhập lại! ");
+				return new ResponseEntity<create_personnel_response>(response,HttpStatus.OK);
+			}
+			
 			Boolean isbike = person.getIsbike() == null ? false : person.getIsbike();
 			person.setIsbike(isbike);
 			if(person.getId() == null) {

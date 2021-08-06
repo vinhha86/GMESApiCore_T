@@ -56,4 +56,11 @@ public interface Personnel_repository extends JpaRepository<Personel, Long>,JpaS
 	@Query("select c from Personel c where c.code = :personnel_code")
 	public Personel getPersonelBycode (
 			@Param ("personnel_code") final String personnel_code);
+	
+	//lấy danh sách nhân viên theo mã nhân viên, không chứa id truyền vào
+	@Query(value="select c from Personel c where c.code = :code "
+			+ "and c.id <> :id")
+	public List<Personel> getPersonelByCode_Id_Personel(
+			@Param ("code") final String code,
+			@Param ("id") final Long id);
 }
