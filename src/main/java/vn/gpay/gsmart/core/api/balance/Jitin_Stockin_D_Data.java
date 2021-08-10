@@ -36,6 +36,8 @@ public class Jitin_Stockin_D_Data implements Serializable {
     private Float m3;
     private Float totalmet_origin;
     private Float totalmet_check;
+	private Float netweight_lbs;
+	private Float grossweight_lbs;
 	
     //Transient
     private String skuname;
@@ -277,6 +279,23 @@ public class Jitin_Stockin_D_Data implements Serializable {
 
 	public void setTotalmet_check(Float totalmet_check) {
 		this.totalmet_check = totalmet_check;
+	}
+	
+
+	public Float getNetweight_lbs() {
+		return netweight_lbs;
+	}
+
+	public void setNetweight_lbs(Float netweight_lbs) {
+		this.netweight_lbs = netweight_lbs;
+	}
+
+	public Float getGrossweight_lbs() {
+		return grossweight_lbs;
+	}
+
+	public void setGrossweight_lbs(Float grossweight_lbs) {
+		this.grossweight_lbs = grossweight_lbs;
 	}
 
 	public String getSkuname() {

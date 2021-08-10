@@ -44,6 +44,15 @@ public class Jitin_Stockin_PkList_Data implements Serializable {
 	private String barcode;
 	private String spaceepc_link;
 	
+	private Float yds_beforecheck;
+	private Float met_beforecheck;
+	private Float width_yds_beforecheck;
+	private Float width_met_beforecheck;
+	private Float grossweight_beforecheck;
+	private Float netweight_lbs;
+	private Float grossweight_lbs;
+	private Float grossweight_lbs_check;
+	
 	//Transient
 	private String skucode;
 	private String skuname;
@@ -53,12 +62,6 @@ public class Jitin_Stockin_PkList_Data implements Serializable {
 	private String unitname;
 	private String warning;
 	private String color_name;
-	
-	private Float yds_beforecheck;
-	private Float met_beforecheck;
-	private Float width_yds_beforecheck;
-	private Float width_met_beforecheck;
-	private Float grossweight_beforecheck;
 	
 	private String row;
 	private String space;
@@ -381,6 +384,24 @@ public class Jitin_Stockin_PkList_Data implements Serializable {
 	}
 	public void setFloor(Integer floor) {
 		this.floor = floor;
+	}
+	public Float getNetweight_lbs() {
+		return netweight_lbs;
+	}
+	public void setNetweight_lbs(Float netweight_lbs) {
+		this.netweight_lbs = netweight_lbs;
+	}
+	public Float getGrossweight_lbs() {
+		return grossweight_lbs;
+	}
+	public void setGrossweight_lbs(Float grossweight_lbs) {
+		this.grossweight_lbs = grossweight_lbs;
+	}
+	public Float getGrossweight_lbs_check() {
+		return grossweight_lbs_check;
+	}
+	public void setGrossweight_lbs_check(Float grossweight_lbs_check) {
+		this.grossweight_lbs_check = grossweight_lbs_check;
 	}
 	
 	

@@ -22,6 +22,8 @@ public class Jitin_StockinLot implements Serializable{
     private Float totalmetcheck;
     private Float grossweight;
     private Float grossweight_check;
+    private Float grossweight_lbs;
+    private Float grossweight_lbs_check;
     private Integer status;
 	private List<Jitin_StockinLotSpace>  stockin_lot_space  = new ArrayList<Jitin_StockinLotSpace>();
 	private String stockinLotSpace;
@@ -145,6 +147,18 @@ public class Jitin_StockinLot implements Serializable{
 	}
 	public void setSkucode(String skucode) {
 		this.skucode = skucode;
+	}
+	public Float getGrossweight_lbs() {
+		return grossweight_lbs;
+	}
+	public void setGrossweight_lbs(Float grossweight_lbs) {
+		this.grossweight_lbs = grossweight_lbs;
+	}
+	public Float getGrossweight_lbs_check() {
+		return grossweight_lbs_check;
+	}
+	public void setGrossweight_lbs_check(Float grossweight_lbs_check) {
+		this.grossweight_lbs_check = grossweight_lbs_check;
 	}
 
 	

@@ -78,6 +78,12 @@ public class StockinLot implements Serializable{
 	@Column(name = "grossweight_check")
     private Float grossweight_check;
 	
+	@Column(name = "grossweight_lbs")
+    private Float grossweight_lbs;
+	
+	@Column(name = "grossweight_lbs_check")
+    private Float grossweight_lbs_check;
+	
 	@Column(name = "status")
     private Integer status;
 	
@@ -259,5 +265,21 @@ public class StockinLot implements Serializable{
 	public void setStockin_lot_space(List<StockinLotSpace> stockin_lot_space) {
 		this.stockin_lot_space = stockin_lot_space;
 	}
-	
+
+	public Float getGrossweight_lbs() {
+		return grossweight_lbs;
+	}
+
+	public void setGrossweight_lbs(Float grossweight_lbs) {
+		this.grossweight_lbs = grossweight_lbs;
+	}
+
+	public Float getGrossweight_lbs_check() {
+		return grossweight_lbs_check;
+	}
+
+	public void setGrossweight_lbs_check(Float grossweight_lbs_check) {
+		this.grossweight_lbs_check = grossweight_lbs_check;
+	}
+
 }

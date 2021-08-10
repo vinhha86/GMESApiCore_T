@@ -17,7 +17,6 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import vn.gpay.gsmart.core.category.Color;
 import vn.gpay.gsmart.core.category.Unit;
 import vn.gpay.gsmart.core.sku.SKU;
 
@@ -108,6 +107,19 @@ public class StockInPklist implements Serializable {
 	private Float met_origin;
 	private Float met_check;
 	private String barcode;
+	private Integer rssi;
+	private String spaceepc_link;
+	
+	private Float yds_beforecheck;
+	private Float met_beforecheck;
+	private Float width_yds_beforecheck;
+	private Float width_met_beforecheck;
+	private Float grossweight_beforecheck;
+	
+	private Float netweight_lbs;
+	private Float grossweight_lbs;
+	private Float grossweight_lbs_check;
+	
 	//mo rong
 	public String getSkucode() {
 		if(sku!=null) {
@@ -386,6 +398,65 @@ public class StockInPklist implements Serializable {
 	public void setWidth_check(Float width_check) {
 		this.width_check = width_check;
 	}
-	
+	public Integer getRssi() {
+		return rssi;
+	}
+	public void setRssi(Integer rssi) {
+		this.rssi = rssi;
+	}
+	public String getSpaceepc_link() {
+		return spaceepc_link;
+	}
+	public void setSpaceepc_link(String spaceepc_link) {
+		this.spaceepc_link = spaceepc_link;
+	}
+	public Float getYds_beforecheck() {
+		return yds_beforecheck;
+	}
+	public void setYds_beforecheck(Float yds_beforecheck) {
+		this.yds_beforecheck = yds_beforecheck;
+	}
+	public Float getMet_beforecheck() {
+		return met_beforecheck;
+	}
+	public void setMet_beforecheck(Float met_beforecheck) {
+		this.met_beforecheck = met_beforecheck;
+	}
+	public Float getWidth_yds_beforecheck() {
+		return width_yds_beforecheck;
+	}
+	public void setWidth_yds_beforecheck(Float width_yds_beforecheck) {
+		this.width_yds_beforecheck = width_yds_beforecheck;
+	}
+	public Float getWidth_met_beforecheck() {
+		return width_met_beforecheck;
+	}
+	public void setWidth_met_beforecheck(Float width_met_beforecheck) {
+		this.width_met_beforecheck = width_met_beforecheck;
+	}
+	public Float getGrossweight_beforecheck() {
+		return grossweight_beforecheck;
+	}
+	public void setGrossweight_beforecheck(Float grossweight_beforecheck) {
+		this.grossweight_beforecheck = grossweight_beforecheck;
+	}
+	public Float getNetweight_lbs() {
+		return netweight_lbs;
+	}
+	public void setNetweight_lbs(Float netweight_lbs) {
+		this.netweight_lbs = netweight_lbs;
+	}
+	public Float getGrossweight_lbs() {
+		return grossweight_lbs;
+	}
+	public void setGrossweight_lbs(Float grossweight_lbs) {
+		this.grossweight_lbs = grossweight_lbs;
+	}
+	public Float getGrossweight_lbs_check() {
+		return grossweight_lbs_check;
+	}
+	public void setGrossweight_lbs_check(Float grossweight_lbs_check) {
+		this.grossweight_lbs_check = grossweight_lbs_check;
+	}
 	
 }
