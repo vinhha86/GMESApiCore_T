@@ -55,8 +55,8 @@ public class Dictionary_TypeAPI {
 			@RequestBody Dictionary_Type_create_request entity, HttpServletRequest request) {
 		Dictionary_Type_create_response response = new Dictionary_Type_create_response();
 		try {
-			DictionaryType devices = entity.data;
-			dictionary_typeService.save(devices);
+			DictionaryType dictionary_type = entity.data;
+			dictionary_typeService.save(dictionary_type);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 		} catch (RuntimeException e) {
@@ -78,9 +78,9 @@ public class Dictionary_TypeAPI {
 			@RequestBody Dictionary_Type_delete_request entity, HttpServletRequest request) {
 		Dictionary_Type_delete_response response = new Dictionary_Type_delete_response();
 		try {
-			// list devices_type
-			DictionaryType devices = entity.data;
-			dictionary_typeService.delete(devices);
+			// list dictionary_type
+			DictionaryType dictionary_type = entity.data;
+			dictionary_typeService.delete(dictionary_type);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 		} catch (RuntimeException e) {

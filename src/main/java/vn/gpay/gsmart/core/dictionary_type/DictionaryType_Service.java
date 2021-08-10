@@ -10,7 +10,7 @@ import vn.gpay.gsmart.core.base.AbstractService;
 
 
 @Service
-public class Dictionary_Service extends AbstractService<DictionaryType> implements IDictionaryType_Service{
+public class DictionaryType_Service extends AbstractService<DictionaryType> implements IDictionaryType_Service{
 	@Autowired IDictionaryType_Repository repo;
 
 	@Override
