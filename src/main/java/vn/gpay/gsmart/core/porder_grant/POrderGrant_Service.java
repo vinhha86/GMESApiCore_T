@@ -134,4 +134,10 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 		// TODO Auto-generated method stub
 		return repo.get_grant_change(orgid_link);
 	}
+
+	@Override
+	public Integer getProductivity_PO(Long pordergrantid_link) {
+		// TODO Auto-generated method stub
+		return repo.getProductivity_po(pordergrantid_link);
+	}
 }

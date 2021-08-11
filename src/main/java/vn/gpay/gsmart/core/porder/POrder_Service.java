@@ -26,7 +26,6 @@ import com.github.wenhao.jpa.Specifications;
 import vn.gpay.gsmart.core.base.AbstractService;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
-import vn.gpay.gsmart.core.org.OrgServiceImpl;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontract_po_productivity.IPContract_PO_Productivity_Service;

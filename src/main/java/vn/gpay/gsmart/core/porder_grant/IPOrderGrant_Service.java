@@ -28,4 +28,5 @@ public interface IPOrderGrant_Service extends Operations<POrderGrant>{
 
 	public List<POrderGrant> getgrant_contain_Day(Date holiday);
 	List<POrderGrant> get_grant_change(Long orgid_link);
+	public Integer getProductivity_PO(Long pordergrantid_link);
 }
