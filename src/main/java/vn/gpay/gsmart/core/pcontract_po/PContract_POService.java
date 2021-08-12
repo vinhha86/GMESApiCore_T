@@ -1,7 +1,6 @@
 package vn.gpay.gsmart.core.pcontract_po;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -16,31 +15,16 @@ import vn.gpay.gsmart.core.cutplan_processing.ICutplanProcessingService;
 import vn.gpay.gsmart.core.packingtype.IPackingTypeRepository;
 import vn.gpay.gsmart.core.packingtype.PackingType;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Repository;
-import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_bom_sku.IPOrderBOMSKU_Service;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
-import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
-import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
-import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.porders_poline.IPOrder_POLine_Service;
-import vn.gpay.gsmart.core.product.IProductRepository;
 import vn.gpay.gsmart.core.product.IProductService;
-import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.productpairing.IProductPairingService;
 import vn.gpay.gsmart.core.productpairing.ProductPairing;
 import vn.gpay.gsmart.core.stockin.IStockInService;
-import vn.gpay.gsmart.core.stockin.StockIn;
 import vn.gpay.gsmart.core.stockout.IStockOutService;
-import vn.gpay.gsmart.core.stockout.StockOut;
-import vn.gpay.gsmart.core.stockout.StockOutD;
-import vn.gpay.gsmart.core.stockout.StockOutPklist;
-import vn.gpay.gsmart.core.utils.SkuType;
-import vn.gpay.gsmart.core.utils.StockinStatus;
-import vn.gpay.gsmart.core.utils.StockinType;
-import vn.gpay.gsmart.core.utils.StockoutStatus;
-import vn.gpay.gsmart.core.utils.StockoutTypes;
 
 @Service
 public class PContract_POService extends AbstractService<PContract_PO> implements IPContract_POService {
@@ -276,6 +260,7 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		
 		List<PContract_PO> list_po = repo.getby_process_shipping(shipdate_from, shipdate_to, orgs, po_type, ismap);
 		List<PContractPO_Shipping> list_shipping = new ArrayList<PContractPO_Shipping>();
+		
 		for(PContract_PO po : list_po) {
 			PContractPO_Shipping ship = new PContractPO_Shipping();
 			ship.setActual_quantity(po.getActual_quantity());

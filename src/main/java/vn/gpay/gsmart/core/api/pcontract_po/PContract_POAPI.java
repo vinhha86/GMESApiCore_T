@@ -2240,6 +2240,25 @@ public class PContract_POAPI {
 			return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	@RequestMapping(value = "/delete_listline", method = RequestMethod.POST)
+	public ResponseEntity<delete_listpo_line_response> DeleteListPOLine(
+			@RequestBody delete_listpo_line_request entity, HttpServletRequest request) {
+		delete_listpo_line_response response = new delete_listpo_line_response();
+		try {
+			for(long id : entity.listid) {
+				pcontract_POService.deleteById(id);
+			}
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<delete_listpo_line_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<delete_listpo_line_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 
 	@RequestMapping(value = "/getpo_offer_accept", method = RequestMethod.POST)
 	public ResponseEntity<PContract_getbycontractproduct_response> getPOAccept(
