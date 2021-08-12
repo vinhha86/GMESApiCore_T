@@ -384,7 +384,7 @@ public class PContractAPI {
 			
 			List<Long> product = new ArrayList<Long>();
 			// Lay danh sach PO thoa man dieu kien
-			List<Long> list_product = pcontract_product_Service.getby_product(products);
+			List<Long> list_product = pcontract_product_Service.getby_product(products, entity.productbuyer_code);
 			for(Long p : list_product) {
 				product.add(p);
 			}

@@ -116,6 +116,30 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 		CriteriaQuery<PContract> cq_po = cb.createQuery(PContract.class);
 		Root<PContract> rootPcontract = cq_po.from(PContract.class);
 		List<Predicate> thePredicates = new ArrayList<>();
+		
+		// pos
+		if (pos.size() > 0) {
+			In<Long> inContractClause = cb.in(rootPcontract.get("id"));
+			for (Long thePContract : pos) {
+				inContractClause.value(thePContract);
+			}
+			thePredicates.add(cb.and(inContractClause));
+		}
+		else {
+			return null;
+		}
+		
+		// product
+		if (product.size() > 0) {
+			In<Long> inContractProductClause = cb.in(rootPcontract.get("id"));
+			for (Long p : product) {
+				inContractProductClause.value(p);
+			}
+			thePredicates.add(cb.and(inContractProductClause));
+		}
+		else {
+			return null;
+		}
 
 		// orgbuyerid_link
 		if (entity.orgbuyerid_link > 0) {
@@ -141,14 +165,7 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 			thePredicates
 					.add(cb.le(rootPcontract.get("contractbuyer").get("contract_year"), entity.contractbuyer_yearto));
 		}
-		// pos
-		if (pos.size() > 0) {
-			In<Long> inContractClause = cb.in(rootPcontract.get("id"));
-			for (Long thePContract : pos) {
-				inContractClause.value(thePContract);
-			}
-			thePredicates.add(cb.and(inContractClause));
-		}
+		
 		
 		//vendor
 		if(vendors.size()>0) {
@@ -168,14 +185,7 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 			thePredicates.add(cb.and(inBuyerClause));
 		}
 		
-		// pos
-		if (product.size() > 0) {
-			In<Long> inContractProductClause = cb.in(rootPcontract.get("id"));
-			for (Long p : product) {
-				inContractProductClause.value(p);
-			}
-			thePredicates.add(cb.and(inContractProductClause));
-		}
+		
 
 		Predicate p = cb.and(thePredicates.toArray(new Predicate[0]));
 		cq_po.where(p);

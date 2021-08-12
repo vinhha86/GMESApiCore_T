@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.pcontractproduct;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,10 @@ public class PContractProductService extends AbstractService<PContractProduct> i
 		return repo.get_by_orgcustomer(orgrootid_link, orgbuyerid_link);
 	}
 	@Override
-	public List<Long> getby_product(List<Long> product) {
+	public List<Long> getby_product(List<Long> product, String product_code) {
+		product_code = product_code == null ? "" : product_code;
+		if(!product_code.equals("") && product.size() == 0) return new ArrayList<Long>();
+		
 		product = product.size() == 0 ? null : product;
 		// TODO Auto-generated method stub
 		return repo.get_by_product(product);
