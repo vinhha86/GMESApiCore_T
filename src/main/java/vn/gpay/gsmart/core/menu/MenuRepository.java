@@ -26,4 +26,8 @@ public interface MenuRepository extends JpaRepository<Menu, String>{
 			+ "inner join AppRoleMenu b on a.id = b.menuid_link "
 			+ " where roleid_link = :roleid_link")
 	public List<Menu> getmenu_inroleid(@Param ("roleid_link")final Long roleid_link);
+	
+	//lay ds menu
+	@Query(value="select a from Menu a")
+	public List<Menu> getListMenu();
 }

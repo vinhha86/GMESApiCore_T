@@ -27,6 +27,7 @@ import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.security.GpayUserOrg;
 import vn.gpay.gsmart.core.security.IGpayUserOrgService;
 import vn.gpay.gsmart.core.security.IGpayUserService;
+import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
 @RequestMapping("/api/v1/menu")
@@ -225,4 +226,48 @@ public class MenuAPI {
 		    return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	/**
+	 * Lay ds Menu
+	 * @param entity
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/load", method = RequestMethod.POST)
+	public ResponseEntity<Menu_load_response> Menu_Load(
+			HttpServletRequest request) {
+		Menu_load_response response = new Menu_load_response();
+		try {
+			
+			response.data = menuService.getListMenu();
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+
+		} catch (RuntimeException e) {
+			response.setRespcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<Menu_load_response>(response, HttpStatus.OK);
+	}
+	/**
+	 * add
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/add", method = RequestMethod.POST)
+	public ResponseEntity<Menu_create_response> Menu_add(@RequestBody Menu_create_request entity,
+			HttpServletRequest request) {
+		Menu_create_response response = new Menu_create_response();
+		try {
+			
+			menuService.save(entity.data);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+
+		} catch (RuntimeException e) {
+			response.setRespcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<Menu_create_response>(response, HttpStatus.OK);
+	}
+	
 }
