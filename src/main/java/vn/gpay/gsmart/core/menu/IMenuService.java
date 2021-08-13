@@ -12,5 +12,4 @@ public interface IMenuService extends StringOperations<Menu>{
 	public List<MenuTree> createTree( List<Menu> nodes);
 	public List<Menu> getby_parentid(String menu_parentid);
 	public List<Menu> getMenu_byRole(long roleid_link);
-	public List<Menu> getListMenu();
 }

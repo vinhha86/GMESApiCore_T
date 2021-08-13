@@ -145,9 +145,4 @@ public class MenuServiceImpl extends StringAbstractService<Menu> implements IMen
 		return repository.getmenu_inroleid(roleid_link);
 	}
 
-	@Override
-	public List<Menu> getListMenu() {
-		// TODO Auto-generated method stub
-		return repository.getListMenu();
-	}
 }

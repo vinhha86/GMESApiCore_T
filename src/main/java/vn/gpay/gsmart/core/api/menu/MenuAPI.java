@@ -227,28 +227,6 @@ public class MenuAPI {
 		}
 	}
 	/**
-	 * Lay ds Menu
-	 * @param entity
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(value = "/load", method = RequestMethod.POST)
-	public ResponseEntity<Menu_load_response> Menu_Load(
-			HttpServletRequest request) {
-		Menu_load_response response = new Menu_load_response();
-		try {
-			
-			response.data = menuService.getListMenu();
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-
-		} catch (RuntimeException e) {
-			response.setRespcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
-			response.setMessage(e.getMessage());
-		}
-		return new ResponseEntity<Menu_load_response>(response, HttpStatus.OK);
-	}
-	/**
 	 * add
 	 * @param request
 	 * @return
