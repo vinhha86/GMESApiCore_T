@@ -2246,8 +2246,64 @@ public class PContract_POAPI {
 			@RequestBody delete_listpo_line_request entity, HttpServletRequest request) {
 		delete_listpo_line_response response = new delete_listpo_line_response();
 		try {
-			for(long id : entity.listid) {
-				pcontract_POService.deleteById(id);
+			for(PContract_PO thePO : entity.listid) {
+				List<POrder> list_porder = porderService.getByContractAndPO(thePO.getPcontractid_link(), thePO.getId());
+				//chi lay nhung lenh da keo vao bieu do
+				List<POrder> list_porder_grant = list_porder.stream().filter(item -> null!=item.getStatus() && item.getStatus() > POrderStatus.PORDER_STATUS_FREE).collect(Collectors.toList());
+				if (list_porder_grant.size() > 0) {
+					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+					response.setMessage(
+							"Hiện vẫn đang có Lệnh SX của đơn hàng đã phân chuyền! Cần hủy phân chuyền Lệnh SX trước khi xóa Line: "+ thePO.getPo_buyer());
+					return new ResponseEntity<delete_listpo_line_response>(response, HttpStatus.BAD_REQUEST);
+				}
+				
+				//Kiem tra danh sach po cua chao gia neu khong co thi cho xoa
+				List<PContract_PO> list_po = pcontract_POService.get_by_parentid(thePO.getId());
+				if(list_po.size() > 0) {
+					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+					response.setMessage(
+							"Bạn không thể xóa chào giá đã phát sinh PO hoặc line giao hàng!");
+					return new ResponseEntity<delete_listpo_line_response>(response, HttpStatus.BAD_REQUEST);
+				}
+
+				// Delete POrder_Req
+				for (POrder_Req thePOrder_Req : porder_req_Service.getByPO(thePO.getId())) {
+					porder_req_Service.delete(thePOrder_Req);
+				}
+
+				// Delete Shipping
+				for (PContract_PO_Shipping theShipping : poshippingService.getByPOID(thePO.getId())) {
+					poshippingService.delete(theShipping);
+				}
+				
+				//Delete porder 
+				List<POrder> list_porder_free = list_porder.stream().filter(item -> null!=item.getStatus() && item.getStatus() == POrderStatus.PORDER_STATUS_FREE).collect(Collectors.toList());
+				for(POrder porder : list_porder_free) {
+					porderService.delete(porder);
+				}
+				
+				//Delete sku
+				List<PContractProductSKU> listsku = ppskuService.getbypo_and_product(thePO.getId(), thePO.getProductid_link());
+				for (PContractProductSKU pContractProductSKU : listsku) {
+					ppskuService.delete(pContractProductSKU);
+				}
+
+				// Delete PO Prices
+				for (PContract_Price thePrice : thePO.getPcontract_price()) {
+					for (PContract_Price_D thePrice_D : thePrice.getPcontract_price_d()) {
+						pcontractpriceDService.delete(thePrice_D);
+					}
+					pcontractpriceService.delete(thePrice);
+				}
+				
+				//xoa producttivity
+				List<PContract_PO_Productivity> list_productivity = productivityService.getbypo(thePO.getId());
+				for (PContract_PO_Productivity productivity: list_productivity) {
+					productivityService.delete(productivity);
+				}
+
+				// Delete PO
+				pcontract_POService.delete(thePO);
 			}
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
