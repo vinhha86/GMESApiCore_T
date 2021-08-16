@@ -51,6 +51,9 @@ public class Jitin_StockOutPklist_Data implements Serializable {
 	private String warning;
 	private String unitname;
 	private Integer warehousestatus;
+	private String invoice;
+	private Date ngayNhapKho;
+	
 	
 	private Float met_remain;
 	private Float yds_remain;
@@ -344,6 +347,18 @@ public class Jitin_StockOutPklist_Data implements Serializable {
 	}
 	public void setYds_remain_and_check(Float yds_remain_and_check) {
 		this.yds_remain_and_check = yds_remain_and_check;
+	}
+	public String getInvoice() {
+		return invoice;
+	}
+	public void setInvoice(String invoice) {
+		this.invoice = invoice;
+	}
+	public Date getNgayNhapKho() {
+		return ngayNhapKho;
+	}
+	public void setNgayNhapKho(Date ngayNhapKho) {
+		this.ngayNhapKho = ngayNhapKho;
 	}
 
 }
