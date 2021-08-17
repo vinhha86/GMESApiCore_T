@@ -133,4 +133,24 @@ public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecification
 	public List<Org> findOrgByTypeBanCat(
 			@Param ("parentid_link")final Long parentid_link
 			);
+	
+	//lay org -huyen theo ten tinh, ten huyen,orgtypeid_link - name,orgtypeid_link,parentid_link
+	@Query(value = "select c from Org c "
+			+ "where c.orgtypeid_link = :orgtypeid_link " 
+			+ "and trim(lower(replace(c.name,' ',''))) = trim(lower(replace(:name, ' ',''))) "
+			+ "and c.parentid_link = :parentid_link "
+			)
+	public Org getByNameAndTypeAndParentid_link(
+			@Param ("name")final String name,
+			@Param ("orgtypeid_link")final Integer orgtypeid_link,
+			@Param ("parentid_link")final Long parentid_link
+			);
+	//lay org (bo phan) theo ma va don vi quan ly - code,parentid_link
+	@Query(value = "select c from Org c "
+			+ "where c.parentid_link = :parentid_link "
+			+ "and trim(lower(replace(c.code,' ',''))) = trim(lower(replace(:code, ' ',''))) " )
+	public Org getByCodeAndParentid_link(
+			@Param ("code")final String code,
+			@Param ("parentid_link")final Long parentid_link
+			);
 }

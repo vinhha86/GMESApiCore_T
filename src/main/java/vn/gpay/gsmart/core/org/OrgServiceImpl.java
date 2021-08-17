@@ -365,4 +365,16 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 	public List<Org> findOrgByTypeBanCat(Long parentid_link) {
 		return repositoty.findOrgByTypeBanCat(parentid_link);
 	}
+	//lay org theo name,orgtypeid_link,parentid_link
+	@Override
+	public Org getByNameAndTypeAndParentid_link(String name, Integer orgtypeid_link, Long parentid_link) {
+		// TODO Auto-generated method stub
+		return repositoty.getByNameAndTypeAndParentid_link(name, orgtypeid_link, parentid_link);
+	}
+	//lay org theo code,parentid_link
+	@Override
+	public Org getByCodeAndParentid_link(String code, Long parentid_link) {
+		// TODO Auto-generated method stub
+		return repositoty.getByCodeAndParentid_link(code, parentid_link);
+	}
 }
