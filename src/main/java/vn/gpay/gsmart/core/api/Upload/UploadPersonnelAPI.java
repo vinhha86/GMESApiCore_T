@@ -17,6 +17,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,6 +29,7 @@ import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.personel.IPersonnel_Service;
 import vn.gpay.gsmart.core.personel.Personel;
+import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ColumnPersonnel;
 import vn.gpay.gsmart.core.utils.ColumnTemplate;
 import vn.gpay.gsmart.core.utils.Common;
@@ -44,12 +46,14 @@ public class UploadPersonnelAPI {
 
 	@RequestMapping(value = "/personnel", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadPersonnel(HttpServletRequest request,
-			@RequestParam("file") MultipartFile file) {
+			@RequestParam("file") MultipartFile file,@RequestParam("orgmanageid_link") long orgmanageid_link) {
 		ResponseBase response = new ResponseBase();
 		Date current_time = new Date();
 		String name = "";
 		String mes_err = "";
 		Personel person = new Personel();
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Long orgrootid_link = user.getRootorgid_link();
 		try {
 			String FolderPath = "upload/personnel";
 			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
@@ -73,20 +77,9 @@ public class UploadPersonnelAPI {
 
 				int rowNum = 1;
 				int colNum = 1;
-				Long orgmanageid_link = null ;
+				
 				Row row = sheet.getRow(rowNum);
-				String sheet_name = sheet.getSheetName().toLowerCase();
-				switch(sheet_name) {
-				case "x1":
-					orgmanageid_link = (long) 8;
-					break;
-				case "x2":
-					orgmanageid_link = (long) 10;
-					break;
-				case "x3":
-					orgmanageid_link = (long) 11;
-					break;
-				}
+			
 				
 				try {
 					String STT = "";
@@ -178,9 +171,9 @@ public class UploadPersonnelAPI {
 						//lay bo phan theo ma, don vi quan ly - code,parentid_link
 						Long parentid_link = (long) orgmanageid_link;
 						Long orgid_link = null;
-						Org lst_bp = org_service.getByCodeAndParentid_link(BoPhan, parentid_link);
-						if(lst_bp != null) {
-							orgid_link=lst_bp.getId();
+						List<Org> lst_bp = org_service.getByCodeAndParentid_link(BoPhan, parentid_link);
+						if(lst_bp.size() != 0) {
+							orgid_link=lst_bp.get(0).getId();
 						}else {
 							mes_err = "Bộ phận không tồn tại! "+" ở dòng " + (rowNum + 1) + " cột Bộ Phận " ;
 							break;
@@ -347,6 +340,9 @@ public class UploadPersonnelAPI {
 						String Tinh = commonService.getStringValue(row.getCell(ColumnPersonnel.Tinh));
 						String DiaChi = commonService.getStringValue(row.getCell(ColumnPersonnel.DiaChi));
 						String DT = commonService.getStringValue(row.getCell(ColumnPersonnel.DienThoai));
+						if(DT.equals("#N/A")) {
+							DT="";
+						}
 						String CMND = commonService.getStringValue(row.getCell(ColumnPersonnel.CMND));
 						
 						//kiem tra tinh trong danh sach orgtypeid_link = 25;
@@ -443,8 +439,12 @@ public class UploadPersonnelAPI {
 						String NoiCapMoi = commonService.getStringValue(row.getCell(ColumnPersonnel.NoiCapMoi));
 						String SK = commonService.getStringValue(row.getCell(ColumnPersonnel.SucKhoe));
 						String SoSBH = commonService.getStringValue(row.getCell(ColumnPersonnel.SoSBH));
+						if(SoSBH.equals("#N/A")) {
+							SoSBH ="";
+						}
 						
 						//person.setCode(MaSoMoi);
+						person.setOrgrootid_link(orgrootid_link);
 						person.setStatus(TinhTrang);
 						person.setFullname(HoVaTen);
 						person.setGender(GioiTinh);
@@ -466,10 +466,23 @@ public class UploadPersonnelAPI {
 						person.setVillage(Thon);
 						person.setAddress(DiaChi);
 						person.setTel(DT);
-						person.setIdnumber(CMND);
 						
-						person.setDateof_idnumber(NgayCap);
-						person.setPlace_idnumber(NoiCap);
+						if (CMTM != "") {
+							person.setIdnumber(CMTM);
+						} else {
+							person.setIdnumber(CMND);
+						}
+						if (NgayCapMoi != null) {
+							person.setDateof_idnumber(NgayCapMoi);
+						} else {
+							person.setDateof_idnumber(NgayCap);
+						}
+						if (NoiCapMoi != "") {
+							person.setPlace_idnumber(NoiCapMoi);
+						} else {
+							person.setPlace_idnumber(NoiCap);
+						}
+						
 						person.setHealthinfo(SK);
 						person.setInsurance_number(SoSBH);
 						
@@ -490,7 +503,8 @@ public class UploadPersonnelAPI {
 					}
 					
 				} catch (Exception e) {
-					mes_err = "Có lỗi ở dòng " + (rowNum + 1) + " và cột " + colNum + ": " + mes_err;
+					System.out.println(e.getMessage());
+					mes_err = "Có lỗi ở dòng " + (rowNum + 1) + mes_err;
 				}
 				finally {
 					workbook.close();

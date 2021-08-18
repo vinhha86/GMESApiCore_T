@@ -35,12 +35,12 @@ public class ColumnPersonnel {
 	public static int Tinh				= 31;
 	public static int DiaChi			= 32;
 	public static int DienThoai			= 33;
-	public static int CMND				= 35;
-	public static int NgayCap			= 36;
-	public static int NoiCap			= 37;
-	public static int CMTM 				= 38; 
-	public static int NgayCapMoi		= 39;
-	public static int NoiCapMoi			= 40;
-	public static int SucKhoe			= 41;
-	public static int SoSBH				= 42;
+	public static int CMND				= 34;
+	public static int NgayCap			= 35;
+	public static int NoiCap			= 36;
+	public static int CMTM 				= 37; 
+	public static int NgayCapMoi		= 38;
+	public static int NoiCapMoi			= 39;
+	public static int SucKhoe			= 40;
+	public static int SoSBH				= 41;
 }

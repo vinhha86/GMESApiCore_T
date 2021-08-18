@@ -148,8 +148,9 @@ public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecification
 	//lay org (bo phan) theo ma va don vi quan ly - code,parentid_link
 	@Query(value = "select c from Org c "
 			+ "where c.parentid_link = :parentid_link "
-			+ "and trim(lower(replace(c.code,' ',''))) = trim(lower(replace(:code, ' ',''))) " )
-	public Org getByCodeAndParentid_link(
+			+ "and trim(lower(replace(c.code,' ',''))) = trim(lower(replace(:code, ' ',''))) "
+			+ "and c.status > -1 " )
+	public List<Org> getByCodeAndParentid_link(
 			@Param ("code")final String code,
 			@Param ("parentid_link")final Long parentid_link
 			);

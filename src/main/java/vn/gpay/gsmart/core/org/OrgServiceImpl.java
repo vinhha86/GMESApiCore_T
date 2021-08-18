@@ -373,7 +373,7 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 	}
 	//lay org theo code,parentid_link
 	@Override
-	public Org getByCodeAndParentid_link(String code, Long parentid_link) {
+	public List<Org> getByCodeAndParentid_link(String code, Long parentid_link) {
 		// TODO Auto-generated method stub
 		return repositoty.getByCodeAndParentid_link(code, parentid_link);
 	}
