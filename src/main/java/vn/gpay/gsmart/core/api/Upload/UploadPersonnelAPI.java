@@ -2,7 +2,6 @@ package vn.gpay.gsmart.core.api.Upload;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,15 +37,16 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 @RestController
 @RequestMapping("/api/v1/upload_personnel")
 public class UploadPersonnelAPI {
-	@Autowired Common commonService;
+	@Autowired
+	Common commonService;
 	@Autowired
 	IPersonnel_Service personnel_service;
-	@Autowired IOrgService org_service;
-	
+	@Autowired
+	IOrgService org_service;
 
 	@RequestMapping(value = "/personnel", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadPersonnel(HttpServletRequest request,
-			@RequestParam("file") MultipartFile file,@RequestParam("orgmanageid_link") long orgmanageid_link) {
+			@RequestParam("file") MultipartFile file, @RequestParam("orgmanageid_link") long orgmanageid_link) {
 		ResponseBase response = new ResponseBase();
 		Date current_time = new Date();
 		String name = "";
@@ -76,20 +76,18 @@ public class UploadPersonnelAPI {
 				XSSFSheet sheet = workbook.getSheetAt(0);
 
 				int rowNum = 1;
-				int colNum = 1;
-				
+				// int colNum = 1;
+
 				Row row = sheet.getRow(rowNum);
-			
-				
+
 				try {
 					String STT = "";
 					STT = commonService.getStringValue(row.getCell(ColumnPersonnel.STT));
 					STT = STT.equals("0") ? "" : STT;
 					while (!STT.equals("")) {
-						String MaSoCu = commonService.getStringValue(row.getCell(ColumnPersonnel.MaSoCu));
+
 						String MaSoMoi = commonService.getStringValue(row.getCell(ColumnPersonnel.MaSoMoi));
-						
-					
+
 						// tim nhan vien theo ma so moi
 						person = personnel_service.getPersonelBycode(MaSoMoi);
 						// neu khong co nhan vien. thi tao nhan vien moi theo ma so moi
@@ -97,78 +95,71 @@ public class UploadPersonnelAPI {
 							person = new Personel();
 							person.setCode(MaSoMoi);
 						}
-						
-						
-						String  tinhTrang = commonService.getStringValue(row.getCell(ColumnPersonnel.TinhTrang));
+
+						String tinhTrang = commonService.getStringValue(row.getCell(ColumnPersonnel.TinhTrang));
 						int TinhTrang;
-						if(tinhTrang.equals("L")) {
+						if (tinhTrang.equals("L")) {
 							TinhTrang = 0;
-						}else {
+						} else {
 							TinhTrang = 1;
 						}
-						String Ho = commonService.getStringValue(row.getCell(ColumnPersonnel.Ho));
-						String Ten =commonService.getStringValue(row.getCell(ColumnPersonnel.Ten));
-						String HoVaTen =commonService.getStringValue(row.getCell(ColumnPersonnel.HoVaTen));
-						String gioiTinh = commonService.getStringValue(row.getCell(ColumnPersonnel.GT)) ;
+
+						String HoVaTen = commonService.getStringValue(row.getCell(ColumnPersonnel.HoVaTen));
+						String gioiTinh = commonService.getStringValue(row.getCell(ColumnPersonnel.GT));
 						int GioiTinh;
-						if(gioiTinh.equals("Nam")) {
+						if (gioiTinh.equals("Nam")) {
 							GioiTinh = 1;
-						}else {
+						} else {
 							GioiTinh = 0;
 						}
-						//ngay sinh
+						// ngay sinh
 						Date NgaySinh = null;
 						try {
 							String ngaySinh = commonService.getStringValue(row.getCell(ColumnPersonnel.NgaySinh));
 							if (ngaySinh.contains("/")) {
 								String[] s_date = ngaySinh.split("/");
-								int vt0 = Integer.parseInt(s_date[0].toString());
-								int vt1 = Integer.parseInt(s_date[1].toString());
 								if (Integer.parseInt(s_date[1].toString()) < 13
 										&& Integer.parseInt(s_date[0].toString()) < 32
 										&& Integer.parseInt(s_date[1].toString()) > 0
 										&& Integer.parseInt(s_date[0].toString()) > 0) {
 									NgaySinh = new SimpleDateFormat("dd/MM/yyyy").parse(ngaySinh);
 								} else {
-									mes_err = "Định dạng ngày sinh không đúng dd/MM/yyyy! ở dòng: " + (rowNum + 1)
-											+ " cột ngày sinh";
-									break;
+									mes_err = "Định dạng ngày sinh không đúng dd/MM/yyyy! ở dòng: " + (rowNum + 1);
 								}
-							} else {
-								mes_err = "Định dạng không đúng dd/MM/yyyy! ở dòng: " + (rowNum + 1)
-										+ " cột ngày sinh";
-								break;
+							} else if (ngaySinh != ""){
+								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgaySinh))) {
+									NgaySinh = row.getCell(ColumnPersonnel.NgaySinh).getDateCellValue();
+								}
 							}
 						} catch (Exception e) {
 							if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgaySinh))) {
 								NgaySinh = row.getCell(ColumnPersonnel.NgaySinh).getDateCellValue();
 							}
 						}
-						
+
 						String BoPhan = commonService.getStringValue(row.getCell(ColumnPersonnel.BoPhan));
-						String ChucVu= commonService.getStringValue(row.getCell(ColumnPersonnel.ChucVu));
-						String ChucVuBH =commonService.getStringValue(row.getCell(ColumnPersonnel.ChucVutrongBH));
-						String Bac = commonService.getStringValue(row.getCell(ColumnPersonnel.Bac));
-						String MaBacLuongBH = commonService.getStringValue(row.getCell(ColumnPersonnel.MaBacluongBH));
-						String HeSoLuong = commonService.getStringValue(row.getCell(ColumnPersonnel.HeSoLuongBH));
-						String MucLuongBH = commonService.getStringValue(row.getCell(ColumnPersonnel.MucLuongDongBH));
-						String HeSoCV = commonService.getStringValue(row.getCell(ColumnPersonnel.HeSoCV));
-						String ThangGiamBH = commonService.getStringValue(row.getCell(ColumnPersonnel.ThangGiamBH));
-						
-						//kiem tra bo phan co trong DB khong
-						//lay bo phan theo ma, don vi quan ly - code,parentid_link
+//						String ChucVu= commonService.getStringValue(row.getCell(ColumnPersonnel.ChucVu));
+//						String ChucVuBH =commonService.getStringValue(row.getCell(ColumnPersonnel.ChucVutrongBH));
+//						String Bac = commonService.getStringValue(row.getCell(ColumnPersonnel.Bac));
+//						String MaBacLuongBH = commonService.getStringValue(row.getCell(ColumnPersonnel.MaBacluongBH));
+//						String HeSoLuong = commonService.getStringValue(row.getCell(ColumnPersonnel.HeSoLuongBH));
+//						String MucLuongBH = commonService.getStringValue(row.getCell(ColumnPersonnel.MucLuongDongBH));
+//						String HeSoCV = commonService.getStringValue(row.getCell(ColumnPersonnel.HeSoCV));
+//						String ThangGiamBH = commonService.getStringValue(row.getCell(ColumnPersonnel.ThangGiamBH));
+
+						// kiem tra bo phan co trong DB khong
+						// lay bo phan theo ma, don vi quan ly - code,parentid_link
 						Long parentid_link = (long) orgmanageid_link;
 						Long orgid_link = null;
 						List<Org> lst_bp = org_service.getByCodeAndParentid_link(BoPhan, parentid_link);
-						if(lst_bp.size() != 0) {
-							orgid_link=lst_bp.get(0).getId();
-						}else {
-							mes_err = "Bộ phận không tồn tại! "+" ở dòng " + (rowNum + 1) + " cột Bộ Phận " ;
-							break;
+						if (lst_bp.size() != 0) {
+							orgid_link = lst_bp.get(0).getId();
+						} else {
+							mes_err = "Bộ phận không tồn tại! " + " ở dòng " + (rowNum + 1) + " cột Bộ Phận ";
+						
 						}
-						
-						
-						//ngay vao cong ty
+
+						// ngay vao cong ty
 						Date NgayVaoCT = null;
 						try {
 							String ngayVaoCT = commonService.getStringValue(row.getCell(ColumnPersonnel.NgayVaoCT));
@@ -178,13 +169,13 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayVaoCT = new SimpleDateFormat("dd/MM/yyyy").parse(ngayVaoCT);
 								} else {
-									mes_err = "Định dạng ngày không đúng dd/MM/yyyy! ";
+									mes_err = "Định dạng ngày vào CT không đúng dd/MM/yyyy! "+ " ở dòng TT " + (rowNum + 1);
 								}
 
-							} else {
-								mes_err = "Định dạng không đúng dd/MM/yyyy! ở dòng: " + (rowNum + 1)
-										+ " cột ngày vào công ty";
-								break;
+							} else if(ngayVaoCT != ""){
+								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayVaoCT))) {
+									NgayVaoCT = row.getCell(ColumnPersonnel.NgayVaoCT).getDateCellValue();
+								}
 							}
 
 						} catch (Exception e) {
@@ -203,13 +194,13 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayThoiViec = new SimpleDateFormat("dd/MM/yyyy").parse(ngayThoiViec);
 								} else {
-									mes_err = "Định dạng ngày không đúng dd/MM/yyyy! ";
+									mes_err = "Định dạng ngày thôi việc không đúng dd/MM/yyyy! "+ " ở dòng " + (rowNum + 1);
 								}
 
-							} else {
-								mes_err = "Định dạng không đúng dd/MM/yyyy! ở dòng: " + (rowNum + 1)
-										+ " cột ngày thôi việc";
-								break;
+							} else if(ngayThoiViec != ""){
+								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayThoiViec))) {
+									NgayThoiViec = row.getCell(ColumnPersonnel.NgayThoiViec).getDateCellValue();
+								}
 							}
 
 						} catch (Exception e) {
@@ -228,13 +219,13 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayKiHDTV = new SimpleDateFormat("dd/MM/yyyy").parse(ngayKiHDTV);
 								} else {
-									mes_err = "Định dạng ngày không đúng dd/MM/yyyy! ";
+									mes_err = "Định dạng ngày kí HDTV không đúng dd/MM/yyyy! "+ " ở dòng " + (rowNum + 1);
 								}
 
-							} else {
-								mes_err = "Định dạng không đúng dd/MM/yyyy! ở dòng: " + (rowNum + 1)
-										+ " cột ngày kí HDTV";
-								break;
+							} else if(ngayKiHDTV != ""){
+								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayKiHDTV))) {
+									NgayKiHDTV = row.getCell(ColumnPersonnel.NgayKiHDTV).getDateCellValue();
+								}
 							}
 
 						} catch (Exception e) {
@@ -253,13 +244,13 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayKiHDCTH = new SimpleDateFormat("dd/MM/yyyy").parse(ngayKiHDCTH);
 								} else {
-									mes_err = "Định dạng ngày không đúng dd/MM/yyyy! ";
+									mes_err = "Định dạng ngày kí HDCTH không đúng dd/MM/yyyy! "+ " ở dòng " + (rowNum + 1);
 								}
 
-							} else {
-								mes_err = "Định dạng không đúng dd/MM/yyyy! ở dòng: " + (rowNum + 1)
-										+ " cột ngày kí HDCTH";
-								break;
+							} else if(ngayKiHDCTH != ""){
+								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayKiHDCTH))) {
+									NgayKiHDCTH = row.getCell(ColumnPersonnel.NgayKiHDCTH).getDateCellValue();
+								}
 							}
 
 						} catch (Exception e) {
@@ -278,13 +269,13 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayKiHDVTH = new SimpleDateFormat("dd/MM/yyyy").parse(ngayKiHDVTH);
 								} else {
-									mes_err = "Định dạng ngày không đúng dd/MM/yyyy! ";
+									mes_err = "Định dạng ngày kí HDVTH không đúng dd/MM/yyyy! "+ " ở dòng " + (rowNum + 1);
 								}
 
-							} else {
-								mes_err = "Định dạng không đúng dd/MM/yyyy! ở dòng: " + (rowNum + 1)
-										+ " cột ngày kí HDVTH";
-								break;
+							} else if(ngayKiHDVTH != ""){
+								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayKiHDVTH))) {
+									NgayKiHDVTH = row.getCell(ColumnPersonnel.NgayKiHDVTH).getDateCellValue();
+								}
 							}
 
 						} catch (Exception e) {
@@ -303,13 +294,13 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayDongBH = new SimpleDateFormat("dd/MM/yyyy").parse(ngayDongBH);
 								} else {
-									mes_err = "Định dạng ngày không đúng dd/MM/yyyy! ";
+									mes_err = "Định dạng ngày đóng BH không đúng dd/MM/yyyy! "+ " ở dòng " + (rowNum + 1);
 								}
 
-							} else {
-								mes_err = "Định dạng không đúng dd/MM/yyyy! ở dòng: " + (rowNum + 1)
-										+ " cột ngày đóng BH";
-								break;
+							} else if(ngayDongBH != ""){
+								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayDongBH))) {
+									NgayDongBH = row.getCell(ColumnPersonnel.NgayDongBH).getDateCellValue();
+								}
 							}
 
 						} catch (Exception e) {
@@ -317,128 +308,122 @@ public class UploadPersonnelAPI {
 								NgayDongBH = row.getCell(ColumnPersonnel.NgayDongBH).getDateCellValue();
 							}
 						}
-						
-						
-						//ly do nghi viec
+
+						// ly do nghi viec
 						String LyDo = commonService.getStringValue(row.getCell(ColumnPersonnel.LyDo));
-						String TGCT = commonService.getStringValue(row.getCell(ColumnPersonnel.TGCongTac));
 						String Thon = commonService.getStringValue(row.getCell(ColumnPersonnel.Thon));
 						String Xa = commonService.getStringValue(row.getCell(ColumnPersonnel.Xa));
 						String Huyen = commonService.getStringValue(row.getCell(ColumnPersonnel.Huyen));
 						String Tinh = commonService.getStringValue(row.getCell(ColumnPersonnel.Tinh));
 						String DiaChi = commonService.getStringValue(row.getCell(ColumnPersonnel.DiaChi));
 						String DT = commonService.getStringValue(row.getCell(ColumnPersonnel.DienThoai));
-						if(DT.equals("#N/A")) {
-							DT="";
+						if (DT.equals("#N/A")) {
+							DT = "";
 						}
 						String CMND = commonService.getStringValue(row.getCell(ColumnPersonnel.CMND));
-						
-						//kiem tra tinh trong danh sach orgtypeid_link = 25;
+
+						// kiem tra tinh trong danh sach orgtypeid_link = 25;
 						Long tinh = null;
-						List<Org> lst_tinh = org_service.getByNameAndType(Tinh,25);
-						if(lst_tinh.size()!=0) {
-							 tinh = lst_tinh.get(0).getId();
-						}else {
+						List<Org> lst_tinh = org_service.getByNameAndType(Tinh, 25);
+						if (lst_tinh.size() != 0) {
+							tinh = lst_tinh.get(0).getId();
+						} else {
+
+							mes_err = "Tỉnh không tồn tại! " + " ở dòng " + (rowNum + 1) + " cột Tỉnh T.phố ";
 							
-							mes_err = "Tỉnh không tồn tại! "+" ở dòng " + (rowNum + 1) + " cột Tỉnh T.phố " ;
-							break;
 						}
-						
-						//kiem tra huyen trong danh sach tinh orgtypeid_link = 26;
+
+						// kiem tra huyen trong danh sach tinh orgtypeid_link = 26;
 						Long huyen = null;
 						Org lst_huyen = org_service.getByNameAndTypeAndParentid_link(Huyen, 26, tinh);
-						
-						if(lst_huyen != null) {
+
+						if (lst_huyen != null) {
 							huyen = lst_huyen.getId();
-						}else {
+						} else {
+
+							mes_err = "Huyện không tồn tại! " + " ở dòng " + (rowNum + 1) + " cột Quận - Huyện ";
 							
-							mes_err = "Huyện không tồn tại! "+" ở dòng " + (rowNum + 1) + " cột Quận - Huyện " ;
-							break;
 						}
-						//kiem tra xa trong danh sach huyen orgtypeid_link = 27;
+						// kiem tra xa trong danh sach huyen orgtypeid_link = 27;
 						Long xa = null;
 						Org lst_xa = org_service.getByNameAndTypeAndParentid_link(Xa, 27, huyen);
-						if(lst_xa != null) {
+						if (lst_xa != null) {
 							xa = lst_xa.getId();
-						}else {
+						} else {
+
+							mes_err = "Xã không tồn tại! " + " ở dòng " + (rowNum + 1) + " cột Xã - Phường ";
 							
-							mes_err = "Xã không tồn tại! "+" ở dòng " + (rowNum + 1) + " cột Xã - Phường " ;
-							break;
 						}
-						
-						//String NgayCap = commonService.getStringValue(row.getCell(ColumnPersonnel.NgayCap));
-						//ngay caop cmnd
-						Date NgayCap = null;				
+
+						// String NgayCap =
+						// commonService.getStringValue(row.getCell(ColumnPersonnel.NgayCap));
+						// ngay caop cmnd
+						Date NgayCap = null;
 						try {
 							String ngayCap = commonService.getStringValue(row.getCell(ColumnPersonnel.NgayCap));
-							if(ngayCap.contains("/")) {
+							if (ngayCap.contains("/")) {
 								String[] s_date = ngayCap.split("/");
-								if(Integer.parseInt(s_date[1].toString()) < 13 && Integer.parseInt(s_date[0].toString()) < 32) {
+								if (Integer.parseInt(s_date[1].toString()) < 13
+										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayCap = new SimpleDateFormat("dd/MM/yyyy").parse(ngayCap);
+								} else {
+									mes_err = "Định dạng ngày cấp không đúng dd/MM/yyyy! ở dòng TT" + (rowNum + 1) ;
+									
 								}
-								else {
-									mes_err = "Định dạng ngày không đúng dd/MM/yyyy! ";
+							} else  if(ngayCap != ""){
+								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayCap))) {
+									NgayCap = row.getCell(ColumnPersonnel.NgayCap).getDateCellValue();
 								}
 							}
-							 else {
-								mes_err = "Định dạng không đúng dd/MM/yyyy! ở dòng: " + (rowNum + 1)
-										+ " cột ngày cấp";
-								break;
-							}
-						}
-						catch (Exception e) {
-							if(DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayCap))) {
+						} catch (Exception e) {
+							if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayCap))) {
 								NgayCap = row.getCell(ColumnPersonnel.NgayCap).getDateCellValue();
 							}
 						}
-						
+
 						String NoiCap = commonService.getStringValue(row.getCell(ColumnPersonnel.NoiCap));
 						String CMTM = commonService.getStringValue(row.getCell(ColumnPersonnel.CMTM));
-					//	String NgayCapMoi = commonService.getStringValue(row.getCell(ColumnPersonnel.NgayCapMoi));
-						
-						//ngay caop cmnd
+						// String NgayCapMoi =
+						// commonService.getStringValue(row.getCell(ColumnPersonnel.NgayCapMoi));
+
+						// ngay caop cmnd
 						Date NgayCapMoi = null;
 						try {
 							String ngayCapMoi = commonService.getStringValue(row.getCell(ColumnPersonnel.NgayCapMoi));
-							if(ngayCapMoi.contains("/")) {
+							if (ngayCapMoi.contains("/")) {
 								String[] s_date = ngayCapMoi.split("/");
-								if(Integer.parseInt(s_date[1].toString()) < 13 && Integer.parseInt(s_date[0].toString()) < 32) {
+								if (Integer.parseInt(s_date[1].toString()) < 13
+										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayCapMoi = new SimpleDateFormat("dd/MM/yyyy").parse(ngayCapMoi);
+								} else {
+									mes_err = "Định dạng ngày cấp mới không đúng dd/MM/yyyy! "+ " ở dòng TT" + (rowNum + 1);
 								}
-								else {
-									mes_err = "Định dạng ngày không đúng dd/MM/yyyy! ";
+							} else  if(ngayCapMoi != ""){
+								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayCapMoi))) {
+									NgayCapMoi = row.getCell(ColumnPersonnel.NgayCapMoi).getDateCellValue();
 								}
 							}
-							else {
-								mes_err = "Định dạng không đúng dd/MM/yyyy! ở dòng: " + (rowNum + 1)
-										+ " cột ngày cấp mới";
-								break;
-							}
-						}
-						catch (Exception e) {
-							if(DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayCapMoi))) {
+						} catch (Exception e) {
+							if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayCapMoi))) {
 								NgayCapMoi = row.getCell(ColumnPersonnel.NgayCapMoi).getDateCellValue();
 							}
 						}
-						
-						
-						
-						
+
 						String NoiCapMoi = commonService.getStringValue(row.getCell(ColumnPersonnel.NoiCapMoi));
 						String SK = commonService.getStringValue(row.getCell(ColumnPersonnel.SucKhoe));
 						String SoSBH = commonService.getStringValue(row.getCell(ColumnPersonnel.SoSBH));
-						if(SoSBH.equals("#N/A")) {
-							SoSBH ="";
+						if (SoSBH.equals("#N/A")) {
+							SoSBH = "";
 						}
-						
-						//person.setCode(MaSoMoi);
+
+						// person.setCode(MaSoMoi);
 						person.setOrgrootid_link(orgrootid_link);
 						person.setStatus(TinhTrang);
 						person.setFullname(HoVaTen);
 						person.setGender(GioiTinh);
 						person.setOrgid_link(orgid_link);
 						person.setOrgmanagerid_link(orgmanageid_link);
-						
+
 						person.setBirthdate(NgaySinh);
 						person.setDate_startworking(NgayVaoCT);
 						person.setDate_endworking(NgayThoiViec);
@@ -447,14 +432,14 @@ public class UploadPersonnelAPI {
 						person.setDate_limit_contract(NgayKiHDCTH);
 						person.setDate_unlimit_contract(NgayKiHDVTH);
 						person.setDate_insurance(NgayDongBH);
-						
+
 						person.setProvinceid_link(tinh);
 						person.setDistrictid_link(huyen);
 						person.setCommuneid_link(xa);
 						person.setVillage(Thon);
 						person.setAddress(DiaChi);
 						person.setTel(DT);
-						
+
 						if (CMTM != "") {
 							person.setIdnumber(CMTM);
 						} else {
@@ -470,35 +455,33 @@ public class UploadPersonnelAPI {
 						} else {
 							person.setPlace_idnumber(NoiCap);
 						}
-						
+
 						person.setHealthinfo(SK);
 						person.setInsurance_number(SoSBH);
-						
+
 						personnel_service.save(person);
-						
-						
+
 						response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 						response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-						
-						
-						//Chuyen sang row tiep theo neu con du lieu thi xu ly tiep khong thi dung lai
+
+						// Chuyen sang row tiep theo neu con du lieu thi xu ly tiep khong thi dung lai
 						rowNum++;
 						row = sheet.getRow(rowNum);
-						if(row == null) break;
-						
+						if (row == null)
+							break;
+
 						STT = commonService.getStringValue(row.getCell(ColumnTemplate.STT));
 						STT = STT.equals("0") ? "" : STT;
 					}
-					
+
 				} catch (Exception e) {
 					System.out.println(e.getMessage());
 					mes_err = "Có lỗi ở dòng " + (rowNum + 1) + mes_err;
-				}
-				finally {
+				} finally {
 					workbook.close();
 					serverFile.delete();
 				}
-				//neu co loi
+				// neu co loi
 				if (mes_err == "") {
 					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -512,7 +495,7 @@ public class UploadPersonnelAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		}
-	
+
 		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 	}
 }
