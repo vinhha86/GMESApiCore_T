@@ -8,66 +8,65 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-
-@Table(name="app_menu")
+@Table(name = "app_menu")
 @Entity
 public class Menu implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	protected String id;
 
 	@Column(name = "xtype")
 	private String xtype;
-	
+
 	@Column(name = "text_vi")
 	private String text_vi;
-	
+
 	@Column(name = "text_en")
 	private String text_en;
-	
+
 	@Column(name = "icon")
 	private String icon;
-	
+
 	@Column(name = "create")
 	private String create;
-	
-	@Column(name="title_list_en")
+
+	@Column(name = "title_list_en")
 	private String title_list_en;
-	
-	@Column(name="title_list_vi")
+
+	@Column(name = "title_list_vi")
 	private String title_list_vi;
-	
+
 	@Column(name = "txtcreate_vi")
 	private String txtcreate_vi;
-	
+
 	@Column(name = "txtcreate_en")
 	private String txtcreate_en;
-	
+
 	@Column(name = "edit")
 	private String edit;
-	
+
 	@Column(name = "txtedit_vi")
 	private String txtedit_vi;
-	
+
 	@Column(name = "txtedit_en")
 	private String txtedit_en;
-	
+
 	@Column(name = "urlc")
 	private String urlc;
-	
+
 	@Column(name = "index")
 	private Integer index;
-	
+
 	@Column(name = "type")
 	private Integer type;
-	
+
 	@Column(name = "parent_id")
 	private String parent_id;
-	
+
 	@Column(name = "edit_detail")
 	private String edit_detail;
-	
+
 	@Transient
 	public boolean checked;
 
@@ -222,5 +221,5 @@ public class Menu implements Serializable {
 	public void setChecked(boolean checked) {
 		this.checked = checked;
 	}
-	
+
 }

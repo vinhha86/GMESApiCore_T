@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import vn.gpay.gsmart.core.attributevalue.Attributevalue;
 import vn.gpay.gsmart.core.attributevalue.IAttributeValueService;
 import vn.gpay.gsmart.core.pcontract_bom2_npl_poline.IPContract_bom2_npl_poline_Service;

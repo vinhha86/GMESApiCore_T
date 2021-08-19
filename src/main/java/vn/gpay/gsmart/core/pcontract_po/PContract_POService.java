@@ -34,17 +34,28 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	IPContract_Price_Repository price_repo;
 	@Autowired
 	EntityManager em;
-	@Autowired IPackingTypeRepository packing_repo;
-	@Autowired IPOrder_POLine_Service porder_line_Service;
-	@Autowired IPOrderGrant_Service porderGrantService;
-	@Autowired IPOrderProcessing_Service pprocessRepository;
-	@Autowired IStockOutService stockOutService;
-	@Autowired IStockInService stockInService;
-	@Autowired IPOrder_Product_SKU_Service porderskuService;
-	@Autowired IPOrderBOMSKU_Service porderBOMSKU_Service;
-	@Autowired ICutplanProcessingService cutplanProcessingService;
-	@Autowired IProductService productService;
-	@Autowired IProductPairingService pairService;
+	@Autowired
+	IPackingTypeRepository packing_repo;
+	@Autowired
+	IPOrder_POLine_Service porder_line_Service;
+	@Autowired
+	IPOrderGrant_Service porderGrantService;
+	@Autowired
+	IPOrderProcessing_Service pprocessRepository;
+	@Autowired
+	IStockOutService stockOutService;
+	@Autowired
+	IStockInService stockInService;
+	@Autowired
+	IPOrder_Product_SKU_Service porderskuService;
+	@Autowired
+	IPOrderBOMSKU_Service porderBOMSKU_Service;
+	@Autowired
+	ICutplanProcessingService cutplanProcessingService;
+	@Autowired
+	IProductService productService;
+	@Autowired
+	IProductPairingService pairService;
 
 	@Override
 	protected JpaRepository<PContract_PO, Long> getRepository() {
@@ -255,13 +266,13 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	public List<PContractPO_Shipping> get_po_shipping(List<Long> orgs, int po_type, Date shipdate_from,
 			Date shipdate_to, Long orgrootid_link, Boolean ismap) {
 		// TODO Auto-generated method stub
-		orgs = orgs.size() == 0 ? null: orgs;
-		ismap = ismap == false ? null :  true;
-		
+		orgs = orgs.size() == 0 ? null : orgs;
+		ismap = ismap == false ? null : true;
+
 		List<PContract_PO> list_po = repo.getby_process_shipping(shipdate_from, shipdate_to, orgs, po_type, ismap);
 		List<PContractPO_Shipping> list_shipping = new ArrayList<PContractPO_Shipping>();
-		
-		for(PContract_PO po : list_po) {
+
+		for (PContract_PO po : list_po) {
 			PContractPO_Shipping ship = new PContractPO_Shipping();
 			ship.setActual_quantity(po.getActual_quantity());
 			ship.setActual_shipdate(po.getActual_shipdate());
@@ -316,42 +327,44 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 			ship.setShipmode_name(po.getShipMode());
 			ship.setIsmap(po.getIsmap());
 //			ship.setOrdercode(po.getOrdercode());
-			
-			List<ProductPairing> p = pairService.getproduct_pairing_detail_bycontract(orgrootid_link, po.getPcontractid_link(), po.getProductid_link());
+
+			List<ProductPairing> p = pairService.getproduct_pairing_detail_bycontract(orgrootid_link,
+					po.getPcontractid_link(), po.getProductid_link());
 			int total = 1;
-			if(p.size()>0) {
+			if (p.size() > 0) {
 				total = 0;
-				for(ProductPairing pair : p) {
+				for (ProductPairing pair : p) {
 					total += pair.getAmount();
 				}
 			}
 			ship.setTotalpair(total);
-			
-			if(!po.getPackingnotice().equals("") && !po.getPackingnotice().equals("null") && !po.getPackingnotice().equals(null)) {
+
+			if (!po.getPackingnotice().equals("") && !po.getPackingnotice().equals("null")
+					&& !po.getPackingnotice().equals(null)) {
 				String[] arr_id = po.getPackingnotice().split(";");
 				List<Long> list_id = new ArrayList<Long>();
-				for(String id : arr_id) {
+				for (String id : arr_id) {
 					list_id.add(Long.parseLong(id));
 				}
 				List<PackingType> list_packing = packing_repo.getbylistid(orgrootid_link, list_id);
 				String packing_method = "";
-				for(PackingType packing : list_packing) {
-					if(packing_method!="") {
-						packing_method+= ", "+packing.getCode();
-					}
-					else {
+				for (PackingType packing : list_packing) {
+					if (packing_method != "") {
+						packing_method += ", " + packing.getCode();
+					} else {
 						packing_method = packing.getCode();
 					}
 				}
 				ship.setPacking_method(packing_method);
 			}
-			
+
 //			Long pcontract_poid_link = po.getId();
 //			List<POrder> porder_list = porder_line_Service.getporder_by_po(pcontract_poid_link);
-			
+
 			// SL Cắt
 			// Tính theo sl vải chính đã cắt được cho bao nhiêu sản phẩm
-			// Nếu sp dùng 2 vải chính trở lên thì lấy số lượng loại vải chính đã cắt cho sp bé nhất
+			// Nếu sp dùng 2 vải chính trở lên thì lấy số lượng loại vải chính đã cắt cho sp
+			// bé nhất
 //			Integer totalamountcut = 0;
 //			if(porder_list.size() > 0) {
 //				for(POrder porder : porder_list) {
@@ -446,14 +459,15 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 //				}
 //			}
 //			ship.setAmountgiaohang(amountgiaohang);
-			
+
 			list_shipping.add(ship);
 		}
 		return list_shipping;
 	}
 
 	@Override
-	public List<PContract_PO> getbycode_and_type_and_product(String po_no, int type, Long pcontractid_link,Long productid_link) {
+	public List<PContract_PO> getbycode_and_type_and_product(String po_no, int type, Long pcontractid_link,
+			Long productid_link) {
 		// TODO Auto-generated method stub
 		return repo.getbycode_and_type_and_product(pcontractid_link, po_no, type, productid_link);
 	}
