@@ -101,7 +101,11 @@ public class UploadPersonnelAPI {
 						if (tinhTrang.equals("L")) {
 							TinhTrang = 0;
 						} else {
-							TinhTrang = 1;
+							rowNum++;
+							row = sheet.getRow(rowNum);
+							STT = commonService.getStringValue(row.getCell(ColumnPersonnel.STT));
+							STT = STT.equals("0") ? "" : STT;
+							continue;
 						}
 
 						String HoVaTen = commonService.getStringValue(row.getCell(ColumnPersonnel.HoVaTen));
@@ -476,7 +480,7 @@ public class UploadPersonnelAPI {
 
 				} catch (Exception e) {
 					System.out.println(e.getMessage());
-					mes_err = "Có lỗi ở dòng " + (rowNum + 1) + mes_err;
+					mes_err = "Có lỗi ở dòng " + (rowNum + 1) +" " + mes_err;
 				} finally {
 					workbook.close();
 					serverFile.delete();
