@@ -240,6 +240,14 @@ public class OrgMenuAPI {
 	public ResponseEntity<ResponseBase> DeleteOrg(@RequestBody Org_delete_request entity, HttpServletRequest request ) {//@RequestParam("type") 
 		ResponseBase response = new ResponseBase();
 		try {
+			Org org = orgService.findOne(entity.id);
+			List<Org> children = orgService.findOrgAllByParent(entity.id);
+			if(children.size() > 0) {
+				response.setRespcode(ResponseMessage.KEY_RC_BAD_REQUEST);
+				response.setMessage("Đơn vị này đã có đơn vị con");
+				return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+			}
+			
 			orgService.deleteById(entity.id);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
