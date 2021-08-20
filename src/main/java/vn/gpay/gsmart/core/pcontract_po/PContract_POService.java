@@ -271,7 +271,6 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 
 		List<PContract_PO> list_po = repo.getby_process_shipping(shipdate_from, shipdate_to, orgs, po_type, ismap);
 		List<PContractPO_Shipping> list_shipping = new ArrayList<PContractPO_Shipping>();
-
 		for (PContract_PO po : list_po) {
 			PContractPO_Shipping ship = new PContractPO_Shipping();
 			ship.setActual_quantity(po.getActual_quantity());
