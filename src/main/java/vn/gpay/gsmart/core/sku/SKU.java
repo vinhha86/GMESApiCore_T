@@ -22,7 +22,7 @@ import org.hibernate.annotations.NotFoundAction;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
 
-@Table(name="sku")
+@Table(name = "sku")
 @Entity
 public class SKU implements Serializable {
 	/**
@@ -32,312 +32,314 @@ public class SKU implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sku_generator")
-	@SequenceGenerator(name="sku_generator", sequenceName = "sku_id_seq", allocationSize=1)
+	@SequenceGenerator(name = "sku_generator", sequenceName = "sku_id_seq", allocationSize = 1)
 	private Long id;
-	
+
 	private Long orgrootid_link;
-	
+
 	private String code;
-	
+
 	private String partnercode;
-	
+
 	private String barcode;
-	
+
 	private Integer skutypeid_link;
-	
+
 	private String name;
-	
+
 	private String name_en;
-	
+
 	private Integer categoryid_link;
-	
+
 	private Integer bossid_link;
-	
+
 	private Integer providerid_link;
-	
+
 	private Integer fabricid_link;
-	
+
 	private Integer packingtype;
-	
+
 //	private Integer colorid_link;
-	
+
 	private Long unitid_link;
-	
+
 	private String imgurl1;
-	
+
 	private String imgurl2;
-	
+
 	private String imgurl3;
-	
+
 	private String hscode;
-	
+
 	private String hsname;
-	
+
 	private Float saleprice;
-	
+
 	private BigDecimal discountpercent;
-	
+
 	private BigDecimal vatpercent;
-	
+
 	private Long productid_link;
-	
+
 //	@NotFound(action = NotFoundAction.IGNORE)
 //	@OneToMany
 //    @JoinColumn(name="productid_link",insertable=false,updatable =false)
 //    private List<ProductAttributeValue> listproductvalue = new ArrayList<ProductAttributeValue>();
-    
-    @NotFound(action = NotFoundAction.IGNORE)
-    @OneToMany
-    @JoinColumn(name="skuid_link",insertable=false,updatable =false)
-    private List<SKU_Attribute_Value> listSKUvalue = new ArrayList<SKU_Attribute_Value>();
-    
-    @Transient
-    public boolean getIs_default() {
-    	for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
-			if(sku_Attribute_Value.getIsdefaultvalue()) {
+
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+	@JoinColumn(name = "skuid_link", insertable = false, updatable = false)
+	private List<SKU_Attribute_Value> listSKUvalue = new ArrayList<SKU_Attribute_Value>();
+
+	@Transient
+	public boolean getIs_default() {
+		for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
+			if (sku_Attribute_Value.getIsdefaultvalue()) {
 				return true;
-			}			
+			}
 		}
-    	return false;
-    }
-    
-    @Transient
-    public int getSort_size() {
-    	int sort = 0;
-    	for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
-			if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZE || 
-					sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) {
+		return false;
+	}
+
+	@Transient
+	public int getSort_size() {
+		int sort = 0;
+		for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
+			if (sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZE
+					|| sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) {
 				sort = sku_Attribute_Value.getSort_Size();
 				break;
-			}			
+			}
 		}
-    	return sort;
-    }
-    
-    @Transient
-    public String getMauSanPham() {
-    	String name ="";
-    	for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
-			if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_COLOR) {
+		return sort;
+	}
+
+	@Transient
+	public String getMauSanPham() {
+		String name = "";
+		for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
+			if (sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_COLOR) {
 				name = sku_Attribute_Value.getAttributeValueName();
 				name = name.equals("ALL") ? "" : name;
 				break;
 			}
 		}
-    	return name;
-    }
-    
-    @Transient
-    public String getMauSanPham_product() {
-    	if(product!=null) {
-    		return product.getTenMauNPL();
-    	}
-    	return "";
-    }
-    
-    @Transient
+		return name;
+	}
+
+	@Transient
+	public String getMauSanPham_product() {
+		if (product != null) {
+			return product.getTenMauNPL();
+		}
+		return "";
+	}
+
+	@Transient
 	public Long getColorid_link() {
-		long ID_Mau =0;
+		long ID_Mau = 0;
 		for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
-			if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_COLOR) {
+			if (sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_COLOR) {
 				ID_Mau = sku_Attribute_Value.getAttributevalueid_link();
 				break;
-			}
-			else if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) {
+			} else if (sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) {
 				ID_Mau = sku_Attribute_Value.getAttributevalueid_link();
 				break;
 			}
 		}
 		return ID_Mau;
 	}
-    
-    @Transient
-    public String getColor_name() {
-    	String name ="";
-    	for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
-			if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_COLOR) {
-				name = sku_Attribute_Value.getAttributeValueName();
-				break;
-			} 
-		}
-    	return name;
-    }
-    @Transient
-    public String getSize_name() {
-    	String name ="";
-    	for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
-			if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZE) {
-				name = sku_Attribute_Value.getAttributeValueName();
-				break;
-			}
-			else if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) {
-				name = sku_Attribute_Value.getAttributeValueName();
-				break;
-			}	
-			else if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_TEX) {
+
+	@Transient
+	public String getColor_name() {
+		String name = "";
+		for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
+			if (sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_COLOR) {
 				name = sku_Attribute_Value.getAttributeValueName();
 				break;
 			}
 		}
-    	return name;
-    }      
-    @Transient
-    public String getFabric_name() {
-    	String name ="";
-    	for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
-			if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_FABRIC) {
+		return name;
+	}
+
+	@Transient
+	public String getSize_name() {
+		String name = "";
+		for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
+			if (sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZE) {
 				name = sku_Attribute_Value.getAttributeValueName();
 				break;
-			} 
+			} else if (sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) {
+				name = sku_Attribute_Value.getAttributeValueName();
+				break;
+			} else if (sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_TEX) {
+				name = sku_Attribute_Value.getAttributeValueName();
+				break;
+			}
 		}
-    	return name;
-    }    
-    @Transient
-    public Long getColor_id() {
-    	Long name = null;
-    	for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
-			if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_COLOR) {
+		return name;
+	}
+
+	@Transient
+	public String getFabric_name() {
+		String name = "";
+		for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
+			if (sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_FABRIC) {
+				name = sku_Attribute_Value.getAttributeValueName();
+				break;
+			}
+		}
+		return name;
+	}
+
+	@Transient
+	public Long getColor_id() {
+		Long name = null;
+		for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
+			if (sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_COLOR) {
 				name = sku_Attribute_Value.getAttributevalueid_link();
 				break;
 			}
 		}
-    	return name;
-    }
-    
-    @Transient
-    public Long getSize_id() {
-    	Long name = null;
-    	for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
-			if(sku_Attribute_Value.getAttributeid_link() == 30) {
+		return name;
+	}
+
+	@Transient
+	public Long getSize_id() {
+		Long name = null;
+		for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
+			if (sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZE) {
 				name = sku_Attribute_Value.getAttributevalueid_link();
 				break;
 			}
 		}
-    	return name;
-    }
-    
-    @Transient
-    public String getCoKho() {
-    	String name ="";
-    	for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
-    		if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) {
-    			name = sku_Attribute_Value.getAttributeValueName();
-				break;
-    		}
-    	}
-    	return name;
-    }
-    
-    @Transient
-    public String getCoSanPham() {
-    	String name ="";
-    	for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
-			if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZE) {
+		return name;
+	}
+
+	@Transient
+	public String getCoKho() {
+		String name = "";
+		for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
+			if (sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) {
 				name = sku_Attribute_Value.getAttributeValueName();
 				break;
 			}
-			else if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) {
-				if (null!=product){
+		}
+		return name;
+	}
+
+	@Transient
+	public String getCoSanPham() {
+		String name = "";
+		for (SKU_Attribute_Value sku_Attribute_Value : listSKUvalue) {
+			if (sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZE) {
+				name = sku_Attribute_Value.getAttributeValueName();
+				break;
+			} else if (sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_SIZEWIDTH) {
+				if (null != product) {
 					name = product.getCoKho();
 					name = name.equals("ALL") ? "" : name;
 				}
 				break;
-			}
-			else if(sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_TEX) {
+			} else if (sku_Attribute_Value.getAttributeid_link() == AtributeFixValues.ATTR_TEX) {
 				name = sku_Attribute_Value.getAttributeValueName();
 				break;
 			}
 		}
-    	return name;
+		return name;
 //    	if(product!=null) {
 //    		return product.getCoKho();
 //    	}
 //    	return "";
-    }
-    
-    @Transient
-    public String getCoSanPham_product() {
-    	if(product!=null) {
-    		return product.getCoKho();
-    	}
-    	return "";
-    }
-  
+	}
+
 	@Transient
-    public String getThanhPhanVai() {
-    	if(product!=null)
-    		return product.getDescription();
-    	return "";
-    }
+	public String getCoSanPham_product() {
+		if (product != null) {
+			return product.getCoKho();
+		}
+		return "";
+	}
+
+	@Transient
+	public String getThanhPhanVai() {
+		if (product != null)
+			return product.getDescription();
+		return "";
+	}
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="productid_link",insertable=false,updatable =false)
-    private Product product;
+	@JoinColumn(name = "productid_link", insertable = false, updatable = false)
+	private Product product;
 
 	@Transient
 	public String getProduct_code() {
-		if(product != null) {
+		if (product != null) {
 			return product.getBuyercode();
 		}
 		return null;
 	}
+
 	@Transient
 	public String getProduct_color() {
-		if(product != null) {
+		if (product != null) {
 			return product.getTenMauNPL();
 		}
 		return null;
 	}
+
 	@Transient
 	public String getProduct_desc() {
-		if(product != null) {
+		if (product != null) {
 			return product.getDescription();
 		}
 		return null;
 	}
+
 	@Transient
 	public String getProduct_name() {
-		if(product!=null) {
-				return product.getBuyername();
+		if (product != null) {
+			return product.getBuyername();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public Integer getProducttypeid_link() {
-		if(product != null) {
+		if (product != null) {
 			return product.getProducttypeid_link();
 		}
 		return null;
 	}
+
 	@Transient
 	public String getProducttype_name() {
-		if(product != null) {
+		if (product != null) {
 			return product.getProducttype_name();
 		}
 		return null;
 	}
-	
+
 	@Transient
 	public String getDescription() {
-		if(product != null) {
+		if (product != null) {
 			return product.getDescription();
 		}
 		return null;
 	}
-	
+
 	@Transient
 	public String getPartnercode_product() {
-		if(product != null)
+		if (product != null)
 			return product.getPartnercode();
 		else
 			return null;
 	}
-	
+
 	@Transient
 	public Float unitPrice;
-	
-	
+
 	public Float getUnitPrice() {
 		return unitPrice;
 	}
@@ -346,17 +348,17 @@ public class SKU implements Serializable {
 		this.unitPrice = unitPrice;
 	}
 
-	//    @NotFound(action = NotFoundAction.IGNORE)
+	// @NotFound(action = NotFoundAction.IGNORE)
 //	@ManyToOne
 //    @JoinColumn(name="unitid_link",insertable=false,updatable =false)
 //    private Unit unit;	
 	@Transient
 	public String getUnit_name() {
-		if(product != null)
+		if (product != null)
 			return product.getUnitName();
 		return "";
 	}
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -454,10 +456,10 @@ public class SKU implements Serializable {
 //	}
 
 	public Long getUnitid_link() {
-		if (null!=unitid_link)
+		if (null != unitid_link)
 			return unitid_link;
 		else {
-			if (null!=product)
+			if (null != product)
 				return product.getUnitid_link();
 			else
 				return null;

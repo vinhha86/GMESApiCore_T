@@ -5,8 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.CountDownLatch;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.gpay.gsmart.core.attributevalue.Attributevalue;
 import vn.gpay.gsmart.core.attributevalue.IAttributeValueService;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBom2ColorService;
@@ -42,6 +42,7 @@ import vn.gpay.gsmart.core.porder_bom_sku.POrderBOMSKU;
 import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
+import vn.gpay.gsmart.core.sku.SKU_Attribute_Value;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.POrderBomType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
@@ -284,6 +285,7 @@ public class POrderBomAPI {
 			long productid_link = porder.getProductid_link();
 			long porderid_link = entity.porderid_link;
 			response.isbomdone = false;
+			response.setMessage("Định mức đơn hàng chưa được chốt");
 
 			// Kiem tra xem dinh muc don hang duoc duyet hay chua roi dong bo ve
 			List<PContractProduct> pp = pcontractproductService.get_by_product_and_pcontract(orgrootid_link,
@@ -339,6 +341,7 @@ public class POrderBomAPI {
 			// dong bo tu pcontract_bom_color
 			if (pp.get(0).getIsbom2done()) {
 				response.isbomdone = true;
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 
 				List<PContractBom2Color> list_bom_color = pcontractbomcolorService.getall_byproduct(pcontractid_link,
 						productid_link);
@@ -373,6 +376,7 @@ public class POrderBomAPI {
 					List<POrderBOMSKU> list_porder_bom_sku = porderbomskuService
 							.getby_porder_and_material_and_sku_and_type(porderid_link, bom_sku.getMaterial_skuid_link(),
 									bom_sku.getProduct_skuid_link(), POrderBomType.CanDoi);
+
 					if (list_porder_bom_sku.size() == 0) {
 						POrderBOMSKU porderbomsku = new POrderBOMSKU();
 						porderbomsku.setAmount(bom_sku.getAmount());
@@ -404,7 +408,6 @@ public class POrderBomAPI {
 //			}
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<PorderBom_sync_response>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
@@ -543,19 +546,29 @@ public class POrderBomAPI {
 					POrderBomType.SanXuat);
 
 			List<Long> List_size = porder_sku_Service.getvalue_by_attribute(porderid_link, AtributeFixValues.ATTR_SIZE);
-
-			ExecutorService executor = Executors.newFixedThreadPool(listbom.size() + 1);
-			for (POrderBomProduct pContractProductBom : listbom) {
-
-				// Chay de lay tung mau san pham
-				Runnable bom2 = new POrderBomProduct_Runnable(list_colorid, pContractProductBom, avService, List_size,
-						listbomsku, listbomsku_kythuat, listbomsku_sanxuat, skuavService, productid_link, listdata);
-				executor.execute(bom2);
+			List<Attributevalue> listav = avService.getlist_byidAttribute(AtributeFixValues.ATTR_COLOR);
+			Map<Long, String> mapcolor = new HashMap<>();
+			for (Attributevalue av : listav) {
+				mapcolor.put(av.getId(), av.getValue());
 			}
-			executor.shutdown();
-			// Wait until all threads are finish
-			while (!executor.isTerminated()) {
 
+			Map<String, Long> mapsku = new HashMap<String, Long>();
+			List<SKU_Attribute_Value> list_skuav = skuavService.getlist_byproduct(productid_link);
+			for (SKU_Attribute_Value sku_av : list_skuav) {
+				mapsku.put(sku_av.getColorid() + "_" + sku_av.getSizeid(), sku_av.getSkuid_link());
+			}
+
+			while (listbom.size() > 0) {
+				CountDownLatch latch = new CountDownLatch(listbom.size());
+				for (POrderBomProduct pContractProductBom : listbom) {
+
+					// Chay de lay tung mau san pham
+					POrderBomProduct_Runnable bom2 = new POrderBomProduct_Runnable(list_colorid, pContractProductBom,
+							List_size, listbomsku, listbomsku_kythuat, listbomsku_sanxuat, listdata, latch, mapcolor,
+							mapsku, listbom);
+					bom2.start();
+				}
+				latch.await();
 			}
 
 			// lay trang thai cua dinh muc
