@@ -78,7 +78,7 @@ public class CutplanProcessingAPI {
 
 					List<CutplanProcessingD> cutplanProcessingDs = cutplanProcessing.getCutplanProcessingD();
 
-					int tong_so_la = 0;
+//					int tong_so_la = 0;
 					for (CutplanProcessingD cutplanProcessingD : cutplanProcessingDs) {
 						if (cutplanProcessingD.getId() == null || cutplanProcessingD.getId() == 0) {
 							cutplanProcessingD.setOrgrootid_link(user.getRootorgid_link());
@@ -86,7 +86,7 @@ public class CutplanProcessingAPI {
 
 							// update status warehouse thanh da cat
 							String epc = cutplanProcessingD.getEpc();
-							Long warehouseid_link = cutplanProcessingD.getWarehouseid_link();
+//							Long warehouseid_link = cutplanProcessingD.getWarehouseid_link();
 							List<Warehouse> warehouseList = warehouseService.findMaterialByEPC(epc);
 							if (warehouseList.size() > 0) {
 								Warehouse warehouse = warehouseList.get(0);
@@ -104,7 +104,7 @@ public class CutplanProcessingAPI {
 								}
 							}
 						}
-						tong_so_la += cutplanProcessingD.getLa_vai();
+//						tong_so_la += cutplanProcessingD.getLa_vai();
 					}
 					;
 
