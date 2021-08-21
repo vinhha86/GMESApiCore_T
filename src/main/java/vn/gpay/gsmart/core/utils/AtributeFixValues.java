@@ -23,13 +23,13 @@ public class AtributeFixValues {
 //	public static String folder_image = "http://27.71.231.154:8080/gmesdha_upload/product/";// DHA
 
 	// GSmart
-//	public static String url_authen = "http://localhost:8181";
+	public static String url_authen = "http://localhost:8181";
 	public static String url_jitin = "http://gpay.vn:8090/jitin";
-//	public static String folder_image = "http://gpay.vn:8090/gmesdha_upload/product/";
+	public static String folder_image = "http://gpay.vn:8090/gmesdha_upload/product/";
 
 	// Local
-	public static String url_authen = "http://gpay.vn:8181";// GSmart
+//	public static String url_authen = "http://gpay.vn:8181";// GSmart
 //    public static String url_jitin = "http://localhost:8991/jitin";//JITIN
 //  public static String url_gmes = "http://localhost:8990";//GMES
-	public static String folder_image = "http://gpay.vn:8090/gmesdha_upload/product/";
+//	public static String folder_image = "http://gpay.vn:8090/gmesdha_upload/product/";
 }

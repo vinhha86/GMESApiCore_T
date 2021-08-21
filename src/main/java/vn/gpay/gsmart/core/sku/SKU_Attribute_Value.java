@@ -19,7 +19,7 @@ import org.hibernate.annotations.NotFoundAction;
 import vn.gpay.gsmart.core.attribute.Attribute;
 import vn.gpay.gsmart.core.attributevalue.Attributevalue;
 
-@Table(name="sku_attribute_value")
+@Table(name = "sku_attribute_value")
 @Entity
 public class SKU_Attribute_Value implements Serializable {
 	/**
@@ -29,71 +29,86 @@ public class SKU_Attribute_Value implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "skuattvalue_generator")
-	@SequenceGenerator(name="skuattvalue_generator", sequenceName = "sku_attribute_value_id_seq", allocationSize=1)
+	@SequenceGenerator(name = "skuattvalue_generator", sequenceName = "sku_attribute_value_id_seq", allocationSize = 1)
 	private Long id;
-	
+
 	private Long skuid_link;
-	
+
 	private Long attributevalueid_link;
-	
+
 	private Long attributeid_link;
-	
+
 	private String extvalue;
-	
+
 	private Long usercreateid_link;
-	
+
 	private Date timecreate;
-	
+
 	private Long Orgrootid_link;
-	
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="skuid_link",insertable=false,updatable =false)
-    private SKU skuName;
-	
+	@JoinColumn(name = "skuid_link", insertable = false, updatable = false)
+	private SKU skuName;
+
+	@Transient
+	public long getColorid() {
+		if (skuName != null)
+			return skuName.getColorid_link();
+		return 0;
+	}
+
+	@Transient
+	public long getSizeid() {
+		if (skuName != null)
+			return skuName.getSize_id();
+		return 0;
+	}
+
 	@Transient
 	public String getSkuName() {
-		if(skuName!=null) {
+		if (skuName != null) {
 			return skuName.getName();
 		}
 		return "";
 	}
-	
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="attributeid_link",insertable=false,updatable =false)
-    private Attribute attribute;
-	
+	@JoinColumn(name = "attributeid_link", insertable = false, updatable = false)
+	private Attribute attribute;
+
 	@Transient
 	public String getAttributeName() {
-		if(attribute!=null) {
+		if (attribute != null) {
 			return attribute.getName();
 		}
 		return "";
 	}
-	
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="attributevalueid_link",insertable=false,updatable =false)
-    private Attributevalue attributevalue;
-	
+	@JoinColumn(name = "attributevalueid_link", insertable = false, updatable = false)
+	private Attributevalue attributevalue;
+
 	@Transient
 	public int getSort_Size() {
-		if(attributevalue!=null)
+		if (attributevalue != null)
 			return attributevalue.getSortvalue() == null ? 0 : attributevalue.getSortvalue();
 		return 0;
 	}
+
 	@Transient
 	public String getAttributeValueName() {
-		if(attributevalue!=null) {
+		if (attributevalue != null) {
 			return attributevalue.getValue();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public Boolean getIsdefaultvalue() {
-		if(attributevalue != null)
+		if (attributevalue != null)
 			return attributevalue.getIsdefault();
 		return true;
 	}

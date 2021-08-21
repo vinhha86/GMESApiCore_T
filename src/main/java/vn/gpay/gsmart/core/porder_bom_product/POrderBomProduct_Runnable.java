@@ -4,135 +4,154 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ThreadLocalRandom;
 
-import vn.gpay.gsmart.core.attributevalue.Attributevalue;
-import vn.gpay.gsmart.core.attributevalue.IAttributeValueService;
 import vn.gpay.gsmart.core.porder_bom_sku.POrderBOMSKU;
-import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 
 public class POrderBomProduct_Runnable implements Runnable {
-	private final List<Long> list_colorid;
-	private final POrderBomProduct pContractProductBom;
-	private final IAttributeValueService avService;
-	private final List<Long> List_size;
-	private final List<POrderBOMSKU> listbomsku;
-	private final List<POrderBOMSKU> listbomsku_kythuat;
-	private final List<POrderBOMSKU> listbomsku_sanxuat;
-	private final ISKU_AttributeValue_Service skuavService;
-	private final long productid_link;
-	private final List<Map<String, String>> listdata;
+	private Thread t;
+	private List<Long> list_colorid;
+	private POrderBomProduct pContractProductBom;
+	private List<Long> List_size;
+	private List<POrderBOMSKU> listbomsku;
+	private List<POrderBOMSKU> listbomsku_kythuat;
+	private List<POrderBOMSKU> listbomsku_sanxuat;
+	private List<Map<String, String>> listdata;
+	private Map<Long, String> mapcolor;
+	private Map<String, Long> map_sku;
+	CountDownLatch latch;
+	List<POrderBomProduct> listbom;
 
 	public POrderBomProduct_Runnable(List<Long> list_colorid, POrderBomProduct pContractProductBom,
-			IAttributeValueService avService, List<Long> List_size, List<POrderBOMSKU> listbomsku,
-			List<POrderBOMSKU> listbomsku_kythuat, List<POrderBOMSKU> listbomsku_sanxuat,
-			ISKU_AttributeValue_Service skuavService, long productid_link, List<Map<String, String>> listdata) {
+			List<Long> List_size, List<POrderBOMSKU> listbomsku, List<POrderBOMSKU> listbomsku_kythuat,
+			List<POrderBOMSKU> listbomsku_sanxuat, List<Map<String, String>> listdata, CountDownLatch latch,
+			Map<Long, String> mapcolor, Map<String, Long> map_sku, List<POrderBomProduct> listbom) {
 		// TODO Auto-generated constructor stub
 		this.list_colorid = list_colorid;
 		this.pContractProductBom = pContractProductBom;
-		this.avService = avService;
 		this.List_size = List_size;
 		this.listbomsku = listbomsku;
 		this.listbomsku_kythuat = listbomsku_kythuat;
 		this.listbomsku_sanxuat = listbomsku_sanxuat;
-		this.skuavService = skuavService;
-		this.productid_link = productid_link;
 		this.listdata = listdata;
+		this.latch = latch;
+		this.mapcolor = mapcolor;
+		this.map_sku = map_sku;
+		this.listbom = listbom;
+	}
+
+	public void start() {
+		if (t == null) {
+			int unboundedRandomValue = ThreadLocalRandom.current().nextInt();
+			t = new Thread(this, String.valueOf(unboundedRandomValue));
+			t.start();
+		}
 	}
 
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		for (Long colorid : list_colorid) {
-			Map<String, String> map = new HashMap<String, String>();
+		try {
+			for (Long colorid : list_colorid) {
+				Map<String, String> map = new HashMap<String, String>();
 
-			map.put("coKho", pContractProductBom.getCoKho() + "");
+				map.put("coKho", pContractProductBom.getCoKho() + "");
 
-			map.put("createddate", pContractProductBom.getCreateddate() + "");
+				map.put("createddate", pContractProductBom.getCreateddate() + "");
 
-			map.put("createduserid_link", "0" + pContractProductBom.getCreateduserid_link());
+				map.put("createduserid_link", "0" + pContractProductBom.getCreateduserid_link());
 
-			map.put("description", pContractProductBom.getDescription_product() + "");
+				map.put("description", pContractProductBom.getDescription_product() + "");
 
-			map.put("id", "0" + pContractProductBom.getId());
+				map.put("id", "0" + pContractProductBom.getId());
 
-			map.put("lost_ratio", "0" + pContractProductBom.getLost_ratio());
+				map.put("lost_ratio", "0" + pContractProductBom.getLost_ratio());
 
-			map.put("materialid_link", "0" + pContractProductBom.getMaterialid_link());
+				map.put("materialid_link", "0" + pContractProductBom.getMaterialid_link());
 
-			map.put("materialName", pContractProductBom.getMaterialName() + "");
+				map.put("materialName", pContractProductBom.getMaterialName() + "");
 
-			map.put("materialCode", pContractProductBom.getMaterialCode() + "");
+				map.put("materialCode", pContractProductBom.getMaterialCode() + "");
 
-			map.put("orgrootid_link", "0" + pContractProductBom.getOrgrootid_link());
+				map.put("orgrootid_link", "0" + pContractProductBom.getOrgrootid_link());
 
-			map.put("pcontractid_link", "0" + pContractProductBom.getPcontractid_link());
+				map.put("pcontractid_link", "0" + pContractProductBom.getPcontractid_link());
 
-			map.put("product_type", pContractProductBom.getProduct_type() + "");
+				map.put("product_type", pContractProductBom.getProduct_type() + "");
 
-			map.put("product_typeName", pContractProductBom.getProduct_typeName() + "");
+				map.put("product_typeName", pContractProductBom.getProduct_typeName() + "");
 
-			map.put("productid_link", pContractProductBom.getProductid_link() + "");
+				map.put("productid_link", pContractProductBom.getProductid_link() + "");
 
-			map.put("tenMauNPL", pContractProductBom.getTenMauNPL() + "");
+				map.put("tenMauNPL", pContractProductBom.getTenMauNPL() + "");
 
-			map.put("thanhPhanVai", pContractProductBom.getDescription_product() + "");
+				map.put("thanhPhanVai", pContractProductBom.getDescription_product() + "");
 
-			map.put("unitName", pContractProductBom.getUnitName() + "");
+				map.put("unitName", pContractProductBom.getUnitName() + "");
 
-			map.put("unitid_link", "0" + pContractProductBom.getUnitid_link());
+				map.put("unitid_link", "0" + pContractProductBom.getUnitid_link());
 
-			map.put("colorid_link", "0" + colorid);
+				map.put("colorid_link", "0" + colorid);
 
-			Attributevalue value = avService.findOne(colorid);
-			String color_name = value.getValue();
-			map.put("color_name", "" + color_name);
+				String color_name = mapcolor.get(colorid);
+				map.put("color_name", "" + color_name);
 
-			Float total_amount = (float) 0;
-			int total_size = 0;
+				Float total_amount = (float) 0;
+				int total_size = 0;
 
-			boolean check = false;
-			for (Long size : List_size) {
-				List<POrderBOMSKU> listbomsku_clone = new ArrayList<POrderBOMSKU>(listbomsku);
-				List<POrderBOMSKU> listbomsku_kt_clone = new ArrayList<POrderBOMSKU>(listbomsku_kythuat);
-				List<POrderBOMSKU> listbomsku_sx_clone = new ArrayList<POrderBOMSKU>(listbomsku_sanxuat);
+//				boolean check = false;
+				long materialid_link = pContractProductBom.getMaterialid_link();
+				for (Long size : List_size) {
+					List<POrderBOMSKU> listbomsku_clone = new ArrayList<POrderBOMSKU>(listbomsku);
+					List<POrderBOMSKU> listbomsku_kt_clone = new ArrayList<POrderBOMSKU>(listbomsku_kythuat);
+					List<POrderBOMSKU> listbomsku_sx_clone = new ArrayList<POrderBOMSKU>(listbomsku_sanxuat);
 
-				long skuid_link = skuavService.getsku_byproduct_and_valuemau_valueco(productid_link, colorid, size);
-				listbomsku_clone.removeIf(c -> !c.getMaterialid_link().equals(pContractProductBom.getMaterialid_link())
-						|| !c.getSkuid_link().equals(skuid_link));
-				listbomsku_kt_clone
-						.removeIf(c -> !c.getMaterialid_link().equals(pContractProductBom.getMaterialid_link())
-								|| !c.getSkuid_link().equals(skuid_link));
+					long skuid_link = map_sku.get(colorid + "_" + size);
+					listbomsku_clone.removeIf(c -> !c.getMaterialid_link().equals(materialid_link)
+							|| !c.getSkuid_link().equals(skuid_link));
 
-				Float amount_size_kt = (float) 0;
-				Float amount_size = (float) 0;
-				Float amount_size_sx = (float) 0;
+					listbomsku_kt_clone.removeIf(c -> !c.getMaterialid_link().equals(materialid_link)
+							|| !c.getSkuid_link().equals(skuid_link));
 
-				if (listbomsku_clone.size() > 0)
-					amount_size = listbomsku_clone.get(0).getAmount();
+					listbomsku_sx_clone.removeIf(c -> !c.getMaterialid_link().equals(materialid_link)
+							|| !c.getSkuid_link().equals(skuid_link));
 
-				if (listbomsku_kt_clone.size() > 0)
-					amount_size_kt = listbomsku_kt_clone.get(0).getAmount();
+					Float amount_size_kt = (float) 0;
+					Float amount_size = (float) 0;
+					Float amount_size_sx = (float) 0;
 
-				if (listbomsku_sx_clone.size() > 0)
-					amount_size_sx = listbomsku_sx_clone.get(0).getAmount();
+					if (listbomsku_clone.size() > 0)
+						amount_size = listbomsku_clone.get(0).getAmount();
 
-				map.put("" + size, amount_size + "");
-				map.put(size + "_KT", amount_size_kt + "");
-				map.put(size + "_SX", amount_size_sx + "");
+					if (listbomsku_kt_clone.size() > 0)
+						amount_size_kt = listbomsku_kt_clone.get(0).getAmount();
 
-				if (amount_size > 0 || amount_size_kt > 0) {
-					check = true;
-					total_amount += amount_size;
-					total_size++;
+					if (listbomsku_sx_clone.size() > 0)
+						amount_size_sx = listbomsku_sx_clone.get(0).getAmount();
+
+					map.put("" + size, amount_size + "");
+					map.put(size + "_KT", amount_size_kt + "");
+					map.put(size + "_SX", amount_size_sx + "");
+
+					if (amount_size > 0 || amount_size_kt > 0) {
+//						check = true;
+						total_amount += amount_size;
+						total_size++;
+					}
 				}
-			}
 
-			if (total_size > 0)
-				map.put("amount", "0" + (total_amount / total_size));
-			else
-				map.put("amount", "0");
-			if (check)
+				if (total_size > 0)
+					map.put("amount", "0" + (total_amount / total_size));
+				else
+					map.put("amount", "0");
+//				if (check)
 				listdata.add(map);
+				listbom.remove(pContractProductBom);
+			}
+		} catch (Exception e) {
+		} finally {
+			latch.countDown();
 		}
 	}
 
