@@ -40,6 +40,8 @@ public class ContractBuyerAPI {
 			for(ContractBuyer cb : cblist) {
 				String contract_code = cb.getContract_code().toLowerCase();
 				if(!contract_code.contains(entity.contract_code.toLowerCase())) continue;
+				if(cb.getIs_delete() == true) continue;
+				
 				temp.add(cb);
 			}
 			
@@ -169,7 +171,10 @@ public class ContractBuyerAPI {
 			,HttpServletRequest request ) {
 		ResponseBase response = new ResponseBase();
 		try {
-			contractBuyerService.deleteById(entity.id);
+//			contractBuyerService.deleteById(entity.id);
+			ContractBuyer contractBuyer = contractBuyerService.findOne(entity.id);
+			contractBuyer.setIs_delete(true);
+			contractBuyerService.save(contractBuyer);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

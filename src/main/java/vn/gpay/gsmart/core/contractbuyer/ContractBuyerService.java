@@ -50,7 +50,7 @@ public class ContractBuyerService extends AbstractService<ContractBuyer> impleme
 				.ge(Objects.nonNull(entity.contract_datefrom),"contract_date",GPAYDateFormat.atStartOfDay(entity.contract_datefrom))
                 .le(Objects.nonNull(entity.contract_dateto),"contract_date",GPAYDateFormat.atEndOfDay(entity.contract_dateto))
                 .eq(Objects.nonNull(entity.contract_year), "contract_year", entity.contract_year)
-				.build();
+                .build();
 		
 		List<ContractBuyer> list = repo.findAll(specification);
 		Comparator<ContractBuyer> compareByContractCode = (ContractBuyer c1, ContractBuyer c2) -> c1.getContract_code().compareTo( c2.getContract_code());

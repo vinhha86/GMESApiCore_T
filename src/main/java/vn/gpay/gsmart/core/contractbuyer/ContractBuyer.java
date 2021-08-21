@@ -39,6 +39,7 @@ public class ContractBuyer implements Serializable{
 	private Long vendorid_link;
 	private Date contract_date_finish;
 	private String comment;
+	private Boolean is_delete;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
@@ -145,6 +146,13 @@ public class ContractBuyer implements Serializable{
 	}
 	public void setContract_date_finish(Date contract_date_finish) {
 		this.contract_date_finish = contract_date_finish;
+	}
+	public Boolean getIs_delete() {
+		if(is_delete == null) return false;
+		return is_delete;
+	}
+	public void setIs_delete(Boolean is_delete) {
+		this.is_delete = is_delete;
 	}
 	public List<ContractBuyerD> getContractBuyerDs() {
 		Collections.sort(contractBuyerDs, new Comparator<ContractBuyerD>() {
