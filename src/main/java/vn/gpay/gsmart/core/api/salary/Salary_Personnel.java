@@ -66,6 +66,7 @@ public class Salary_Personnel implements Runnable{
 	public void run() {
 		try {
 			if (null != personnel){
+//				System.out.println(personnel.getFullname());
 				//2.Lay thong tin thang luong, bac luong cua nhan su
 				Long saltypeidlink = personnel.getSaltypeid_link(); //thang luong
 				Long sallevelid_link = personnel.getSallevelid_link();//bac luong
@@ -75,6 +76,7 @@ public class Salary_Personnel implements Runnable{
 					if (null!=theSal_Type){
 						//Neu la luong thoi gian
 						if (theSal_Type.getType() == 0){
+							
 							//Tinh gia tri luong gio theo thang luong, bac luong va so ngay lam viec
 							OrgSal_Type_Level theSal_Type_Level = saltype_levelService.get_bysaltype_and_level(saltypeidlink, sallevelid_link);
 							if (null != theSal_Type_Level.getSalamount() && null != theSalBasic.getWorkingdays() && 0 != theSalBasic.getWorkingdays()){
@@ -100,6 +102,7 @@ public class Salary_Personnel implements Runnable{
 			}
 			latch.countDown();
 		} catch (Exception e) {
+			latch.countDown();
 			e.printStackTrace();
 		}
 	}
