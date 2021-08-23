@@ -18,4 +18,7 @@ public interface TimesheetShiftTypeRepository extends JpaRepository<TimesheetShi
 	
 	@Query(value = "select c from TimesheetShiftType c where c.id = 1 ")
 	public List<TimesheetShiftType>getShift1ForAbsence();
+	//lay cao theo don vi
+	@Query(value = "select c from TimesheetShiftType c where c.orgid_link = :orgid_link ")
+	public List<TimesheetShiftType> getByOrgid_link(@Param ("orgid_link")final  Long orgid_link);
 }

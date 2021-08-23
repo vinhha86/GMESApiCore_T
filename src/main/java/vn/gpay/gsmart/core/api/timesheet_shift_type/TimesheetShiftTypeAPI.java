@@ -38,6 +38,20 @@ public class TimesheetShiftTypeAPI {
 			return new ResponseEntity<TimesheetShiftType_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+	@RequestMapping(value = "/getbyorgid_link", method = RequestMethod.POST)
+	public ResponseEntity<TimesheetShiftType_response> timesheetshifttype_GetByorgid_link(@RequestBody TimesheetShiftType_load_byorgid_link entity,HttpServletRequest request) {
+		TimesheetShiftType_response response = new TimesheetShiftType_response();
+		try {
+			response.data = timesheetShiftTypeService.getByOrgid_link(entity.orgid_link);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<TimesheetShiftType_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<TimesheetShiftType_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> timesheetshifttype_Create(@RequestBody TimesheetShiftType_create_request entity,
@@ -51,7 +65,7 @@ public class TimesheetShiftTypeAPI {
 			Date timeto = entity.timeto;
 			boolean checkboxfrom = entity.checkboxfrom;
 			boolean checkboxto = entity.checkboxto;
-			
+			Long orgid_link  =entity.orgid_link;
 //			List<TimesheetShiftType> listTimesheetShiftType = timesheetShiftTypeService.getByName(name);
 //			if(listTimesheetShiftType.size() > 0) {
 //				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -79,6 +93,8 @@ public class TimesheetShiftTypeAPI {
 			timesheetShiftType.setFrom_minute(from_minute);
 			timesheetShiftType.setTo_hour(to_hour);
 			timesheetShiftType.setTo_minute(to_minute);
+			
+			timesheetShiftType.setOrgid_link(orgid_link);
 			timesheetShiftTypeService.save(timesheetShiftType);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

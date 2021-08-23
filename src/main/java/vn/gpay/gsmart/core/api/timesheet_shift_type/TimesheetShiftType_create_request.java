@@ -11,4 +11,5 @@ public class TimesheetShiftType_create_request extends RequestBase{
 	public Date timeto;
 	public boolean checkboxfrom;
 	public boolean checkboxto;
+	public Long orgid_link;
 }

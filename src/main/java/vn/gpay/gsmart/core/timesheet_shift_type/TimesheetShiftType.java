@@ -25,6 +25,7 @@ public class TimesheetShiftType implements Serializable {
 	private Boolean is_atnight;
 	private Boolean is_default;
 	private Integer lunch_minute;
+	private Long orgid_link;
 	public Long getId() {
 		return id;
 	}
@@ -78,6 +79,12 @@ public class TimesheetShiftType implements Serializable {
 	}
 	public void setLunch_minute(Integer lunch_minute) {
 		this.lunch_minute = lunch_minute;
+	}
+	public Long getOrgid_link() {
+		return orgid_link;
+	}
+	public void setOrgid_link(Long orgid_link) {
+		this.orgid_link = orgid_link;
 	}
 	
 	
