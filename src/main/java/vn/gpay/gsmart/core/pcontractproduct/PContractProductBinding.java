@@ -19,103 +19,150 @@ public class PContractProductBinding {
 	private String productBuyerCode;
 	private String productVendorCode;
 	private String productinfo;
-	
-	
-	
+	private Float price;
+	private Integer amount_in_pair;
+
 	public Integer getProducttypeid_link() {
 		return producttypeid_link;
 	}
+
 	public void setProducttypeid_link(Integer producttypeid_link) {
 		this.producttypeid_link = producttypeid_link;
 	}
+
 	public Long getId() {
 		return id;
 	}
+
 	public void setId(Long id) {
 		this.id = id;
 	}
+
 	public Long getPcontractid_link() {
 		return pcontractid_link;
 	}
+
 	public void setPcontractid_link(Long pcontractid_link) {
 		this.pcontractid_link = pcontractid_link;
 	}
+
 	public Long getProductid_link() {
 		return productid_link;
 	}
+
 	public void setProductid_link(Long productid_link) {
 		this.productid_link = productid_link;
 	}
+
 	public Integer getPquantity() {
 		return pquantity;
 	}
+
 	public void setPquantity(Integer pquantity) {
 		this.pquantity = pquantity;
 	}
+
 	public Integer getAmount() {
 		return amount;
 	}
+
 	public void setAmount(Integer amount) {
 		this.amount = amount;
 	}
+
 	public Long getOrgrootid_link() {
 		return orgrootid_link;
 	}
+
 	public void setOrgrootid_link(Long orgrootid_link) {
 		this.orgrootid_link = orgrootid_link;
 	}
+
 	public byte[] getImgproduct() {
 		return imgproduct;
 	}
+
 	public void setImgproduct(byte[] imgproduct) {
 		this.imgproduct = imgproduct;
 	}
+
 	public String getProductName() {
 		return productName;
 	}
+
 	public void setProductName(String productName) {
 		this.productName = productName;
 	}
+
 	public String getProductCode() {
 		return productCode;
 	}
+
 	public void setProductCode(String productCode) {
 		this.productCode = productCode;
 	}
+
 	public Date getProduction_date() {
 		return production_date;
 	}
+
 	public Date getDelivery_date() {
 		return delivery_date;
 	}
+
 	public Float getUnitprice() {
 		return unitprice;
 	}
+
 	public void setProduction_date(Date production_date) {
 		this.production_date = production_date;
 	}
+
 	public void setDelivery_date(Date delivery_date) {
 		this.delivery_date = delivery_date;
 	}
+
 	public void setUnitprice(Float unitprice) {
 		this.unitprice = unitprice;
 	}
+
 	public String getProductBuyerCode() {
 		return productBuyerCode;
 	}
+
 	public String getProductVendorCode() {
 		return productVendorCode;
 	}
+
 	public void setProductBuyerCode(String productBuyerCode) {
 		this.productBuyerCode = productBuyerCode;
 	}
+
 	public void setProductVendorCode(String productVendorCode) {
 		this.productVendorCode = productVendorCode;
 	}
+
 	public String getProductinfo() {
 		return productinfo;
 	}
+
 	public void setProductinfo(String productinfo) {
 		this.productinfo = productinfo;
+	}
+
+	public Float getPrice() {
+		return price;
+	}
+
+	public void setPrice(Float price) {
+		this.price = price;
+	}
+
+	public Integer getAmount_in_pair() {
+		return amount_in_pair;
+	}
+
+	public void setAmount_in_pair(Integer amount_in_pair) {
+		this.amount_in_pair = amount_in_pair;
 	}
 }

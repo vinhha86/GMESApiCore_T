@@ -33,6 +33,8 @@ import vn.gpay.gsmart.core.pcontractproductpairing.IPContractProductPairingRepos
 import vn.gpay.gsmart.core.pcontractproductpairing.PContractProductPairing;
 import vn.gpay.gsmart.core.productattributevalue.IProductAttributeRepository;
 import vn.gpay.gsmart.core.productattributevalue.ProductAttributeValue;
+import vn.gpay.gsmart.core.productpairing.IProductPairingService;
+import vn.gpay.gsmart.core.productpairing.ProductPairing;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
 
 @Service
@@ -56,6 +58,8 @@ public class ProductService extends AbstractService<Product> implements IProduct
 	IPContractProductPairingRepository pcontractpairingRepo;
 	@Autowired
 	IProductRepository productRepo;
+	@Autowired
+	IProductPairingService pairService;
 
 	@Override
 	protected JpaRepository<Product, Long> getRepository() {
@@ -86,17 +90,16 @@ public class ProductService extends AbstractService<Product> implements IProduct
 		// Danh sach product cua khach hang
 		List<Long> lsProduct_Id = new ArrayList<Long>();
 		lsProduct_Id = serviceContractProduct.get_by_orgcustomer(orgrootid_link, orgcustomerid_link);
-		
-		//Lấy những sản phẩm mà chưa thuộc khách hàng nào
-		
+
+		// Lấy những sản phẩm mà chưa thuộc khách hàng nào
+
 		List<Long> list_product = productRepo.getproduct_notinbuyer();
-		if(list_product.size() > 0)
+		if (list_product.size() > 0)
 			lsProduct_Id.addAll(list_product);
-		
 
 		if (lsProduct_Id.size() == 0)
 			return null;
-		
+
 		// Tim danh sach Product thoa man dieu kien trong Attribute
 		List<Long> lsAttr_Final = new ArrayList<Long>();
 		if (attributes.size() > 0) {
@@ -209,11 +212,9 @@ public class ProductService extends AbstractService<Product> implements IProduct
 		String code = request.code;
 		Specification<Product> specification = Specifications.<Product>and()
 //	            .eq("product_type", request.product_type)
-				.eq("status", 1)
-				.eq("orgrootid_link", orgrootid_link)
+				.eq("status", 1).eq("orgrootid_link", orgrootid_link)
 				.like(name != "" && name != null, "buyername", "%" + name + "%")
-				.like(code != "" && code != null, "buyercode", "%" + code + "%")
-				.between("producttypeid_link", 10, 19)
+				.like(code != "" && code != null, "buyercode", "%" + code + "%").between("producttypeid_link", 10, 19)
 				.build();
 		Sort sort = Sorts.builder().asc("buyercode").build();
 
@@ -228,13 +229,10 @@ public class ProductService extends AbstractService<Product> implements IProduct
 		String code = request.code;
 		Specification<Product> specification = Specifications.<Product>and()
 //	            .eq("product_type", request.product_type)
-				.eq("status", 1)
-				.eq("orgrootid_link", orgrootid_link)
+				.eq("status", 1).eq("orgrootid_link", orgrootid_link)
 				.like(name != "" && name != null, "name", "%" + name + "%")
-				.like(code != "" && code != null, "code", "%" + code + "%")
-				.ge("producttypeid_link", 20)
-				.le("producttypeid_link", 29)
-				.build();
+				.like(code != "" && code != null, "code", "%" + code + "%").ge("producttypeid_link", 20)
+				.le("producttypeid_link", 29).build();
 		Sort sort = Sorts.builder().asc("name").build();
 
 		Page<Product> lst = repo.findAll(specification, PageRequest.of(request.page - 1, request.limit, sort));
@@ -274,7 +272,7 @@ public class ProductService extends AbstractService<Product> implements IProduct
 		Page<Product> lst = repo.findAll(specification, PageRequest.of(request.page - 1, request.limit, sort));
 		return lst;
 	}
-	
+
 	public Page<Product> getall_packingtrim(Long orgrootid_link, Product_getall_request request) {
 		// TODO Auto-generated method stub
 		String name = request.name;
@@ -296,7 +294,9 @@ public class ProductService extends AbstractService<Product> implements IProduct
 		String name = request.name.equals("") ? null : request.name;
 		String code = request.code.equals("") ? null : request.code;
 
-		List<Product> lst = repo.get_product_by_type(orgrootid_link, name, code, vn.gpay.gsmart.core.utils.ProductType.SKU_TYPE_MATERIAL_MIN, vn.gpay.gsmart.core.utils.ProductType.SKU_TYPE_MATERIAL_MAX);
+		List<Product> lst = repo.get_product_by_type(orgrootid_link, name, code,
+				vn.gpay.gsmart.core.utils.ProductType.SKU_TYPE_MATERIAL_MIN,
+				vn.gpay.gsmart.core.utils.ProductType.SKU_TYPE_MATERIAL_MAX);
 //		List<Product> lst = repo.findAllIgnoreCase(specification);
 		return lst;
 	}
@@ -358,6 +358,8 @@ public class ProductService extends AbstractService<Product> implements IProduct
 			product.setCode(current.getProductCode());
 			product.setImgproduct(current.getImgproduct());
 			product.setInfo(current.getProductinfo());
+			product.setAmount(current.getAmount());
+			product.setPrice(current.getPrice());
 			mapTmp.put(current.getProductid_link(), product);
 
 			id++;
@@ -370,14 +372,18 @@ public class ProductService extends AbstractService<Product> implements IProduct
 				long productid_link = current.getProductid_link();
 				List<PContractProductPairing> pairing = pcontractpairingRepo
 						.get_pairing_bypcontract_and_product(pcontractid_link, productid_link);
-				
+
 				if (pairing.size() > 0) {
 					for (PContractProductPairing pp : pairing) {
 						parentId = pp.getProductpairid_link();
-
 						if (parentId != null) {
 							ProductTree parent = mapTmp.get(parentId);
 							if (parent != null) {
+								ProductPairing pair = pairService.getproduct_pairing_bykey(productid_link, parentId);
+								int amount = 1;
+								if (pair != null)
+									amount = (pair.getAmount() == null || pair.getAmount() == 0) ? 1 : pair.getAmount();
+								int parent_amount = parent.getAmount() == null ? 0 : parent.getAmount();
 								ProductTree current_n = new ProductTree();
 								current_n.setId(id);
 								current_n.setProductid_link(productid_link);
@@ -386,6 +392,8 @@ public class ProductService extends AbstractService<Product> implements IProduct
 								current_n.setImgproduct(current.getImgproduct());
 								current_n.setParent_id(parentId);
 								current_n.setInfo(current.getProductinfo());
+								current_n.setAmount(parent_amount * amount);
+								current_n.setPrice(current.getPrice());
 
 								parent.getChildren().add(current_n);
 								mapTmp.remove(parentId);
@@ -427,30 +435,33 @@ public class ProductService extends AbstractService<Product> implements IProduct
 		// TODO Auto-generated method stub
 		return repo.getProductByExactBuyercode(buyercode);
 	}
-	
+
 	@Override
 	public List<Product> getProductByLikeBuyercode(String buyercode) {
 		// TODO Auto-generated method stub
-		return repo.getProductByLikeBuyercode("%"+buyercode+"%");
+		return repo.getProductByLikeBuyercode("%" + buyercode + "%");
 	}
 
 	@Override
-	public List<Product> getby_code_type_description_and_color_and_size(Long orgrootid_link, String code, int type, String description, Long colorid_link, Long sizeid_link) {
+	public List<Product> getby_code_type_description_and_color_and_size(Long orgrootid_link, String code, int type,
+			String description, Long colorid_link, Long sizeid_link) {
 		// TODO Auto-generated method stub
-		List<Product> list_color = repo.getby_code_type_description_and_value(orgrootid_link, code, description, colorid_link, AtributeFixValues.ATTR_COLOR, type);
-		List<Product> list_size = repo.getby_code_type_description_and_value(orgrootid_link, code, description, sizeid_link, AtributeFixValues.ATTR_SIZEWIDTH, type);
-		
+		List<Product> list_color = repo.getby_code_type_description_and_value(orgrootid_link, code, description,
+				colorid_link, AtributeFixValues.ATTR_COLOR, type);
+		List<Product> list_size = repo.getby_code_type_description_and_value(orgrootid_link, code, description,
+				sizeid_link, AtributeFixValues.ATTR_SIZEWIDTH, type);
+
 		Map<Long, Long> map_color = new HashMap<>();
-		for(Product p_color : list_color) {
+		for (Product p_color : list_color) {
 			map_color.put(p_color.getId(), p_color.getId());
 		}
-		
-		for(Product p_size : list_size) {
-			if(map_color.get(p_size.getId())!=null) {
+
+		for (Product p_size : list_size) {
+			if (map_color.get(p_size.getId()) != null) {
 				return list_color;
 			}
 		}
-		
+
 		return new ArrayList<Product>();
 	}
 
@@ -476,8 +487,10 @@ public class ProductService extends AbstractService<Product> implements IProduct
 
 	@Override
 	public List<Product> getAllProduct(Long orgrootid_link, String buyercode, String buyername) {
-		if(buyercode == null) buyercode = "";
-		if(buyername == null) buyername = "";
+		if (buyercode == null)
+			buyercode = "";
+		if (buyername == null)
+			buyername = "";
 		return repo.getAllProduct(orgrootid_link, buyercode, buyername);
 	}
 }

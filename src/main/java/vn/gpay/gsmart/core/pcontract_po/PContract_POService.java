@@ -496,4 +496,16 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		// TODO Auto-generated method stub
 		return repo.getby_parent_and_type_and_mausp(pcontractpo_parentid_link, mausanphamid_link, po_typeid_link);
 	}
+
+	@Override
+	public Integer getTotalProductinPcontract(Long pcontractid_link, Long productid_link) {
+		// TODO Auto-generated method stub
+		return repo.getTotalProductinPcontract(pcontractid_link, productid_link);
+	}
+
+	@Override
+	public Float getTotalPriceProductInPcontract(Long pcontractid_link, Long productid_link) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

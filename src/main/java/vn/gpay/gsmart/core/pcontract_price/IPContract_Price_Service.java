@@ -8,10 +8,13 @@ public interface IPContract_Price_Service extends Operations<PContract_Price> {
 	public List<PContract_Price> getPrice_ByPO(long pcontract_poid_link);
 
 	public PContract_Price getPrice_CMP(long pcontract_poid_link, long productid_link);
-	
+
 	public List<PContract_Price> getPrice_by_product(long pcontract_poid_link, long productid_link);
-	
+
 	public List<PContract_Price> getBySizesetNotAll(long pcontract_poid_link);
-	
-	public List<PContract_Price> getPrice_by_product_and_sizeset(long pcontract_poid_link, long productid_link, long sizesetid_link);
+
+	public List<PContract_Price> getPrice_by_product_and_sizeset(long pcontract_poid_link, long productid_link,
+			long sizesetid_link);
+
+	Float getTotalPrice(Long pcontractid_link, Long productid_link);
 }

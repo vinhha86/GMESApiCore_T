@@ -9,12 +9,14 @@ import org.springframework.stereotype.Service;
 import vn.gpay.gsmart.core.base.AbstractService;
 import vn.gpay.gsmart.core.pcontractproduct.IPContractProductRepository;
 
-
 @Service
-public class PContractProductPairingService extends AbstractService<PContractProductPairing> implements IPContractProductPairingService {
-	@Autowired IPContractProductPairingRepository repo;
-	@Autowired IPContractProductRepository pp_repo;
-	
+public class PContractProductPairingService extends AbstractService<PContractProductPairing>
+		implements IPContractProductPairingService {
+	@Autowired
+	IPContractProductPairingRepository repo;
+	@Autowired
+	IPContractProductRepository pp_repo;
+
 	@Override
 	protected JpaRepository<PContractProductPairing, Long> getRepository() {
 		// TODO Auto-generated method stub

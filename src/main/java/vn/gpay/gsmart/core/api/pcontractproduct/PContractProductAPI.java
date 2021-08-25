@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
+import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Service;
 import vn.gpay.gsmart.core.pcontractattributevalue.IPContractProductAtrributeValueService;
 import vn.gpay.gsmart.core.pcontractattributevalue.PContractAttributeValue;
 import vn.gpay.gsmart.core.pcontractproduct.IPContractProductService;
@@ -79,6 +80,8 @@ public class PContractProductAPI {
 	ITask_Service taskService;
 	@Autowired
 	ITask_Flow_Service commentService;
+	@Autowired
+	IPContract_Price_Service priceService;
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> Create(HttpServletRequest request,
@@ -520,6 +523,9 @@ public class PContractProductAPI {
 				binding.setUnitprice(pContractProduct.getUnitprice());
 				binding.setProducttypeid_link(pContractProduct.getProducttypeid_link());
 				binding.setProductinfo(pContractProduct.getProductinfo());
+				binding.setAmount(pcontract_POService.getTotalProductinPcontract(pcontractid_link,
+						pContractProduct.getProductid_link()));
+				binding.setPrice(priceService.getTotalPrice(pcontractid_link, pContractProduct.getProductid_link()));
 
 				String uploadRootPath = request.getServletContext().getRealPath("");
 				File uploadRootDir = new File(uploadRootPath);
@@ -556,8 +562,11 @@ public class PContractProductAPI {
 				binding.setProductid_link(pair.getProductpairid_link());
 				binding.setProductCode(pair.getproductpairCode());
 				binding.setProductName(pair.getproductpairName());
-				binding.setProducttypeid_link(5);
+				binding.setProducttypeid_link(vn.gpay.gsmart.core.utils.ProductType.SKU_TYPE_PRODUCT_PAIR);
 				binding.setProductinfo(pair.getProductinfo());
+				binding.setAmount(
+						pcontract_POService.getTotalProductinPcontract(pcontractid_link, pair.getProductpairid_link()));
+				binding.setPrice(priceService.getTotalPrice(pcontractid_link, pair.getProductpairid_link()));
 
 				data.add(binding);
 			}

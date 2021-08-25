@@ -110,13 +110,14 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 	}
 
 	@Override
-	public List<PContract> getBySearch_PosList(PContract_getbysearch_request entity, List<Long> pos, List<Long> product,List<Long> vendors, List<Long> buyers) {
+	public List<PContract> getBySearch_PosList(PContract_getbysearch_request entity, List<Long> pos, List<Long> product,
+			List<Long> vendors, List<Long> buyers) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 
 		CriteriaQuery<PContract> cq_po = cb.createQuery(PContract.class);
 		Root<PContract> rootPcontract = cq_po.from(PContract.class);
 		List<Predicate> thePredicates = new ArrayList<>();
-		
+
 		// pos
 		if (pos.size() > 0) {
 			In<Long> inContractClause = cb.in(rootPcontract.get("id"));
@@ -124,11 +125,10 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 				inContractClause.value(thePContract);
 			}
 			thePredicates.add(cb.and(inContractClause));
-		}
-		else {
+		} else {
 			return null;
 		}
-		
+
 		// product
 		if (product.size() > 0) {
 			In<Long> inContractProductClause = cb.in(rootPcontract.get("id"));
@@ -136,8 +136,7 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 				inContractProductClause.value(p);
 			}
 			thePredicates.add(cb.and(inContractProductClause));
-		}
-		else {
+		} else {
 			return null;
 		}
 
@@ -149,43 +148,40 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 		if (entity.orgvendorid_link > 0) {
 			thePredicates.add(cb.equal(rootPcontract.get("orgvendorid_link"), entity.orgvendorid_link));
 		}
-		
+
 		// contractbuyer_code
 		if (entity.contractbuyer_code.length() > 0) {
 			thePredicates
 					.add(cb.equal(rootPcontract.get("contractbuyer").get("contract_code"), entity.contractbuyer_code));
 		}
 		// contractbuyer_yearfrom
-		if (Objects.nonNull(entity.contractbuyer_yearfrom)) {
-			thePredicates
-					.add(cb.ge(rootPcontract.get("contractbuyer").get("contract_year"), entity.contractbuyer_yearfrom));
-		}
-		// contractbuyer_yearto
-		if (Objects.nonNull(entity.contractbuyer_yearto)) {
-			thePredicates
-					.add(cb.le(rootPcontract.get("contractbuyer").get("contract_year"), entity.contractbuyer_yearto));
-		}
-		
-		
-		//vendor
-		if(vendors.size()>0) {
+//		if (Objects.nonNull(entity.contractbuyer_yearfrom)) {
+//			thePredicates
+//					.add(cb.ge(rootPcontract.get("contractbuyer").get("contract_year"), entity.contractbuyer_yearfrom));
+//		}
+//		// contractbuyer_yearto
+//		if (Objects.nonNull(entity.contractbuyer_yearto)) {
+//			thePredicates
+//					.add(cb.le(rootPcontract.get("contractbuyer").get("contract_year"), entity.contractbuyer_yearto));
+//		}
+
+		// vendor
+		if (vendors.size() > 0) {
 			In<Long> inVendorClause = cb.in(rootPcontract.get("orgvendorid_link"));
 			for (Long vendor : vendors) {
 				inVendorClause.value(vendor);
 			}
 			thePredicates.add(cb.and(inVendorClause));
 		}
-		
-		//buyer
-		if(buyers.size()>0) {
+
+		// buyer
+		if (buyers.size() > 0) {
 			In<Long> inBuyerClause = cb.in(rootPcontract.get("orgbuyerid_link"));
 			for (Long buyer : buyers) {
 				inBuyerClause.value(buyer);
 			}
 			thePredicates.add(cb.and(inBuyerClause));
 		}
-		
-		
 
 		Predicate p = cb.and(thePredicates.toArray(new Predicate[0]));
 		cq_po.where(p);

@@ -26,125 +26,134 @@ import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Repository;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.utils.POrderStatus;
 
-
 @Service
 public class SalaryFund_Service implements ISalaryFund_Service {
-	@Autowired IOrgService orgService;
-	@Autowired IPOrder_Repository repoPOrder;
-	@Autowired IPOrderGrant_Repository repoPOrderGrant;
-	@Autowired IPContract_Price_Service priceService;
-	@Autowired IPContract_POService poService;
-	
+	@Autowired
+	IOrgService orgService;
+	@Autowired
+	IPOrder_Repository repoPOrder;
+	@Autowired
+	IPOrderGrant_Repository repoPOrderGrant;
+	@Autowired
+	IPContract_Price_Service priceService;
+	@Autowired
+	IPContract_POService poService;
+
 	@Override
-	public List<SalaryFund_Data> getData_ByMonth(Long userrootorgid_link, Long userorgid_link, int month, int year, int reportmonths){
-		List<SalaryFund_Data> data =  new ArrayList<SalaryFund_Data>();
-		List<ReportMonth> month_data =  new ArrayList<ReportMonth>();
-		//Tinh nam va thang cua thang truoc do
-		int month_prev = month -1;
+	public List<SalaryFund_Data> getData_ByMonth(Long userrootorgid_link, Long userorgid_link, int month, int year,
+			int reportmonths) {
+		List<SalaryFund_Data> data = new ArrayList<SalaryFund_Data>();
+		List<ReportMonth> month_data = new ArrayList<ReportMonth>();
+		// Tinh nam va thang cua thang truoc do
+		int month_prev = month - 1;
 		int year_prev = year;
-		if (month_prev == 0){
+		if (month_prev == 0) {
 			month_prev = 12;
-			year_prev = year -1;
+			year_prev = year - 1;
 		}
-	
-		//Neu month_prev <> 1 va 12 --> Tinh luon cac thang tu dau nam (de hien duoc so tong ca nam trong bang CMP)
-		if (month_prev !=1 && month_prev !=12){
-			for(int i=1;i<=month_prev;i++){
-				month_data.add(new ReportMonth(i,year_prev));
+
+		// Neu month_prev <> 1 va 12 --> Tinh luon cac thang tu dau nam (de hien duoc so
+		// tong ca nam trong bang CMP)
+		if (month_prev != 1 && month_prev != 12) {
+			for (int i = 1; i <= month_prev; i++) {
+				month_data.add(new ReportMonth(i, year_prev));
 			}
 		}
-		month_data.add(new ReportMonth(month_prev,year_prev));
-		month_data.add(new ReportMonth(month,year));
-		for(int i=0;i<reportmonths;i++){
+		month_data.add(new ReportMonth(month_prev, year_prev));
+		month_data.add(new ReportMonth(month, year));
+		for (int i = 0; i < reportmonths; i++) {
 			int month_next = month + 1;
 			int year_next = year;
-			if (month_next == 13){
+			if (month_next == 13) {
 				month_next = 1;
 				year_next = year + 1;
 			}
-			
-			month_data.add(new ReportMonth(month_next,year_next));
+
+			month_data.add(new ReportMonth(month_next, year_next));
 			month = month_next;
 			year = year_next;
 		}
-		
-		//Lay danh sach toan bo cac phan xuong trong he thong
-		List<Org> ls_tosx = orgService.findOrgByType(userrootorgid_link, userorgid_link,13);
-		int id=0;
+
+		// Lay danh sach toan bo cac phan xuong trong he thong
+		List<Org> ls_tosx = orgService.findOrgByType(userrootorgid_link, userorgid_link, 13);
+		int id = 0;
 		try {
-			for(Org theOrg: ls_tosx){
+			for (Org theOrg : ls_tosx) {
 //				System.out.println(theOrg.getCode());
-				for(ReportMonth theRMonth: month_data){
-					Integer cmp_month = getSalaryFund_Month(theOrg.getId(), theRMonth.getMonth(),theRMonth.getYear());
-					
+				for (ReportMonth theRMonth : month_data) {
+					Integer cmp_month = getSalaryFund_Month(theOrg.getId(), theRMonth.getMonth(), theRMonth.getYear());
+
 					SalaryFund_Data data_month = new SalaryFund_Data();
 					data_month.setId(id);
 					data_month.setMonth(theRMonth.getMonth());
 					data_month.setYear(theRMonth.getYear());
 					data_month.setOrgid_link(theOrg.getId());
 					data_month.setOrgname(theOrg.getCode());
-	//				data_prev.setParentorgid_link(theOrg.getParentid_link());
-	//				data_prev.setParentorgname(theOrg.getParentcode());
-					
+					// data_prev.setParentorgid_link(theOrg.getParentid_link());
+					// data_prev.setParentorgname(theOrg.getParentcode());
+
 					data_month.setSalaryfundamount(cmp_month);
 					data.add(data_month);
 					id++;
 				}
 			}
-		} catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return data;
 	}
-	
+
 	@Override
-	public List<SalaryFund_Data> getData_ByMonth_ToSX(Long userrootorgid_link, Long userorgid_link, int month, int year, int reportmonths){
-		List<SalaryFund_Data> data =  new ArrayList<SalaryFund_Data>();
-		List<ReportMonth> month_data =  new ArrayList<ReportMonth>();
-		//Tinh nam va thang cua thang truoc do
-		int month_prev = month -1;
+	public List<SalaryFund_Data> getData_ByMonth_ToSX(Long userrootorgid_link, Long userorgid_link, int month, int year,
+			int reportmonths) {
+		List<SalaryFund_Data> data = new ArrayList<SalaryFund_Data>();
+		List<ReportMonth> month_data = new ArrayList<ReportMonth>();
+		// Tinh nam va thang cua thang truoc do
+		int month_prev = month - 1;
 		int year_prev = year;
-		if (month_prev == 0){
+		if (month_prev == 0) {
 			month_prev = 12;
-			year_prev = year -1;
+			year_prev = year - 1;
 		}
-	
-		//Neu month_prev <> 1 va 12 --> Tinh luon cac thang tu dau nam (de hien duoc so tong ca nam trong bang CMP)
-		if (month_prev !=1 && month_prev !=12){
-			for(int i=1;i<=month_prev;i++){
-				month_data.add(new ReportMonth(i,year_prev));
+
+		// Neu month_prev <> 1 va 12 --> Tinh luon cac thang tu dau nam (de hien duoc so
+		// tong ca nam trong bang CMP)
+		if (month_prev != 1 && month_prev != 12) {
+			for (int i = 1; i <= month_prev; i++) {
+				month_data.add(new ReportMonth(i, year_prev));
 			}
 		}
-		month_data.add(new ReportMonth(month_prev,year_prev));
-		month_data.add(new ReportMonth(month,year));
-		for(int i=0;i<reportmonths;i++){
+		month_data.add(new ReportMonth(month_prev, year_prev));
+		month_data.add(new ReportMonth(month, year));
+		for (int i = 0; i < reportmonths; i++) {
 			int month_next = month + 1;
 			int year_next = year;
-			if (month_next == 13){
+			if (month_next == 13) {
 				month_next = 1;
 				year_next = year + 1;
 			}
-			
-			month_data.add(new ReportMonth(month_next,year_next));
+
+			month_data.add(new ReportMonth(month_next, year_next));
 			month = month_next;
 			year = year_next;
 		}
-		
+
 		List<Org> ls_tosx;
-		
+
 		if (userrootorgid_link == userorgid_link)
-			//Lay danh sach toan bo cac phan xuong trong he thong
-			ls_tosx = orgService.findOrgByType(userrootorgid_link, userorgid_link,14);
+			// Lay danh sach toan bo cac phan xuong trong he thong
+			ls_tosx = orgService.findOrgByType(userrootorgid_link, userorgid_link, 14);
 		else
-			//Lay danh sach toan bo cac to thuoc phan xuong
-			ls_tosx = orgService.findChildByType(userrootorgid_link, userorgid_link,14);
-		int id=0;
+			// Lay danh sach toan bo cac to thuoc phan xuong
+			ls_tosx = orgService.findChildByType(userrootorgid_link, userorgid_link, 14);
+		int id = 0;
 		try {
-			for(Org theOrg: ls_tosx){
+			for (Org theOrg : ls_tosx) {
 //				System.out.println(theOrg.getCode());
-				for(ReportMonth theRMonth: month_data){
-					Integer cmp_month = getSalaryFund_Month_ToSX(theOrg.getId(), theRMonth.getMonth(),theRMonth.getYear());
-					
+				for (ReportMonth theRMonth : month_data) {
+					Integer cmp_month = getSalaryFund_Month_ToSX(theOrg.getId(), theRMonth.getMonth(),
+							theRMonth.getYear());
+
 					SalaryFund_Data data_month = new SalaryFund_Data();
 					data_month.setId(id);
 					data_month.setMonth(theRMonth.getMonth());
@@ -153,26 +162,27 @@ public class SalaryFund_Service implements ISalaryFund_Service {
 					data_month.setOrgname(theOrg.getName());
 					data_month.setParentorgid_link(theOrg.getParentid_link());
 					data_month.setParentorgname(theOrg.getParentcode());
-					
+
 					data_month.setSalaryfundamount(cmp_month);
 					data.add(data_month);
 					id++;
 				}
 			}
-		} catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return data;
 	}
-	
-	private Integer getSalaryFund_Month(long orgid_link, Integer month, Integer year){
-		//StartDate from 00:00:00 of the Date 7 of the month
-		//EndDate from 23:59:59 of the Date 6 of next month
+
+	private Integer getSalaryFund_Month(long orgid_link, Integer month, Integer year) {
+		// StartDate from 00:00:00 of the Date 7 of the month
+		// EndDate from 23:59:59 of the Date 6 of next month
+
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
 		String dateStartString = "07-" + month.toString() + "-" + year.toString() + " 00:00:00";
 		Integer month_next = month + 1;
 		Integer year_next = year;
-		if (month_next == 13){
+		if (month_next == 13) {
 			month_next = 1;
 			year_next = year + 1;
 		}
@@ -180,38 +190,45 @@ public class SalaryFund_Service implements ISalaryFund_Service {
 		try {
 			Date dateStart = sdf.parse(dateStartString);
 			Date dateEnd = sdf.parse(dateEndString);
-			//Lay danh sach cac Porder trong khoang thoi gian
-			Specification<POrder> specification = Specifications.<POrder>and()
-					.eq("granttoorgid_link", orgid_link)
-					.ge("status", POrderStatus.PORDER_STATUS_FREE)
-		            .ge("pcontract_po.shipdate",dateStart)
-	                .le("pcontract_po.shipdate",dateEnd)
-		            .build();
-			Sort sort = Sorts.builder()
-			        .desc("ordercode")
-			        .build();
-			List<POrder> lsPOrder = repoPOrder.findAll(specification,sort);
+			// Lay danh sach cac Porder trong khoang thoi gian
+			Specification<POrder> specification = Specifications.<POrder>and().eq("granttoorgid_link", orgid_link)
+					.ge("status", POrderStatus.PORDER_STATUS_FREE).ge("pcontract_po.shipdate", dateStart)
+					.le("pcontract_po.shipdate", dateEnd).build();
+			Sort sort = Sorts.builder().desc("ordercode").build();
+			List<POrder> lsPOrder = repoPOrder.findAll(specification, sort);
 			Integer totalSalaryFund = 0;
-			for(POrder thePOrder: lsPOrder){
-				//Neu Price_Sewingcost =0 --> Lay gia Price_Sweingtarget. Else lay gia Price_Sewingcost
-				PContract_Price thePrice = priceService.getPrice_CMP(thePOrder.getPcontract_poid_link(), thePOrder.getProductid_link());
+			for (POrder thePOrder : lsPOrder) {
+				// Neu Price_Sewingcost =0 --> Lay gia Price_Sweingtarget. Else lay gia
+				// Price_Sewingcost
+				PContract_Price thePrice = priceService.getPrice_CMP(thePOrder.getPcontract_poid_link(),
+						thePOrder.getProductid_link());
 				if (null != thePrice) {
-					int price = Math.round(thePrice.getPrice_sewingcost()>0?thePrice.getPrice_sewingcost():thePrice.getPrice_sewingtarget());
-					int totalorder = Math.round(null==thePOrder.getTotalorder()?0:thePOrder.getTotalorder());
-					totalSalaryFund = totalSalaryFund + (price*totalorder);
+					int price = Math.round(thePrice.getPrice_sewingcost() > 0 ? thePrice.getPrice_sewingcost()
+							: thePrice.getPrice_sewingtarget());
+					int totalorder = Math.round(null == thePOrder.getTotalorder() ? 0 : thePOrder.getTotalorder());
+					totalSalaryFund = totalSalaryFund + (price * totalorder);
 				} else {
-					//Kiem tra xem PO co phai PO con ko
+					// Kiem tra xem PO co phai PO con ko
 					PContract_PO thePO = poService.findOne(thePOrder.getPcontract_poid_link());
-					if (null != thePO){
-						if (null != thePO.getParentpoid_link()){
-							//Lay gia CMP cua san pham trong PO cha
-							PContract_Price thePrice_Parent = priceService.getPrice_CMP(thePO.getParentpoid_link(), thePOrder.getProductid_link());
-							if (null != thePrice_Parent){
-								int price = Math.round(thePrice_Parent.getPrice_sewingcost()>0?thePrice_Parent.getPrice_sewingcost():thePrice_Parent.getPrice_sewingtarget());
-								int totalorder = Math.round(null==thePOrder.getTotalorder()?0:thePOrder.getTotalorder());
-								totalSalaryFund = totalSalaryFund + (price*totalorder);							}
+					if (null != thePO) {
+						if (null != thePO.getParentpoid_link()) {
+							// Lay gia CMP cua san pham trong PO cha
+							PContract_Price thePrice_Parent = priceService.getPrice_CMP(thePO.getParentpoid_link(),
+									thePOrder.getProductid_link());
+							if (null != thePrice_Parent) {
+								float parent_price_sewingcost = thePrice_Parent.getPrice_sewingcost() == null ? 0
+										: thePrice_Parent.getPrice_sewingcost();
+								float parent_price_sewingtarget = thePrice_Parent.getPrice_sewingtarget() == null ? 0
+										: thePrice_Parent.getPrice_sewingtarget();
+
+								int price = Math.round(parent_price_sewingcost > 0 ? parent_price_sewingcost
+										: parent_price_sewingtarget);
+								int totalorder = Math
+										.round(null == thePOrder.getTotalorder() ? 0 : thePOrder.getTotalorder());
+								totalSalaryFund = totalSalaryFund + (price * totalorder);
+							}
 						}
-					}					
+					}
 				}
 			}
 			return totalSalaryFund;
@@ -221,14 +238,15 @@ public class SalaryFund_Service implements ISalaryFund_Service {
 			return 0;
 		}
 	}
-	private Integer getSalaryFund_Month_ToSX(long orgid_link, Integer month, Integer year){
-		//StartDate from 00:00:00 of the Date 7 of the month
-		//EndDate from 23:59:59 of the Date 6 of next month
+
+	private Integer getSalaryFund_Month_ToSX(long orgid_link, Integer month, Integer year) {
+		// StartDate from 00:00:00 of the Date 7 of the month
+		// EndDate from 23:59:59 of the Date 6 of next month
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
 		String dateStartString = "07-" + month.toString() + "-" + year.toString() + " 00:00:00";
 		Integer month_next = month + 1;
 		Integer year_next = year;
-		if (month_next == 13){
+		if (month_next == 13) {
 			month_next = 1;
 			year_next = year + 1;
 		}
@@ -236,39 +254,46 @@ public class SalaryFund_Service implements ISalaryFund_Service {
 		try {
 			Date dateStart = sdf.parse(dateStartString);
 			Date dateEnd = sdf.parse(dateEndString);
-			//Lay danh sach cac Porder trong khoang thoi gian
+			// Lay danh sach cac Porder trong khoang thoi gian
 			Specification<POrderGrant> specification = Specifications.<POrderGrant>and()
-					.eq("granttoorgid_link", orgid_link)
-					.ge("status", POrderStatus.PORDER_STATUS_FREE)
-		            .ge("finish_date_plan",dateStart)
-	                .le("finish_date_plan",dateEnd)
-		            .build();
+					.eq("granttoorgid_link", orgid_link).ge("status", POrderStatus.PORDER_STATUS_FREE)
+					.ge("finish_date_plan", dateStart).le("finish_date_plan", dateEnd).build();
 //			Sort sort = Sorts.builder()
 //			        .desc("ordercode")
 //			        .build();
 			List<POrderGrant> lsPOrderGrant = repoPOrderGrant.findAll(specification);
 			Integer totalSalaryFund = 0;
-			for(POrderGrant thePOrder: lsPOrderGrant){
-				//Neu Price_Sewingcost =0 --> Lay gia Price_Sweingtarget. Else lay gia Price_Sewingcost
-				PContract_Price thePrice = priceService.getPrice_CMP(thePOrder.getPcontract_poid_link(), thePOrder.getProductid_link());
+			for (POrderGrant thePOrder : lsPOrderGrant) {
+				// Neu Price_Sewingcost =0 --> Lay gia Price_Sweingtarget. Else lay gia
+				// Price_Sewingcost
+				PContract_Price thePrice = priceService.getPrice_CMP(thePOrder.getPcontract_poid_link(),
+						thePOrder.getProductid_link());
 				if (null != thePrice) {
-					int price = Math.round(thePrice.getPrice_sewingcost()>0?thePrice.getPrice_sewingcost():thePrice.getPrice_sewingtarget());
-					int totalorder = Math.round(null==thePOrder.getGrantamount()?0:thePOrder.getGrantamount());
-					totalSalaryFund = totalSalaryFund + (price*totalorder);
+					int price = Math.round(thePrice.getPrice_sewingcost() > 0 ? thePrice.getPrice_sewingcost()
+							: thePrice.getPrice_sewingtarget());
+					int totalorder = Math.round(null == thePOrder.getGrantamount() ? 0 : thePOrder.getGrantamount());
+					totalSalaryFund = totalSalaryFund + (price * totalorder);
 				} else {
-					//Kiem tra xem PO co phai PO con ko
+					// Kiem tra xem PO co phai PO con ko
 					PContract_PO thePO = poService.findOne(thePOrder.getPcontract_poid_link());
-					if (null != thePO){
-						if (null != thePO.getParentpoid_link()){
-							//Lay gia CMP cua san pham trong PO cha
-							PContract_Price thePrice_Parent = priceService.getPrice_CMP(thePO.getParentpoid_link(), thePOrder.getProductid_link());
-							if (null != thePrice_Parent){
-								int price = Math.round(null!=thePrice_Parent.getPrice_sewingcost()&&thePrice_Parent.getPrice_sewingcost()>0?thePrice_Parent.getPrice_sewingcost():null!=thePrice_Parent.getPrice_sewingtarget()?thePrice_Parent.getPrice_sewingtarget():0);
-								int totalorder = Math.round(null==thePOrder.getGrantamount()?0:thePOrder.getGrantamount());
-								totalSalaryFund = totalSalaryFund + (price*totalorder);							
+					if (null != thePO) {
+						if (null != thePO.getParentpoid_link()) {
+							// Lay gia CMP cua san pham trong PO cha
+							PContract_Price thePrice_Parent = priceService.getPrice_CMP(thePO.getParentpoid_link(),
+									thePOrder.getProductid_link());
+							if (null != thePrice_Parent) {
+								int price = Math.round(null != thePrice_Parent.getPrice_sewingcost()
+										&& thePrice_Parent.getPrice_sewingcost() > 0
+												? thePrice_Parent.getPrice_sewingcost()
+												: null != thePrice_Parent.getPrice_sewingtarget()
+														? thePrice_Parent.getPrice_sewingtarget()
+														: 0);
+								int totalorder = Math
+										.round(null == thePOrder.getGrantamount() ? 0 : thePOrder.getGrantamount());
+								totalSalaryFund = totalSalaryFund + (price * totalorder);
 							}
 						}
-					}					
+					}
 				}
 			}
 			return totalSalaryFund;
@@ -277,5 +302,5 @@ public class SalaryFund_Service implements ISalaryFund_Service {
 			e.printStackTrace();
 			return 0;
 		}
-	}	
+	}
 }
