@@ -36,8 +36,9 @@ public interface IPContract_Price_Repository
 			+ "pcontract_poid_link = :pcontract_poid_link")
 	public List<PContract_Price> getBySizesetNotAll(@Param("pcontract_poid_link") final Long pcontract_poid_link);
 
-	@Query(value = "select sum(totalprice) from PContract_Price c " + "where sizesetid_link = 1 and "
-			+ "pcontractid_link = :pcontractid_link and productid_link = :productid_link")
+	@Query(value = "select sum(c.totalprice) from PContract_Price c "
+			+ "inner join PContract_PO a on a.id = c.pcontract_poid_link " + "where sizesetid_link = 1 and "
+			+ "c.pcontractid_link = :pcontractid_link and c.productid_link = :productid_link and po_typeid_link in (0,1)")
 	public Float getTotalPrice(@Param("pcontractid_link") final Long pcontractid_link,
 			@Param("productid_link") final Long productid_link);
 }

@@ -16,51 +16,50 @@ import vn.gpay.gsmart.core.base.AbstractService;
 
 @Service
 public class Personnel_Service extends AbstractService<Personel> implements IPersonnel_Service {
-	@Autowired Personnel_repository repo;
+	@Autowired
+	Personnel_repository repo;
+
 	@Override
 	protected JpaRepository<Personel, Long> getRepository() {
 		// TODO Auto-generated method stub
 		return repo;
 	}
+
 	@Override
 	public List<Personel> getby_orgmanager(Long orgmanagerid_link, long orgrootid_link) {
 		// TODO Auto-generated method stub
 		Specification<Personel> specification = Specifications.<Personel>and()
-				.eq("orgmanagerid_link", orgmanagerid_link)
-				.eq("orgrootid_link", orgrootid_link)
-				.ge("status", 0)
+				.eq("orgmanagerid_link", orgmanagerid_link).eq("orgrootid_link", orgrootid_link).ge("status", 0)
 				.build();
 
 		Sort sort = Sorts.builder().asc("code").build();
 		List<Personel> lst = repo.findAll(specification, sort);
 		return lst;
 	}
+
 	@Override
 	public List<Personel> getby_org(Long orgid_link, long orgrootid_link) {
 		// TODO Auto-generated method stub
-		Specification<Personel> specification = Specifications.<Personel>and()
-				.eq("orgid_link", orgid_link)
-				.eq("orgrootid_link", orgrootid_link)
-				.build();
-
-		Sort sort = Sorts.builder().asc("code").build();
-		List<Personel> lst = repo.findAll(specification, sort);
-		return lst;
+		return repo.getbyOrg(orgid_link);
 	}
+
 	@Override
 	public List<Personel> getByNotRegister() {
 		// TODO Auto-generated method stub
 		return repo.getByNotRegister();
 	}
+
 	@Override
 	public List<Personel> getPerson_by_register_code(Long orgrootid_link, String register_code) {
 		// TODO Auto-generated method stub
 		return repo.getby_registercode(register_code, orgrootid_link);
 	}
+
 	@Override
 	public List<Personel> getForPProcessingProductivity(Long orgid_link, Integer shifttypeid_link, Date workingdate) {
 		return repo.getForPProcessingProductivity(orgid_link, shifttypeid_link, workingdate);
 	}
+
 	@Override
 	public List<Personel> getby_orgs(List<Long> orgid_link, long orgrootid_link, boolean ishas_bikenumber) {
 		// TODO Auto-generated method stub
@@ -75,18 +74,20 @@ public class Personnel_Service extends AbstractService<Personel> implements IPer
 //		List<Personel> lst = repo.findAll(specification, sort);
 		return repo.getperson_and_bikenumber(orgid_link, ishas_bikenumber, orgrootid_link);
 	}
+
 	@Override
 	public List<Personel> getby_bikenumber(String bike_number) {
 		// TODO Auto-generated method stub
 		return repo.getby_bikenumber(bike_number);
 	}
+
 	@Override
 	public Personel getPersonelBycode(String personnel_code) {
 		// TODO Auto-generated method stub
 		return repo.getPersonelBycode(personnel_code);
 	}
-	
-	//lấy danh sách nhân viên không chưa id truyền vào,theo mã nhân viên
+
+	// lấy danh sách nhân viên không chưa id truyền vào,theo mã nhân viên
 	@Override
 	public List<Personel> getPersonelByCode_Id_Personel(String code, Long id) {
 		// TODO Auto-generated method stub
