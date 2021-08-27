@@ -35,16 +35,17 @@ import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.POType;
 
-@Table(name="pcontract_po")
+@Table(name = "pcontract_po")
 @Entity
-public class PContract_PO implements Serializable {/**
-	 * 
-	 */
+public class PContract_PO implements Serializable {
+	/**
+	* 
+	*/
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pcontract_po_generator")
-	@SequenceGenerator(name="pcontract_po_generator", sequenceName = "pcontract_po_id_seq", allocationSize=1)
+	@SequenceGenerator(name = "pcontract_po_generator", sequenceName = "pcontract_po_id_seq", allocationSize = 1)
 	private Long id;
 	private Long orgrootid_link;
 	private Long pcontractid_link;
@@ -95,8 +96,10 @@ public class PContract_PO implements Serializable {/**
 	private String comment;
 	private Boolean ismap;
 	private String dc;
-	
-	
+
+	@Transient
+	private int po_quantity_set;
+
 	public Integer getPo_typeid_link() {
 		return po_typeid_link;
 	}
@@ -106,13 +109,13 @@ public class PContract_PO implements Serializable {/**
 	}
 
 	@Transient
-    private String productionlines;	
-	
+	private String productionlines;
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
-    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
+	@JoinColumn(name = "pcontract_poid_link", insertable = false, updatable = false)
 	private List<PContractProductSKU> pcontractProductSKUs = new ArrayList<>();
-	
+
 //	@NotFound(action = NotFoundAction.IGNORE)
 //	@OneToMany
 //    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
@@ -125,45 +128,46 @@ public class PContract_PO implements Serializable {/**
 //		}
 //		return "";
 //	}
-	
+
 	@Transient
 	public Integer getPcontractPoProductSkuQuantityTotal() { // sl sp sku trong po line
 		Integer sum = 0;
-		if(pcontractProductSKUs != null && pcontractProductSKUs.size() > 0){
-			for(PContractProductSKU PContractProductSKU : pcontractProductSKUs) {
-				if(PContractProductSKU.getPquantity_total() != null && PContractProductSKU.getPquantity_total() != 0) {
+		if (pcontractProductSKUs != null && pcontractProductSKUs.size() > 0) {
+			for (PContractProductSKU PContractProductSKU : pcontractProductSKUs) {
+				if (PContractProductSKU.getPquantity_total() != null && PContractProductSKU.getPquantity_total() != 0) {
 					sum += PContractProductSKU.getPquantity_total();
 				}
 			}
 		}
 		return sum;
 	}
-	
+
 	@Transient
 	public Long getId_MinPOShipdate() {
-		if(sub_po.size() > 0) {
-			
-			List<PContract_PO> list_line = sub_po.stream().filter(item -> null!=item.po_typeid_link && item.po_typeid_link==POType.PO_LINE_PLAN).collect(Collectors.toList());
+		if (sub_po.size() > 0) {
+
+			List<PContract_PO> list_line = sub_po.stream()
+					.filter(item -> null != item.po_typeid_link && item.po_typeid_link == POType.PO_LINE_PLAN)
+					.collect(Collectors.toList());
 			Date min = null;
 			int i = -1;
-			for(int a= 0; a<list_line.size(); a++) {
-				if(a == 0) {
+			for (int a = 0; a < list_line.size(); a++) {
+				if (a == 0) {
 					min = list_line.get(a).getShipdate();
-					i =a;
-				}
-				else {
+					i = a;
+				} else {
 					if (min.after(list_line.get(a).getShipdate())) {
 						min = list_line.get(a).getShipdate();
 						i = a;
 					}
 				}
 			}
-			if(i>-1)
+			if (i > -1)
 				return list_line.get(i).getId();
 		}
-			return null;
+		return null;
 	}
-	
+
 	public Integer getPlan_productivity() {
 		return plan_productivity;
 	}
@@ -195,198 +199,209 @@ public class PContract_PO implements Serializable {/**
 	public void setProductiondays(Integer productiondays) {
 		this.productiondays = productiondays;
 	}
-	
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
-    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
-    private List<POrder_Req> porder_req = new ArrayList<POrder_Req>();
-    	
+	@JoinColumn(name = "pcontract_poid_link", insertable = false, updatable = false)
+	private List<POrder_Req> porder_req = new ArrayList<POrder_Req>();
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="usercreatedid_link",insertable=false,updatable =false)
-    private GpayUser usercreated;
-	
+	@JoinColumn(name = "usercreatedid_link", insertable = false, updatable = false)
+	private GpayUser usercreated;
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="productid_link",insertable=false,updatable =false)
-    private Product product;
-	
+	@JoinColumn(name = "productid_link", insertable = false, updatable = false)
+	private Product product;
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="parentpoid_link",insertable=false,updatable =false)
-    private PContract_PO parent;
-    
+	@JoinColumn(name = "parentpoid_link", insertable = false, updatable = false)
+	private PContract_PO parent;
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
-    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
-    private List<PContract_Price> pcontract_price = new ArrayList<PContract_Price>();
-    
-    @NotFound(action = NotFoundAction.IGNORE)
-	@OneToMany
-    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
-    private List<PContract_PO_Productivity> pcontract_po_productivity = new ArrayList<PContract_PO_Productivity>();
-    
-    @NotFound(action = NotFoundAction.IGNORE)
-	@OneToMany
-    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
-    private List<PContractProductSKU> pcontract_po_sku = new ArrayList<PContractProductSKU>();
-    
+	@JoinColumn(name = "pcontract_poid_link", insertable = false, updatable = false)
+	private List<PContract_Price> pcontract_price = new ArrayList<PContract_Price>();
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
-    @JoinColumn(name="parentpoid_link",insertable=false,updatable =false)
-    private List<PContract_PO> sub_po = new ArrayList<PContract_PO>();
-   
+	@JoinColumn(name = "pcontract_poid_link", insertable = false, updatable = false)
+	private List<PContract_PO_Productivity> pcontract_po_productivity = new ArrayList<PContract_PO_Productivity>();
+
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+	@JoinColumn(name = "pcontract_poid_link", insertable = false, updatable = false)
+	private List<PContractProductSKU> pcontract_po_sku = new ArrayList<PContractProductSKU>();
+
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+	@JoinColumn(name = "parentpoid_link", insertable = false, updatable = false)
+	private List<PContract_PO> sub_po = new ArrayList<PContract_PO>();
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="merchandiserid_link",insertable=false,updatable =false)
-    private GpayUser merchandiser;
-	
+	@JoinColumn(name = "merchandiserid_link", insertable = false, updatable = false)
+	private GpayUser merchandiser;
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="currencyid_link",insertable=false,updatable =false)
-    private Currency currency;
-	
+	@JoinColumn(name = "currencyid_link", insertable = false, updatable = false)
+	private Currency currency;
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="orgmerchandiseid_link",insertable=false,updatable =false)
-    private Org org_factory;
-	
+	@JoinColumn(name = "orgmerchandiseid_link", insertable = false, updatable = false)
+	private Org org_factory;
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="shipmodeid_link",insertable=false,updatable =false)
-    private ShipMode shipmode;
-	
+	@JoinColumn(name = "shipmodeid_link", insertable = false, updatable = false)
+	private ShipMode shipmode;
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="porttoid_link",insertable=false,updatable =false)
-    private Port port_to;
-	
+	@JoinColumn(name = "porttoid_link", insertable = false, updatable = false)
+	private Port port_to;
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="portfromid_link",insertable=false,updatable =false)
-    private Port port_from;
-		
+	@JoinColumn(name = "portfromid_link", insertable = false, updatable = false)
+	private Port port_from;
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="pcontractid_link",insertable=false,updatable =false)
-    private PContract pcontract;
-	
-	@Transient 
+	@JoinColumn(name = "pcontractid_link", insertable = false, updatable = false)
+	private PContract pcontract;
+
+	@Transient
+	public long getProduct_poparent() {
+		if (parent != null)
+			return parent.getProductid_link();
+		return 0;
+	}
+
+	@Transient
 	public String getPortTo() {
-		if(port_to!=null)
+		if (port_to != null)
 			return port_to.getCode();
 		return "";
 	}
-	
-	@Transient 
+
+	@Transient
 	public String getPortFrom() {
-		if(port_from!=null)
+		if (port_from != null)
 			return port_from.getCode();
 		return "";
 	}
-	
+
 	@Transient
 	public String getShipMode() {
-		if(shipmode != null)
+		if (shipmode != null)
 			return shipmode.getName();
 		return "";
 	}
+
 	@Transient
 	public Boolean getCheckamount() {
 		int amount_sku = 0;
-		for(PContractProductSKU sku : pcontract_po_sku) {
+		for (PContractProductSKU sku : pcontract_po_sku) {
 			amount_sku += sku.getPquantity_porder() == null ? 0 : sku.getPquantity_porder();
 		}
 		int quantity = po_quantity == null ? 0 : po_quantity;
-		if(quantity == amount_sku) return true;
+		if (quantity == amount_sku)
+			return true;
 		return false;
 	}
-	
+
 	@Transient
 	public Float getTotalprice() {
 		Float price = (float) 0;
-		if(pcontract_price!=null){
-			for(PContract_Price thePrice:pcontract_price){
+		if (pcontract_price != null) {
+			for (PContract_Price thePrice : pcontract_price) {
 				if (thePrice.getProductid_link().compareTo(productid_link) == 0)
-					if(thePrice.getSizesetid_link() != null && thePrice.getSizesetid_link() == 1){
-						if(thePrice.getTotalprice() != null)
+					if (thePrice.getSizesetid_link() != null && thePrice.getSizesetid_link() == 1) {
+						if (thePrice.getTotalprice() != null)
 							price = thePrice.getTotalprice();
 					}
 			}
-		} 
+		}
 		return price;
 	}
-	
+
 	@Transient
 	public Integer getProductivity_byproduct(Long productid_link) {
-		if(parent!=null) {
+		if (parent != null) {
 			for (PContract_PO_Productivity productivity : parent.getPcontract_po_productivity()) {
-				if(productivity.getProductid_link().equals(productid_link)) {
+				if (productivity.getProductid_link().equals(productid_link)) {
 					return productivity.getPlan_productivity();
 				}
 			}
-		}
-		else if(pcontract_po_productivity!=null) {
+		} else if (pcontract_po_productivity != null) {
 			for (PContract_PO_Productivity pContract_PO_Productivity2 : pcontract_po_productivity) {
-				if(pContract_PO_Productivity2.getProductid_link() != null) {
-					if(pContract_PO_Productivity2.getProductid_link().equals(productid_link)) {
-						return pContract_PO_Productivity2.getPlan_productivity() == null ? 0 : pContract_PO_Productivity2.getPlan_productivity();
+				if (pContract_PO_Productivity2.getProductid_link() != null) {
+					if (pContract_PO_Productivity2.getProductid_link().equals(productid_link)) {
+						return pContract_PO_Productivity2.getPlan_productivity() == null ? 0
+								: pContract_PO_Productivity2.getPlan_productivity();
 					}
 				}
 			}
 		}
 		return 0;
 	}
-	
+
 	@Transient
 	public String getFactory_name() {
-		if(org_factory!=null)
+		if (org_factory != null)
 			return org_factory.getName();
 		return "";
 	}
+
 	@Transient
 	public String getMerchandiser_name() {
-		if(merchandiser!=null) {
+		if (merchandiser != null) {
 			return merchandiser.getFullname();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public String getUsercreatedName() {
-		if(usercreated != null) {
+		if (usercreated != null) {
 			return usercreated.getFullName();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public String getCurrencyCode() {
-		if(currency!=null)
+		if (currency != null)
 			return currency.getCode();
 		return "$";
 	}
-	
+
 	@Transient
 	public String getCurrencyName() {
-		if(currency!=null)
+		if (currency != null)
 			return currency.getName();
 		return "US Dollar";
 	}
-	
+
 	@Transient
-    public String getFactories() {
-    	String name = "";
-    	for(POrder_Req req : porder_req) {
-    		if(name.contains(req.getGranttoorgcode())) continue;
-    		if(name == "")
-    			name += req.getGranttoorgcode();
-    		else
-    			name += ", " + req.getGranttoorgcode();
-    	}
-    	return name;
-    }
-    
+	public String getFactories() {
+		String name = "";
+		for (POrder_Req req : porder_req) {
+			if (name.contains(req.getGranttoorgcode()))
+				continue;
+			if (name == "")
+				name += req.getGranttoorgcode();
+			else
+				name += ", " + req.getGranttoorgcode();
+		}
+		return name;
+	}
+
 	public List<PContract_Price> getPcontract_price() {
 		return pcontract_price;
 	}
@@ -398,7 +413,7 @@ public class PContract_PO implements Serializable {/**
 ////		sub_po.removeIf(c->c.getPo_typeid_link() != 10);
 //		return sub_po;
 //	}
-	
+
 //	public List<PContract_PO> getSub_po_plan() {
 //		List<PContract_PO> list_line = sub_po.stream().filter(item -> null!=item.po_typeid_link && item.po_typeid_link==POType.PO_LINE_PLAN).collect(Collectors.toList());
 //		Comparator<PContract_PO> compareBySortValue = (PContract_PO a1, PContract_PO a2) -> a1.getShipdate().compareTo( a2.getShipdate());
@@ -415,108 +430,108 @@ public class PContract_PO implements Serializable {/**
 	public void setSub_po(List<PContract_PO> sub_po) {
 		this.sub_po = sub_po;
 	}
-	
+
 	@Transient
 	public int getProduct_typeid_link() {
-		if(product!=null) {
+		if (product != null) {
 			return product.getProducttypeid_link();
 		}
 		return 0;
 	}
-	
+
 	@Transient
-    public int getAmount_org() {
-    	int sum_product = 0;
-    	if(parentpoid_link == null) {
-    		if(product.getProducttypeid_link() == 5) {
-    			HashMap<Long, Integer> lst_org = new HashMap<>();
-    			
-    			for(POrder_Req req : porder_req) {
-	    			Integer amountInset = req.getAmount_inset();
-	    			if(amountInset == null) amountInset = 1;
-	    			
-    	    		if(!lst_org.containsKey(req.getGranttoorgid_link())){
+	public int getAmount_org() {
+		int sum_product = 0;
+		if (parentpoid_link == null) {
+			if (product.getProducttypeid_link() == 5) {
+				HashMap<Long, Integer> lst_org = new HashMap<>();
+
+				for (POrder_Req req : porder_req) {
+					Integer amountInset = req.getAmount_inset();
+					if (amountInset == null)
+						amountInset = 1;
+
+					if (!lst_org.containsKey(req.getGranttoorgid_link())) {
 //    	    			lst_org.put(req.getGranttoorgid_link(), (req.getTotalorder() / req.getAmount_inset()));
-    	    			lst_org.put(req.getGranttoorgid_link(), (req.getTotalorder() / amountInset));
-    	    		}
-    	    		
-    	    		int amount_org = lst_org.get(req.getGranttoorgid_link());
+						lst_org.put(req.getGranttoorgid_link(), (req.getTotalorder() / amountInset));
+					}
+
+					int amount_org = lst_org.get(req.getGranttoorgid_link());
 //    	    		amount_org = (req.getTotalorder() / req.getAmount_inset()) < amount_org ? (req.getTotalorder()/req.getAmount_inset()) : amount_org;
-    	    		amount_org = (req.getTotalorder() / amountInset) < amount_org ? (req.getTotalorder()/amountInset) : amount_org;
-    	    		lst_org.replace(req.getGranttoorgid_link(), amount_org);
-    	    	}
-    			Set<Long> keySet = lst_org.keySet();
-    			for (Long key : keySet) {
-    				sum_product  += lst_org.get(key);
-    	        }
-    	    	
-    		}
-    		else {
-    			for(POrder_Req req : porder_req) {
-    				sum_product += req.getTotalorder();
-    			}
-    		}
-    	}
-		
-    	
-    	return sum_product;
-    }
-	
+					amount_org = (req.getTotalorder() / amountInset) < amount_org ? (req.getTotalorder() / amountInset)
+							: amount_org;
+					lst_org.replace(req.getGranttoorgid_link(), amount_org);
+				}
+				Set<Long> keySet = lst_org.keySet();
+				for (Long key : keySet) {
+					sum_product += lst_org.get(key);
+				}
+
+			} else {
+				for (POrder_Req req : porder_req) {
+					sum_product += req.getTotalorder();
+				}
+			}
+		}
+
+		return sum_product;
+	}
+
 	@Transient
 	public String getProductbuyercode() {
-		if(product != null) {
+		if (product != null) {
 			return product.getBuyercode();
 		}
 		return "";
 	}
-	
+
 	@Transient
-	public List<PContract_PO_Productivity> getpo_productivity_parent(){
-		if(parent != null)
-				return parent.getPcontract_po_productivity();
+	public List<PContract_PO_Productivity> getpo_productivity_parent() {
+		if (parent != null)
+			return parent.getPcontract_po_productivity();
 		return new ArrayList<PContract_PO_Productivity>();
 	}
-	
+
 	@Transient
 	public String getBuyerName() {
-		if(pcontract != null) {
+		if (pcontract != null) {
 			return pcontract.getBuyername();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public String getVendorName() {
-		if(pcontract != null) {
+		if (pcontract != null) {
 			return pcontract.getVendorname();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public String getProductvendorcode() {
-		if(product != null) {
+		if (product != null) {
 			return product.getVendorcode();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public String getProduct_code() {
-		if(product != null) {
+		if (product != null) {
 			return product.getBuyercode();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public Integer getparent_quantity() {
-		if(parent != null) {
+		if (parent != null) {
 			return parent.getPo_quantity();
 		}
 		return 0;
 	}
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -848,8 +863,6 @@ public class PContract_PO implements Serializable {/**
 	public List<PContract_PO_Productivity> getPcontract_po_productivity() {
 		return pcontract_po_productivity;
 	}
-	
-	
 
 	public void setPcontract_po_productivity(List<PContract_PO_Productivity> pcontract_po_productivity) {
 		this.pcontract_po_productivity = pcontract_po_productivity;
@@ -894,6 +907,13 @@ public class PContract_PO implements Serializable {/**
 	public void setDc(String dc) {
 		this.dc = dc;
 	}
-	
-	
+
+	public int getPo_quantity_set() {
+		return po_quantity_set;
+	}
+
+	public void setPo_quantity_set(int po_quantity_set) {
+		this.po_quantity_set = po_quantity_set;
+	}
+
 }

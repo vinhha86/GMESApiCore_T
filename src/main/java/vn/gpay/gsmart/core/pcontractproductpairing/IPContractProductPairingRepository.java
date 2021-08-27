@@ -31,4 +31,12 @@ public interface IPContractProductPairingRepository
 	public List<PContractProductPairing> get_pairing_bypcontract_and_product(
 			@Param("pcontractid_link") final Long pcontractid_link, @Param("productid_link") final Long productid_link);
 
+	@Query(value = "select d.amount from PContractProductPairing c "
+			+ "inner join ProductPairing d on c.productpairid_link = d.productpairid_link "
+			+ "where c.pcontractid_link = :pcontractid_link "
+			+ "and d.productid_link = :productid_link and c.productpairid_link = :product_setid_link")
+	public Integer getAmountinSet(@Param("pcontractid_link") final Long pcontractid_link,
+			@Param("productid_link") final Long productid_link,
+			@Param("product_setid_link") final Long product_setid_link);
+
 }

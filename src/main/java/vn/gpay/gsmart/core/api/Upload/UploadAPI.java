@@ -74,35 +74,45 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 @RestController
 @RequestMapping("/api/v1/upload")
 public class UploadAPI {
-	@Autowired Common commonService;
 	@Autowired
-	IProductService productService; 
+	Common commonService;
+	@Autowired
+	IProductService productService;
 	@Autowired
 	IAttributeService attrService;
-	@Autowired IProductAttributeService pavService;
-	@Autowired ISKU_Service skuService;
-	@Autowired ISKU_AttributeValue_Service skuattService;
+	@Autowired
+	IProductAttributeService pavService;
+	@Autowired
+	ISKU_Service skuService;
+	@Autowired
+	ISKU_AttributeValue_Service skuattService;
 	@Autowired
 	IProductPairingService productpairService;
-	@Autowired IPContract_Price_DService pricedetailService;
+	@Autowired
+	IPContract_Price_DService pricedetailService;
 	@Autowired
 	IPContractProductService pcontractproductService;
 	@Autowired
 	IPContractProductPairingService pcontractpairService;
 	@Autowired
 	IShipModeService shipmodeService;
-	@Autowired IOrgService orgService;
+	@Autowired
+	IOrgService orgService;
 	@Autowired
 	IPContract_POService pcontract_POService;
 	@Autowired
 	IPContract_Price_Service priceService;
 	@Autowired
 	IPContract_PO_Productivity_Service productivityService;
-	@Autowired ISizeSetService sizesetService;
-	@Autowired IPOrder_Req_Service reqService;
-	@Autowired IPOrder_Service porderService;
-	@Autowired IPContractService pcontractService;
-	
+	@Autowired
+	ISizeSetService sizesetService;
+	@Autowired
+	IPOrder_Req_Service reqService;
+	@Autowired
+	IPOrder_Service porderService;
+	@Autowired
+	IPContractService pcontractService;
+
 	@RequestMapping(value = "/offers", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadTemplate(HttpServletRequest request,
 			@RequestParam("file") MultipartFile file, @RequestParam("pcontractid_link") long pcontractid_link) {
@@ -113,11 +123,11 @@ public class UploadAPI {
 		String mes_err = "";
 		try {
 			PContract pcontract = pcontractService.findOne(pcontractid_link);
-			if(pcontract == null) {
+			if (pcontract == null) {
 				mes_err = "Đơn hàng không tồn tại trong hệ thống! Bạn hãy kiểm tra lại";
 			}
-			
-			if(mes_err == "") {
+
+			if (mes_err == "") {
 				GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 				long orgrootid_link = user.getRootorgid_link();
 				String FolderPath = "upload/pcontract_po";
@@ -148,40 +158,40 @@ public class UploadAPI {
 					// Kiem tra header
 					int rowNum = 2;
 					int colNum = 1, col_phancach1 = 13, col_phancach2 = 0;
-					
+
 					Row row = sheet.getRow(rowNum);
-					Row rowheader = sheet.getRow(0);				
-					
+					Row rowheader = sheet.getRow(0);
+
 					try {
 						String STT = "";
 						STT = commonService.getStringValue(row.getCell(ColumnTempNew.STT));
 						STT = STT.equals("0") ? "" : STT;
-						
+
 						while (!STT.equals("")) {
-							//Lay thong tin PO kiem tra xem PO da ton tai trong he thong hay chua
-							//Neu la san pham don chiec thi kiem tra masp, ngay giao, vendor target
-							//Neu la san pham bo thi kiem tra masp bo, ngay giao
+							// Lay thong tin PO kiem tra xem PO da ton tai trong he thong hay chua
+							// Neu la san pham don chiec thi kiem tra masp, ngay giao, vendor target
+							// Neu la san pham bo thi kiem tra masp bo, ngay giao
 //							if(rowNum == 14) {
 //								String a = "";
 //							}
 //							else if(rowNum == 15) {
 //								String a = "";
 //							}
-							//Kiem tra san pham co chua thi them san pham vao trong he thong
+							// Kiem tra san pham co chua thi them san pham vao trong he thong
 							long productid_link = 0;
 							colNum = ColumnTempNew.MaSP + 1;
 							String product_code = commonService.getStringValue(row.getCell(ColumnTempNew.MaSP));
-							
+
 							colNum = ColumnTempNew.TenSP + 1;
 							String stylename = commonService.getStringValue(row.getCell(ColumnTempNew.TenSP));
-							
-							if(product_code=="") {
+
+							if (product_code == "") {
 								mes_err = "Mã Sản phẩm không được để trống";
 								break;
 							}
-							
-							List<Product> products = productService.getone_by_code(orgrootid_link, product_code, (long) 0,
-									ProductType.SKU_TYPE_COMPLETEPRODUCT);
+
+							List<Product> products = productService.getone_by_code(orgrootid_link, product_code,
+									(long) 0, ProductType.SKU_TYPE_COMPLETEPRODUCT);
 							if (products.size() == 0) {
 								Product p = new Product();
 								p.setBuyercode(product_code);
@@ -195,23 +205,22 @@ public class UploadAPI {
 								p = productService.save(p);
 
 								productid_link = p.getId();
-								
-								//Sinh thuoc tinh mac dinh cho san pham
-								List<Attribute> lstAttr = attrService.getList_attribute_forproduct(ProductType.SKU_TYPE_COMPLETEPRODUCT,
-										user.getRootorgid_link());
+
+								// Sinh thuoc tinh mac dinh cho san pham
+								List<Attribute> lstAttr = attrService.getList_attribute_forproduct(
+										ProductType.SKU_TYPE_COMPLETEPRODUCT, user.getRootorgid_link());
 								for (Attribute attribute : lstAttr) {
 									ProductAttributeValue pav = new ProductAttributeValue();
 									long value = 0;
-									
-									if(attribute.getId() == AtributeFixValues.ATTR_COLOR) {
+
+									if (attribute.getId() == AtributeFixValues.ATTR_COLOR) {
 										value = AtributeFixValues.value_color_all;
-									}
-									else if(attribute.getId() == AtributeFixValues.ATTR_SIZE) {
+									} else if (attribute.getId() == AtributeFixValues.ATTR_SIZE) {
 										value = AtributeFixValues.value_size_all;
-									} else if(attribute.getId() == AtributeFixValues.ATTR_SIZEWIDTH) {
+									} else if (attribute.getId() == AtributeFixValues.ATTR_SIZEWIDTH) {
 										value = AtributeFixValues.value_sizewidth_all;
 									}
-									
+
 									pav.setId((long) 0);
 									pav.setProductid_link(productid_link);
 									pav.setAttributeid_link(attribute.getId());
@@ -219,10 +228,10 @@ public class UploadAPI {
 									pav.setOrgrootid_link(user.getRootorgid_link());
 									pavService.save(pav);
 								}
-								
-								//Sinh SKU cho mau all va co all
+
+								// Sinh SKU cho mau all va co all
 								long skuid_link = 0;
-								
+
 								SKU sku = new SKU();
 								sku.setId(skuid_link);
 								sku.setCode(genCodeSKU(p));
@@ -233,7 +242,7 @@ public class UploadAPI {
 
 								sku = skuService.save(sku);
 								skuid_link = sku.getId();
-								
+
 								// Them vao bang sku_attribute_value
 								SKU_Attribute_Value savMau = new SKU_Attribute_Value();
 								savMau.setId((long) 0);
@@ -256,27 +265,28 @@ public class UploadAPI {
 								savCo.setTimecreate(new Date());
 
 								skuattService.save(savCo);
-								
+
 							} else {
 								productid_link = products.get(0).getId();
 							}
-							
-							//Kiem tra xem PO co phai la hang bo hay khong
+
+							// Kiem tra xem PO co phai la hang bo hay khong
 							long product_set_id_link = 0;
-							
+
 							colNum = ColumnTempNew.Style_Set + 1;
-							String product_set_code = commonService.getStringValue(row.getCell(ColumnTempNew.Style_Set));
+							String product_set_code = commonService
+									.getStringValue(row.getCell(ColumnTempNew.Style_Set));
 							product_set_code = product_set_code.equals("0") ? "" : product_set_code;
-							
+
 							colNum = ColumnTemplate.amount_style + 1;
 							String s_amount = commonService.getStringValue(row.getCell(ColumnTemplate.amount_style));
 							s_amount = s_amount.replace(",", "");
-							int amount = (int) row.getCell(ColumnTemplate.amount_style).getNumericCellValue() == 0 ? 1 : (int) row.getCell(ColumnTemplate.amount_style).getNumericCellValue();
-							
-							
+							int amount = (int) row.getCell(ColumnTemplate.amount_style).getNumericCellValue() == 0 ? 1
+									: (int) row.getCell(ColumnTemplate.amount_style).getNumericCellValue();
+
 							if (!product_set_code.equals(null) && !product_set_code.equals("")) {
-								List<Product> product_set = productService.getone_by_code(orgrootid_link, product_set_code,
-										(long) 0, ProductType.SKU_TYPE_PRODUCT_PAIR);
+								List<Product> product_set = productService.getone_by_code(orgrootid_link,
+										product_set_code, (long) 0, ProductType.SKU_TYPE_PRODUCT_PAIR);
 								if (product_set.size() == 0) {
 									Product set = new Product();
 									set.setId(null);
@@ -295,7 +305,7 @@ public class UploadAPI {
 									product_set_id_link = product_set.get(0).getId();
 								}
 							}
-							
+
 							// kiem tra trong bang productpair co chua thi them bo vao
 							if (product_set_id_link > 0) {
 								ProductPairing pair = productpairService.getproduct_pairing_bykey(productid_link,
@@ -308,18 +318,18 @@ public class UploadAPI {
 									newpair.setProductid_link(productid_link);
 									newpair.setProductpairid_link(product_set_id_link);
 									productpairService.save(newpair);
-									
+
 									Product set = productService.findOne(product_set_id_link);
 									String name_old = set.getBuyername();
-									name_old = name_old.equals("") ? "": name_old+ "; ";
-									String name_new = name_old+amount+"-"+product_code;
+									name_old = name_old.equals("") ? "" : name_old + "; ";
+									String name_new = name_old + amount + "-" + product_code;
 									set.setBuyername(name_new);
 								}
 							}
-							
+
 							// Them san pham vao trong pcontract
-							List<PContractProduct> list_product = pcontractproductService.get_by_product_and_pcontract(
-									orgrootid_link, productid_link, pcontractid_link);
+							List<PContractProduct> list_product = pcontractproductService
+									.get_by_product_and_pcontract(orgrootid_link, productid_link, pcontractid_link);
 							if (list_product.size() == 0) {
 								PContractProduct product = new PContractProduct();
 								product.setIs_breakdown_done(false);
@@ -331,7 +341,7 @@ public class UploadAPI {
 								product.setId(null);
 								pcontractproductService.save(product);
 							}
-							
+
 							// them bo vao trong pcontract
 							if (product_set_id_link > 0) {
 								List<PContractProductPairing> list_pair = pcontractpairService
@@ -346,215 +356,211 @@ public class UploadAPI {
 									pcontractpairService.save(pair);
 								}
 							}
-							
+
 							long shipmodeid_link = 0;
-							colNum = ColumnTempNew.shipmode + 1; 
+							colNum = ColumnTempNew.shipmode + 1;
 							String shipmode_name = commonService.getStringValue(row.getCell(ColumnTempNew.shipmode));
 							List<ShipMode> shipmode = shipmodeService.getbyname(shipmode_name);
 							if (shipmode.size() > 0) {
 								shipmodeid_link = shipmode.get(0).getId();
 							}
-							
-							//Lay ngay giao hang lon nhat
+
+							// Lay ngay giao hang lon nhat
 
 							List<Date> list_ngaygiao = new ArrayList<Date>();
 							List<Integer> list_soluong = new ArrayList<Integer>();
-							
+
 							Date ShipDate = null;
 							colNum = 14;
 							col_phancach2 = col_phancach1 + 3;
 							String s_header_phancach2 = commonService.getStringValue(rowheader.getCell(col_phancach2));
-							
+
 							try {
 								String s_shipdate = commonService.getStringValue(row.getCell(colNum));
-								if(s_shipdate.contains("/")) {
+								if (s_shipdate.contains("/")) {
 									String[] s_date = s_shipdate.split("/");
-									if(Integer.parseInt(s_date[1].toString()) < 13 && Integer.parseInt(s_date[0].toString()) < 32) {
+									if (Integer.parseInt(s_date[1].toString()) < 13
+											&& Integer.parseInt(s_date[0].toString()) < 32) {
 										ShipDate = new SimpleDateFormat("dd/MM/yyyy").parse(s_shipdate);
-									}
-									else {
+									} else {
 										mes_err = "Định dạng ngày không đúng dd/MM/yyyy! ";
 									}
-									
-								}
-								else if (s_shipdate != ""){
-									if(DateUtil.isCellDateFormatted(row.getCell(colNum))) {
+
+								} else if (s_shipdate != "") {
+									if (DateUtil.isCellDateFormatted(row.getCell(colNum))) {
 										ShipDate = row.getCell(colNum).getDateCellValue();
 									}
 								}
-								
-							}
-							catch (Exception e) {
-								if(DateUtil.isCellDateFormatted(row.getCell(colNum))) {
+
+							} catch (Exception e) {
+								if (DateUtil.isCellDateFormatted(row.getCell(colNum))) {
 									ShipDate = row.getCell(colNum).getDateCellValue();
 								}
 							}
-							
-							if(ShipDate != null) {
+
+							if (ShipDate != null) {
 								list_ngaygiao.add(ShipDate);
 							}
-							
+
 							colNum = col_phancach1 + 3;
 							String s_po_quantity = commonService.getStringValue(row.getCell(col_phancach1 + 2));
 							s_po_quantity = s_po_quantity.replace(",", "");
 							Float f_po_quantity = s_po_quantity.equals("") ? 0 : Float.parseFloat(s_po_quantity);
 							int po_quantity = f_po_quantity.intValue();
-							if(po_quantity>0)
+							if (po_quantity > 0)
 								list_soluong.add(po_quantity);
-							
+
 							while (!s_header_phancach2.equals("xxx")) {
 								col_phancach2 += 2;
 								s_header_phancach2 = commonService.getStringValue(rowheader.getCell(col_phancach2));
-								
+
 								Date shipdate2 = null;
 								try {
 									String s_shipdate2 = commonService.getStringValue(row.getCell(colNum));
-									if(s_shipdate2.contains("/")) {
+									if (s_shipdate2.contains("/")) {
 										String[] s_date = s_shipdate2.split("/");
-										if(Integer.parseInt(s_date[1].toString()) < 13 && Integer.parseInt(s_date[0].toString()) < 32) {
+										if (Integer.parseInt(s_date[1].toString()) < 13
+												&& Integer.parseInt(s_date[0].toString()) < 32) {
 											shipdate2 = new SimpleDateFormat("dd/MM/yyyy").parse(s_shipdate2);
-										}
-										else {
+										} else {
 											mes_err = "Định dạng ngày không đúng dd/MM/yyyy! ";
 										}
-										
-									}
-									else if (s_shipdate2 != "") {
-										if(DateUtil.isCellDateFormatted(row.getCell(colNum))) {
+
+									} else if (s_shipdate2 != "") {
+										if (DateUtil.isCellDateFormatted(row.getCell(colNum))) {
 											shipdate2 = row.getCell(colNum).getDateCellValue();
 										}
 									}
-									
-								}
-								catch (Exception e) {
-									if(DateUtil.isCellDateFormatted(row.getCell(colNum))) {
+
+								} catch (Exception e) {
+									if (DateUtil.isCellDateFormatted(row.getCell(colNum))) {
 										shipdate2 = row.getCell(colNum).getDateCellValue();
 									}
 								}
-								
-								if(shipdate2 != null) {
+
+								if (shipdate2 != null) {
 									list_ngaygiao.add(shipdate2);
-									//Lay so luong
-									String s_sub_quantity = commonService.getStringValue(row.getCell(colNum+1));
+									// Lay so luong
+									String s_sub_quantity = commonService.getStringValue(row.getCell(colNum + 1));
 									s_sub_quantity = s_sub_quantity.replace(",", "");
-									Float f_sub_quantity = s_sub_quantity.equals("") ? 0 : Float.parseFloat(s_sub_quantity);
+									Float f_sub_quantity = s_sub_quantity.equals("") ? 0
+											: Float.parseFloat(s_sub_quantity);
 									po_quantity += f_sub_quantity.intValue();
-									
+
 									list_soluong.add(f_sub_quantity.intValue() * amount);
-									
-									if(ShipDate ==null)
+
+									if (ShipDate == null)
 										ShipDate = shipdate2;
-									else if(ShipDate.before(shipdate2)) {
+									else if (ShipDate.before(shipdate2)) {
 										ShipDate = shipdate2;
 									}
 								}
 
-								colNum +=2;
+								colNum += 2;
 							}
-							
-							
-							//Kiem tra chao gia da ton tai hay chua
+
+							// Kiem tra chao gia da ton tai hay chua
 							long pcontractpo_id_link = 0;
 							PContract_PO po_tong = new PContract_PO();
 							long po_productid_link = product_set_id_link > 0 ? product_set_id_link : productid_link;
-							
+
 							colNum = ColumnTempNew.fob + 1;
 							String s_price_fob = commonService.getStringValue(row.getCell(ColumnTempNew.fob));
 							s_price_fob = s_price_fob.replace(",", "");
 							float price_fob = s_price_fob.equals("") ? 0 : Float.parseFloat(s_price_fob);
-							
+
 //							colNum = ColumnTempNew.amount_style + 1;
 //							String s_amount_style = commonService.getStringValue(row.getCell(ColumnTempNew.amount_style));
 //							s_amount_style = s_amount_style.replace(",", "");
 //							Float amount_style = s_amount_style == "" ? 0 : Float.parseFloat(s_amount_style);
-													
+
 							colNum = ColumnTempNew.vendor_target + 1;
-							String s_vendor_target = commonService.getStringValue(row.getCell(ColumnTempNew.vendor_target));
+							String s_vendor_target = commonService
+									.getStringValue(row.getCell(ColumnTempNew.vendor_target));
 							s_vendor_target = s_vendor_target.replace(",", "");
 							float vendor_target = s_vendor_target == "" ? 0 : Float.parseFloat(s_vendor_target);
-							
+
 							colNum = ColumnTempNew.ns_target + 1;
 							String s_ns_target = commonService.getStringValue(row.getCell(ColumnTempNew.ns_target));
 							s_ns_target = s_ns_target.replace(",", "");
 							Float ns_target = s_ns_target == "" ? 0 : Float.parseFloat(s_ns_target);
-							
+
 							colNum = ColumnTempNew.org + 1;
 							String s_org_code = commonService.getStringValue(row.getCell(ColumnTempNew.org));
 							s_org_code = s_org_code.replace(",", "");
 							Long orgid_link = null;
 							List<Org> list_org = orgService.getbycode(s_org_code, orgrootid_link);
-							if(list_org.size() > 0) {
+							if (list_org.size() > 0) {
 								orgid_link = list_org.get(0).getId();
 							}
-							
-							int productiondays_ns = ns_target == 0 ? 0 : po_quantity/(ns_target.intValue()); 
-							
+
+							int productiondays_ns = ns_target == 0 ? 0 : po_quantity / (ns_target.intValue());
+
 							colNum = ColumnTemplate.matdate + 1;
 							Date matdate = null;
-							
+
 							try {
 								String s_matdate = commonService.getStringValue(row.getCell(ColumnTempNew.matdate));
-								if(s_matdate.contains("/")) {
+								if (s_matdate.contains("/")) {
 									String[] s_date = s_matdate.split("/");
-									if(Integer.parseInt(s_date[1].toString()) < 13 && Integer.parseInt(s_date[0].toString()) < 32) {
+									if (Integer.parseInt(s_date[1].toString()) < 13
+											&& Integer.parseInt(s_date[0].toString()) < 32) {
 										matdate = new SimpleDateFormat("dd/MM/yyyy").parse(s_matdate);
-									}
-									else {
+									} else {
 										mes_err = "Định dạng ngày không đúng dd/MM/yyyy! ";
 									}
-									
-								}
-								else {
-									if(DateUtil.isCellDateFormatted(row.getCell(ColumnTempNew.matdate))) {
+
+								} else {
+									if (DateUtil.isCellDateFormatted(row.getCell(ColumnTempNew.matdate))) {
 										matdate = row.getCell(ColumnTempNew.matdate).getDateCellValue();
 									}
 								}
-								
-							}
-							catch (Exception e) {
-								if(DateUtil.isCellDateFormatted(row.getCell(ColumnTempNew.matdate))) {
+
+							} catch (Exception e) {
+								if (DateUtil.isCellDateFormatted(row.getCell(ColumnTempNew.matdate))) {
 									matdate = row.getCell(ColumnTempNew.matdate).getDateCellValue();
 								}
 							}
 							Date production_date = null;
 							int production_day = 0;
 							float plan_linerequired = 0;
-							if(matdate != null) {
+							if (matdate != null) {
 								production_date = Common.Date_Add(matdate, 7);
 								production_day = commonService.getDuration(production_date, ShipDate, orgrootid_link);
-								plan_linerequired = (float)productiondays_ns/(float)production_day;
-								if(plan_linerequired < 1) plan_linerequired = 1;
-								
-								DecimalFormat df = new DecimalFormat("#.##"); 
+								plan_linerequired = (float) productiondays_ns / (float) production_day;
+								if (plan_linerequired < 1)
+									plan_linerequired = 1;
+
+								DecimalFormat df = new DecimalFormat("#.##");
 								String formatted = df.format(plan_linerequired);
 								plan_linerequired = Float.parseFloat(formatted);
 							}
-							
+
 							colNum = ColumnTempNew.PO + 1;
 							String PO_No = commonService.getStringValue(row.getCell(ColumnTempNew.PO));
 							if (PO_No == "" || PO_No.equals("0")) {
 								PO_No = "TBD";
 							}
-							
+
 							colNum = ColumnTempNew.status + 1;
 							String s_status = commonService.getStringValue(row.getCell(ColumnTempNew.status));
 							Integer status = POStatus.PO_STATUS_UNCONFIRM;
-							if(!s_status.equals("")) {
+							if (s_status.toLowerCase().equals("y")) {
 								status = POStatus.PO_STATUS_CONFIRMED;
 							}
-							
-							//Neu khong cot ngay giao hang nao co gia tri thi ko xu ly nua chuyen den dong tiep theo
-							if(ShipDate !=null) {
+
+							// Neu khong cot ngay giao hang nao co gia tri thi ko xu ly nua chuyen den dong
+							// tiep theo
+							if (ShipDate != null) {
 								List<PContract_PO> listpo = new ArrayList<PContract_PO>();
-								if(product_set_id_link == 0) {
-									listpo = pcontract_POService.check_exist_po(ShipDate,
-											po_productid_link, shipmodeid_link, pcontractid_link, PO_No);
+								if (product_set_id_link == 0) {
+									listpo = pcontract_POService.check_exist_po(ShipDate, po_productid_link,
+											shipmodeid_link, pcontractid_link, PO_No);
+								} else {
+									listpo = pcontract_POService.check_exist_po(ShipDate, po_productid_link,
+											shipmodeid_link, pcontractid_link, "");
 								}
-								else {
-									listpo = pcontract_POService.check_exist_po(ShipDate,
-											po_productid_link, shipmodeid_link, pcontractid_link, "");
-								}
-								if(listpo.size() == 0) {
+								if (listpo.size() == 0) {
 									po_tong.setId(null);
 									po_tong.setCurrencyid_link((long) 1);
 									po_tong.setDatecreated(current_time);
@@ -565,15 +571,14 @@ public class UploadAPI {
 									po_tong.setUsercreatedid_link(user.getId());
 									po_tong.setDate_importdata(current_time);
 									po_tong.setPo_typeid_link(POType.PO_CMP);
-									po_tong.setSewtarget_percent((float)20);
+									po_tong.setSewtarget_percent((float) 20);
 									po_tong.setParentpoid_link(null);
-									
-									if(status == POStatus.PO_STATUS_CONFIRMED) {
+
+									if (status == POStatus.PO_STATUS_CONFIRMED) {
 										po_tong.setOrgmerchandiseid_link(orgid_link);
 									}
 
-								}
-								else {
+								} else {
 									po_tong = listpo.get(0);
 								}
 
@@ -590,67 +595,71 @@ public class UploadAPI {
 								po_tong.setIs_tbd(PO_No == "TBD" ? true : false);
 								po_tong.setCode(PO_No);
 								po_tong.setProductid_link(po_productid_link);
-								
+
 								po_tong = pcontract_POService.save(po_tong);
 								pcontractpo_id_link = po_tong.getId();
-								
-								//Kiem tra ns cua san pham 
-								List<PContract_PO_Productivity> list_productivity = productivityService.getbypo_and_product(pcontractpo_id_link, productid_link);
+
+								// Kiem tra ns cua san pham
+								List<PContract_PO_Productivity> list_productivity = productivityService
+										.getbypo_and_product(pcontractpo_id_link, productid_link);
 								PContract_PO_Productivity po_productivity = new PContract_PO_Productivity();
-								if(list_productivity.size() == 0) {
+								if (list_productivity.size() == 0) {
 									po_productivity.setId(null);
 									po_productivity.setOrgrootid_link(orgrootid_link);
 									po_productivity.setPcontract_poid_link(pcontractpo_id_link);
-									po_productivity.setProductid_link(productid_link);							
-								}
-								else {
+									po_productivity.setProductid_link(productid_link);
+								} else {
 									po_productivity = list_productivity.get(0);
 								}
-								
-								po_productivity.setAmount(po_quantity*amount);
+
+								po_productivity.setAmount(po_quantity * amount);
 								po_productivity.setPlan_linerequired(plan_linerequired);
 								po_productivity.setPlan_productivity(ns_target.intValue());
 								po_productivity.setProductiondays_ns(productiondays_ns);
 								productivityService.save(po_productivity);
 
-								//Xoa cac dai co di roi insert lai vao san pham con hoac san pham don
-								List<PContract_Price> list_price = priceService.getPrice_by_product(pcontractpo_id_link, productid_link);
-								for(PContract_Price price : list_price) {
-									List<PContract_Price_D> list_price_d = pricedetailService.getPrice_D_ByPContractPrice(price.getId());
-									for(PContract_Price_D price_d : list_price_d) {
+								// Xoa cac dai co di roi insert lai vao san pham con hoac san pham don
+								List<PContract_Price> list_price = priceService.getPrice_by_product(pcontractpo_id_link,
+										productid_link);
+								for (PContract_Price price : list_price) {
+									List<PContract_Price_D> list_price_d = pricedetailService
+											.getPrice_D_ByPContractPrice(price.getId());
+									for (PContract_Price_D price_d : list_price_d) {
 										pricedetailService.delete(price_d);
 									}
 									priceService.delete(price);
 								}
-								
-								//Sinh cac dai co vao trong san pham con 
-								
-								//Sinh cac dai co khac all
+
+								// Sinh cac dai co vao trong san pham con
+
+								// Sinh cac dai co khac all
 								float total_price_amount = 0;
 								float total_amount = 0;
 								float total_price = 0;
 								int count = 0;
-								
-								for(int i= col_phancach2+1; i<=col_phancach2+6;i++) {
-									colNum = i+1;
+
+								for (int i = col_phancach2 + 1; i <= col_phancach2 + 6; i++) {
+									colNum = i + 1;
 									Row row2 = sheet.getRow(1);
 									String sizesetname = commonService.getStringValue(row2.getCell(i));
 									String s_price_sizeset = commonService.getStringValue(row.getCell(i));
 									s_price_sizeset = s_price_sizeset.replace(",", "");
-									Float price_sizeset = s_price_sizeset.equals("") ? 0 : Float.parseFloat(s_price_sizeset);
-									
-									String s_amount_sizeset = commonService.getStringValue(row.getCell(i+7));
+									Float price_sizeset = s_price_sizeset.equals("") ? 0
+											: Float.parseFloat(s_price_sizeset);
+
+									String s_amount_sizeset = commonService.getStringValue(row.getCell(i + 7));
 									s_amount_sizeset = s_amount_sizeset.replace(",", "");
-									Float amount_sizeset = s_amount_sizeset.equals("") ? 0 : Float.parseFloat(s_amount_sizeset);
-									
+									Float amount_sizeset = s_amount_sizeset.equals("") ? 0
+											: Float.parseFloat(s_amount_sizeset);
+
 									if (price_sizeset > 0 || amount_sizeset > 0) {
 										count++;
 										total_price_amount += price_sizeset * amount_sizeset;
 										total_amount += amount_sizeset;
 										total_price += price_sizeset;
-										
+
 										Long sizesetid_link = sizesetService.getbyname(sizesetname);
-										
+
 										PContract_Price price = new PContract_Price();
 										price.setId(null);
 										price.setIs_fix(true);
@@ -664,11 +673,11 @@ public class UploadAPI {
 										price.setTotalprice(price_sizeset);
 										price.setQuantity(amount_sizeset.intValue());
 										price = priceService.save(price);
-										
-										//Them detail
+
+										// Them detail
 										PContract_Price_D price_sizeset_d = new PContract_Price_D();
 										price_sizeset_d.setOrgrootid_link(orgrootid_link);
-										price_sizeset_d.setFobpriceid_link((long)1);
+										price_sizeset_d.setFobpriceid_link((long) 1);
 										price_sizeset_d.setPrice(price_sizeset);
 										price_sizeset_d.setIsfob(false);
 										price_sizeset_d.setId(null);
@@ -678,23 +687,22 @@ public class UploadAPI {
 										price_sizeset_d.setPcontractpriceid_link(price.getId());
 										price_sizeset_d.setProductid_link(productid_link);
 										pricedetailService.save(price_sizeset_d);
-										
+
 									}
 								}
 								float price_cmp = 0;
-								
-								if(total_amount == 0) {
-									price_cmp = count == 0 ? 0 : total_price /count;
-								}
-								else {
-									price_cmp = total_price_amount/ total_amount;
+
+								if (total_amount == 0) {
+									price_cmp = count == 0 ? 0 : total_price / count;
+								} else {
+									price_cmp = total_price_amount / total_amount;
 								}
 
-								DecimalFormat df = new DecimalFormat("#.###"); 
+								DecimalFormat df = new DecimalFormat("#.###");
 								String formatted = df.format(price_cmp);
 								price_cmp = Float.parseFloat(formatted);
-								
-								//Sinh dai co all vao san pham con 
+
+								// Sinh dai co all vao san pham con
 								PContract_Price price_all = new PContract_Price();
 								price_all.setId(null);
 								price_all.setIs_fix(true);
@@ -702,7 +710,7 @@ public class UploadAPI {
 								price_all.setPcontract_poid_link(pcontractpo_id_link);
 								price_all.setPcontractid_link(pcontractid_link);
 								price_all.setProductid_link(productid_link);
-								price_all.setSizesetid_link((long)1);
+								price_all.setSizesetid_link((long) 1);
 								price_all.setDate_importdata(current_time);
 								price_all.setPrice_cmp(price_cmp);
 								price_all.setTotalprice(price_cmp + price_fob);
@@ -710,33 +718,34 @@ public class UploadAPI {
 								price_all.setPrice_vendortarget(vendor_target);
 								price_all.setQuantity(po_quantity);
 								price_all = priceService.save(price_all);
-								
-								//Them detail
+
+								// Them detail
 								PContract_Price_D price_detail_all = new PContract_Price_D();
 								price_detail_all.setOrgrootid_link(orgrootid_link);
-								price_detail_all.setFobpriceid_link((long)1);
+								price_detail_all.setFobpriceid_link((long) 1);
 								price_detail_all.setPrice(price_cmp);
 								price_detail_all.setIsfob(false);
 								price_detail_all.setId(null);
-								price_detail_all.setSizesetid_link((long)1);
+								price_detail_all.setSizesetid_link((long) 1);
 								price_detail_all.setPcontract_poid_link(pcontractpo_id_link);
 								price_detail_all.setPcontractid_link(pcontractid_link);
 								price_detail_all.setPcontractpriceid_link(price_all.getId());
 								price_detail_all.setProductid_link(productid_link);
 								pricedetailService.save(price_detail_all);
-								
-								//kiem tra xem co phai san pham bo khong thi cap nhat cac dai co vao trong sản phẩm bộ
-								if(product_set_id_link > 0) {
-									//Kiem tra ns cua san pham bo
-									List<PContract_PO_Productivity> list_productivity_set = productivityService.getbypo_and_product(pcontractpo_id_link, product_set_id_link);
+
+								// kiem tra xem co phai san pham bo khong thi cap nhat cac dai co vao trong sản
+								// phẩm bộ
+								if (product_set_id_link > 0) {
+									// Kiem tra ns cua san pham bo
+									List<PContract_PO_Productivity> list_productivity_set = productivityService
+											.getbypo_and_product(pcontractpo_id_link, product_set_id_link);
 									PContract_PO_Productivity po_productivity_set = new PContract_PO_Productivity();
-									if(list_productivity_set.size() == 0) {
+									if (list_productivity_set.size() == 0) {
 										po_productivity_set.setId(null);
 										po_productivity_set.setOrgrootid_link(orgrootid_link);
 										po_productivity_set.setPcontract_poid_link(pcontractpo_id_link);
-										po_productivity_set.setProductid_link(product_set_id_link);							
-									}
-									else {
+										po_productivity_set.setProductid_link(product_set_id_link);
+									} else {
 										po_productivity_set = list_productivity_set.get(0);
 									}
 
@@ -745,43 +754,49 @@ public class UploadAPI {
 									po_productivity_set.setPlan_productivity(ns_target.intValue());
 									po_productivity_set.setProductiondays_ns(productiondays_ns);
 									productivityService.save(po_productivity_set);
-									
-									//Xoa cac dai co di roi insert lai vao san pham con hoac san pham bo
-									List<PContract_Price> list_price_set = priceService.getPrice_by_product(pcontractpo_id_link, product_set_id_link);
-									for(PContract_Price price : list_price_set) {
-										List<PContract_Price_D> list_price_d = pricedetailService.getPrice_D_ByPContractPrice(price.getId());
-										for(PContract_Price_D price_d : list_price_d) {
+
+									// Xoa cac dai co di roi insert lai vao san pham con hoac san pham bo
+									List<PContract_Price> list_price_set = priceService
+											.getPrice_by_product(pcontractpo_id_link, product_set_id_link);
+									for (PContract_Price price : list_price_set) {
+										List<PContract_Price_D> list_price_d = pricedetailService
+												.getPrice_D_ByPContractPrice(price.getId());
+										for (PContract_Price_D price_d : list_price_d) {
 											pricedetailService.delete(price_d);
 										}
 										priceService.delete(price);
 									}
-									
-									//them gia va so luong cac dai co khac all vao trong bo
+
+									// them gia va so luong cac dai co khac all vao trong bo
 									List<Long> list_sizeset = new ArrayList<Long>();
-									list_sizeset.add((long)1);
-									for(int i= col_phancach2+1; i<=col_phancach2+6;i++) {
+									list_sizeset.add((long) 1);
+									for (int i = col_phancach2 + 1; i <= col_phancach2 + 6; i++) {
 										Row row2 = sheet.getRow(1);
 										String sizesetname = commonService.getStringValue(row2.getCell(i));
 										Long sizesetid_link = sizesetService.getbyname(sizesetname);
 										list_sizeset.add(sizesetid_link);
 									}
-									
-									for(Long sizeid : list_sizeset) {
-										//Lay gia cua cac san pham con cua dai co do
-										//Lay ds cac san pham con cua san pham bo
-										List<ProductPairing> list_pair = productpairService.getproduct_pairing_detail_bycontract(orgrootid_link, pcontractid_link, product_set_id_link);
-										Float price_set = (float)0;
+
+									for (Long sizeid : list_sizeset) {
+										// Lay gia cua cac san pham con cua dai co do
+										// Lay ds cac san pham con cua san pham bo
+										List<ProductPairing> list_pair = productpairService
+												.getproduct_pairing_detail_bycontract(orgrootid_link, pcontractid_link,
+														product_set_id_link);
+										Float price_set = (float) 0;
 										int amount_set = 0;
-										for(ProductPairing pair : list_pair) {
-											List<PContract_Price> list_price_chil = priceService.getPrice_by_product_and_sizeset(pcontractpo_id_link, pair.getProductid_link(), sizeid);
-											if(list_price_chil.size() > 0) {
+										for (ProductPairing pair : list_pair) {
+											List<PContract_Price> list_price_chil = priceService
+													.getPrice_by_product_and_sizeset(pcontractpo_id_link,
+															pair.getProductid_link(), sizeid);
+											if (list_price_chil.size() > 0) {
 												amount_set = list_price_chil.get(0).getQuantity();
 												price_set += list_price_chil.get(0).getPrice_cmp();
 											}
 										}
-										
-										if(amount_set > 0 || price_set>0) {
-											//them gia va so luong vao trong san pham bo
+
+										if (amount_set > 0 || price_set > 0) {
+											// them gia va so luong vao trong san pham bo
 											PContract_Price price_sizeset = new PContract_Price();
 											price_sizeset.setId(null);
 											price_sizeset.setIs_fix(true);
@@ -795,11 +810,11 @@ public class UploadAPI {
 											price_sizeset.setTotalprice(price_set);
 											price_sizeset.setQuantity(amount_set);
 											price_sizeset = priceService.save(price_sizeset);
-											
-											//Them detail
+
+											// Them detail
 											PContract_Price_D price_sizeset_d = new PContract_Price_D();
 											price_sizeset_d.setOrgrootid_link(orgrootid_link);
-											price_sizeset_d.setFobpriceid_link((long)1);
+											price_sizeset_d.setFobpriceid_link((long) 1);
 											price_sizeset_d.setPrice(price_set);
 											price_sizeset_d.setIsfob(false);
 											price_sizeset_d.setId(null);
@@ -812,46 +827,52 @@ public class UploadAPI {
 										}
 									}
 								}
-								
-								//Kiem tra line giao hang va sinh line giao hang
-								for(int i=0; i<list_ngaygiao.size(); i++) {
+
+								// Kiem tra line giao hang va sinh line giao hang
+								for (int i = 0; i < list_ngaygiao.size(); i++) {
 									Date ngaygiao = list_ngaygiao.get(i);
 									int soluong = list_soluong.get(i);
-									
+
 									List<PContract_PO> list_line_gh = new ArrayList<PContract_PO>();
-									list_line_gh = pcontract_POService.check_exist_line(ngaygiao, po_productid_link, pcontractid_link, pcontractpo_id_link);
+									list_line_gh = pcontract_POService.check_exist_line(ngaygiao, po_productid_link,
+											pcontractid_link, pcontractpo_id_link);
 									PContract_PO po_line = new PContract_PO();
-									
+
 									Date production_date_line = null;
 									int production_day_line = 0;
 									float plan_linerequired_line = 0;
-									int productiondays_ns_line = ns_target == 0 ? 0 : soluong/ns_target.intValue(); 
-									if(i==0) {
-										if(matdate != null) {
+									int productiondays_ns_line = ns_target == 0 ? 0 : soluong / ns_target.intValue();
+									if (i == 0) {
+										if (matdate != null) {
 											production_date_line = Common.Date_Add(matdate, 7);
-											production_day_line = commonService.getDuration(production_date_line, ngaygiao, orgrootid_link);
-											plan_linerequired_line = (float)productiondays_ns_line/(float)production_day_line;
-											if (plan_linerequired_line < 1) plan_linerequired_line = 1;
-											
-											DecimalFormat df_line = new DecimalFormat("#.##"); 
+											production_day_line = commonService.getDuration(production_date_line,
+													ngaygiao, orgrootid_link);
+											plan_linerequired_line = (float) productiondays_ns_line
+													/ (float) production_day_line;
+											if (plan_linerequired_line < 1)
+												plan_linerequired_line = 1;
+
+											DecimalFormat df_line = new DecimalFormat("#.##");
 											String formatted_line = df_line.format(plan_linerequired_line);
 											plan_linerequired_line = Float.parseFloat(formatted_line);
 										}
-									}
-									else {
-										//từ đợt thứ 2 thì ngày bắt đầu = ngày giao hàng đợt trước đó - 2
-										production_date_line = commonService.Date_Add_with_holiday(list_ngaygiao.get(i-1), -2, orgrootid_link);
-										production_day_line = commonService.getDuration(production_date_line, ngaygiao, orgrootid_link);
-										plan_linerequired_line = (float)productiondays_ns_line/(float)production_day_line;
-										if (plan_linerequired_line < 1) plan_linerequired_line = 1;
-										
-										DecimalFormat df_line = new DecimalFormat("#.##"); 
+									} else {
+										// từ đợt thứ 2 thì ngày bắt đầu = ngày giao hàng đợt trước đó - 2
+										production_date_line = commonService
+												.Date_Add_with_holiday(list_ngaygiao.get(i - 1), -2, orgrootid_link);
+										production_day_line = commonService.getDuration(production_date_line, ngaygiao,
+												orgrootid_link);
+										plan_linerequired_line = (float) productiondays_ns_line
+												/ (float) production_day_line;
+										if (plan_linerequired_line < 1)
+											plan_linerequired_line = 1;
+
+										DecimalFormat df_line = new DecimalFormat("#.##");
 										String formatted_line = df_line.format(plan_linerequired_line);
 										plan_linerequired_line = Float.parseFloat(formatted_line);
 									}
-									
-									
-									if(list_line_gh.size() == 0) {
+									int total = 0;
+									if (list_line_gh.size() == 0) {
 										po_line.setId(null);
 										po_line.setCurrencyid_link((long) 1);
 										po_line.setDatecreated(current_time);
@@ -862,18 +883,17 @@ public class UploadAPI {
 										po_line.setUsercreatedid_link(user.getId());
 										po_line.setDate_importdata(current_time);
 										po_line.setPo_typeid_link(POType.PO_LINE_PLAN);
-										po_line.setSewtarget_percent((float)20);
+										po_line.setSewtarget_percent((float) 20);
 										po_line.setParentpoid_link(pcontractpo_id_link);
-										
-										if(status == POStatus.PO_STATUS_CONFIRMED) {
+
+										if (status == POStatus.PO_STATUS_CONFIRMED) {
 											po_line.setOrgmerchandiseid_link(orgid_link);
 										}
-
-									}
-									else {
+										po_line.setPo_quantity(soluong);
+									} else {
 										po_line = list_line_gh.get(0);
+										total = po_line.getPo_quantity();
 									}
-
 									po_line.setProductiondays_ns(productiondays_ns_line);
 									po_line.setShipmodeid_link(shipmodeid_link);
 									po_line.setShipdate(ngaygiao);
@@ -883,59 +903,21 @@ public class UploadAPI {
 									po_line.setStatus(po_tong.getStatus());
 									po_line.setPo_buyer(PO_No);
 									po_line.setPo_vendor(PO_No);
-									po_line.setPo_quantity(soluong);
+//									po_line.setPo_quantity(soluong);
 									po_line.setIs_tbd(PO_No == "TBD" ? true : false);
 									po_line.setCode(PO_No);
 									po_line.setProductid_link(po_productid_link);
-									
+
 									po_line = pcontract_POService.save(po_line);
-									
+
 									Long pcontract_po_line_id = po_line.getId();
-									
-									//Kiem tra ns cua san pham trong line
-									List<PContract_PO_Productivity> list_productivity_line = productivityService.getbypo_and_product(pcontract_po_line_id, productid_link);
-									PContract_PO_Productivity po_productivity_line = new PContract_PO_Productivity();
-									if(list_productivity_line.size() == 0) {
-										po_productivity_line.setId(null);
-										po_productivity_line.setOrgrootid_link(orgrootid_link);
-										po_productivity_line.setPcontract_poid_link(pcontract_po_line_id);
-										po_productivity_line.setProductid_link(productid_link);							
-									}
-									else {
-										po_productivity_line = list_productivity_line.get(0);
-									}
-									
-									po_productivity_line.setAmount(soluong*amount);
-									po_productivity_line.setPlan_linerequired(plan_linerequired_line);
-									po_productivity_line.setPlan_productivity(ns_target.intValue());
-									po_productivity_line.setProductiondays_ns(productiondays_ns_line);
-									productivityService.save(po_productivity_line);
-									
-									if(product_set_id_link > 0) {
-										//Kiem tra ns cua san pham trong line
-										List<PContract_PO_Productivity> list_productivity_line_set = productivityService.getbypo_and_product(pcontract_po_line_id, product_set_id_link);
-										PContract_PO_Productivity po_productivity_line_set = new PContract_PO_Productivity();
-										if(list_productivity_line_set.size() == 0) {
-											po_productivity_line_set.setId(null);
-											po_productivity_line_set.setOrgrootid_link(orgrootid_link);
-											po_productivity_line_set.setPcontract_poid_link(pcontract_po_line_id);
-											po_productivity_line_set.setProductid_link(product_set_id_link);							
-										}
-										else {
-											po_productivity_line_set = list_productivity_line_set.get(0);
-										}
-										
-										po_productivity_line_set.setAmount(soluong);
-										po_productivity_line_set.setPlan_linerequired(plan_linerequired_line);
-										po_productivity_line_set.setPlan_productivity(ns_target.intValue());
-										po_productivity_line_set.setProductiondays_ns(productiondays_ns_line);
-										productivityService.save(po_productivity_line_set);
-									}
-									
-									//kiem tra porder_req ton tai chua thi them vao
-									if(orgid_link != null) {
-										List<POrder_Req> list_req = reqService.getByOrg_PO_Product(pcontract_po_line_id, productid_link, orgid_link);
-										if(list_req.size() == 0) {
+
+									// kiem tra porder_req ton tai chua thi them vao
+									if (orgid_link != null) {
+										List<POrder_Req> list_req = reqService.getByOrg_PO_Product(pcontract_po_line_id,
+												productid_link, orgid_link);
+										if (list_req.size() == 0) {
+											total += soluong;
 											POrder_Req porder_req = new POrder_Req();
 											porder_req.setAmount_inset(amount);
 											porder_req.setGranttoorgid_link(orgid_link);
@@ -945,31 +927,80 @@ public class UploadAPI {
 											porder_req.setPcontract_poid_link(pcontract_po_line_id);
 											porder_req.setPcontractid_link(pcontractid_link);
 											porder_req.setProductid_link(productid_link);
-											porder_req.setStatus(status == POStatus.PO_STATUS_CONFIRMED ? POrderReqStatus.STATUS_POCONFFIRMED : POrderReqStatus.STATUS_FREE);
+											porder_req.setStatus(status == POStatus.PO_STATUS_CONFIRMED
+													? POrderReqStatus.STATUS_POCONFFIRMED
+													: POrderReqStatus.STATUS_FREE);
 											porder_req.setTotalorder(soluong);
 											porder_req = reqService.save(porder_req);
-											
-											if(po_tong.getStatus() == POStatus.PO_STATUS_CONFIRMED)
+
+											if (po_tong.getStatus() == POStatus.PO_STATUS_CONFIRMED)
 												porderService.createPOrder(porder_req, user);
+										} else {
+											POrder_Req porder_req = list_req.get(0);
+											total = total - porder_req.getTotalorder() + soluong;
+											porder_req.setTotalorder(total);
+											reqService.save(porder_req);
 										}
-										
+
 									}
+									po_line.setPo_quantity(total);
+									pcontract_POService.save(po_line);
+
+									// Kiem tra ns cua san pham trong line
+									List<PContract_PO_Productivity> list_productivity_line = productivityService
+											.getbypo_and_product(pcontract_po_line_id, productid_link);
+									PContract_PO_Productivity po_productivity_line = new PContract_PO_Productivity();
+									if (list_productivity_line.size() == 0) {
+										po_productivity_line.setId(null);
+										po_productivity_line.setOrgrootid_link(orgrootid_link);
+										po_productivity_line.setPcontract_poid_link(pcontract_po_line_id);
+										po_productivity_line.setProductid_link(productid_link);
+									} else {
+										po_productivity_line = list_productivity_line.get(0);
+									}
+
+									po_productivity_line.setAmount(po_line.getPo_quantity() * amount);
+									po_productivity_line.setPlan_linerequired(plan_linerequired_line);
+									po_productivity_line.setPlan_productivity(ns_target.intValue());
+									po_productivity_line.setProductiondays_ns(productiondays_ns_line);
+									productivityService.save(po_productivity_line);
+
+									if (product_set_id_link > 0) {
+										// Kiem tra ns cua san pham trong line
+										List<PContract_PO_Productivity> list_productivity_line_set = productivityService
+												.getbypo_and_product(pcontract_po_line_id, product_set_id_link);
+										PContract_PO_Productivity po_productivity_line_set = new PContract_PO_Productivity();
+										if (list_productivity_line_set.size() == 0) {
+											po_productivity_line_set.setId(null);
+											po_productivity_line_set.setOrgrootid_link(orgrootid_link);
+											po_productivity_line_set.setPcontract_poid_link(pcontract_po_line_id);
+											po_productivity_line_set.setProductid_link(product_set_id_link);
+										} else {
+											po_productivity_line_set = list_productivity_line_set.get(0);
+										}
+
+										po_productivity_line_set.setAmount(soluong);
+										po_productivity_line_set.setPlan_linerequired(plan_linerequired_line);
+										po_productivity_line_set.setPlan_productivity(ns_target.intValue());
+										po_productivity_line_set.setProductiondays_ns(productiondays_ns_line);
+										productivityService.save(po_productivity_line_set);
+									}
+
 								}
 							}
-							
-							//Chuyen sang row tiep theo neu con du lieu thi xu ly tiep khong thi dung lai
+
+							// Chuyen sang row tiep theo neu con du lieu thi xu ly tiep khong thi dung lai
 							rowNum++;
 							row = sheet.getRow(rowNum);
-							if(row == null) break;
-							
+							if (row == null)
+								break;
+
 							STT = commonService.getStringValue(row.getCell(ColumnTemplate.STT));
 							STT = STT.equals("0") ? "" : STT;
 						}
-					}
-					catch (Exception e) {
-						mes_err = "Có lỗi ở dòng " +(rowNum+1)+" và cột "+ colNum +": "+ mes_err; 
-					}
-					finally {
+					} catch (Exception e) {
+						mes_err = "Có lỗi ở dòng " + (rowNum + 1) + " và cột " + colNum + ": " + mes_err;
+					} finally {
 						workbook.close();
 						serverFile.delete();
 					}
@@ -985,20 +1016,18 @@ public class UploadAPI {
 					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 					response.setMessage("Có lỗi trong quá trình upload! Bạn hãy thử lại");
 				}
-			}
-			else {
+			} else {
 				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 				response.setMessage(mes_err);
 			}
-			
-			
+
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		}
 		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 	}
-	
+
 	private String genCodeSKU(Product product) {
 		List<SKU> lstSKU = skuService.getlist_byProduct(product.getId());
 		if (lstSKU.size() == 0) {
@@ -1006,7 +1035,7 @@ public class UploadAPI {
 		}
 		String old_code = lstSKU.get(0).getCode().trim();
 		String[] obj = old_code.split("_");
-		int a = Integer.parseInt(obj[obj.length-1]);
+		int a = Integer.parseInt(obj[obj.length - 1]);
 		String code = product.getBuyercode() + "_" + (a + 1);
 		return code;
 	}

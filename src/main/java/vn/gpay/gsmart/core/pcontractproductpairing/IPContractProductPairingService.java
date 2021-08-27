@@ -10,4 +10,6 @@ public interface IPContractProductPairingService extends Operations<PContractPro
 	public List<PContractProductPairing> getdetail_bypcontract_and_productpair(long orgrootid_link,
 			long pcontractid_link, long productpairid_link);
 
+	Integer getAmountinSet(long pcontractid_link, long productid_link, long product_setid_link);
+
 }

@@ -97,38 +97,72 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 @RestController
 @RequestMapping("/api/v1/pcontract_po")
 public class PContract_POAPI {
-	@Autowired IAttributeService attrService;
-	@Autowired IPContract_POService pcontract_POService;
-	@Autowired IProductAttributeService pavService;
-	@Autowired IPContract_Price_Service pcontractpriceService;
-	@Autowired IPContract_Price_DService pcontractpriceDService;
-	@Autowired IPContract_Price_D_SKUService pcontractpriceDSkuService;
-	@Autowired IPOrder_Service porderService;
-	@Autowired IPOrder_Req_Service porder_req_Service;
-	@Autowired ISKU_AttributeValue_Service skuattService;
-	@Autowired ISKU_Service skuService;
-	@Autowired IPContract_PO_ShippingService poshippingService;
-	@Autowired IPOrderProcessing_Service processService;
-	@Autowired Common commonService;
-	@Autowired ITask_Object_Service taskobjectService;
-	@Autowired IProductPairingService productpairService;
-	@Autowired IPOrder_Req_Service reqService;
-	@Autowired IProductService productService;
-	@Autowired IShipModeService shipmodeService;
-	@Autowired IPContractProductService pcontractproductService;
-	@Autowired IPContractProductPairingService pcontractpairService;
-	@Autowired IPContract_Price_Service priceService;
-	@Autowired ISizeSetService sizesetService;
-	@Autowired IPContract_PO_Productivity_Service productivityService;
-	@Autowired IPContract_Price_DService pricedetailService;
-	@Autowired IOrgService orgService;
-	@Autowired IGpayUserOrgService userOrgService;
-	@Autowired IPackingTypeService packingService;
-	@Autowired IAttributeValueService attributevalueService;
-	@Autowired IPContractProductSKUService ppskuService;
-	@Autowired IPOrderGrant_Service grantService;
-	@Autowired IPOrderGrant_SKUService grantskuService;
-	@Autowired IPContract_bom2_npl_poline_Service bomnplService;
+	@Autowired
+	IAttributeService attrService;
+	@Autowired
+	IPContract_POService pcontract_POService;
+	@Autowired
+	IProductAttributeService pavService;
+	@Autowired
+	IPContract_Price_Service pcontractpriceService;
+	@Autowired
+	IPContract_Price_DService pcontractpriceDService;
+	@Autowired
+	IPContract_Price_D_SKUService pcontractpriceDSkuService;
+	@Autowired
+	IPOrder_Service porderService;
+	@Autowired
+	IPOrder_Req_Service porder_req_Service;
+	@Autowired
+	ISKU_AttributeValue_Service skuattService;
+	@Autowired
+	ISKU_Service skuService;
+	@Autowired
+	IPContract_PO_ShippingService poshippingService;
+	@Autowired
+	IPOrderProcessing_Service processService;
+	@Autowired
+	Common commonService;
+	@Autowired
+	ITask_Object_Service taskobjectService;
+	@Autowired
+	IProductPairingService productpairService;
+	@Autowired
+	IPOrder_Req_Service reqService;
+	@Autowired
+	IProductService productService;
+	@Autowired
+	IShipModeService shipmodeService;
+	@Autowired
+	IPContractProductService pcontractproductService;
+	@Autowired
+	IPContractProductPairingService pcontractpairService;
+	@Autowired
+	IPContract_Price_Service priceService;
+	@Autowired
+	ISizeSetService sizesetService;
+	@Autowired
+	IPContract_PO_Productivity_Service productivityService;
+	@Autowired
+	IPContract_Price_DService pricedetailService;
+	@Autowired
+	IOrgService orgService;
+	@Autowired
+	IGpayUserOrgService userOrgService;
+	@Autowired
+	IPackingTypeService packingService;
+	@Autowired
+	IAttributeValueService attributevalueService;
+	@Autowired
+	IPContractProductSKUService ppskuService;
+	@Autowired
+	IPOrderGrant_Service grantService;
+	@Autowired
+	IPOrderGrant_SKUService grantskuService;
+	@Autowired
+	IPContract_bom2_npl_poline_Service bomnplService;
+	@Autowired
+	IProductPairingService pairService;
 
 	@RequestMapping(value = "/upload_template", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadTemplate(HttpServletRequest request,
@@ -168,7 +202,7 @@ public class PContract_POAPI {
 				// Kiem tra header
 				int rowNum = 1;
 				int colNum = 1;
-				
+
 				String mes_err = "";
 				Row row = sheet.getRow(rowNum);
 				try {
@@ -177,32 +211,34 @@ public class PContract_POAPI {
 					STT = STT.equals("0") ? "" : STT;
 					while (!STT.equals("")) {
 						// Kiểm tra sản phẩm có chưa thì sinh id sản phẩm
-						
+
 						long productid_link = 0;
 						colNum = ColumnTemplate.Style + 1;
 						String product_code = commonService.getStringValue(row.getCell(ColumnTemplate.Style));
-						
-						if(product_code=="") break;
-						
+
+						if (product_code == "")
+							break;
+
 						colNum = ColumnTemplate.amount_po + 1;
 						String s_product_quantity = commonService.getStringValue(row.getCell(ColumnTemplate.amount_po));
 						s_product_quantity = s_product_quantity.replace(",", "");
 						Float product_quantity = s_product_quantity == "" ? 0 : Float.parseFloat(s_product_quantity);
-						
+
 						colNum = ColumnTemplate.Style_Set + 1;
 						String product_set_code = commonService.getStringValue(row.getCell(ColumnTemplate.Style_Set));
 						product_set_code = product_set_code.equals("0") ? "" : product_set_code;
-						
+
 						colNum = ColumnTemplate.amount_style + 1;
 						String s_amount = commonService.getStringValue(row.getCell(ColumnTemplate.amount_style));
 						s_amount = s_amount.replace(",", "");
-						int amount = (int) row.getCell(ColumnTemplate.amount_style).getNumericCellValue() == 0 ? 1 : (int) row.getCell(ColumnTemplate.amount_style).getNumericCellValue();
-						
+						int amount = (int) row.getCell(ColumnTemplate.amount_style).getNumericCellValue() == 0 ? 1
+								: (int) row.getCell(ColumnTemplate.amount_style).getNumericCellValue();
+
 						int po_quantity = product_quantity.intValue() / amount;
-						
+
 						colNum = ColumnTemplate.Style_name + 1;
 						String stylename = commonService.getStringValue(row.getCell(ColumnTemplate.Style_name));
-						
+
 						List<Product> products = productService.getone_by_code(orgrootid_link, product_code, (long) 0,
 								ProductType.SKU_TYPE_COMPLETEPRODUCT);
 						if (products.size() == 0) {
@@ -218,23 +254,22 @@ public class PContract_POAPI {
 							p = productService.save(p);
 
 							productid_link = p.getId();
-							
-							//Sinh thuoc tinh mac dinh cho san pham
-							List<Attribute> lstAttr = attrService.getList_attribute_forproduct(ProductType.SKU_TYPE_COMPLETEPRODUCT,
-									user.getRootorgid_link());
+
+							// Sinh thuoc tinh mac dinh cho san pham
+							List<Attribute> lstAttr = attrService.getList_attribute_forproduct(
+									ProductType.SKU_TYPE_COMPLETEPRODUCT, user.getRootorgid_link());
 							for (Attribute attribute : lstAttr) {
 								ProductAttributeValue pav = new ProductAttributeValue();
 								long value = 0;
-								
-								if(attribute.getId() == AtributeFixValues.ATTR_COLOR) {
+
+								if (attribute.getId() == AtributeFixValues.ATTR_COLOR) {
 									value = AtributeFixValues.value_color_all;
-								}
-								else if(attribute.getId() == AtributeFixValues.ATTR_SIZE) {
+								} else if (attribute.getId() == AtributeFixValues.ATTR_SIZE) {
 									value = AtributeFixValues.value_size_all;
-								} else if(attribute.getId() == AtributeFixValues.ATTR_SIZEWIDTH) {
+								} else if (attribute.getId() == AtributeFixValues.ATTR_SIZEWIDTH) {
 									value = AtributeFixValues.value_sizewidth_all;
 								}
-								
+
 								pav.setId((long) 0);
 								pav.setProductid_link(productid_link);
 								pav.setAttributeid_link(attribute.getId());
@@ -242,10 +277,10 @@ public class PContract_POAPI {
 								pav.setOrgrootid_link(user.getRootorgid_link());
 								pavService.save(pav);
 							}
-							
-							//Sinh SKU cho mau all va co all
+
+							// Sinh SKU cho mau all va co all
 							long skuid_link = 0;
-							
+
 							SKU sku = new SKU();
 							sku.setId(skuid_link);
 							sku.setCode(genCodeSKU(p));
@@ -256,7 +291,7 @@ public class PContract_POAPI {
 
 							sku = skuService.save(sku);
 							skuid_link = sku.getId();
-							
+
 							// Them vao bang sku_attribute_value
 							SKU_Attribute_Value savMau = new SKU_Attribute_Value();
 							savMau.setId((long) 0);
@@ -279,7 +314,7 @@ public class PContract_POAPI {
 							savCo.setTimecreate(new Date());
 
 							skuattService.save(savCo);
-							
+
 						} else {
 							productid_link = products.get(0).getId();
 						}
@@ -293,8 +328,8 @@ public class PContract_POAPI {
 								Product set = new Product();
 								set.setId(null);
 								set.setBuyercode(product_set_code);
-								set.setBuyername(amount+"-"+product_set_code);
-								set.setDescription(amount+"-"+product_set_code);
+								set.setBuyername(amount + "-" + product_set_code);
+								set.setDescription(amount + "-" + product_set_code);
 								set.setOrgrootid_link(orgrootid_link);
 								set.setStatus(1);
 								set.setUsercreateid_link(user.getId());
@@ -320,14 +355,13 @@ public class PContract_POAPI {
 								newpair.setProductid_link(productid_link);
 								newpair.setProductpairid_link(product_set_id_link);
 								productpairService.save(newpair);
-								
-								
+
 							}
 						}
 
 						// Them san pham vao trong pcontract
-						List<PContractProduct> list_product = pcontractproductService.get_by_product_and_pcontract(
-								orgrootid_link, productid_link, pcontractid_link);
+						List<PContractProduct> list_product = pcontractproductService
+								.get_by_product_and_pcontract(orgrootid_link, productid_link, pcontractid_link);
 						if (list_product.size() == 0) {
 							PContractProduct product = new PContractProduct();
 							product.setIs_breakdown_done(false);
@@ -369,111 +403,107 @@ public class PContract_POAPI {
 						if (PO_No == "" || PO_No.equals("0")) {
 							PO_No = "TBD";
 						}
-						
+
 						colNum = ColumnTemplate.shipdate + 1;
 						Date ShipDate = null;
-						
+
 						try {
 							String s_shipdate = commonService.getStringValue(row.getCell(ColumnTemplate.shipdate));
-							if(s_shipdate.contains("/")) {
+							if (s_shipdate.contains("/")) {
 								String[] s_date = s_shipdate.split("/");
-								if(Integer.parseInt(s_date[1].toString()) < 13 && Integer.parseInt(s_date[0].toString()) < 32) {
+								if (Integer.parseInt(s_date[1].toString()) < 13
+										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									ShipDate = new SimpleDateFormat("dd/MM/yyyy").parse(s_shipdate);
-								}
-								else {
+								} else {
 									mes_err = "Định dạng ngày không đúng dd/MM/yyyy! ";
 								}
-								
-							}
-							else {
-								if(DateUtil.isCellDateFormatted(row.getCell(ColumnTemplate.shipdate))) {
+
+							} else {
+								if (DateUtil.isCellDateFormatted(row.getCell(ColumnTemplate.shipdate))) {
 									ShipDate = row.getCell(ColumnTemplate.shipdate).getDateCellValue();
 								}
 							}
-							
-						}
-						catch (Exception e) {
-							if(DateUtil.isCellDateFormatted(row.getCell(ColumnTemplate.shipdate))) {
+
+						} catch (Exception e) {
+							if (DateUtil.isCellDateFormatted(row.getCell(ColumnTemplate.shipdate))) {
 								ShipDate = row.getCell(ColumnTemplate.shipdate).getDateCellValue();
 							}
 						}
-						
-						if(ShipDate == null) {
+
+						if (ShipDate == null) {
 							throw new Exception();
 						}
-						
+
 						long po_productid_link = product_set_id_link > 0 ? product_set_id_link : productid_link;
 						long pcontractpo_id_link = 0;
-						
+
 //						colNum = ColumnTemplate.cmp + 1;
 //						String s_price_cmp = commonService.getStringValue(row.getCell(ColumnTemplate.cmp));
 //						s_price_cmp = s_price_cmp.replace(",", "");
 //						float price_cmp = s_price_cmp.equals("") ? 0 : Float.parseFloat(s_price_cmp);
-						
+
 						colNum = ColumnTemplate.fob + 1;
 						String s_price_fob = commonService.getStringValue(row.getCell(ColumnTemplate.fob));
 						s_price_fob = s_price_fob.replace(",", "");
 						float price_fob = s_price_fob.equals("") ? 0 : Float.parseFloat(s_price_fob);
-						
+
 						colNum = ColumnTemplate.vendor_target + 1;
-						String s_vendor_target = commonService.getStringValue(row.getCell(ColumnTemplate.vendor_target));
+						String s_vendor_target = commonService
+								.getStringValue(row.getCell(ColumnTemplate.vendor_target));
 						s_vendor_target = s_vendor_target.replace(",", "");
 						float vendor_target = s_vendor_target == "" ? 0 : Float.parseFloat(s_vendor_target);
-						
+
 						colNum = ColumnTemplate.org + 1;
 						String s_org_code = commonService.getStringValue(row.getCell(ColumnTemplate.org));
 						s_org_code = s_org_code.replace(",", "");
 						Long orgid_link = null;
 						List<Org> list_org = orgService.getbycode(s_org_code, orgrootid_link);
-						if(list_org.size() > 0) {
+						if (list_org.size() > 0) {
 							orgid_link = list_org.get(0).getId();
 						}
-						
+
 						colNum = ColumnTemplate.matdate + 1;
 						Date matdate = null;
-						
+
 						try {
 							String s_matdate = commonService.getStringValue(row.getCell(ColumnTemplate.matdate));
-							if(s_matdate.contains("/")) {
+							if (s_matdate.contains("/")) {
 								String[] s_date = s_matdate.split("/");
-								if(Integer.parseInt(s_date[1].toString()) < 13 && Integer.parseInt(s_date[0].toString()) < 32) {
+								if (Integer.parseInt(s_date[1].toString()) < 13
+										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									matdate = new SimpleDateFormat("dd/MM/yyyy").parse(s_matdate);
-								}
-								else {
+								} else {
 									mes_err = "Định dạng ngày không đúng dd/MM/yyyy! ";
 								}
-								
-							}
-							else {
-								if(DateUtil.isCellDateFormatted(row.getCell(ColumnTemplate.matdate))) {
+
+							} else {
+								if (DateUtil.isCellDateFormatted(row.getCell(ColumnTemplate.matdate))) {
 									matdate = row.getCell(ColumnTemplate.matdate).getDateCellValue();
 								}
 							}
-							
-						}
-						catch (Exception e) {
-							if(DateUtil.isCellDateFormatted(row.getCell(ColumnTemplate.matdate))) {
+
+						} catch (Exception e) {
+							if (DateUtil.isCellDateFormatted(row.getCell(ColumnTemplate.matdate))) {
 								matdate = row.getCell(ColumnTemplate.matdate).getDateCellValue();
 							}
 						}
-						
-						if(matdate == null) {
+
+						if (matdate == null) {
 							throw new Exception();
 						}
-						
+
 						Date production_date = Common.Date_Add(matdate, 7);
 						int production_day = commonService.getDuration(production_date, ShipDate, orgrootid_link);
-						
+
 						List<PContract_PO> listpo = new ArrayList<PContract_PO>();
-						if(product_set_id_link == 0) {
-							listpo = pcontract_POService.check_exist_po( ShipDate,
-									po_productid_link, shipmodeid_link, pcontractid_link, PO_No);
+						if (product_set_id_link == 0) {
+							listpo = pcontract_POService.check_exist_po(ShipDate, po_productid_link, shipmodeid_link,
+									pcontractid_link, PO_No);
+						} else {
+							listpo = pcontract_POService.check_exist_po(ShipDate, po_productid_link, shipmodeid_link,
+									pcontractid_link, "");
 						}
-						else {
-							listpo = pcontract_POService.check_exist_po( ShipDate,
-									po_productid_link, shipmodeid_link, pcontractid_link, "");
-						}
-						
+
 						if (listpo.size() > 0) {
 							pcontractpo_id_link = listpo.get(0).getId();
 							PContract_PO po = listpo.get(0);
@@ -485,7 +515,7 @@ public class PContract_POAPI {
 
 						if (pcontractpo_id_link == 0) {
 							Float price_cmp = null;
-							Float price_cmp_total = (float)0;
+							Float price_cmp_total = (float) 0;
 							int count = 0;
 
 							PContract_PO po_new = new PContract_PO();
@@ -512,11 +542,12 @@ public class PContract_POAPI {
 
 							po_new = pcontract_POService.save(po_new);
 							pcontractpo_id_link = po_new.getId();
-							
-							//kiem tra porder_req ton tai chua thi them vao
-							if(orgid_link != null) {
-								List<POrder_Req> list_req = reqService.getByOrg_PO_Product(pcontractpo_id_link, productid_link, orgid_link);
-								if(list_req.size() == 0) {
+
+							// kiem tra porder_req ton tai chua thi them vao
+							if (orgid_link != null) {
+								List<POrder_Req> list_req = reqService.getByOrg_PO_Product(pcontractpo_id_link,
+										productid_link, orgid_link);
+								if (list_req.size() == 0) {
 									POrder_Req porder_req = new POrder_Req();
 									porder_req.setAmount_inset(amount);
 									porder_req.setGranttoorgid_link(orgid_link);
@@ -530,17 +561,18 @@ public class PContract_POAPI {
 									porder_req.setTotalorder(po_quantity);
 									reqService.save(porder_req);
 								}
-								
+
 							}
-							
+
 							for (int i = ColumnTemplate.infant; i <= ColumnTemplate.plus; i++) {
-								colNum = i+ 1;
+								colNum = i + 1;
 								Row row_header = sheet.getRow(0);
 								String sizesetname = commonService.getStringValue(row_header.getCell(i));
 								String s_amount_sizeset = commonService.getStringValue(row.getCell(i));
 								s_amount_sizeset = s_amount_sizeset.replace(",", "");
-								Float amount_sizeset = s_amount_sizeset.equals("") ? 0 : Float.parseFloat(s_amount_sizeset);
-								
+								Float amount_sizeset = s_amount_sizeset.equals("") ? 0
+										: Float.parseFloat(s_amount_sizeset);
+
 								Long sizesetid_link = sizesetService.getbyname(sizesetname);
 								if (amount_sizeset > 0) {
 									count++;
@@ -557,16 +589,16 @@ public class PContract_POAPI {
 									price.setPrice_cmp(amount_sizeset);
 									price.setTotalprice(amount_sizeset);
 									price = priceService.save(price);
-									
-									//Them detail cho dai co 
+
+									// Them detail cho dai co
 									PContract_Price_D price_detail_sizeset = new PContract_Price_D();
 									price_detail_sizeset.setOrgrootid_link(orgrootid_link);
-									price_detail_sizeset.setFobpriceid_link((long)1);
+									price_detail_sizeset.setFobpriceid_link((long) 1);
 									price_detail_sizeset.setPrice(amount_sizeset);
 									price_detail_sizeset.setIsfob(false);
 									price_detail_sizeset.setDatecreated(current_time);
 									price_detail_sizeset.setId(null);
-									price_detail_sizeset.setSizesetid_link((long)1);
+									price_detail_sizeset.setSizesetid_link((long) 1);
 									price_detail_sizeset.setPcontract_poid_link(pcontractpo_id_link);
 									price_detail_sizeset.setPcontractid_link(pcontractid_link);
 									price_detail_sizeset.setPcontractpriceid_link(price.getId());
@@ -574,12 +606,13 @@ public class PContract_POAPI {
 									pricedetailService.save(price_detail_sizeset);
 								}
 							}
-							
-							//Tinh gia cmp = trung binh gia cua cac dai co
-							if(count == 0) price_cmp = (float)0;
+
+							// Tinh gia cmp = trung binh gia cua cac dai co
+							if (count == 0)
+								price_cmp = (float) 0;
 							else {
 								price_cmp = price_cmp_total / count;
-								DecimalFormat df = new DecimalFormat("#.###"); 
+								DecimalFormat df = new DecimalFormat("#.###");
 								String formatted = df.format(price_cmp);
 								price_cmp = Float.parseFloat(formatted);
 							}
@@ -600,16 +633,16 @@ public class PContract_POAPI {
 							price_all.setSizesetid_link(sizesetService.getbyname("ALL"));
 							price_all.setDate_importdata(current_time);
 							price_all = priceService.save(price_all);
-							
-							//Them detail cho dai co All
+
+							// Them detail cho dai co All
 							PContract_Price_D price_detail_all = new PContract_Price_D();
 							price_detail_all.setOrgrootid_link(orgrootid_link);
-							price_detail_all.setFobpriceid_link((long)1);
+							price_detail_all.setFobpriceid_link((long) 1);
 							price_detail_all.setPrice(price_cmp);
 							price_detail_all.setIsfob(false);
 							price_detail_all.setDatecreated(current_time);
 							price_detail_all.setId(null);
-							price_detail_all.setSizesetid_link((long)1);
+							price_detail_all.setSizesetid_link((long) 1);
 							price_detail_all.setPcontract_poid_link(pcontractpo_id_link);
 							price_detail_all.setPcontractid_link(pcontractid_link);
 							price_detail_all.setPcontractpriceid_link(price_all.getId());
@@ -633,16 +666,16 @@ public class PContract_POAPI {
 								price_all_set.setSizesetid_link(sizesetService.getbyname("ALL"));
 								price_all_set.setDate_importdata(current_time);
 								price_all_set = priceService.save(price_all_set);
-								
-								//Them detai price cho dai co All
+
+								// Them detai price cho dai co All
 								PContract_Price_D price_detail = new PContract_Price_D();
 								price_detail.setOrgrootid_link(orgrootid_link);
-								price_detail.setFobpriceid_link((long)1);
+								price_detail.setFobpriceid_link((long) 1);
 								price_detail.setPrice(price_cmp);
 								price_detail.setIsfob(false);
 								price_detail.setDatecreated(current_time);
 								price_detail.setId(null);
-								price_detail.setSizesetid_link((long)1);
+								price_detail.setSizesetid_link((long) 1);
 								price_detail.setPcontract_poid_link(pcontractpo_id_link);
 								price_detail.setPcontractid_link(pcontractid_link);
 								price_detail.setPcontractpriceid_link(price_all_set.getId());
@@ -651,14 +684,15 @@ public class PContract_POAPI {
 
 								//
 								for (int i = ColumnTemplate.infant; i <= ColumnTemplate.plus; i++) {
-									colNum = i+1;
+									colNum = i + 1;
 									Row row_header = sheet.getRow(0);
 									String sizesetname = commonService.getStringValue(row_header.getCell(i));
 									String s_amount_sizeset = commonService.getStringValue(row.getCell(i));
 									s_amount_sizeset = s_amount_sizeset.replace(",", "");
-									Float amount_sizeset = s_amount_sizeset.equals("") ? 0 : Float.parseFloat(s_amount_sizeset);
+									Float amount_sizeset = s_amount_sizeset.equals("") ? 0
+											: Float.parseFloat(s_amount_sizeset);
 									Long sizesetid_link = sizesetService.getbyname(sizesetname);
-									
+
 									if (amount_sizeset > 0) {
 										PContract_Price price = new PContract_Price();
 										price.setId(null);
@@ -672,11 +706,11 @@ public class PContract_POAPI {
 										price.setPrice_cmp(amount_sizeset);
 										price.setTotalprice(amount_sizeset);
 										price = priceService.save(price);
-										
-										//Them detail
+
+										// Them detail
 										PContract_Price_D price_sizeset = new PContract_Price_D();
 										price_sizeset.setOrgrootid_link(orgrootid_link);
-										price_sizeset.setFobpriceid_link((long)1);
+										price_sizeset.setFobpriceid_link((long) 1);
 										price_sizeset.setPrice(amount_sizeset);
 										price_sizeset.setIsfob(false);
 										price_sizeset.setId(null);
@@ -694,32 +728,34 @@ public class PContract_POAPI {
 						// truong hop hang bo po da co roi
 						else {
 							Float price_cmp = null;
-							Float price_cmp_total = (float)0;
+							Float price_cmp_total = (float) 0;
 							int count = 0;
-							
-							//  neu la hang bo thi them khong thi thoi trung coi nhu bo qua khong xu ly
-							if (product_set_id_link > 0) 	{
-								//Kiem tra dai co san pham con da co hay chua
-								List<PContract_Price> list_price = priceService.getPrice_by_product(pcontractpo_id_link, productid_link);
+
+							// neu la hang bo thi them khong thi thoi trung coi nhu bo qua khong xu ly
+							if (product_set_id_link > 0) {
+								// Kiem tra dai co san pham con da co hay chua
+								List<PContract_Price> list_price = priceService.getPrice_by_product(pcontractpo_id_link,
+										productid_link);
 
 								//
 								for (int i = ColumnTemplate.infant; i <= ColumnTemplate.plus; i++) {
-									colNum = i+1;
+									colNum = i + 1;
 									Row row_header = sheet.getRow(0);
 //									String sizesetname = row_header.getCell(i).getStringCellValue();
 //									int amount_sizeset = (int) row.getCell(i).getNumericCellValue();
-									
+
 									String sizesetname = commonService.getStringValue(row_header.getCell(i));
 									String s_amount_sizeset = commonService.getStringValue(row.getCell(i));
 									s_amount_sizeset = s_amount_sizeset.replace(",", "");
-									Float amount_sizeset = s_amount_sizeset.equals("") ? 0 : Float.parseFloat(s_amount_sizeset);
+									Float amount_sizeset = s_amount_sizeset.equals("") ? 0
+											: Float.parseFloat(s_amount_sizeset);
 									Long sizesetid_link = sizesetService.getbyname(sizesetname);
-									
+
 									if (amount_sizeset > 0) {
 										price_cmp_total += amount_sizeset;
 										count++;
-										//kiem tra xem dai co co du lieu chua! 
-										if(list_price.size() == 0) {
+										// kiem tra xem dai co co du lieu chua!
+										if (list_price.size() == 0) {
 											PContract_Price price = new PContract_Price();
 											price.setId(null);
 											price.setIs_fix(false);
@@ -732,11 +768,11 @@ public class PContract_POAPI {
 											price.setPrice_cmp(amount_sizeset);
 											price.setTotalprice(amount_sizeset);
 											price = priceService.save(price);
-											
-											//Them detail
+
+											// Them detail
 											PContract_Price_D price_detail = new PContract_Price_D();
 											price_detail.setOrgrootid_link(orgrootid_link);
-											price_detail.setFobpriceid_link((long)1);
+											price_detail.setFobpriceid_link((long) 1);
 											price_detail.setPrice(amount_sizeset);
 											price_detail.setIsfob(false);
 											price_detail.setId(null);
@@ -746,7 +782,7 @@ public class PContract_POAPI {
 											price_detail.setPcontractpriceid_link(price.getId());
 											price_detail.setProductid_link(productid_link);
 											pricedetailService.save(price_detail);
-											
+
 //											PContract_Price _price_set = new PContract_Price();
 //											_price_set.setId(null);
 //											_price_set.setIs_fix(false);
@@ -773,11 +809,11 @@ public class PContract_POAPI {
 //											price_detail_set.setPcontractpriceid_link(_price_set.getId());
 //											price_detail_set.setProductid_link(productid_link);
 //											pricedetailService.save(price_detail_set);
-										}
-										else {
-											List<PContract_Price> list_price_old = new ArrayList<PContract_Price>(list_price);
-											list_price_old.removeIf(c->!c.getSizesetid_link().equals(sizesetid_link));
-											if(list_price_old.size() == 0) {
+										} else {
+											List<PContract_Price> list_price_old = new ArrayList<PContract_Price>(
+													list_price);
+											list_price_old.removeIf(c -> !c.getSizesetid_link().equals(sizesetid_link));
+											if (list_price_old.size() == 0) {
 												PContract_Price price = new PContract_Price();
 												price.setId(null);
 												price.setIs_fix(false);
@@ -790,11 +826,11 @@ public class PContract_POAPI {
 												price.setPrice_cmp(amount_sizeset);
 												price.setTotalprice(price_cmp);
 												price = priceService.save(price);
-												
-												//Them detail
+
+												// Them detail
 												PContract_Price_D price_detail = new PContract_Price_D();
 												price_detail.setOrgrootid_link(orgrootid_link);
-												price_detail.setFobpriceid_link((long)1);
+												price_detail.setFobpriceid_link((long) 1);
 												price_detail.setPrice(amount_sizeset);
 												price_detail.setIsfob(false);
 												price_detail.setId(null);
@@ -804,8 +840,7 @@ public class PContract_POAPI {
 												price_detail.setPcontractpriceid_link(price.getId());
 												price_detail.setProductid_link(productid_link);
 												pricedetailService.save(price_detail);
-												
-												
+
 												PContract_Price price_set = new PContract_Price();
 												price_set.setId(null);
 												price_set.setIs_fix(false);
@@ -818,11 +853,11 @@ public class PContract_POAPI {
 												price_set.setPrice_cmp(price_cmp);
 												price_set.setTotalprice(price_cmp);
 												price_set = priceService.save(price_set);
-												
-												//Them detail
+
+												// Them detail
 												PContract_Price_D price_detail_set = new PContract_Price_D();
 												price_detail_set.setOrgrootid_link(orgrootid_link);
-												price_detail_set.setFobpriceid_link((long)1);
+												price_detail_set.setFobpriceid_link((long) 1);
 												price_detail_set.setPrice(price_cmp);
 												price_detail_set.setIsfob(false);
 												price_detail_set.setId(null);
@@ -832,22 +867,22 @@ public class PContract_POAPI {
 												price_detail_set.setPcontractpriceid_link(price_set.getId());
 												price_detail_set.setProductid_link(productid_link);
 												pricedetailService.save(price_detail_set);
-												
+
 											}
 										}
 									}
 								}
-								if(count == 0) price_cmp = (float)0;
+								if (count == 0)
+									price_cmp = (float) 0;
 								else {
 									price_cmp = price_cmp_total / count;
-									DecimalFormat df = new DecimalFormat("#.###"); 
+									DecimalFormat df = new DecimalFormat("#.###");
 									String formatted = df.format(price_cmp);
 									price_cmp = Float.parseFloat(formatted);
 								}
-								
 
 								// them dai co vao san pham con
-								if(list_price.size() == 0) {
+								if (list_price.size() == 0) {
 									PContract_Price price_all_set = new PContract_Price();
 									price_all_set.setId(null);
 									price_all_set.setIs_fix(false);
@@ -863,11 +898,11 @@ public class PContract_POAPI {
 									price_all_set.setSizesetid_link(sizesetService.getbyname("ALL"));
 									price_all_set.setDate_importdata(current_time);
 									price_all_set = priceService.save(price_all_set);
-									
-									//Them detail
+
+									// Them detail
 									PContract_Price_D price_detail = new PContract_Price_D();
 									price_detail.setOrgrootid_link(orgrootid_link);
-									price_detail.setFobpriceid_link((long)1);
+									price_detail.setFobpriceid_link((long) 1);
 									price_detail.setPrice(price_cmp);
 									price_detail.setIsfob(false);
 									price_detail.setId(null);
@@ -878,18 +913,19 @@ public class PContract_POAPI {
 									price_all_set.setProductid_link(productid_link);
 									pricedetailService.save(price_detail);
 								}
-								
-								//Cap nhat gia len san pham cha
-								List<PContract_Price> list_price_set = priceService.getPrice_by_product(pcontractpo_id_link, product_set_id_link);
-								if(list_price_set.size() > 0) {
+
+								// Cap nhat gia len san pham cha
+								List<PContract_Price> list_price_set = priceService
+										.getPrice_by_product(pcontractpo_id_link, product_set_id_link);
+								if (list_price_set.size() > 0) {
 									PContract_Price price_parent = list_price_set.get(0);
 									price_parent.setPrice_cmp(price_parent.getPrice_cmp() + price_cmp);
 								}
-							}
-							else {
-								if(orgid_link != null) {
-									List<POrder_Req> list_req = reqService.getByOrg_PO_Product(pcontractpo_id_link, productid_link, orgid_link);
-									if(list_req.size() == 0) {
+							} else {
+								if (orgid_link != null) {
+									List<POrder_Req> list_req = reqService.getByOrg_PO_Product(pcontractpo_id_link,
+											productid_link, orgid_link);
+									if (list_req.size() == 0) {
 										POrder_Req porder_req = new POrder_Req();
 										porder_req.setAmount_inset(amount);
 										porder_req.setGranttoorgid_link(orgid_link);
@@ -903,26 +939,28 @@ public class PContract_POAPI {
 										porder_req.setTotalorder(po_quantity);
 										reqService.save(porder_req);
 									}
-									
+
 								}
-								//Hàng đơn chiếc thì cập nhật dải cỡ
+								// Hàng đơn chiếc thì cập nhật dải cỡ
 								for (int i = ColumnTemplate.infant; i <= ColumnTemplate.plus; i++) {
-									colNum = i+1;
+									colNum = i + 1;
 									Row row_header = sheet.getRow(0);
 									String s_amount_sizeset = commonService.getStringValue(row.getCell(i));
 									s_amount_sizeset = s_amount_sizeset.replace(",", "");
-									Float amount_sizeset = s_amount_sizeset.equals("") ? 0 : Float.parseFloat(s_amount_sizeset);
+									Float amount_sizeset = s_amount_sizeset.equals("") ? 0
+											: Float.parseFloat(s_amount_sizeset);
 //									int amount_sizeset = (int) row.getCell(i).getNumericCellValue();
 									if (amount_sizeset > 0) {
 										price_cmp_total += amount_sizeset;
 										count++;
 										String sizesetname = commonService.getStringValue(row_header.getCell(i));
 										Long sizesetid_link = sizesetService.getbyname(sizesetname);
-										List<PContract_Price> list_price = priceService.getPrice_by_product_and_sizeset(pcontractpo_id_link, productid_link, sizesetid_link);
+										List<PContract_Price> list_price = priceService.getPrice_by_product_and_sizeset(
+												pcontractpo_id_link, productid_link, sizesetid_link);
 										for (PContract_Price pContract_Price : list_price) {
 											priceService.delete(pContract_Price);
 										}
-										
+
 										PContract_Price price = new PContract_Price();
 										price.setDate_importdata(current_time);
 										price.setId(null);
@@ -935,10 +973,10 @@ public class PContract_POAPI {
 										price.setPrice_cmp(amount_sizeset);
 										price.setTotalprice(amount_sizeset);
 										priceService.save(price);
-										
+
 										PContract_Price_D price_detail = new PContract_Price_D();
 										price_detail.setOrgrootid_link(orgrootid_link);
-										price_detail.setFobpriceid_link((long)1);
+										price_detail.setFobpriceid_link((long) 1);
 										price_detail.setPrice(amount_sizeset);
 										price_detail.setIsfob(false);
 										price_detail.setId(null);
@@ -950,38 +988,40 @@ public class PContract_POAPI {
 										pricedetailService.save(price_detail);
 									}
 								}
-								
-								//tinh gia cmp theo trung binh cua cac dai co
-								if(count == 0) price_cmp = (float)0;
+
+								// tinh gia cmp theo trung binh cua cac dai co
+								if (count == 0)
+									price_cmp = (float) 0;
 								else {
 									price_cmp = price_cmp_total / count;
-									DecimalFormat df = new DecimalFormat("#.###"); 
+									DecimalFormat df = new DecimalFormat("#.###");
 									String formatted = df.format(price_cmp);
 									price_cmp = Float.parseFloat(formatted);
 								}
-								
-								//cap nhat lai gia cmp cua san pham ( dai co all)
-								List<PContract_Price> prices = priceService.getPrice_by_product_and_sizeset(pcontractpo_id_link, productid_link, (long)1);
-								if(prices.size() > 0) {
+
+								// cap nhat lai gia cmp cua san pham ( dai co all)
+								List<PContract_Price> prices = priceService
+										.getPrice_by_product_and_sizeset(pcontractpo_id_link, productid_link, (long) 1);
+								if (prices.size() > 0) {
 									PContract_Price price = prices.get(0);
 									price.setPrice_cmp(price_cmp);
 									price.setTotalprice(price_cmp);
 									priceService.save(price);
-									
-									List<PContract_Price_D> price_details = pricedetailService.getPrice_D_ByFobPriceAndPContractPrice(price.getId(), (long)1);
-									if(price_details.size() > 0) {
+
+									List<PContract_Price_D> price_details = pricedetailService
+											.getPrice_D_ByFobPriceAndPContractPrice(price.getId(), (long) 1);
+									if (price_details.size() > 0) {
 										PContract_Price_D price_detail = price_details.get(0);
 										price_detail.setPrice(price_cmp);
 										pricedetailService.save(price_detail);
-									}
-									else {
+									} else {
 										PContract_Price_D price_detail = new PContract_Price_D();
 										price_detail.setOrgrootid_link(orgrootid_link);
-										price_detail.setFobpriceid_link((long)1);
+										price_detail.setFobpriceid_link((long) 1);
 										price_detail.setPrice(price_cmp);
 										price_detail.setIsfob(false);
 										price_detail.setId(null);
-										price_detail.setSizesetid_link((long)1);
+										price_detail.setSizesetid_link((long) 1);
 										price_detail.setPcontract_poid_link(pcontractpo_id_link);
 										price_detail.setPcontractid_link(pcontractid_link);
 										price_detail.setPcontractpriceid_link(price.getId());
@@ -989,16 +1029,14 @@ public class PContract_POAPI {
 										pricedetailService.save(price_detail);
 									}
 								}
-								
-								
-								
+
 							}
 						}
-						
-						//Tu sinh PO con neu po da xac nhan 
+
+						// Tu sinh PO con neu po da xac nhan
 						colNum = ColumnTemplate.status + 1;
 						String s_status = commonService.getStringValue(row.getCell(ColumnTemplate.status));
-						if(!s_status.equals("")) {
+						if (!s_status.equals("")) {
 							PContract_PO po = pcontract_POService.findOne(pcontractpo_id_link);
 							po.setStatus(POStatus.PO_STATUS_CONFIRMED);
 							po.setOrgmerchandiseid_link(orgid_link);
@@ -1051,25 +1089,26 @@ public class PContract_POAPI {
 //								porder_req.setTotalorder(po_quantity);
 //								reqService.save(porder_req);
 //							}
-							
-							//Lay danh sach cac porder_req cua po 
-							List<POrder_Req> list_req = reqService.getByContractAndPO(pcontractid_link, pcontractpo_id_link);
-							for(POrder_Req req : list_req) {
+
+							// Lay danh sach cac porder_req cua po
+							List<POrder_Req> list_req = reqService.getByContractAndPO(pcontractid_link,
+									pcontractpo_id_link);
+							for (POrder_Req req : list_req) {
 								porderService.createPOrder(req, user);
 							}
 						}
-						
+
 						rowNum++;
 						row = sheet.getRow(rowNum);
-						if(row == null) break;
-						
+						if (row == null)
+							break;
+
 						STT = commonService.getStringValue(row.getCell(ColumnTemplate.STT));
 						STT = STT.equals("0") ? "" : STT;
 					}
 				} catch (Exception e) {
-					mes_err = "Có lỗi ở dòng " +(rowNum+1)+" và cột "+ colNum; 
-				}
-				finally {
+					mes_err = "Có lỗi ở dòng " + (rowNum + 1) + " và cột " + colNum;
+				} finally {
 					workbook.close();
 					serverFile.delete();
 				}
@@ -1091,10 +1130,11 @@ public class PContract_POAPI {
 		}
 		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/upload_po", method = RequestMethod.POST)
-	public ResponseEntity<ResponseBase> UploadPO(HttpServletRequest request,
-			@RequestParam("file") MultipartFile file, @RequestParam("parentid_link") long parentid_link, @RequestParam("pcontractid_link") long pcontractid_link) {
+	public ResponseEntity<ResponseBase> UploadPO(HttpServletRequest request, @RequestParam("file") MultipartFile file,
+			@RequestParam("parentid_link") long parentid_link,
+			@RequestParam("pcontractid_link") long pcontractid_link) {
 		ResponseBase response = new ResponseBase();
 
 		Date current_time = new Date();
@@ -1143,216 +1183,303 @@ public class PContract_POAPI {
 //						String a  = commonService.getStringValue(row.getCell(ColumnPO.STT));
 						colNum = ColumnPO.PO;
 						String PO_No = commonService.getStringValue(row.getCell(ColumnPO.PO));
-						
+
 						colNum = ColumnPO.Line;
 						String Line = commonService.getStringValue(row.getCell(ColumnPO.Line));
 						Line = Line.equals("0") ? "" : Line;
-						
+
 						colNum = ColumnPO.Shipdate;
 						Date ShipDate = null;
 						try {
 							String s_shipdate = commonService.getStringValue(row.getCell(ColumnPO.Shipdate));
-							if(s_shipdate.contains("/")) {
+							if (s_shipdate.contains("/")) {
 								String[] s_date = s_shipdate.split("/");
-								if(Integer.parseInt(s_date[1].toString()) < 13 && Integer.parseInt(s_date[0].toString()) < 32) {
+								if (Integer.parseInt(s_date[1].toString()) < 13
+										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									ShipDate = new SimpleDateFormat("dd/MM/yyyy").parse(s_shipdate);
-								}
-								else {
+								} else {
 									mes_err = "Định dạng ngày không đúng dd/MM/yyyy! ";
 								}
-								
-							}
-							else {
-								if(DateUtil.isCellDateFormatted(row.getCell(ColumnPO.Shipdate))) {
+
+							} else {
+								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPO.Shipdate))) {
 									ShipDate = row.getCell(ColumnPO.Shipdate).getDateCellValue();
 								}
 							}
-							
-						}
-						catch (Exception e) {
-							if(DateUtil.isCellDateFormatted(row.getCell(ColumnPO.Shipdate))) {
+
+						} catch (Exception e) {
+							if (DateUtil.isCellDateFormatted(row.getCell(ColumnPO.Shipdate))) {
 								ShipDate = row.getCell(ColumnPO.Shipdate).getDateCellValue();
 							}
 						}
-						
-						if(ShipDate == null) {
+
+						if (ShipDate == null) {
 							throw new Exception();
 						}
-						
+
 						colNum = ColumnPO.Shipmode;
 						String Shipmode = row.getCell(ColumnPO.Shipmode).getStringCellValue();
 						Shipmode = Shipmode.equals("0") ? "" : Shipmode;
-						
+
 						colNum = ColumnPO.PackingMethod;
 						String PackingMethod = row.getCell(ColumnPO.PackingMethod).getStringCellValue();
 						PackingMethod = PackingMethod.equals("0") ? "" : PackingMethod;
-						
+
 						colNum = ColumnPO.Colorname;
 						String ColorName = commonService.getStringValue(row.getCell(ColumnPO.Colorname));
 						ColorName = ColorName.equals("0") ? "" : ColorName;
-						
+
 						colNum = ColumnPO.Colorcode;
 						String ColorCode = commonService.getStringValue(row.getCell(ColumnPO.Colorcode));
 						ColorCode = ColorCode.equals("0") ? "" : ColorCode;
-						
+
 						colNum = ColumnPO.Style;
 						String Style = commonService.getStringValue(row.getCell(ColumnPO.Style));
 						Style = Style.equals("0") ? "" : Style;
-						
-						//Kiem tra Shipmode da ton tai hay chua
+
+						// Kiem tra Shipmode da ton tai hay chua
 						Long shipmodeid_link = null;
-						if(!Shipmode.equals("")) {
+						if (!Shipmode.equals("")) {
 							List<ShipMode> shipmodes = shipmodeService.getbyname(Shipmode);
-							if(shipmodes.size() == 0) {
+							if (shipmodes.size() == 0) {
 								ShipMode shipmode_new = new ShipMode();
 								shipmode_new.setId(null);
 								shipmode_new.setName(Shipmode);
 								shipmode_new = shipmodeService.save(shipmode_new);
-								
+
 								shipmodeid_link = shipmode_new.getId();
-							}
-							else {
+							} else {
 								shipmodeid_link = shipmodes.get(0).getId();
 							}
 						}
-						
-						
-						//Kiem tra PackingMethod
+
+						// Kiem tra PackingMethod
 						Long packingmethodid_link = null;
-						if(!PackingMethod.equals("")) {
+						if (!PackingMethod.equals("")) {
 							List<PackingType> list_packing = packingService.getbyname(PackingMethod, orgrootid_link);
-							if(list_packing.size() == 0) {
+							if (list_packing.size() == 0) {
 								PackingType pk = new PackingType();
 								pk.setCode(PackingMethod);
 								pk.setId(null);
 								pk.setName(PackingMethod);
 								pk.setOrgrootid_link(orgrootid_link);
 								pk = packingService.save(pk);
-								
+
 								packingmethodid_link = pk.getId();
-							}
-							else {
+							} else {
 								packingmethodid_link = list_packing.get(0).getId();
 							}
 						}
-						
-						
-						//Kiem tra PO co dung voi PO dang chon de them moi khong
-						if(!PO_No.equals("TBD")) {
+
+						// Kiem tra PO co dung voi PO dang chon de them moi khong
+						if (!PO_No.equals("TBD")) {
 							Long pcontractpoid_link = null;
-							//Kiem tra so PO va so PO cha
+							// Kiem tra so PO va so PO cha
 //							List<PContract_PO> list_po_parent = pcontract_POService.check_exist_PONo(PO_No, pcontractid_link);
 //							if(list_po_parent.size() > 0) {
-							
-								//Kiem tra xem PO con da ton tai hay chua
-								String s_po  = Line.equals("") ? PO_No : PO_No+"-"+Line;
-								List<PContract_PO> list_po = pcontract_POService.check_exist_po_children(s_po, ShipDate, shipmodeid_link, pcontractid_link, parentid_link);
 
-								if(list_po.size() == 0) {
-									
-									PContract_PO po_new = new PContract_PO();
-									po_new.setId(null);
-									po_new.setPo_buyer(s_po);
-									po_new.setShipdate(ShipDate);
-									po_new.setShipmodeid_link(shipmodeid_link);
-									po_new.setPcontractid_link(pcontractid_link);
-									po_new.setParentpoid_link(parentid_link);
-									po_new.setOrgrootid_link(orgrootid_link);
-									po_new.setPackingnotice(packingmethodid_link+"");
-									po_new.setProductid_link(parent.getProductid_link());
-									po_new.setPlan_productivity(parent.getPlan_productivity());
-									po_new.setPlan_linerequired(parent.getPlan_linerequired());
-									po_new.setStatus(POStatus.PO_STATUS_CONFIRMED);
-									po_new.setPo_typeid_link(POType.PO_LINE_CONFIRMED);
-									po_new.setComment(Style);
-									
-									po_new = pcontract_POService.save(po_new);
-									
-									pcontractpoid_link = po_new.getId();
-									
-									//khi tim thay po moi thi de lai so luong ve 0 
-									amount_po = 0;
-								}
-								else {
-									pcontractpoid_link = list_po.get(0).getId();
-									PContract_PO po = list_po.get(0);
-									po.setStatus(POStatus.PO_STATUS_CONFIRMED);
-									po.setComment(Style);
+							// Kiem tra xem PO con da ton tai hay chua
+							String s_po = Line.equals("") ? PO_No : PO_No + "-" + Line;
+							List<PContract_PO> list_po = pcontract_POService.check_exist_po_children(s_po, ShipDate,
+									shipmodeid_link, pcontractid_link, parentid_link);
+
+							if (list_po.size() == 0) {
+
+								PContract_PO po_new = new PContract_PO();
+								po_new.setId(null);
+								po_new.setPo_buyer(s_po);
+								po_new.setShipdate(ShipDate);
+								po_new.setShipmodeid_link(shipmodeid_link);
+								po_new.setPcontractid_link(pcontractid_link);
+								po_new.setParentpoid_link(parentid_link);
+								po_new.setOrgrootid_link(orgrootid_link);
+								po_new.setPackingnotice(packingmethodid_link + "");
+								po_new.setProductid_link(parent.getProductid_link());
+								po_new.setPlan_productivity(parent.getPlan_productivity());
+								po_new.setPlan_linerequired(parent.getPlan_linerequired());
+								po_new.setStatus(POStatus.PO_STATUS_CONFIRMED);
+								po_new.setPo_typeid_link(POType.PO_LINE_CONFIRMED);
+								po_new.setComment(Style);
+
+								po_new = pcontract_POService.save(po_new);
+
+								pcontractpoid_link = po_new.getId();
+
+								// khi tim thay po moi thi de lai so luong ve 0
+								amount_po = 0;
+							} else {
+								pcontractpoid_link = list_po.get(0).getId();
+								PContract_PO po = list_po.get(0);
+								po.setStatus(POStatus.PO_STATUS_CONFIRMED);
+								po.setComment(Style);
 //									amount_po = po.getPo_quantity();
-								}
-								
-								Long colorid_link = null;
-								List<Attributevalue> listAttributevalue = attributevalueService.getByValue(ColorName+"("+ColorCode+")", AtributeFixValues.ATTR_COLOR);
-								if(listAttributevalue.size() == 0) {
+							}
+
+							Long colorid_link = null;
+							List<Attributevalue> listAttributevalue = attributevalueService
+									.getByValue(ColorName + "(" + ColorCode + ")", AtributeFixValues.ATTR_COLOR);
+							if (listAttributevalue.size() == 0) {
+								Attributevalue av = new Attributevalue();
+								av.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
+								av.setId(null);
+								av.setIsdefault(false);
+								av.setOrgrootid_link(orgrootid_link);
+								av.setSortvalue(attributevalueService.getMaxSortValue(AtributeFixValues.ATTR_COLOR));
+								av.setTimecreate(new Date());
+								av.setUsercreateid_link(user.getId());
+								av.setValue(ColorName + "(" + ColorCode + ")");
+
+								av = attributevalueService.save(av);
+								colorid_link = av.getId();
+							} else {
+								colorid_link = listAttributevalue.get(0).getId();
+							}
+
+							int columnsize = ColumnPO.Colorcode + 1;
+							String s_sizename = commonService.getStringValue(rowheader.getCell(columnsize));
+							s_sizename = s_sizename.equals("0") ? "" : s_sizename;
+							while (!s_sizename.equals("")) {
+								colNum = columnsize;
+								// han che viec de qua nhieu cot co thi khong xu ly nua
+								if (colNum == 50)
+									break;
+
+								Long sizeid_link = null;
+								String sizename = commonService.getStringValue(rowheader.getCell(columnsize));
+								List<Attributevalue> list_size = attributevalueService.getByValue(sizename,
+										AtributeFixValues.ATTR_SIZE);
+								if (list_size.size() == 0) {
 									Attributevalue av = new Attributevalue();
-									av.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
+									av.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
 									av.setId(null);
 									av.setIsdefault(false);
 									av.setOrgrootid_link(orgrootid_link);
-									av.setSortvalue(attributevalueService.getMaxSortValue(AtributeFixValues.ATTR_COLOR));
+									av.setSortvalue(attributevalueService.getMaxSortValue(AtributeFixValues.ATTR_SIZE));
 									av.setTimecreate(new Date());
 									av.setUsercreateid_link(user.getId());
-									av.setValue(ColorName+"("+ColorCode+")");
-									
-									av = attributevalueService.save(av);
-									colorid_link = av.getId();
-								}
-								else {
-									colorid_link = listAttributevalue.get(0).getId();
-								}
-								
-								int columnsize = ColumnPO.Colorcode + 1;
-								String s_sizename = commonService.getStringValue(rowheader.getCell(columnsize));
-								s_sizename = s_sizename.equals("0") ? "" : s_sizename;
-								while (!s_sizename.equals("")) {
-									colNum = columnsize;
-									//han che viec de qua nhieu cot co thi khong xu ly nua
-									if(colNum == 50) break;
-									
-									Long sizeid_link = null;
-									String sizename = commonService.getStringValue(rowheader.getCell(columnsize));
-									List<Attributevalue> list_size = attributevalueService.getByValue(sizename, AtributeFixValues.ATTR_SIZE);
-									if(list_size.size() == 0) {
-										Attributevalue av = new Attributevalue();
-										av.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
-										av.setId(null);
-										av.setIsdefault(false);
-										av.setOrgrootid_link(orgrootid_link);
-										av.setSortvalue(attributevalueService.getMaxSortValue(AtributeFixValues.ATTR_SIZE));
-										av.setTimecreate(new Date());
-										av.setUsercreateid_link(user.getId());
-										av.setValue(sizename);
-										
-										av = attributevalueService.save(av);
-										sizeid_link = av.getId();
-									}
-									else {
-										sizeid_link = list_size.get(0).getId();
-									}
-									String s_amount = commonService.getStringValue(row.getCell(columnsize)).equals("") ? "0" : commonService.getStringValue(row.getCell(columnsize));
-									s_amount = s_amount.replace(",","");
-									Double amount = Double.parseDouble(s_amount);
-									if(amount>0) {
-										amount_po += amount;
+									av.setValue(sizename);
 
-										Product product = productService.findOne(parent.getProductid_link());
-										if(product.getProducttypeid_link() != 5) {
-											Long skuid_link = skuattService.getsku_byproduct_and_valuemau_valueco(parent.getProductid_link(), colorid_link, sizeid_link);
-											
-											if(skuid_link == 0) {
+									av = attributevalueService.save(av);
+									sizeid_link = av.getId();
+								} else {
+									sizeid_link = list_size.get(0).getId();
+								}
+								String s_amount = commonService.getStringValue(row.getCell(columnsize)).equals("") ? "0"
+										: commonService.getStringValue(row.getCell(columnsize));
+								s_amount = s_amount.replace(",", "");
+								Double amount = Double.parseDouble(s_amount);
+								if (amount > 0) {
+									amount_po += amount;
+
+									Product product = productService.findOne(parent.getProductid_link());
+									if (product.getProducttypeid_link() != 5) {
+										Long skuid_link = skuattService.getsku_byproduct_and_valuemau_valueco(
+												parent.getProductid_link(), colorid_link, sizeid_link);
+
+										if (skuid_link == 0) {
+
+											SKU sku = new SKU();
+											sku.setCode(genCodeSKU(product));
+											sku.setId(null);
+											sku.setUnitid_link(product.getUnitid_link());
+											sku.setName(genCodeSKU(product));
+											sku.setOrgrootid_link(orgrootid_link);
+											sku.setProductid_link(parent.getProductid_link());
+											sku.setSkutypeid_link(10);
+											sku = skuService.save(sku);
+
+											skuid_link = sku.getId();
+
+											// Them vao bang sku_attribute_value
+											SKU_Attribute_Value savMau = new SKU_Attribute_Value();
+											savMau.setId((long) 0);
+											savMau.setAttributevalueid_link(colorid_link);
+											savMau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
+											savMau.setOrgrootid_link(orgrootid_link);
+											savMau.setSkuid_link(skuid_link);
+											savMau.setUsercreateid_link(user.getId());
+											savMau.setTimecreate(new Date());
+
+											skuattService.save(savMau);
+
+											SKU_Attribute_Value savCo = new SKU_Attribute_Value();
+											savCo.setId((long) 0);
+											savCo.setAttributevalueid_link(sizeid_link);
+											savCo.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
+											savCo.setOrgrootid_link(orgrootid_link);
+											savCo.setSkuid_link(skuid_link);
+											savCo.setUsercreateid_link(user.getId());
+											savCo.setTimecreate(new Date());
+
+											skuattService.save(savCo);
+
+											// Them vao trong product_attribute_value
+											ProductAttributeValue pav_mau = new ProductAttributeValue();
+											pav_mau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
+											pav_mau.setAttributevalueid_link(colorid_link);
+											pav_mau.setId(null);
+											pav_mau.setIsDefault(false);
+											pav_mau.setOrgrootid_link(orgrootid_link);
+											pav_mau.setProductid_link(parent.getProductid_link());
+											pavService.save(pav_mau);
+
+											ProductAttributeValue pav_co = new ProductAttributeValue();
+											pav_co.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
+											pav_co.setAttributevalueid_link(sizeid_link);
+											pav_co.setId(null);
+											pav_co.setIsDefault(false);
+											pav_co.setOrgrootid_link(orgrootid_link);
+											pav_co.setProductid_link(parent.getProductid_link());
+											pavService.save(pav_co);
+										}
+										int amount_plus = commonService
+												.Calculate_pquantity_production(amount.intValue());
+										List<PContractProductSKU> ppskus = ppskuService.getlistsku_bysku_and_product_PO(
+												skuid_link, pcontractpoid_link, parent.getProductid_link());
+										if (ppskus.size() == 0) {
+											PContractProductSKU ppsku = new PContractProductSKU();
+											ppsku.setId(null);
+											ppsku.setOrgrootid_link(orgrootid_link);
+											ppsku.setPcontract_poid_link(pcontractpoid_link);
+											ppsku.setPcontractid_link(pcontractid_link);
+											ppsku.setPquantity_porder(amount.intValue());
+											ppsku.setPquantity_production(amount_plus);
+											ppsku.setPquantity_total(amount_plus);
+											ppsku.setProductid_link(parent.getProductid_link());
+											ppsku.setSkuid_link(skuid_link);
+											ppskuService.save(ppsku);
+										} else {
+											PContractProductSKU ppsku = ppskus.get(0);
+											ppsku.setPquantity_porder(amount.intValue());
+											ppsku.setPquantity_production(amount_plus);
+											ppsku.setPquantity_total(amount_plus);
+											ppskuService.save(ppsku);
+										}
+									} else {
+										List<ProductPairing> list_pair = productpairService
+												.getproduct_pairing_detail_bycontract(orgrootid_link, pcontractid_link,
+														product.getId());
+										for (ProductPairing productPairing : list_pair) {
+											Product product_children = productService
+													.findOne(productPairing.getProductid_link());
+
+											Long skuid_link = skuattService.getsku_byproduct_and_valuemau_valueco(
+													productPairing.getProductid_link(), colorid_link, sizeid_link);
+
+											if (skuid_link == 0 || skuid_link == null) {
 
 												SKU sku = new SKU();
-												sku.setCode(genCodeSKU(product));
+												sku.setCode(genCodeSKU(product_children));
 												sku.setId(null);
 												sku.setUnitid_link(product.getUnitid_link());
-												sku.setName(genCodeSKU(product));
+												sku.setName(genCodeSKU(product_children));
 												sku.setOrgrootid_link(orgrootid_link);
-												sku.setProductid_link(parent.getProductid_link());
+												sku.setProductid_link(productPairing.getProductid_link());
 												sku.setSkutypeid_link(10);
 												sku = skuService.save(sku);
-												
+
 												skuid_link = sku.getId();
-												
+
 												// Them vao bang sku_attribute_value
 												SKU_Attribute_Value savMau = new SKU_Attribute_Value();
 												savMau.setId((long) 0);
@@ -1375,151 +1502,69 @@ public class PContract_POAPI {
 												savCo.setTimecreate(new Date());
 
 												skuattService.save(savCo);
-												
-												//Them vao trong product_attribute_value
+
+												// Them vao trong product_attribute_value
 												ProductAttributeValue pav_mau = new ProductAttributeValue();
 												pav_mau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
 												pav_mau.setAttributevalueid_link(colorid_link);
 												pav_mau.setId(null);
 												pav_mau.setIsDefault(false);
 												pav_mau.setOrgrootid_link(orgrootid_link);
-												pav_mau.setProductid_link(parent.getProductid_link());
+												pav_mau.setProductid_link(productPairing.getProductid_link());
 												pavService.save(pav_mau);
-												
+
 												ProductAttributeValue pav_co = new ProductAttributeValue();
 												pav_co.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
 												pav_co.setAttributevalueid_link(sizeid_link);
 												pav_co.setId(null);
 												pav_co.setIsDefault(false);
 												pav_co.setOrgrootid_link(orgrootid_link);
-												pav_co.setProductid_link(parent.getProductid_link());
+												pav_co.setProductid_link(productPairing.getProductid_link());
 												pavService.save(pav_co);
 											}
-											int amount_plus = commonService.Calculate_pquantity_production(amount.intValue());
-											List<PContractProductSKU> ppskus = ppskuService.getlistsku_bysku_and_product_PO(skuid_link, pcontractpoid_link, parent.getProductid_link());
-											if(ppskus.size() == 0) {
+
+											int amount_plus = commonService.Calculate_pquantity_production(
+													amount.intValue() * productPairing.getAmount());
+											List<PContractProductSKU> ppskus = ppskuService
+													.getlistsku_bysku_and_product_PO(skuid_link, pcontractpoid_link,
+															productPairing.getProductid_link());
+											if (ppskus.size() == 0) {
 												PContractProductSKU ppsku = new PContractProductSKU();
 												ppsku.setId(null);
 												ppsku.setOrgrootid_link(orgrootid_link);
 												ppsku.setPcontract_poid_link(pcontractpoid_link);
 												ppsku.setPcontractid_link(pcontractid_link);
-												ppsku.setPquantity_porder(amount.intValue());
+												ppsku.setPquantity_porder(
+														amount.intValue() * productPairing.getAmount());
 												ppsku.setPquantity_production(amount_plus);
 												ppsku.setPquantity_total(amount_plus);
-												ppsku.setProductid_link(parent.getProductid_link());
+												ppsku.setProductid_link(productPairing.getProductid_link());
 												ppsku.setSkuid_link(skuid_link);
 												ppskuService.save(ppsku);
-											}
-											else {
+											} else {
 												PContractProductSKU ppsku = ppskus.get(0);
-												ppsku.setPquantity_porder(amount.intValue());
+												ppsku.setPquantity_porder(
+														amount.intValue() * productPairing.getAmount());
 												ppsku.setPquantity_production(amount_plus);
 												ppsku.setPquantity_total(amount_plus);
 												ppskuService.save(ppsku);
-											}
-										}
-										else {
-											List<ProductPairing> list_pair = productpairService.getproduct_pairing_detail_bycontract(orgrootid_link, pcontractid_link, product.getId());
-											for (ProductPairing productPairing : list_pair) {
-												Product product_children = productService.findOne(productPairing.getProductid_link());
-												
-												Long skuid_link = skuattService.getsku_byproduct_and_valuemau_valueco(productPairing.getProductid_link(), colorid_link, sizeid_link);
-												
-												if(skuid_link == 0 || skuid_link == null) {
-
-													SKU sku = new SKU();
-													sku.setCode(genCodeSKU(product_children));
-													sku.setId(null);
-													sku.setUnitid_link(product.getUnitid_link());
-													sku.setName(genCodeSKU(product_children));
-													sku.setOrgrootid_link(orgrootid_link);
-													sku.setProductid_link(productPairing.getProductid_link());
-													sku.setSkutypeid_link(10);
-													sku = skuService.save(sku);
-													
-													skuid_link = sku.getId();
-													
-													// Them vao bang sku_attribute_value
-													SKU_Attribute_Value savMau = new SKU_Attribute_Value();
-													savMau.setId((long) 0);
-													savMau.setAttributevalueid_link(colorid_link);
-													savMau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
-													savMau.setOrgrootid_link(orgrootid_link);
-													savMau.setSkuid_link(skuid_link);
-													savMau.setUsercreateid_link(user.getId());
-													savMau.setTimecreate(new Date());
-
-													skuattService.save(savMau);
-
-													SKU_Attribute_Value savCo = new SKU_Attribute_Value();
-													savCo.setId((long) 0);
-													savCo.setAttributevalueid_link(sizeid_link);
-													savCo.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
-													savCo.setOrgrootid_link(orgrootid_link);
-													savCo.setSkuid_link(skuid_link);
-													savCo.setUsercreateid_link(user.getId());
-													savCo.setTimecreate(new Date());
-
-													skuattService.save(savCo);
-													
-													//Them vao trong product_attribute_value
-													ProductAttributeValue pav_mau = new ProductAttributeValue();
-													pav_mau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
-													pav_mau.setAttributevalueid_link(colorid_link);
-													pav_mau.setId(null);
-													pav_mau.setIsDefault(false);
-													pav_mau.setOrgrootid_link(orgrootid_link);
-													pav_mau.setProductid_link(productPairing.getProductid_link());
-													pavService.save(pav_mau);
-													
-													ProductAttributeValue pav_co = new ProductAttributeValue();
-													pav_co.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
-													pav_co.setAttributevalueid_link(sizeid_link);
-													pav_co.setId(null);
-													pav_co.setIsDefault(false);
-													pav_co.setOrgrootid_link(orgrootid_link);
-													pav_co.setProductid_link(productPairing.getProductid_link());
-													pavService.save(pav_co);
-												}
-												
-												int amount_plus = commonService.Calculate_pquantity_production(amount.intValue()*productPairing.getAmount());
-												List<PContractProductSKU> ppskus = ppskuService.getlistsku_bysku_and_product_PO(skuid_link, pcontractpoid_link, productPairing.getProductid_link());
-												if(ppskus.size() == 0) {
-													PContractProductSKU ppsku = new PContractProductSKU();
-													ppsku.setId(null);
-													ppsku.setOrgrootid_link(orgrootid_link);
-													ppsku.setPcontract_poid_link(pcontractpoid_link);
-													ppsku.setPcontractid_link(pcontractid_link);
-													ppsku.setPquantity_porder(amount.intValue()*productPairing.getAmount());
-													ppsku.setPquantity_production(amount_plus);
-													ppsku.setPquantity_total(amount_plus);
-													ppsku.setProductid_link(productPairing.getProductid_link());
-													ppsku.setSkuid_link(skuid_link);
-													ppskuService.save(ppsku);
-												}
-												else {
-													PContractProductSKU ppsku = ppskus.get(0);
-													ppsku.setPquantity_porder(amount.intValue()*productPairing.getAmount());
-													ppsku.setPquantity_production(amount_plus);
-													ppsku.setPquantity_total(amount_plus);
-													ppskuService.save(ppsku);
-												}
 											}
 										}
 									}
-									
-									columnsize++;
-									
-									s_sizename = commonService.getStringValue(rowheader.getCell(columnsize));
-									s_sizename = s_sizename.equals("0") ? "" : s_sizename;
 								}
 
-								//Cap nhat lai so tong cua po
-								PContract_PO po = pcontract_POService.findOne(pcontractpoid_link);
-								po.setPo_quantity(amount_po);
-								po = pcontract_POService.save(po);
-								
-								//Them porder req theo don vi chinh
+								columnsize++;
+
+								s_sizename = commonService.getStringValue(rowheader.getCell(columnsize));
+								s_sizename = s_sizename.equals("0") ? "" : s_sizename;
+							}
+
+							// Cap nhat lai so tong cua po
+							PContract_PO po = pcontract_POService.findOne(pcontractpoid_link);
+							po.setPo_quantity(amount_po);
+							po = pcontract_POService.save(po);
+
+							// Them porder req theo don vi chinh
 //								Product product = productService.findOne(parent.getProductid_link());
 //								if(product.getProducttypeid_link() != 5) {
 //									List<POrder_Req> list_req = reqService.getByContractAndPO_and_Org(pcontractid_link, pcontractpoid_link, parent.getOrgmerchandiseid_link(), product.getId());
@@ -1579,20 +1624,19 @@ public class PContract_POAPI {
 						}
 						rowNum++;
 						row = sheet.getRow(rowNum);
-						if(row == null) break;
-						
+						if (row == null)
+							break;
+
 						STT = commonService.getStringValue(row.getCell(ColumnTemplate.STT));
 						STT = STT.equals("0") ? "" : STT;
 					}
 				} catch (Exception e) {
-					mes_err += "Có lỗi ở dòng "+(rowNum+1)+" và cột "+ (colNum+1); 
-				}
-				finally {
+					mes_err += "Có lỗi ở dòng " + (rowNum + 1) + " và cột " + (colNum + 1);
+				} finally {
 					workbook.close();
 					serverFile.delete();
 				}
 
-				
 				if (mes_err == "") {
 					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -1610,8 +1654,7 @@ public class PContract_POAPI {
 		}
 		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 	}
-	
-	
+
 	private String genCodeSKU(Product product) {
 		List<SKU> lstSKU = skuService.getlist_byProduct(product.getId());
 		if (lstSKU.size() == 0) {
@@ -1619,7 +1662,7 @@ public class PContract_POAPI {
 		}
 		String old_code = lstSKU.get(0).getCode().trim();
 		String[] obj = old_code.split("_");
-		int a = Integer.parseInt(obj[obj.length-1]);
+		int a = Integer.parseInt(obj[obj.length - 1]);
 		String code = product.getBuyercode() + "_" + (a + 1);
 		return code;
 	}
@@ -1666,11 +1709,11 @@ public class PContract_POAPI {
 				updatePriceList(usercreatedid_link, orgrootid_link, pcontractid_link, thePO_Latershipdate.getId(),
 						entity.data.getPcontract_price());
 			}
-			
-			//Cap nhat productivity
+
+			// Cap nhat productivity
 			List<PContract_PO_Productivity> list_productivity = entity.data.getPcontract_po_productivity();
 			for (PContract_PO_Productivity pContract_PO_Productivity : list_productivity) {
-				if(pContract_PO_Productivity.getId() == null) {
+				if (pContract_PO_Productivity.getId() == null) {
 					pContract_PO_Productivity.setOrgrootid_link(orgrootid_link);
 				}
 				pContract_PO_Productivity.setPcontract_poid_link(pcontract_poid_link);
@@ -1684,7 +1727,6 @@ public class PContract_POAPI {
 				POrder_Req porder_req = new POrder_Req();
 				if (null == porder.getId() || 0 == porder.getId()) {
 					// Them moi POrder_req
-					
 
 					porder_req.setPcontractid_link(pcontractid_link);
 					porder_req.setPcontract_poid_link(pcontract_poid_link);
@@ -1700,13 +1742,14 @@ public class PContract_POAPI {
 					porder_req.setStatus(POrderReqStatus.STATUS_FREE);
 					porder_req.setTimecreated(new Date());
 					porder_req.setIs_calculate(porder.getIs_calculate());
-					
-					//Them ngay yeu cau phan xuong phai hoan thanh xep ke hoach (2 ngay sau ngay hien tai)
+
+					// Them ngay yeu cau phan xuong phai hoan thanh xep ke hoach (2 ngay sau ngay
+					// hien tai)
 					Calendar c = Calendar.getInstance();
-			        c.setTime(new Date());
-			        c.add(Calendar.DATE, 2);
-			        porder_req.setPlandate_required(c.getTime());
-			        
+					c.setTime(new Date());
+					c.add(Calendar.DATE, 2);
+					porder_req.setPlandate_required(c.getTime());
+
 					// Save to DB
 					porder_req_Service.savePOrder_Req(porder_req);
 
@@ -1745,13 +1788,13 @@ public class PContract_POAPI {
 					// Save to DB
 					porder_req_Service.savePOrder_Req(porder_req);
 				}
-				
-				//Tao lenh cho Phan xuong neu chao gia được chốt 
+
+				// Tao lenh cho Phan xuong neu chao gia được chốt
 				Long parentid_link = pcontract_po.getParentpoid_link() == null ? 0 : pcontract_po.getParentpoid_link();
-				if(pcontract_po.getStatus() == POStatus.PO_STATUS_CONFIRMED && parentid_link == 0) {
+				if (pcontract_po.getStatus() == POStatus.PO_STATUS_CONFIRMED && parentid_link == 0) {
 					porderService.createPOrder(porder_req, user);
 				}
-				
+
 			}
 
 			// Response to Client
@@ -1767,19 +1810,19 @@ public class PContract_POAPI {
 			return new ResponseEntity<PContract_pocreate_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
-	
-	
 
 	private void updatePriceList(Long usercreatedid_link, Long orgrootid_link, Long pcontractid_link,
 			Long pcontract_poid_link, List<PContract_Price> list_price_new) {
 		// Xoa list price cu của PO
-		
-		// Xoa PContract_Price_D_SKU truoc vi lay pcontract_poid_link theo PContract_Price_D
-		List<PContract_Price_D_SKU> list_price_d_sku = pcontractpriceDSkuService.getPrice_D_SKU_ByPO(pcontract_poid_link);
+
+		// Xoa PContract_Price_D_SKU truoc vi lay pcontract_poid_link theo
+		// PContract_Price_D
+		List<PContract_Price_D_SKU> list_price_d_sku = pcontractpriceDSkuService
+				.getPrice_D_SKU_ByPO(pcontract_poid_link);
 		for (PContract_Price_D_SKU price_d_sku : list_price_d_sku) {
 			pcontractpriceDSkuService.delete(price_d_sku);
 		}
-		
+
 		List<PContract_Price> list_price = pcontractpriceService.getPrice_ByPO(pcontract_poid_link);
 		for (PContract_Price price : list_price) {
 			pcontractpriceService.delete(price);
@@ -1828,23 +1871,22 @@ public class PContract_POAPI {
 				newPrice_D.setUnitid_link(price_d.getUnitid_link());
 				newPrice_D.setUsercreatedid_link(usercreatedid_link);
 				newPrice_D.setDatecreated(new Date());
-				
+
 				newPrice_D.setLost_ratio(price_d.getLost_ratio());
 				newPrice_D.setMaterialid_link(price_d.getMaterialid_link());
 				newPrice_D.setProviderid_link(price_d.getProviderid_link());
-				
-				for(PContract_Price_D_SKU price_d_sku : price_d.getPcontract_price_d_sku()) {
+
+				for (PContract_Price_D_SKU price_d_sku : price_d.getPcontract_price_d_sku()) {
 					PContract_Price_D_SKU newPrice_D_SKU = new PContract_Price_D_SKU();
-					
+
 //					newPrice_D_SKU.setPcontractprice_d_id_link(pcontractprice_d_id_link);
 					newPrice_D_SKU.setMaterialid_link(price_d_sku.getMaterialid_link());
 					newPrice_D_SKU.setAmount(price_d_sku.getAmount());
 					newPrice_D_SKU.setUnitprice(price_d_sku.getUnitprice());
 					newPrice_D_SKU.setTotalprice(price_d_sku.getTotalprice());
-					
+
 					newPrice_D.getPcontract_price_d_sku().add(newPrice_D_SKU);
 				}
-
 
 				newPrice.getPcontract_price_d().add(newPrice_D);
 			}
@@ -1870,55 +1912,55 @@ public class PContract_POAPI {
 
 			pcontract_po = pcontract_POService.save(pcontract_po);
 
-			//Cap nhat productivity
+			// Cap nhat productivity
 			List<PContract_PO_Productivity> list_productivity = entity.data.getPcontract_po_productivity();
 			for (PContract_PO_Productivity pContract_PO_Productivity : list_productivity) {
-				if(pContract_PO_Productivity.getId() == null) {
+				if (pContract_PO_Productivity.getId() == null) {
 					pContract_PO_Productivity.setOrgrootid_link(orgrootid_link);
 				}
 				pContract_PO_Productivity.setPcontract_poid_link(pcontract_po.getId());
 				productivityService.save(pContract_PO_Productivity);
 			}
-			
+
 			// Update POrder_Req
 //			int total = 0;
 			List<POrder_Req> lst_porders = entity.po_orders;
 //			String po_code = pcontract_po.getPo_vendor().length() > 0?pcontract_po.getPo_vendor():pcontract_po.getPo_buyer();
 			if (null != lst_porders)
-			for (POrder_Req porder : lst_porders) {
+				for (POrder_Req porder : lst_porders) {
 //				total += porder.getTotalorder();
-				POrder_Req porder_req = new POrder_Req();
-				if (null == porder.getId() || 0 == porder.getId()) {
-					// Them moi POrder
-					porder_req.setPcontractid_link(pcontract_po.getPcontractid_link());
-					porder_req.setPcontract_poid_link(pcontract_po.getId());
+					POrder_Req porder_req = new POrder_Req();
+					if (null == porder.getId() || 0 == porder.getId()) {
+						// Them moi POrder
+						porder_req.setPcontractid_link(pcontract_po.getPcontractid_link());
+						porder_req.setPcontract_poid_link(pcontract_po.getId());
 
-					porder_req.setTotalorder(porder.getTotalorder());
-					porder_req.setGranttoorgid_link(porder.getGranttoorgid_link());
-					porder_req.setAmount_inset(porder.getAmount_inset());
+						porder_req.setTotalorder(porder.getTotalorder());
+						porder_req.setGranttoorgid_link(porder.getGranttoorgid_link());
+						porder_req.setAmount_inset(porder.getAmount_inset());
 
-					porder_req.setOrgrootid_link(orgrootid_link);
-					porder_req.setProductid_link(porder.getProductid_link());
-					porder_req.setOrderdate(new Date());
-					porder_req.setUsercreatedid_link(usercreatedid_link);
-					porder_req.setStatus(POrderReqStatus.STATUS_FREE);
-					porder_req.setTimecreated(new Date());
+						porder_req.setOrgrootid_link(orgrootid_link);
+						porder_req.setProductid_link(porder.getProductid_link());
+						porder_req.setOrderdate(new Date());
+						porder_req.setUsercreatedid_link(usercreatedid_link);
+						porder_req.setStatus(POrderReqStatus.STATUS_FREE);
+						porder_req.setTimecreated(new Date());
 
-					// Save to DB
-					porder_req_Service.savePOrder_Req(porder_req);
-				} else {
-					porder_req = porder_req_Service.findOne(porder.getId());
-					porder_req.setTotalorder(porder.getTotalorder());
-					// Save to DB
-					porder_req_Service.savePOrder_Req(porder_req);
-				}
-				
-				//Tao lenh cho Phan xuong neu chao gia được chốt 
+						// Save to DB
+						porder_req_Service.savePOrder_Req(porder_req);
+					} else {
+						porder_req = porder_req_Service.findOne(porder.getId());
+						porder_req.setTotalorder(porder.getTotalorder());
+						// Save to DB
+						porder_req_Service.savePOrder_Req(porder_req);
+					}
+
+					// Tao lenh cho Phan xuong neu chao gia được chốt
 //				Long parentid_link = pcontract_po.getParentpoid_link() == null ? 0 : pcontract_po.getParentpoid_link();
-				if(pcontract_po.getStatus() == POStatus.PO_STATUS_CONFIRMED) {
-					porderService.createPOrder(porder_req, user);
+					if (pcontract_po.getStatus() == POStatus.PO_STATUS_CONFIRMED) {
+						porderService.createPOrder(porder_req, user);
+					}
 				}
-			}
 //			pcontract_po.setPo_quantity(total);
 //			pcontract_po = pcontract_POService.save(pcontract_po);
 
@@ -1958,20 +2000,21 @@ public class PContract_POAPI {
 			return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@RequestMapping(value = "/getby_product_and_type", method = RequestMethod.POST)
-	public ResponseEntity<getpo_by_product_response> getByProductAndType(
-			@RequestBody getpo_by_product_request entity, HttpServletRequest request) {
+	public ResponseEntity<getpo_by_product_response> getByProductAndType(@RequestBody getpo_by_product_request entity,
+			HttpServletRequest request) {
 		getpo_by_product_response response = new getpo_by_product_response();
 		try {
 			Long pcontractid_link = entity.pcontractid_link;
 			Long productid_link = entity.productid_link;
 //			Long material_skuid_link = entity.material_skuid_link;
-			
+
 			List<Integer> type = new ArrayList<Integer>();
 			type.add(POType.PO_LINE_CONFIRMED);
-			
-			response.data = pcontract_POService.getby_pcontract_and_type_andproduct(pcontractid_link, type, productid_link);
+
+			response.data = pcontract_POService.getby_pcontract_and_type_andproduct(pcontractid_link, type,
+					productid_link);
 //			response.poline = bomnplService.getby_product_and_npl(productid_link, pcontractid_link, material_skuid_link);
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -1983,29 +2026,31 @@ public class PContract_POAPI {
 			return new ResponseEntity<getpo_by_product_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@RequestMapping(value = "/getby_shipping", method = RequestMethod.POST)
-	public ResponseEntity<getby_shipping_response> getby_shipping(
-			@RequestBody getby_shipping_request entity, HttpServletRequest request) {
+	public ResponseEntity<getby_shipping_response> getby_shipping(@RequestBody getby_shipping_request entity,
+			HttpServletRequest request) {
 		getby_shipping_response response = new getby_shipping_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgid_link = user.getOrgid_link();
 
 			List<Long> list_org = new ArrayList<Long>();
-			if(orgid_link != 0 && orgid_link != 1) {
-				for(GpayUserOrg userorg:userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY)){
+			if (orgid_link != 0 && orgid_link != 1) {
+				for (GpayUserOrg userorg : userOrgService.getall_byuser_andtype(user.getId(),
+						OrgType.ORG_TYPE_FACTORY)) {
 					list_org.add(userorg.getOrgid_link());
 				}
-				//Them chinh don vi cua user
-				if(!list_org.contains(orgid_link))
+				// Them chinh don vi cua user
+				if (!list_org.contains(orgid_link))
 					list_org.add(orgid_link);
 			}
 			Date shipdate_from = entity.shipdate_from;
 			Date shipdate_to = entity.shipdate_to;
 			Boolean ismap = entity.ismap;
-			
-			response.data = pcontract_POService.get_po_shipping(list_org, POType.PO_LINE_CONFIRMED, shipdate_from, shipdate_to, user.getRootorgid_link(),ismap);
+
+			response.data = pcontract_POService.get_po_shipping(list_org, POType.PO_LINE_CONFIRMED, shipdate_from,
+					shipdate_to, user.getRootorgid_link(), ismap);
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -2016,7 +2061,7 @@ public class PContract_POAPI {
 			return new ResponseEntity<getby_shipping_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@RequestMapping(value = "/quick_update_line", method = RequestMethod.POST)
 	public ResponseEntity<quickupdate_line_response> getPOByContractProduct(
 			@RequestBody quickupdate_line_request entity, HttpServletRequest request) {
@@ -2033,20 +2078,37 @@ public class PContract_POAPI {
 			return new ResponseEntity<quickupdate_line_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@RequestMapping(value = "/getbycontract_type", method = RequestMethod.POST)
 	public ResponseEntity<getby_pcontract_and_type_response> getPOByContractAndType(
 			@RequestBody getby_pcontract_and_type_request entity, HttpServletRequest request) {
 		getby_pcontract_and_type_response response = new getby_pcontract_and_type_response();
 		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+
 			List<Integer> type = new ArrayList<Integer>();
 			Long pcontractid_link = entity.pcontractid_link;
-			String [] list_type = entity.potype.split(",");
-			for(String id: list_type) {
+			String[] list_type = entity.potype.split(",");
+			for (String id : list_type) {
 				type.add(Integer.parseInt(id));
 			}
 
 			List<PContract_PO> pcontract = pcontract_POService.getby_pcontract_and_type(pcontractid_link, type);
+			for (PContract_PO po : pcontract) {
+				List<ProductPairing> p = pairService.getproduct_pairing_detail_bycontract(orgrootid_link,
+						po.getPcontractid_link(), po.getProductid_link());
+				int total = 1;
+				if (p.size() > 0) {
+					total = 0;
+					for (ProductPairing pair : p) {
+						total += pair.getAmount();
+					}
+				}
+				int pquantity = po.getPo_quantity();
+				int quantity_set = po.getProduct_typeid_link() == 5 ? pquantity / total : 0;
+				po.setPo_quantity_set(quantity_set);
+			}
 			response.data = pcontract;
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -2058,51 +2120,52 @@ public class PContract_POAPI {
 			return new ResponseEntity<getby_pcontract_and_type_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@RequestMapping(value = "/cancel_po_offer", method = RequestMethod.POST)
-	public ResponseEntity<cancel_po_offer_response> Cancel_PO_Offer(
-			@RequestBody cancel_po_offer_request entity, HttpServletRequest request) {
+	public ResponseEntity<cancel_po_offer_response> Cancel_PO_Offer(@RequestBody cancel_po_offer_request entity,
+			HttpServletRequest request) {
 		cancel_po_offer_response response = new cancel_po_offer_response();
 		try {
 			Long pcontract_poid_link = entity.pcontract_poid_link;
-			//Lay ds nhung line giao hang cua chao gia
-			List<PContract_PO> list_line = pcontract_POService.get_by_parent_and_type(pcontract_poid_link, POType.PO_LINE_PLAN);
-			for(PContract_PO line : list_line) {
-				//Lay nhung porder
+			// Lay ds nhung line giao hang cua chao gia
+			List<PContract_PO> list_line = pcontract_POService.get_by_parent_and_type(pcontract_poid_link,
+					POType.PO_LINE_PLAN);
+			for (PContract_PO line : list_line) {
+				// Lay nhung porder
 				Long pcontractid_link = line.getPcontractid_link();
 				List<POrder> list_porder = porderService.getByContractAndPO(pcontractid_link, line.getId());
-				
-				for(POrder porder: list_porder) {
-					//lay nhung grant cua lenh
+
+				for (POrder porder : list_porder) {
+					// lay nhung grant cua lenh
 					List<POrderGrant> list_grant = grantService.getbyporder_andpo(porder.getId(), pcontract_poid_link);
-					for(POrderGrant grant : list_grant) {
+					for (POrderGrant grant : list_grant) {
 						grantService.delete(grant);
 					}
-					
-					//xoa lenh chua phan chuyen
+
+					// xoa lenh chua phan chuyen
 					porderService.delete(porder);
-					
-					//Cap nhat lai trang thai cua porder-req
-					if(porder.getPorderreqid_link() != null) {
+
+					// Cap nhat lai trang thai cua porder-req
+					if (porder.getPorderreqid_link() != null) {
 						POrder_Req req = porder_req_Service.findOne(porder.getPorderreqid_link());
 						req.setStatus(POrderReqStatus.STATUS_FREE);
 						porder_req_Service.save(req);
 					}
-					
+
 				}
-				
-				//Cap nhat trang thai cua line
+
+				// Cap nhat trang thai cua line
 				line.setStatus(POStatus.PO_STATUS_UNCONFIRM);
 				pcontract_POService.save(line);
 			}
-			
-			//Xoa SKU cua po 
+
+			// Xoa SKU cua po
 			List<PContractProductSKU> list_sku = ppskuService.getlistsku_bypo(pcontract_poid_link);
-			for(PContractProductSKU sku : list_sku) {
+			for (PContractProductSKU sku : list_sku) {
 				ppskuService.delete(sku);
 			}
-			
-			//Cap nhat trang thai cua chao gia
+
+			// Cap nhat trang thai cua chao gia
 			PContract_PO offer = pcontract_POService.findOne(pcontract_poid_link);
 			offer.setStatus(POStatus.PO_STATUS_UNCONFIRM);
 			pcontract_POService.save(offer);
@@ -2116,7 +2179,7 @@ public class PContract_POAPI {
 			return new ResponseEntity<cancel_po_offer_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@RequestMapping(value = "/getall_bycode", method = RequestMethod.POST)
 	public ResponseEntity<getall_poline_by_code_response> GetAllByCode(
 			@RequestBody getall_poline_by_code_request entity, HttpServletRequest request) {
@@ -2126,19 +2189,18 @@ public class PContract_POAPI {
 //			long orgrootid_link = user.getRootorgid_link();
 			long orgid_link = user.getOrgid_link();
 			String po_code = entity.po_buyer;
-			
+
 			List<Long> list_org = new ArrayList<Long>();
-			if(orgid_link != 0 && orgid_link != 1) {
-				for(GpayUserOrg userorg:userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY)){
+			if (orgid_link != 0 && orgid_link != 1) {
+				for (GpayUserOrg userorg : userOrgService.getall_byuser_andtype(user.getId(),
+						OrgType.ORG_TYPE_FACTORY)) {
 					list_org.add(userorg.getOrgid_link());
 				}
-				//Them chinh don vi cua user
-				if(!list_org.contains(orgid_link))
+				// Them chinh don vi cua user
+				if (!list_org.contains(orgid_link))
 					list_org.add(orgid_link);
 			}
-			
-			
-			
+
 			response.data = pcontract_POService.getBySearch_andType(po_code, list_org, POType.PO_LINE_CONFIRMED);
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -2150,36 +2212,36 @@ public class PContract_POAPI {
 			return new ResponseEntity<getall_poline_by_code_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@RequestMapping(value = "/getall_sku_byline", method = RequestMethod.POST)
-	public ResponseEntity<get_sku_by_line_response> GetAllSKUByLine(
-			@RequestBody get_sku_by_line_request entity, HttpServletRequest request) {
+	public ResponseEntity<get_sku_by_line_response> GetAllSKUByLine(@RequestBody get_sku_by_line_request entity,
+			HttpServletRequest request) {
 		get_sku_by_line_response response = new get_sku_by_line_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long orgrootid_link = user.getRootorgid_link();
 			PContract_PO po_line = pcontract_POService.findOne(entity.pcontract_poid_link);
 			Long pcontractid_link = po_line.getPcontractid_link();
-			
+
 			Product product = productService.findOne(po_line.getProductid_link());
 			List<Long> list_product = new ArrayList<Long>();
-			
-			if(product.getProducttypeid_link() == ProductType.SKU_TYPE_PRODUCT_PAIR) {
+
+			if (product.getProducttypeid_link() == ProductType.SKU_TYPE_PRODUCT_PAIR) {
 				Long productpairid_link = product.getId();
-				List<ProductPairing> list_pair = productpairService.getproduct_pairing_detail_bycontract(orgrootid_link, pcontractid_link, productpairid_link);
-				for(ProductPairing pair: list_pair) {
+				List<ProductPairing> list_pair = productpairService.getproduct_pairing_detail_bycontract(orgrootid_link,
+						pcontractid_link, productpairid_link);
+				for (ProductPairing pair : list_pair) {
 					list_product.add(pair.getProductid_link());
 				}
-			}
-			else {
+			} else {
 				list_product.add(product.getId());
 			}
-			
+
 			List<PContractProductSKU> list_sku = new ArrayList<PContractProductSKU>();
-			for(Long productid_link: list_product) {
+			for (Long productid_link : list_product) {
 				list_sku.addAll(ppskuService.getbypo_and_product(po_line.getId(), productid_link));
 			}
-			
+
 			response.data = list_sku;
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -2240,29 +2302,31 @@ public class PContract_POAPI {
 			return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@RequestMapping(value = "/delete_listline", method = RequestMethod.POST)
-	public ResponseEntity<delete_listpo_line_response> DeleteListPOLine(
-			@RequestBody delete_listpo_line_request entity, HttpServletRequest request) {
+	public ResponseEntity<delete_listpo_line_response> DeleteListPOLine(@RequestBody delete_listpo_line_request entity,
+			HttpServletRequest request) {
 		delete_listpo_line_response response = new delete_listpo_line_response();
 		try {
-			for(PContract_PO thePO : entity.listid) {
+			for (PContract_PO thePO : entity.listid) {
 				List<POrder> list_porder = porderService.getByContractAndPO(thePO.getPcontractid_link(), thePO.getId());
-				//chi lay nhung lenh da keo vao bieu do
-				List<POrder> list_porder_grant = list_porder.stream().filter(item -> null!=item.getStatus() && item.getStatus() > POrderStatus.PORDER_STATUS_FREE).collect(Collectors.toList());
+				// chi lay nhung lenh da keo vao bieu do
+				List<POrder> list_porder_grant = list_porder.stream()
+						.filter(item -> null != item.getStatus() && item.getStatus() > POrderStatus.PORDER_STATUS_FREE)
+						.collect(Collectors.toList());
 				if (list_porder_grant.size() > 0) {
 					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 					response.setMessage(
-							"Hiện vẫn đang có Lệnh SX của đơn hàng đã phân chuyền! Cần hủy phân chuyền Lệnh SX trước khi xóa Line: "+ thePO.getPo_buyer());
+							"Hiện vẫn đang có Lệnh SX của đơn hàng đã phân chuyền! Cần hủy phân chuyền Lệnh SX trước khi xóa Line: "
+									+ thePO.getPo_buyer());
 					return new ResponseEntity<delete_listpo_line_response>(response, HttpStatus.BAD_REQUEST);
 				}
-				
-				//Kiem tra danh sach po cua chao gia neu khong co thi cho xoa
+
+				// Kiem tra danh sach po cua chao gia neu khong co thi cho xoa
 				List<PContract_PO> list_po = pcontract_POService.get_by_parentid(thePO.getId());
-				if(list_po.size() > 0) {
+				if (list_po.size() > 0) {
 					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-					response.setMessage(
-							"Bạn không thể xóa chào giá đã phát sinh PO hoặc line giao hàng!");
+					response.setMessage("Bạn không thể xóa chào giá đã phát sinh PO hoặc line giao hàng!");
 					return new ResponseEntity<delete_listpo_line_response>(response, HttpStatus.BAD_REQUEST);
 				}
 
@@ -2275,15 +2339,18 @@ public class PContract_POAPI {
 				for (PContract_PO_Shipping theShipping : poshippingService.getByPOID(thePO.getId())) {
 					poshippingService.delete(theShipping);
 				}
-				
-				//Delete porder 
-				List<POrder> list_porder_free = list_porder.stream().filter(item -> null!=item.getStatus() && item.getStatus() == POrderStatus.PORDER_STATUS_FREE).collect(Collectors.toList());
-				for(POrder porder : list_porder_free) {
+
+				// Delete porder
+				List<POrder> list_porder_free = list_porder.stream()
+						.filter(item -> null != item.getStatus() && item.getStatus() == POrderStatus.PORDER_STATUS_FREE)
+						.collect(Collectors.toList());
+				for (POrder porder : list_porder_free) {
 					porderService.delete(porder);
 				}
-				
-				//Delete sku
-				List<PContractProductSKU> listsku = ppskuService.getbypo_and_product(thePO.getId(), thePO.getProductid_link());
+
+				// Delete sku
+				List<PContractProductSKU> listsku = ppskuService.getbypo_and_product(thePO.getId(),
+						thePO.getProductid_link());
 				for (PContractProductSKU pContractProductSKU : listsku) {
 					ppskuService.delete(pContractProductSKU);
 				}
@@ -2295,10 +2362,10 @@ public class PContract_POAPI {
 					}
 					pcontractpriceService.delete(thePrice);
 				}
-				
-				//xoa producttivity
+
+				// xoa producttivity
 				List<PContract_PO_Productivity> list_productivity = productivityService.getbypo(thePO.getId());
-				for (PContract_PO_Productivity productivity: list_productivity) {
+				for (PContract_PO_Productivity productivity : list_productivity) {
 					productivityService.delete(productivity);
 				}
 
@@ -2324,25 +2391,26 @@ public class PContract_POAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgid_link = user.getOrgid_link();
 			String orgcode = user.getOrgcode();
-				
+
 			List<String> orgs = new ArrayList<String>();
 			List<Long> list_org = new ArrayList<Long>();
-			if(orgid_link != 0 && orgid_link != 1) {
-				for(GpayUserOrg userorg:userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY)){
+			if (orgid_link != 0 && orgid_link != 1) {
+				for (GpayUserOrg userorg : userOrgService.getall_byuser_andtype(user.getId(),
+						OrgType.ORG_TYPE_FACTORY)) {
 					orgs.add(userorg.getOrgcode());
 					list_org.add(userorg.getOrgid_link());
 				}
-				//Them chinh don vi cua user
+				// Them chinh don vi cua user
 				orgs.add(orgcode);
-				if(!list_org.contains(orgid_link))
+				if (!list_org.contains(orgid_link))
 					list_org.add(orgid_link);
 			}
-			
+
 //			list_org = "("+list_org+")";
 //			System.out.println(new Date());
-			List<PContract_PO> pcontract = pcontract_POService.getPO_Offer_Accept_ByPContract_AndOrg(entity.pcontractid_link,
-					entity.productid_link == null ? 0 : entity.productid_link, list_org);
-			
+			List<PContract_PO> pcontract = pcontract_POService.getPO_Offer_Accept_ByPContract_AndOrg(
+					entity.pcontractid_link, entity.productid_link == null ? 0 : entity.productid_link, list_org);
+
 //			if(orgs.size() > 0 ) {
 //				for(PContract_PO parent: pcontract) {
 ////				      new Thread("" + parent.getId()){
@@ -2360,7 +2428,7 @@ public class PContract_POAPI {
 ////				        }.start();
 //				}
 //			}
-			
+
 			response.data = pcontract;
 //			System.out.println(new Date());
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -2394,46 +2462,45 @@ public class PContract_POAPI {
 			po.setStatus(POStatus.PO_STATUS_CONFIRMED);
 
 			pcontract_POService.save(po);
-			
-			//Lay danh sach cac line cua po tong va chuyen ve trang thai xác nhận
-			List<PContract_PO> list_line_gh = pcontract_POService.get_by_parent_and_type(entity.pcontract_poid_link, POType.PO_LINE_PLAN);
-			
-			for(PContract_PO line : list_line_gh) {
+
+			// Lay danh sach cac line cua po tong va chuyen ve trang thai xác nhận
+			List<PContract_PO> list_line_gh = pcontract_POService.get_by_parent_and_type(entity.pcontract_poid_link,
+					POType.PO_LINE_PLAN);
+
+			for (PContract_PO line : list_line_gh) {
 				line.setOrgmerchandiseid_link(entity.orgid_link);
 				line.setMerchandiserid_link(entity.userid_link);
 				line.setStatus(POStatus.PO_STATUS_CONFIRMED);
 
 				pcontract_POService.save(line);
-				
-				//Kiem tra xem porder_req da keo vao uom thu hay chua? Neu keo roi thi cap nhat lai trang thai cua lenh
+
+				// Kiem tra xem porder_req da keo vao uom thu hay chua? Neu keo roi thi cap nhat
+				// lai trang thai cua lenh
 				List<POrder_Req> list_req = porder_req_Service.getByPO(line.getId());
 				for (POrder_Req req : list_req) {
-					//Req co porder la da duoc keo vao chuyen roi
+					// Req co porder la da duoc keo vao chuyen roi
 					List<POrder> list_porder = porderService.getByPOrder_Req(line.getId(), req.getId());
-					if(list_porder.size() > 0) {
+					if (list_porder.size() > 0) {
 						POrder porder = list_porder.get(0);
-						if(porder.getStatus() == POrderStatus.PORDER_STATUS_UNCONFIRM) {
+						if (porder.getStatus() == POrderStatus.PORDER_STATUS_UNCONFIRM) {
 							porder.setStatus(POrderStatus.PORDER_STATUS_GRANTED);
 						}
-						
-						//Cap nhat porder_grant status ve 1
+
+						// Cap nhat porder_grant status ve 1
 						List<POrderGrant> list_grant = grantService.getByOrderId(porder.getId());
-						for(POrderGrant grant : list_grant) {
-							if(grant.getStatus() == -1)
-							{
+						for (POrderGrant grant : list_grant) {
+							if (grant.getStatus() == -1) {
 								grant.setStatus(1);
 								grantService.save(grant);
 							}
 						}
 					}
-					//req chua co porder thi sinh porder cho req
+					// req chua co porder thi sinh porder cho req
 					else {
 						porderService.createPOrder(req, user);
 					}
 				}
 			}
-			
-			
 
 			// Sinh Cong viec
 //			long pcontractid_link = po.getPcontractid_link();
@@ -2567,7 +2634,7 @@ public class PContract_POAPI {
 			return new ResponseEntity<PContract_pogetone_response>(response, HttpStatus.OK);
 		}
 	}
-	
+
 	@RequestMapping(value = "/check_cancel", method = RequestMethod.POST)
 	public ResponseEntity<check_cancel_po_response> CheckCancel(@RequestBody cancel_po_request entity,
 			HttpServletRequest request) {
@@ -2575,12 +2642,12 @@ public class PContract_POAPI {
 		try {
 			String mes = "";
 			Long pcontract_poid_link = entity.pcontract_poid_link;
-			
+
 			List<POrderProcessing> list = processService.getby_pcontratpo(pcontract_poid_link);
-			if(list.size() > 0) {
+			if (list.size() > 0) {
 				mes = "PO đã tồn tại lệnh sản xuất đã vào chuyển! Bạn có chắc chắn muốn hủy PO?";
 			}
-			
+
 			response.mes = mes;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -2591,36 +2658,34 @@ public class PContract_POAPI {
 			return new ResponseEntity<check_cancel_po_response>(response, HttpStatus.OK);
 		}
 	}
-	
+
 	@RequestMapping(value = "/cancel_po", method = RequestMethod.POST)
 	public ResponseEntity<cancel_po_response> Cancel(@RequestBody cancel_po_request entity,
 			HttpServletRequest request) {
 		cancel_po_response response = new cancel_po_response();
 		try {
 			Long pcontract_poid_link = entity.pcontract_poid_link;
-			
-			//Cap nhat trang thai PO
+
+			// Cap nhat trang thai PO
 			PContract_PO po = pcontract_POService.findOne(pcontract_poid_link);
 			po.setStatus(POStatus.PO_STATUS_CANCEL);
 			pcontract_POService.save(po);
-			
-			//Cap nhat trang thai lenh
+
+			// Cap nhat trang thai lenh
 			Long pcontractid_link = po.getPcontractid_link();
 			List<POrder> list_porder = porderService.getByContractAndPO(pcontractid_link, pcontract_poid_link);
 			for (POrder pOrder : list_porder) {
 				pOrder.setStatus(POrderStatus.PORDER_STATUS_CANCEL);
 				porderService.save(pOrder);
 			}
-			
-			//Cap nhat trang thai yeu cau xep KH
+
+			// Cap nhat trang thai yeu cau xep KH
 			List<POrder_Req> list_req = porder_req_Service.getByContractAndPO(pcontractid_link, pcontract_poid_link);
 			for (POrder_Req pOrder_Req : list_req) {
 				pOrder_Req.setStatus(POrderReqStatus.STATUS_CANCEL);
 				porder_req_Service.save(pOrder_Req);
 			}
-			
-			
-			
+
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<cancel_po_response>(response, HttpStatus.OK);
@@ -2641,21 +2706,22 @@ public class PContract_POAPI {
 			if (null != thePO) {
 //				 Check if having POrder? refuse deleting if have
 				List<POrder> list_porder = porderService.getByContractAndPO(thePO.getPcontractid_link(), thePO.getId());
-				//chi lay nhung lenh da keo vao bieu do
-				List<POrder> list_porder_grant = list_porder.stream().filter(item -> null!=item.getStatus() && item.getStatus() > POrderStatus.PORDER_STATUS_FREE).collect(Collectors.toList());
+				// chi lay nhung lenh da keo vao bieu do
+				List<POrder> list_porder_grant = list_porder.stream()
+						.filter(item -> null != item.getStatus() && item.getStatus() > POrderStatus.PORDER_STATUS_FREE)
+						.collect(Collectors.toList());
 				if (list_porder_grant.size() > 0) {
 					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 					response.setMessage(
 							"Hiện vẫn đang có Lệnh SX của đơn hàng đã phân chuyền! Cần hủy phân chuyền Lệnh SX trước khi xóa đơn hàng");
 					return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 				}
-				
-				//Kiem tra danh sach po cua chao gia neu khong co thi cho xoa
+
+				// Kiem tra danh sach po cua chao gia neu khong co thi cho xoa
 				List<PContract_PO> list_po = pcontract_POService.get_by_parentid(thePO.getId());
-				if(list_po.size() > 0) {
+				if (list_po.size() > 0) {
 					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-					response.setMessage(
-							"Bạn không thể xóa chào giá đã phát sinh PO hoặc line giao hàng!");
+					response.setMessage("Bạn không thể xóa chào giá đã phát sinh PO hoặc line giao hàng!");
 					return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 				}
 
@@ -2668,15 +2734,18 @@ public class PContract_POAPI {
 				for (PContract_PO_Shipping theShipping : poshippingService.getByPOID(thePO.getId())) {
 					poshippingService.delete(theShipping);
 				}
-				
-				//Delete porder 
-				List<POrder> list_porder_free = list_porder.stream().filter(item -> null!=item.getStatus() && item.getStatus() == POrderStatus.PORDER_STATUS_FREE).collect(Collectors.toList());
-				for(POrder porder : list_porder_free) {
+
+				// Delete porder
+				List<POrder> list_porder_free = list_porder.stream()
+						.filter(item -> null != item.getStatus() && item.getStatus() == POrderStatus.PORDER_STATUS_FREE)
+						.collect(Collectors.toList());
+				for (POrder porder : list_porder_free) {
 					porderService.delete(porder);
 				}
-				
-				//Delete sku
-				List<PContractProductSKU> listsku = ppskuService.getbypo_and_product(thePO.getId(), thePO.getProductid_link());
+
+				// Delete sku
+				List<PContractProductSKU> listsku = ppskuService.getbypo_and_product(thePO.getId(),
+						thePO.getProductid_link());
 				for (PContractProductSKU pContractProductSKU : listsku) {
 					ppskuService.delete(pContractProductSKU);
 				}
@@ -2688,10 +2757,10 @@ public class PContract_POAPI {
 					}
 					pcontractpriceService.delete(thePrice);
 				}
-				
-				//xoa producttivity
+
+				// xoa producttivity
 				List<PContract_PO_Productivity> list_productivity = productivityService.getbypo(thePO.getId());
-				for (PContract_PO_Productivity productivity: list_productivity) {
+				for (PContract_PO_Productivity productivity : list_productivity) {
 					productivityService.delete(productivity);
 				}
 
@@ -2708,7 +2777,7 @@ public class PContract_POAPI {
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-			response.setMessage(e.getMessage()); 
+			response.setMessage(e.getMessage());
 			return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 		}
 
@@ -2721,51 +2790,53 @@ public class PContract_POAPI {
 		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		try {
 			List<Org> listorg = new ArrayList<Org>();
-			for(GpayUserOrg userorg:userOrgService.getall_byuser_andtype(user.getId(), OrgType.ORG_TYPE_FACTORY)){
+			for (GpayUserOrg userorg : userOrgService.getall_byuser_andtype(user.getId(), OrgType.ORG_TYPE_FACTORY)) {
 				listorg.add(orgService.findOne(userorg.getOrgid_link()));
 			}
-			
+
 			Long orgid_link = user.getOrgid_link();
 			Org userOrg = null;
-			if(orgid_link != 0 && orgid_link != 1 && orgid_link != null) {
+			if (orgid_link != 0 && orgid_link != 1 && orgid_link != null) {
 				userOrg = orgService.findOne(orgid_link);
 			}
-			
+
 			List<PContract_PO> pcontractpoList = pcontract_POService
 					.getPcontractPoByPContractAndPOBuyer(entity.pcontractid_link, entity.po_buyer, entity.buyercode);
 			response.data = new ArrayList<PContract_PO>();
-			
+
 //			List<PContract_PO> pcontractpoList = pcontract_POService.getPOByContract(user.getRootorgid_link(), entity.pcontractid_link);
 //			response.data = pcontractpoList;
 			// chỉ lấy pcontract_po con
 			for (PContract_PO pcontractpo : pcontractpoList) {
-				if(userOrg != null) {
+				if (userOrg != null) {
 					boolean flag = true;
 					List<POrder_Req> porderReqList = porder_req_Service.getByPO(pcontractpo.getId());
-					for(POrder_Req porderReq : porderReqList) {
+					for (POrder_Req porderReq : porderReqList) {
 						Long granttoorgid_link = porderReq.getGranttoorgid_link();
-						
+
 						// nếu user được xem nhiều org (GpayUserOrg)
-						if(listorg.size() > 0) {
-							if(!flag) break;
-							for(Org org : listorg) {
-								if(user.getOrgid_link() == granttoorgid_link || org.getId() == granttoorgid_link) {
+						if (listorg.size() > 0) {
+							if (!flag)
+								break;
+							for (Org org : listorg) {
+								if (user.getOrgid_link() == granttoorgid_link || org.getId() == granttoorgid_link) {
 									flag = false;
 									break;
 								}
 							}
-						}else {
-							if(user.getOrgid_link() == granttoorgid_link) {
+						} else {
+							if (user.getOrgid_link() == granttoorgid_link) {
 								flag = false;
 								break;
 							}
 						}
 					}
-					
-					if(flag) continue;
+
+					if (flag)
+						continue;
 				}
-				
-				//Chi lay cac PO Line
+
+				// Chi lay cac PO Line
 				if (pcontractpo.getParentpoid_link() != null) {
 					response.data.add(pcontractpo);
 				}
@@ -2780,9 +2851,10 @@ public class PContract_POAPI {
 			return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@RequestMapping(value = "/getForMarketTypeChart", method = RequestMethod.POST)
-	public ResponseEntity<PContract_PO_getForMarketTypeChart_response> getForMarketTypeChart(HttpServletRequest request) {
+	public ResponseEntity<PContract_PO_getForMarketTypeChart_response> getForMarketTypeChart(
+			HttpServletRequest request) {
 		PContract_PO_getForMarketTypeChart_response response = new PContract_PO_getForMarketTypeChart_response();
 		try {
 			response.data = pcontract_POService.getForMarketTypeChart();
@@ -2797,24 +2869,25 @@ public class PContract_POAPI {
 		}
 
 	}
-	
+
 	@RequestMapping(value = "/getPOLine_Confirm", method = RequestMethod.POST)
-	public ResponseEntity<PContract_getbycontractproduct_response> getPOLine_Confirm(@RequestBody PContract_PO_getByPorder_request entity,
-			HttpServletRequest request) {
+	public ResponseEntity<PContract_getbycontractproduct_response> getPOLine_Confirm(
+			@RequestBody PContract_PO_getByPorder_request entity, HttpServletRequest request) {
 		PContract_getbycontractproduct_response response = new PContract_getbycontractproduct_response();
 		try {
 			Long pcontract_poid_link = entity.pcontract_poid_link;
 			Long mausanphamid_link = entity.mausanphamid_link == 0 ? null : entity.mausanphamid_link;
-			
-			List<PContract_PO> listPContractPO = pcontract_POService.get_by_parent_and_type_and_MauSP(pcontract_poid_link, POType.PO_LINE_CONFIRMED, mausanphamid_link);
-			
-			//Update danh sach to chuyen duoc giao sx cho PO Line
-			for (PContract_PO thePoline: listPContractPO){
+
+			List<PContract_PO> listPContractPO = pcontract_POService
+					.get_by_parent_and_type_and_MauSP(pcontract_poid_link, POType.PO_LINE_CONFIRMED, mausanphamid_link);
+
+			// Update danh sach to chuyen duoc giao sx cho PO Line
+			for (PContract_PO thePoline : listPContractPO) {
 				thePoline.setProductionlines(grantskuService.getProductionLines(thePoline.getId()));
 			}
 
 			response.data = listPContractPO;
-			
+
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.OK);
@@ -2824,22 +2897,23 @@ public class PContract_POAPI {
 			return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.OK);
 		}
 	}
+
 	@RequestMapping(value = "/getForPOrderListPContractPO", method = RequestMethod.POST)
-	public ResponseEntity<PContract_getbycontractproduct_response> getForPOrderListPContractPO(@RequestBody PContract_PO_getByPorder_request entity,
-			HttpServletRequest request) {
+	public ResponseEntity<PContract_getbycontractproduct_response> getForPOrderListPContractPO(
+			@RequestBody PContract_PO_getByPorder_request entity, HttpServletRequest request) {
 		PContract_getbycontractproduct_response response = new PContract_getbycontractproduct_response();
 		try {
 //			Long porderid_link = entity.porderid_link;
 			Long pcontract_poid_link = entity.pcontract_poid_link;
 //			POrder porder = porderService.findOne(porderid_link);
 			PContract_PO pcontractPo = pcontract_POService.findOne(pcontract_poid_link);
-			if(pcontractPo.getParentpoid_link() != null) {
+			if (pcontractPo.getParentpoid_link() != null) {
 				pcontract_poid_link = pcontractPo.getParentpoid_link();
 			}
-			
+
 			List<PContract_PO> listPContractPO = pcontract_POService.get_by_parentid(pcontract_poid_link);
 			response.data = listPContractPO;
-			
+
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.OK);
@@ -2849,7 +2923,7 @@ public class PContract_POAPI {
 			return new ResponseEntity<PContract_getbycontractproduct_response>(response, HttpStatus.OK);
 		}
 	}
-	
+
 	@RequestMapping(value = "/getOffers_byOrg", method = RequestMethod.POST)
 	public ResponseEntity<getOffes_byOrg_response> getOffers_byOrg(@RequestBody getOffers_byOrg_request entity,
 			HttpServletRequest request) {
@@ -2858,28 +2932,30 @@ public class PContract_POAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgid_link = user.getOrgid_link();
 			List<Long> list_org = new ArrayList<Long>();
-			
-			if(orgid_link != 0 && orgid_link != 1) {
-				for(GpayUserOrg userorg:userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY)){
+
+			if (orgid_link != 0 && orgid_link != 1) {
+				for (GpayUserOrg userorg : userOrgService.getall_byuser_andtype(user.getId(),
+						OrgType.ORG_TYPE_FACTORY)) {
 					list_org.add(userorg.getOrgid_link());
 				}
-				//Them chinh don vi cua user
+				// Them chinh don vi cua user
 				list_org.add(orgid_link);
-			}
-			else {
-				List<Org> listorg = orgService.findOrgByType(user.getRootorgid_link(), orgid_link, OrgType.ORG_TYPE_FACTORY);
-				for(Org org :listorg){
+			} else {
+				List<Org> listorg = orgService.findOrgByType(user.getRootorgid_link(), orgid_link,
+						OrgType.ORG_TYPE_FACTORY);
+				for (Org org : listorg) {
 					list_org.add(org.getId());
 				}
 			}
-			
+
 			List<PContract_PO> list = new ArrayList<PContract_PO>();
 			list = pcontract_POService.getall_offers_by_org(list_org);
 			response.data = list;
-			
+
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			ResponseEntity<getOffes_byOrg_response> a = new ResponseEntity<getOffes_byOrg_response>(response, HttpStatus.OK);
+			ResponseEntity<getOffes_byOrg_response> a = new ResponseEntity<getOffes_byOrg_response>(response,
+					HttpStatus.OK);
 			return a;
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
@@ -2887,7 +2963,7 @@ public class PContract_POAPI {
 			return new ResponseEntity<getOffes_byOrg_response>(response, HttpStatus.OK);
 		}
 	}
-	
+
 	@RequestMapping(value = "/get_poline_by_offer", method = RequestMethod.POST)
 	public ResponseEntity<get_poline_by_po_response> GetLineByOffer(@RequestBody get_poline_by_po entity,
 			HttpServletRequest request) {
@@ -2895,10 +2971,11 @@ public class PContract_POAPI {
 		try {
 			Long parentid_link = entity.pcontract_poid_link;
 			response.data = pcontract_POService.get_by_parent_and_type(parentid_link, POType.PO_LINE_PLAN);
-			
+
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			ResponseEntity<get_poline_by_po_response> a = new ResponseEntity<get_poline_by_po_response>(response, HttpStatus.OK);
+			ResponseEntity<get_poline_by_po_response> a = new ResponseEntity<get_poline_by_po_response>(response,
+					HttpStatus.OK);
 			return a;
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
@@ -2906,43 +2983,44 @@ public class PContract_POAPI {
 			return new ResponseEntity<get_poline_by_po_response>(response, HttpStatus.OK);
 		}
 	}
-	
+
 	@RequestMapping(value = "/delete_plan_porder", method = RequestMethod.POST)
 	public ResponseEntity<delete_plan_porder_response> DeletePlanPOrder(@RequestBody delete_porder_plan_request entity,
 			HttpServletRequest request) {
 		delete_plan_porder_response response = new delete_plan_porder_response();
 		try {
 			Long pcontract_poid_link = entity.pcontract_poid_link;
-			
-			//Lay nhung line giao hang cua po
-			List<PContract_PO> list_line = pcontract_POService.get_by_parent_and_type(pcontract_poid_link, POType.PO_LINE_PLAN);
-			
+
+			// Lay nhung line giao hang cua po
+			List<PContract_PO> list_line = pcontract_POService.get_by_parent_and_type(pcontract_poid_link,
+					POType.PO_LINE_PLAN);
+
 			for (PContract_PO line : list_line) {
-				//lay nhung porder_req cua line
+				// lay nhung porder_req cua line
 				List<POrder_Req> list_req = porder_req_Service.getByPO(line.getId());
-				
-				for(POrder_Req req: list_req) {
-					//Lay nhung porder
+
+				for (POrder_Req req : list_req) {
+					// Lay nhung porder
 					List<POrder> list_porder = porderService.getByPOrder_Req(pcontract_poid_link, req.getId());
-					//Lay cac lenh uom thu
-					for(POrder porder : list_porder) {
+					// Lay cac lenh uom thu
+					for (POrder porder : list_porder) {
 						List<POrderGrant> list_grant = grantService.getByOrderId(porder.getId());
-						
+
 						for (POrderGrant grant : list_grant) {
 							grantService.delete(grant);
 						}
-						
+
 						porderService.delete(porder);
 					}
-					
+
 					porder_req_Service.delete(req);
 				}
 			}
-			
-			
+
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			ResponseEntity<delete_plan_porder_response> a = new ResponseEntity<delete_plan_porder_response>(response, HttpStatus.OK);
+			ResponseEntity<delete_plan_porder_response> a = new ResponseEntity<delete_plan_porder_response>(response,
+					HttpStatus.OK);
 			return a;
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
@@ -2950,7 +3028,7 @@ public class PContract_POAPI {
 			return new ResponseEntity<delete_plan_porder_response>(response, HttpStatus.OK);
 		}
 	}
-	
+
 	@RequestMapping(value = "/copyline", method = RequestMethod.POST)
 	public ResponseEntity<copy_poline_response> CopyLine(@RequestBody copy_poline_request entity,
 			HttpServletRequest request) {
@@ -2958,9 +3036,9 @@ public class PContract_POAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long orgrootid_link = user.getRootorgid_link();
-			
+
 			PContract_PO po_old = pcontract_POService.findOne(entity.pcontract_poid_Link);
-			
+
 			PContract_PO po_new = new PContract_PO();
 			po_new.setCode(po_old.getCode());
 			po_new.setCurrencyid_link(po_old.getCurrencyid_link());
@@ -3004,12 +3082,12 @@ public class PContract_POAPI {
 			po_new.setStatus(po_old.getStatus());
 			po_new.setUnitid_link(po_old.getUnitid_link());
 			po_new.setUsercreatedid_link(user.getId());
-			
+
 			po_new = pcontract_POService.save(po_new);
-			
-			//copy ns_production
+
+			// copy ns_production
 			List<PContract_PO_Productivity> list_productivity = po_old.getPcontract_po_productivity();
-			for(PContract_PO_Productivity po_productivity : list_productivity) {
+			for (PContract_PO_Productivity po_productivity : list_productivity) {
 				PContract_PO_Productivity po_productivity_new = new PContract_PO_Productivity();
 				po_productivity_new.setAmount(po_productivity.getAmount());
 				po_productivity_new.setId(null);
@@ -3019,13 +3097,14 @@ public class PContract_POAPI {
 				po_productivity_new.setPlan_productivity(po_productivity.getPlan_productivity());
 				po_productivity_new.setProductid_link(po_productivity.getProductid_link());
 				po_productivity_new.setProductiondays_ns(po_productivity.getProductiondays_ns());
-				
+
 				productivityService.save(po_productivity_new);
 			}
-			
-			//copy porder_req
-			List<POrder_Req> list_req = porder_req_Service.getByContractAndPO(po_old.getPcontractid_link(), po_old.getId());
-			for(POrder_Req req : list_req) {
+
+			// copy porder_req
+			List<POrder_Req> list_req = porder_req_Service.getByContractAndPO(po_old.getPcontractid_link(),
+					po_old.getId());
+			for (POrder_Req req : list_req) {
 				POrder_Req req_new = new POrder_Req();
 				req_new.setAmount_inset(req.getAmount_inset());
 				req_new.setGranttoorgid_link(req.getGranttoorgid_link());
@@ -3043,10 +3122,10 @@ public class PContract_POAPI {
 				req_new.setTimecreated(new Date());
 				req_new.setTotalorder(req.getTotalorder());
 				req_new.setUsercreatedid_link(user.getId());
-				
+
 				porder_req_Service.save(req_new);
 			}
-			
+
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			ResponseEntity<copy_poline_response> a = new ResponseEntity<copy_poline_response>(response, HttpStatus.OK);

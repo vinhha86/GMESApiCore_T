@@ -36,4 +36,12 @@ public class PContractProductPairingService extends AbstractService<PContractPro
 		return repo.getall_product_pairdetail_bypcontract(pcontractid_link, productpairid_link, orgrootid_link);
 	}
 
+	@Override
+	public Integer getAmountinSet(long pcontractid_link, long productid_link, long product_setid_link) {
+		// TODO Auto-generated method stub
+		Integer a = repo.getAmountinSet(pcontractid_link, productid_link, product_setid_link);
+		a = a == null ? 1 : a;
+		return a;
+	}
+
 }
