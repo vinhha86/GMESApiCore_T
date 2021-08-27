@@ -23,6 +23,7 @@ import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.porder.PorderOrigin;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
@@ -152,71 +153,7 @@ public class POrderListAPI {
 //		}
 //	}
 	@RequestMapping(value = "/getallbysearch", method = RequestMethod.POST)
-	public ResponseEntity<POrderList_getlist_response> POrderGetAllBySearch(
-			@RequestBody POrderList_getlist_request entity, HttpServletRequest request) {
-		POrderList_getlist_response response = new POrderList_getlist_response();
-		try {
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			Long user_orgid_link = user.getOrgid_link();
-			Long granttoorgid_link = (long) 0;
-			if (user_orgid_link == (long) 1)
-				granttoorgid_link = null;
-			else
-				granttoorgid_link = user_orgid_link;
-
-			response.data = new ArrayList<>();
-
-			String contractcode = entity.contractcode;
-			String pobuyer = entity.pobuyer;
-			String stylebuyer = entity.style;
-			Long buyerid = entity.buyerid;
-			Long vendorid = entity.vendorid;
-			Long factoryid = entity.factoryid;
-			Date golivedatefrom = entity.golivedatefrom;
-			Date golivedateto = entity.golivedateto;
-			List<Integer> statuses = entity.status;
-
-//			System.out.println(golivedatefrom);
-//			System.out.println(golivedateto);
-			System.out.println(new Date());
-			if (statuses.size() == 0) {
-				response.data = porderService.getPOrderBySearch(buyerid, vendorid, factoryid, pobuyer, stylebuyer,
-						contractcode, granttoorgid_link, GPAYDateFormat.atStartOfDay(golivedatefrom),
-						GPAYDateFormat.atEndOfDay(golivedateto));
-			} else {
-				response.data = porderService.getPOrderBySearch(buyerid, vendorid, factoryid, pobuyer, stylebuyer,
-						contractcode, statuses, granttoorgid_link, GPAYDateFormat.atStartOfDay(golivedatefrom),
-						GPAYDateFormat.atEndOfDay(golivedateto));
-			}
-			System.out.println(new Date());
-//			if(response.data.size() > 1000) {
-//				response.data = new ArrayList<>(response.data.subList(0, 1000));
-//			}
-
-//			response.data = result;
-
-//			response.totalCount = response.data.size();
-//			
-//			PageRequest page = PageRequest.of(entity.page - 1, entity.limit);
-//			int start = (int) page.getOffset();
-//			int end = (start + page.getPageSize()) > response.data.size() ? response.data.size() : (start + page.getPageSize());
-//			Page<POrder> pageToReturn = new PageImpl<POrder>(response.data.subList(start, end), page, response.data.size()); 
-//			
-//			response.data = pageToReturn.getContent();
-
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<POrderList_getlist_response>(response, HttpStatus.OK);
-		} catch (Exception e) {
-			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-			response.setMessage(e.getMessage());
-			e.printStackTrace();
-			return new ResponseEntity<POrderList_getlist_response>(response, HttpStatus.BAD_REQUEST);
-		}
-	}
-
-	@RequestMapping(value = "/getallbysearch_origin", method = RequestMethod.POST)
-	public ResponseEntity<getbysearch_origin_response> POrderGetAllBySearchOrigin(
+	public ResponseEntity<getbysearch_origin_response> POrderGetAllBySearch(
 			@RequestBody POrderList_getlist_request entity, HttpServletRequest request) {
 		getbysearch_origin_response response = new getbysearch_origin_response();
 		try {
@@ -242,32 +179,29 @@ public class POrderListAPI {
 
 //			System.out.println(golivedatefrom);
 //			System.out.println(golivedateto);
+			List<POrder> list_porder = porderService.getPOrderBySearch(buyerid, vendorid, factoryid, pobuyer,
+					stylebuyer, contractcode, statuses, granttoorgid_link, GPAYDateFormat.atStartOfDay(golivedatefrom),
+					GPAYDateFormat.atEndOfDay(golivedateto));
 
-			if (statuses.size() == 0) {
-				response.data = porderService.getPOrderOriginBySearch(buyerid, vendorid, factoryid, pobuyer, stylebuyer,
-						contractcode, granttoorgid_link, GPAYDateFormat.atStartOfDay(golivedatefrom),
-						GPAYDateFormat.atEndOfDay(golivedateto));
-			} else {
-				response.data = porderService.getPOrderOriginBySearch(buyerid, vendorid, factoryid, pobuyer, stylebuyer,
-						contractcode, statuses, granttoorgid_link, GPAYDateFormat.atStartOfDay(golivedatefrom),
-						GPAYDateFormat.atEndOfDay(golivedateto));
+			List<PorderOrigin> list = new ArrayList<PorderOrigin>();
+			System.out.println(new Date());
+			for (POrder p : list_porder) {
+				PorderOrigin origin = new PorderOrigin();
+				origin.setId(p.getId());
+				origin.setBuyername(p.getBuyername());
+				origin.setGolivedate(p.getGolivedate());
+				origin.setOrdercode(p.getOrdercode());
+				origin.setPo_buyer(p.getPo_buyer());
+				origin.setStartDatePlan(p.getStartDatePlan());
+				origin.setStatusName(p.getStatusName());
+				origin.setStylebuyer(p.getStylebuyer());
+				origin.setTotalorder(p.getTotalorder());
+				origin.setVendorname(p.getVendorname());
+
+				list.add(origin);
 			}
-
-//			if(response.data.size() > 1000) {
-//				response.data = new ArrayList<>(response.data.subList(0, 1000));
-//			}
-
-//			response.data = result;
-
-//			response.totalCount = response.data.size();
-//			
-//			PageRequest page = PageRequest.of(entity.page - 1, entity.limit);
-//			int start = (int) page.getOffset();
-//			int end = (start + page.getPageSize()) > response.data.size() ? response.data.size() : (start + page.getPageSize());
-//			Page<POrder> pageToReturn = new PageImpl<POrder>(response.data.subList(start, end), page, response.data.size()); 
-//			
-//			response.data = pageToReturn.getContent();
-
+			System.out.println(new Date());
+			response.data = list;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<getbysearch_origin_response>(response, HttpStatus.OK);

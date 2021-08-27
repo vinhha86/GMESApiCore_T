@@ -2105,9 +2105,8 @@ public class PContract_POAPI {
 						total += pair.getAmount();
 					}
 				}
-				int pquantity = po.getPo_quantity();
-				int quantity_set = po.getProduct_typeid_link() == 5 ? pquantity / total : 0;
-				po.setPo_quantity_set(quantity_set);
+				po.setTotalpair(total);
+				po.setPo_quantity_sp(po.getPo_quantity() * total);
 			}
 			response.data = pcontract;
 

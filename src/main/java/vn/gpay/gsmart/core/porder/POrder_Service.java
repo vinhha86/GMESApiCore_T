@@ -11,8 +11,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -44,8 +42,6 @@ import vn.gpay.gsmart.core.utils.POrderStatus;
 public class POrder_Service extends AbstractService<POrder> implements IPOrder_Service {
 	@Autowired
 	IPOrder_Repository repo;
-	@Autowired
-	POrderOriginRepo repoOrigin;
 	@Autowired
 	IPOrder_AutoID_Service porder_AutoID_Service;
 	@Autowired
@@ -636,9 +632,10 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 			String stylebuyer, String contractcode, List<Integer> statuses, Long granttoorgid_link, Date golivedatefrom,
 			Date golivedateto) {
 		// TODO Auto-generated method stub
-		Page<POrder> page = repo.getPOrderBySearch(buyerid, vendorid, factoryid, pobuyer, stylebuyer, contractcode,
-				statuses, granttoorgid_link, golivedatefrom, golivedateto, PageRequest.of(0, 1000));
-		return page.getContent();
+		statuses = statuses.size() > 0 ? statuses : null;
+		List<POrder> page = repo.getPOrderBySearch(buyerid, vendorid, factoryid, pobuyer, stylebuyer, contractcode,
+				statuses, granttoorgid_link, golivedatefrom, golivedateto);
+		return page;
 
 //		List<POrder> a= repo.getPOrderBySearch(buyerid, vendorid, factoryid, 
 //				pobuyer, 
@@ -649,12 +646,12 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 //		return a;
 	}
 
-	@Override
-	public List<POrder> getPOrderBySearch(Long buyerid, Long vendorid, Long factoryid, String pobuyer,
-			String stylebuyer, String contractcode, Long granttoorgid_link, Date golivedatefrom, Date golivedateto) {
-		return repo.getPOrderBySearch(buyerid, vendorid, factoryid, pobuyer, stylebuyer, contractcode,
-				granttoorgid_link, golivedatefrom, golivedateto);
-	}
+//	@Override
+//	public List<POrder> getPOrderBySearch(Long buyerid, Long vendorid, Long factoryid, String pobuyer,
+//			String stylebuyer, String contractcode, Long granttoorgid_link, Date golivedatefrom, Date golivedateto) {
+//		return repo.getPOrderBySearch(buyerid, vendorid, factoryid, pobuyer, stylebuyer, contractcode,
+//				granttoorgid_link, golivedatefrom, golivedateto);
+//	}
 
 	@Override
 	public List<POrder> get_free_bygolivedate_groupby_product(Date golivedate_from, Date golivedate_to,
@@ -686,23 +683,6 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 	@Override
 	public List<POrder> getByPcontractPO(Long pcontract_poid_link) {
 		return repo.getByPcontractPO(pcontract_poid_link);
-	}
-
-	@Override
-	public List<POrderOrigin> getPOrderOriginBySearch(Long buyerid, Long vendorid, Long factoryid, String pobuyer,
-			String stylebuyer, String contractcode, List<Integer> statuses, Long granttoorgid_link, Date golivedatefrom,
-			Date golivedateto) {
-		// TODO Auto-generated method stub
-		return repoOrigin.getPOrderBySearch(buyerid, vendorid, factoryid, pobuyer, stylebuyer, contractcode, statuses,
-				granttoorgid_link, golivedatefrom, golivedateto);
-	}
-
-	@Override
-	public List<POrderOrigin> getPOrderOriginBySearch(Long buyerid, Long vendorid, Long factoryid, String pobuyer,
-			String stylebuyer, String contractcode, Long granttoorgid_link, Date golivedatefrom, Date golivedateto) {
-		// TODO Auto-generated method stub
-		return repoOrigin.getPOrderBySearch(buyerid, vendorid, factoryid, pobuyer, stylebuyer, contractcode, null,
-				granttoorgid_link, golivedatefrom, golivedateto);
 	}
 
 	@Override

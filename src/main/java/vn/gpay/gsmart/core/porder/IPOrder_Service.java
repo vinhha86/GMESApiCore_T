@@ -67,8 +67,8 @@ public interface IPOrder_Service extends Operations<POrder> {
 			String stylebuyer, String contractcode, List<Integer> statuses, Long granttoorgid_link, Date golivedatefrom,
 			Date golivedateto);
 
-	public List<POrder> getPOrderBySearch(Long buyerid, Long vendorid, Long factoryid, String pobuyer,
-			String stylebuyer, String contractcode, Long granttoorgid_link, Date golivedatefrom, Date golivedateto);
+//	public List<POrder> getPOrderBySearch(Long buyerid, Long vendorid, Long factoryid, String pobuyer,
+//			String stylebuyer, String contractcode, Long granttoorgid_link, Date golivedatefrom, Date golivedateto);
 
 	List<POrder> getby_offer_and_orgs(Long pcontract_poid_link, List<Long> orgs);
 
@@ -79,12 +79,4 @@ public interface IPOrder_Service extends Operations<POrder> {
 	List<POrder> getByPcontractPO(Long pcontract_poid_link);
 
 	Integer getTotalOrder(Long porderid_link);
-
-	// origin
-	public List<POrderOrigin> getPOrderOriginBySearch(Long buyerid, Long vendorid, Long factoryid, String pobuyer,
-			String stylebuyer, String contractcode, List<Integer> statuses, Long granttoorgid_link, Date golivedatefrom,
-			Date golivedateto);
-
-	public List<POrderOrigin> getPOrderOriginBySearch(Long buyerid, Long vendorid, Long factoryid, String pobuyer,
-			String stylebuyer, String contractcode, Long granttoorgid_link, Date golivedatefrom, Date golivedateto);
 }

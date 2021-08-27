@@ -63,7 +63,6 @@ import vn.gpay.gsmart.core.sku.SKU;
 import vn.gpay.gsmart.core.sku.SKU_Attribute_Value;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.ColumnTempNew;
-import vn.gpay.gsmart.core.utils.ColumnTemplate;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.POStatus;
 import vn.gpay.gsmart.core.utils.POType;
@@ -157,7 +156,7 @@ public class UploadAPI {
 
 					// Kiem tra header
 					int rowNum = 2;
-					int colNum = 1, col_phancach1 = 13, col_phancach2 = 0;
+					int colNum = 1, col_phancach1 = ColumnTempNew.vendor_target + 1, col_phancach2 = 0;
 
 					Row row = sheet.getRow(rowNum);
 					Row rowheader = sheet.getRow(0);
@@ -278,11 +277,17 @@ public class UploadAPI {
 									.getStringValue(row.getCell(ColumnTempNew.Style_Set));
 							product_set_code = product_set_code.equals("0") ? "" : product_set_code;
 
-							colNum = ColumnTemplate.amount_style + 1;
-							String s_amount = commonService.getStringValue(row.getCell(ColumnTemplate.amount_style));
+							colNum = ColumnTempNew.Style_Set_Vendor + 1;
+							String product_set_code_vendor = commonService
+									.getStringValue(row.getCell(ColumnTempNew.Style_Set_Vendor));
+							product_set_code_vendor = product_set_code_vendor.equals("0") ? ""
+									: product_set_code_vendor;
+
+							colNum = ColumnTempNew.amount_style + 1;
+							String s_amount = commonService.getStringValue(row.getCell(ColumnTempNew.amount_style));
 							s_amount = s_amount.replace(",", "");
-							int amount = (int) row.getCell(ColumnTemplate.amount_style).getNumericCellValue() == 0 ? 1
-									: (int) row.getCell(ColumnTemplate.amount_style).getNumericCellValue();
+							int amount = (int) row.getCell(ColumnTempNew.amount_style).getNumericCellValue() == 0 ? 1
+									: (int) row.getCell(ColumnTempNew.amount_style).getNumericCellValue();
 
 							if (!product_set_code.equals(null) && !product_set_code.equals("")) {
 								List<Product> product_set = productService.getone_by_code(orgrootid_link,
@@ -291,6 +296,7 @@ public class UploadAPI {
 									Product set = new Product();
 									set.setId(null);
 									set.setBuyercode(product_set_code);
+									set.setVendorcode(product_set_code_vendor);
 									set.setBuyername("");
 									set.setDescription("");
 									set.setOrgrootid_link(orgrootid_link);
@@ -371,9 +377,7 @@ public class UploadAPI {
 							List<Integer> list_soluong = new ArrayList<Integer>();
 
 							Date ShipDate = null;
-							colNum = 14;
-							col_phancach2 = col_phancach1 + 3;
-							String s_header_phancach2 = commonService.getStringValue(rowheader.getCell(col_phancach2));
+							colNum = ColumnTempNew.ns_target + 2;
 
 							try {
 								String s_shipdate = commonService.getStringValue(row.getCell(colNum));
@@ -403,16 +407,17 @@ public class UploadAPI {
 							}
 
 							colNum = col_phancach1 + 3;
-							String s_po_quantity = commonService.getStringValue(row.getCell(col_phancach1 + 2));
+							String s_po_quantity = commonService
+									.getStringValue(row.getCell(ColumnTempNew.ns_target + 3));
 							s_po_quantity = s_po_quantity.replace(",", "");
 							Float f_po_quantity = s_po_quantity.equals("") ? 0 : Float.parseFloat(s_po_quantity);
 							int po_quantity = f_po_quantity.intValue();
 							if (po_quantity > 0)
 								list_soluong.add(po_quantity);
 
+							col_phancach2 = col_phancach1 + 3;
+							String s_header_phancach2 = commonService.getStringValue(rowheader.getCell(col_phancach2));
 							while (!s_header_phancach2.equals("xxx")) {
-								col_phancach2 += 2;
-								s_header_phancach2 = commonService.getStringValue(rowheader.getCell(col_phancach2));
 
 								Date shipdate2 = null;
 								try {
@@ -457,6 +462,10 @@ public class UploadAPI {
 								}
 
 								colNum += 2;
+
+								col_phancach2 += 2;
+								s_header_phancach2 = commonService.getStringValue(rowheader.getCell(col_phancach2));
+
 							}
 
 							// Kiem tra chao gia da ton tai hay chua
@@ -496,7 +505,7 @@ public class UploadAPI {
 
 							int productiondays_ns = ns_target == 0 ? 0 : po_quantity / (ns_target.intValue());
 
-							colNum = ColumnTemplate.matdate + 1;
+							colNum = ColumnTempNew.matdate + 1;
 							Date matdate = null;
 
 							try {
@@ -937,14 +946,16 @@ public class UploadAPI {
 												porderService.createPOrder(porder_req, user);
 										} else {
 											POrder_Req porder_req = list_req.get(0);
-											total = total - porder_req.getTotalorder() + soluong;
+//											total = total - porder_req.getTotalorder() + soluong;
 											porder_req.setTotalorder(total);
 											reqService.save(porder_req);
 										}
 
 									}
-									po_line.setPo_quantity(total);
-									pcontract_POService.save(po_line);
+//									if (product_set_code.equals("")) {
+//										po_line.setPo_quantity(total);
+//										pcontract_POService.save(po_line);
+//									}
 
 									// Kiem tra ns cua san pham trong line
 									List<PContract_PO_Productivity> list_productivity_line = productivityService
@@ -995,7 +1006,7 @@ public class UploadAPI {
 							if (row == null)
 								break;
 
-							STT = commonService.getStringValue(row.getCell(ColumnTemplate.STT));
+							STT = commonService.getStringValue(row.getCell(ColumnTempNew.STT));
 							STT = STT.equals("0") ? "" : STT;
 						}
 					} catch (Exception e) {

@@ -3,8 +3,6 @@ package vn.gpay.gsmart.core.porder;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -83,18 +81,17 @@ public interface IPOrder_Repository extends JpaRepository<POrder, Long>, JpaSpec
 			+ "and (d.buyercode is null or lower(d.buyercode) like lower(concat('%',:stylebuyer,'%'))) "
 			+ "and lower(b.contractcode) like lower(concat('%',:contractcode,'%')) "
 //			+ "and (:statuses is null or a.status in :statuses) "
-			+ "and a.status in :statuses "
+			+ "and (a.status in :statuses or :statuses is null) "
 			+ "and (CAST(:golivedatefrom AS date) IS NULL or a.golivedate >= :golivedatefrom) "
 			+ "and (CAST(:golivedateto AS date) IS NULL or a.golivedate <= :golivedateto) "
 			+ "order by a.granttoorgid_link, d.buyercode, a.golivedate "
 //			+ "limit 0,1000 "
 	)
-	public Page<POrder> getPOrderBySearch(@Param("buyerid") final Long buyerid, @Param("vendorid") final Long vendorid,
+	public List<POrder> getPOrderBySearch(@Param("buyerid") final Long buyerid, @Param("vendorid") final Long vendorid,
 			@Param("factoryid") final Long factoryid, @Param("pobuyer") final String pobuyer,
 			@Param("stylebuyer") final String stylebuyer, @Param("contractcode") final String contractcode,
 			@Param("statuses") final List<Integer> statuses, @Param("granttoorgid_link") final Long granttoorgid_link,
-			@Param("golivedatefrom") final Date golivedatefrom, @Param("golivedateto") final Date golivedateto,
-			Pageable pageable);
+			@Param("golivedatefrom") final Date golivedatefrom, @Param("golivedateto") final Date golivedateto);
 
 	@Query(value = "select a from POrder a " + "inner join PContract b on a.pcontractid_link = b.id "
 			+ "inner join PContract_PO c on a.pcontract_poid_link = c.id "

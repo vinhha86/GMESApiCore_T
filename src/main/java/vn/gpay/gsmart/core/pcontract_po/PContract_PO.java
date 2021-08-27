@@ -98,7 +98,9 @@ public class PContract_PO implements Serializable {
 	private String dc;
 
 	@Transient
-	private int po_quantity_set;
+	private int po_quantity_sp;
+	@Transient
+	private int totalpair;
 
 	public Integer getPo_typeid_link() {
 		return po_typeid_link;
@@ -908,12 +910,20 @@ public class PContract_PO implements Serializable {
 		this.dc = dc;
 	}
 
-	public int getPo_quantity_set() {
-		return po_quantity_set;
+	public int getPo_quantity_sp() {
+		return po_quantity_sp;
 	}
 
-	public void setPo_quantity_set(int po_quantity_set) {
-		this.po_quantity_set = po_quantity_set;
+	public void setPo_quantity_sp(int po_quantity_sp) {
+		this.po_quantity_sp = po_quantity_sp;
+	}
+
+	public int getTotalpair() {
+		return totalpair;
+	}
+
+	public void setTotalpair(int totalpair) {
+		this.totalpair = totalpair;
 	}
 
 }
