@@ -3,9 +3,7 @@ package vn.gpay.gsmart.core.pcontract_po;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.persistence.Entity;
@@ -444,35 +442,9 @@ public class PContract_PO implements Serializable {
 	@Transient
 	public int getAmount_org() {
 		int sum_product = 0;
-		if (parentpoid_link == null) {
-			if (product.getProducttypeid_link() == 5) {
-				HashMap<Long, Integer> lst_org = new HashMap<>();
-
-				for (POrder_Req req : porder_req) {
-					Integer amountInset = req.getAmount_inset();
-					if (amountInset == null)
-						amountInset = 1;
-
-					if (!lst_org.containsKey(req.getGranttoorgid_link())) {
-//    	    			lst_org.put(req.getGranttoorgid_link(), (req.getTotalorder() / req.getAmount_inset()));
-						lst_org.put(req.getGranttoorgid_link(), (req.getTotalorder() / amountInset));
-					}
-
-					int amount_org = lst_org.get(req.getGranttoorgid_link());
-//    	    		amount_org = (req.getTotalorder() / req.getAmount_inset()) < amount_org ? (req.getTotalorder()/req.getAmount_inset()) : amount_org;
-					amount_org = (req.getTotalorder() / amountInset) < amount_org ? (req.getTotalorder() / amountInset)
-							: amount_org;
-					lst_org.replace(req.getGranttoorgid_link(), amount_org);
-				}
-				Set<Long> keySet = lst_org.keySet();
-				for (Long key : keySet) {
-					sum_product += lst_org.get(key);
-				}
-
-			} else {
-				for (POrder_Req req : porder_req) {
-					sum_product += req.getTotalorder();
-				}
+		for (PContract_PO po : sub_po) {
+			if (po.getPo_typeid_link() == POType.PO_LINE_PLAN) {
+				sum_product += po.getPo_quantity();
 			}
 		}
 

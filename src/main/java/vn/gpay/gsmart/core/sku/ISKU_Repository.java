@@ -67,6 +67,19 @@ public interface ISKU_Repository extends JpaRepository<SKU, Long>, JpaSpecificat
 			@Param("producttypeid_link_to") final Integer producttypeid_link_to,
 			@Param("pcontractid_link") final Long pcontractid_link, @Param("productid_link") final Long productid_link);
 
+	@Query(value = "select c from SKU c " + "inner join PContractBOM2SKU a on c.id = a.material_skuid_link "
+			+ "inner join Product b on b.id = c.productid_link "
+			+ "inner join SKU_Attribute_Value d on d.skuid_link = a.product_skuid_link "
+			+ "where a.pcontractid_link = :pcontractid_link " + "and b.producttypeid_link >= :producttypeid_link_from "
+			+ "and b.producttypeid_link < :producttypeid_link_to " + "and a.productid_link =:productid_link "
+			+ "and d.attributeid_link = 4 and d.attributevalueid_link = :colorid_link and a.amount > 0 and a.amount is not null  "
+			+ "group by c")
+	public List<SKU> getbytype_and_pcontract_product_and_color(
+			@Param("producttypeid_link_from") final Integer producttypeid_link_from,
+			@Param("producttypeid_link_to") final Integer producttypeid_link_to,
+			@Param("pcontractid_link") final Long pcontractid_link, @Param("productid_link") final Long productid_link,
+			@Param("colorid_link") final Long colorid_link);
+
 	@Query(value = "select a from SKU a " + "where lower(a.code) like lower(concat('%',:code,'%')) "
 			+ "and a.skutypeid_link >= 20 and a.skutypeid_link < 30 ")
 	public List<SKU> getSkuByCode(@Param("code") final String code);

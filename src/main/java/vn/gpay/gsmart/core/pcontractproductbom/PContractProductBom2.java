@@ -19,17 +19,18 @@ import org.hibernate.annotations.NotFoundAction;
 import vn.gpay.gsmart.core.category.Unit;
 import vn.gpay.gsmart.core.sku.SKU;
 
-@Table(name="pcontract_bom2_product")
+@Table(name = "pcontract_bom2_product")
 @Entity
-public class PContractProductBom2 implements Serializable{/**
-	 * 
-	 */
+public class PContractProductBom2 implements Serializable {
+	/**
+	* 
+	*/
 	private static final long serialVersionUID = 1L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pcontract_bom_product_generator")
-	@SequenceGenerator(name="pcontract_bom_product_generator", sequenceName = "pcontract_bom_product_id_seq", allocationSize=1)
+	@SequenceGenerator(name = "pcontract_bom_product_generator", sequenceName = "pcontract_bom_product_id_seq", allocationSize = 1)
 	private Long id;
-	
+
 	private Long productid_link;
 	private Long materialid_link;
 	private Float amount;
@@ -40,115 +41,116 @@ public class PContractProductBom2 implements Serializable{/**
 	private Long orgrootid_link;
 	private Long pcontractid_link;
 	private Long unitid_link;
-	
+
 //	@NotFound(action = NotFoundAction.IGNORE)
 //	@ManyToOne
 //    @JoinColumn(name="materialid_link",insertable=false,updatable =false)
 //    private Product product;
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="materialid_link",insertable=false,updatable =false)
-    private SKU sku;
-	
+	@JoinColumn(name = "materialid_link", insertable = false, updatable = false)
+	private SKU sku;
+
 //	@NotFound(action = NotFoundAction.IGNORE)
 //	@ManyToOne
 //    @JoinColumn(name="productid_link",insertable=false,updatable =false)
 //    private SKU sku_product;
-	
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="unitid_link",insertable=false,updatable =false)
-    private Unit unit;
-	
+	@JoinColumn(name = "unitid_link", insertable = false, updatable = false)
+	private Unit unit;
+
 	@Transient
 	public String getDescription_product() {
-		if(sku !=null) {
+		if (sku != null) {
 			return sku.getDescription();
 		}
 		return "";
 	}
+
 	@Transient
 	public String getMaterialName() {
-		if(sku !=null) {
+		if (sku != null) {
 			return sku.getProduct_name();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public String getMaterialCode() {
-		if(sku !=null) {
-			return sku.getProduct_code();
+		if (sku != null) {
+			return sku.getCode();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public String getNhaCungCap() {
-		if(sku!=null)
+		if (sku != null)
 			return sku.getPartnercode_product();
 		return "";
 	}
-	
+
 	@Transient
 	public String getTenMauNPL() {
-		if(sku !=null) {
+		if (sku != null) {
 			return sku.getMauSanPham();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public String getTenMauNPL_product() {
-		if(sku !=null) {
+		if (sku != null) {
 			return sku.getMauSanPham_product();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public String getCoKho() {
-		if(sku !=null) {
+		if (sku != null) {
 			return sku.getCoKho();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public String getCoKho_product() {
-		if(sku !=null) {
+		if (sku != null) {
 			return sku.getCoSanPham_product();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public int getProduct_type() {
-		if(sku != null) {
-			return (int)sku.getProducttypeid_link();
+		if (sku != null) {
+			return (int) sku.getProducttypeid_link();
 		}
 		return 0;
 	}
-	
+
 	@Transient
 	public String getProduct_typeName() {
-		if(sku != null) {
+		if (sku != null) {
 			return sku.getProducttype_name();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public String getThanhPhanVai() {
-		if(sku !=null) {
+		if (sku != null) {
 			return sku.getThanhPhanVai();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public String getUnitName() {
-		if(unit !=null) {
+		if (unit != null) {
 			return unit.getCode();
 		}
 		return "";

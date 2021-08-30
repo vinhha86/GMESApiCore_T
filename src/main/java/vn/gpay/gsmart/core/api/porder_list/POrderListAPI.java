@@ -184,7 +184,7 @@ public class POrderListAPI {
 					GPAYDateFormat.atEndOfDay(golivedateto));
 
 			List<PorderOrigin> list = new ArrayList<PorderOrigin>();
-			System.out.println(new Date());
+
 			for (POrder p : list_porder) {
 				PorderOrigin origin = new PorderOrigin();
 				origin.setId(p.getId());
@@ -197,6 +197,8 @@ public class POrderListAPI {
 				origin.setStylebuyer(p.getStylebuyer());
 				origin.setTotalorder(p.getTotalorder());
 				origin.setVendorname(p.getVendorname());
+				origin.setPcontractid_link(p.getPcontractid_link());
+				origin.setProductid_link(p.getProductid_link());
 
 				list.add(origin);
 			}
