@@ -16,7 +16,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import vn.gpay.gsmart.core.timesheet_shift_type.TimesheetShiftType;
+import vn.gpay.gsmart.core.timesheet_shift_type_org.TimesheetShiftTypeOrg;
 
 @Table(name="timesheet_lunch")
 @Entity
@@ -39,7 +39,7 @@ public class TimeSheetLunch implements Serializable {
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="shifttypeid_link",insertable=false,updatable =false)
-    private TimesheetShiftType shifttype;
+    private TimesheetShiftTypeOrg shifttype;
 	
 	@Transient
 	public Integer getShift_from_hour() {

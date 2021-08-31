@@ -8,29 +8,20 @@ import org.springframework.stereotype.Service;
 
 import vn.gpay.gsmart.core.base.AbstractService;
 
+
 @Service
 public class TimesheetShiftTypeService extends AbstractService<TimesheetShiftType> implements ITimesheetShiftTypeService {
+	@Autowired ITimesheetShiftTypeRepository repo;
 
-	@Autowired TimesheetShiftTypeRepository repo;
 	@Override
 	protected JpaRepository<TimesheetShiftType, Long> getRepository() {
 		// TODO Auto-generated method stub
 		return repo;
 	}
-	@Override
-	public List<TimesheetShiftType> getByName(String name) {
-		// TODO Auto-generated method stub
-		return repo.getByName(name);
-	}
-	@Override
-	public List<TimesheetShiftType> getShift1ForAbsence() {
-		// TODO Auto-generated method stub
-		return repo.getShift1ForAbsence();
-	}
-	@Override
-	public List<TimesheetShiftType> getByOrgid_link(Long orgid_link) {
-		// TODO Auto-generated method stub
-		return repo.getByOrgid_link(orgid_link);
-	}
 
+	@Override
+	public List<TimesheetShiftType> getTimesheetShiftType_ByIdOrgid_link(Long id) {
+		// TODO Auto-generated method stub
+		return repo.getTimesheetShiftType_ByIdOrgid_link(id);
+	}
 }

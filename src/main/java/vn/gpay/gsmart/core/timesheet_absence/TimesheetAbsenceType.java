@@ -18,7 +18,7 @@ public class TimesheetAbsenceType implements Serializable{
 	@SequenceGenerator(name="timesheet_absence_type_generator", sequenceName = "timesheet_absence_type_id_seq", allocationSize=1)
 	private Long id;
 	private String name;
-	
+	private Integer percent;
 	public Long getId() {
 		return id;
 	}
@@ -30,5 +30,11 @@ public class TimesheetAbsenceType implements Serializable{
 	}
 	public void setName(String name) {
 		this.name = name;
+	}
+	public Integer getPercent() {
+		return percent;
+	}
+	public void setPercent(Integer percent) {
+		this.percent = percent;
 	}
 }

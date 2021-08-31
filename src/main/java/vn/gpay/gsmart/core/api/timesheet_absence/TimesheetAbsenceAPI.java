@@ -26,6 +26,7 @@ import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.timesheet_absence.ITimesheetAbsenceService;
 import vn.gpay.gsmart.core.timesheet_absence.ITimesheetAbsenceTypeService;
 import vn.gpay.gsmart.core.timesheet_absence.TimesheetAbsence;
+import vn.gpay.gsmart.core.timesheet_absence.TimesheetAbsenceType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -269,4 +270,38 @@ public class TimesheetAbsenceAPI {
 		    return new ResponseEntity<ResponseBase>(HttpStatus.OK);
 		}    			
 	}
+	//them loai nghi viec
+	@RequestMapping(value = "/add_timesheetabsencetype",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> add_TimeSheetAbsenceType(@RequestBody TimeSheetAbsenceType_add_request entity ,HttpServletRequest request) {
+		ResponseBase response = new ResponseBase();
+		try {
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			TimesheetAbsenceType data = entity.data;
+			timesheetAbsenceTypeService.save(data);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());			
+		    return new ResponseEntity<ResponseBase>(HttpStatus.OK);
+		}    			
+	}
+	//xoa loai nghi viec
+		@RequestMapping(value = "/delete_timesheetabsencetype",method = RequestMethod.POST)
+		public ResponseEntity<ResponseBase> delete_TimeSheetAbsenceType(@RequestBody TimeSheetAbsenceType_delete_request entity ,HttpServletRequest request) {
+			ResponseBase response = new ResponseBase();
+			try {
+
+				TimesheetAbsenceType data = entity.data;
+				timesheetAbsenceTypeService.delete(data);
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
+				return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+			}catch (Exception e) {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage(e.getMessage());			
+			    return new ResponseEntity<ResponseBase>(HttpStatus.OK);
+			}    			
+		}
 }

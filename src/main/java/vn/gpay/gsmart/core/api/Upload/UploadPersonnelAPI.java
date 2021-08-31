@@ -28,6 +28,10 @@ import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.personel.IPersonnel_Service;
 import vn.gpay.gsmart.core.personel.Personel;
+import vn.gpay.gsmart.core.personnel_history.IPersonnel_His_Service;
+import vn.gpay.gsmart.core.personnel_history.Personnel_His;
+import vn.gpay.gsmart.core.personnel_position.IPersonnel_Position_Service;
+import vn.gpay.gsmart.core.personnel_position.Personnel_Position;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ColumnPersonnel;
 import vn.gpay.gsmart.core.utils.ColumnTemplate;
@@ -43,7 +47,11 @@ public class UploadPersonnelAPI {
 	IPersonnel_Service personnel_service;
 	@Autowired
 	IOrgService org_service;
-
+	@Autowired 
+	IPersonnel_His_Service personnel_his_service;
+	@Autowired
+	IPersonnel_Position_Service personnel_position_service;
+	
 	@RequestMapping(value = "/personnel", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadPersonnel(HttpServletRequest request,
 			@RequestParam("file") MultipartFile file, @RequestParam("orgmanageid_link") long orgmanageid_link) {
@@ -128,7 +136,7 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) > 0) {
 									NgaySinh = new SimpleDateFormat("dd/MM/yyyy").parse(ngaySinh);
 								} else {
-									mes_err = "Định dạng ngày sinh không đúng dd/MM/yyyy! ở dòng: " + (rowNum + 1);
+									mes_err = " Định dạng ngày sinh không đúng dd/MM/yyyy! ở dòng TT : " + rowNum ;
 								}
 							} else if (ngaySinh != ""){
 								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgaySinh))) {
@@ -142,8 +150,24 @@ public class UploadPersonnelAPI {
 						}
 
 						String BoPhan = commonService.getStringValue(row.getCell(ColumnPersonnel.BoPhan));
-//						String ChucVu= commonService.getStringValue(row.getCell(ColumnPersonnel.ChucVu));
-//						String ChucVuBH =commonService.getStringValue(row.getCell(ColumnPersonnel.ChucVutrongBH));
+						
+						String ChucVu= commonService.getStringValue(row.getCell(ColumnPersonnel.ChucVu));
+						String ChucVuBH =commonService.getStringValue(row.getCell(ColumnPersonnel.ChucVutrongBH));
+						//kiem tra chu vu trong DB, neu chua co thi them chuc vu vao DB
+						Personnel_Position personnel_Position = personnel_position_service.getByName_Code(ChucVuBH, ChucVu);
+						Long positionid_link;
+						if(personnel_Position != null) {
+							 positionid_link = personnel_Position.getId();
+						}else {
+							personnel_Position = new Personnel_Position();
+							personnel_Position.setCode(ChucVu);
+							personnel_Position.setName(ChucVuBH);
+							Personnel_Position per_positionid = personnel_position_service.save(personnel_Position);
+							positionid_link =per_positionid.getId();
+						}
+						
+						
+					
 //						String Bac = commonService.getStringValue(row.getCell(ColumnPersonnel.Bac));
 //						String MaBacLuongBH = commonService.getStringValue(row.getCell(ColumnPersonnel.MaBacluongBH));
 //						String HeSoLuong = commonService.getStringValue(row.getCell(ColumnPersonnel.HeSoLuongBH));
@@ -159,7 +183,7 @@ public class UploadPersonnelAPI {
 						if (lst_bp.size() != 0) {
 							orgid_link = lst_bp.get(0).getId();
 						} else {
-							mes_err = "Bộ phận không tồn tại! " + " ở dòng " + (rowNum + 1) + " cột Bộ Phận ";
+							mes_err = " Bộ phận không tồn tại! " + " ở dòng " + rowNum  + " cột Bộ Phận ";
 						
 						}
 
@@ -173,7 +197,7 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayVaoCT = new SimpleDateFormat("dd/MM/yyyy").parse(ngayVaoCT);
 								} else {
-									mes_err = "Định dạng ngày vào CT không đúng dd/MM/yyyy! "+ " ở dòng TT " + (rowNum + 1);
+									mes_err = " Định dạng ngày vào CT không đúng dd/MM/yyyy! "+ " ở dòng TT: " + rowNum  ;
 								}
 
 							} else if(ngayVaoCT != ""){
@@ -198,7 +222,7 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayThoiViec = new SimpleDateFormat("dd/MM/yyyy").parse(ngayThoiViec);
 								} else {
-									mes_err = "Định dạng ngày thôi việc không đúng dd/MM/yyyy! "+ " ở dòng " + (rowNum + 1);
+									mes_err = " Định dạng ngày thôi việc không đúng dd/MM/yyyy! "+ " ở dòng TT" + rowNum ;
 								}
 
 							} else if(ngayThoiViec != ""){
@@ -223,7 +247,7 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayKiHDTV = new SimpleDateFormat("dd/MM/yyyy").parse(ngayKiHDTV);
 								} else {
-									mes_err = "Định dạng ngày kí HDTV không đúng dd/MM/yyyy! "+ " ở dòng " + (rowNum + 1);
+									mes_err = " Định dạng ngày kí HDTV không đúng dd/MM/yyyy! "+ " ở dòng TT" + rowNum ;
 								}
 
 							} else if(ngayKiHDTV != ""){
@@ -248,7 +272,7 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayKiHDCTH = new SimpleDateFormat("dd/MM/yyyy").parse(ngayKiHDCTH);
 								} else {
-									mes_err = "Định dạng ngày kí HDCTH không đúng dd/MM/yyyy! "+ " ở dòng " + (rowNum + 1);
+									mes_err = " Định dạng ngày kí HDCTH không đúng dd/MM/yyyy! "+ " ở dòng TT" + rowNum ;
 								}
 
 							} else if(ngayKiHDCTH != ""){
@@ -273,7 +297,7 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayKiHDVTH = new SimpleDateFormat("dd/MM/yyyy").parse(ngayKiHDVTH);
 								} else {
-									mes_err = "Định dạng ngày kí HDVTH không đúng dd/MM/yyyy! "+ " ở dòng " + (rowNum + 1);
+									mes_err = " Định dạng ngày kí HDVTH không đúng dd/MM/yyyy! "+ " ở dòng TT" + rowNum ;
 								}
 
 							} else if(ngayKiHDVTH != ""){
@@ -298,7 +322,7 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayDongBH = new SimpleDateFormat("dd/MM/yyyy").parse(ngayDongBH);
 								} else {
-									mes_err = "Định dạng ngày đóng BH không đúng dd/MM/yyyy! "+ " ở dòng " + (rowNum + 1);
+									mes_err = " Định dạng ngày đóng BH không đúng dd/MM/yyyy! "+ " ở dòng TT" + rowNum ;
 								}
 
 							} else if(ngayDongBH != ""){
@@ -333,7 +357,7 @@ public class UploadPersonnelAPI {
 							tinh = lst_tinh.get(0).getId();
 						} else {
 
-							mes_err = "Tỉnh không tồn tại! " + " ở dòng " + (rowNum + 1) + " cột Tỉnh T.phố ";
+							mes_err = " Tỉnh không tồn tại! " + " ở dòng " + rowNum + " cột Tỉnh T.phố " ;
 							
 						}
 
@@ -345,7 +369,7 @@ public class UploadPersonnelAPI {
 							huyen = lst_huyen.getId();
 						} else {
 
-							mes_err = "Huyện không tồn tại! " + " ở dòng " + (rowNum + 1) + " cột Quận - Huyện ";
+							mes_err = " Huyện không tồn tại! " + " ở dòng " + rowNum + " cột Quận - Huyện " ;
 							
 						}
 						// kiem tra xa trong danh sach huyen orgtypeid_link = 27;
@@ -355,7 +379,7 @@ public class UploadPersonnelAPI {
 							xa = lst_xa.getId();
 						} else {
 
-							mes_err = "Xã không tồn tại! " + " ở dòng " + (rowNum + 1) + " cột Xã - Phường ";
+							mes_err = " Xã không tồn tại! " + " ở dòng " + rowNum + " cột Xã - Phường " ; 
 							
 						}
 
@@ -371,7 +395,7 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayCap = new SimpleDateFormat("dd/MM/yyyy").parse(ngayCap);
 								} else {
-									mes_err = "Định dạng ngày cấp không đúng dd/MM/yyyy! ở dòng TT" + (rowNum + 1) ;
+									mes_err = " Định dạng ngày cấp không đúng dd/MM/yyyy! ở dòng TT" + rowNum ;
 									
 								}
 							} else  if(ngayCap != ""){
@@ -400,7 +424,7 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayCapMoi = new SimpleDateFormat("dd/MM/yyyy").parse(ngayCapMoi);
 								} else {
-									mes_err = "Định dạng ngày cấp mới không đúng dd/MM/yyyy! "+ " ở dòng TT" + (rowNum + 1);
+									mes_err = " Định dạng ngày cấp mới không đúng dd/MM/yyyy! "+ " ở dòng TT " + rowNum;
 								}
 							} else  if(ngayCapMoi != ""){
 								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayCapMoi))) {
@@ -463,8 +487,35 @@ public class UploadPersonnelAPI {
 						person.setHealthinfo(SK);
 						person.setInsurance_number(SoSBH);
 
-						personnel_service.save(person);
-
+						//luu nhan vien
+						Personel personnel= personnel_service.save(person);
+						Long personnelid_link =personnel.getId();
+						
+						
+						//luu chuc vu
+						
+						int type = 1;//chu vu type =1 
+					//	Date decision_date = new SimpleDateFormat("dd/MM/yyyy").parse("01/08/2021");
+						Personnel_His personnel_His = new Personnel_His();
+						List<Personnel_His> lst_personnel_His =personnel_his_service.gethis_by_person(personnelid_link);
+						//neu da co trong danh sach roi-> update
+						if(lst_personnel_His.size() != 0) {
+							personnel_His.setId(lst_personnel_His.get(0).getId());
+							personnel_His.setPositionid_link(positionid_link);				
+							personnel_His.setType(type);
+							personnel_His.setDecision_date(NgayKiHDCTH);
+							personnel_His.setPersonnelid_link(personnelid_link);
+						}//neu khong co trong danh sach thi tao moi
+						else {
+							
+							personnel_His.setPositionid_link(positionid_link);				
+							personnel_His.setType(type);
+							personnel_His.setDecision_date(NgayKiHDCTH);
+							personnel_His.setPersonnelid_link(personnelid_link);
+						}
+						personnel_his_service.save(personnel_His);
+						
+						
 						response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 						response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 
