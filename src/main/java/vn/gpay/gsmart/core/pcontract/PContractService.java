@@ -155,15 +155,15 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 					.add(cb.equal(rootPcontract.get("contractbuyer").get("contract_code"), entity.contractbuyer_code));
 		}
 		// contractbuyer_yearfrom
-//		if (Objects.nonNull(entity.contractbuyer_yearfrom)) {
-//			thePredicates
-//					.add(cb.ge(rootPcontract.get("contractbuyer").get("contract_year"), entity.contractbuyer_yearfrom));
-//		}
-//		// contractbuyer_yearto
-//		if (Objects.nonNull(entity.contractbuyer_yearto)) {
-//			thePredicates
-//					.add(cb.le(rootPcontract.get("contractbuyer").get("contract_year"), entity.contractbuyer_yearto));
-//		}
+		if (Objects.nonNull(entity.contractbuyer_yearfrom)) {
+			thePredicates
+					.add(cb.ge(rootPcontract.get("contractbuyer").get("contract_year"), entity.contractbuyer_yearfrom));
+		}
+		// contractbuyer_yearto
+		if (Objects.nonNull(entity.contractbuyer_yearto)) {
+			thePredicates
+					.add(cb.le(rootPcontract.get("contractbuyer").get("contract_year"), entity.contractbuyer_yearto));
+		}
 
 		// vendor
 		if (vendors.size() > 0) {
@@ -185,6 +185,11 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 
 		Predicate p = cb.and(thePredicates.toArray(new Predicate[0]));
 		cq_po.where(p);
+
+//		List<Order> orderList = new ArrayList<Order>();
+//
+//		orderList.add(cb.desc(rootPcontract.get("datecreated")));
+//		cq_po.orderBy(orderList);
 
 		List<PContract> lst = em.createQuery(cq_po).getResultList();
 		return lst;

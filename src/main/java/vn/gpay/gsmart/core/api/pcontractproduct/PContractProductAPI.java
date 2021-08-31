@@ -526,6 +526,7 @@ public class PContractProductAPI {
 				binding.setAmount(pcontract_POService.getTotalProductinPcontract(pcontractid_link,
 						pContractProduct.getProductid_link()));
 				binding.setPrice(priceService.getTotalPrice(pcontractid_link, pContractProduct.getProductid_link()));
+				binding.setProductVendorCode(pContractProduct.getProductVendorCode());
 
 				String uploadRootPath = request.getServletContext().getRealPath("");
 				File uploadRootDir = new File(uploadRootPath);
@@ -567,6 +568,7 @@ public class PContractProductAPI {
 				binding.setAmount(
 						pcontract_POService.getTotalProductinPcontract(pcontractid_link, pair.getProductpairid_link()));
 				binding.setPrice(priceService.getTotalPrice(pcontractid_link, pair.getProductpairid_link()));
+				binding.setProductVendorCode(pair.getproductpairVendorCode());
 
 				data.add(binding);
 			}

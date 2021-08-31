@@ -13,6 +13,8 @@ public class POrderOrigin {
 	private Date golivedate;
 	private Integer totalorder;
 	private String statusName;
+	private Long pcontractid_link;
+	private Long productid_link;
 
 	public Long getId() {
 		return id;
@@ -92,6 +94,22 @@ public class POrderOrigin {
 
 	public void setStatusName(String statusName) {
 		this.statusName = statusName;
+	}
+
+	public Long getPcontractid_link() {
+		return pcontractid_link;
+	}
+
+	public Long getProductid_link() {
+		return productid_link;
+	}
+
+	public void setPcontractid_link(Long pcontractid_link) {
+		this.pcontractid_link = pcontractid_link;
+	}
+
+	public void setProductid_link(Long productid_link) {
+		this.productid_link = productid_link;
 	}
 
 }

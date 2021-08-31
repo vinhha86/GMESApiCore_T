@@ -20,6 +20,7 @@ public class ProductTree implements Serializable {
 	private byte[] imgproduct;
 	private Integer amount;
 	private Float price;
+	private String vendorcode;
 
 	public String getIconCls() {
 		return "x-tree-node-icon";
@@ -105,5 +106,13 @@ public class ProductTree implements Serializable {
 
 	public void setPrice(Float price) {
 		this.price = price;
+	}
+
+	public String getVendorcode() {
+		return vendorcode;
+	}
+
+	public void setVendorcode(String vendorcode) {
+		this.vendorcode = vendorcode;
 	}
 }

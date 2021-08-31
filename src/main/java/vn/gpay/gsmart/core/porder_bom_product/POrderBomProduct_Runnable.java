@@ -100,7 +100,7 @@ public class POrderBomProduct_Runnable implements Runnable {
 				Float total_amount = (float) 0;
 				int total_size = 0;
 
-//				boolean check = false;
+				boolean check = false;
 				long materialid_link = pContractProductBom.getMaterialid_link();
 				for (Long size : List_size) {
 					List<POrderBOMSKU> listbomsku_clone = new ArrayList<POrderBOMSKU>(listbomsku);
@@ -134,8 +134,8 @@ public class POrderBomProduct_Runnable implements Runnable {
 					map.put(size + "_KT", amount_size_kt + "");
 					map.put(size + "_SX", amount_size_sx + "");
 
-					if (amount_size > 0 || amount_size_kt > 0) {
-//						check = true;
+					if (amount_size > 0) {
+						check = true;
 						total_amount += amount_size;
 						total_size++;
 					}
@@ -145,8 +145,8 @@ public class POrderBomProduct_Runnable implements Runnable {
 					map.put("amount", "0" + (total_amount / total_size));
 				else
 					map.put("amount", "0");
-//				if (check)
-				listdata.add(map);
+				if (check)
+					listdata.add(map);
 				listbom.remove(pContractProductBom);
 			}
 		} catch (Exception e) {

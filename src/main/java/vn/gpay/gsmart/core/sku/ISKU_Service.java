@@ -24,6 +24,9 @@ public interface ISKU_Service extends Operations<SKU> {
 	public List<SKU> getnpl_by_pcontract_product(Integer producttypeid_link, Long pcontractid_link,
 			Long productid_link);
 
+	public List<SKU> getnpl_by_pcontract_product_and_color(Integer producttypeid_link, Long pcontractid_link,
+			Long productid_link, Long colorid_link);
+
 	public List<SKU> getSkuByCode(String code);
 
 	public List<SKU> getSkuByCodeAndType(String code, Integer typeFrom, Integer typeTo);

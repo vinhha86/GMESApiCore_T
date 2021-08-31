@@ -23,7 +23,7 @@ import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
-import vn.gpay.gsmart.core.porder.PorderOrigin;
+import vn.gpay.gsmart.core.porder.POrderOrigin;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
@@ -183,10 +183,10 @@ public class POrderListAPI {
 					stylebuyer, contractcode, statuses, granttoorgid_link, GPAYDateFormat.atStartOfDay(golivedatefrom),
 					GPAYDateFormat.atEndOfDay(golivedateto));
 
-			List<PorderOrigin> list = new ArrayList<PorderOrigin>();
-			System.out.println(new Date());
+			List<POrderOrigin> list = new ArrayList<POrderOrigin>();
+
 			for (POrder p : list_porder) {
-				PorderOrigin origin = new PorderOrigin();
+				POrderOrigin origin = new POrderOrigin();
 				origin.setId(p.getId());
 				origin.setBuyername(p.getBuyername());
 				origin.setGolivedate(p.getGolivedate());
@@ -197,6 +197,8 @@ public class POrderListAPI {
 				origin.setStylebuyer(p.getStylebuyer());
 				origin.setTotalorder(p.getTotalorder());
 				origin.setVendorname(p.getVendorname());
+				origin.setPcontractid_link(p.getPcontractid_link());
+				origin.setProductid_link(p.getProductid_link());
 
 				list.add(origin);
 			}

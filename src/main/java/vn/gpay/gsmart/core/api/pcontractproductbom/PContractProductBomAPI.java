@@ -191,6 +191,28 @@ public class PContractProductBomAPI {
 		return new ResponseEntity<getNPL_by_pcontract_response>(response, HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/getlist_npl_by_pcontract_product_color", method = RequestMethod.POST)
+	public ResponseEntity<getNPL_by_pcontract_response> GetListNPLColor(HttpServletRequest request,
+			@RequestBody getNPL_byPContract_Product_Color_request entity) {
+		getNPL_by_pcontract_response response = new getNPL_by_pcontract_response();
+		try {
+			long pcontractid_link = entity.pcontractid_link;
+			int producttypeid_link = entity.producttypeid_link;
+			long productid_link = entity.productid_link;
+			long colorid_link = entity.colorid_link;
+
+			response.data = skuService.getnpl_by_pcontract_product_and_color(producttypeid_link, pcontractid_link,
+					productid_link, colorid_link);
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<getNPL_by_pcontract_response>(response, HttpStatus.OK);
+	}
+
 	@RequestMapping(value = "/confim_bom1", method = RequestMethod.POST)
 	public ResponseEntity<confim_bom1_response> ConfimBom1(HttpServletRequest request,
 			@RequestBody confim_bom1_request entity) {

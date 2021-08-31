@@ -558,18 +558,16 @@ public class POrderBomAPI {
 				mapsku.put(sku_av.getColorid() + "_" + sku_av.getSizeid(), sku_av.getSkuid_link());
 			}
 
-			while (listbom.size() > 0) {
-				CountDownLatch latch = new CountDownLatch(listbom.size());
-				for (POrderBomProduct pContractProductBom : listbom) {
+			CountDownLatch latch = new CountDownLatch(listbom.size());
+			for (POrderBomProduct pContractProductBom : listbom) {
 
-					// Chay de lay tung mau san pham
-					POrderBomProduct_Runnable bom2 = new POrderBomProduct_Runnable(list_colorid, pContractProductBom,
-							List_size, listbomsku, listbomsku_kythuat, listbomsku_sanxuat, listdata, latch, mapcolor,
-							mapsku, listbom);
-					bom2.start();
-				}
-				latch.await();
+				// Chay de lay tung mau san pham
+				POrderBomProduct_Runnable bom2 = new POrderBomProduct_Runnable(list_colorid, pContractProductBom,
+						List_size, listbomsku, listbomsku_kythuat, listbomsku_sanxuat, listdata, latch, mapcolor,
+						mapsku, listbom);
+				bom2.start();
 			}
+			latch.await();
 
 			// lay trang thai cua dinh muc
 			response.isbomdone = porder.getIsbomdone() == null ? false : porder.getIsbomdone();
