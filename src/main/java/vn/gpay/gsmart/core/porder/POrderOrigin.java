@@ -2,7 +2,7 @@ package vn.gpay.gsmart.core.porder;
 
 import java.util.Date;
 
-public class PorderOrigin {
+public class POrderOrigin {
 	private Long id;
 	private String ordercode;
 	private String stylebuyer;
