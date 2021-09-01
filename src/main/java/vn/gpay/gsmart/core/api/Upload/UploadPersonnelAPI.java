@@ -25,7 +25,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.org.IOrgService;
+import vn.gpay.gsmart.core.org.IOrgTypeService;
 import vn.gpay.gsmart.core.org.Org;
+import vn.gpay.gsmart.core.org.OrgType;
 import vn.gpay.gsmart.core.personel.IPersonnel_Service;
 import vn.gpay.gsmart.core.personel.Personel;
 import vn.gpay.gsmart.core.personnel_history.IPersonnel_His_Service;
@@ -47,6 +49,8 @@ public class UploadPersonnelAPI {
 	IPersonnel_Service personnel_service;
 	@Autowired
 	IOrgService org_service;
+	@Autowired
+	IOrgTypeService org_type_service;
 	@Autowired 
 	IPersonnel_His_Service personnel_his_service;
 	@Autowired
@@ -137,6 +141,7 @@ public class UploadPersonnelAPI {
 									NgaySinh = new SimpleDateFormat("dd/MM/yyyy").parse(ngaySinh);
 								} else {
 									mes_err = " Định dạng ngày sinh không đúng dd/MM/yyyy! ở dòng TT : " + rowNum ;
+									break;
 								}
 							} else if (ngaySinh != ""){
 								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgaySinh))) {
@@ -183,8 +188,23 @@ public class UploadPersonnelAPI {
 						if (lst_bp.size() != 0) {
 							orgid_link = lst_bp.get(0).getId();
 						} else {
-							mes_err = " Bộ phận không tồn tại! " + " ở dòng " + rowNum  + " cột Bộ Phận ";
-						
+							//nếu chưa có thì thêm bộ phận vào DB
+							Org org = new Org();
+							OrgType org_type = new OrgType();
+							org_type.setName(BoPhan);
+							OrgType id_org_type = org_type_service.save(org_type);
+							org.setCode(BoPhan);
+							org.setName(BoPhan);
+							org.setOrgtypeid_link((int)id_org_type.getId());
+							org.setStatus(1);
+							org.setParentid_link(parentid_link);
+							org.setOrgrootid_link((long)1);
+							
+							//luu bộ phận vào DB
+							Org org_id = org_service.save(org);
+							orgid_link = org_id.getId();
+							//mes_err = " Bộ phận không tồn tại! " + " ở dòng " + rowNum  + " cột Bộ Phận ";
+							//break;
 						}
 
 						// ngay vao cong ty
@@ -198,6 +218,7 @@ public class UploadPersonnelAPI {
 									NgayVaoCT = new SimpleDateFormat("dd/MM/yyyy").parse(ngayVaoCT);
 								} else {
 									mes_err = " Định dạng ngày vào CT không đúng dd/MM/yyyy! "+ " ở dòng TT: " + rowNum  ;
+									break;
 								}
 
 							} else if(ngayVaoCT != ""){
@@ -223,6 +244,7 @@ public class UploadPersonnelAPI {
 									NgayThoiViec = new SimpleDateFormat("dd/MM/yyyy").parse(ngayThoiViec);
 								} else {
 									mes_err = " Định dạng ngày thôi việc không đúng dd/MM/yyyy! "+ " ở dòng TT" + rowNum ;
+									break;
 								}
 
 							} else if(ngayThoiViec != ""){
@@ -248,6 +270,7 @@ public class UploadPersonnelAPI {
 									NgayKiHDTV = new SimpleDateFormat("dd/MM/yyyy").parse(ngayKiHDTV);
 								} else {
 									mes_err = " Định dạng ngày kí HDTV không đúng dd/MM/yyyy! "+ " ở dòng TT" + rowNum ;
+									break;
 								}
 
 							} else if(ngayKiHDTV != ""){
@@ -273,6 +296,7 @@ public class UploadPersonnelAPI {
 									NgayKiHDCTH = new SimpleDateFormat("dd/MM/yyyy").parse(ngayKiHDCTH);
 								} else {
 									mes_err = " Định dạng ngày kí HDCTH không đúng dd/MM/yyyy! "+ " ở dòng TT" + rowNum ;
+									break;
 								}
 
 							} else if(ngayKiHDCTH != ""){
@@ -298,6 +322,7 @@ public class UploadPersonnelAPI {
 									NgayKiHDVTH = new SimpleDateFormat("dd/MM/yyyy").parse(ngayKiHDVTH);
 								} else {
 									mes_err = " Định dạng ngày kí HDVTH không đúng dd/MM/yyyy! "+ " ở dòng TT" + rowNum ;
+									break;
 								}
 
 							} else if(ngayKiHDVTH != ""){
@@ -323,6 +348,7 @@ public class UploadPersonnelAPI {
 									NgayDongBH = new SimpleDateFormat("dd/MM/yyyy").parse(ngayDongBH);
 								} else {
 									mes_err = " Định dạng ngày đóng BH không đúng dd/MM/yyyy! "+ " ở dòng TT" + rowNum ;
+									break;
 								}
 
 							} else if(ngayDongBH != ""){
@@ -358,7 +384,7 @@ public class UploadPersonnelAPI {
 						} else {
 
 							mes_err = " Tỉnh không tồn tại! " + " ở dòng " + rowNum + " cột Tỉnh T.phố " ;
-							
+							break;
 						}
 
 						// kiem tra huyen trong danh sach tinh orgtypeid_link = 26;
@@ -370,7 +396,7 @@ public class UploadPersonnelAPI {
 						} else {
 
 							mes_err = " Huyện không tồn tại! " + " ở dòng " + rowNum + " cột Quận - Huyện " ;
-							
+							break;
 						}
 						// kiem tra xa trong danh sach huyen orgtypeid_link = 27;
 						Long xa = null;
@@ -380,7 +406,7 @@ public class UploadPersonnelAPI {
 						} else {
 
 							mes_err = " Xã không tồn tại! " + " ở dòng " + rowNum + " cột Xã - Phường " ; 
-							
+							break;
 						}
 
 						// String NgayCap =
@@ -396,7 +422,7 @@ public class UploadPersonnelAPI {
 									NgayCap = new SimpleDateFormat("dd/MM/yyyy").parse(ngayCap);
 								} else {
 									mes_err = " Định dạng ngày cấp không đúng dd/MM/yyyy! ở dòng TT" + rowNum ;
-									
+									break;
 								}
 							} else  if(ngayCap != ""){
 								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayCap))) {
@@ -425,6 +451,7 @@ public class UploadPersonnelAPI {
 									NgayCapMoi = new SimpleDateFormat("dd/MM/yyyy").parse(ngayCapMoi);
 								} else {
 									mes_err = " Định dạng ngày cấp mới không đúng dd/MM/yyyy! "+ " ở dòng TT " + rowNum;
+									break;
 								}
 							} else  if(ngayCapMoi != ""){
 								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayCapMoi))) {

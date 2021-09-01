@@ -48,5 +48,11 @@ public class Personnel_His_Service extends AbstractService<Personnel_His> implem
 		else
 			return list.get(1);
 	}
+	@Override
+	public List<Personnel_His> getHis_personByType_Id(Long personnelid_link, Integer type) {
+		// TODO Auto-generated method stub
+		return repo.getHis_personByType_Id(personnelid_link, type);
+	}
+	
 
 }

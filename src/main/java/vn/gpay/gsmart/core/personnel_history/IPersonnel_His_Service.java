@@ -9,4 +9,5 @@ public interface IPersonnel_His_Service extends Operations<Personnel_His> {
 	Long getmaxid_bytype_andperson(Long personnelid_link, int type);
 	Long getpreid_bytype_andperson(Long personnelid_link, int type);
 	Personnel_His getprehis_bytype_andperson(Long personnelid_link, int type);
+	List<Personnel_His> getHis_personByType_Id(Long personnelid_link, Integer type);
 }

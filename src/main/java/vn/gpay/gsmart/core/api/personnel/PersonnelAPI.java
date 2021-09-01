@@ -253,6 +253,17 @@ public class PersonnelAPI {
 			Personnel_His person_his = entity.data;
 			Personel person = personService.findOne(entity.data.getPersonnelid_link());
 			if (person_his.getId() == null) {
+				//kiểm tra xem ngày quyết định mới có lơn hơn ngày quyết định cũ không, nếu nhỏ hơn thì không được thêm mới quyết định
+				List<Personnel_His> perhis = hispersonService.getHis_personByType_Id(person_his.getPersonnelid_link(), person_his.getType());
+				//nếu ngày quyết định nhỏ hơn ngày đã tồn tại
+				if(perhis.size()!=0) {
+					if(person_his.getDecision_date().compareTo(perhis.get(0).getDecision_date())<0) {
+						response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+						response.setMessage("Ngày quyết định không đúng");
+						return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+					}
+				}
+				
 				if (person_his.getType() == 1) {
 					person.setPositionid_link(person_his.getPositionid_link());
 				} else if (person_his.getType() == 2) {

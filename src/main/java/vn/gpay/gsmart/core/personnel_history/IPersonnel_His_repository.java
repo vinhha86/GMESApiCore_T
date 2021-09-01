@@ -22,4 +22,11 @@ public interface IPersonnel_His_repository extends JpaRepository<Personnel_His, 
 	public List<Personnel_His> getmaxid_bytype_andperson(
 			@Param ("personnelid_link")final Long personnelid_link,
 			@Param ("type")final Integer type);
+	//lay personnel_his theo ngày mới nhất
+	@Query("SELECT c FROM Personnel_His c where c.personnelid_link = :personnelid_link "
+			+ " and c.type = :type "
+			+ "order by decision_date desc ")
+	public List<Personnel_His> getHis_personByType_Id(
+			@Param ("personnelid_link")final Long personnelid_link,
+			@Param ("type")final Integer type);
 }
