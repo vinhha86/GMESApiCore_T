@@ -20,6 +20,7 @@ import vn.gpay.gsmart.core.category.LaborLevel;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.salary.OrgSal_Level;
 import vn.gpay.gsmart.core.salary.OrgSal_Type;
+import vn.gpay.gsmart.core.timesheet_shift_type.TimesheetShiftType;
 
 @Table(name="personnel")
 @Entity
@@ -70,7 +71,7 @@ public class Personel implements Serializable {
 	private String place_idnumber; //nơi cấp chứng minh thư
 	private String healthinfo;// loại sức khỏe
 	private String insurance_number;//số sổ bảo hiểm
-	
+	private Long timesheet_absence_type_id_link;
 	
 	
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -146,7 +147,19 @@ public class Personel implements Serializable {
 		}
 		return "";
 	}
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="timesheet_absence_type_id_link",insertable=false,updatable =false)
+    private TimesheetShiftType timesheetshifttype;
 	
+	
+	@Transient
+	public String getShiftName() {
+		if(timesheetshifttype!=null) {
+			return timesheetshifttype.getName();
+		}
+		return "";
+	}
 	
 	public Long getId() {
 		return id;
@@ -405,6 +418,12 @@ public class Personel implements Serializable {
 	}
 	public void setPlace_idnumber(String place_idnumber) {
 		this.place_idnumber = place_idnumber;
+	}
+	public Long getTimesheet_absence_type_id_link() {
+		return timesheet_absence_type_id_link;
+	}
+	public void setTimesheet_absence_type_id_link(Long timesheet_absence_type_id_link) {
+		this.timesheet_absence_type_id_link = timesheet_absence_type_id_link;
 	}
 	
 	

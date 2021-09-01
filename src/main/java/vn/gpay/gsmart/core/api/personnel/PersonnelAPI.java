@@ -578,4 +578,30 @@ public class PersonnelAPI {
 			return new ResponseEntity<getperson_byorg_response>(response, HttpStatus.OK);
 		}
 	}
+	/**
+	 * thêm ca làm việc mặc định
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/addshift_personnel", method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> AddShift_Personnel(@RequestBody personnel_addshift_request entity) {
+		ResponseBase response = new ResponseBase();
+		try {
+			Personel person = new Personel();
+			for(int i =0; i<entity.data.size(); i++) {
+				person = personService.getPersonelBycode(entity.data.get(i));
+	
+				person.setTimesheet_absence_type_id_link(entity.timesheet_absence_type_id_link);
+				personService.save(person);
+			}
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			
+		}
+		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+	}
 }
