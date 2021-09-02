@@ -246,29 +246,31 @@ public class PersonnelAPI {
 	}
 
 	@RequestMapping(value = "/create_his", method = RequestMethod.POST)
-	public ResponseEntity<ResponseBase> CreateHis(HttpServletRequest request,
+	public ResponseEntity<person_create_response> CreateHis(HttpServletRequest request,
 			@RequestBody personnel_create_his_request entity) {
-		ResponseBase response = new ResponseBase();
+		person_create_response response = new person_create_response();
 		try {
 			Personnel_His person_his = entity.data;
 			Personel person = personService.findOne(entity.data.getPersonnelid_link());
 			if (person_his.getId() == null) {
-				//kiểm tra xem ngày quyết định mới có lơn hơn ngày quyết định cũ không, nếu nhỏ hơn thì không được thêm mới quyết định
-				List<Personnel_His> perhis = hispersonService.getHis_personByType_Id(person_his.getPersonnelid_link(), person_his.getType());
-				//nếu ngày quyết định nhỏ hơn ngày đã tồn tại
-				if(perhis.size()!=0) {
-					if(person_his.getDecision_date().compareTo(perhis.get(0).getDecision_date())<0) {
+				// kiểm tra xem ngày quyết định mới có lơn hơn ngày quyết định cũ không, nếu nhỏ
+				// hơn thì không được thêm mới quyết định
+				List<Personnel_His> perhis = hispersonService.getHis_personByType_Id(person_his.getPersonnelid_link(),
+						person_his.getType());
+				// nếu ngày quyết định nhỏ hơn ngày đã tồn tại
+				if (perhis.size() != 0) {
+					if (person_his.getDecision_date().compareTo(perhis.get(0).getDecision_date()) < 0) {
 						response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 						response.setMessage("Ngày quyết định mới không được nhỏ hơn ngày quyết định đã có");
-						return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+						return new ResponseEntity<person_create_response>(response, HttpStatus.OK);
 					}
-					if(person_his.getDecision_date().compareTo(perhis.get(0).getDecision_date())== 0) {
+					if (person_his.getDecision_date().compareTo(perhis.get(0).getDecision_date()) == 0) {
 						response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 						response.setMessage("Ngày quyết định đã tồn tại");
-						return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+						return new ResponseEntity<person_create_response>(response, HttpStatus.OK);
 					}
 				}
-				
+
 				if (person_his.getType() == 1) {
 					person.setPositionid_link(person_his.getPositionid_link());
 				} else if (person_his.getType() == 2) {
@@ -281,6 +283,7 @@ public class PersonnelAPI {
 				}
 				personService.save(person);
 			} else {
+
 				// kiem tra xem co phai la sua cua hien tai khong thi moi update len thong tin
 				// person
 				Long maxid = hispersonService.getmaxid_bytype_andperson(person.getId(), person_his.getType());
@@ -298,16 +301,14 @@ public class PersonnelAPI {
 					personService.save(person);
 				}
 			}
-
 			hispersonService.save(person_his);
-
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+			return new ResponseEntity<person_create_response>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+			return new ResponseEntity<person_create_response>(response, HttpStatus.OK);
 		}
 	}
 
@@ -327,7 +328,30 @@ public class PersonnelAPI {
 			return new ResponseEntity<get_person_his_response>(response, HttpStatus.OK);
 		}
 	}
-
+	@RequestMapping(value = "/delete", method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> delete_person(HttpServletRequest request,
+			@RequestBody personnel_delete_request entity) {
+		ResponseBase response = new ResponseBase();
+		try {
+			//xóa nhân viên
+			personService.delete(entity.data);
+			Long personnelid_link = entity.data.getId();
+			List<Personnel_His> his_person = hispersonService.gethis_by_person(personnelid_link);
+			//xóa quá trình công tác của nhân viên
+			if(his_person.size() != 0) {
+				for(int i =0; i < his_person.size();i++) {
+					hispersonService.delete(his_person.get(i));
+				}
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+	}
 	@RequestMapping(value = "/delete_his_person", method = RequestMethod.POST)
 	public ResponseEntity<del_hisperson_response> DelHis(HttpServletRequest request,
 			@RequestBody delete_hisperson_request entity) {
@@ -335,24 +359,27 @@ public class PersonnelAPI {
 		try {
 			Long personnelid_link = entity.personnelid_link;
 			Personnel_His his_person = hispersonService.findOne(entity.id);
-
-			Long maxid = hispersonService.getmaxid_bytype_andperson(personnelid_link, his_person.getType());
 			response.orgid_link = null;
+			response.positionid_link = null;
+			response.levelid_link = null;
+			//Long maxid = hispersonService.getmaxid_bytype_andperson(personnelid_link, his_person.getType());
+			
 			// Xoa lich su cuoi cung thi cap nhat person ve lan truoc do
-			if (maxid == entity.id) {
+			//if (maxid == entity.id) {
 				Personel person = personService.findOne(personnelid_link);
 				Personnel_His his_person_pre = hispersonService.getprehis_bytype_andperson(personnelid_link,
 						his_person.getType());
 				if (his_person_pre != null) {
 					if (his_person.getType() == 1) {
 						person.setPositionid_link(his_person_pre.getPositionid_link());
+						response.positionid_link = his_person_pre.getPositionid_link();
 					} else if (his_person.getType() == 2) {
 						person.setLevelid_link(his_person_pre.getLevelid_link());
+						response.levelid_link = his_person_pre.getLevelid_link();
 					} else if (his_person.getType() == 3) {
 						person.setOrgid_link(his_person_pre.getOrgid_link());
 						response.orgid_link = his_person_pre.getOrgid_link();
 					}
-
 				} else {
 					if (his_person.getType() == 1) {
 						person.setPositionid_link(null);
@@ -362,10 +389,9 @@ public class PersonnelAPI {
 						person.setOrgid_link(null);
 					}
 				}
-
 				personService.save(person);
-			}
-
+			//}
+			
 			hispersonService.deleteById(entity.id);
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -594,8 +620,10 @@ public class PersonnelAPI {
 			return new ResponseEntity<getperson_byorg_response>(response, HttpStatus.OK);
 		}
 	}
+
 	/**
 	 * thêm ca làm việc mặc định
+	 * 
 	 * @param request
 	 * @return
 	 */
@@ -604,9 +632,9 @@ public class PersonnelAPI {
 		ResponseBase response = new ResponseBase();
 		try {
 			Personel person = new Personel();
-			for(int i =0; i<entity.data.size(); i++) {
+			for (int i = 0; i < entity.data.size(); i++) {
 				person = personService.getPersonelBycode(entity.data.get(i));
-	
+
 				person.setTimesheet_absence_type_id_link(entity.timesheet_absence_type_id_link);
 				personService.save(person);
 			}
@@ -616,7 +644,7 @@ public class PersonnelAPI {
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			
+
 		}
 		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 	}
