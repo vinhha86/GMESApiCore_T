@@ -216,10 +216,10 @@ public class UploadPersonnelAPI {
 								//nếu ngày quyết định nhỏ hơn ngày đã tồn tại
 								if(perhis.size()!=0) {
 									if(NgayKiHDCTH.compareTo(perhis.get(0).getDecision_date())<0) {
-										mes_err = " Ngày quyết định(kí hợp đồng có thời hạn) mới không được nhỏ hơn ngày quyết định đã có "+ " ở dòng TT" + rowNum ;
+										mes_err = " Kí hợp đồng có thời hạn mới không được nhỏ hơn ngày kí hợp đồng thời có thời hạn đã có "+ " ở dòng TT" + rowNum ;
 										break;
 									}
-								}
+								}							
 							}
 						if (lst_bp.size() != 0) {
 							// thêm 
@@ -492,8 +492,10 @@ public class UploadPersonnelAPI {
 						person.setFullname(HoVaTen);
 						person.setGender(GioiTinh);
 						person.setOrgid_link(orgid_link);
+						person.setPositionid_link(positionid_link);
 						person.setOrgmanagerid_link(orgmanageid_link);
 
+						
 						person.setBirthdate(NgaySinh);
 						person.setDate_startworking(NgayVaoCT);
 						person.setDate_endworking(NgayThoiViec);
@@ -535,11 +537,10 @@ public class UploadPersonnelAPI {
 						
 						
 						//luu chuc vu
-						
 						int type = 1;//chu vu type =1 
 					//	Date decision_date = new SimpleDateFormat("dd/MM/yyyy").parse("01/08/2021");
 						Personnel_His personnel_His = new Personnel_His();
-						List<Personnel_His> lst_personnel_His =personnel_his_service.gethis_by_person(personnelid_link);
+						List<Personnel_His> lst_personnel_His =personnel_his_service.getHis_personByType_Id(personnelid_link, type);
 						//neu da co trong danh sach roi-> update
 						if(lst_personnel_His.size() != 0) {
 							personnel_His.setId(lst_personnel_His.get(0).getId());
@@ -552,6 +553,27 @@ public class UploadPersonnelAPI {
 							
 							personnel_His.setPositionid_link(positionid_link);				
 							personnel_His.setType(type);
+							personnel_His.setDecision_date(NgayKiHDCTH);
+							personnel_His.setPersonnelid_link(personnelid_link);
+						}
+						personnel_his_service.save(personnel_His);
+						
+						//luu phòng ban orgid_link
+						//chu vu type =1, phong ban type =3
+						List<Personnel_His> lst_personnel_His_org =personnel_his_service.getHis_personByType_Id(personnelid_link, 3);
+						 personnel_His = new Personnel_His();
+						//neu da co trong danh sach roi-> update
+						if(lst_personnel_His_org.size() != 0) {
+							personnel_His.setId(lst_personnel_His_org.get(0).getId());
+							personnel_His.setOrgid_link(orgid_link);				
+							personnel_His.setType(3);
+							personnel_His.setDecision_date(NgayKiHDCTH);
+							personnel_His.setPersonnelid_link(personnelid_link);
+						}//neu khong co trong danh sach thi tao moi
+						else {
+							
+							personnel_His.setOrgid_link(orgid_link);				
+							personnel_His.setType(3);
 							personnel_His.setDecision_date(NgayKiHDCTH);
 							personnel_His.setPersonnelid_link(personnelid_link);
 						}

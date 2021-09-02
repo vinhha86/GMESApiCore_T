@@ -259,7 +259,12 @@ public class PersonnelAPI {
 				if(perhis.size()!=0) {
 					if(person_his.getDecision_date().compareTo(perhis.get(0).getDecision_date())<0) {
 						response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-						response.setMessage("Ngày quyết định không đúng");
+						response.setMessage("Ngày quyết định mới không được nhỏ hơn ngày quyết định đã có");
+						return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+					}
+					if(person_his.getDecision_date().compareTo(perhis.get(0).getDecision_date())== 0) {
+						response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+						response.setMessage("Ngày quyết định đã tồn tại");
 						return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 					}
 				}
