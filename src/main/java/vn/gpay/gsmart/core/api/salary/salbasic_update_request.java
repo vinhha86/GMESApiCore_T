@@ -1,5 +1,7 @@
 package vn.gpay.gsmart.core.api.salary;
 
+import java.sql.Date;
+
 public class salbasic_update_request {
 	public Long id;
 	public Long orgid_link;
@@ -11,5 +13,5 @@ public class salbasic_update_request {
 	public Float overtime_weekend;
 	public Float overtime_holiday;
 	public Float overtime_night;
-	
+	public Date date_cal_sal;
 }

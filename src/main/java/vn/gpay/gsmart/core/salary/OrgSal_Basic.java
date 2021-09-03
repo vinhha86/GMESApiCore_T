@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.salary;
 
 import java.io.Serializable;
+import java.sql.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,6 +32,7 @@ public class OrgSal_Basic implements Serializable {/**
 	private Float overtime_weekend;
 	private Float overtime_holiday;
 	private Float overtime_night;
+	private Date date_cal_sal;
 	public Long getId() {
 		return id;
 	}
@@ -96,6 +98,12 @@ public class OrgSal_Basic implements Serializable {/**
 	}
 	public void setCostpersecond(Integer costpersecond) {
 		this.costpersecond = costpersecond;
+	}
+	public Date getDate_cal_sal() {
+		return date_cal_sal;
+	}
+	public void setDate_cal_sal(Date date_cal_sal) {
+		this.date_cal_sal = date_cal_sal;
 	}
 	
 }

@@ -266,6 +266,7 @@ public class SalaryAPI {
 					theSalBasic.setOvertime_weekend(entity.overtime_weekend);
 					theSalBasic.setOvertime_holiday(entity.overtime_holiday);
 					theSalBasic.setOvertime_night(entity.overtime_night);
+					theSalBasic.setDate_cal_sal(entity.date_cal_sal);
 					
 					salbasicService.save(theSalBasic);
 					
@@ -290,6 +291,7 @@ public class SalaryAPI {
 				theSalBasic.setOvertime_weekend(entity.overtime_weekend);
 				theSalBasic.setOvertime_holiday(entity.overtime_holiday);
 				theSalBasic.setOvertime_night(entity.overtime_night);
+				theSalBasic.setDate_cal_sal(entity.date_cal_sal);
 				
 				salbasicService.save(theSalBasic);
 				
