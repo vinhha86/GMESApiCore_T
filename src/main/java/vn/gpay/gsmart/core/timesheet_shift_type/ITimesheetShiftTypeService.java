@@ -6,4 +6,5 @@ import vn.gpay.gsmart.core.base.Operations;
 
 public interface ITimesheetShiftTypeService extends Operations<TimesheetShiftType> {
 	public List<TimesheetShiftType>getTimesheetShiftType_ByIdOrgid_link(Long id);
+	public Long getTimesheetShiftTypeID_ByName(String name);
 }

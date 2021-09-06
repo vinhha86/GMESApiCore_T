@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
+import vn.gpay.gsmart.core.org.IOrgService;
+import vn.gpay.gsmart.core.org.IOrgTypeService;
+import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.timesheet_shift_type_org.ITimesheetShiftTypeOrgService;
 import vn.gpay.gsmart.core.timesheet_shift_type_org.TimesheetShiftTypeOrg;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
@@ -23,7 +26,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 @RequestMapping("/api/v1/timesheetshifttypeorg")
 public class TimesheetShiftTypeOrgAPI {
 	@Autowired ITimesheetShiftTypeOrgService timesheetShiftTypeOrgService;
-	
+	@Autowired IOrgService orgeService;
 	@RequestMapping(value = "/getall", method = RequestMethod.POST)
 	public ResponseEntity<TimesheetShiftTypeOrg_response> timesheetshifttype_GetAll(HttpServletRequest request) {
 		TimesheetShiftTypeOrg_response response = new TimesheetShiftTypeOrg_response();
@@ -42,7 +45,14 @@ public class TimesheetShiftTypeOrgAPI {
 	public ResponseEntity<TimesheetShiftTypeOrg_response> timesheetshifttype_GetByorgid_link(@RequestBody TimesheetShiftTypeOrg_load_byorgid_link entity,HttpServletRequest request) {
 		TimesheetShiftTypeOrg_response response = new TimesheetShiftTypeOrg_response();
 		try {
-			response.data = timesheetShiftTypeOrgService.getByOrgid_link(entity.orgid_link);
+			
+			long id = entity.orgid_link;
+			//kieerm tra phong ban day thuoc don vi nao - lay id cua don vi do; 
+			Long id_org =orgeService.getById(id);
+			if(id_org != null && id_org != 1) {
+				id= id_org;
+			}
+			response.data = timesheetShiftTypeOrgService.getByOrgid_link(id);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<TimesheetShiftTypeOrg_response>(response, HttpStatus.OK);

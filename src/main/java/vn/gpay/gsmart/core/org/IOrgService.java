@@ -62,4 +62,6 @@ public interface IOrgService extends Operations<Org>{
 	public List<Org> getByCodeAndParentid_link(String code,Long parentid_link);
 	
 	List<Org> findOrgAllByParent(Long parent_id);
+	//lay org theo id -
+	public Long getById(Long id);
 }

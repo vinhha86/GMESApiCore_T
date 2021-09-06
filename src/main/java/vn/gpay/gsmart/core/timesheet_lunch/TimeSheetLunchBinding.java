@@ -9,12 +9,16 @@ public class TimeSheetLunchBinding {
 	private String personnelCode;
 	private String personnelFullname;
 	private Date workingdate;
+	private boolean isWorkingShift;
 	private boolean isWorkingShift1;
 	private boolean isWorkingShift2;
 	private boolean isWorkingShift3;
+	private boolean isWorkingShift4;
+	private boolean isLunchShift;
 	private boolean isLunchShift1;
 	private boolean isLunchShift2;
 	private boolean isLunchShift3;
+	private boolean isLunchShift4;
 	private Integer status;
 	private String dataIndex;
 	private String register_code;
@@ -49,6 +53,22 @@ public class TimeSheetLunchBinding {
 
 	public void setWorkingdate(Date workingdate) {
 		this.workingdate = workingdate;
+	}
+
+	public boolean isWorkingShift() {
+		return isWorkingShift;
+	}
+
+	public void setWorkingShift(boolean isWorkingShift) {
+		this.isWorkingShift = isWorkingShift;
+	}
+
+	public boolean isLunchShift() {
+		return isLunchShift;
+	}
+
+	public void setLunchShift(boolean isLunchShift) {
+		this.isLunchShift = isLunchShift;
 	}
 
 	public boolean isWorkingShift1() {
@@ -97,6 +117,22 @@ public class TimeSheetLunchBinding {
 
 	public void setLunchShift3(boolean isLunchShift3) {
 		this.isLunchShift3 = isLunchShift3;
+	}
+
+	public boolean isWorkingShift4() {
+		return isWorkingShift4;
+	}
+
+	public void setWorkingShift4(boolean isWorkingShift4) {
+		this.isWorkingShift4 = isWorkingShift4;
+	}
+
+	public boolean isLunchShift4() {
+		return isLunchShift4;
+	}
+
+	public void setLunchShift4(boolean isLunchShift4) {
+		this.isLunchShift4 = isLunchShift4;
 	}
 
 	public Integer getStatus() {
