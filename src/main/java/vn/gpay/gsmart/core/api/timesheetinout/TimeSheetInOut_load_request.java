@@ -1,8 +1,9 @@
 package vn.gpay.gsmart.core.api.timesheetinout;
 
-import java.sql.Date;
+
+import java.sql.Timestamp;
 
 public class TimeSheetInOut_load_request {
-	public Date todate;
-	public Date fromdate;
+	public Timestamp todate;
+	public Timestamp fromdate;
 }

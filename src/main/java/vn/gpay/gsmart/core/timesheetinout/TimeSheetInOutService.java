@@ -1,6 +1,5 @@
 package vn.gpay.gsmart.core.timesheetinout;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -20,7 +19,7 @@ public class TimeSheetInOutService extends AbstractService<TimeSheetInOut> imple
 		return repo;
 	}
 	@Override
-	public List<TimeSheetInOut> getAll(Date todate, Date fromdate) {
+	public List<TimeSheetInOut> getAll(Timestamp todate, Timestamp fromdate) {
 		// TODO Auto-generated method stub
 		return repo.getAll(todate, fromdate);
 	}
