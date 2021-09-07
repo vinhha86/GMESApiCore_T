@@ -17,4 +17,9 @@ public interface ITimesheetShiftTypeRepository extends JpaRepository<TimesheetSh
 	//lấy id ca làm việc theo name
 	@Query(value = "select c.id from TimesheetShiftType c where c.name LIKE :name ")
 	public Long getTimesheetShiftTypeID_ByName(@Param ("name")final  String id);
+	//lấy danh sách ca làm việc trong đơn vị
+	@Query(value = "select c from TimesheetShiftType c inner join TimesheetShiftTypeOrg b "
+			+ "on c.id = b.timesheet_shift_type_id_link "
+			+ " where b.orgid_link = :orgid_link ")
+	public List<TimesheetShiftType> getShift_ByIdOrgid_link(@Param ("orgid_link")final  Long orgid_link);
 }
