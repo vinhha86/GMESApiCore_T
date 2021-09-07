@@ -1,7 +1,6 @@
 package vn.gpay.gsmart.core.timesheetinout;
 
 import java.io.Serializable;
-import java.sql.Date;
 import java.sql.Timestamp;
 
 import javax.persistence.Entity;
@@ -9,7 +8,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+
 import javax.persistence.ManyToOne;
+
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -91,23 +92,25 @@ public class TimeSheetInOut implements Serializable{
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="register_code",insertable=false,updatable =false)
+    @JoinColumn(name="register_code",referencedColumnName="register_code",unique=true,insertable=false,updatable =false)
     private Personel personel;
 	
 	@Transient
-	public String getcode() {
+	public String getCode() {
 		if(personel!=null) {
 			return personel.getCode();
 		}
 		return "";
 	}
 	@Transient
-	public String getname() {
+	public String getName() {
 		if(personel!=null) {
 			return personel.getFullname();
 		}
 		return "";
 	}
+	
+	
 	public Timestamp getTimerecorded() {
 		return timerecorded;
 	}

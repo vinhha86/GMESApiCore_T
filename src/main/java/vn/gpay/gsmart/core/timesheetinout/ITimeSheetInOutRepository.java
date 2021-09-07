@@ -1,6 +1,5 @@
 package vn.gpay.gsmart.core.timesheetinout;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -11,9 +10,13 @@ import org.springframework.data.repository.query.Param;
 
 
 
+
 public interface ITimeSheetInOutRepository extends JpaRepository<TimeSheetInOut, Long>, JpaSpecificationExecutor<TimeSheetInOut>{
-	@Query(value = "select c from TimeSheetInOut c where c.timerecorded  between  :todate and :fromdate order by c.timerecorded ")
+	@Query(value = "select c from TimeSheetInOut c "
+			+ " inner join Personel b ON c.register_code = b.register_code "
+			+ "where c.timerecorded  between  :todate and :fromdate order by c.timerecorded ")
 	public List<TimeSheetInOut> getAll(
 			@Param("todate") final Timestamp todate,
 			@Param("fromdate") final Timestamp fromdate);
+
 }
