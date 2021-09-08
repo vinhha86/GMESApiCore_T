@@ -23,6 +23,7 @@ import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_balance.IPOrderBalanceService;
 import vn.gpay.gsmart.core.porder_balance_process.IPOrderBalanceProcessService;
+import vn.gpay.gsmart.core.porder_balance_process.POrderBalanceProcess;
 import vn.gpay.gsmart.core.porder_sewingcost.IPorderSewingCost_Service;
 import vn.gpay.gsmart.core.porder_sewingcost.POrderSewingCost;
 import vn.gpay.gsmart.core.porder_sewingcost.POrderSewingCostBinding;
@@ -152,6 +153,14 @@ public class PorderSewingCostAPI {
 		public ResponseEntity<delete_porersewingcost_response> Delete(HttpServletRequest request, @RequestBody delete_pordersewingcost_request entity ) {
 			delete_porersewingcost_response response = new delete_porersewingcost_response();
 			try {
+				// xoá trong bảng porders_balance_process (danh sách công đoạn trong cụm công đoạn)
+				List<POrderBalanceProcess> porderBalanceProcess_list = porderBalanceProcessService.getByPorderSewingcost(entity.id);
+				if(porderBalanceProcess_list.size() > 0) {
+					for(POrderBalanceProcess item : porderBalanceProcess_list) {
+						porderBalanceProcessService.deleteById(item.getId());
+					}
+				}
+				// xoá trong bảng porders_sewingcost (danh sách công đoạn lệnh)
 				pordersewingService.deleteById(entity.id);
 				
 				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
