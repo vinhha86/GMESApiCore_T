@@ -18,6 +18,8 @@ import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.porder_balance.IPOrderBalanceService;
 import vn.gpay.gsmart.core.porder_balance.POrderBalance;
 import vn.gpay.gsmart.core.porder_balance.POrderBalanceBinding;
+import vn.gpay.gsmart.core.porder_balance_process.IPOrderBalanceProcessService;
+import vn.gpay.gsmart.core.porder_balance_process.POrderBalanceProcess;
 import vn.gpay.gsmart.core.porder_grant_balance.IPOrderGrantBalanceService;
 import vn.gpay.gsmart.core.porder_grant_balance.POrderGrantBalance;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -28,6 +30,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 public class POrderBalanceAPI {
 	@Autowired IPOrderBalanceService porderBalanceService;
 	@Autowired IPOrderGrantBalanceService porderGrantBalanceService;
+	@Autowired IPOrderBalanceProcessService porderBalanceProcessService;
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> create(@RequestBody POrderBalance_create_request entity,
@@ -45,11 +48,12 @@ public class POrderBalanceAPI {
 			
 			for(int i=1;i<=amount;i++) {
 				POrderBalance newPOrderBalance = new POrderBalance();
-				newPOrderBalance.setId(0L);
+				newPOrderBalance.setId(null);
 				newPOrderBalance.setOrgrootid_link(orgrootid_link);
 				newPOrderBalance.setPorderid_link(porderid_link);
 				
-				String balanceName = "Vị trí " + (listSize + i);
+//				String balanceName = "Cụm công đoạn " + (listSize + i);
+				String balanceName = "Cụm công đoạn " + (listSize + i);
 				newPOrderBalance.setBalance_name(balanceName);
 				
 				Integer sortValue = listSize + i;
@@ -59,6 +63,55 @@ public class POrderBalanceAPI {
 			}
 			
 			
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/delete", method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> delete(@RequestBody POrderBalance_delete_request entity,
+			HttpServletRequest request) {
+		ResponseBase response = new ResponseBase();
+		try {
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long id = entity.id;
+			
+			POrderBalance porderBalance = porderBalanceService.findOne(id);
+			Long porderid_link = porderBalance.getPorderid_link();
+			
+			List<POrderBalance> porderBalance_list = porderBalanceService.getByPorder(porderid_link);
+			
+			// set name, sortvalue
+			Boolean isAfterDeleteRec = false;
+			for(POrderBalance item : porderBalance_list) {
+				if(item.getId().equals(id)) {
+					isAfterDeleteRec = true;
+					continue;
+				}
+				if(isAfterDeleteRec) {
+					Integer sortValue = item.getSortvalue() - 1;
+					item.setSortvalue(sortValue);
+					item.setBalance_name("Cụm công đoạn " + sortValue);
+					porderBalanceService.save(item);
+				}
+			}
+			
+			// delete
+			List<POrderBalanceProcess> porderBalanceProcess_list = porderBalance.getPorderBalanceProcesses();
+			if(porderBalanceProcess_list != null) {
+				if(porderBalanceProcess_list.size() > 0) {
+					for(POrderBalanceProcess item : porderBalanceProcess_list) {
+						porderBalanceProcessService.deleteById(item.getId());
+					}
+				}
+			}
+			porderBalanceService.deleteById(id);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

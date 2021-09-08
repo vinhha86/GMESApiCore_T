@@ -23,4 +23,9 @@ public class POrderBalanceProcessService extends AbstractService<POrderBalancePr
 		return repo.getPOrderBalanceProcessIdByPorder(porderid_link);
 	}
 
+	@Override
+	public List<POrderBalanceProcess> getByPorderSewingcost(Long pordersewingcostid_link) {
+		return repo.getByPorderSewingcost(pordersewingcostid_link);
+	}
+
 }
