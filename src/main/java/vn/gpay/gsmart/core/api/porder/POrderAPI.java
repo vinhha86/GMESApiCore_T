@@ -42,6 +42,7 @@ import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder.POrderBinding;
 import vn.gpay.gsmart.core.porder.POrderFilter;
+import vn.gpay.gsmart.core.porder.POrderFree;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_product.IPOrder_Product_Service;
@@ -516,7 +517,28 @@ public class POrderAPI {
 			Long pcontract_poid_link = entity.pcontract_poid_link;
 			Long orgid_link = entity.orgid_link;
 			
-			response.data = porderService.getby_offer(pcontract_poid_link, productid_link, orgid_link);
+			List<POrder> list_porder = porderService.getby_offer(pcontract_poid_link, productid_link, orgid_link);
+			List<POrderFree> list_return = new ArrayList<>();
+			for(POrder porder : list_porder) {
+				POrderFree free = new POrderFree();
+				free.setId(porder.getId());
+				free.setMatdate(porder.getMatdate());
+				free.setPo_buyer(porder.getPo_buyer());
+				free.setPo_Productiondate(porder.getPO_Productiondate());
+				free.setPo_vendor(porder.getPo_vendor());
+				free.setShipdate(porder.getShipdate());
+				free.setPcontract_poid_link(porder.getPcontract_poid_link());
+				free.setGranttoorgid_link(porder.getGranttoorgid_link());
+				long pcontractid_link = porder.getPcontractid_link();
+				List<POrder_Req> list_req = porder_reqService.getByContractAndPO_and_Org(pcontractid_link, porder.getPcontract_poid_link(), porder.getGranttoorgid_link(), porder.getProductid_link());
+				if(list_req.size() > 0) {
+					free.setTotalorder(list_req.get(0).getTotalorder());
+				}
+//				
+				list_return.add(free);
+			}
+			
+			response.data = list_return;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<get_porder_by_offer_response>(response, HttpStatus.OK);
