@@ -444,7 +444,7 @@ public class POrderGrant implements Serializable {
 		this.totalamount_tt = totalamount_tt;
 	}
 	public Boolean getIs_show_image() {
-		return is_show_image ;
+		return is_show_image == null ? false : is_show_image;
 	}
 	public void setIs_show_image(Boolean is_show_image) {
 		this.is_show_image = is_show_image;
