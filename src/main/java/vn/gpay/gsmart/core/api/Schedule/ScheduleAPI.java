@@ -376,9 +376,9 @@ public class ScheduleAPI {
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<update_schedule_response>(response, HttpStatus.OK);
 		}
-	}
-
-	@RequestMapping(value = "/showhide_image", method = RequestMethod.POST)
+	} 
+	
+	@RequestMapping(value = "/showhide_image",method = RequestMethod.POST)
 	public ResponseEntity<ShowHideImage_response> ShowHideImage(HttpServletRequest request,
 			@RequestBody ShowHideImage_request entity) {
 		ShowHideImage_response response = new ShowHideImage_response();
@@ -397,8 +397,8 @@ public class ScheduleAPI {
 			return new ResponseEntity<ShowHideImage_response>(response, HttpStatus.OK);
 		}
 	}
-
-	@RequestMapping(value = "/update_porder", method = RequestMethod.POST)
+	
+	@RequestMapping(value = "/update_porder",method = RequestMethod.POST)
 	public ResponseEntity<update_porder_response> UpdatePorder(HttpServletRequest request,
 			@RequestBody update_porder_request entity) {
 		update_porder_response response = new update_porder_response();
