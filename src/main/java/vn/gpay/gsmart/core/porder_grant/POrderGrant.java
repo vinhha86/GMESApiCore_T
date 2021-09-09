@@ -73,9 +73,7 @@ public class POrderGrant implements Serializable {
 	private Integer totalamount_tt;
 	private String reason_change;
 	private Integer type;
-	
-	
-	
+	private Boolean is_show_image;
 	
 	public Integer getType() {
 		return type;
@@ -444,6 +442,12 @@ public class POrderGrant implements Serializable {
 	}
 	public void setTotalamount_tt(Integer totalamount_tt) {
 		this.totalamount_tt = totalamount_tt;
+	}
+	public Boolean getIs_show_image() {
+		return is_show_image == null ? false : is_show_image;
+	}
+	public void setIs_show_image(Boolean is_show_image) {
+		this.is_show_image = is_show_image;
 	}
 
 }

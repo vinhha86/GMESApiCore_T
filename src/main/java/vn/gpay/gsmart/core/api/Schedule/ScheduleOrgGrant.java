@@ -144,6 +144,7 @@ public class ScheduleOrgGrant implements Runnable {
 				sch_porder.setPcontract_poid_link(pordergrant.getPcontract_poid_link());
 				sch_porder.setPcontractid_link(pordergrant.getPcontractid_link());
 				sch_porder.setProductbuyercode(pordergrant.getProductcode());
+				sch_porder.setIs_show_image(pordergrant.getIs_show_image());
 
 				Integer po_productivity = granttService.getProductivity_PO(pordergrant.getId());
 				sch_porder.setProductivity_po(po_productivity);

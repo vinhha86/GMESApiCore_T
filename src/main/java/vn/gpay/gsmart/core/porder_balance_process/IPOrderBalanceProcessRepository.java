@@ -17,4 +17,9 @@ public interface IPOrderBalanceProcessRepository extends JpaRepository<POrderBal
 			+ " where  b.porderid_link = :porderid_link ")
 	public List<Long> getPOrderBalanceProcessIdByPorder(
 			@Param("porderid_link") final Long porderid_link);
+	
+	@Query(value = "select c from POrderBalanceProcess c "
+			+ " where c.pordersewingcostid_link = :pordersewingcostid_link ")
+	public List<POrderBalanceProcess> getByPorderSewingcost(
+			@Param("pordersewingcostid_link") final Long pordersewingcostid_link);
 }

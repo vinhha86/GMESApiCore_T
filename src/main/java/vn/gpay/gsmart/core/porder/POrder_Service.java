@@ -88,6 +88,7 @@ public class POrder_Service extends AbstractService<POrder> implements IPOrder_S
 			if (lsPOrder.size() > 0) {
 				porder = lsPOrder.get(0);
 				porder.setGranttoorgid_link(porder_req.getGranttoorgid_link());
+				porder.setTotalorder(porder_req.getTotalorder());
 				porder = this.save(porder);
 				return porder;
 
