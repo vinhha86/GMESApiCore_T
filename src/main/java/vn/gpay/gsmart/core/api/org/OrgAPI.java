@@ -178,15 +178,15 @@ public class OrgAPI {
 			Org org = entity.data;
 			
 //			//thêm tỉnh. huyện , xã
-//			if(org.getOrgtypeid_link() == 25 || org.getOrgtypeid_link() == 26 || org.getOrgtypeid_link() == 27 ) {
-//
-//				org.setOrgrootid_link(user.getRootorgid_link());
-//				orgService.save(org);
-//				
-//				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-//				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-//				return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
-//			}
+			if(org.getOrgtypeid_link() == 25 || org.getOrgtypeid_link() == 26 || org.getOrgtypeid_link() == 27 ) {
+
+				org.setOrgrootid_link(user.getRootorgid_link());
+				orgService.save(org);
+				
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+			}
 			
 			
 			if(org.getId() == 0 || org.getId() == null) {

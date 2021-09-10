@@ -393,13 +393,23 @@ public class UploadPersonnelAPI {
 
 						// kiem tra tinh trong danh sach orgtypeid_link = 25;
 						Long tinh = null;
+
+						Long id_huyen = null;
 						List<Org> lst_tinh = org_service.getByNameAndType(Tinh, 25);
 						if (lst_tinh.size() != 0) {
 							tinh = lst_tinh.get(0).getId();
 						} else {
-
-							mes_err = " Tỉnh không tồn tại! " + " ở dòng " + rowNum + " cột Tỉnh T.phố " ;
-							break;
+							Org org = new Org();
+							org.setName(Tinh);
+							org.setCode(Tinh.replaceAll(" ", ""));
+							org.setStatus(1);
+							org.setIs_manufacturer(0);
+							org.setOrgtypeid_link(25);
+							Org id_org = org_service.save(org);
+							
+							//lấy id tỉnh thành vừa thêm
+							tinh = id_org.getId();
+							
 						}
 
 						// kiem tra huyen trong danh sach tinh orgtypeid_link = 26;
@@ -409,9 +419,18 @@ public class UploadPersonnelAPI {
 						if (lst_huyen != null) {
 							huyen = lst_huyen.getId();
 						} else {
-
-							mes_err = " Huyện không tồn tại! " + " ở dòng " + rowNum + " cột Quận - Huyện " ;
-							break;
+							Org org = new Org();
+							org.setName(Huyen);
+							org.setCode(Huyen.replaceAll(" ", ""));
+							org.setStatus(1);
+							org.setIs_manufacturer(0);
+							org.setParentid_link(tinh);
+							org.setOrgtypeid_link(26);
+							
+							//lấy id huyện vừa thêm
+							Org id_org = org_service.save(org);
+							huyen = id_org.getId();
+//							
 						}
 						// kiem tra xa trong danh sach huyen orgtypeid_link = 27;
 						Long xa = null;
@@ -419,9 +438,18 @@ public class UploadPersonnelAPI {
 						if (lst_xa != null) {
 							xa = lst_xa.getId();
 						} else {
-
-							mes_err = " Xã không tồn tại! " + " ở dòng " + rowNum + " cột Xã - Phường " ; 
-							break;
+							Org org = new Org();
+							org.setName(Xa);
+							org.setCode(Xa.replaceAll(" ", ""));
+							org.setStatus(1);
+							org.setIs_manufacturer(0);
+							org.setParentid_link(huyen);
+							org.setOrgtypeid_link(27);
+							
+							//lấy id huyện vừa thêm
+							Org id_org = org_service.save(org);
+							xa = id_org.getId();
+							
 						}
 
 						// String NgayCap =
