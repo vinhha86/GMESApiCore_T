@@ -124,7 +124,9 @@ public class PorderSewingCostAPI {
 			long porderid_link = entity.porderid_link;
 
 			long workingprocessid_link = 0; // 0 : lay theo porder
-			response.data = pordersewingService.getby_porder_and_workingprocess(porderid_link, workingprocessid_link);
+			List<POrderSewingCost> porderSewingCost_list = pordersewingService.getby_porder_and_workingprocess(porderid_link, workingprocessid_link);
+			
+			response.data = porderSewingCost_list;
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -580,10 +582,10 @@ public class PorderSewingCostAPI {
 								// TODO porders_balance
 								
 								// porders_balance_process
+								POrderBalanceProcess porderBalanceProcess = new POrderBalanceProcess();
 								if(cumCongDoan != null) {
 									List<POrderBalance> porderBalance_list = porderBalanceService.getByBalanceName_POrder(cumCongDoan, porderid_link);
 									POrderBalance porderBalance = new POrderBalance();
-									POrderBalanceProcess porderBalanceProcess = new POrderBalanceProcess();
 									if(porderBalance_list.size() > 0) {
 										porderBalance = porderBalance_list.get(0);
 										List<POrderBalanceProcess> porderBalanceProcess_list = porderBalanceProcessService.getByPorderSewingcost(porderSewingCost.getId());
@@ -599,6 +601,12 @@ public class PorderSewingCostAPI {
 											porderBalanceProcess.setPordersewingcostid_link(porderSewingCost.getId());
 											porderBalanceProcess = porderBalanceProcessService.save(porderBalanceProcess);
 										}
+									}
+								}else {
+									List<POrderBalanceProcess> porderBalanceProcess_list = porderBalanceProcessService.getByPorderSewingcost(porderSewingCost.getId());
+									if(porderBalanceProcess_list.size() > 0) { // công đoạn đã có trong 1 cụm công đoạn
+										porderBalanceProcess =  porderBalanceProcess_list.get(0);
+										porderBalanceProcessService.delete(porderBalanceProcess);
 									}
 								}
 								

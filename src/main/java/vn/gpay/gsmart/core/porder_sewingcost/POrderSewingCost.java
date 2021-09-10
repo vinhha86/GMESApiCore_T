@@ -2,6 +2,7 @@ package vn.gpay.gsmart.core.porder_sewingcost;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -18,6 +20,7 @@ import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.category.LaborLevel;
 import vn.gpay.gsmart.core.devices_type.Devices_Type;
+import vn.gpay.gsmart.core.porder_balance_process.POrderBalanceProcess;
 import vn.gpay.gsmart.core.workingprocess.WorkingProcess;
 
 @Table(name="porders_sewingcost")
@@ -61,6 +64,11 @@ public class POrderSewingCost implements Serializable {
     @JoinColumn(name="laborrequiredid_link",insertable=false,updatable =false)
     private LaborLevel laborlevel;
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToMany
+	@JoinColumn(name="pordersewingcostid_link",insertable=false,updatable =false)
+    private List<POrderBalanceProcess> porderBalanceProcess_list;
+	
 	@Transient
 	public String getWorkingprocess_name() {
 		if(workingprocess != null) {
@@ -83,6 +91,28 @@ public class POrderSewingCost implements Serializable {
 			return laborlevel.getName();
 		}
 		return "";
+	}
+	
+	@Transient
+	public Long getPorderbalanceid_link() {
+		if(porderBalanceProcess_list != null) {
+			if(porderBalanceProcess_list.size() > 0) {
+				POrderBalanceProcess porderBalanceProcess = porderBalanceProcess_list.get(0);
+				return porderBalanceProcess.getPorderbalanceid_link();
+			}
+		}
+		return null;
+	}
+	
+	@Transient
+	public String getPorderbalance_name() {
+		if(porderBalanceProcess_list != null) {
+			if(porderBalanceProcess_list.size() > 0) {
+				POrderBalanceProcess porderBalanceProcess = porderBalanceProcess_list.get(0);
+				return porderBalanceProcess.getBalance_name();
+			}
+		}
+		return null;
 	}
 	
 	public Long getId() {

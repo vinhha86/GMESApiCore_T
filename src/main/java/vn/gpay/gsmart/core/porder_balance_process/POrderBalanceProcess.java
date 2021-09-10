@@ -15,6 +15,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.porder_balance.POrderBalance;
 import vn.gpay.gsmart.core.porder_sewingcost.POrderSewingCost;
 
 @Table(name="porders_balance_process")
@@ -30,6 +31,18 @@ public class POrderBalanceProcess implements Serializable{
 	private Long orgrootid_link;
 	private Long porderbalanceid_link;
 	private Long pordersewingcostid_link;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="porderbalanceid_link",insertable=false,updatable =false)
+	private POrderBalance porderBalance;
+	
+	@Transient
+	public String getBalance_name() {
+		if(porderBalance!=null)
+			return porderBalance.getBalance_name();
+		return "";
+	}
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
