@@ -204,6 +204,35 @@ public class PorderSewingCostAPI {
 			return new ResponseEntity<delete_porersewingcost_response>(response, HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/delete_multi", method = RequestMethod.POST)
+	public ResponseEntity<delete_porersewingcost_response> delete_multi(HttpServletRequest request,
+			@RequestBody delete_pordersewingcost_request entity) {
+		delete_porersewingcost_response response = new delete_porersewingcost_response();
+		try {
+			List<Long> idList = entity.idList;
+			for(Long id : idList) {
+				// xoá trong bảng porders_balance_process (danh sách công đoạn trong cụm công đoạn)
+				List<POrderBalanceProcess> porderBalanceProcess_list = porderBalanceProcessService
+						.getByPorderSewingcost(id);
+				if (porderBalanceProcess_list.size() > 0) {
+					for (POrderBalanceProcess item : porderBalanceProcess_list) {
+						porderBalanceProcessService.deleteById(item.getId());
+					}
+				}
+				// xoá trong bảng porders_sewingcost (danh sách công đoạn lệnh)
+				pordersewingService.deleteById(id);
+			}
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<delete_porersewingcost_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<delete_porersewingcost_response>(response, HttpStatus.OK);
+		}
+	}
 
 	@RequestMapping(value = "/getby_porder_notin_porder_balance", method = RequestMethod.POST)
 	public ResponseEntity<getby_porder_response> getByPorderNotInPorderBalance(HttpServletRequest request,
@@ -352,14 +381,14 @@ public class PorderSewingCostAPI {
 							colNum = ColumnPorderSewingCost.CumCongDoan;
 							String cumCongDoan = commonService.getStringValue(row.getCell(ColumnPorderSewingCost.CumCongDoan));
 							cumCongDoan = cumCongDoan.toLowerCase().trim();
-							if(!cumCongDoan.equals("")) {
-								List<POrderBalance> porderBalance_list = porderBalanceService.getByBalanceName_POrder(cumCongDoan, porderid_link);
-								if(porderBalance_list.size() == 0) {
-									mes_err = "Cụm công đoạn không tồn tại. Ở dòng " + (rowNum + 1) + " và cột "
-											+ (colNum + 1);
-									break;
-								}
-							}
+//							if(!cumCongDoan.equals("")) {
+//								List<POrderBalance> porderBalance_list = porderBalanceService.getByBalanceName_POrder(cumCongDoan, porderid_link);
+//								if(porderBalance_list.size() == 0) {
+//									mes_err = "Cụm công đoạn không tồn tại. Ở dòng " + (rowNum + 1) + " và cột "
+//											+ (colNum + 1);
+//									break;
+//								}
+//							}
 							
 //							System.out.println("- ThietBi");
 							// ThietBi
@@ -367,7 +396,7 @@ public class PorderSewingCostAPI {
 							String thietBi = commonService.getStringValue(row.getCell(ColumnPorderSewingCost.ThietBi));
 							thietBi = thietBi.toLowerCase().trim();
 							if(!thietBi.equals("")) {
-								List<Devices_Type> devices_type_list = devicesTypeService.loadDevicesTypeByName(thietBi);
+								List<Devices_Type> devices_type_list = devicesTypeService.loadDevicesTypeByCode(thietBi);
 								if(devices_type_list.size() == 0) {
 									mes_err = "Thiết bị không tồn tại. Ở dòng " + (rowNum + 1) + " và cột "
 											+ (colNum + 1);
@@ -381,7 +410,7 @@ public class PorderSewingCostAPI {
 							String bacTho = commonService.getStringValue(row.getCell(ColumnPorderSewingCost.BacTho));
 							bacTho = bacTho.toLowerCase().trim();
 							if(!bacTho.equals("")) {
-								List<LaborLevel> laborLevel_list = laborLevelService.findByName(bacTho);
+								List<LaborLevel> laborLevel_list = laborLevelService.findByCode(bacTho);
 								if(laborLevel_list.size() == 0) {
 									mes_err = "Bậc thợ không tồn tại. Ở dòng " + (rowNum + 1) + " và cột "
 											+ (colNum + 1);
@@ -485,7 +514,7 @@ public class PorderSewingCostAPI {
 								
 								// ThietBi
 								if(!thietBi.equals("")) {
-									List<Devices_Type> devices_type_list = devicesTypeService.loadDevicesTypeByName(thietBi);
+									List<Devices_Type> devices_type_list = devicesTypeService.loadDevicesTypeByCode(thietBi);
 									if(devices_type_list.size() > 0) {
 										Devices_Type devices_Type = devices_type_list.get(0);
 										thietBiId = devices_Type.getId();
@@ -493,7 +522,7 @@ public class PorderSewingCostAPI {
 								}
 								// BacTho
 								if(!bacTho.equals("")) {
-									List<LaborLevel> laborLevel_list = laborLevelService.findByName(bacTho);
+									List<LaborLevel> laborLevel_list = laborLevelService.findByCode(bacTho);
 									if(laborLevel_list.size() > 0) {
 										LaborLevel laborLevel = laborLevel_list.get(0);
 										bacThoId = laborLevel.getId();
@@ -578,8 +607,21 @@ public class PorderSewingCostAPI {
 									porderSewingCost.setWorkingprocessid_link(workingProcess.getId());
 									porderSewingCost = pordersewingService.save(porderSewingCost);
 								}
+								
 								// porders_balance
-								// TODO porders_balance
+								if(cumCongDoan != null) { System.out.println("cumCongDoan: " + cumCongDoan);
+									POrderBalance porderBalance = new POrderBalance();
+									List<POrderBalance> porderBalance_list = porderBalanceService.getByBalanceName_POrder(cumCongDoan, porderid_link);
+									List<POrderBalance> porderBalance_list_by_porderid_link = porderBalanceService.getByPorder(porderid_link);
+									if(porderBalance_list.size() == 0) { System.out.println("cumCongDoan new: " + cumCongDoan);
+										porderBalance.setId(null);
+										porderBalance.setOrgrootid_link(orgrootid_link);
+										porderBalance.setPorderid_link(porderid_link);
+										porderBalance.setBalance_name(commonService.getStringValue(row.getCell(ColumnPorderSewingCost.CumCongDoan)).trim());
+										porderBalance.setSortvalue(porderBalance_list_by_porderid_link.size());
+										porderBalance = porderBalanceService.save(porderBalance);
+									}
+								}
 								
 								// porders_balance_process
 								POrderBalanceProcess porderBalanceProcess = new POrderBalanceProcess();

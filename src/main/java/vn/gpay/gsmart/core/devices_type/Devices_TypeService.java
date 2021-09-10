@@ -26,5 +26,10 @@ public class Devices_TypeService extends AbstractService<Devices_Type> implement
 	public List<Devices_Type> loadDevicesTypeByName(String name) {
 		return repo.loadDevicesTypeByName(name);
 	}
+
+	@Override
+	public List<Devices_Type> loadDevicesTypeByCode(String code) {
+		return repo.loadDevicesTypeByCode(code);
+	}
 	
 }

@@ -24,6 +24,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.gpay.gsmart.core.porder_balance.IPOrderBalanceService;
+import vn.gpay.gsmart.core.porder_balance_process.IPOrderBalanceProcessService;
+import vn.gpay.gsmart.core.porder_balance_process.POrderBalanceProcess;
+import vn.gpay.gsmart.core.porder_sewingcost.IPorderSewingCost_Service;
+import vn.gpay.gsmart.core.porder_sewingcost.POrderSewingCost;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 import vn.gpay.gsmart.core.workingprocess.IWorkingProcess_Service;
@@ -31,9 +36,10 @@ import vn.gpay.gsmart.core.workingprocess.WorkingProcess;
 @RestController
 @RequestMapping("/api/v1/workingprocess")
 public class WorkingProcessAPI {
-    @Autowired
-    private IWorkingProcess_Service workingprocessService;
-
+    @Autowired IWorkingProcess_Service workingprocessService;
+	@Autowired IPorderSewingCost_Service pordersewingService;
+	@Autowired IPOrderBalanceService porderBalanceService;
+	@Autowired IPOrderBalanceProcessService porderBalanceProcessService;
     
     @GetMapping("/workingprocess")
     public List<WorkingProcess> getAllProcess() {
@@ -124,6 +130,34 @@ public class WorkingProcessAPI {
 		workingprocess_delete_response response = new workingprocess_delete_response();
 		try {
 			workingprocessService.deleteById(entity.id);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<workingprocess_delete_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<workingprocess_delete_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/delete_multi",method = RequestMethod.POST)
+	public ResponseEntity<workingprocess_delete_response> delete_multi(HttpServletRequest request, @RequestBody workingprocess_delete_reques entity ) {
+		workingprocess_delete_response response = new workingprocess_delete_response();
+		try {
+			List<Long> idList = entity.idList;
+			
+			for(Long id : idList) {
+				List<POrderSewingCost> porderSewingCost_list = pordersewingService.getby_workingprocess(id);
+				for(POrderSewingCost porderSewingCost : porderSewingCost_list) {
+					List<POrderBalanceProcess> porderBalanceProcess_list = porderBalanceProcessService.getByPorderSewingcost(porderSewingCost.getId());
+					for(POrderBalanceProcess porderBalanceProcess : porderBalanceProcess_list) {
+						porderBalanceProcessService.deleteById(porderBalanceProcess.getId());
+					}
+					pordersewingService.deleteById(porderSewingCost.getId());
+				}
+				workingprocessService.deleteById(id);
+			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

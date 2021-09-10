@@ -32,6 +32,48 @@ public class POrderBalanceAPI {
 	@Autowired IPOrderGrantBalanceService porderGrantBalanceService;
 	@Autowired IPOrderBalanceProcessService porderBalanceProcessService;
 	
+//	@RequestMapping(value = "/create", method = RequestMethod.POST)
+//	public ResponseEntity<ResponseBase> create(@RequestBody POrderBalance_create_request entity,
+//			HttpServletRequest request) {
+//		ResponseBase response = new ResponseBase();
+//		try {
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//			Long orgrootid_link = user.getRootorgid_link();
+//			
+//			Long porderid_link = entity.porderid_link;
+//			Integer amount = entity.amount;
+//			
+//			List<POrderBalance> listPOrderBalance = porderBalanceService.getByPorder(porderid_link);
+//			Integer listSize = listPOrderBalance.size();
+//			
+//			for(int i=1;i<=amount;i++) {
+//				POrderBalance newPOrderBalance = new POrderBalance();
+//				newPOrderBalance.setId(null);
+//				newPOrderBalance.setOrgrootid_link(orgrootid_link);
+//				newPOrderBalance.setPorderid_link(porderid_link);
+//				
+////				String balanceName = "Cụm công đoạn " + (listSize + i);
+//				String balanceName = "" + (listSize + i);
+//				newPOrderBalance.setBalance_name(balanceName);
+//				
+//				Integer sortValue = listSize + i;
+//				newPOrderBalance.setSortvalue(sortValue);
+//				
+//				porderBalanceService.save(newPOrderBalance);
+//			}
+//			
+//			
+//			
+//			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+//			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+//			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+//		} catch (Exception e) {
+//			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+//			response.setMessage(e.getMessage());
+//			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+//		}
+//	}
+	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> create(@RequestBody POrderBalance_create_request entity,
 			HttpServletRequest request) {
@@ -41,28 +83,26 @@ public class POrderBalanceAPI {
 			Long orgrootid_link = user.getRootorgid_link();
 			
 			Long porderid_link = entity.porderid_link;
-			Integer amount = entity.amount;
+			String name = entity.name;
+			
+			List<POrderBalance> porderBalance_list = porderBalanceService.getByBalanceName_POrder(name, porderid_link);
+			if(porderBalance_list.size() > 0) {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage("Cụm công đoạn đã tồn tại");
+				return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+			}
 			
 			List<POrderBalance> listPOrderBalance = porderBalanceService.getByPorder(porderid_link);
 			Integer listSize = listPOrderBalance.size();
 			
-			for(int i=1;i<=amount;i++) {
-				POrderBalance newPOrderBalance = new POrderBalance();
-				newPOrderBalance.setId(null);
-				newPOrderBalance.setOrgrootid_link(orgrootid_link);
-				newPOrderBalance.setPorderid_link(porderid_link);
-				
-//				String balanceName = "Cụm công đoạn " + (listSize + i);
-				String balanceName = "" + (listSize + i);
-				newPOrderBalance.setBalance_name(balanceName);
-				
-				Integer sortValue = listSize + i;
-				newPOrderBalance.setSortvalue(sortValue);
-				
-				porderBalanceService.save(newPOrderBalance);
-			}
-			
-			
+			POrderBalance newPOrderBalance = new POrderBalance();
+			newPOrderBalance.setId(null);
+			newPOrderBalance.setOrgrootid_link(orgrootid_link);
+			newPOrderBalance.setPorderid_link(porderid_link);
+			newPOrderBalance.setBalance_name(name);
+			Integer sortValue = listSize;
+			newPOrderBalance.setSortvalue(sortValue);
+			porderBalanceService.save(newPOrderBalance);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -112,6 +152,57 @@ public class POrderBalanceAPI {
 				}
 			}
 			porderBalanceService.deleteById(id);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/delete_multi", method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> delete_multi(@RequestBody POrderBalance_delete_request entity,
+			HttpServletRequest request) {
+		ResponseBase response = new ResponseBase();
+		try {
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			List<Long> idList = entity.idList;
+			
+			for(Long id : idList) {
+				POrderBalance porderBalance = porderBalanceService.findOne(id);
+				Long porderid_link = porderBalance.getPorderid_link();
+				
+				List<POrderBalance> porderBalance_list = porderBalanceService.getByPorder(porderid_link);
+				
+				// set name, sortvalue
+				Boolean isAfterDeleteRec = false;
+				for(POrderBalance item : porderBalance_list) {
+					if(item.getId().equals(id)) {
+						isAfterDeleteRec = true;
+						continue;
+					}
+					if(isAfterDeleteRec) {
+						Integer sortValue = item.getSortvalue() - 1;
+						item.setSortvalue(sortValue);
+						item.setBalance_name("Cụm công đoạn " + sortValue);
+						porderBalanceService.save(item);
+					}
+				}
+				
+				// delete
+				List<POrderBalanceProcess> porderBalanceProcess_list = porderBalance.getPorderBalanceProcesses();
+				if(porderBalanceProcess_list != null) {
+					if(porderBalanceProcess_list.size() > 0) {
+						for(POrderBalanceProcess item : porderBalanceProcess_list) {
+							porderBalanceProcessService.deleteById(item.getId());
+						}
+					}
+				}
+				porderBalanceService.deleteById(id);
+			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

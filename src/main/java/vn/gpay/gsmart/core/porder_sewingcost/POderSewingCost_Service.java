@@ -13,12 +13,10 @@ public class POderSewingCost_Service extends AbstractService<POrderSewingCost> i
 	@Autowired IPOrderSewignCost_Repository repo;
 	@Override
 	protected JpaRepository<POrderSewingCost, Long> getRepository() {
-		// TODO Auto-generated method stub
 		return repo;
 	}
 	@Override
 	public List<POrderSewingCost> getby_porder_and_workingprocess(Long porderid_link, Long workingprocessid_link) {
-		// TODO Auto-generated method stub
 		workingprocessid_link = workingprocessid_link == 0 ? null : workingprocessid_link;
 		
 		return repo.getby_porder_and_workingprocess(porderid_link, workingprocessid_link);
@@ -29,13 +27,15 @@ public class POderSewingCost_Service extends AbstractService<POrderSewingCost> i
 	}
 	@Override
 	public List<POrderSewingCost> getByPorderUnused(Long porderid_link) {
-		// TODO Auto-generated method stub
 		return repo.getByPorderUnused(porderid_link);
 	}
 	@Override
 	public List<POrderSewingCost> getForPProcessProductivity(Long personnelid_link) {
-		// TODO Auto-generated method stub
 		return repo.getForPProcessProductivity(personnelid_link);
+	}
+	@Override
+	public List<POrderSewingCost> getby_workingprocess(Long workingprocessid_link) {
+		return repo.getby_workingprocess(workingprocessid_link);
 	}
 
 }

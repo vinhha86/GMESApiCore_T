@@ -19,4 +19,11 @@ public interface LaborLevelRepository extends JpaRepository<LaborLevel, Long>{
 	public List<LaborLevel> findByName(
 			@Param ("name")final String name
 			);
+	
+	@Query("SELECT c FROM LaborLevel c "
+			+ "where trim(lower(c.code)) = trim(lower(:code)) "
+			)
+	public List<LaborLevel> findByCode(
+			@Param ("code")final String code
+			);
 }

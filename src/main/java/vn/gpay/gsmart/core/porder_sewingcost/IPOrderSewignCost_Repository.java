@@ -19,6 +19,11 @@ public interface IPOrderSewignCost_Repository extends JpaRepository<POrderSewing
 			@Param("porderid_link") final Long porderid_link,
 			@Param("workingprocessid_link") final Long workingprocessid_link);
 	
+	@Query(value = "select c from POrderSewingCost c "
+			+ "where workingprocessid_link = :workingprocessid_link")
+	public List<POrderSewingCost> getby_workingprocess(
+			@Param("workingprocessid_link") final Long workingprocessid_link);
+	
 	@Query(value = "select c from POrderSewingCost c"
 			+ " where  c.porderid_link = :porderid_link and "
 			+ "c.id not in :listPorderBalanceProcessId ")

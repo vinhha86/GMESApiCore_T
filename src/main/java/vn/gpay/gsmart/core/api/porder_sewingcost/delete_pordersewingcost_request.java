@@ -1,5 +1,10 @@
 package vn.gpay.gsmart.core.api.porder_sewingcost;
 
-public class delete_pordersewingcost_request {
-	public long id;
+import java.util.List;
+
+import vn.gpay.gsmart.core.base.RequestBase;
+
+public class delete_pordersewingcost_request extends RequestBase {
+	public Long id;
+	public List<Long> idList;
 }

@@ -28,4 +28,9 @@ public class LaborLevelServiceImpl  extends AbstractService<LaborLevel> implemen
 		return repo.findByName(name);
 	}
 
+	@Override
+	public List<LaborLevel> findByCode(String code) {
+		return repo.findByCode(code);
+	}
+
 }

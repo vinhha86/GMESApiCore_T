@@ -22,5 +22,10 @@ public interface IDevices_TypeRepository
 	public List<Devices_Type> loadDevicesTypeByName(
 			@Param ("name")final String name
 			);
-
+	@Query(value = "select c from Devices_Type c " 
+			+ "where trim(lower(c.code)) = trim(lower(:code))"
+			)
+	public List<Devices_Type> loadDevicesTypeByCode(
+			@Param ("code")final String code
+			);
 }
