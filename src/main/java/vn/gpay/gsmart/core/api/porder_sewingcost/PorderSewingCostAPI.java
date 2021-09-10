@@ -609,11 +609,11 @@ public class PorderSewingCostAPI {
 								}
 								
 								// porders_balance
-								if(cumCongDoan != null) { System.out.println("cumCongDoan: " + cumCongDoan);
+								if(cumCongDoan != null) {
 									POrderBalance porderBalance = new POrderBalance();
 									List<POrderBalance> porderBalance_list = porderBalanceService.getByBalanceName_POrder(cumCongDoan, porderid_link);
 									List<POrderBalance> porderBalance_list_by_porderid_link = porderBalanceService.getByPorder(porderid_link);
-									if(porderBalance_list.size() == 0) { System.out.println("cumCongDoan new: " + cumCongDoan);
+									if(porderBalance_list.size() == 0) {
 										porderBalance.setId(null);
 										porderBalance.setOrgrootid_link(orgrootid_link);
 										porderBalance.setPorderid_link(porderid_link);
