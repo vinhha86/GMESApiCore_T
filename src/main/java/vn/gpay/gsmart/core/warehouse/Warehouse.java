@@ -132,13 +132,13 @@ public class Warehouse implements Serializable {
 	}
 
 	//	//mo rong
-//	public String getSkucode() {
-//		if(sku!=null) {
-//			return sku.getCode();
-//		}
-//		return "";
-//		
-//	}
+	public String getSkuCode() {
+		if(sku!=null) {
+			return sku.getCode();
+		}
+		return "";
+		
+	}
 	public String getPSkuname() {
 		if(psku!=null) {
 			return psku.getName();

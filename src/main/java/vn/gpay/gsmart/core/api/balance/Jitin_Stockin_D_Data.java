@@ -41,6 +41,7 @@ public class Jitin_Stockin_D_Data implements Serializable {
 	
     //Transient
     private String skuname;
+    private String skuCode;
     private String hscode;
     private String hsname;
     private String unit_name;
@@ -304,6 +305,14 @@ public class Jitin_Stockin_D_Data implements Serializable {
 
 	public void setSkuname(String skuname) {
 		this.skuname = skuname;
+	}
+
+	public String getSkuCode() {
+		return skuCode;
+	}
+
+	public void setSkuCode(String skuCode) {
+		this.skuCode = skuCode;
 	}
 
 	public String getHscode() {

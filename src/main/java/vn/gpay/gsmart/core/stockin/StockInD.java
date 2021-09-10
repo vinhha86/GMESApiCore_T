@@ -129,6 +129,13 @@ public class StockInD implements Serializable {
 		return "";
 	}
 	@Transient
+	public String getSkuCode() {
+		if(sku!=null) {
+			return sku.getCode();
+		}
+		return "";
+	}
+	@Transient
 	public String getHscode() {
 		if(sku!=null) {
 			return sku.getHscode();
