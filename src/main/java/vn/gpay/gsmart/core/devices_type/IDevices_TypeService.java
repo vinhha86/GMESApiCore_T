@@ -7,4 +7,5 @@ import vn.gpay.gsmart.core.base.Operations;
 
 public interface IDevices_TypeService extends Operations<Devices_Type>{
 	List<Devices_Type> loadDivicesType();
+	List<Devices_Type> loadDevicesTypeByName(String name);
 }

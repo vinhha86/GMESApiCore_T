@@ -13,7 +13,6 @@ public class WorkingProcess_Service extends AbstractService<WorkingProcess> impl
 	@Autowired IWorkingProcess_Repository repo;
 	@Override
 	protected JpaRepository<WorkingProcess, Long> getRepository() {
-		// TODO Auto-generated method stub
 		return repo;
 	}
 	
@@ -28,7 +27,11 @@ public class WorkingProcess_Service extends AbstractService<WorkingProcess> impl
 
 	@Override
 	public List<WorkingProcess> getby_product(Long productid_link) {
-		// TODO Auto-generated method stub
 		return repo.getby_product(productid_link);
+	}
+
+	@Override
+	public List<WorkingProcess> getByName_Product(String name, Long productid_link) {
+		return repo.getByName_Product(name, productid_link);
 	}
 }

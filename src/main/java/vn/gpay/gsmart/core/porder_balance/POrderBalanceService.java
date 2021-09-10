@@ -15,19 +15,21 @@ public class POrderBalanceService extends AbstractService<POrderBalance> impleme
 
 	@Override
 	protected JpaRepository<POrderBalance, Long> getRepository() {
-		// TODO Auto-generated method stub
 		return repo;
 	}
 
 	@Override
 	public List<POrderBalance> getByPorder(Long porderid_link) {
-		// TODO Auto-generated method stub
 		return repo.getByPorder(porderid_link);
 	}
 
 	@Override
 	public List<POrderBalance> getByPOrderAndPOrderSewingCost(Long porderid_link, Long pordersewingcostid_link) {
-		// TODO Auto-generated method stub
 		return repo.getByPOrderAndPOrderSewingCost(porderid_link, pordersewingcostid_link);
+	}
+
+	@Override
+	public List<POrderBalance> getByBalanceName_POrder(String balance_name, Long porderid_link) {
+		return repo.getByBalanceName_POrder(balance_name, porderid_link);
 	}
 }

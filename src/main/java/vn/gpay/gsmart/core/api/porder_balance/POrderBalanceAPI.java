@@ -53,7 +53,7 @@ public class POrderBalanceAPI {
 				newPOrderBalance.setPorderid_link(porderid_link);
 				
 //				String balanceName = "Cụm công đoạn " + (listSize + i);
-				String balanceName = "Cụm công đoạn " + (listSize + i);
+				String balanceName = "" + (listSize + i);
 				newPOrderBalance.setBalance_name(balanceName);
 				
 				Integer sortValue = listSize + i;

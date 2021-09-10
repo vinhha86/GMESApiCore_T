@@ -14,14 +14,17 @@ public class Devices_TypeService extends AbstractService<Devices_Type> implement
 
 	@Override
 	protected JpaRepository<Devices_Type, Long> getRepository() {
-		// TODO Auto-generated method stub
 		return repo;
 	}
 
 	@Override
 	public List<Devices_Type> loadDivicesType() {
-		// TODO Auto-generated method stub
 		return repo.loadDivicesType();
+	}
+
+	@Override
+	public List<Devices_Type> loadDevicesTypeByName(String name) {
+		return repo.loadDevicesTypeByName(name);
 	}
 	
 }

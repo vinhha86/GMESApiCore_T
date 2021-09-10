@@ -20,4 +20,13 @@ public interface IWorkingProcess_Repository extends JpaRepository<WorkingProcess
 	public List<WorkingProcess>getby_product(
 			@Param("productid_link") final Long productid_link
 			);
+	@Query(value = "Select a from WorkingProcess a "
+			+ "where a.process_type=1 " 
+			+ "and trim(lower(a.name)) = trim(lower(:name)) "
+			+ "and a.productid_link = :productid_link "
+			)
+	public List<WorkingProcess>getByName_Product(
+			@Param("name") final String name,
+			@Param("productid_link") final Long productid_link
+			);
 }

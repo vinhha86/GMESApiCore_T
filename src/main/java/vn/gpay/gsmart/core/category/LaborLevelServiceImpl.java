@@ -15,14 +15,17 @@ public class LaborLevelServiceImpl  extends AbstractService<LaborLevel> implemen
 
 	@Override
 	protected JpaRepository<LaborLevel, Long> getRepository() {
-		// TODO Auto-generated method stub
 		return repo;
 	}
 
 	@Override
 	public List<LaborLevel> findAllByOrderByIdAsc() {
-		// TODO Auto-generated method stub
 		return repo.findAllByOrderByIdAsc();
+	}
+
+	@Override
+	public List<LaborLevel> findByName(String name) {
+		return repo.findByName(name);
 	}
 
 }

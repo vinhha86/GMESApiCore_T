@@ -26,4 +26,12 @@ public interface IPOrderBalanceRepository  extends JpaRepository<POrderBalance, 
 			@Param ("porderid_link")final Long porderid_link,
 			@Param ("pordersewingcostid_link")final Long pordersewingcostid_link
 			);
+	
+	@Query("SELECT c FROM POrderBalance c "
+			+ "where lower(c.balance_name) = lower(:balance_name) "
+			+ "and c.porderid_link = :porderid_link "
+			+ "order by c.sortvalue ")
+	public List<POrderBalance> getByBalanceName_POrder(
+			@Param ("balance_name")final String balance_name, 
+			@Param ("porderid_link")final Long porderid_link);
 }
