@@ -3,6 +3,9 @@ package vn.gpay.gsmart.core.api.porder_sewingcost;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -638,5 +641,29 @@ public class PorderSewingCostAPI {
 			response.setMessage(e.getMessage());
 		}
 		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/download_temp_pordersewingcost", method = RequestMethod.POST)
+	public ResponseEntity<download_temp_pordersewingcost_response> download_temp_pordersewingcost(HttpServletRequest request) {
+
+		download_temp_pordersewingcost_response response = new download_temp_pordersewingcost_response();
+		try {
+			String FolderPath = "TemplateUpload";
+
+			// Thư mục gốc upload file.
+			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+
+			String filePath = uploadRootPath + "/" + "Template_PorderSewingCost_New.xlsx";
+			Path path = Paths.get(filePath);
+			byte[] data = Files.readAllBytes(path);
+			response.data = data;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<download_temp_pordersewingcost_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<download_temp_pordersewingcost_response>(response, HttpStatus.OK);
+		}
 	}
 }
