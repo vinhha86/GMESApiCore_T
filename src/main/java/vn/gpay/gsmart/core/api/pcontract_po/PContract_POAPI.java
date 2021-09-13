@@ -1273,6 +1273,8 @@ public class PContract_POAPI {
 
 						// Kiem tra PO co dung voi PO dang chon de them moi khong
 						if (!PO_No.equals("TBD")) {
+
+							amount_po = 0;
 							Long pcontractpoid_link = null;
 							// Kiem tra so PO va so PO cha
 //							List<PContract_PO> list_po_parent = pcontract_POService.check_exist_PONo(PO_No, pcontractid_link);
@@ -1304,9 +1306,6 @@ public class PContract_POAPI {
 								po_new = pcontract_POService.save(po_new);
 
 								pcontractpoid_link = po_new.getId();
-
-								// khi tim thay po moi thi de lai so luong ve 0
-								amount_po = 0;
 							} else {
 								pcontractpoid_link = list_po.get(0).getId();
 								PContract_PO po = list_po.get(0);
@@ -1558,69 +1557,13 @@ public class PContract_POAPI {
 								s_sizename = commonService.getStringValue(rowheader.getCell(columnsize));
 								s_sizename = s_sizename.equals("0") ? "" : s_sizename;
 							}
-
+							System.out.println("amount_po: " + amount_po);
 							// Cap nhat lai so tong cua po
 							PContract_PO po = pcontract_POService.findOne(pcontractpoid_link);
 							po.setPo_quantity(amount_po);
 							po = pcontract_POService.save(po);
 
-							// Them porder req theo don vi chinh
-//								Product product = productService.findOne(parent.getProductid_link());
-//								if(product.getProducttypeid_link() != 5) {
-//									List<POrder_Req> list_req = reqService.getByContractAndPO_and_Org(pcontractid_link, pcontractpoid_link, parent.getOrgmerchandiseid_link(), product.getId());
-//									if(list_req.size() == 0) {
-//										POrder_Req req = new POrder_Req();
-//										req.setAmount_inset(1);
-//										req.setGranttoorgid_link(parent.getOrgmerchandiseid_link());
-//										req.setId(null);
-//										req.setIs_calculate(false);
-//										req.setOrgrootid_link(orgrootid_link);
-//										req.setPcontract_poid_link(pcontractpoid_link);
-//										req.setPcontractid_link(pcontractid_link);
-//										req.setProductid_link(parent.getProductid_link());
-//										req.setSizesetid_link((long)1);
-//										req.setUsercreatedid_link(user.getId());
-//										req.setStatus(POrderReqStatus.STATUS_FREE);
-//										req.setTimecreated(new Date());
-//										req.setTotalorder(amount_po);
-//										reqService.save(req);
-//									}
-//									else {
-//										POrder_Req req = list_req.get(0);
-//										req.setTotalorder(amount_po);
-//										reqService.save(req);
-//									}
-//								}
-//								else {
-//									List<ProductPairing> list_pair = productpairService.getproduct_pairing_detail_bycontract(orgrootid_link, pcontractid_link, product.getId());
-//									for (ProductPairing productPairing : list_pair) {
-//										List<POrder_Req> list_req = reqService.getByContractAndPO_and_Org(pcontractid_link, pcontractpoid_link, parent.getOrgmerchandiseid_link(), productPairing.getProductid_link());
-//										if(list_req.size() == 0) {
-//											POrder_Req req = new POrder_Req();
-//											req.setAmount_inset(productPairing.getAmount());
-//											req.setGranttoorgid_link(parent.getOrgmerchandiseid_link());
-//											req.setId(null);
-//											req.setIs_calculate(false);
-//											req.setOrgrootid_link(orgrootid_link);
-//											req.setPcontract_poid_link(pcontractpoid_link);
-//											req.setPcontractid_link(pcontractid_link);
-//											req.setProductid_link(productPairing.getProductid_link());
-//											req.setSizesetid_link((long)1);
-//											req.setUsercreatedid_link(user.getId());
-//											req.setStatus(POrderReqStatus.STATUS_POCONFFIRMED);
-//											req.setTimecreated(new Date());
-//											req.setTotalorder(amount_po*productPairing.getAmount());
-//											reqService.save(req);
-//										}
-//										else {
-//											POrder_Req req = list_req.get(0);
-//											req.setTotalorder(amount_po*productPairing.getAmount());
-//											reqService.save(req);
-//										}
-//									}
-////								}
-//								
-//							}
+							// Cap nhat lai so luong trong pcontract_productivity
 						}
 						rowNum++;
 						row = sheet.getRow(rowNum);
