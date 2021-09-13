@@ -29,4 +29,10 @@ public class TimesheetAbsenceService extends AbstractService<TimesheetAbsence> i
 				);
 	}
 
+	@Override
+	public List<TimesheetAbsence> getbyOrgid(Long org_id) {
+		// TODO Auto-generated method stub
+		return repo.getbyOrgid(org_id);
+	}
+
 }

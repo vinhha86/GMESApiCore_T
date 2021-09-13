@@ -7,4 +7,5 @@ import vn.gpay.gsmart.core.base.Operations;
 
 public interface ITimesheetAbsenceService extends Operations<TimesheetAbsence>{
 	public List<TimesheetAbsence> getbypaging(TimeSheetAbsence_getbypaging_request entity);
+	public List<TimesheetAbsence> getbyOrgid(Long org_id);
 }

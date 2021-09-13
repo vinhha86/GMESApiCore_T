@@ -159,4 +159,9 @@ public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecification
 			+ "where c.id = :id " )
 	public Long getById(
 			@Param ("id")final Long id);
+	//lấy đơn vị theo id -(lấy đơn vị mà tài khoản quản đó quản lý)
+	@Query(value = "select c from Org c "
+			+ "where c.id = :id " )
+	public List<Org> getOrgById(
+			@Param ("id")final Long id);
 }

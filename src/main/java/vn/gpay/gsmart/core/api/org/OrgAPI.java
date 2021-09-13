@@ -115,6 +115,23 @@ public class OrgAPI {
 			list.add("17");
 			list.add("4");
 			list.add("19");
+			list.add("20");
+			list.add("21");
+			list.add("22");
+			list.add("23");
+			list.add("28");
+			list.add("29");
+			list.add("30");
+			list.add("31");
+			list.add("32");
+			list.add("33");
+			list.add("34");
+			list.add("35");
+			list.add("36");
+			list.add("37");
+			list.add("38");
+			list.add("39");
+			list.add("221");
 			
 			List<Org> ls_tosx = orgService.findChildByListType(user.getRootorgid_link(),entity.id,list);
 	    	
@@ -435,12 +452,18 @@ public class OrgAPI {
 		OrgResponse response = new OrgResponse();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			response.data = orgService.findAllorgByTypeId(entity.orgtypeid_link,(long)user.getRootorgid_link());
-			if(entity.isAll) {
-				Org org = new Org();
-				org.setId((long)0);
-				org.setName("Tất cả");
-				response.data.add(0, org);
+			//nếu user có org_id khác 1(1 là công ty DHA) : tức là thuộc 1 đơn vị cụ thể thì chỉ lấy đơn vị đấy, không được lấy đơn vị khác
+			if(user.getOrgid_link()!=1) {
+				response.data = orgService.getOrgById((long)user.getOrgid_link());
+			}else {
+				response.data = orgService.findAllorgByTypeId(entity.orgtypeid_link,(long)user.getRootorgid_link());
+				if(entity.isAll) {
+					Org org = new Org();
+					org.setId((long)0);
+					org.setName("Tất cả");
+					response.data.add(0, org);
+				}
+				
 			}
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

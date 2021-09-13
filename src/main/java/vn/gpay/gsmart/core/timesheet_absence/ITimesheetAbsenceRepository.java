@@ -37,4 +37,11 @@ public interface ITimesheetAbsenceRepository extends JpaRepository<TimesheetAbse
 //	WHERE (Column1 = @Var1 OR @Var1 IS NULL)
 //	AND (Column2 = @Var2 OR @Var2 IS NULL)
 //	+ "and lower(c.po_buyer) like lower(concat('%',:po_buyer,'%')) "
+	
+	//lây danh sách theo đơn vị - của tài khoản quản lý 
+	@Query(value="select c from TimesheetAbsence c "
+			+ " inner join Personel b on c.personnelid_link = b.id "
+			+ " where b.orgmanagerid_link = :org_id")
+	public List<TimesheetAbsence> getbyOrgid(
+			@Param ("org_id")final Long org_id);
 }

@@ -388,4 +388,10 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 		// TODO Auto-generated method stub
 		return repositoty.getById(id);
 	}
+
+	@Override
+	public List<Org> getOrgById(Long id) {
+		// TODO Auto-generated method stub
+		return repositoty.getOrgById(id);
+	}
 }

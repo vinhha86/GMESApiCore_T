@@ -62,6 +62,8 @@ public interface IOrgService extends Operations<Org>{
 	public List<Org> getByCodeAndParentid_link(String code,Long parentid_link);
 	
 	List<Org> findOrgAllByParent(Long parent_id);
-	//lay org theo id -
+	//lay parent_id theo id -
 	public Long getById(Long id);
+	//lấy đơn vị theo tài khoản quản lý
+	public List<Org> getOrgById(Long id);
 }
