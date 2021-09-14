@@ -44,9 +44,26 @@ public class OrgMenuAPI {
 	public ResponseEntity<?> OrgMenuTree(HttpServletRequest request) {
 		try {
 			OrgMenuTreeResponse response = new OrgMenuTreeResponse();
-			List<Org> menu = orgService.findOrgByTypeForMenuOrg();
-			List<OrgTree> children = orgService.createTree(menu);
-//			System.out.println(menu.size());
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			List<Org> menu ;
+			List<OrgTree> children;
+			if(user.getOrgid_link()!=1) {
+				//nếu user chỉ quản lý 1 tổ cụ thể
+				if(user.getOrg_grant_id_link()!=null) {
+					menu = orgService.findOrgByType_Id_ParentId_Org_grant_IdForMenuOrg((long)user.getOrgid_link(), user.getOrg_grant_id_link());
+					children = orgService.createTree(menu);
+				}else {
+					 menu = orgService.findOrgByType_Id_ParentIdForMenuOrg((long)user.getOrgid_link());
+					 children = orgService.createTree(menu);
+				}
+				
+			}else {
+				menu = orgService.findOrgByTypeForMenuOrg();
+				children = orgService.createTree(menu);
+//				System.out.println(menu.size());
+				
+				
+			}
 			response.children = children;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

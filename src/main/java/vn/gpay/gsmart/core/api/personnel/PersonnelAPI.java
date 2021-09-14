@@ -102,6 +102,16 @@ public class PersonnelAPI {
 			Long orgrootid_link = user.getRootorgid_link();
 
 			List<Personel> list = new ArrayList<Personel>();
+			// lấy danh sách nhân viên theo tổ mà user quản lý
+			if (user.getOrg_grant_id_link() != null) {
+				list = personService.getPersonelByOrgid_link(user.getOrg_grant_id_link());
+				if (list.size() != 0) {
+					response.data = list;
+					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+					return new ResponseEntity<getperson_byorg_response>(response, HttpStatus.OK);
+				}
+			}
 			if (entity.orgid_link == orgrootid_link) {
 				if (entity.isviewall)
 					list = personService.findAll();

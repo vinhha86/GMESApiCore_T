@@ -45,7 +45,13 @@ public class TimesheetAbsenceAPI {
 			Long orgrootid_link = user.getRootorgid_link();
 			//lấy danh sách theo đơn vị của tài khoản quản lý
 			if(user.getOrgid_link()!=1) {
-				response.data = timesheetAbsenceService.getbyOrgid(user.getOrgid_link());
+				//lấy ds theo tổ của tài khoản quản lý (nếu có)
+				if(user.getOrg_grant_id_link()!=null) {
+					response.data = timesheetAbsenceService.getbyOrg_grant_id_link(user.getOrg_grant_id_link());
+				}else {
+					response.data = timesheetAbsenceService.getbyOrgid(user.getOrgid_link());
+				}
+				
 			}else {
 				response.data = timesheetAbsenceService.findAll();
 			}
@@ -92,10 +98,9 @@ public class TimesheetAbsenceAPI {
 	public ResponseEntity<TimeSheetAbsenceType_response> getAllTimeSheetAbsenceType(@RequestBody TimeSheetAbsence_request entity ,HttpServletRequest request) {
 		TimeSheetAbsenceType_response response = new TimeSheetAbsenceType_response();
 		try {
-//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//			Long orgrootid_link = user.getRootorgid_link();
+			//GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			
-			response.data = timesheetAbsenceTypeService.findAll();
+				response.data = timesheetAbsenceTypeService.findAll();
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				

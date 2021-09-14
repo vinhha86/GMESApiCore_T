@@ -17,5 +17,6 @@ public interface IPersonnel_Service extends Operations<Personel> {
 	public Personel getPersonelBycode(String personnel_code);
 	//lấy danh sách nhân viên theo mã nhân viên,không chứa id truyền vào
 	public List<Personel> getPersonelByCode_Id_Personel(String code,Long id);
-	
+	//lấy danh sách nhân viên theo tổ 
+	public List<Personel>getPersonelByOrgid_link(Long org_id);
 }

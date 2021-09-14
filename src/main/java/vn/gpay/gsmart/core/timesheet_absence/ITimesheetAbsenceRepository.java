@@ -44,4 +44,10 @@ public interface ITimesheetAbsenceRepository extends JpaRepository<TimesheetAbse
 			+ " where b.orgmanagerid_link = :org_id")
 	public List<TimesheetAbsence> getbyOrgid(
 			@Param ("org_id")final Long org_id);
+	//lấy danh sách theo tổ - của tài khoản quản lý
+	@Query(value="select c from TimesheetAbsence c "
+			+ " inner join Personel b on c.personnelid_link = b.id "
+			+ " where b.orgid_link = :Org_grant_id_link")
+	public List<TimesheetAbsence> getbyOrg_grant_id_link(
+			@Param ("Org_grant_id_link")final Long Org_grant_id_link);
 }

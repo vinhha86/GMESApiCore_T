@@ -394,4 +394,16 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 		// TODO Auto-generated method stub
 		return repositoty.getOrgById(id);
 	}
+
+	@Override
+	public List<Org> findOrgByType_Id_ParentIdForMenuOrg(Long org_id) {
+		// TODO Auto-generated method stub
+		return repositoty.findOrgByType_Id_ParentIdForMenuOrg(org_id);
+	}
+
+	@Override
+	public List<Org> findOrgByType_Id_ParentId_Org_grant_IdForMenuOrg(Long org_id, Long Org_grant_id_link) {
+		// TODO Auto-generated method stub
+		return repositoty.findOrgByType_Id_ParentId_Org_grant_IdForMenuOrg(org_id, Org_grant_id_link);
+	}
 }
