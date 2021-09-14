@@ -429,7 +429,7 @@ public class ProductService extends AbstractService<Product> implements IProduct
 	@Override
 	public List<Product> getby_pairid(long productpairid_link) {
 		// TODO Auto-generated method stub
-		return repo.getby_pairid(productpairid_link);
+		return repo.getby_pairid(productpairid_link, null);
 	}
 
 	@Override
@@ -494,5 +494,11 @@ public class ProductService extends AbstractService<Product> implements IProduct
 		if (buyername == null)
 			buyername = "";
 		return repo.getAllProduct(orgrootid_link, buyercode, buyername);
+	}
+
+	@Override
+	public List<Product> getby_pairid_and_pcontract(long productpairid_link, long pcontractid_link) {
+		// TODO Auto-generated method stub
+		return repo.getby_pairid(productpairid_link, pcontractid_link);
 	}
 }

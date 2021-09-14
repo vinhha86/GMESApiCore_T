@@ -807,7 +807,7 @@ public class UploadBomSizeSetAPI {
 														PContractBOM2SKU bom_sku = list_bom_sku.get(0);
 														// luu lai gia tri cu truoc khi update
 														amount_old = bom_sku.getAmount();
-
+														bom_sku.setLost_ratio((float) lost_ratio);
 														bom_sku.setAmount(Float.parseFloat("0" + amount));
 														bomskuService.save(bom_sku);
 													}

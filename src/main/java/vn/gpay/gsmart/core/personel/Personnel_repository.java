@@ -47,4 +47,8 @@ public interface Personnel_repository extends JpaRepository<Personel, Long>, Jpa
 	// lấy danh sách nhân viên theo mã nhân viên, không chứa id truyền vào
 	@Query(value = "select c from Personel c where c.code = :code " + "and c.id <> :id")
 	public List<Personel> getPersonelByCode_Id_Personel(@Param("code") final String code, @Param("id") final Long id);
+	
+	//lấy danh sách nhân viên theo tổ 
+	@Query(value = "select c from Personel c where c.orgid_link = :org_id ")
+	public List<Personel> getPersonelByOrgid_link( @Param("org_id") final Long id);
 }

@@ -159,4 +159,19 @@ public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecification
 			+ "where c.id = :id " )
 	public Long getById(
 			@Param ("id")final Long id);
+	//lấy đơn vị theo id -(lấy đơn vị mà tài khoản quản đó quản lý)
+	@Query(value = "select c from Org c "
+			+ "where c.id = :id " )
+	public List<Org> getOrgById(
+			@Param ("id")final Long id);
+	//lấy tất cả DHA,đợn vị, tổ theo đơn vị mà tài khoản quản lý
+	@Query(value = "select c from Org c where c.id = :org_id  or c.id = 1 or "
+			+ "( c.parentid_link = :org_id and c.orgtypeid_link in(1,3,8,9,13,14,17,19,21,28,29,30,31,32,33,34,35,36,37,38,39)) order by c.id asc")
+	public List<Org> findOrgByType_Id_ParentIdForMenuOrg(@Param ("org_id")final Long org_id);
+	//lấy DHA,đơn vị, tổ cụ thể theo tổ mà tài khoản quản lý
+	@Query(value = "select c from Org c where c.id in( :org_id, 1, :Org_grant_id_link) "
+			+ " order by c.id asc")
+	public List<Org> findOrgByType_Id_ParentId_Org_grant_IdForMenuOrg(
+			@Param ("org_id")final Long org_id,
+			@Param ("Org_grant_id_link")final Long Org_grant_id_link);
 }
