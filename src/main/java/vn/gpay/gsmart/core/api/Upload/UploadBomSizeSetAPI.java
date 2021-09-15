@@ -692,14 +692,17 @@ public class UploadBomSizeSetAPI {
 												List<PContract_PO> listpo = poService.getbycode_and_type_and_product(
 														po_no, POType.PO_LINE_CONFIRMED, pcontractid_link,
 														productid_link);
-												if (listpo.size() == 0) {
-													PContract_bom2_npl_poline po_npl = new PContract_bom2_npl_poline();
-													po_npl.setId(null);
-													po_npl.setNpl_skuid_link(material_skuid_link);
-													po_npl.setPcontract_poid_link(listpo.get(0).getId());
-													po_npl.setPcontractid_link(pcontractid_link);
+												if (listpo.size() > 0) {
+													List<PContract_bom2_npl_poline> listpo_npl = po_npl_Service.getby_product_and_npl(productid_link, pcontractid_link, material_skuid_link);
+													if(listpo_npl.size() == 0) {
+														PContract_bom2_npl_poline po_npl = new PContract_bom2_npl_poline();
+														po_npl.setId(null);
+														po_npl.setNpl_skuid_link(material_skuid_link);
+														po_npl.setPcontract_poid_link(listpo.get(0).getId());
+														po_npl.setPcontractid_link(pcontractid_link);
 
-													po_npl_Service.save(po_npl);
+														po_npl_Service.save(po_npl);
+													}
 												}
 											}
 
