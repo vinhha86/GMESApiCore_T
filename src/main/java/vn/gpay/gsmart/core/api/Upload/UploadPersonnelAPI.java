@@ -34,6 +34,8 @@ import vn.gpay.gsmart.core.personnel_history.IPersonnel_His_Service;
 import vn.gpay.gsmart.core.personnel_history.Personnel_His;
 import vn.gpay.gsmart.core.personnel_position.IPersonnel_Position_Service;
 import vn.gpay.gsmart.core.personnel_position.Personnel_Position;
+import vn.gpay.gsmart.core.personnel_type.IPersonnelType_Service;
+import vn.gpay.gsmart.core.personnel_type.PersonnelType;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ColumnPersonnel;
 import vn.gpay.gsmart.core.utils.ColumnTemplate;
@@ -51,11 +53,13 @@ public class UploadPersonnelAPI {
 	IOrgService org_service;
 	@Autowired
 	IOrgTypeService org_type_service;
-	@Autowired 
+	@Autowired
 	IPersonnel_His_Service personnel_his_service;
 	@Autowired
 	IPersonnel_Position_Service personnel_position_service;
-	
+	@Autowired
+	IPersonnelType_Service personneltypeService;
+
 	@RequestMapping(value = "/personnel", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadPersonnel(HttpServletRequest request,
 			@RequestParam("file") MultipartFile file, @RequestParam("orgmanageid_link") long orgmanageid_link) {
@@ -119,7 +123,19 @@ public class UploadPersonnelAPI {
 							STT = STT.equals("0") ? "" : STT;
 							continue;
 						}
-
+						String ThoiVu = commonService.getStringValue(row.getCell(ColumnPersonnel.ThoiVu));
+						Long LoaiNV = null;
+						String ssThoiVu = ThoiVu.trim().toLowerCase();
+						if(ssThoiVu.equals("c")  || ssThoiVu.equals("có")){
+							//lấy id của loại nhân viên
+							List<PersonnelType> lst_type=personneltypeService.getByName("Thời vụ");
+							LoaiNV=lst_type.get(0).getId();
+							
+						}else {
+							List<PersonnelType> lst_type=personneltypeService.getByName("Hợp đồng");
+							LoaiNV=lst_type.get(0).getId();
+						}
+						
 						String HoVaTen = commonService.getStringValue(row.getCell(ColumnPersonnel.HoVaTen));
 						String gioiTinh = commonService.getStringValue(row.getCell(ColumnPersonnel.GT));
 						int GioiTinh;
@@ -140,10 +156,10 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) > 0) {
 									NgaySinh = new SimpleDateFormat("dd/MM/yyyy").parse(ngaySinh);
 								} else {
-									mes_err = " Định dạng ngày sinh không đúng dd/MM/yyyy! ở dòng TT : " + rowNum ;
+									mes_err = " Định dạng ngày sinh không đúng dd/MM/yyyy! ở dòng TT : " + rowNum;
 									break;
 								}
-							} else if (ngaySinh != ""){
+							} else if (ngaySinh != "") {
 								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgaySinh))) {
 									NgaySinh = row.getCell(ColumnPersonnel.NgaySinh).getDateCellValue();
 								}
@@ -155,20 +171,20 @@ public class UploadPersonnelAPI {
 						}
 
 						String BoPhan = commonService.getStringValue(row.getCell(ColumnPersonnel.BoPhan));
-						
-						String ChucVu= commonService.getStringValue(row.getCell(ColumnPersonnel.ChucVu));
-						String ChucVuBH =commonService.getStringValue(row.getCell(ColumnPersonnel.ChucVutrongBH));
-						//kiem tra chu vu trong DB, neu chua co thi them chuc vu vao DB
-						Personnel_Position personnel_Position = personnel_position_service.getByName_Code(ChucVuBH, ChucVu);
+
+						String ChucVu = commonService.getStringValue(row.getCell(ColumnPersonnel.ChucVu));
+						String ChucVuBH = commonService.getStringValue(row.getCell(ColumnPersonnel.ChucVutrongBH));
+						// kiem tra chu vu trong DB, neu chua co thi them chuc vu vao DB
+						List<Personnel_Position> lst_personnel_Position = personnel_position_service.getByName_Code(ChucVuBH,ChucVu);
 						Long positionid_link;
-						if(personnel_Position != null) {
-							 positionid_link = personnel_Position.getId();
-						}else {
-							personnel_Position = new Personnel_Position();
+						if (lst_personnel_Position.size() != 0) {
+							positionid_link = lst_personnel_Position.get(0).getId();
+						} else {
+							Personnel_Position personnel_Position = new Personnel_Position();
 							personnel_Position.setCode(ChucVu);
 							personnel_Position.setName(ChucVuBH);
 							Personnel_Position per_positionid = personnel_position_service.save(personnel_Position);
-							positionid_link =per_positionid.getId();
+							positionid_link = per_positionid.getId();
 						}
 						// ngay ki hop dong co thoi han
 						Date NgayKiHDCTH = null;
@@ -180,11 +196,11 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayKiHDCTH = new SimpleDateFormat("dd/MM/yyyy").parse(ngayKiHDCTH);
 								} else {
-									mes_err = " Định dạng ngày kí HDCTH không đúng dd/MM/yyyy! "+ " ở dòng TT" + rowNum ;
+									mes_err = " Định dạng ngày kí HDCTH không đúng dd/MM/yyyy! " + " ở dòng TT" + rowNum;
 									break;
 								}
 
-							} else if(ngayKiHDCTH != ""){
+							} else if (ngayKiHDCTH != "") {
 								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayKiHDCTH))) {
 									NgayKiHDCTH = row.getCell(ColumnPersonnel.NgayKiHDCTH).getDateCellValue();
 								}
@@ -195,8 +211,7 @@ public class UploadPersonnelAPI {
 								NgayKiHDCTH = row.getCell(ColumnPersonnel.NgayKiHDCTH).getDateCellValue();
 							}
 						}
-						
-					
+
 //						String Bac = commonService.getStringValue(row.getCell(ColumnPersonnel.Bac));
 //						String MaBacLuongBH = commonService.getStringValue(row.getCell(ColumnPersonnel.MaBacluongBH));
 //						String HeSoLuong = commonService.getStringValue(row.getCell(ColumnPersonnel.HeSoLuongBH));
@@ -209,41 +224,43 @@ public class UploadPersonnelAPI {
 						Long parentid_link = (long) orgmanageid_link;
 						Long orgid_link = null;
 						List<Org> lst_bp = org_service.getByCodeAndParentid_link(BoPhan, parentid_link);
-						
-						if(person.getId()!=null) {
-							//	kiểm tra xem ngày quyết định mới có lơn hơn ngày quyết định cũ không, nếu nhỏ hơn thì không được thêm mới quyết định
-								List<Personnel_His> perhis = personnel_his_service.getHis_personByType_Id(person.getId(), 3);
-								//nếu ngày quyết định nhỏ hơn ngày đã tồn tại
-								if(perhis.size()!=0) {
-									if(NgayKiHDCTH.compareTo(perhis.get(0).getDecision_date())<0) {
-										mes_err = " Kí hợp đồng có thời hạn mới không được nhỏ hơn ngày kí hợp đồng thời có thời hạn đã có "+ " ở dòng TT" + rowNum ;
-										break;
-									}
-								}							
+
+						if (person.getId() != null) {
+							// kiểm tra xem ngày quyết định mới có lơn hơn ngày quyết định cũ không, nếu nhỏ
+							// hơn thì không được thêm mới quyết định
+							List<Personnel_His> perhis = personnel_his_service.getHis_personByType_Id(person.getId(),
+									3);
+							// nếu ngày quyết định nhỏ hơn ngày đã tồn tại
+							if (perhis.size() != 0) {
+								if (NgayKiHDCTH.compareTo(perhis.get(0).getDecision_date()) < 0) {
+									mes_err = " Kí hợp đồng có thời hạn mới không được nhỏ hơn ngày kí hợp đồng thời có thời hạn đã có "
+											+ " ở dòng TT" + rowNum;
+									break;
+								}
 							}
+						}
 						if (lst_bp.size() != 0) {
-							// thêm 
+							// thêm
 							orgid_link = lst_bp.get(0).getId();
 						} else {
-							
-							
-							//nếu chưa có thì thêm bộ phận vào DB
+
+							// nếu chưa có thì thêm bộ phận vào DB
 							Org org = new Org();
 							OrgType org_type = new OrgType();
 							org_type.setName(BoPhan);
 							OrgType id_org_type = org_type_service.save(org_type);
 							org.setCode(BoPhan);
 							org.setName(BoPhan);
-							org.setOrgtypeid_link((int)id_org_type.getId());
+							org.setOrgtypeid_link((int) id_org_type.getId());
 							org.setStatus(1);
 							org.setParentid_link(parentid_link);
-							org.setOrgrootid_link((long)1);
-							
-							//luu bộ phận vào DB
+							org.setOrgrootid_link((long) 1);
+
+							// luu bộ phận vào DB
 							Org org_id = org_service.save(org);
 							orgid_link = org_id.getId();
-							//mes_err = " Bộ phận không tồn tại! " + " ở dòng " + rowNum  + " cột Bộ Phận ";
-							//break;
+							// mes_err = " Bộ phận không tồn tại! " + " ở dòng " + rowNum + " cột Bộ Phận ";
+							// break;
 						}
 
 						// ngay vao cong ty
@@ -256,11 +273,12 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayVaoCT = new SimpleDateFormat("dd/MM/yyyy").parse(ngayVaoCT);
 								} else {
-									mes_err = " Định dạng ngày vào CT không đúng dd/MM/yyyy! "+ " ở dòng TT: " + rowNum  ;
+									mes_err = " Định dạng ngày vào CT không đúng dd/MM/yyyy! " + " ở dòng TT: "
+											+ rowNum;
 									break;
 								}
 
-							} else if(ngayVaoCT != ""){
+							} else if (ngayVaoCT != "") {
 								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayVaoCT))) {
 									NgayVaoCT = row.getCell(ColumnPersonnel.NgayVaoCT).getDateCellValue();
 								}
@@ -275,18 +293,19 @@ public class UploadPersonnelAPI {
 						// ngay thoi viec
 						Date NgayThoiViec = null;
 						try {
-							String ngayThoiViec = commonService.getStringValue(row.getCell(ColumnPersonnel.NgayThoiViec));
+							String ngayThoiViec = commonService
+									.getStringValue(row.getCell(ColumnPersonnel.NgayThoiViec));
 							if (ngayThoiViec.contains("/")) {
 								String[] s_date = ngayThoiViec.split("/");
 								if (Integer.parseInt(s_date[1].toString()) < 13
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayThoiViec = new SimpleDateFormat("dd/MM/yyyy").parse(ngayThoiViec);
 								} else {
-									mes_err = " Định dạng ngày thôi việc không đúng dd/MM/yyyy! "+ " ở dòng TT" + rowNum ;
+									mes_err = " Định dạng ngày thôi việc không đúng dd/MM/yyyy! " + " ở dòng TT" + rowNum;
 									break;
 								}
 
-							} else if(ngayThoiViec != ""){
+							} else if (ngayThoiViec != "") {
 								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayThoiViec))) {
 									NgayThoiViec = row.getCell(ColumnPersonnel.NgayThoiViec).getDateCellValue();
 								}
@@ -308,11 +327,11 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayKiHDTV = new SimpleDateFormat("dd/MM/yyyy").parse(ngayKiHDTV);
 								} else {
-									mes_err = " Định dạng ngày kí HDTV không đúng dd/MM/yyyy! "+ " ở dòng TT" + rowNum ;
+									mes_err = " Định dạng ngày kí HDTV không đúng dd/MM/yyyy! " + " ở dòng TT" + rowNum;
 									break;
 								}
 
-							} else if(ngayKiHDTV != ""){
+							} else if (ngayKiHDTV != "") {
 								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayKiHDTV))) {
 									NgayKiHDTV = row.getCell(ColumnPersonnel.NgayKiHDTV).getDateCellValue();
 								}
@@ -324,8 +343,6 @@ public class UploadPersonnelAPI {
 							}
 						}
 
-					
-
 						// ngay ki hop dong vo thoi han
 						Date NgayKiHDVTH = null;
 						try {
@@ -336,11 +353,11 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayKiHDVTH = new SimpleDateFormat("dd/MM/yyyy").parse(ngayKiHDVTH);
 								} else {
-									mes_err = " Định dạng ngày kí HDVTH không đúng dd/MM/yyyy! "+ " ở dòng TT" + rowNum ;
+									mes_err = " Định dạng ngày kí HDVTH không đúng dd/MM/yyyy! " + " ở dòng TT"+ rowNum;
 									break;
 								}
 
-							} else if(ngayKiHDVTH != ""){
+							} else if (ngayKiHDVTH != "") {
 								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayKiHDVTH))) {
 									NgayKiHDVTH = row.getCell(ColumnPersonnel.NgayKiHDVTH).getDateCellValue();
 								}
@@ -362,11 +379,11 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayDongBH = new SimpleDateFormat("dd/MM/yyyy").parse(ngayDongBH);
 								} else {
-									mes_err = " Định dạng ngày đóng BH không đúng dd/MM/yyyy! "+ " ở dòng TT" + rowNum ;
+									mes_err = " Định dạng ngày đóng BH không đúng dd/MM/yyyy! " + " ở dòng TT" + rowNum;
 									break;
 								}
 
-							} else if(ngayDongBH != ""){
+							} else if (ngayDongBH != "") {
 								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayDongBH))) {
 									NgayDongBH = row.getCell(ColumnPersonnel.NgayDongBH).getDateCellValue();
 								}
@@ -406,10 +423,10 @@ public class UploadPersonnelAPI {
 							org.setIs_manufacturer(0);
 							org.setOrgtypeid_link(25);
 							Org id_org = org_service.save(org);
-							
-							//lấy id tỉnh thành vừa thêm
+
+							// lấy id tỉnh thành vừa thêm
 							tinh = id_org.getId();
-							
+
 						}
 
 						// kiem tra huyen trong danh sach tinh orgtypeid_link = 26;
@@ -426,8 +443,8 @@ public class UploadPersonnelAPI {
 							org.setIs_manufacturer(0);
 							org.setParentid_link(tinh);
 							org.setOrgtypeid_link(26);
-							
-							//lấy id huyện vừa thêm
+
+							// lấy id huyện vừa thêm
 							Org id_org = org_service.save(org);
 							huyen = id_org.getId();
 //							
@@ -445,11 +462,11 @@ public class UploadPersonnelAPI {
 							org.setIs_manufacturer(0);
 							org.setParentid_link(huyen);
 							org.setOrgtypeid_link(27);
-							
-							//lấy id huyện vừa thêm
+
+							// lấy id huyện vừa thêm
 							Org id_org = org_service.save(org);
 							xa = id_org.getId();
-							
+
 						}
 
 						// String NgayCap =
@@ -464,10 +481,10 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayCap = new SimpleDateFormat("dd/MM/yyyy").parse(ngayCap);
 								} else {
-									mes_err = " Định dạng ngày cấp không đúng dd/MM/yyyy! ở dòng TT" + rowNum ;
+									mes_err = " Định dạng ngày cấp không đúng dd/MM/yyyy! ở dòng TT" + rowNum;
 									break;
 								}
-							} else  if(ngayCap != ""){
+							} else if (ngayCap != "") {
 								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayCap))) {
 									NgayCap = row.getCell(ColumnPersonnel.NgayCap).getDateCellValue();
 								}
@@ -493,10 +510,11 @@ public class UploadPersonnelAPI {
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayCapMoi = new SimpleDateFormat("dd/MM/yyyy").parse(ngayCapMoi);
 								} else {
-									mes_err = " Định dạng ngày cấp mới không đúng dd/MM/yyyy! "+ " ở dòng TT " + rowNum;
+									mes_err = " Định dạng ngày cấp mới không đúng dd/MM/yyyy! " + " ở dòng TT "
+											+ rowNum;
 									break;
 								}
-							} else  if(ngayCapMoi != ""){
+							} else if (ngayCapMoi != "") {
 								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPersonnel.NgayCapMoi))) {
 									NgayCapMoi = row.getCell(ColumnPersonnel.NgayCapMoi).getDateCellValue();
 								}
@@ -517,13 +535,15 @@ public class UploadPersonnelAPI {
 						// person.setCode(MaSoMoi);
 						person.setOrgrootid_link(orgrootid_link);
 						person.setStatus(TinhTrang);
+						
+						//loại nhân viên
+						person.setPersonnel_typeid_link(LoaiNV);
 						person.setFullname(HoVaTen);
 						person.setGender(GioiTinh);
 						person.setOrgid_link(orgid_link);
 						person.setPositionid_link(positionid_link);
 						person.setOrgmanagerid_link(orgmanageid_link);
 
-						
 						person.setBirthdate(NgaySinh);
 						person.setDate_startworking(NgayVaoCT);
 						person.setDate_endworking(NgayThoiViec);
@@ -559,55 +579,55 @@ public class UploadPersonnelAPI {
 						person.setHealthinfo(SK);
 						person.setInsurance_number(SoSBH);
 
-						//luu nhan vien
-						Personel personnel= personnel_service.save(person);
-						Long personnelid_link =personnel.getId();
-						
-						
-						//luu chuc vu
-						int type = 1;//chu vu type =1 
-					//	Date decision_date = new SimpleDateFormat("dd/MM/yyyy").parse("01/08/2021");
+						// luu nhan vien
+						Personel personnel = personnel_service.save(person);
+						Long personnelid_link = personnel.getId();
+
+						// luu chuc vu
+						int type = 1;// chu vu type =1
+						// Date decision_date = new SimpleDateFormat("dd/MM/yyyy").parse("01/08/2021");
 						Personnel_His personnel_His = new Personnel_His();
-						List<Personnel_His> lst_personnel_His =personnel_his_service.getHis_personByType_Id(personnelid_link, type);
-						//neu da co trong danh sach roi-> update
-						if(lst_personnel_His.size() != 0) {
+						List<Personnel_His> lst_personnel_His = personnel_his_service
+								.getHis_personByType_Id(personnelid_link, type);
+						// neu da co trong danh sach roi-> update
+						if (lst_personnel_His.size() != 0) {
 							personnel_His.setId(lst_personnel_His.get(0).getId());
-							personnel_His.setPositionid_link(positionid_link);				
+							personnel_His.setPositionid_link(positionid_link);
 							personnel_His.setType(type);
 							personnel_His.setDecision_date(NgayKiHDCTH);
 							personnel_His.setPersonnelid_link(personnelid_link);
-						}//neu khong co trong danh sach thi tao moi
+						} // neu khong co trong danh sach thi tao moi
 						else {
-							
-							personnel_His.setPositionid_link(positionid_link);				
+
+							personnel_His.setPositionid_link(positionid_link);
 							personnel_His.setType(type);
 							personnel_His.setDecision_date(NgayKiHDCTH);
 							personnel_His.setPersonnelid_link(personnelid_link);
 						}
 						personnel_his_service.save(personnel_His);
-						
-						//luu phòng ban orgid_link
-						//chu vu type =1, phong ban type =3
-						List<Personnel_His> lst_personnel_His_org =personnel_his_service.getHis_personByType_Id(personnelid_link, 3);
-						 personnel_His = new Personnel_His();
-						//neu da co trong danh sach roi-> update
-						if(lst_personnel_His_org.size() != 0) {
+
+						// luu phòng ban orgid_link
+						// chu vu type =1, phong ban type =3
+						List<Personnel_His> lst_personnel_His_org = personnel_his_service
+								.getHis_personByType_Id(personnelid_link, 3);
+						personnel_His = new Personnel_His();
+						// neu da co trong danh sach roi-> update
+						if (lst_personnel_His_org.size() != 0) {
 							personnel_His.setId(lst_personnel_His_org.get(0).getId());
-							personnel_His.setOrgid_link(orgid_link);				
+							personnel_His.setOrgid_link(orgid_link);
 							personnel_His.setType(3);
 							personnel_His.setDecision_date(NgayKiHDCTH);
 							personnel_His.setPersonnelid_link(personnelid_link);
-						}//neu khong co trong danh sach thi tao moi
+						} // neu khong co trong danh sach thi tao moi
 						else {
-							
-							personnel_His.setOrgid_link(orgid_link);				
+
+							personnel_His.setOrgid_link(orgid_link);
 							personnel_His.setType(3);
 							personnel_His.setDecision_date(NgayKiHDCTH);
 							personnel_His.setPersonnelid_link(personnelid_link);
 						}
 						personnel_his_service.save(personnel_His);
-						
-						
+
 						response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 						response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 
@@ -623,7 +643,7 @@ public class UploadPersonnelAPI {
 
 				} catch (Exception e) {
 					System.out.println(e.getMessage());
-					mes_err = "Có lỗi ở dòng " + (rowNum + 1) +" " + mes_err;
+					mes_err = "Có lỗi ở dòng " + (rowNum + 1) + " " + mes_err;
 				} finally {
 					workbook.close();
 					serverFile.delete();

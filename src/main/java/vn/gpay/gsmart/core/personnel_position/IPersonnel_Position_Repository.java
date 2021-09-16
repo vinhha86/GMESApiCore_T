@@ -19,7 +19,7 @@ public interface IPersonnel_Position_Repository extends JpaRepository<Personnel_
 	@Query(value = "select c from Personnel_Position c where "
 			+ " trim(lower(replace(c.name,' ',''))) = trim(lower(replace(:name, ' ',''))) "
 			+ "and trim(lower(replace(c.code,' ',''))) = trim(lower(replace(:code, ' ','')))")
-	public Personnel_Position getByName_Code(
+	public List<Personnel_Position> getByName_Code(
 			@Param ("name")final String name,
 			@Param ("code")final String code);
 }

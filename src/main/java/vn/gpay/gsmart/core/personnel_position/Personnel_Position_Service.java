@@ -25,11 +25,12 @@ public class Personnel_Position_Service extends AbstractService<Personnel_Positi
 	}
 
 	@Override
-	public Personnel_Position getByName_Code(String name, String code) {
+	public List<Personnel_Position> getByName_Code(String name, String code) {
 		// TODO Auto-generated method stub
 		return repo.getByName_Code(name, code);
 	}
 
+	
 	
 
 }
