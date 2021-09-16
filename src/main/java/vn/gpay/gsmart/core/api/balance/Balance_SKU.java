@@ -136,7 +136,8 @@ public class Balance_SKU implements Runnable {
 //			e.printStackTrace();
 //		}	
 //	}
-	// Tinh SL da nhap kho
+	
+	// Tinh SL NPL da nhap kho theo đơn hàng
 	private void cal_stockin_bycontract() {
 		try {
 			RestTemplate restTemplate = new RestTemplate();
@@ -172,7 +173,7 @@ public class Balance_SKU implements Runnable {
 		}
 	}
 
-	// Tinh SL da xuat kho
+	// Tinh SL NPL da xuat kho sang san xuat theo đơn hàng
 	private void cal_stockout_bycontract() {
 		try {
 			RestTemplate restTemplate = new RestTemplate();
@@ -213,7 +214,7 @@ public class Balance_SKU implements Runnable {
 		}
 	}
 
-	// Tinh SL da yeu cau xuat
+	// Tinh SL da lap yeu cau xuat kho sang san xuat
 	private void cal_stockout_order_bycontract() {
 		try {
 			RestTemplate restTemplate = new RestTemplate();
