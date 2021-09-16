@@ -18,6 +18,7 @@ import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.category.LaborLevel;
 import vn.gpay.gsmart.core.org.Org;
+import vn.gpay.gsmart.core.personnel_position.Personnel_Position;
 import vn.gpay.gsmart.core.salary.OrgSal_Level;
 import vn.gpay.gsmart.core.salary.OrgSal_Type;
 import vn.gpay.gsmart.core.timesheet_shift_type.TimesheetShiftType;
@@ -161,6 +162,18 @@ public class Personel implements Serializable {
 		return "";
 	}
 	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="positionid_link",insertable=false,updatable =false)
+    private Personnel_Position personnel_position;
+
+	@Transient
+	public String getPosition() {
+		if(personnel_position!=null) {
+			return personnel_position.getName();
+		}
+		return "";
+	}
 	public Long getId() {
 		return id;
 	}

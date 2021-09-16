@@ -103,7 +103,7 @@ public class PersonnelAPI {
 
 			List<Personel> list = new ArrayList<Personel>();
 			// lấy danh sách nhân viên theo tổ mà user quản lý
-			if (user.getOrg_grant_id_link() != null) {
+			if (user.getOrg_grant_id_link() != null && entity.orgid_link!=1) {
 				list = personService.getPersonelByOrgid_link(user.getOrg_grant_id_link());
 				if (list.size() != 0) {
 					response.data = list;
@@ -112,8 +112,9 @@ public class PersonnelAPI {
 					return new ResponseEntity<getperson_byorg_response>(response, HttpStatus.OK);
 				}
 			}
+			
 			if (entity.orgid_link == orgrootid_link) {
-				if (entity.isviewall)
+				if (entity.isviewall && user.getOrgid_link()==1)
 					list = personService.findAll();
 				else
 					list = personService.getby_orgmanager(entity.orgid_link, orgrootid_link);
