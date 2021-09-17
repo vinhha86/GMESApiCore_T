@@ -29,4 +29,26 @@ public interface IWorkingProcess_Repository extends JpaRepository<WorkingProcess
 			@Param("name") final String name,
 			@Param("productid_link") final Long productid_link
 			);
+	
+	@Query(value = "Select a from WorkingProcess a "
+			+ "where a.process_type=1 " 
+			+ "and trim(lower(a.code)) = trim(lower(:code)) "
+			+ "and a.productid_link = :productid_link "
+			)
+	public List<WorkingProcess>getByCode(
+			@Param("code") final String code,
+			@Param("productid_link") final Long productid_link
+			);
+	
+	@Query(value = "Select a from WorkingProcess a "
+			+ "where a.process_type=1 " 
+			+ "and trim(lower(a.code)) = trim(lower(:code)) "
+			+ "and a.productid_link = :productid_link "
+			+ "and a.id != :id "
+			)
+	public List<WorkingProcess>getByCode_NotId(
+			@Param("code") final String code,
+			@Param("productid_link") final Long productid_link,
+			@Param("id") final Long id
+			);
 }

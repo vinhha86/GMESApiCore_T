@@ -1,20 +1,17 @@
-package vn.gpay.gsmart.core.workingprocess;
+package vn.gpay.gsmart.core.porder_workingprocess;
+
 import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-//import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
-//import javax.persistence.JoinColumn;
-//import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-//import javax.persistence.Transient;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.NotFound;
@@ -23,15 +20,15 @@ import org.hibernate.annotations.NotFoundAction;
 import vn.gpay.gsmart.core.category.LaborLevel;
 import vn.gpay.gsmart.core.devices_type.Devices_Type;
 
-@Table(name="workingprocess")
+@Table(name="porders_workingprocess")
 @Entity
-public class WorkingProcess implements Serializable {
+public class POrderWorkingProcess implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@Id
 //	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "workingprocess_generator")
-	@SequenceGenerator(name="workingprocess_generator", sequenceName = "workingprocess_id_seq", allocationSize=1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "porders_workingprocess_generator")
+	@SequenceGenerator(name="porders_workingprocess_generator", sequenceName = "porders_workingprocess_id_seq", allocationSize=1)
 	protected Long id;
 	
 	@Column(name ="orgrootid_link")
@@ -48,6 +45,9 @@ public class WorkingProcess implements Serializable {
 
 	@Column(name ="productid_link")
     private Long productid_link;
+	
+	@Column(name ="porderid_link")
+    private Long porderid_link;
 
 	@Column(name ="timespent_standard")
     private Integer timespent_standard;
@@ -166,6 +166,14 @@ public class WorkingProcess implements Serializable {
 	public void setProductid_link(Long productid_link) {
 		this.productid_link = productid_link;
 	}
+	
+	public Long getPorderid_link() {
+		return porderid_link;
+	}
+
+	public void setPorderid_link(Long porderid_link) {
+		this.porderid_link = porderid_link;
+	}
 
 	public Integer getTimespent_standard() {
 		return timespent_standard;
@@ -258,6 +266,4 @@ public class WorkingProcess implements Serializable {
 	public void setLastcost(Float lastcost) {
 		this.lastcost = lastcost;
 	}
-
-
 }

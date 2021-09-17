@@ -14,4 +14,7 @@ public interface IWorkingProcess_Service extends Operations<WorkingProcess>{
 	
 	List<WorkingProcess> getByName_Product(String name, Long productid_link);
 
+	List<WorkingProcess>getByCode(String code, Long productid_link);
+	
+	List<WorkingProcess>getByCode_NotId(String code, Long productid_link, Long id);
 }

@@ -1,4 +1,4 @@
-package vn.gpay.gsmart.core.porder_sewingcost;
+package vn.gpay.gsmart.core.product_sewingcost;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -20,24 +20,20 @@ import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.category.LaborLevel;
 import vn.gpay.gsmart.core.devices_type.Devices_Type;
-import vn.gpay.gsmart.core.porder_balance_process.POrderBalanceProcess;
-import vn.gpay.gsmart.core.porder_workingprocess.POrderWorkingProcess;
+import vn.gpay.gsmart.core.product_balance_process.ProductBalanceProcess;
+import vn.gpay.gsmart.core.workingprocess.WorkingProcess;
 
-@Table(name="porders_sewingcost")
+@Table(name="product_sewingcost")
 @Entity
-public class POrderSewingCost implements Serializable {
-
-	/**
-	 * 
-	 */
+public class ProductSewingCost implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "porders_sewingcost_generator")
-	@SequenceGenerator(name="porders_sewingcost_generator", sequenceName = "porders_sewingcost_id_seq", allocationSize=1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_sewingcost_generator")
+	@SequenceGenerator(name="product_sewingcost_generator", sequenceName = "product_sewingcost_id_seq", allocationSize=1)
 	private Long id;
 	private Long orgrootid_link;
-	private Long porderid_link;
+	private Long productid_link;
 	private Long workingprocessid_link;
 	private Float cost;
 	private Integer amount;
@@ -52,7 +48,7 @@ public class POrderSewingCost implements Serializable {
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="workingprocessid_link",insertable=false,updatable =false)
-    private POrderWorkingProcess workingprocess;
+    private WorkingProcess workingprocess;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -66,8 +62,8 @@ public class POrderSewingCost implements Serializable {
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
-	@JoinColumn(name="pordersewingcostid_link",insertable=false,updatable =false)
-    private List<POrderBalanceProcess> porderBalanceProcess_list;
+	@JoinColumn(name="productsewingcostid_link",insertable=false,updatable =false)
+    private List<ProductBalanceProcess> productBalanceProcess_list;
 	
 	@Transient
 	public String getWorkingprocess_name() {
@@ -102,22 +98,22 @@ public class POrderSewingCost implements Serializable {
 	}
 	
 	@Transient
-	public Long getPorderbalanceid_link() {
-		if(porderBalanceProcess_list != null) {
-			if(porderBalanceProcess_list.size() > 0) {
-				POrderBalanceProcess porderBalanceProcess = porderBalanceProcess_list.get(0);
-				return porderBalanceProcess.getPorderbalanceid_link();
+	public Long getProductbalanceid_link() {
+		if(productBalanceProcess_list != null) {
+			if(productBalanceProcess_list.size() > 0) {
+				ProductBalanceProcess productBalanceProcess = productBalanceProcess_list.get(0);
+				return productBalanceProcess.getProductbalanceid_link();
 			}
 		}
 		return null;
 	}
 	
 	@Transient
-	public String getPorderbalance_name() {
-		if(porderBalanceProcess_list != null) {
-			if(porderBalanceProcess_list.size() > 0) {
-				POrderBalanceProcess porderBalanceProcess = porderBalanceProcess_list.get(0);
-				return porderBalanceProcess.getBalance_name();
+	public String getProductbalance_name() {
+		if(productBalanceProcess_list != null) {
+			if(productBalanceProcess_list.size() > 0) {
+				ProductBalanceProcess productBalanceProcess = productBalanceProcess_list.get(0);
+				return productBalanceProcess.getBalance_name();
 			}
 		}
 		return null;
@@ -128,9 +124,6 @@ public class POrderSewingCost implements Serializable {
 	}
 	public Long getOrgrootid_link() {
 		return orgrootid_link;
-	}
-	public Long getPorderid_link() {
-		return porderid_link;
 	}
 	public Long getWorkingprocessid_link() {
 		return workingprocessid_link;
@@ -155,9 +148,6 @@ public class POrderSewingCost implements Serializable {
 	}
 	public void setOrgrootid_link(Long orgrootid_link) {
 		this.orgrootid_link = orgrootid_link;
-	}
-	public void setPorderid_link(Long porderid_link) {
-		this.porderid_link = porderid_link;
 	}
 	public void setWorkingprocessid_link(Long workingprocessid_link) {
 		this.workingprocessid_link = workingprocessid_link;
@@ -208,6 +198,14 @@ public class POrderSewingCost implements Serializable {
 
 	public void setTechcomment(String techcomment) {
 		this.techcomment = techcomment;
+	}
+
+	public Long getProductid_link() {
+		return productid_link;
+	}
+
+	public void setProductid_link(Long productid_link) {
+		this.productid_link = productid_link;
 	}
 	
 }

@@ -1,4 +1,4 @@
-package vn.gpay.gsmart.core.api.porder_sewingcost;
+package vn.gpay.gsmart.core.api.product_sewingcost;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -6,11 +6,8 @@ import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -33,283 +30,211 @@ import vn.gpay.gsmart.core.category.ILaborLevelService;
 import vn.gpay.gsmart.core.category.LaborLevel;
 import vn.gpay.gsmart.core.devices_type.Devices_Type;
 import vn.gpay.gsmart.core.devices_type.IDevices_TypeService;
-import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Service;
-import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
-import vn.gpay.gsmart.core.porder.IPOrder_Service;
-import vn.gpay.gsmart.core.porder.POrder;
-import vn.gpay.gsmart.core.porder_balance.IPOrderBalanceService;
-import vn.gpay.gsmart.core.porder_balance.POrderBalance;
-import vn.gpay.gsmart.core.porder_balance_process.IPOrderBalanceProcessService;
-import vn.gpay.gsmart.core.porder_balance_process.POrderBalanceProcess;
-import vn.gpay.gsmart.core.porder_sewingcost.IPorderSewingCost_Service;
-import vn.gpay.gsmart.core.porder_sewingcost.POrderSewingCost;
-import vn.gpay.gsmart.core.porder_sewingcost.POrderSewingCostBinding;
-import vn.gpay.gsmart.core.porder_workingprocess.IPOrderWorkingProcess_Service;
-import vn.gpay.gsmart.core.porder_workingprocess.POrderWorkingProcess;
-import vn.gpay.gsmart.core.porderprocessingns.IPorderProcessingNsService;
-import vn.gpay.gsmart.core.porderprocessingns.PorderProcessingNs;
+import vn.gpay.gsmart.core.product.IProductService;
+import vn.gpay.gsmart.core.product.Product;
+import vn.gpay.gsmart.core.product_balance.IProductBalanceService;
+import vn.gpay.gsmart.core.product_balance.ProductBalance;
+import vn.gpay.gsmart.core.product_balance_process.IProductBalanceProcessService;
+import vn.gpay.gsmart.core.product_balance_process.ProductBalanceProcess;
+import vn.gpay.gsmart.core.product_sewingcost.IProductSewingCostService;
+import vn.gpay.gsmart.core.product_sewingcost.ProductSewingCost;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ColumnPorderSewingCost;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 import vn.gpay.gsmart.core.workingprocess.IWorkingProcess_Service;
-//import vn.gpay.gsmart.core.workingprocess.WorkingProcess;
+import vn.gpay.gsmart.core.workingprocess.WorkingProcess;
 
 @RestController
-@RequestMapping("/api/v1/pordersewingcost")
-public class PorderSewingCostAPI {
+@RequestMapping("/api/v1/productsewingcost")
+public class ProductSewingCostAPI {
 	@Autowired
 	Common commonService;
-	@Autowired IPorderSewingCost_Service pordersewingService;
-	@Autowired IWorkingProcess_Service workingprocessService;
-	@Autowired IPOrder_Service porderService;
-	@Autowired IPContract_Price_Service pcontractpriceService;
-	@Autowired IPOrderBalanceService porderBalanceService;
-	@Autowired IPOrderBalanceProcessService porderBalanceProcessService;
-	@Autowired IPorderProcessingNsService porderProcessingNsService;
+	@Autowired IProductSewingCostService productSewingCostService;
+	@Autowired IProductBalanceService productBalanceService;
+	@Autowired IProductBalanceProcessService productBalanceProcessService;
 	@Autowired IDevices_TypeService devicesTypeService;
 	@Autowired ILaborLevelService laborLevelService;
-//	@Autowired IWorkingProcess_Service workingProcessService;
-	@Autowired IPOrderWorkingProcess_Service porderWorkingProcessService;
+	@Autowired IWorkingProcess_Service workingProcessService;
+	@Autowired IProductService productService;
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public ResponseEntity<create_pordersewingcost_response> Create(HttpServletRequest request,
-			@RequestBody create_pordersewingcost_request entity) {
-		create_pordersewingcost_response response = new create_pordersewingcost_response();
+	public ResponseEntity<create_productsewingcost_response> Create(HttpServletRequest request,
+			@RequestBody create_productsewingcost_request entity) {
+		create_productsewingcost_response response = new create_productsewingcost_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			long porderid_link = entity.porderid_link;
+			long productid_link = entity.productid_link;
 			long orgrootid_link = user.getRootorgid_link();
 			List<Long> list_id = entity.list_working;
 
 			for (Long workingprocessid_link : list_id) {
-				POrderWorkingProcess wp = porderWorkingProcessService.findOne(workingprocessid_link);
+				WorkingProcess wp = workingProcessService.findOne(workingprocessid_link);
 
-				List<POrderSewingCost> list_sewing = pordersewingService.getby_porder_and_workingprocess(porderid_link,
+				List<ProductSewingCost> list_sewing = productSewingCostService.getby_product_and_workingprocess(productid_link,
 						workingprocessid_link);
 				if (list_sewing.size() == 0) {
-					POrderSewingCost porderSewing = new POrderSewingCost();
-					porderSewing.setAmount(0);
-					porderSewing.setCost((float) 0);
-					porderSewing.setDatecreated(new Date());
-					porderSewing.setId(null);
-					porderSewing.setOrgrootid_link(orgrootid_link);
-					porderSewing.setPorderid_link(porderid_link);
-					porderSewing.setTotalcost((float) 0);
-					porderSewing.setUsercreatedid_link(user.getId());
-					porderSewing.setWorkingprocessid_link(workingprocessid_link);
-					porderSewing.setTechcomment(wp.getTechcomment());
-					porderSewing.setLaborrequiredid_link(wp.getLaborrequiredid_link());
-					porderSewing.setDevicerequiredid_link(wp.getDevicerequiredid_link());
-					porderSewing.setTimespent_standard(wp.getTimespent_standard());
-					porderSewing.setDevicerequiredid_link(wp.getDevicerequiredid_link());
-					porderSewing.setLaborrequiredid_link(wp.getLaborrequiredid_link());
+					ProductSewingCost productSewing = new ProductSewingCost();
+					productSewing.setAmount(0);
+					productSewing.setCost((float) 0);
+					productSewing.setDatecreated(new Date());
+					productSewing.setId(null);
+					productSewing.setOrgrootid_link(orgrootid_link);
+					productSewing.setProductid_link(productid_link);
+					productSewing.setTotalcost((float) 0);
+					productSewing.setUsercreatedid_link(user.getId());
+					productSewing.setWorkingprocessid_link(workingprocessid_link);
+					productSewing.setTechcomment(wp.getTechcomment());
+					productSewing.setLaborrequiredid_link(wp.getLaborrequiredid_link());
+					productSewing.setDevicerequiredid_link(wp.getDevicerequiredid_link());
+					productSewing.setTimespent_standard(wp.getTimespent_standard());
+					productSewing.setDevicerequiredid_link(wp.getDevicerequiredid_link());
+					productSewing.setLaborrequiredid_link(wp.getLaborrequiredid_link());
 
-					pordersewingService.save(porderSewing);
+					productSewingCostService.save(productSewing);
 				}
 			}
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<create_pordersewingcost_response>(response, HttpStatus.OK);
+			return new ResponseEntity<create_productsewingcost_response>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			return new ResponseEntity<create_pordersewingcost_response>(response, HttpStatus.OK);
+			return new ResponseEntity<create_productsewingcost_response>(response, HttpStatus.OK);
 		}
 	}
 
-	@RequestMapping(value = "/getby_porder", method = RequestMethod.POST)
-	public ResponseEntity<getby_porder_response> GetByPorder(HttpServletRequest request,
-			@RequestBody getby_porder_request entity) {
-		getby_porder_response response = new getby_porder_response();
+	@RequestMapping(value = "/getby_product", method = RequestMethod.POST)
+	public ResponseEntity<getby_product_response> GetByProduct(HttpServletRequest request,
+			@RequestBody getby_product_request entity) {
+		getby_product_response response = new getby_product_response();
 		try {
-			long porderid_link = entity.porderid_link;
+			long productid_link = entity.productid_link;
 
-			long workingprocessid_link = 0; // 0 : lay theo porder
-			List<POrderSewingCost> porderSewingCost_list = pordersewingService.getby_porder_and_workingprocess(porderid_link, workingprocessid_link);
+			long workingprocessid_link = 0; // 0 : lay theo product
+			List<ProductSewingCost> productSewingCost_list = productSewingCostService.getby_product_and_workingprocess(productid_link, workingprocessid_link);
 			
-			response.data = porderSewingCost_list;
+			response.data = productSewingCost_list;
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<getby_porder_response>(response, HttpStatus.OK);
+			return new ResponseEntity<getby_product_response>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			return new ResponseEntity<getby_porder_response>(response, HttpStatus.OK);
+			return new ResponseEntity<getby_product_response>(response, HttpStatus.OK);
 		}
 	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public ResponseEntity<update_pordersewingcost_response> Update(HttpServletRequest request,
-			@RequestBody update_pordersewingcost_request entity) {
-		update_pordersewingcost_response response = new update_pordersewingcost_response();
+	public ResponseEntity<update_productsewingcost_response> Update(HttpServletRequest request,
+			@RequestBody update_productsewingcost_request entity) {
+		update_productsewingcost_response response = new update_productsewingcost_response();
 		try {
-			POrderSewingCost pordersewingcost = pordersewingService.findOne(entity.data.getId());
-			float cost_old = pordersewingcost.getTotalcost();
-			pordersewingService.save(entity.data);
+			ProductSewingCost productsewingcost = productSewingCostService.findOne(entity.data.getId());
+			productSewingCostService.save(entity.data);
 
 			// Cap nhat gia moi nhat cho san pham vao bang workingprocess
-			POrderWorkingProcess wp = porderWorkingProcessService.findOne(entity.data.getWorkingprocessid_link());
+			WorkingProcess wp = workingProcessService.findOne(entity.data.getWorkingprocessid_link());
 			wp.setLastcost(entity.data.getCost());
-			porderWorkingProcessService.save(wp);
-
-			// Cap nhat gia len PContract_PO
-			POrder porder = porderService.findOne(entity.data.getPorderid_link());
-			long pcontract_poid_link = porder.getPcontract_poid_link();
-			long productid_link = porder.getProductid_link();
-			PContract_Price price = pcontractpriceService.getPrice_CMP(pcontract_poid_link, productid_link);
-			float price_cost_old = 0;
-			if (price == null) {
-				price = new PContract_Price();
-				price.setPcontract_poid_link(pcontract_poid_link);
-				price.setProductid_link(productid_link);
-			} else {
-				price_cost_old = price.getPrice_sewingcost();
-			}
-			price.setPrice_sewingcost(price_cost_old - cost_old + entity.data.getTotalcost());
-			pcontractpriceService.save(price);
+			workingProcessService.save(wp);
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<update_pordersewingcost_response>(response, HttpStatus.OK);
+			return new ResponseEntity<update_productsewingcost_response>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			return new ResponseEntity<update_pordersewingcost_response>(response, HttpStatus.OK);
+			return new ResponseEntity<update_productsewingcost_response>(response, HttpStatus.OK);
 		}
 	}
 
 	@RequestMapping(value = "/delete", method = RequestMethod.POST)
-	public ResponseEntity<delete_porersewingcost_response> Delete(HttpServletRequest request,
-			@RequestBody delete_pordersewingcost_request entity) {
-		delete_porersewingcost_response response = new delete_porersewingcost_response();
+	public ResponseEntity<delete_productsewingcost_response> Delete(HttpServletRequest request,
+			@RequestBody delete_productsewingcost_request entity) {
+		delete_productsewingcost_response response = new delete_productsewingcost_response();
 		try {
-			// xoá trong bảng porders_balance_process (danh sách công đoạn trong cụm công
+			// xoá trong bảng product_balance_process (danh sách công đoạn trong cụm công
 			// đoạn)
-			List<POrderBalanceProcess> porderBalanceProcess_list = porderBalanceProcessService
-					.getByPorderSewingcost(entity.id);
-			if (porderBalanceProcess_list.size() > 0) {
-				for (POrderBalanceProcess item : porderBalanceProcess_list) {
-					porderBalanceProcessService.deleteById(item.getId());
+			List<ProductBalanceProcess> productBalanceProcess_list = productBalanceProcessService
+					.getByProductSewingcost(entity.id);
+			if (productBalanceProcess_list.size() > 0) {
+				for (ProductBalanceProcess item : productBalanceProcess_list) {
+					productBalanceProcessService.deleteById(item.getId());
 				}
 			}
-			// xoá trong bảng porders_sewingcost (danh sách công đoạn lệnh)
-			pordersewingService.deleteById(entity.id);
+			// xoá trong bảng product_sewingcost (danh sách công đoạn lệnh)
+			productSewingCostService.deleteById(entity.id);
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<delete_porersewingcost_response>(response, HttpStatus.OK);
+			return new ResponseEntity<delete_productsewingcost_response>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			return new ResponseEntity<delete_porersewingcost_response>(response, HttpStatus.OK);
+			return new ResponseEntity<delete_productsewingcost_response>(response, HttpStatus.OK);
 		}
 	}
 	
 	@RequestMapping(value = "/delete_multi", method = RequestMethod.POST)
-	public ResponseEntity<delete_porersewingcost_response> delete_multi(HttpServletRequest request,
-			@RequestBody delete_pordersewingcost_request entity) {
-		delete_porersewingcost_response response = new delete_porersewingcost_response();
+	public ResponseEntity<delete_productsewingcost_response> delete_multi(HttpServletRequest request,
+			@RequestBody delete_productsewingcost_request entity) {
+		delete_productsewingcost_response response = new delete_productsewingcost_response();
 		try {
 			List<Long> idList = entity.idList;
 			for(Long id : idList) {
-				// xoá trong bảng porders_balance_process (danh sách công đoạn trong cụm công đoạn)
-				List<POrderBalanceProcess> porderBalanceProcess_list = porderBalanceProcessService
-						.getByPorderSewingcost(id);
-				if (porderBalanceProcess_list.size() > 0) {
-					for (POrderBalanceProcess item : porderBalanceProcess_list) {
-						porderBalanceProcessService.deleteById(item.getId());
+				// xoá trong bảng product_balance_process (danh sách công đoạn trong cụm công đoạn)
+				List<ProductBalanceProcess> productBalanceProcess_list = productBalanceProcessService
+						.getByProductSewingcost(id);
+				if (productBalanceProcess_list.size() > 0) {
+					for (ProductBalanceProcess item : productBalanceProcess_list) {
+						productBalanceProcessService.deleteById(item.getId());
 					}
 				}
-				// xoá trong bảng porders_sewingcost (danh sách công đoạn lệnh)
-				pordersewingService.deleteById(id);
+				// xoá trong bảng product_sewingcost (danh sách công đoạn lệnh)
+				productSewingCostService.deleteById(id);
 			}
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<delete_porersewingcost_response>(response, HttpStatus.OK);
+			return new ResponseEntity<delete_productsewingcost_response>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			return new ResponseEntity<delete_porersewingcost_response>(response, HttpStatus.OK);
+			return new ResponseEntity<delete_productsewingcost_response>(response, HttpStatus.OK);
 		}
 	}
 
-	@RequestMapping(value = "/getby_porder_notin_porder_balance", method = RequestMethod.POST)
-	public ResponseEntity<getby_porder_response> getByPorderNotInPorderBalance(HttpServletRequest request,
-			@RequestBody getby_porder_request entity) {
-		getby_porder_response response = new getby_porder_response();
+	@RequestMapping(value = "/getby_product_notin_product_balance", method = RequestMethod.POST)
+	public ResponseEntity<getby_product_response> getByProductNotInProductBalance(HttpServletRequest request,
+			@RequestBody getby_product_request entity) {
+		getby_product_response response = new getby_product_response();
 		try {
-			Long porderid_link = entity.porderid_link;
-//				porderid_link = 268L;
+			Long productid_link = entity.productid_link;
+//				productid_link = 268L;
 
-			List<Long> listPorderBalanceProcessId = porderBalanceProcessService
-					.getPOrderBalanceProcessIdByPorder(porderid_link);
-//				System.out.println(listPorderBalanceProcessId);
-			if (listPorderBalanceProcessId.size() > 0)
-				response.data = pordersewingService.getByPorderUnused(porderid_link, listPorderBalanceProcessId);
+			List<Long> listProductBalanceProcessId = productBalanceProcessService
+					.getProductBalanceProcessIdByProduct(productid_link);
+//				System.out.println(listProductBalanceProcessId);
+			if (listProductBalanceProcessId.size() > 0)
+				response.data = productSewingCostService.getByProductUnused(productid_link, listProductBalanceProcessId);
 			else
-				response.data = pordersewingService.getByPorderUnused(porderid_link);
+				response.data = productSewingCostService.getByProductUnused(productid_link);
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<getby_porder_response>(response, HttpStatus.OK);
+			return new ResponseEntity<getby_product_response>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			return new ResponseEntity<getby_porder_response>(response, HttpStatus.OK);
+			return new ResponseEntity<getby_product_response>(response, HttpStatus.OK);
 		}
 	}
 
-	@RequestMapping(value = "/getForPProcessProductivity", method = RequestMethod.POST)
-	public ResponseEntity<getForPProcessProductivity_response> getForPProcessProductivity(HttpServletRequest request,
-			@RequestBody getForPProcessProductivity_request entity) {
-		getForPProcessProductivity_response response = new getForPProcessProductivity_response();
-		try {
-			Long personnelid_link = entity.personnelid_link;
-			Long porderid_link = entity.porderid_link;
-			Long pordergrantid_link = entity.pordergrantid_link;
-			Integer shifttypeid_link = entity.shifttypeid_link;
-			Date processingdate = entity.processingdate;
-
-			List<POrderSewingCost> listPOrderSewingCost = pordersewingService
-					.getForPProcessProductivity(personnelid_link);
-			Map<Long, POrderSewingCostBinding> mapTmp = new HashMap<Long, POrderSewingCostBinding>();
-			List<PorderProcessingNs> listPorderProcessingNs = porderProcessingNsService.getByPersonnelDateAndShift(
-					porderid_link, pordergrantid_link, personnelid_link, processingdate, shifttypeid_link);
-
-			for (POrderSewingCost porderSewingCost : listPOrderSewingCost) {
-				POrderSewingCostBinding temp = new POrderSewingCostBinding();
-				temp.setId(porderSewingCost.getId());
-				temp.setWorkingprocess_name(porderSewingCost.getWorkingprocess_name());
-				temp.setAmount_complete(0);
-				mapTmp.put(temp.getId(), temp);
-			}
-
-			for (PorderProcessingNs porderProcessingNs : listPorderProcessingNs) {
-				Long pordersewingcostid_link = porderProcessingNs.getPordersewingcostid_link();
-				POrderSewingCostBinding temp = mapTmp.get(pordersewingcostid_link);
-				temp.setAmount_complete(porderProcessingNs.getAmount_complete());
-				mapTmp.put(temp.getId(), temp);
-			}
-
-			response.data = new ArrayList<>(mapTmp.values());
-
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<getForPProcessProductivity_response>(response, HttpStatus.OK);
-		} catch (Exception e) {
-			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-			response.setMessage(e.getMessage());
-			return new ResponseEntity<getForPProcessProductivity_response>(response, HttpStatus.OK);
-		}
-	}
-
-	@RequestMapping(value = "/upload_porders_sewingcost", method = RequestMethod.POST)
-	public ResponseEntity<ResponseBase> upload_porders_sewingcost(HttpServletRequest request, @RequestParam("file") MultipartFile file,
-			@RequestParam("porderid_link") Long porderid_link
+	@RequestMapping(value = "/upload_product_sewingcost", method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> upload_product_sewingcost(HttpServletRequest request, @RequestParam("file") MultipartFile file,
+			@RequestParam("productid_link") Long productid_link
 			) {
 		ResponseBase response = new ResponseBase();
 
@@ -319,7 +244,7 @@ public class PorderSewingCostAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long orgrootid_link = user.getRootorgid_link();
-			String FolderPath = "upload/porders_sewingcost";
+			String FolderPath = "upload/product_sewingcost";
 			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
 			File uploadRootDir = new File(uploadRootPath);
 			// Tạo thư mục gốc upload nếu nó không tồn tại.
@@ -360,8 +285,8 @@ public class PorderSewingCostAPI {
 						STT = commonService.getStringValue(row.getCell(ColumnPorderSewingCost.STT));
 						STT = STT.equals("0") ? "" : STT;
 						
-						POrder porder = porderService.findOne(porderid_link);
-						Long productid_link = porder.getProductid_link();
+						Product product = productService.findOne(productid_link);
+//						Long productid_link = product.getId();
 						
 						// kiểm tra các dòng có lỗi hay không (loop qua toàn bộ file excel)
 						while(!STT.equals("")) {
@@ -554,10 +479,10 @@ public class PorderSewingCostAPI {
 									cumCongDoan = null;
 								}
 								
-								// porder workingprocess
-								POrderWorkingProcess workingProcess = new POrderWorkingProcess();
-//								List<POrderWorkingProcess> workingProcess_list = porderWorkingProcessService.getByName_Product(tenCongDoan, productid_link);
-								List<POrderWorkingProcess> workingProcess_list = porderWorkingProcessService.getByCode(maCongDoan, productid_link, porderid_link);
+								// product workingprocess
+								WorkingProcess workingProcess = new WorkingProcess();
+//								List<WorkingProcess> workingProcess_list = workingProcessService.getByName_Product(tenCongDoan, productid_link);
+								List<WorkingProcess> workingProcess_list = workingProcessService.getByCode(maCongDoan, productid_link);
 								if(workingProcess_list.size() > 0) { // công đoạn đã tồn tại
 									workingProcess = workingProcess_list.get(0);
 									workingProcess.setName(commonService.getStringValue(row.getCell(ColumnPorderSewingCost.TenCongDoan)).trim());
@@ -566,8 +491,8 @@ public class PorderSewingCostAPI {
 									workingProcess.setLaborrequired_desc(bacThoComment);
 									workingProcess.setTimespent_standard(intValueThoiGian);
 									workingProcess.setTechcomment(chuThich);
-									workingProcess.setPorderid_link(porderid_link);
-									workingProcess = porderWorkingProcessService.save(workingProcess);
+									workingProcess.setProductid_link(productid_link);
+									workingProcess = workingProcessService.save(workingProcess);
 								} else { // công đoạn chưa tồn tại -> create
 									workingProcess.setId(null);
 									workingProcess.setOrgrootid_link(orgrootid_link);
@@ -579,85 +504,85 @@ public class PorderSewingCostAPI {
 									workingProcess.setLaborrequiredid_link(bacThoId);
 									workingProcess.setLaborrequired_desc(bacThoComment);
 									workingProcess.setTechcomment(chuThich);
-									workingProcess.setPorderid_link(porderid_link);
+									workingProcess.setProductid_link(productid_link);
 									workingProcess.setProcess_type(1);
 									workingProcess.setUsercreatedid_link(user.getId());
 									workingProcess.setTimecreated(current_time);
-									workingProcess = porderWorkingProcessService.save(workingProcess);
+									workingProcess = workingProcessService.save(workingProcess);
 								}
-								// porders_sewingcost
-								POrderSewingCost porderSewingCost = new POrderSewingCost();
-								List<POrderSewingCost> porderSewingCost_list = pordersewingService.getby_porder_and_workingprocess(porderid_link, workingProcess.getId());
-								if(porderSewingCost_list.size() > 0) { // công đoạn đã tồn tại trong lệnh sx
-									porderSewingCost = porderSewingCost_list.get(0);
-									porderSewingCost.setDevicerequiredid_link(thietBiId);
-									porderSewingCost.setLaborrequiredid_link(bacThoId);
-									porderSewingCost.setTechcomment(chuThich);
-									porderSewingCost.setTimespent_standard(intValueThoiGian);
-									porderSewingCost.setCost(floatValueDonGia);
-									porderSewingCost.setAmount(intValueSoLuong);
-									porderSewingCost.setTotalcost(floatValueTongGia);
-									porderSewingCost.setWorkingprocessid_link(workingProcess.getId());
-									porderSewingCost = pordersewingService.save(porderSewingCost);
+								// product_sewingcost
+								ProductSewingCost productSewingCost = new ProductSewingCost();
+								List<ProductSewingCost> productSewingCost_list = productSewingCostService.getby_product_and_workingprocess(productid_link, workingProcess.getId());
+								if(productSewingCost_list.size() > 0) { // công đoạn đã tồn tại trong lệnh sx
+									productSewingCost = productSewingCost_list.get(0);
+									productSewingCost.setDevicerequiredid_link(thietBiId);
+									productSewingCost.setLaborrequiredid_link(bacThoId);
+									productSewingCost.setTechcomment(chuThich);
+									productSewingCost.setTimespent_standard(intValueThoiGian);
+									productSewingCost.setCost(floatValueDonGia);
+									productSewingCost.setAmount(intValueSoLuong);
+									productSewingCost.setTotalcost(floatValueTongGia);
+									productSewingCost.setWorkingprocessid_link(workingProcess.getId());
+									productSewingCost = productSewingCostService.save(productSewingCost);
 								}else { // công đoạn chưa tồn tại trong lệnh sx -> create
-									porderSewingCost.setId(null);
-									porderSewingCost.setOrgrootid_link(orgrootid_link);
-									porderSewingCost.setPorderid_link(porderid_link);
-									porderSewingCost.setWorkingprocessid_link(workingProcess.getId());
-									porderSewingCost.setCost(floatValueDonGia);
-									porderSewingCost.setAmount(intValueSoLuong);
-									porderSewingCost.setTotalcost(floatValueTongGia);
-									porderSewingCost.setUsercreatedid_link(user.getId());
-									porderSewingCost.setDatecreated(current_time);
-									porderSewingCost.setTimespent_standard(intValueThoiGian);
-									porderSewingCost.setDevicerequiredid_link(thietBiId);
-									porderSewingCost.setLaborrequiredid_link(bacThoId);
-									porderSewingCost.setTechcomment(chuThich);
-									porderSewingCost.setWorkingprocessid_link(workingProcess.getId());
-									porderSewingCost = pordersewingService.save(porderSewingCost);
+									productSewingCost.setId(null);
+									productSewingCost.setOrgrootid_link(orgrootid_link);
+									productSewingCost.setProductid_link(productid_link);
+									productSewingCost.setWorkingprocessid_link(workingProcess.getId());
+									productSewingCost.setCost(floatValueDonGia);
+									productSewingCost.setAmount(intValueSoLuong);
+									productSewingCost.setTotalcost(floatValueTongGia);
+									productSewingCost.setUsercreatedid_link(user.getId());
+									productSewingCost.setDatecreated(current_time);
+									productSewingCost.setTimespent_standard(intValueThoiGian);
+									productSewingCost.setDevicerequiredid_link(thietBiId);
+									productSewingCost.setLaborrequiredid_link(bacThoId);
+									productSewingCost.setTechcomment(chuThich);
+									productSewingCost.setWorkingprocessid_link(workingProcess.getId());
+									productSewingCost = productSewingCostService.save(productSewingCost);
 								}
 								
-								// porders_balance
+								// product_balance
 								if(cumCongDoan != null) {
-									POrderBalance porderBalance = new POrderBalance();
-									List<POrderBalance> porderBalance_list = porderBalanceService.getByBalanceName_POrder(cumCongDoan, porderid_link);
-									List<POrderBalance> porderBalance_list_by_porderid_link = porderBalanceService.getByPorder(porderid_link);
-									if(porderBalance_list.size() == 0) {
-										porderBalance.setId(null);
-										porderBalance.setOrgrootid_link(orgrootid_link);
-										porderBalance.setPorderid_link(porderid_link);
-										porderBalance.setBalance_name(commonService.getStringValue(row.getCell(ColumnPorderSewingCost.CumCongDoan)).trim());
-										porderBalance.setSortvalue(porderBalance_list_by_porderid_link.size());
-										porderBalance = porderBalanceService.save(porderBalance);
+									ProductBalance productBalance = new ProductBalance();
+									List<ProductBalance> productBalance_list = productBalanceService.getByBalanceName_Product(cumCongDoan, productid_link);
+									List<ProductBalance> productBalance_list_by_productid_link = productBalanceService.getByProduct(productid_link);
+									if(productBalance_list.size() == 0) {
+										productBalance.setId(null);
+										productBalance.setOrgrootid_link(orgrootid_link);
+										productBalance.setProductid_link(productid_link);
+										productBalance.setBalance_name(commonService.getStringValue(row.getCell(ColumnPorderSewingCost.CumCongDoan)).trim());
+										productBalance.setSortvalue(productBalance_list_by_productid_link.size());
+										productBalance = productBalanceService.save(productBalance);
 									}
 								}
 								
-								// porders_balance_process
-								POrderBalanceProcess porderBalanceProcess = new POrderBalanceProcess();
+								// product_balance_process
+								ProductBalanceProcess productBalanceProcess = new ProductBalanceProcess();
 								if(cumCongDoan != null) {
-									List<POrderBalance> porderBalance_list = porderBalanceService.getByBalanceName_POrder(cumCongDoan, porderid_link);
-									POrderBalance porderBalance = new POrderBalance();
-									if(porderBalance_list.size() > 0) {
-										porderBalance = porderBalance_list.get(0);
-										List<POrderBalanceProcess> porderBalanceProcess_list = porderBalanceProcessService.getByPorderSewingcost(porderSewingCost.getId());
-										if(porderBalanceProcess_list.size() > 0) { // công đoạn đã có trong 1 cụm công đoạn
-											porderBalanceProcess =  porderBalanceProcess_list.get(0);
-											porderBalanceProcess.setPorderbalanceid_link(porderBalance.getId());
-											porderBalanceProcess.setPordersewingcostid_link(porderSewingCost.getId());
-											porderBalanceProcess = porderBalanceProcessService.save(porderBalanceProcess);
+									List<ProductBalance> productBalance_list = productBalanceService.getByBalanceName_Product(cumCongDoan, productid_link);
+									ProductBalance productBalance = new ProductBalance();
+									if(productBalance_list.size() > 0) {
+										productBalance = productBalance_list.get(0);
+										List<ProductBalanceProcess> productBalanceProcess_list = productBalanceProcessService.getByProductSewingcost(productSewingCost.getId());
+										if(productBalanceProcess_list.size() > 0) { // công đoạn đã có trong 1 cụm công đoạn
+											productBalanceProcess =  productBalanceProcess_list.get(0);
+											productBalanceProcess.setProductbalanceid_link(productBalance.getId());
+											productBalanceProcess.setProductsewingcostid_link(productSewingCost.getId());
+											productBalanceProcess = productBalanceProcessService.save(productBalanceProcess);
 										}else { // công đoạn chưa có trong 1 cụm công đoạn
-											porderBalanceProcess.setId(null);
-											porderBalanceProcess.setOrgrootid_link(orgrootid_link);
-											porderBalanceProcess.setPorderbalanceid_link(porderBalance.getId());
-											porderBalanceProcess.setPordersewingcostid_link(porderSewingCost.getId());
-											porderBalanceProcess = porderBalanceProcessService.save(porderBalanceProcess);
+											productBalanceProcess.setId(null);
+											productBalanceProcess.setOrgrootid_link(orgrootid_link);
+											productBalanceProcess.setProductbalanceid_link(productBalance.getId());
+											productBalanceProcess.setProductsewingcostid_link(productSewingCost.getId());
+											productBalanceProcess = productBalanceProcessService.save(productBalanceProcess);
 										}
 									}
 								}else {
-									List<POrderBalanceProcess> porderBalanceProcess_list = porderBalanceProcessService.getByPorderSewingcost(porderSewingCost.getId());
-									if(porderBalanceProcess_list.size() > 0) { // công đoạn đã có trong 1 cụm công đoạn
-										porderBalanceProcess =  porderBalanceProcess_list.get(0);
-										porderBalanceProcessService.delete(porderBalanceProcess);
+									List<ProductBalanceProcess> productBalanceProcess_list = productBalanceProcessService.getByProductSewingcost(productSewingCost.getId());
+									if(productBalanceProcess_list.size() > 0) { // công đoạn đã có trong 1 cụm công đoạn
+										productBalanceProcess =  productBalanceProcess_list.get(0);
+										productBalanceProcessService.delete(productBalanceProcess);
 									}
 								}
 								
@@ -702,27 +627,27 @@ public class PorderSewingCostAPI {
 		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/download_temp_pordersewingcost", method = RequestMethod.POST)
-	public ResponseEntity<download_temp_pordersewingcost_response> download_temp_pordersewingcost(HttpServletRequest request) {
+	@RequestMapping(value = "/download_temp_productsewingcost", method = RequestMethod.POST)
+	public ResponseEntity<download_temp_productsewingcost_response> download_temp_productsewingcost(HttpServletRequest request) {
 
-		download_temp_pordersewingcost_response response = new download_temp_pordersewingcost_response();
+		download_temp_productsewingcost_response response = new download_temp_productsewingcost_response();
 		try {
 			String FolderPath = "TemplateUpload";
 
 			// Thư mục gốc upload file.
 			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
 
-			String filePath = uploadRootPath + "/" + "Template_PorderSewingCost_New.xlsx";
+			String filePath = uploadRootPath + "/" + "Template_ProductSewingCost_New.xlsx";
 			Path path = Paths.get(filePath);
 			byte[] data = Files.readAllBytes(path);
 			response.data = data;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<download_temp_pordersewingcost_response>(response, HttpStatus.OK);
+			return new ResponseEntity<download_temp_productsewingcost_response>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			return new ResponseEntity<download_temp_pordersewingcost_response>(response, HttpStatus.OK);
+			return new ResponseEntity<download_temp_productsewingcost_response>(response, HttpStatus.OK);
 		}
 	}
 }

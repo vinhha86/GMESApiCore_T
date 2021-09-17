@@ -29,6 +29,13 @@ import vn.gpay.gsmart.core.porder_balance_process.IPOrderBalanceProcessService;
 import vn.gpay.gsmart.core.porder_balance_process.POrderBalanceProcess;
 import vn.gpay.gsmart.core.porder_sewingcost.IPorderSewingCost_Service;
 import vn.gpay.gsmart.core.porder_sewingcost.POrderSewingCost;
+import vn.gpay.gsmart.core.porder_workingprocess.IPOrderWorkingProcess_Service;
+import vn.gpay.gsmart.core.porder_workingprocess.POrderWorkingProcess;
+import vn.gpay.gsmart.core.product_balance.IProductBalanceService;
+import vn.gpay.gsmart.core.product_balance_process.IProductBalanceProcessService;
+import vn.gpay.gsmart.core.product_balance_process.ProductBalanceProcess;
+import vn.gpay.gsmart.core.product_sewingcost.IProductSewingCostService;
+import vn.gpay.gsmart.core.product_sewingcost.ProductSewingCost;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 import vn.gpay.gsmart.core.workingprocess.IWorkingProcess_Service;
@@ -36,10 +43,18 @@ import vn.gpay.gsmart.core.workingprocess.WorkingProcess;
 @RestController
 @RequestMapping("/api/v1/workingprocess")
 public class WorkingProcessAPI {
+	// product
     @Autowired IWorkingProcess_Service workingprocessService;
+	@Autowired IProductSewingCostService productSewingCostService;
+	@Autowired IProductBalanceService productBalanceService;
+	@Autowired IProductBalanceProcessService productBalanceProcessService;
+    
+	// porder
+	@Autowired IPOrderWorkingProcess_Service porderWorkingProcessService;
 	@Autowired IPorderSewingCost_Service pordersewingService;
 	@Autowired IPOrderBalanceService porderBalanceService;
 	@Autowired IPOrderBalanceProcessService porderBalanceProcessService;
+	
     
     @GetMapping("/workingprocess")
     public List<WorkingProcess> getAllProcess() {
@@ -96,6 +111,24 @@ public class WorkingProcessAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/getby_porder",method = RequestMethod.POST)
+	public ResponseEntity<get_porderworkingprocess_response> GetByPorder(HttpServletRequest request, @RequestBody getby_product_request entity ) {
+		get_porderworkingprocess_response response = new get_porderworkingprocess_response();
+		try {
+			long porderid_link = entity.porderid_link;
+			
+			response.data = porderWorkingProcessService.getby_porder(porderid_link);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<get_porderworkingprocess_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<get_porderworkingprocess_response>(response, HttpStatus.OK);
+		}
+	}
+	
 	@RequestMapping(value = "/create",method = RequestMethod.POST)
 	public ResponseEntity<create_workingprocess_response> Create(HttpServletRequest request, @RequestBody create_workingprocess_request entity ) {
 		create_workingprocess_response response = new create_workingprocess_response();
@@ -104,14 +137,30 @@ public class WorkingProcessAPI {
 			long orgrootid_link = user.getRootorgid_link();
 			
 			WorkingProcess wp = entity.data;
+			String code = wp.getCode();
+			Long productid_link = wp.getProductid_link();
 			
 			if(wp.getId() == null) {
 				wp.setUsercreatedid_link(user.getId());
 				wp.setTimecreated(new Date());
 				wp.setOrgrootid_link(orgrootid_link);
 				wp.setProcess_type(1);
+				
+				List<WorkingProcess> workingProcess_list = workingprocessService.getByCode(code, productid_link);
+				if(workingProcess_list.size() > 0) {
+					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+					response.setMessage("Mã công đoạn đã tồn tại");
+				    return new ResponseEntity<create_workingprocess_response>(response, HttpStatus.OK);
+				}
+			}else {
+				Long id = wp.getId();
+				List<WorkingProcess> workingProcess_list = workingprocessService.getByCode_NotId(code, productid_link, id);
+				if(workingProcess_list.size() > 0) {
+					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+					response.setMessage("Mã công đoạn đã tồn tại");
+				    return new ResponseEntity<create_workingprocess_response>(response, HttpStatus.OK);
+				}
 			}
-			
 			
 			response.data = workingprocessService.save(wp);
 			
@@ -125,11 +174,96 @@ public class WorkingProcessAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/create_porderworkingprocess",method = RequestMethod.POST)
+	public ResponseEntity<create_porderworkingprocess_response> create_porderworkingprocess(HttpServletRequest request, @RequestBody create_porderworkingprocess_request entity ) {
+		create_porderworkingprocess_response response = new create_porderworkingprocess_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			
+			POrderWorkingProcess wp = entity.data;
+			String code = wp.getCode();
+			Long productid_link = wp.getProductid_link();
+			Long porderid_link = wp.getPorderid_link();
+			
+			if(wp.getId() == null) {
+				wp.setUsercreatedid_link(user.getId());
+				wp.setTimecreated(new Date());
+				wp.setOrgrootid_link(orgrootid_link);
+				wp.setProcess_type(1);
+				
+				List<POrderWorkingProcess> workingProcess_list = porderWorkingProcessService.getByCode(code, productid_link, porderid_link);
+				if(workingProcess_list.size() > 0) {
+					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+					response.setMessage("Mã công đoạn đã tồn tại");
+				    return new ResponseEntity<create_porderworkingprocess_response>(response, HttpStatus.OK);
+				}
+			}else {
+				Long id = wp.getId();
+				List<POrderWorkingProcess> workingProcess_list = porderWorkingProcessService.getByCode_NotId(code, productid_link, porderid_link, id);
+				if(workingProcess_list.size() > 0) {
+					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+					response.setMessage("Mã công đoạn đã tồn tại");
+				    return new ResponseEntity<create_porderworkingprocess_response>(response, HttpStatus.OK);
+				}
+			}
+			
+			response.data = porderWorkingProcessService.save(wp);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<create_porderworkingprocess_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<create_porderworkingprocess_response>(response, HttpStatus.OK);
+		}
+	}
+	
 	@RequestMapping(value = "/delete",method = RequestMethod.POST)
 	public ResponseEntity<workingprocess_delete_response> Delete(HttpServletRequest request, @RequestBody workingprocess_delete_reques entity ) {
 		workingprocess_delete_response response = new workingprocess_delete_response();
 		try {
-			workingprocessService.deleteById(entity.id);
+//			workingprocessService.deleteById(entity.id);
+			
+			Long id = entity.id;
+			List<ProductSewingCost> productSewingCost_list = productSewingCostService.getby_workingprocess(id);
+			for(ProductSewingCost productSewingCost : productSewingCost_list) {
+				List<ProductBalanceProcess> productBalanceProcess_list = productBalanceProcessService.getByProductSewingcost(productSewingCost.getId());
+				for(ProductBalanceProcess productBalanceProcess : productBalanceProcess_list) {
+					productBalanceProcessService.deleteById(productBalanceProcess.getId());
+				}
+				productSewingCostService.deleteById(productSewingCost.getId());
+			}
+			workingprocessService.deleteById(id);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<workingprocess_delete_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<workingprocess_delete_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/delete_porderworkingprocess",method = RequestMethod.POST)
+	public ResponseEntity<workingprocess_delete_response> delete_porderworkingprocess(HttpServletRequest request, @RequestBody workingprocess_delete_reques entity ) {
+		workingprocess_delete_response response = new workingprocess_delete_response();
+		try {
+//			porderWorkingProcessService.deleteById(entity.id);
+			
+			Long id = entity.id;
+			
+			List<POrderSewingCost> porderSewingCost_list = pordersewingService.getby_workingprocess(id);
+			for(POrderSewingCost porderSewingCost : porderSewingCost_list) {
+				List<POrderBalanceProcess> porderBalanceProcess_list = porderBalanceProcessService.getByPorderSewingcost(porderSewingCost.getId());
+				for(POrderBalanceProcess porderBalanceProcess : porderBalanceProcess_list) {
+					porderBalanceProcessService.deleteById(porderBalanceProcess.getId());
+				}
+				pordersewingService.deleteById(porderSewingCost.getId());
+			}
+			porderWorkingProcessService.deleteById(id);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -148,6 +282,34 @@ public class WorkingProcessAPI {
 			List<Long> idList = entity.idList;
 			
 			for(Long id : idList) {
+				List<ProductSewingCost> productSewingCost_list = productSewingCostService.getby_workingprocess(id);
+				for(ProductSewingCost productSewingCost : productSewingCost_list) {
+					List<ProductBalanceProcess> productBalanceProcess_list = productBalanceProcessService.getByProductSewingcost(productSewingCost.getId());
+					for(ProductBalanceProcess productBalanceProcess : productBalanceProcess_list) {
+						productBalanceProcessService.deleteById(productBalanceProcess.getId());
+					}
+					productSewingCostService.deleteById(productSewingCost.getId());
+				}
+				workingprocessService.deleteById(id);
+			}
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<workingprocess_delete_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<workingprocess_delete_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/delete_multi_porderworkingprocess",method = RequestMethod.POST)
+	public ResponseEntity<workingprocess_delete_response> delete_multi_porderworkingprocess(HttpServletRequest request, @RequestBody workingprocess_delete_reques entity ) {
+		workingprocess_delete_response response = new workingprocess_delete_response();
+		try {
+			List<Long> idList = entity.idList;
+			
+			for(Long id : idList) {
 				List<POrderSewingCost> porderSewingCost_list = pordersewingService.getby_workingprocess(id);
 				for(POrderSewingCost porderSewingCost : porderSewingCost_list) {
 					List<POrderBalanceProcess> porderBalanceProcess_list = porderBalanceProcessService.getByPorderSewingcost(porderSewingCost.getId());
@@ -156,7 +318,7 @@ public class WorkingProcessAPI {
 					}
 					pordersewingService.deleteById(porderSewingCost.getId());
 				}
-				workingprocessService.deleteById(id);
+				porderWorkingProcessService.deleteById(id);
 			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

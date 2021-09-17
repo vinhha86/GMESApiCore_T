@@ -34,4 +34,14 @@ public class WorkingProcess_Service extends AbstractService<WorkingProcess> impl
 	public List<WorkingProcess> getByName_Product(String name, Long productid_link) {
 		return repo.getByName_Product(name, productid_link);
 	}
+
+	@Override
+	public List<WorkingProcess> getByCode(String code, Long productid_link) {
+		return repo.getByCode(code, productid_link);
+	}
+
+	@Override
+	public List<WorkingProcess> getByCode_NotId(String code, Long productid_link, Long id) {
+		return repo.getByCode_NotId(code, productid_link, id);
+	}
 }
