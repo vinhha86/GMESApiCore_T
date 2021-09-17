@@ -25,6 +25,9 @@ import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.security.GpayUserOrg;
+import vn.gpay.gsmart.core.security.IGpayUserOrgService;
+import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -39,30 +42,49 @@ public class OrgMenuAPI {
 	IPOrderGrant_Service porderGrantService;
 	@Autowired
 	IPOrderProcessing_Service pprocessService;
+	@Autowired
+	IGpayUserOrgService userOrgService;
 
 	@RequestMapping(value = "/orgmenu_tree", method = RequestMethod.POST)
 	public ResponseEntity<?> OrgMenuTree(HttpServletRequest request) {
 		try {
 			OrgMenuTreeResponse response = new OrgMenuTreeResponse();
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			List<Org> menu ;
-			List<OrgTree> children;
-			if(user.getOrgid_link()!=1) {
-				//nếu user chỉ quản lý 1 tổ cụ thể
-				if(user.getOrg_grant_id_link()!=null) {
-					menu = orgService.findOrgByType_Id_ParentId_Org_grant_IdForMenuOrg((long)user.getOrgid_link(), user.getOrg_grant_id_link());
-					children = orgService.createTree(menu);
-				}else {
-					 menu = orgService.findOrgByType_Id_ParentIdForMenuOrg((long)user.getOrgid_link());
-					 children = orgService.createTree(menu);
+			List<Long> list_org_id = new ArrayList<Long>();
+
+			List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),
+					OrgType.ORG_TYPE_FACTORY);
+			for (GpayUserOrg userorg : list_userorg) {
+				list_org_id.add(userorg.getOrgid_link());
+			}
+			if (!list_org_id.contains(user.getOrgid_link())) {
+				list_org_id.add(user.getOrgid_link());
+			}
+			List<Org> menu = new ArrayList<Org>();
+			List<OrgTree> children = new ArrayList<OrgTree>();
+			if (user.getOrgid_link() != 1) {
+				// neu user quan ly nhieu don vi
+				if (list_org_id.size() > 1) {
+					for (Long orgid : list_org_id) {
+						menu.addAll(orgService.findOrgByType_Id_ParentIdForMenuOrg(orgid));
+					}
+					children.addAll(orgService.createTree(menu));
+				} else {
+					// nếu user chỉ quản lý 1 tổ cụ thể
+					if (user.getOrg_grant_id_link() != null) {
+						menu = orgService.findOrgByType_Id_ParentId_Org_grant_IdForMenuOrg((long) user.getOrgid_link(),
+								user.getOrg_grant_id_link());
+						children = orgService.createTree(menu);
+					} else {
+						menu = orgService.findOrgByType_Id_ParentIdForMenuOrg((long) user.getOrgid_link());
+						children = orgService.createTree(menu);
+					}
 				}
-				
-			}else {
+			} else {
 				menu = orgService.findOrgByTypeForMenuOrg();
 				children = orgService.createTree(menu);
 //				System.out.println(menu.size());
-				
-				
+
 			}
 			response.children = children;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
