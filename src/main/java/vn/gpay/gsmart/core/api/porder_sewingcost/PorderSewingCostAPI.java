@@ -46,14 +46,22 @@ import vn.gpay.gsmart.core.porder_sewingcost.POrderSewingCost;
 import vn.gpay.gsmart.core.porder_sewingcost.POrderSewingCostBinding;
 import vn.gpay.gsmart.core.porder_workingprocess.IPOrderWorkingProcess_Service;
 import vn.gpay.gsmart.core.porder_workingprocess.POrderWorkingProcess;
+import vn.gpay.gsmart.core.porder_workingprocess.POrderWorkingProcess_Service;
 import vn.gpay.gsmart.core.porderprocessingns.IPorderProcessingNsService;
 import vn.gpay.gsmart.core.porderprocessingns.PorderProcessingNs;
+import vn.gpay.gsmart.core.product_balance.IProductBalanceService;
+import vn.gpay.gsmart.core.product_balance.ProductBalance;
+import vn.gpay.gsmart.core.product_balance_process.IProductBalanceProcessService;
+import vn.gpay.gsmart.core.product_balance_process.ProductBalanceProcess;
+import vn.gpay.gsmart.core.product_sewingcost.IProductSewingCostService;
+import vn.gpay.gsmart.core.product_sewingcost.ProductSewingCost;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ColumnPorderSewingCost;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 import vn.gpay.gsmart.core.workingprocess.IWorkingProcess_Service;
 //import vn.gpay.gsmart.core.workingprocess.WorkingProcess;
+import vn.gpay.gsmart.core.workingprocess.WorkingProcess;
 
 @RestController
 @RequestMapping("/api/v1/pordersewingcost")
@@ -61,7 +69,6 @@ public class PorderSewingCostAPI {
 	@Autowired
 	Common commonService;
 	@Autowired IPorderSewingCost_Service pordersewingService;
-	@Autowired IWorkingProcess_Service workingprocessService;
 	@Autowired IPOrder_Service porderService;
 	@Autowired IPContract_Price_Service pcontractpriceService;
 	@Autowired IPOrderBalanceService porderBalanceService;
@@ -71,6 +78,11 @@ public class PorderSewingCostAPI {
 	@Autowired ILaborLevelService laborLevelService;
 //	@Autowired IWorkingProcess_Service workingProcessService;
 	@Autowired IPOrderWorkingProcess_Service porderWorkingProcessService;
+
+	@Autowired IWorkingProcess_Service workingprocessService;
+	@Autowired IProductSewingCostService productSewingCostService;
+	@Autowired IProductBalanceService productBalanceService;
+	@Autowired IProductBalanceProcessService productBalanceProcessService;
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ResponseEntity<create_pordersewingcost_response> Create(HttpServletRequest request,
@@ -700,6 +712,140 @@ public class PorderSewingCostAPI {
 			response.setMessage(e.getMessage());
 		}
 		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+	}
+	
+	// update_copy_productsewingcost_default_request
+	@RequestMapping(value = "/copy_productsewingcost_default", method = RequestMethod.POST)
+	public ResponseEntity<create_pordersewingcost_response> copy_productsewingcost_default(HttpServletRequest request,
+			@RequestBody copy_productsewingcost_default_request entity) {
+		create_pordersewingcost_response response = new create_pordersewingcost_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Date date = new Date();
+			Long porderid_link = entity.porderid_link;
+			Long productid_link = entity.productid_link;
+			
+			// delete old
+			List<POrderWorkingProcess> porderWorkingProcess_list = 
+					porderWorkingProcessService.getby_porder(porderid_link);
+			List<POrderSewingCost> porderSewingCost_list =
+					pordersewingService.getby_porder_and_workingprocess(porderid_link, (long) 0);
+			List<POrderBalance> porderBalance_list =
+					porderBalanceService.getByPorder(porderid_link);
+			
+			for(POrderWorkingProcess porderWorkingProcess : porderWorkingProcess_list) {
+				porderWorkingProcessService.deleteById(porderWorkingProcess.getId());
+			}
+			for(POrderSewingCost porderSewingCost : porderSewingCost_list) {
+				pordersewingService.deleteById(porderSewingCost.getId());
+			}
+			for(POrderBalance porderBalance : porderBalance_list) {
+				List<POrderBalanceProcess> porderBalanceProcess_list = porderBalance.getPorderBalanceProcesses();
+				for(POrderBalanceProcess porderBalanceProcess : porderBalanceProcess_list) {
+					porderBalanceProcessService.deleteById(porderBalanceProcess.getId());
+				}
+				porderBalanceService.deleteById(porderBalance.getId());
+			}
+			
+			// create new
+			List<WorkingProcess> workingProcess_list = 
+					workingprocessService.getby_product(productid_link);
+			List<ProductSewingCost> productSewingCost_list = 
+					productSewingCostService.getby_product_and_workingprocess(productid_link, (long)0);
+			List<ProductBalance> productBalance_list = 
+					productBalanceService.getByProduct(productid_link);
+			
+			for(WorkingProcess workingProcess : workingProcess_list) {
+				POrderWorkingProcess newPOrderWorkingProcess = new POrderWorkingProcess();
+				newPOrderWorkingProcess.setId(null);
+				newPOrderWorkingProcess.setOrgrootid_link(workingProcess.getOrgrootid_link());
+				newPOrderWorkingProcess.setName(workingProcess.getName());
+				newPOrderWorkingProcess.setCode(workingProcess.getCode());
+				newPOrderWorkingProcess.setProductid_link(workingProcess.getProductid_link());
+				newPOrderWorkingProcess.setPorderid_link(porderid_link);
+				newPOrderWorkingProcess.setTimespent_standard(workingProcess.getTimespent_standard());
+				newPOrderWorkingProcess.setDevicerequiredid_link(workingProcess.getDevicerequiredid_link());
+				newPOrderWorkingProcess.setDevicerequired_desc(workingProcess.getDevicerequired_desc());
+				newPOrderWorkingProcess.setLaborrequiredid_link(workingProcess.getLaborrequiredid_link());
+				newPOrderWorkingProcess.setLaborrequired_desc(workingProcess.getLaborrequired_desc());
+				newPOrderWorkingProcess.setTechcomment(workingProcess.getTechcomment());
+				newPOrderWorkingProcess.setProcess_type(workingProcess.getProcess_type());
+				newPOrderWorkingProcess.setStatus(workingProcess.getStatus());
+				newPOrderWorkingProcess.setUsercreatedid_link(user.getId());
+				newPOrderWorkingProcess.setTimecreated(date);
+				newPOrderWorkingProcess.setIsselected(workingProcess.getIsselected());
+				newPOrderWorkingProcess.setLastcost(workingProcess.getLastcost());
+				newPOrderWorkingProcess = porderWorkingProcessService.save(newPOrderWorkingProcess);
+				
+				for(ProductSewingCost productSewingCost : productSewingCost_list) {
+					if(productSewingCost.getWorkingprocessid_link().equals(workingProcess.getId())) {
+						POrderSewingCost newPOrderSewingCost = new POrderSewingCost();
+						newPOrderSewingCost.setId(null);
+						newPOrderSewingCost.setOrgrootid_link(productSewingCost.getOrgrootid_link());
+						newPOrderSewingCost.setPorderid_link(porderid_link);
+						newPOrderSewingCost.setWorkingprocessid_link(newPOrderWorkingProcess.getId());
+						newPOrderSewingCost.setCost(productSewingCost.getCost());
+						newPOrderSewingCost.setAmount(productSewingCost.getAmount());
+						newPOrderSewingCost.setTotalcost(productSewingCost.getTotalcost());
+						newPOrderSewingCost.setUsercreatedid_link(user.getId());
+						newPOrderSewingCost.setDatecreated(date);
+						newPOrderSewingCost.setTimespent_standard(productSewingCost.getTimespent_standard());
+						newPOrderSewingCost.setDevicerequiredid_link(productSewingCost.getDevicerequiredid_link());
+						newPOrderSewingCost.setLaborrequiredid_link(productSewingCost.getLaborrequiredid_link());
+						newPOrderSewingCost.setTechcomment(productSewingCost.getTechcomment());
+						newPOrderSewingCost = pordersewingService.save(newPOrderSewingCost);
+					}
+				}
+			}
+			
+			for(ProductBalance productBalance : productBalance_list) {
+				List<ProductBalanceProcess> productBalanceProcess_list = productBalance.getProductBalanceProcesses();
+				POrderBalance newPOrderBalance = new POrderBalance();
+				newPOrderBalance.setId(null);
+				newPOrderBalance.setPorderid_link(porderid_link);
+				newPOrderBalance.setOrgrootid_link(productBalance.getOrgrootid_link());
+				newPOrderBalance.setBalance_name(productBalance.getBalance_name());
+				newPOrderBalance.setSortvalue(productBalance.getSortvalue());
+				newPOrderBalance = porderBalanceService.save(newPOrderBalance);
+				for(ProductBalanceProcess productBalanceProcess : productBalanceProcess_list) {
+					POrderBalanceProcess newPorderBalanceProcess = new POrderBalanceProcess();
+					newPorderBalanceProcess.setId(null);
+					newPorderBalanceProcess.setOrgrootid_link(productBalanceProcess.getOrgrootid_link());
+					newPorderBalanceProcess.setPorderbalanceid_link(newPOrderBalance.getId());
+					
+					Long productsewingcostid_link = productBalanceProcess.getProductsewingcostid_link();
+					ProductSewingCost productSewingCost = productSewingCostService.findOne(productsewingcostid_link);
+					WorkingProcess workingProcess = workingprocessService.findOne(productSewingCost.getWorkingprocessid_link());
+					String code = workingProcess.getCode();
+//					System.out.println("_____________");
+//					System.out.println(code);
+					List<POrderWorkingProcess> porderWorkingProcess__list = 
+							porderWorkingProcessService.getByCode(code, productid_link, porderid_link);
+					if(porderWorkingProcess__list.size() > 0) {
+//						System.out.println("if 1");
+						POrderWorkingProcess porderWorkingProcess = porderWorkingProcess__list.get(0);
+						List<POrderSewingCost> porderSewingCost__list = 
+								pordersewingService.getby_porder_and_workingprocess(porderid_link, porderWorkingProcess.getId());
+						if(porderSewingCost__list.size() > 0) {
+//							System.out.println("if 2");
+							POrderSewingCost porderSewingCost = porderSewingCost__list.get(0);
+							newPorderBalanceProcess.setPordersewingcostid_link(porderSewingCost.getId());
+						}
+					}
+//					System.out.println("_____________");
+					newPorderBalanceProcess = porderBalanceProcessService.save(newPorderBalanceProcess);
+//					List<POrderSewingCost> porderSewing_list = pordersewingService.f
+				}
+			}
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<create_pordersewingcost_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<create_pordersewingcost_response>(response, HttpStatus.OK);
+		}
 	}
 	
 	@RequestMapping(value = "/download_temp_pordersewingcost", method = RequestMethod.POST)

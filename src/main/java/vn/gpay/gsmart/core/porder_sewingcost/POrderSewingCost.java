@@ -120,7 +120,7 @@ public class POrderSewingCost implements Serializable {
 				return porderBalanceProcess.getBalance_name();
 			}
 		}
-		return null;
+		return "";
 	}
 	
 	public Long getId() {

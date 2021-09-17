@@ -111,12 +111,12 @@ public class ProductSewingCost implements Serializable {
 	@Transient
 	public String getProductbalance_name() {
 		if(productBalanceProcess_list != null) {
-			if(productBalanceProcess_list.size() > 0) {
+			if(productBalanceProcess_list.size() > 0) { System.out.println();
 				ProductBalanceProcess productBalanceProcess = productBalanceProcess_list.get(0);
 				return productBalanceProcess.getBalance_name();
 			}
 		}
-		return null;
+		return "";
 	}
 	
 	public Long getId() {
