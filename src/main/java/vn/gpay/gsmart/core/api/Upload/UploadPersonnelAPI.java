@@ -38,7 +38,6 @@ import vn.gpay.gsmart.core.personnel_type.IPersonnelType_Service;
 import vn.gpay.gsmart.core.personnel_type.PersonnelType;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.ColumnPersonnel;
-import vn.gpay.gsmart.core.utils.ColumnTemplate;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -97,13 +96,12 @@ public class UploadPersonnelAPI {
 				Row row = sheet.getRow(rowNum);
 
 				try {
-					String STT = "";
-					STT = commonService.getStringValue(row.getCell(ColumnPersonnel.STT));
-					STT = STT.equals("0") ? "" : STT;
-					while (!STT.equals("")) {
+					String MaSoMoi = "";
+					MaSoMoi = commonService.getStringValue(row.getCell(ColumnPersonnel.MaSoMoi));
+					MaSoMoi = MaSoMoi.equals("0") ? "" : MaSoMoi;
+					while (!MaSoMoi.equals("")) {
 
-						String MaSoMoi = commonService.getStringValue(row.getCell(ColumnPersonnel.MaSoMoi));
-
+					
 						// tim nhan vien theo ma so moi
 						person = personnel_service.getPersonelBycode(MaSoMoi);
 						// neu khong co nhan vien. thi tao nhan vien moi theo ma so moi
@@ -111,7 +109,6 @@ public class UploadPersonnelAPI {
 							person = new Personel();
 							person.setCode(MaSoMoi);
 						}
-
 						String tinhTrang = commonService.getStringValue(row.getCell(ColumnPersonnel.TinhTrang));
 						int TinhTrang;
 						if (tinhTrang.equals("L")) {
@@ -119,8 +116,8 @@ public class UploadPersonnelAPI {
 						} else {
 							rowNum++;
 							row = sheet.getRow(rowNum);
-							STT = commonService.getStringValue(row.getCell(ColumnPersonnel.STT));
-							STT = STT.equals("0") ? "" : STT;
+							MaSoMoi = commonService.getStringValue(row.getCell(ColumnPersonnel.MaSoMoi));
+							MaSoMoi = MaSoMoi.equals("0") ? "" : MaSoMoi;
 							continue;
 						}
 						String ThoiVu = commonService.getStringValue(row.getCell(ColumnPersonnel.ThoiVu));
@@ -411,7 +408,7 @@ public class UploadPersonnelAPI {
 						// kiem tra tinh trong danh sach orgtypeid_link = 25;
 						Long tinh = null;
 
-						Long id_huyen = null;
+						//Long id_huyen = null;
 						List<Org> lst_tinh = org_service.getByNameAndType(Tinh, 25);
 						if (lst_tinh.size() != 0) {
 							tinh = lst_tinh.get(0).getId();
@@ -422,6 +419,7 @@ public class UploadPersonnelAPI {
 							org.setStatus(1);
 							org.setIs_manufacturer(0);
 							org.setOrgtypeid_link(25);
+							org.setOrgrootid_link(user.getRootorgid_link());
 							Org id_org = org_service.save(org);
 
 							// lấy id tỉnh thành vừa thêm
@@ -442,6 +440,7 @@ public class UploadPersonnelAPI {
 							org.setStatus(1);
 							org.setIs_manufacturer(0);
 							org.setParentid_link(tinh);
+							org.setOrgrootid_link(user.getRootorgid_link());
 							org.setOrgtypeid_link(26);
 
 							// lấy id huyện vừa thêm
@@ -462,7 +461,7 @@ public class UploadPersonnelAPI {
 							org.setIs_manufacturer(0);
 							org.setParentid_link(huyen);
 							org.setOrgtypeid_link(27);
-
+							org.setOrgrootid_link(user.getRootorgid_link());
 							// lấy id huyện vừa thêm
 							Org id_org = org_service.save(org);
 							xa = id_org.getId();
@@ -637,8 +636,8 @@ public class UploadPersonnelAPI {
 						if (row == null)
 							break;
 
-						STT = commonService.getStringValue(row.getCell(ColumnTemplate.STT));
-						STT = STT.equals("0") ? "" : STT;
+						MaSoMoi = commonService.getStringValue(row.getCell(ColumnPersonnel.MaSoMoi));
+						MaSoMoi = MaSoMoi.equals("0") ? "" : MaSoMoi;
 					}
 
 				} catch (Exception e) {
