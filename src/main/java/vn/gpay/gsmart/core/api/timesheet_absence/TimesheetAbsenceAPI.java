@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.api.timesheet_absence;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -20,13 +21,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.org.IOrgService;
+import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.personel.IPersonnel_Service;
 import vn.gpay.gsmart.core.personel.Personel;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.security.GpayUserOrg;
+import vn.gpay.gsmart.core.security.IGpayUserOrgService;
 import vn.gpay.gsmart.core.timesheet_absence.ITimesheetAbsenceService;
 import vn.gpay.gsmart.core.timesheet_absence.ITimesheetAbsenceTypeService;
 import vn.gpay.gsmart.core.timesheet_absence.TimesheetAbsence;
 import vn.gpay.gsmart.core.timesheet_absence.TimesheetAbsenceType;
+import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -36,6 +41,8 @@ public class TimesheetAbsenceAPI {
 	@Autowired ITimesheetAbsenceTypeService timesheetAbsenceTypeService;
 	@Autowired IPersonnel_Service personnelService;
 	@Autowired IOrgService orgService;
+	@Autowired
+	IGpayUserOrgService userOrgService;
 	
 	@RequestMapping(value = "/getAllTimeSheetAbsence",method = RequestMethod.POST)
 	public ResponseEntity<TimeSheetAbsence_response> getAllTimeSheetAbsence(@RequestBody TimeSheetAbsence_request entity ,HttpServletRequest request) {
@@ -43,19 +50,33 @@ public class TimesheetAbsenceAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long orgrootid_link = user.getRootorgid_link();
-			//lấy danh sách theo đơn vị của tài khoản quản lý
-			if(user.getOrgid_link()!=1) {
-				//lấy ds theo tổ của tài khoản quản lý (nếu có)
-				if(user.getOrg_grant_id_link()!=null) {
+
+			// : lấy danh sách những đơn vị mà user đấy quản lý
+			List<Long> list_org_id = new ArrayList<Long>();
+			List<TimesheetAbsence> lst_timesheetab = new ArrayList<TimesheetAbsence>();
+			List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),
+					OrgType.ORG_TYPE_FACTORY);
+			// danh sách ID những đơn vị user quản lý
+			for (GpayUserOrg userorg : list_userorg) {
+				list_org_id.add(userorg.getOrgid_link());
+			}
+
+			// lấy danh sách báo nghỉ theo đơn vị của tài khoản quản lý
+			if (user.getOrgid_link() != 1) {
+				// lấy ds báo nghỉ theo tổ của tài khoản quản lý (nếu có)
+				if (user.getOrg_grant_id_link() != null) {
 					response.data = timesheetAbsenceService.getbyOrg_grant_id_link(user.getOrg_grant_id_link());
-				}else {
-					response.data = timesheetAbsenceService.getbyOrgid(user.getOrgid_link());
+				} else {
+					for (int i = 0; i < list_org_id.size(); i++) {
+						List<TimesheetAbsence> lstlst_timesheetabsence = timesheetAbsenceService.getbyOrgid(list_org_id.get(i));
+						lst_timesheetab.addAll(lstlst_timesheetabsence);
+					}
+					response.data = lst_timesheetab;
 				}
-				
-			}else {
+
+			} else {
 				response.data = timesheetAbsenceService.findAll();
 			}
-			
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				

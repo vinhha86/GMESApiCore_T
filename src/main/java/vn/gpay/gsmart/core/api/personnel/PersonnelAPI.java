@@ -38,6 +38,7 @@ import vn.gpay.gsmart.core.personnel_history.Personnel_His;
 import vn.gpay.gsmart.core.personnel_notmap.IPersonnel_notmap_Service;
 import vn.gpay.gsmart.core.personnel_notmap.Personnel_notmap;
 import vn.gpay.gsmart.core.personnel_type.IPersonnelType_Service;
+import vn.gpay.gsmart.core.personnel_type.PersonnelType;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.porder_grant_balance.IPOrderGrantBalanceService;
@@ -100,11 +101,12 @@ public class PersonnelAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long orgrootid_link = user.getRootorgid_link();
-
+	
 			List<Personel> list = new ArrayList<Personel>();
 			// lấy danh sách nhân viên theo tổ mà user quản lý
 			if (user.getOrg_grant_id_link() != null && entity.orgid_link!=1) {
-				list = personService.getPersonelByOrgid_link(user.getOrg_grant_id_link());
+				
+				list = personService.getPersonelByOrgid_link(user.getOrg_grant_id_link(),null);
 				if (list.size() != 0) {
 					response.data = list;
 					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -120,6 +122,55 @@ public class PersonnelAPI {
 					list = personService.getby_orgmanager(entity.orgid_link, orgrootid_link);
 			} else {
 				list = personService.getby_org(entity.orgid_link, orgrootid_link);
+			}
+
+			response.data = list;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getperson_byorg_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<getperson_byorg_response>(response, HttpStatus.OK);
+		}
+	}
+	@RequestMapping(value = "/getby_org_personeltype", method = RequestMethod.POST)
+	public ResponseEntity<getperson_byorg_response> getPeronnelByPersonelType(HttpServletRequest request,
+			@RequestBody getperson_byorgmanager_request entity) {
+		getperson_byorg_response response = new getperson_byorg_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long orgrootid_link = user.getRootorgid_link();
+			
+			//loại nhân viên 
+			long personnel_typeid_link;
+			//lấy id của loại nhân viên
+			if(entity.isviewallThoiVu) {
+				List<PersonnelType> lst_type=personneltypeService.getByName("Thời vụ");
+				personnel_typeid_link=lst_type.get(0).getId();
+			}else {
+				List<PersonnelType> lst_type=personneltypeService.getByName("Hợp đồng");
+				personnel_typeid_link=lst_type.get(0).getId();
+			}
+			
+			List<Personel> list = new ArrayList<Personel>();
+			// lấy danh sách nhân viên theo tổ mà user quản lý
+			if (entity.orgid_link == orgrootid_link) {
+				if (entity.isviewall && user.getOrgid_link()==1)
+					//laasy tat ca nhan vien cua cong ty
+					list = personService.findAll();
+				else
+					//lay tat ca nhan vien theo don vi
+					list = personService.getby_orgmanager(entity.orgid_link, orgrootid_link);
+			} else {
+				//lay danh sach nhan vien theo loai nhan vien
+				//nếu chọn tất cả 
+				if(entity.isviewall) {
+					list = personService.getPersonelByOrgid_link_PersonelType(entity.orgid_link, null);
+				}else {
+					list = personService.getPersonelByOrgid_link_PersonelType(entity.orgid_link, personnel_typeid_link);
+				}
+				
 			}
 
 			response.data = list;

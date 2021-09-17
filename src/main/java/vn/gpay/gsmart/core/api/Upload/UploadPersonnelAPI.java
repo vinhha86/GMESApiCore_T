@@ -242,22 +242,8 @@ public class UploadPersonnelAPI {
 						} else {
 
 							// nếu chưa có thì thêm bộ phận vào DB
-							Org org = new Org();
-							OrgType org_type = new OrgType();
-							org_type.setName(BoPhan);
-							OrgType id_org_type = org_type_service.save(org_type);
-							org.setCode(BoPhan);
-							org.setName(BoPhan);
-							org.setOrgtypeid_link((int) id_org_type.getId());
-							org.setStatus(1);
-							org.setParentid_link(parentid_link);
-							org.setOrgrootid_link((long) 1);
-
-							// luu bộ phận vào DB
-							Org org_id = org_service.save(org);
-							orgid_link = org_id.getId();
-							// mes_err = " Bộ phận không tồn tại! " + " ở dòng " + rowNum + " cột Bộ Phận ";
-							// break;
+							 mes_err = " Bộ phận không tồn tại! " + " ở dòng " + rowNum + " cột Bộ Phận ";
+							 break;
 						}
 
 						// ngay vao cong ty
