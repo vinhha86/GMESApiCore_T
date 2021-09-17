@@ -411,7 +411,7 @@ public class UploadPersonnelAPI {
 						// kiem tra tinh trong danh sach orgtypeid_link = 25;
 						Long tinh = null;
 
-						Long id_huyen = null;
+						//Long id_huyen = null;
 						List<Org> lst_tinh = org_service.getByNameAndType(Tinh, 25);
 						if (lst_tinh.size() != 0) {
 							tinh = lst_tinh.get(0).getId();
@@ -422,6 +422,7 @@ public class UploadPersonnelAPI {
 							org.setStatus(1);
 							org.setIs_manufacturer(0);
 							org.setOrgtypeid_link(25);
+							org.setOrgrootid_link(user.getRootorgid_link());
 							Org id_org = org_service.save(org);
 
 							// lấy id tỉnh thành vừa thêm
@@ -442,6 +443,7 @@ public class UploadPersonnelAPI {
 							org.setStatus(1);
 							org.setIs_manufacturer(0);
 							org.setParentid_link(tinh);
+							org.setOrgrootid_link(user.getRootorgid_link());
 							org.setOrgtypeid_link(26);
 
 							// lấy id huyện vừa thêm
@@ -462,7 +464,7 @@ public class UploadPersonnelAPI {
 							org.setIs_manufacturer(0);
 							org.setParentid_link(huyen);
 							org.setOrgtypeid_link(27);
-
+							org.setOrgrootid_link(user.getRootorgid_link());
 							// lấy id huyện vừa thêm
 							Org id_org = org_service.save(org);
 							xa = id_org.getId();
