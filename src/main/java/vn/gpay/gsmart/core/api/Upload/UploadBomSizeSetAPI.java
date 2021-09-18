@@ -416,8 +416,8 @@ public class UploadBomSizeSetAPI {
 									String ma_npl_code = MaMauNPL.equals("") ? ma_npl : ma_npl + "(" + MaMauNPL + ")";
 
 									// kiem tra san pham (npl) da ton tai hay chua
-									List<Product> list_npl = productService.getby_code_type_description(orgrootid_link,
-											ma_npl_code, type_npl, description);
+									List<Product> list_npl = productService.getby_code_type_description_name(
+											orgrootid_link, ma_npl_code, type_npl, description, name_npl);
 
 									if (list_npl.size() == 0) {
 										Product new_npl = new Product();
@@ -693,8 +693,10 @@ public class UploadBomSizeSetAPI {
 														po_no, POType.PO_LINE_CONFIRMED, pcontractid_link,
 														productid_link);
 												if (listpo.size() > 0) {
-													List<PContract_bom2_npl_poline> listpo_npl = po_npl_Service.getby_product_and_npl(productid_link, pcontractid_link, material_skuid_link);
-													if(listpo_npl.size() == 0) {
+													List<PContract_bom2_npl_poline> listpo_npl = po_npl_Service
+															.getby_product_and_npl(productid_link, pcontractid_link,
+																	material_skuid_link);
+													if (listpo_npl.size() == 0) {
 														PContract_bom2_npl_poline po_npl = new PContract_bom2_npl_poline();
 														po_npl.setId(null);
 														po_npl.setNpl_skuid_link(material_skuid_link);

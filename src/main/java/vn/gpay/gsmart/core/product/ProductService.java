@@ -468,8 +468,9 @@ public class ProductService extends AbstractService<Product> implements IProduct
 	}
 
 	@Override
-	public List<Product> getby_code_type_description(Long orgrootid_link, String code, int type, String description) {
-		return repo.getby_code_type_description(orgrootid_link, code, description, type);
+	public List<Product> getby_code_type_description_name(Long orgrootid_link, String code, int type,
+			String description, String name) {
+		return repo.getby_code_type_description(orgrootid_link, code, description, type, name);
 	}
 
 	@Override

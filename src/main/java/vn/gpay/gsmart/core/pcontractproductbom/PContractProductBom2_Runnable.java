@@ -125,7 +125,7 @@ public class PContractProductBom2_Runnable implements Runnable {
 				boolean check = false;
 				for (Long size : List_size) {
 					List<PContractBOM2SKU> listbomsku_clone = new ArrayList<PContractBOM2SKU>(listbomsku);
-					long skuid_link = mapsku.get(colorid + "_" + size);
+					Long skuid_link = mapsku.get(colorid + "_" + size);
 					listbomsku_clone
 							.removeIf(c -> !c.getMaterial_skuid_link().equals(pContractProductBom.getMaterialid_link())
 									|| !c.getProduct_skuid_link().equals(skuid_link));

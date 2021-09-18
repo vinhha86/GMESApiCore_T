@@ -52,7 +52,8 @@ public interface IProductService extends Operations<Product> {
 	List<Product> getby_code_type_description_and_color_and_size(Long orgrootid_link, String code, int type,
 			String description, Long colorid_link, Long sizeid_link);
 
-	List<Product> getby_code_type_description(Long orgrootid_link, String code, int type, String description);
+	List<Product> getby_code_type_description_name(Long orgrootid_link, String code, int type, String description,
+			String name);
 
 	List<Long> getByBuyerCode(String buyercode);
 

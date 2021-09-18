@@ -86,10 +86,10 @@ public interface IProductRepository extends JpaRepository<Product, Long>, JpaSpe
 
 	@Query(value = "select c from Product c " + "where LOWER(c.buyercode) = LOWER(:code) "
 			+ "and c.orgrootid_link = :orgrootid_link " + "and c.status = 1 " + "and c.description = :description "
-			+ "and c.producttypeid_link = :type")
+			+ "and c.producttypeid_link = :type and LOWER(c.buyername) = LOWER(:name)")
 	public List<Product> getby_code_type_description(@Param("orgrootid_link") final Long orgrootid_link,
 			@Param("code") final String code, @Param("description") final String description,
-			@Param("type") final int type);
+			@Param("type") final int type, @Param("name") final String name);
 
 	@Query(value = "select distinct c.id from Product c "
 			+ "where (TRIM(LOWER(buyercode)) like TRIM(LOWER(concat('%',:buyercode,'%'))) or :buyercode is null)")
