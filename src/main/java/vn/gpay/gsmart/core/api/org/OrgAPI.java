@@ -590,8 +590,26 @@ public class OrgAPI {
 				}
 			} else {
 				// Neu user ko phai thuoc tong cong ty --> lay thong tin don vi cua nguoi dung
-				Org org = orgService.findOne(user.getOrgId());
-				listreturn.add(org);
+				// Lấy thông tin đơn vị của người dùng quản lý
+				List<Long> list_org_id = new ArrayList<Long>();
+				List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getUserId(),
+						OrgType.ORG_TYPE_FACTORY);
+				// nếu user quản lý nhiều hơn 1 đơn vị
+				if (list_userorg.size() > 1) {
+					// danh sasch id don vi user quản lý
+					for (GpayUserOrg userorg : list_userorg) {
+						list_org_id.add(userorg.getOrgid_link());
+					}
+					for (int i = 0; i < list_org_id.size(); i++) {
+						Org lstlst_org = orgService.findOne(list_org_id.get(i));
+						listreturn.add(lstlst_org);
+					}
+
+				} else {
+					Org org = orgService.findOne(user.getOrgId());
+					listreturn.add(org);
+				}
+
 			}
 
 			response.data = listreturn;
