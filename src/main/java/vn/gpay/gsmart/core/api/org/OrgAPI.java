@@ -503,9 +503,9 @@ public class OrgAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			
-			List<Long> list_org_id = new ArrayList<Long>();
-			List<Org> lst_org = new ArrayList<Org>();
-			List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY);
+			//List<Long> list_org_id = new ArrayList<Long>();
+			//List<Org> lst_org = new ArrayList<Org>();
+			//List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY);
 			
 //			for (GpayUserOrg userorg : list_userorg) {
 //				list_org_id.add(userorg.getOrgid_link());
