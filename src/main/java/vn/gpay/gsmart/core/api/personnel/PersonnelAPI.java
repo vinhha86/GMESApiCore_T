@@ -27,7 +27,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import vn.gpay.gsmart.core.api.org.OrgResponse;
 import vn.gpay.gsmart.core.base.ResponseBase;
+import vn.gpay.gsmart.core.org.IOrgService;
+import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.personel.IPersonnel_Service;
 import vn.gpay.gsmart.core.personel.IPersonnel_inout_Service;
 import vn.gpay.gsmart.core.personel.Personel;
@@ -50,6 +53,7 @@ import vn.gpay.gsmart.core.security.IGpayUserService;
 import vn.gpay.gsmart.core.stocking_uniquecode.IStocking_UniqueCode_Service;
 import vn.gpay.gsmart.core.stocking_uniquecode.Stocking_UniqueCode;
 import vn.gpay.gsmart.core.utils.Common;
+import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -77,6 +81,8 @@ public class PersonnelAPI {
 	IPersonnel_inout_Service person_inout_Service;
 	@Autowired
 	IStocking_UniqueCode_Service stockingService;
+	@Autowired
+	IOrgService orgService;
 
 	@RequestMapping(value = "/gettype", method = RequestMethod.POST)
 	public ResponseEntity<gettype_response> getType(HttpServletRequest request) {
@@ -141,6 +147,8 @@ public class PersonnelAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long orgrootid_link = user.getRootorgid_link();
+			List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY);
+			List<Org> lst_org = new ArrayList<Org>();
 			
 			//loại nhân viên 
 			long personnel_typeid_link;
@@ -163,16 +171,31 @@ public class PersonnelAPI {
 					//lay tat ca nhan vien theo don vi
 					list = personService.getby_orgmanager(entity.orgid_link, orgrootid_link);
 			} else {
-				//lay danh sach nhan vien theo loai nhan vien
-				//nếu chọn tất cả 
-				if(entity.isviewall) {
-					list = personService.getPersonelByOrgid_link_PersonelType(entity.orgid_link, null);
+				//nếu user quản lý nhiều hơn 1 đơn vị
+				if (list_userorg.size() > 1) {
+					//nếu chọn tất cả 
+					if(entity.isviewall) {
+						list = personService.getPersonelByOrgid_link_PersonelType(entity.orgid_link, null);
+					}else {
+						list = personService.getPersonelByOrgid_link_PersonelType(entity.orgid_link, personnel_typeid_link);
+					}
 				}else {
-					list = personService.getPersonelByOrgid_link_PersonelType(entity.orgid_link, personnel_typeid_link);
-				}
+					//nếu user quản lý tổ con cụ thể thì chỉ load tổ con, kể cả bấm vào đơn vị
+					//nếu user có 1 đơn vị con và chỉ quản lý 1 đơn vị
 				
+					if (user.getOrg_grant_id_link() != null) {
+						//nếu chọn tất cả nhân viên của tổ đấy
+						if(entity.isviewall) {
+							list = personService.getPersonelByOrgid_link_PersonelType(user.getOrg_grant_id_link(), null);
+						}else {
+							lst_org = orgService.getOrgById(user.getOrg_grant_id_link());
+							if (lst_org.size() != 0) {
+								list = personService.getPersonelByOrgid_link_PersonelType(user.getOrg_grant_id_link(), personnel_typeid_link);
+							}
+						}
+					}
+				}
 			}
-
 			response.data = list;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
