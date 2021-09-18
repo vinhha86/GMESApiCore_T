@@ -63,17 +63,19 @@ public class TimesheetAbsenceAPI {
 
 			// lấy danh sách báo nghỉ theo đơn vị của tài khoản quản lý
 			if (user.getOrgid_link() != 1) {
-				// lấy ds báo nghỉ theo tổ của tài khoản quản lý (nếu có)
-				if (user.getOrg_grant_id_link() != null) {
-					response.data = timesheetAbsenceService.getbyOrg_grant_id_link(user.getOrg_grant_id_link());
-				} else {
+				//nếu quản lý nhiều đơn vị
+				if(list_org_id.size()>1) {
 					for (int i = 0; i < list_org_id.size(); i++) {
 						List<TimesheetAbsence> lstlst_timesheetabsence = timesheetAbsenceService.getbyOrgid(list_org_id.get(i));
 						lst_timesheetab.addAll(lstlst_timesheetabsence);
 					}
 					response.data = lst_timesheetab;
+				}else {
+					// lấy ds báo nghỉ theo tổ của tài khoản quản lý (nếu có)
+					if (user.getOrg_grant_id_link() != null) {
+						response.data = timesheetAbsenceService.getbyOrg_grant_id_link(user.getOrg_grant_id_link());
+					}
 				}
-
 			} else {
 				response.data = timesheetAbsenceService.findAll();
 			}

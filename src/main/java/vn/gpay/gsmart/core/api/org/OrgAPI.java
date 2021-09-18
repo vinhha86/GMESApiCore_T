@@ -130,19 +130,19 @@ public class OrgAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			// lấy tổ cụ thể trong đơn vị - theo tổ mà tài khoản đấy quản lý (nếu có)
-			if (user.getOrgid_link() != 1) {
-				if (user.getOrg_grant_id_link() != null) {
-					List<Org> lst_org = new ArrayList<Org>();
-					lst_org = orgService.getOrgById(user.getOrg_grant_id_link());
-					if (lst_org.size() != 0) {
-						response.data = lst_org;
-						response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-						response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-						return new ResponseEntity<OrgResponse>(response, HttpStatus.OK);
-					}
-
-				}
-			}
+//			if (user.getOrgid_link() != 1) {
+//				if (user.getOrg_grant_id_link() != null) {
+//					List<Org> lst_org = new ArrayList<Org>();
+//					lst_org = orgService.getOrgById(user.getOrg_grant_id_link());
+//					if (lst_org.size() != 0) {
+//						response.data = lst_org;
+//						response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+//						response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+//						return new ResponseEntity<OrgResponse>(response, HttpStatus.OK);
+//					}
+//
+//				}
+//			}
 
 			List<String> list = new ArrayList<String>();
 			list.add("3");
@@ -183,7 +183,85 @@ public class OrgAPI {
 			return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	//lấy danh sách tổ(đơn vị con: nếu có) theo user quản lý
+	@RequestMapping(value = "/loadOrgByParent", method = RequestMethod.POST)
+	public ResponseEntity<?> loadOrgByParent(@RequestBody GetOrgById_request entity, HttpServletRequest request) {// @RequestParam("type")
+		OrgResponse response = new OrgResponse();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			List<Long> list_org_id = new ArrayList<Long>();
+			List<Org> lst_org = new ArrayList<Org>();
+			List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY);
+			
+			List<String> list = new ArrayList<String>();
+			list.add("3");
+			list.add("8");
+			list.add("9");
+			list.add("14");
+			list.add("17");
+			list.add("4");
+			list.add("19");
+			list.add("20");
+			list.add("21");
+			list.add("22");
+			list.add("23");
+			list.add("28");
+			list.add("29");
+			list.add("30");
+			list.add("31");
+			list.add("32");
+			list.add("33");
+			list.add("34");
+			list.add("35");
+			list.add("36");
+			list.add("37");
+			list.add("38");
+			list.add("39");
+			
+			
+			for (GpayUserOrg userorg : list_userorg) {
+				list_org_id.add(userorg.getOrgid_link());
+			}
+			// lấy tổ cụ thể trong đơn vị - theo tổ mà tài khoản đấy quản lý (nếu có)
+			if (user.getOrgid_link() != 1) {
+				//nếu user quản lý nhiều đơn vị
+				if (list_org_id.size() > 1) {
+					List<Org> ls_tosx = orgService.findChildByListType(user.getRootorgid_link(), entity.id, list);
+					response.data = ls_tosx;
+					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+					return new ResponseEntity<OrgResponse>(response, HttpStatus.OK);
+				}else {
+					//nếu user có 1 đơn vị con và chỉ quản lý 1 đơn vị
+					if (user.getOrg_grant_id_link() != null) {
+						
+						lst_org = orgService.getOrgById(user.getOrg_grant_id_link());
+						if (lst_org.size() != 0) {
+							response.data = lst_org;
+							response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+							response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+							return new ResponseEntity<OrgResponse>(response, HttpStatus.OK);
+						}
 
+					}
+				}	
+			}
+
+		
+
+			List<Org> ls_tosx = orgService.findChildByListType(user.getRootorgid_link(), entity.id, list);
+
+			response.data = ls_tosx;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<OrgResponse>(response, HttpStatus.OK);
+		} catch (RuntimeException e) {
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(e.getMessage());
+			return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 	@RequestMapping(value = "/getby_listtype", method = RequestMethod.POST)
 	public ResponseEntity<?> getByListType(@RequestBody getorg_by_type_request entity, HttpServletRequest request) {// @RequestParam("type")
 		getorg_by_type_response response = new getorg_by_type_response();
@@ -503,9 +581,9 @@ public class OrgAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			
-			List<Long> list_org_id = new ArrayList<Long>();
-			List<Org> lst_org = new ArrayList<Org>();
-			List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY);
+			//List<Long> list_org_id = new ArrayList<Long>();
+			//List<Org> lst_org = new ArrayList<Org>();
+			//List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY);
 			
 //			for (GpayUserOrg userorg : list_userorg) {
 //				list_org_id.add(userorg.getOrgid_link());
@@ -548,6 +626,49 @@ public class OrgAPI {
 		}
 	}
 
+	//lây danh sách org theo user quản lý
+	@RequestMapping(value = "/loadOrg_ByOrgType", method = RequestMethod.POST)
+	public ResponseEntity<OrgResponse> loadOrg_ByOrgType(@RequestBody Org_getbyType_request entity,
+			HttpServletRequest request) {// @RequestParam("type")
+		OrgResponse response = new OrgResponse();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			
+			List<Long> list_org_id = new ArrayList<Long>();
+			List<Org> lst_org = new ArrayList<Org>();
+			List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY);
+			
+			for (GpayUserOrg userorg : list_userorg) {
+				list_org_id.add(userorg.getOrgid_link());
+			}
+			// nếu user có org_id khác 1(1 là công ty DHA) : tức là thuộc 1 đơn vị cụ thể
+			// thì chỉ lấy đơn vị đấy, không được lấy đơn vị khác
+			if (user.getOrgid_link() != 1) {
+				for(int i = 0 ; i<list_org_id.size();i++) {
+				List<Org>	lstlst_org= orgService.getOrgById(list_org_id.get(i));
+				lst_org.add(lstlst_org.get(0));
+				}
+				
+				response.data =lst_org;
+			} else {
+				response.data = orgService.findAllorgByTypeId(entity.orgtypeid_link, (long) user.getRootorgid_link());
+				if (entity.isAll) {
+					Org org = new Org();
+					org.setId((long) 0);
+					org.setName("Tất cả");
+					response.data.add(0, org);
+				}
+
+			}
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<OrgResponse>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_SERVER_ERROR);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<OrgResponse>(response, HttpStatus.OK);
+		}
+	}
 	@RequestMapping(value = "/getOrgById", method = RequestMethod.POST)
 	public ResponseEntity<GetOrgById_response> GetOrgByid(@RequestBody GetOrgById_request entity,
 			HttpServletRequest request) {// @RequestParam("type")
