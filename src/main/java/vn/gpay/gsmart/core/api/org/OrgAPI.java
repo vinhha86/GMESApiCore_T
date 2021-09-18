@@ -507,28 +507,37 @@ public class OrgAPI {
 			List<Org> lst_org = new ArrayList<Org>();
 			List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY);
 			
-			for (GpayUserOrg userorg : list_userorg) {
-				list_org_id.add(userorg.getOrgid_link());
+//			for (GpayUserOrg userorg : list_userorg) {
+//				list_org_id.add(userorg.getOrgid_link());
+//			}
+//			// nếu user có org_id khác 1(1 là công ty DHA) : tức là thuộc 1 đơn vị cụ thể
+//			// thì chỉ lấy đơn vị đấy, không được lấy đơn vị khác
+//			if (user.getOrgid_link() != 1) {
+//				for(int i = 0 ; i<list_org_id.size();i++) {
+//				List<Org>	lstlst_org= orgService.getOrgById(list_org_id.get(i));
+//				lst_org.add(lstlst_org.get(0));
+//				}
+//				
+//				response.data =lst_org;
+//			} else {
+//				response.data = orgService.findAllorgByTypeId(entity.orgtypeid_link, (long) user.getRootorgid_link());
+//				if (entity.isAll) {
+//					Org org = new Org();
+//					org.setId((long) 0);
+//					org.setName("Tất cả");
+//					response.data.add(0, org);
+//				}
+//
+//			}
+			
+			response.data = orgService.findAllorgByTypeId(entity.orgtypeid_link, (long) user.getRootorgid_link());
+			if (entity.isAll) {
+				Org org = new Org();
+				org.setId((long) 0);
+				org.setName("Tất cả");
+				response.data.add(0, org);
 			}
-			// nếu user có org_id khác 1(1 là công ty DHA) : tức là thuộc 1 đơn vị cụ thể
-			// thì chỉ lấy đơn vị đấy, không được lấy đơn vị khác
-			if (user.getOrgid_link() != 1) {
-				for(int i = 0 ; i<list_org_id.size();i++) {
-				List<Org>	lstlst_org= orgService.getOrgById(list_org_id.get(i));
-				lst_org.add(lstlst_org.get(0));
-				}
-				
-				response.data =lst_org;
-			} else {
-				response.data = orgService.findAllorgByTypeId(entity.orgtypeid_link, (long) user.getRootorgid_link());
-				if (entity.isAll) {
-					Org org = new Org();
-					org.setId((long) 0);
-					org.setName("Tất cả");
-					response.data.add(0, org);
-				}
-
-			}
+			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<OrgResponse>(response, HttpStatus.OK);
