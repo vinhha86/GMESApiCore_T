@@ -84,7 +84,7 @@ public class OrgAPI {
 	public ResponseEntity<?> getChilbyType(@RequestBody getchil_bytype_request entity, HttpServletRequest request) {// @RequestParam("type")
 		OrgResponse response = new OrgResponse();
 		try {
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			//GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			// lấy tổ cụ thể trong đơn vị - theo tổ mà tài khoản đấy quản lý (nếu có)
 //			if (user.getOrgid_link() != 1) {
 //				if (user.getOrg_grant_id_link() != null) {
@@ -569,57 +569,90 @@ public class OrgAPI {
 			@RequestBody Org_getbyroot_andtypeid_request entity) {// @RequestParam("type")
 		OrgResponse response = new OrgResponse();
 		try {
-			GpayAuthentication user = (GpayAuthentication) SecurityContextHolder.getContext().getAuthentication();
+			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
 			Long orgrootid_link = user.getRootorgid_link();
 			String[] listtype = entity.listid.split(",");
 			List<String> list = new ArrayList<String>();
 			for (String string : listtype) {
 				list.add(string);
 			}
-
-			// Lay org la con
+			
+			//Lay org la con 	
 			List<Org> listreturn = new ArrayList<Org>();
-
+			
 			List<Org> listorg = orgService.getorgChildrenbyOrg(user.getOrgId(), list);
-
+			
 			listreturn.addAll(listorg);
-
-			// Lay org chau
-
-			for (Org org : listorg) {
+			
+			//Lay org chau
+			
+			for(Org org : listorg) {
 				List<Org> list_chil = orgService.getorgChildrenbyOrg(org.getId(), list);
 				listreturn.addAll(list_chil);
 			}
-
-			if (user.getOrgId() == orgrootid_link) {
-				// Neu nguoi dung thuoc tong cong ty, kiem tra xem co load goc hay ko
-				if (entity.isincludemyself) {
+			
+			if (user.getOrgId() == orgrootid_link){
+				//Neu nguoi dung thuoc tong cong ty, kiem tra xem co load goc hay ko
+				if (entity.isincludemyself){
 					Org org = orgService.findOne(user.getOrgId());
 					listreturn.add(org);
 				}
 			} else {
-				// Neu user ko phai thuoc tong cong ty --> lay thong tin don vi cua nguoi dung
-				// Lấy thông tin đơn vị của người dùng quản lý
-				List<Long> list_org_id = new ArrayList<Long>();
-				List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getUserId(),
-						OrgType.ORG_TYPE_FACTORY);
-				// nếu user quản lý nhiều hơn 1 đơn vị
-				if (list_userorg.size() > 1) {
-					// danh sasch id don vi user quản lý
-					for (GpayUserOrg userorg : list_userorg) {
-						list_org_id.add(userorg.getOrgid_link());
-					}
-					for (int i = 0; i < list_org_id.size(); i++) {
-						Org lstlst_org = orgService.findOne(list_org_id.get(i));
-						listreturn.add(lstlst_org);
-					}
-
-				} else {
-					Org org = orgService.findOne(user.getOrgId());
-					listreturn.add(org);
-				}
-
+				//Neu user ko phai thuoc tong cong ty --> lay thong tin don vi cua nguoi dung
+				Org org = orgService.findOne(user.getOrgId());
+				listreturn.add(org);
 			}
+//			GpayAuthentication user = (GpayAuthentication) SecurityContextHolder.getContext().getAuthentication();
+//			Long orgrootid_link = user.getRootorgid_link();
+//			String[] listtype = entity.listid.split(",");
+//			List<String> list = new ArrayList<String>();
+//			for (String string : listtype) {
+//				list.add(string);
+//			}
+//
+//			// Lay org la con
+//			List<Org> listreturn = new ArrayList<Org>();
+//
+//			List<Org> listorg = orgService.getorgChildrenbyOrg(user.getOrgId(), list);
+//
+//			listreturn.addAll(listorg);
+//
+//			// Lay org chau
+//
+//			for (Org org : listorg) {
+//				List<Org> list_chil = orgService.getorgChildrenbyOrg(org.getId(), list);
+//				listreturn.addAll(list_chil);
+//			}
+//
+//			if (user.getOrgId() == orgrootid_link) {
+//				// Neu nguoi dung thuoc tong cong ty, kiem tra xem co load goc hay ko
+//				if (entity.isincludemyself) {
+//					Org org = orgService.findOne(user.getOrgId());
+//					listreturn.add(org);
+//				}
+//			} else {
+//				// Neu user ko phai thuoc tong cong ty --> lay thong tin don vi cua nguoi dung
+//				// Lấy thông tin đơn vị của người dùng quản lý
+//				List<Long> list_org_id = new ArrayList<Long>();
+//				List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getUserId(),
+//						OrgType.ORG_TYPE_FACTORY);
+//				// nếu user quản lý nhiều hơn 1 đơn vị
+//				if (list_userorg.size() > 1) {
+//					// danh sasch id don vi user quản lý
+//					for (GpayUserOrg userorg : list_userorg) {
+//						list_org_id.add(userorg.getOrgid_link());
+//					}
+//					for (int i = 0; i < list_org_id.size(); i++) {
+//						Org lstlst_org = orgService.findOne(list_org_id.get(i));
+//						listreturn.add(lstlst_org);
+//					}
+//
+//				} else {
+//					Org org = orgService.findOne(user.getOrgId());
+//					listreturn.add(org);
+//				}
+//
+//			}
 
 			response.data = listreturn;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
