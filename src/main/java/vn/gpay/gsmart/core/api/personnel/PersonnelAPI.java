@@ -163,14 +163,17 @@ public class PersonnelAPI {
 			
 			List<Personel> list = new ArrayList<Personel>();
 			// lấy danh sách nhân viên theo tổ mà user quản lý
+			//1.Trường hợp chọn Công ty DHA
 			if (entity.orgid_link == orgrootid_link) {
+				//nếu tích vào tát cả và chọn vào DHA,tài khoản đấy là admin thì lấy tất cả DS nhân viên của cty
 				if (entity.isviewall && user.getOrgid_link()==1)
 					//laasy tat ca nhan vien cua cong ty
 					list = personService.findAll();
-				else
+				else if(user.getOrgid_link()==1)		//nếu chọn vào DHA mà tài khoản đấy là admin thì lấy các nhân viên hợp đồng,nếu ko phải admin thì k lấy đc ds
 					//lay tat ca nhan vien theo don vi
-					list = personService.getby_orgmanager(entity.orgid_link, orgrootid_link);
-			} else {
+					list = personService.getPersonelByOrgid_link_PersonelType(entity.orgid_link, personnel_typeid_link);
+			} 
+			else {
 				//nếu user quản lý nhiều hơn 1 đơn vị
 				if (list_userorg.size() > 1) {
 					//nếu chọn tất cả 
@@ -193,6 +196,14 @@ public class PersonnelAPI {
 								list = personService.getPersonelByOrgid_link_PersonelType(user.getOrg_grant_id_link(), personnel_typeid_link);
 							}
 						}
+					}else {
+						//nếu chọn tất cả
+						if(entity.isviewall) {
+							list = personService.getPersonelByOrgid_link_PersonelType(entity.orgid_link, null);
+						}else {
+							list = personService.getPersonelByOrgid_link_PersonelType(entity.orgid_link, personnel_typeid_link);
+						}
+						
 					}
 				}
 			}

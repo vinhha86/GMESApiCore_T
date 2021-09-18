@@ -54,7 +54,7 @@ public interface Personnel_repository extends JpaRepository<Personel, Long>, Jpa
 			@Param("org_id") final Long id,
 			@Param("personnel_typeid_link") final Long personnel_typeid_link);
 	//lấy danh sách nhân viên theo đơn vị, loại nhân viên
-	@Query(value = "select c from Personel c where (c.orgid_link = :orgmanagerid_link or orgmanagerid_link = :orgmanagerid_link) and ( c.personnel_typeid_link = :personnel_typeid_link or null is :personnel_typeid_link) ")
+	@Query(value = "select c from Personel c where (c.orgid_link = :orgmanagerid_link or orgmanagerid_link = :orgmanagerid_link or c.orgrootid_link = :orgmanagerid_link) and ( c.personnel_typeid_link = :personnel_typeid_link or null is :personnel_typeid_link) ")
 	public List<Personel> getPersonelByOrgid_link_PersonelType(
 			@Param("orgmanagerid_link") final Long orgmanagerid_link,
 			@Param("personnel_typeid_link") final Long personnel_typeid_link);
