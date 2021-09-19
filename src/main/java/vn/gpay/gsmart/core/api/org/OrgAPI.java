@@ -641,6 +641,9 @@ public class OrgAPI {
 			for (GpayUserOrg userorg : list_userorg) {
 				list_org_id.add(userorg.getOrgid_link());
 			}
+			if (!list_org_id.contains(user.getOrgid_link())) {
+				list_org_id.add(user.getOrgid_link());
+			}
 			// nếu user có org_id khác 1(1 là công ty DHA) : tức là thuộc 1 đơn vị cụ thể
 			// thì chỉ lấy đơn vị đấy, không được lấy đơn vị khác
 			if (user.getOrgid_link() != 1) {
