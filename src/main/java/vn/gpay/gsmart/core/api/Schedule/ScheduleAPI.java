@@ -38,6 +38,7 @@ import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
+import vn.gpay.gsmart.core.personel.IPersonnel_Service;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
@@ -61,6 +62,7 @@ import vn.gpay.gsmart.core.task_checklist.ITask_CheckList_Service;
 import vn.gpay.gsmart.core.task_checklist.Task_CheckList;
 import vn.gpay.gsmart.core.task_object.ITask_Object_Service;
 import vn.gpay.gsmart.core.task_object.Task_Object;
+import vn.gpay.gsmart.core.timesheet_absence.ITimesheetAbsenceService;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.POrderReqStatus;
@@ -103,6 +105,10 @@ public class ScheduleAPI {
 
 	@Autowired
 	IGpayUserOrgService userOrgService;
+	@Autowired
+	IPersonnel_Service personnelService;
+	@Autowired
+	ITimesheetAbsenceService timesheet_absence_Service;
 
 	@RequestMapping(value = "/getplan", method = RequestMethod.POST)
 	public ResponseEntity<get_schedule_porder_response> GetAll(HttpServletRequest request, @RequestParam String listid,
@@ -214,13 +220,21 @@ public class ScheduleAPI {
 				for (Org org_grant : listorg_grantt) {
 					Schedule_plan sch_org_grant = new Schedule_plan();
 
+					// Lấy lao động định biên
+					int total_personnel = personnelService.GetSizePersonnelByGrant(org_grant.getId(), null);
+
+					// Lấy số lao động nghỉ trong ngày
+					int total_absence = timesheet_absence_Service.GetTimeSheetAbsenceByDate(org_grant.getId(),
+							new Date());
+					int total_working = total_personnel - total_absence;
+
 					sch_org_grant.setId(id);
 					sch_org_grant.setCode(org_grant.getCode());
 					sch_org_grant.setExpanded(false);
 					sch_org_grant.setIconCls("x-fa fa-sliders");
 					sch_org_grant.setId_origin(org_grant.getId());
 					sch_org_grant.setLeaf(false);
-					sch_org_grant.setName(org_grant.getName());
+					sch_org_grant.setName(org_grant.getName() + " (" + total_working + "/" + total_personnel + ")");
 					sch_org_grant.setOrgtypeid_link(org_grant.getOrgtypeid_link());
 					sch_org_grant.setParentid_origin(org_grant.getParentid_link());
 					sch_org_grant.setType(1);
@@ -376,9 +390,9 @@ public class ScheduleAPI {
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<update_schedule_response>(response, HttpStatus.OK);
 		}
-	} 
-	
-	@RequestMapping(value = "/showhide_image",method = RequestMethod.POST)
+	}
+
+	@RequestMapping(value = "/showhide_image", method = RequestMethod.POST)
 	public ResponseEntity<ShowHideImage_response> ShowHideImage(HttpServletRequest request,
 			@RequestBody ShowHideImage_request entity) {
 		ShowHideImage_response response = new ShowHideImage_response();
@@ -397,8 +411,8 @@ public class ScheduleAPI {
 			return new ResponseEntity<ShowHideImage_response>(response, HttpStatus.OK);
 		}
 	}
-	
-	@RequestMapping(value = "/update_porder",method = RequestMethod.POST)
+
+	@RequestMapping(value = "/update_porder", method = RequestMethod.POST)
 	public ResponseEntity<update_porder_response> UpdatePorder(HttpServletRequest request,
 			@RequestBody update_porder_request entity) {
 		update_porder_response response = new update_porder_response();

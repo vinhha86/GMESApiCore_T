@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.timesheet_absence;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +12,10 @@ import vn.gpay.gsmart.core.base.AbstractService;
 import vn.gpay.gsmart.core.utils.GPAYDateFormat;
 
 @Service
-public class TimesheetAbsenceService extends AbstractService<TimesheetAbsence> implements ITimesheetAbsenceService{
-	@Autowired ITimesheetAbsenceRepository repo;
-	
+public class TimesheetAbsenceService extends AbstractService<TimesheetAbsence> implements ITimesheetAbsenceService {
+	@Autowired
+	ITimesheetAbsenceRepository repo;
+
 	@Override
 	protected JpaRepository<TimesheetAbsence, Long> getRepository() {
 		// TODO Auto-generated method stub
@@ -23,10 +25,9 @@ public class TimesheetAbsenceService extends AbstractService<TimesheetAbsence> i
 	@Override
 	public List<TimesheetAbsence> getbypaging(TimeSheetAbsence_getbypaging_request entity) {
 		// TODO Auto-generated method stub
-		return repo.getbypaging(
-				entity.orgFactory, entity.personnelCode, entity.personnelName,
-				GPAYDateFormat.atStartOfDay(entity.datefrom), GPAYDateFormat.atEndOfDay(entity.dateto), entity.timeSheetAbsenceType
-				);
+		return repo.getbypaging(entity.orgFactory, entity.personnelCode, entity.personnelName,
+				GPAYDateFormat.atStartOfDay(entity.datefrom), GPAYDateFormat.atEndOfDay(entity.dateto),
+				entity.timeSheetAbsenceType);
 	}
 
 	@Override
@@ -39,6 +40,12 @@ public class TimesheetAbsenceService extends AbstractService<TimesheetAbsence> i
 	public List<TimesheetAbsence> getbyOrg_grant_id_link(Long Org_grant_id_link) {
 		// TODO Auto-generated method stub
 		return repo.getbyOrg_grant_id_link(Org_grant_id_link);
+	}
+
+	@Override
+	public int GetTimeSheetAbsenceByDate(Long Org_grant_id_link, Date today) {
+		// TODO Auto-generated method stub
+		return repo.getbyOrg_grant_id_link_Today(Org_grant_id_link, today);
 	}
 
 }

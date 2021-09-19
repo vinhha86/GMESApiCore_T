@@ -24,6 +24,12 @@ public interface Personnel_repository extends JpaRepository<Personel, Long>, Jpa
 	@Query("SELECT c FROM Personel c " + "where (c.orgid_link = :orgid_link or orgmanagerid_link = :orgid_link) ")
 	public List<Personel> getbyOrg(@Param("orgid_link") final Long orgid_link);
 
+	@Query("SELECT count(id) FROM Personel c "
+			+ "where (c.orgid_link = :orgid_link or orgmanagerid_link = :orgid_link) "
+			+ "and (personnel_typeid_link = :personnel_typeid_link or :personnel_typeid_link is null)")
+	public int getSizePersonnelbyOrgAndType(@Param("orgid_link") final Long orgid_link,
+			@Param("personnel_typeid_link") final Long personnel_typeid_link);
+
 	@Query("SELECT c FROM Personel c " + "inner join TimeSheetLunch b on c.id = b.personnelid_link "
 			+ "where c.orgid_link = :orgid_link " + "and b.shifttypeid_link = :shifttypeid_link "
 			+ "and b.workingdate = :workingdate " + "and b.isworking = true ")
@@ -47,15 +53,14 @@ public interface Personnel_repository extends JpaRepository<Personel, Long>, Jpa
 	// lấy danh sách nhân viên theo mã nhân viên, không chứa id truyền vào
 	@Query(value = "select c from Personel c where c.code = :code " + "and c.id <> :id")
 	public List<Personel> getPersonelByCode_Id_Personel(@Param("code") final String code, @Param("id") final Long id);
-	
-	//lấy danh sách nhân viên theo tổ , loại nhân viên
+
+	// lấy danh sách nhân viên theo tổ , loại nhân viên
 	@Query(value = "select c from Personel c where c.orgid_link = :org_id and (c.personnel_typeid_link = :personnel_typeid_link or null is :personnel_typeid_link) ")
-	public List<Personel> getPersonelByOrgid_link(
-			@Param("org_id") final Long id,
+	public List<Personel> getPersonelByOrgid_link(@Param("org_id") final Long id,
 			@Param("personnel_typeid_link") final Long personnel_typeid_link);
-	//lấy danh sách nhân viên theo đơn vị, loại nhân viên
+
+	// lấy danh sách nhân viên theo đơn vị, loại nhân viên
 	@Query(value = "select c from Personel c where (c.orgid_link = :orgmanagerid_link or orgmanagerid_link = :orgmanagerid_link or c.orgrootid_link = :orgmanagerid_link) and ( c.personnel_typeid_link = :personnel_typeid_link or null is :personnel_typeid_link) ")
-	public List<Personel> getPersonelByOrgid_link_PersonelType(
-			@Param("orgmanagerid_link") final Long orgmanagerid_link,
+	public List<Personel> getPersonelByOrgid_link_PersonelType(@Param("orgmanagerid_link") final Long orgmanagerid_link,
 			@Param("personnel_typeid_link") final Long personnel_typeid_link);
 }

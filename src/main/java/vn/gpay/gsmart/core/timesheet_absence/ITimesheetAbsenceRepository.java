@@ -10,12 +10,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-
 @Repository
 @Transactional
-public interface ITimesheetAbsenceRepository extends JpaRepository<TimesheetAbsence, Long>, JpaSpecificationExecutor<TimesheetAbsence>{
-	@Query(value = "select c from TimesheetAbsence c "
-			+ "inner join Personel b on b.id = c.personnelid_link "
+public interface ITimesheetAbsenceRepository
+		extends JpaRepository<TimesheetAbsence, Long>, JpaSpecificationExecutor<TimesheetAbsence> {
+	@Query(value = "select c from TimesheetAbsence c " + "inner join Personel b on b.id = c.personnelid_link "
 			+ "where (b.orgmanagerid_link = :orgFactory or :orgFactory = 0) "
 			+ "and lower(b.code) like lower(concat('%',:personnelCode,'%')) "
 			+ "and lower(b.fullname) like lower(concat('%',:personnelName,'%')) "
@@ -23,31 +22,29 @@ public interface ITimesheetAbsenceRepository extends JpaRepository<TimesheetAbse
 			+ "and (CAST(:dateto AS date) IS NULL or c.absencedate_to <= :dateto) "
 //			+ "and (c.absencedate_from >= :datefrom) "
 //			+ "and (c.absencedate_to <= :dateto) "
-			+ "and (c.absencetypeid_link = :timeSheetAbsenceType or :timeSheetAbsenceType = 0) "
-			)
-	public List<TimesheetAbsence> getbypaging(
-			@Param ("orgFactory")final Long orgFactory,
-			@Param ("personnelCode")final String personnelCode,
-			@Param ("personnelName")final String personnelName,
-			@Param ("datefrom")final Date datefrom,
-			@Param ("dateto")final Date dateto,
-			@Param ("timeSheetAbsenceType")final Long timeSheetAbsenceType
-			);
-	
+			+ "and (c.absencetypeid_link = :timeSheetAbsenceType or :timeSheetAbsenceType = 0) ")
+	public List<TimesheetAbsence> getbypaging(@Param("orgFactory") final Long orgFactory,
+			@Param("personnelCode") final String personnelCode, @Param("personnelName") final String personnelName,
+			@Param("datefrom") final Date datefrom, @Param("dateto") final Date dateto,
+			@Param("timeSheetAbsenceType") final Long timeSheetAbsenceType);
+
 //	WHERE (Column1 = @Var1 OR @Var1 IS NULL)
 //	AND (Column2 = @Var2 OR @Var2 IS NULL)
 //	+ "and lower(c.po_buyer) like lower(concat('%',:po_buyer,'%')) "
-	
-	//lây danh sách theo đơn vị - của tài khoản quản lý 
-	@Query(value="select c from TimesheetAbsence c "
-			+ " inner join Personel b on c.personnelid_link = b.id "
+
+	// lây danh sách theo đơn vị - của tài khoản quản lý
+	@Query(value = "select c from TimesheetAbsence c " + " inner join Personel b on c.personnelid_link = b.id "
 			+ " where b.orgmanagerid_link = :org_id")
-	public List<TimesheetAbsence> getbyOrgid(
-			@Param ("org_id")final Long org_id);
-	//lấy danh sách theo tổ - của tài khoản quản lý
-	@Query(value="select c from TimesheetAbsence c "
-			+ " inner join Personel b on c.personnelid_link = b.id "
+	public List<TimesheetAbsence> getbyOrgid(@Param("org_id") final Long org_id);
+
+	// lấy danh sách theo tổ - của tài khoản quản lý
+	@Query(value = "select c from TimesheetAbsence c " + " inner join Personel b on c.personnelid_link = b.id "
 			+ " where b.orgid_link = :Org_grant_id_link")
-	public List<TimesheetAbsence> getbyOrg_grant_id_link(
-			@Param ("Org_grant_id_link")final Long Org_grant_id_link);
+	public List<TimesheetAbsence> getbyOrg_grant_id_link(@Param("Org_grant_id_link") final Long Org_grant_id_link);
+
+	@Query(value = "select count(c.id) from TimesheetAbsence c "
+			+ " inner join Personel b on c.personnelid_link = b.id "
+			+ " where b.orgid_link = :Org_grant_id_link and absencedate_from <= :today and absencedate_to >= :today")
+	public int getbyOrg_grant_id_link_Today(@Param("Org_grant_id_link") final Long Org_grant_id_link,
+			@Param("today") final Date today);
 }
