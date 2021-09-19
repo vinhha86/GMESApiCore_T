@@ -32,19 +32,66 @@ public interface ITimesheetAbsenceRepository
 //	AND (Column2 = @Var2 OR @Var2 IS NULL)
 //	+ "and lower(c.po_buyer) like lower(concat('%',:po_buyer,'%')) "
 
-	// lây danh sách theo đơn vị - của tài khoản quản lý
-	@Query(value = "select c from TimesheetAbsence c " + " inner join Personel b on c.personnelid_link = b.id "
-			+ " where b.orgmanagerid_link = :org_id")
-	public List<TimesheetAbsence> getbyOrgid(@Param("org_id") final Long org_id);
 
-	// lấy danh sách theo tổ - của tài khoản quản lý
-	@Query(value = "select c from TimesheetAbsence c " + " inner join Personel b on c.personnelid_link = b.id "
-			+ " where b.orgid_link = :Org_grant_id_link")
-	public List<TimesheetAbsence> getbyOrg_grant_id_link(@Param("Org_grant_id_link") final Long Org_grant_id_link);
+
 
 	@Query(value = "select count(c.id) from TimesheetAbsence c "
 			+ " inner join Personel b on c.personnelid_link = b.id "
 			+ " where b.orgid_link = :Org_grant_id_link and absencedate_from <= :today and absencedate_to >= :today")
 	public int getbyOrg_grant_id_link_Today(@Param("Org_grant_id_link") final Long Org_grant_id_link,
 			@Param("today") final Date today);
+
+	
+	//lây danh sách theo đơn vị - của tài khoản quản lý 
+	@Query(value="select c from TimesheetAbsence c "
+			+ " inner join Personel b on c.personnelid_link = b.id " 
+			+ " where b.orgmanagerid_link = :org_id "
+			+ " and (b.orgmanagerid_link = :orgFactory or :orgFactory = 0) "
+			+ " and lower(b.code) like lower(concat('%',:personnelCode,'%')) "
+			+ " and lower(b.fullname) like lower(concat('%',:personnelName,'%')) "
+			+ " and (c.absencetypeid_link = :timeSheetAbsenceType or :timeSheetAbsenceType = 0) "
+			+ "	and  c.absencedate_from >= :datefrom "
+			+ " and  c.absencedate_to <= :dateto")
+	public List<TimesheetAbsence> getbyOrgid(
+			@Param ("orgFactory")final Long orgFactory,
+			@Param ("org_id")final Long org_id,
+			@Param ("datefrom")final Date datefrom,
+			@Param ("dateto")final Date dateto,
+			@Param ("personnelCode")final String personnelCode,
+			@Param ("personnelName")final String personnelName,
+			@Param ("timeSheetAbsenceType")final Long timeSheetAbsenceType);
+	//lấy danh sách theo tổ - của tài khoản quản lý
+	@Query(value="select c from TimesheetAbsence c "
+			+ " inner join Personel b on c.personnelid_link = b.id "
+			+ " where b.orgid_link = :Org_grant_id_link "
+			+ " and lower(b.code) like lower(concat('%',:personnelCode,'%')) "
+			+ " and lower(b.fullname) like lower(concat('%',:personnelName,'%')) "
+			+ " and (c.absencetypeid_link = :timeSheetAbsenceType or :timeSheetAbsenceType = 0) "
+			+ "	and  c.absencedate_from >= :datefrom "
+			+ " and  c.absencedate_to <= :dateto")
+	public List<TimesheetAbsence> getbyOrg_grant_id_link(
+			@Param ("Org_grant_id_link")final Long Org_grant_id_link,
+			@Param ("datefrom")final Date datefrom,
+			@Param ("dateto")final Date dateto,
+			@Param ("personnelCode")final String personnelCode,
+			@Param ("personnelName")final String personnelName,
+			@Param ("timeSheetAbsenceType")final Long timeSheetAbsenceType);
+	
+	//lấy tất cả danh sách báo nghỉ theo ngày
+	@Query(value="select c from TimesheetAbsence c "
+			+ " inner join Personel b on c.personnelid_link = b.id "
+			+ " where   c.absencedate_from >= :datefrom "
+			+ " and lower(b.code) like lower(concat('%',:personnelCode,'%')) "
+			+ " and lower(b.fullname) like lower(concat('%',:personnelName,'%')) "
+			+ " and (c.absencetypeid_link = :timeSheetAbsenceType or :timeSheetAbsenceType = 0) "
+			+ " and (b.orgmanagerid_link = :orgFactory or :orgFactory = 0) "
+			+ " and  c.absencedate_to <= :dateto")
+	public List<TimesheetAbsence> getAllbydate(
+			@Param ("orgFactory")final Long orgFactory,
+			@Param ("datefrom")final Date datefrom,
+			@Param ("dateto")final Date dateto,
+			@Param ("personnelCode")final String personnelCode,
+			@Param ("personnelName")final String personnelName,
+			@Param ("timeSheetAbsenceType")final Long timeSheetAbsenceType);
+
 }

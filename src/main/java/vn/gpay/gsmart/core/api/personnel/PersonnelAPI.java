@@ -107,46 +107,6 @@ public class PersonnelAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long orgrootid_link = user.getRootorgid_link();
-	
-			List<Personel> list = new ArrayList<Personel>();
-			// lấy danh sách nhân viên theo tổ mà user quản lý
-			if (user.getOrg_grant_id_link() != null && entity.orgid_link!=1) {
-				
-				list = personService.getPersonelByOrgid_link(user.getOrg_grant_id_link(),null);
-				if (list.size() != 0) {
-					response.data = list;
-					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-					return new ResponseEntity<getperson_byorg_response>(response, HttpStatus.OK);
-				}
-			}
-			
-			if (entity.orgid_link == orgrootid_link) {
-				if (entity.isviewall && user.getOrgid_link()==1)
-					list = personService.findAll();
-				else
-					list = personService.getby_orgmanager(entity.orgid_link, orgrootid_link);
-			} else {
-				list = personService.getby_org(entity.orgid_link, orgrootid_link);
-			}
-
-			response.data = list;
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<getperson_byorg_response>(response, HttpStatus.OK);
-		} catch (Exception e) {
-			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-			response.setMessage(e.getMessage());
-			return new ResponseEntity<getperson_byorg_response>(response, HttpStatus.OK);
-		}
-	}
-	@RequestMapping(value = "/getby_org_personeltype", method = RequestMethod.POST)
-	public ResponseEntity<getperson_byorg_response> getPeronnelByPersonelType(HttpServletRequest request,
-			@RequestBody getperson_byorgmanager_request entity) {
-		getperson_byorg_response response = new getperson_byorg_response();
-		try {
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			Long orgrootid_link = user.getRootorgid_link();
 			List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY);
 			List<Org> lst_org = new ArrayList<Org>();
 			
@@ -163,37 +123,18 @@ public class PersonnelAPI {
 			
 			List<Personel> list = new ArrayList<Personel>();
 			// lấy danh sách nhân viên theo tổ mà user quản lý
-			//1.Trường hợp chọn Công ty DHA
-			if (entity.orgid_link == orgrootid_link && user.getOrgid_link()==1) {
-					//nếu chọn vào DHA mà tài khoản đấy là admin thì lấy các nhân viên hợp đồng,nếu ko phải admin thì k lấy đc ds
-					//lay tat ca nhan vien theo don vi
+			if (entity.orgid_link != orgrootid_link) {
+				// nếu user quản lý nhiều hơn 1 đơn vị
+				// nếu user quản lý tổ con cụ thể thì chỉ load tổ con, kể cả bấm vào đơn vị
+				// nếu user có 1 đơn vị con và chỉ quản lý 1 đơn vị
+				if (user.getOrg_grant_id_link() != null) {
+					lst_org = orgService.getOrgById(user.getOrg_grant_id_link());
+					if (lst_org.size() != 0) {
+						list = personService.getPersonelByOrgid_link_PersonelType(user.getOrg_grant_id_link(),
+								personnel_typeid_link);
+					}
+				} else {
 					list = personService.getPersonelByOrgid_link_PersonelType(entity.orgid_link, personnel_typeid_link);
-			} 
-			else {
-				//nếu user quản lý nhiều hơn 1 đơn vị
-				if (list_userorg.size() > 1) {
-					
-					if(entity.orgid_link !=orgrootid_link) {
-						list = personService.getPersonelByOrgid_link_PersonelType(entity.orgid_link, personnel_typeid_link);
-					}
-					
-				}else {
-					//nếu user quản lý tổ con cụ thể thì chỉ load tổ con, kể cả bấm vào đơn vị
-					//nếu user có 1 đơn vị con và chỉ quản lý 1 đơn vị
-				
-					if (user.getOrg_grant_id_link() != null) {
-						if(entity.orgid_link !=orgrootid_link) {
-							lst_org = orgService.getOrgById(user.getOrg_grant_id_link());
-							if (lst_org.size() != 0) {
-								list = personService.getPersonelByOrgid_link_PersonelType(user.getOrg_grant_id_link(), personnel_typeid_link);
-							}
-						}
-							
-					}else {
-						if(entity.orgid_link != orgrootid_link)
-							list = personService.getPersonelByOrgid_link_PersonelType(entity.orgid_link, personnel_typeid_link);
-
-					}
 				}
 			}
 			response.data = list;

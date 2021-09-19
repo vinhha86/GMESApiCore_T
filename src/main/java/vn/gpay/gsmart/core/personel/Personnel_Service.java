@@ -107,9 +107,16 @@ public class Personnel_Service extends AbstractService<Personel> implements IPer
 	}
 
 	@Override
+
 	public int GetSizePersonnelByGrant(long pordergrantid_link, Long personnel_typeid_link) {
 		// TODO Auto-generated method stub
 		return repo.getSizePersonnelbyOrgAndType(pordergrantid_link, personnel_typeid_link);
+
+	}
+	public Personel getPersonelByname(String personnel_name) {
+		// TODO Auto-generated method stub
+		return repo.getPersonelByname(personnel_name);
+
 	}
 
 }

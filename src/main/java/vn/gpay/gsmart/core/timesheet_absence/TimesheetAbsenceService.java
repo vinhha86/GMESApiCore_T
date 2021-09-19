@@ -30,22 +30,38 @@ public class TimesheetAbsenceService extends AbstractService<TimesheetAbsence> i
 				entity.timeSheetAbsenceType);
 	}
 
+
+
 	@Override
-	public List<TimesheetAbsence> getbyOrgid(Long org_id) {
+	public List<TimesheetAbsence> getbyOrg_grant_id_link(Long Org_grant_id_link, Date datefrom, Date dateto,
+			String personnelCode, String personnelName, Long timeSheetAbsenceType) {
 		// TODO Auto-generated method stub
-		return repo.getbyOrgid(org_id);
+		return repo.getbyOrg_grant_id_link(Org_grant_id_link, datefrom, dateto, personnelCode, personnelName, timeSheetAbsenceType);
+	}
+
+	
+
+	@Override
+	public List<TimesheetAbsence> getAllbydate(Long orgFactory, Date datefrom, Date dateto, String personnelCode,
+			String personnelName, Long timeSheetAbsenceType) {
+		// TODO Auto-generated method stub
+		return repo.getAllbydate(orgFactory, datefrom, dateto, personnelCode, personnelName, timeSheetAbsenceType);
 	}
 
 	@Override
-	public List<TimesheetAbsence> getbyOrg_grant_id_link(Long Org_grant_id_link) {
-		// TODO Auto-generated method stub
-		return repo.getbyOrg_grant_id_link(Org_grant_id_link);
-	}
 
-	@Override
 	public int GetTimeSheetAbsenceByDate(Long Org_grant_id_link, Date today) {
 		// TODO Auto-generated method stub
 		return repo.getbyOrg_grant_id_link_Today(Org_grant_id_link, today);
 	}
+
+
+	public List<TimesheetAbsence> getbyOrgid(Long orgFactory, Long org_id, Date datefrom, Date dateto,
+			String personnelCode, String personnelName, Long timeSheetAbsenceType) {
+		// TODO Auto-generated method stub
+		return repo.getbyOrgid(orgFactory, org_id, datefrom, dateto, personnelCode, personnelName, timeSheetAbsenceType);
+	}
+
+
 
 }

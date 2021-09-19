@@ -49,11 +49,10 @@ public class TimesheetAbsenceAPI {
 		TimeSheetAbsence_response response = new TimeSheetAbsence_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			Long orgrootid_link = user.getRootorgid_link();
-
+		//	Long orgrootid_link = user.getRootorgid_link();
 			// : lấy danh sách những đơn vị mà user đấy quản lý
 			List<Long> list_org_id = new ArrayList<Long>();
-			List<TimesheetAbsence> lst_timesheetab = new ArrayList<TimesheetAbsence>();
+		//	List<TimesheetAbsence> lst_timesheetab = new ArrayList<TimesheetAbsence>();
 			List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),
 					OrgType.ORG_TYPE_FACTORY);
 			// danh sách ID những đơn vị user quản lý
@@ -62,30 +61,31 @@ public class TimesheetAbsenceAPI {
 			}
 
 			// lấy danh sách báo nghỉ theo đơn vị của tài khoản quản lý
-			if (user.getOrgid_link() != 1) {
-				//nếu quản lý nhiều đơn vị
-				if(list_org_id.size()>1) {
-					for (int i = 0; i < list_org_id.size(); i++) {
-						List<TimesheetAbsence> lstlst_timesheetabsence = timesheetAbsenceService.getbyOrgid(list_org_id.get(i));
-						lst_timesheetab.addAll(lstlst_timesheetabsence);
-					}
-					response.data = lst_timesheetab;
-				}else {
-					// lấy ds báo nghỉ theo tổ của tài khoản quản lý (nếu có)
-					if (user.getOrg_grant_id_link() != null) {
-						response.data = timesheetAbsenceService.getbyOrg_grant_id_link(user.getOrg_grant_id_link());
-					}
-				}
-			} else {
-				response.data = timesheetAbsenceService.findAll();
-			}
+//			if (user.getOrgid_link() != 1) {
+//				//nếu quản lý nhiều đơn vị
+//				if(list_org_id.size()>1) {
+//					for (int i = 0; i < list_org_id.size(); i++) {
+//						List<TimesheetAbsence> lstlst_timesheetabsence = timesheetAbsenceService.getbyOrgid(list_org_id.get(i),entity.datefrom, entity.dateto);
+//						lst_timesheetab.addAll(lstlst_timesheetabsence);
+//					}
+//					response.data = lst_timesheetab;
+//				}else {
+//					// lấy ds báo nghỉ theo tổ của tài khoản quản lý (nếu có)
+//					if (user.getOrg_grant_id_link() != null) {
+//						response.data = timesheetAbsenceService.getbyOrg_grant_id_link(user.getOrg_grant_id_link(),entity.datefrom, entity.dateto);
+//					}
+//				}
+//			} else {
+//				response.data = timesheetAbsenceService.getAllbydate(entity.datefrom, entity.dateto);
+//			}
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
 			return new ResponseEntity<TimeSheetAbsence_response>(response,HttpStatus.OK);
 		}catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-			response.setMessage(e.getMessage());			
+			response.setMessage(e.getMessage());	
+			System.out.println(e.getMessage());
 		    return new ResponseEntity<TimeSheetAbsence_response>(HttpStatus.OK);
 		}    			
 	}
@@ -96,14 +96,46 @@ public class TimesheetAbsenceAPI {
 		try {
 //			limit, page, 
 //			orgFactory, personnelCode, personnelName, datefrom, dateto, timeSheetAbsenceType
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			//List<TimesheetAbsence> listTimesheetAbsence;
+				// : lấy danh sách những đơn vị mà user đấy quản lý
+				List<Long> list_org_id = new ArrayList<Long>();
+				List<TimesheetAbsence> lst_timesheetab = new ArrayList<TimesheetAbsence>();
+				List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),
+						OrgType.ORG_TYPE_FACTORY);
+				// danh sách ID những đơn vị user quản lý
+				for (GpayUserOrg userorg : list_userorg) {
+					list_org_id.add(userorg.getOrgid_link());
+				}
+
+				// lấy danh sách báo nghỉ theo đơn vị của tài khoản quản lý
+				if (user.getOrgid_link() != 1) {
+					//nếu quản lý nhiều đơn vị
+					if(list_org_id.size()>1) {
+						for (int i = 0; i < list_org_id.size(); i++) {
+							List<TimesheetAbsence> lstlst_timesheetabsence = timesheetAbsenceService.getbyOrgid(entity.orgFactory,
+									list_org_id.get(i),entity.datefrom, entity.dateto,entity.personnelCode,entity.personnelName,entity.timeSheetAbsenceType);
+							lst_timesheetab.addAll(lstlst_timesheetabsence);
+						}
+						//response.data = lst_timesheetab;
+					}else {
+						// lấy ds báo nghỉ theo tổ của tài khoản quản lý (nếu có)
+						if (user.getOrg_grant_id_link() != null) {
+							lst_timesheetab = timesheetAbsenceService.getbyOrg_grant_id_link(
+									user.getOrg_grant_id_link(),entity.datefrom, entity.dateto,entity.personnelCode,entity.personnelName,entity.timeSheetAbsenceType);
+						}
+					}
+				} else {
+					lst_timesheetab = timesheetAbsenceService.getAllbydate(entity.orgFactory,entity.datefrom, entity.dateto,entity.personnelCode,entity.personnelName,entity.timeSheetAbsenceType);
+				}
 			
-			List<TimesheetAbsence> listTimesheetAbsence = timesheetAbsenceService.getbypaging(entity);
-			response.totalCount = listTimesheetAbsence.size();
+			//List<TimesheetAbsence> listTimesheetAbsence = timesheetAbsenceService.getbypaging(entity);
+			response.totalCount = lst_timesheetab.size();
 			
 			PageRequest page = PageRequest.of(entity.page - 1, entity.limit);
 			int start = (int) page.getOffset();
-			int end = (start + page.getPageSize()) > listTimesheetAbsence.size() ? listTimesheetAbsence.size() : (start + page.getPageSize());
-			Page<TimesheetAbsence> pageToReturn = new PageImpl<TimesheetAbsence>(listTimesheetAbsence.subList(start, end), page, listTimesheetAbsence.size()); 
+			int end = (start + page.getPageSize()) > lst_timesheetab.size() ? lst_timesheetab.size() : (start + page.getPageSize());
+			Page<TimesheetAbsence> pageToReturn = new PageImpl<TimesheetAbsence>(lst_timesheetab.subList(start, end), page, lst_timesheetab.size()); 
 			
 			response.data = pageToReturn.getContent();
 			
@@ -148,22 +180,35 @@ public class TimesheetAbsenceAPI {
 			
 			Date timefromDate = timesheetAbsence.getAbsencedate_from();
 			Date timetoDate = timesheetAbsence.getAbsencedate_to();
-			
+
 			Calendar calFrom = Calendar.getInstance();
 			calFrom.setTime(timefromDate);
+			
+			String timefrom_hour =String.valueOf(calFrom.get(Calendar.HOUR_OF_DAY));
+			String timefrom_minute =String.valueOf(calFrom.get(Calendar.MINUTE));
 			if(calFrom.get(Calendar.MINUTE) < 10) {
-				timefrom = timefrom + calFrom.get(Calendar.HOUR_OF_DAY) + ":0" + calFrom.get(Calendar.MINUTE);
-			}else {
-				timefrom = timefrom + calFrom.get(Calendar.HOUR_OF_DAY) + ":" + calFrom.get(Calendar.MINUTE);
+				timefrom_minute  =  "0" + calFrom.get(Calendar.MINUTE);
 			}
+			if(calFrom.get(Calendar.HOUR_OF_DAY) < 10) {
+				timefrom_hour = "0" + calFrom.get(Calendar.HOUR_OF_DAY);
+			}
+			timefrom = timefrom_hour + ":" + timefrom_minute;
+			
+			//
 			
 			Calendar calTo = Calendar.getInstance();
 			calTo.setTime(timetoDate);
+			String timeto_hour =String.valueOf(calTo.get(Calendar.HOUR_OF_DAY));
+			String timeto_minute =String.valueOf(calTo.get(Calendar.MINUTE));
 			if(calTo.get(Calendar.MINUTE) < 10) {
-				timeto = timeto + calTo.get(Calendar.HOUR_OF_DAY) + ":0" + calTo.get(Calendar.MINUTE);
-			}else {
-				timeto = timeto + calTo.get(Calendar.HOUR_OF_DAY) + ":" + calTo.get(Calendar.MINUTE);
+				
+				timeto_minute = "0" + calTo.get(Calendar.MINUTE);
 			}
+			if(calTo.get(Calendar.HOUR_OF_DAY) < 10)
+			{
+				timeto_hour = "0"+ calTo.get(Calendar.HOUR_OF_DAY) ;
+			}
+			timeto = timeto_hour + ":" + timeto_minute;
 			
 			response.orgProductionLineId = personnel.getOrgid_link();
 			response.orgFactoryId = personnel.getOrgmanagerid_link();
@@ -171,7 +216,8 @@ public class TimesheetAbsenceAPI {
 			response.absencedate_to = timetoDate;
 			response.absence_reason = timesheetAbsence.getAbsence_reason();
 			response.absencetypeid_link = timesheetAbsence.getAbsencetypeid_link();
-			response.personnelid_link = personnel.getId();;
+			response.personnelfullname= personnel.getFullname();
+			response.personnelid_link = personnel.getId();
 			response.timefrom = timefrom;
 			response.timeto = timeto;
 			
@@ -200,6 +246,20 @@ public class TimesheetAbsenceAPI {
 			
 			Long id = entity.id;
 			Long personnelid_link = entity.personnelid_link;
+			//kiểm tra xem mã nhân viên và tên NV có trong DB không
+			Personel personel_Code= personnelService.findOne(personnelid_link);
+			if(personel_Code!=null  ) {
+				if(!personel_Code.getFullname().equals(entity.personnelfullname ) && entity.personnelfullname !=null) {
+					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+					response.setMessage("Mã nhân viên hoặc tên không trùng khớp!");		
+					return new ResponseEntity<TimeSheetAbsenceType_response>(response,HttpStatus.OK);
+				}
+			}else {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage("Mã nhân viên hoặc tên không trùng khớp!");		
+				return new ResponseEntity<TimeSheetAbsenceType_response>(response,HttpStatus.OK);
+			}
+			
 			Long absencetypeid_link = entity.absencetypeid_link;
 			String absence_reason = entity.absence_reason;
 			Date absencedate_from = entity.absencedate_from;
@@ -235,7 +295,7 @@ public class TimesheetAbsenceAPI {
 			calDateToCombine.set(Calendar.MILLISECOND, 0);
 			Date dateTo = calDateToCombine.getTime();
 			
-			if(entity.id == null || entity.id == 0L) {
+			
 				TimesheetAbsence timesheetAbsence = new TimesheetAbsence();
 				timesheetAbsence.setId(id);
 				timesheetAbsence.setOrgrootid_link(orgrootid_link);
@@ -247,12 +307,7 @@ public class TimesheetAbsenceAPI {
 				timesheetAbsence.setUsercreatedid_link(user.getId());
 				timesheetAbsence.setTimecreate(new Date());
 				timesheetAbsenceService.save(timesheetAbsence);
-				
-			}else {
-				
-			}
-			
-			
+
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));				
 			return new ResponseEntity<TimeSheetAbsenceType_response>(response,HttpStatus.OK);

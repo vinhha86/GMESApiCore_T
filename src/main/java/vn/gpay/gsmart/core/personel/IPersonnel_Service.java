@@ -33,4 +33,9 @@ public interface IPersonnel_Service extends Operations<Personel> {
 	public List<Personel> getPersonelByOrgid_link_PersonelType(Long orgmanagerid_link, Long personnel_typeid_link);
 
 	public int GetSizePersonnelByGrant(long pordergrantid_link, Long personnel_typeid_link);
+
+	//lay person theo ten
+	public Personel getPersonelByname(String personnel_name);
+	
+	
 }

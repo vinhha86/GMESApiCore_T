@@ -8,6 +8,7 @@ public class TimeSheetAbsence_getOne_response extends ResponseBase{
 	public Long orgFactoryId;
 	public Long orgProductionLineId;
 	public Long personnelid_link;
+	public String personnelfullname;
 	public Date absencedate_from;
 	public Date absencedate_to;
 	public String absence_reason;
