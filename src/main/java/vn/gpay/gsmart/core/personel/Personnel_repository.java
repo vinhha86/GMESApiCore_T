@@ -49,22 +49,24 @@ public interface Personnel_repository extends JpaRepository<Personel, Long>, Jpa
 	// tim personel theo ma
 	@Query("select c from Personel c where c.code = :personnel_code")
 	public Personel getPersonelBycode(@Param("personnel_code") final String personnel_code);
-	//lấy nhân viên theo tên
+
+	// lấy nhân viên theo tên
 	@Query("select c from Personel c where c.fullname = :personnel_name")
 	public Personel getPersonelByname(@Param("personnel_name") final String personnel_name);
+
 	// lấy danh sách nhân viên theo mã nhân viên, không chứa id truyền vào
 	@Query(value = "select c from Personel c where c.code = :code " + "and c.id <> :id")
 	public List<Personel> getPersonelByCode_Id_Personel(@Param("code") final String code, @Param("id") final Long id);
 
 	// lấy danh sách nhân viên theo tổ , loại nhân viên
-	@Query(value = "select c from Personel c where c.orgid_link = :org_id and (c.personnel_typeid_link = :personnel_typeid_link or null is :personnel_typeid_link) ")
+	@Query(value = "select c from Personel c where c.orgid_link = :org_id and (c.personnel_typeid_link = :personnel_typeid_link or :personnel_typeid_link is null or :personnel_typeid_link = 0) ")
 	public List<Personel> getPersonelByOrgid_link(@Param("org_id") final Long id,
 			@Param("personnel_typeid_link") final Long personnel_typeid_link);
 
 	// lấy danh sách nhân viên theo đơn vị, loại nhân viên
-	@Query(value = "select c from Personel c where (c.orgid_link = :orgmanagerid_link or orgmanagerid_link = :orgmanagerid_link or c.orgrootid_link = :orgmanagerid_link) and ( c.personnel_typeid_link = :personnel_typeid_link or null is :personnel_typeid_link) ")
+	@Query(value = "select c from Personel c where (c.orgid_link = :orgmanagerid_link or orgmanagerid_link = :orgmanagerid_link or c.orgrootid_link = :orgmanagerid_link) "
+			+ "and ( c.personnel_typeid_link = :personnel_typeid_link or :personnel_typeid_link is null or :personnel_typeid_link = 0) ")
 	public List<Personel> getPersonelByOrgid_link_PersonelType(@Param("orgmanagerid_link") final Long orgmanagerid_link,
 			@Param("personnel_typeid_link") final Long personnel_typeid_link);
-	
-	
+
 }

@@ -27,10 +27,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import vn.gpay.gsmart.core.api.org.OrgResponse;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.org.IOrgService;
-import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.personel.IPersonnel_Service;
 import vn.gpay.gsmart.core.personel.IPersonnel_inout_Service;
 import vn.gpay.gsmart.core.personel.Personel;
@@ -41,7 +39,6 @@ import vn.gpay.gsmart.core.personnel_history.Personnel_His;
 import vn.gpay.gsmart.core.personnel_notmap.IPersonnel_notmap_Service;
 import vn.gpay.gsmart.core.personnel_notmap.Personnel_notmap;
 import vn.gpay.gsmart.core.personnel_type.IPersonnelType_Service;
-import vn.gpay.gsmart.core.personnel_type.PersonnelType;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.porder_grant_balance.IPOrderGrantBalanceService;
@@ -53,7 +50,6 @@ import vn.gpay.gsmart.core.security.IGpayUserService;
 import vn.gpay.gsmart.core.stocking_uniquecode.IStocking_UniqueCode_Service;
 import vn.gpay.gsmart.core.stocking_uniquecode.Stocking_UniqueCode;
 import vn.gpay.gsmart.core.utils.Common;
-import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -107,20 +103,10 @@ public class PersonnelAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long orgrootid_link = user.getRootorgid_link();
-			List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY);
-			List<Org> lst_org = new ArrayList<Org>();
-			
-			//loại nhân viên 
-			long personnel_typeid_link;
-			//lấy id của loại nhân viên
-			if(entity.isviewallThoiVu) {
-				List<PersonnelType> lst_type=personneltypeService.getByName("Thời vụ");
-				personnel_typeid_link=lst_type.get(0).getId();
-			}else {
-				List<PersonnelType> lst_type=personneltypeService.getByName("Hợp đồng");
-				personnel_typeid_link=lst_type.get(0).getId();
-			}
-			
+
+			// loại nhân viên
+			Long personnel_typeid_link = entity.personnel_typeid_link;
+
 			List<Personel> list = new ArrayList<Personel>();
 			// lấy danh sách nhân viên theo tổ mà user quản lý
 			if (entity.orgid_link != orgrootid_link) {
@@ -128,11 +114,8 @@ public class PersonnelAPI {
 				// nếu user quản lý tổ con cụ thể thì chỉ load tổ con, kể cả bấm vào đơn vị
 				// nếu user có 1 đơn vị con và chỉ quản lý 1 đơn vị
 				if (user.getOrg_grant_id_link() != null) {
-					lst_org = orgService.getOrgById(user.getOrg_grant_id_link());
-					if (lst_org.size() != 0) {
-						list = personService.getPersonelByOrgid_link_PersonelType(user.getOrg_grant_id_link(),
-								personnel_typeid_link);
-					}
+					list = personService.getPersonelByOrgid_link_PersonelType(user.getOrg_grant_id_link(),
+							personnel_typeid_link);
 				} else {
 					list = personService.getPersonelByOrgid_link_PersonelType(entity.orgid_link, personnel_typeid_link);
 				}
@@ -354,22 +337,23 @@ public class PersonnelAPI {
 			return new ResponseEntity<get_person_his_response>(response, HttpStatus.OK);
 		}
 	}
+
 	@RequestMapping(value = "/delete", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> delete_person(HttpServletRequest request,
 			@RequestBody personnel_delete_request entity) {
 		ResponseBase response = new ResponseBase();
 		try {
-			//xóa nhân viên
+			// xóa nhân viên
 			personService.delete(entity.data);
 			Long personnelid_link = entity.data.getId();
 			List<Personnel_His> his_person = hispersonService.gethis_by_person(personnelid_link);
-			//xóa quá trình công tác của nhân viên
-			if(his_person.size() != 0) {
-				for(int i =0; i < his_person.size();i++) {
+			// xóa quá trình công tác của nhân viên
+			if (his_person.size() != 0) {
+				for (int i = 0; i < his_person.size(); i++) {
 					hispersonService.delete(his_person.get(i));
 				}
 			}
-			
+
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 		} catch (Exception e) {
@@ -378,6 +362,7 @@ public class PersonnelAPI {
 		}
 		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 	}
+
 	@RequestMapping(value = "/delete_his_person", method = RequestMethod.POST)
 	public ResponseEntity<del_hisperson_response> DelHis(HttpServletRequest request,
 			@RequestBody delete_hisperson_request entity) {
@@ -388,36 +373,37 @@ public class PersonnelAPI {
 			response.orgid_link = null;
 			response.positionid_link = null;
 			response.levelid_link = null;
-			//Long maxid = hispersonService.getmaxid_bytype_andperson(personnelid_link, his_person.getType());
-			
+			// Long maxid = hispersonService.getmaxid_bytype_andperson(personnelid_link,
+			// his_person.getType());
+
 			// Xoa lich su cuoi cung thi cap nhat person ve lan truoc do
-			//if (maxid == entity.id) {
-				Personel person = personService.findOne(personnelid_link);
-				Personnel_His his_person_pre = hispersonService.getprehis_bytype_andperson(personnelid_link,
-						his_person.getType());
-				if (his_person_pre != null) {
-					if (his_person.getType() == 1) {
-						person.setPositionid_link(his_person_pre.getPositionid_link());
-						response.positionid_link = his_person_pre.getPositionid_link();
-					} else if (his_person.getType() == 2) {
-						person.setLevelid_link(his_person_pre.getLevelid_link());
-						response.levelid_link = his_person_pre.getLevelid_link();
-					} else if (his_person.getType() == 3) {
-						person.setOrgid_link(his_person_pre.getOrgid_link());
-						response.orgid_link = his_person_pre.getOrgid_link();
-					}
-				} else {
-					if (his_person.getType() == 1) {
-						person.setPositionid_link(null);
-					} else if (his_person.getType() == 2) {
-						person.setLevelid_link(null);
-					} else if (his_person.getType() == 3) {
-						person.setOrgid_link(null);
-					}
+			// if (maxid == entity.id) {
+			Personel person = personService.findOne(personnelid_link);
+			Personnel_His his_person_pre = hispersonService.getprehis_bytype_andperson(personnelid_link,
+					his_person.getType());
+			if (his_person_pre != null) {
+				if (his_person.getType() == 1) {
+					person.setPositionid_link(his_person_pre.getPositionid_link());
+					response.positionid_link = his_person_pre.getPositionid_link();
+				} else if (his_person.getType() == 2) {
+					person.setLevelid_link(his_person_pre.getLevelid_link());
+					response.levelid_link = his_person_pre.getLevelid_link();
+				} else if (his_person.getType() == 3) {
+					person.setOrgid_link(his_person_pre.getOrgid_link());
+					response.orgid_link = his_person_pre.getOrgid_link();
 				}
-				personService.save(person);
-			//}
-			
+			} else {
+				if (his_person.getType() == 1) {
+					person.setPositionid_link(null);
+				} else if (his_person.getType() == 2) {
+					person.setLevelid_link(null);
+				} else if (his_person.getType() == 3) {
+					person.setOrgid_link(null);
+				}
+			}
+			personService.save(person);
+			// }
+
 			hispersonService.deleteById(entity.id);
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
