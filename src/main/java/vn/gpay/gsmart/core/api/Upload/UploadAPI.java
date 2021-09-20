@@ -407,6 +407,7 @@ public class UploadAPI {
 							}
 
 							colNum = col_phancach1 + 3;
+
 							String s_po_quantity = commonService
 									.getStringValue(row.getCell(ColumnTempNew.ns_target + 3));
 							s_po_quantity = s_po_quantity.replace(",", "");
@@ -415,7 +416,8 @@ public class UploadAPI {
 							if (po_quantity > 0)
 								list_soluong.add(po_quantity);
 
-							col_phancach2 = col_phancach1 + 3;
+							col_phancach2 = ColumnTempNew.ns_target + 4;
+							colNum = col_phancach2;
 							String s_header_phancach2 = commonService.getStringValue(rowheader.getCell(col_phancach2));
 							while (!s_header_phancach2.equals("xxx")) {
 

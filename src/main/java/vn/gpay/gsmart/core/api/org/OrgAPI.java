@@ -84,7 +84,8 @@ public class OrgAPI {
 	public ResponseEntity<?> getChilbyType(@RequestBody getchil_bytype_request entity, HttpServletRequest request) {// @RequestParam("type")
 		OrgResponse response = new OrgResponse();
 		try {
-			//GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			// GpayUser user = (GpayUser)
+			// SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			// lấy tổ cụ thể trong đơn vị - theo tổ mà tài khoản đấy quản lý (nếu có)
 //			if (user.getOrgid_link() != 1) {
 //				if (user.getOrg_grant_id_link() != null) {
@@ -183,7 +184,8 @@ public class OrgAPI {
 			return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	//lấy danh sách tổ(đơn vị con: nếu có) theo user quản lý
+
+	// lấy danh sách tổ(đơn vị con: nếu có) theo user quản lý
 	@RequestMapping(value = "/loadOrgByParent", method = RequestMethod.POST)
 	public ResponseEntity<?> loadOrgByParent(@RequestBody GetOrgById_request entity, HttpServletRequest request) {// @RequestParam("type")
 		OrgResponse response = new OrgResponse();
@@ -191,8 +193,9 @@ public class OrgAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			List<Long> list_org_id = new ArrayList<Long>();
 			List<Org> lst_org = new ArrayList<Org>();
-			List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY);
-			
+			List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),
+					OrgType.ORG_TYPE_FACTORY);
+
 			List<String> list = new ArrayList<String>();
 			list.add("3");
 			list.add("8");
@@ -217,24 +220,23 @@ public class OrgAPI {
 			list.add("37");
 			list.add("38");
 			list.add("39");
-			
-			
+
 			for (GpayUserOrg userorg : list_userorg) {
 				list_org_id.add(userorg.getOrgid_link());
 			}
 			// lấy tổ cụ thể trong đơn vị - theo tổ mà tài khoản đấy quản lý (nếu có)
 			if (user.getOrgid_link() != 1) {
-				//nếu user quản lý nhiều đơn vị
+				// nếu user quản lý nhiều đơn vị
 				if (list_org_id.size() > 1) {
 					List<Org> ls_tosx = orgService.findChildByListType(user.getRootorgid_link(), entity.id, list);
 					response.data = ls_tosx;
 					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 					return new ResponseEntity<OrgResponse>(response, HttpStatus.OK);
-				}else {
-					//nếu user có 1 đơn vị con và chỉ quản lý 1 đơn vị
+				} else {
+					// nếu user có 1 đơn vị con và chỉ quản lý 1 đơn vị
 					if (user.getOrg_grant_id_link() != null) {
-						
+
 						lst_org = orgService.getOrgById(user.getOrg_grant_id_link());
 						if (lst_org.size() != 0) {
 							response.data = lst_org;
@@ -244,10 +246,8 @@ public class OrgAPI {
 						}
 
 					}
-				}	
+				}
 			}
-
-		
 
 			List<Org> ls_tosx = orgService.findChildByListType(user.getRootorgid_link(), entity.id, list);
 
@@ -262,6 +262,7 @@ public class OrgAPI {
 			return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
 	@RequestMapping(value = "/getby_listtype", method = RequestMethod.POST)
 	public ResponseEntity<?> getByListType(@RequestBody getorg_by_type_request entity, HttpServletRequest request) {// @RequestParam("type")
 		getorg_by_type_response response = new getorg_by_type_response();
@@ -272,15 +273,14 @@ public class OrgAPI {
 			for (String string : arr_id) {
 				list.add(string);
 			}
-			List<Org> ls_tosx ;
-			//nếu có orgtype = 25là tỉnh thành - để lấy dannh sách tỉnh thành-> không check quyền user
-			if(list.size()==1 && (list.get(0).equals("25"))) {
-				 ls_tosx = orgService.findChildByListType(user.getRootorgid_link(), 1, list);
-			}else {
+			List<Org> ls_tosx;
+			// nếu có orgtype = 25là tỉnh thành - để lấy dannh sách tỉnh thành-> không check
+			// quyền user
+			if (list.size() == 1 && (list.get(0).equals("25"))) {
+				ls_tosx = orgService.findChildByListType(user.getRootorgid_link(), 1, list);
+			} else {
 				ls_tosx = orgService.findChildByListType(user.getRootorgid_link(), user.getOrgid_link(), list);
 			}
-			
-			
 
 			response.data = ls_tosx;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -580,11 +580,12 @@ public class OrgAPI {
 		OrgResponse response = new OrgResponse();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			
-			//List<Long> list_org_id = new ArrayList<Long>();
-			//List<Org> lst_org = new ArrayList<Org>();
-			//List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY);
-			
+
+			// List<Long> list_org_id = new ArrayList<Long>();
+			// List<Org> lst_org = new ArrayList<Org>();
+			// List<GpayUserOrg> list_userorg =
+			// userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY);
+
 //			for (GpayUserOrg userorg : list_userorg) {
 //				list_org_id.add(userorg.getOrgid_link());
 //			}
@@ -607,7 +608,7 @@ public class OrgAPI {
 //				}
 //
 //			}
-			
+
 			response.data = orgService.findAllorgByTypeId(entity.orgtypeid_link, (long) user.getRootorgid_link());
 			if (entity.isAll) {
 				Org org = new Org();
@@ -615,7 +616,7 @@ public class OrgAPI {
 				org.setName("Tất cả");
 				response.data.add(0, org);
 			}
-			
+
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<OrgResponse>(response, HttpStatus.OK);
@@ -626,18 +627,19 @@ public class OrgAPI {
 		}
 	}
 
-	//lây danh sách org theo user quản lý
+	// lây danh sách org theo user quản lý
 	@RequestMapping(value = "/loadOrg_ByOrgType", method = RequestMethod.POST)
 	public ResponseEntity<OrgResponse> loadOrg_ByOrgType(@RequestBody Org_getbyType_request entity,
 			HttpServletRequest request) {// @RequestParam("type")
 		OrgResponse response = new OrgResponse();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			
+
 			List<Long> list_org_id = new ArrayList<Long>();
 			List<Org> lst_org = new ArrayList<Org>();
-			List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),OrgType.ORG_TYPE_FACTORY);
-			
+			List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),
+					OrgType.ORG_TYPE_FACTORY);
+
 			for (GpayUserOrg userorg : list_userorg) {
 				list_org_id.add(userorg.getOrgid_link());
 			}
@@ -647,12 +649,12 @@ public class OrgAPI {
 			// nếu user có org_id khác 1(1 là công ty DHA) : tức là thuộc 1 đơn vị cụ thể
 			// thì chỉ lấy đơn vị đấy, không được lấy đơn vị khác
 			if (user.getOrgid_link() != 1) {
-				for(int i = 0 ; i<list_org_id.size();i++) {
-				List<Org>	lstlst_org= orgService.getOrgById(list_org_id.get(i));
-				lst_org.add(lstlst_org.get(0));
+				for (int i = 0; i < list_org_id.size(); i++) {
+					List<Org> lstlst_org = orgService.getOrgById(list_org_id.get(i));
+					lst_org.add(lstlst_org.get(0));
 				}
-				
-				response.data =lst_org;
+
+				response.data = lst_org;
 			} else {
 				response.data = orgService.findAllorgByTypeId(entity.orgtypeid_link, (long) user.getRootorgid_link());
 				if (entity.isAll) {
@@ -672,6 +674,7 @@ public class OrgAPI {
 			return new ResponseEntity<OrgResponse>(response, HttpStatus.OK);
 		}
 	}
+
 	@RequestMapping(value = "/getOrgById", method = RequestMethod.POST)
 	public ResponseEntity<GetOrgById_response> GetOrgByid(@RequestBody GetOrgById_request entity,
 			HttpServletRequest request) {// @RequestParam("type")
@@ -693,36 +696,36 @@ public class OrgAPI {
 			@RequestBody Org_getbyroot_andtypeid_request entity) {// @RequestParam("type")
 		OrgResponse response = new OrgResponse();
 		try {
-			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
+			GpayAuthentication user = (GpayAuthentication) SecurityContextHolder.getContext().getAuthentication();
 			Long orgrootid_link = user.getRootorgid_link();
 			String[] listtype = entity.listid.split(",");
 			List<String> list = new ArrayList<String>();
 			for (String string : listtype) {
 				list.add(string);
 			}
-			
-			//Lay org la con 	
+
+			// Lay org la con
 			List<Org> listreturn = new ArrayList<Org>();
-			
+
 			List<Org> listorg = orgService.getorgChildrenbyOrg(user.getOrgId(), list);
-			
+
 			listreturn.addAll(listorg);
-			
-			//Lay org chau
-			
-			for(Org org : listorg) {
+
+			// Lay org chau
+
+			for (Org org : listorg) {
 				List<Org> list_chil = orgService.getorgChildrenbyOrg(org.getId(), list);
 				listreturn.addAll(list_chil);
 			}
-			
-			if (user.getOrgId() == orgrootid_link){
-				//Neu nguoi dung thuoc tong cong ty, kiem tra xem co load goc hay ko
-				if (entity.isincludemyself){
+
+			if (user.getOrgId() == orgrootid_link) {
+				// Neu nguoi dung thuoc tong cong ty, kiem tra xem co load goc hay ko
+				if (entity.isincludemyself) {
 					Org org = orgService.findOne(user.getOrgId());
 					listreturn.add(org);
 				}
 			} else {
-				//Neu user ko phai thuoc tong cong ty --> lay thong tin don vi cua nguoi dung
+				// Neu user ko phai thuoc tong cong ty --> lay thong tin don vi cua nguoi dung
 				Org org = orgService.findOne(user.getOrgId());
 				listreturn.add(org);
 			}
@@ -967,6 +970,46 @@ public class OrgAPI {
 			} else if (org.getOrgtypeid_link().equals(OrgType.ORG_TYPE_FACTORY)) {
 				Long parentOrgId = org.getId();
 				response.data = orgService.findOrgByOrgType(orgtypeList, parentOrgId);
+			}
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<OrgResponse>(response, HttpStatus.OK);
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(e.getMessage());
+			return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@RequestMapping(value = "/getOrgInReqByPContractAndProduct", method = RequestMethod.POST)
+	public ResponseEntity<?> getOrgBInReqByPContractAndProduct(@RequestBody GetOrgInReqByPcontractAndProduct entity,
+			HttpServletRequest request) {// @RequestParam("type")
+		OrgResponse response = new OrgResponse();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			List<Integer> orgtypeList = entity.orgtypeList;
+			//
+			Long orgid_link = user.getOrgid_link();
+			Org org = orgService.findOne(orgid_link);
+
+			if (org.getOrgtypeid_link().equals(OrgType.ORG_TYPE_HEADQUARTER)) {
+				// nếu là trụ sở chính -> lấy hết
+				response.data = orgService.findOrgByOrgType(orgtypeList);
+			} else if (org.getOrgtypeid_link().equals(OrgType.ORG_TYPE_FACTORY)) {
+				long pcontractid_link = entity.pcontractid_link;
+				long productid_link = entity.productid_link;
+
+				List<Long> list_org_req = reqService.getOrgbyPContractAndProduct(pcontractid_link, productid_link);
+				if (!list_org_req.contains(org.getId())) {
+					list_org_req.add(orgid_link);
+				}
+				response.data = new ArrayList<Org>();
+				for (Long orgid : list_org_req) {
+					response.data.addAll(orgService.findOrgByOrgType(orgtypeList, orgid));
+				}
 			}
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
