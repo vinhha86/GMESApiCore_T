@@ -31,7 +31,7 @@ public interface IPersonnel_Service extends Operations<Personel> {
 	public List<Personel> getPersonelByOrgid_link(Long org_id, Long personnel_typeid_link);
 
 	// lấy danh sách nhân viên theo đơn vị, loại nhân viên
-	public List<Personel> getPersonelByOrgid_link_PersonelType(Long orgmanagerid_link, Long personnel_typeid_link);
+	public List<Personel> getPersonelByOrgid_link_PersonelType(Long orgmanagerid_link, Long personnel_typeid_link,Integer status);
 
 	public int GetSizePersonnelByGrant(long pordergrantid_link, Long personnel_typeid_link);
 

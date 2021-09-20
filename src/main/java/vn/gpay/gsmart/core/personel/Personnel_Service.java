@@ -95,12 +95,7 @@ public class Personnel_Service extends AbstractService<Personel> implements IPer
 		return repo.getPersonelByOrgid_link(org_id, personnel_typeid_link);
 	}
 
-	@Override
-	public List<Personel> getPersonelByOrgid_link_PersonelType(Long orgmanagerid_link, Long personnel_typeid_link) {
-		// TODO Auto-generated method stub
-		return repo.getPersonelByOrgid_link_PersonelType(orgmanagerid_link, personnel_typeid_link);
-	}
-
+	
 	@Override
 
 	public int GetSizePersonnelByGrant(long pordergrantid_link, Long personnel_typeid_link) {
@@ -125,6 +120,13 @@ public class Personnel_Service extends AbstractService<Personel> implements IPer
 	public List<Personel> getPersonelByCode_Id_Orgmanagerid_link_Personel(String code, Long id, Long orgmanageid_link) {
 		// TODO Auto-generated method stub
 		return repo.getPersonelByCode_Id_Orgmanagerid_link_Personel(code, id, orgmanageid_link);
+	}
+
+	@Override
+	public List<Personel> getPersonelByOrgid_link_PersonelType(Long orgmanagerid_link, Long personnel_typeid_link,
+			Integer status) {
+		// TODO Auto-generated method stub
+		return repo.getPersonelByOrgid_link_PersonelType(orgmanagerid_link, personnel_typeid_link, status);
 	}
 
 }

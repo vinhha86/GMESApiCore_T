@@ -105,7 +105,8 @@ public class PersonnelAPI {
 			Long orgrootid_link = user.getRootorgid_link();
 			// loại nhân viên
 			Long personnel_typeid_link = entity.personnel_typeid_link;
-
+			// trạng thái
+			Integer personel_status = entity.status;
 			List<Personel> list = new ArrayList<Personel>();
 			// lấy danh sách nhân viên theo tổ mà user quản lý
 			if (entity.orgid_link != orgrootid_link) {
@@ -115,9 +116,9 @@ public class PersonnelAPI {
 				// nếu user có 1 đơn vị con và chỉ quản lý 1 đơn vị
 				if (user.getOrg_grant_id_link() != null) {
 					list = personService.getPersonelByOrgid_link_PersonelType(user.getOrg_grant_id_link(),
-							personnel_typeid_link);
+							personnel_typeid_link,personel_status);
 				} else {
-					list = personService.getPersonelByOrgid_link_PersonelType(entity.orgid_link, personnel_typeid_link);
+					list = personService.getPersonelByOrgid_link_PersonelType(entity.orgid_link, personnel_typeid_link,personel_status);
 
 				}
 			}
@@ -128,6 +129,7 @@ public class PersonnelAPI {
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
+			System.out.println(e.getMessage());	
 			return new ResponseEntity<getperson_byorg_response>(response, HttpStatus.OK);
 		}
 	}
