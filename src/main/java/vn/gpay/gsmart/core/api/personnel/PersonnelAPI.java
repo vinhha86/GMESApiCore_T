@@ -103,7 +103,6 @@ public class PersonnelAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long orgrootid_link = user.getRootorgid_link();
-
 			// loại nhân viên
 			Long personnel_typeid_link = entity.personnel_typeid_link;
 
@@ -111,6 +110,7 @@ public class PersonnelAPI {
 			// lấy danh sách nhân viên theo tổ mà user quản lý
 			if (entity.orgid_link != orgrootid_link) {
 				// nếu user quản lý nhiều hơn 1 đơn vị
+
 				// nếu user quản lý tổ con cụ thể thì chỉ load tổ con, kể cả bấm vào đơn vị
 				// nếu user có 1 đơn vị con và chỉ quản lý 1 đơn vị
 				if (user.getOrg_grant_id_link() != null) {
@@ -118,6 +118,7 @@ public class PersonnelAPI {
 							personnel_typeid_link);
 				} else {
 					list = personService.getPersonelByOrgid_link_PersonelType(entity.orgid_link, personnel_typeid_link);
+
 				}
 			}
 			response.data = list;
@@ -473,7 +474,7 @@ public class PersonnelAPI {
 
 			// kiểm tra trùng mã nhân viên trước khi lưu
 			Long id = person.getId() == null ? 0 : person.getId();
-			List<Personel> lst = personService.getPersonelByCode_Id_Personel(person.getCode(), id);
+			List<Personel> lst = personService.getPersonelByCode_Id_Orgmanagerid_link_Personel(person.getCode(), id,person.getOrgmanagerid_link());
 			if (lst.size() != 0) {
 				response.setMessage("Mã nhân viên đã có sẵn.Mời nhập lại! ");
 				return new ResponseEntity<create_personnel_response>(response, HttpStatus.OK);

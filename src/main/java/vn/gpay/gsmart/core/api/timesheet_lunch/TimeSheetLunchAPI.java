@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.org.IOrgService;
+import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.personel.IPersonnel_Service;
 import vn.gpay.gsmart.core.personel.Personel;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -74,7 +75,9 @@ public class TimeSheetLunchAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long orgrootid_link = user.getRootorgid_link();
-
+			List<Org> lst_org = new ArrayList<Org>();
+			List<Personel> listPersonnel = null ;
+			
 //			Calendar cal = new GregorianCalendar();
 //			cal.add(Calendar.DAY_OF_MONTH, -20);
 //			Date twentyDaysAgo = cal.getTime();
@@ -82,7 +85,18 @@ public class TimeSheetLunchAPI {
 			Long orgid_link = entity.orgid_link;
 
 			List<TimeSheetLunchBinding> list = new ArrayList<TimeSheetLunchBinding>();
-			List<Personel> listPersonnel = personnelService.getby_org(orgid_link, orgrootid_link);
+			
+			if (user.getOrg_grant_id_link() != null) {
+				lst_org = orgeService.getOrgById(user.getOrg_grant_id_link());
+				if (lst_org.size() != 0) {
+					listPersonnel =  personnelService.getby_org(user.getOrg_grant_id_link(),orgrootid_link);
+
+				}
+			} else {
+				listPersonnel = personnelService.getby_org(orgid_link, orgrootid_link);
+			}
+			
+		//	List<Personel> listPersonnel = personnelService.getby_org(orgid_link, orgrootid_link);
 //			System.out.println(listPersonnel.size());
 			
 			//kieerm tra phong ban day thuoc don vi nao - lay id cua don vi do; 

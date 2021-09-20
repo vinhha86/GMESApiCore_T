@@ -22,9 +22,10 @@ public interface IPersonnel_Service extends Operations<Personel> {
 
 	// lay personel theo ma
 	public Personel getPersonelBycode(String personnel_code);
-
+	//lấy personle theo code và orgmanageid_link
+	public Personel getPersonelBycode_orgmanageid_link(String code,Long orgmanageid_link);
 	// lấy danh sách nhân viên theo mã nhân viên,không chứa id truyền vào
-	public List<Personel> getPersonelByCode_Id_Personel(String code, Long id);
+	public List<Personel> getPersonelByCode_Id_Orgmanagerid_link_Personel(String code, Long id,Long orgmanageid_link);
 
 	// lấy danh sách nhân viên theo tổ, loại nhân viên
 	public List<Personel> getPersonelByOrgid_link(Long org_id, Long personnel_typeid_link);
