@@ -192,7 +192,6 @@ public class OrgAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			List<Long> list_org_id = new ArrayList<Long>();
-			List<Org> lst_org = new ArrayList<Org>();
 			List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),
 					OrgType.ORG_TYPE_FACTORY);
 
@@ -224,10 +223,14 @@ public class OrgAPI {
 			for (GpayUserOrg userorg : list_userorg) {
 				list_org_id.add(userorg.getOrgid_link());
 			}
+			if(!list_org_id.contains(user.getOrgid_link())) {
+				list_org_id.add(user.getOrgid_link());
+			}
+			
 			// lấy tổ cụ thể trong đơn vị - theo tổ mà tài khoản đấy quản lý (nếu có)
 			if (user.getOrgid_link() != 1) {
 				// nếu user quản lý nhiều đơn vị
-				if (list_org_id.size() > 1) {
+				if (list_org_id.size() > 0) {
 					List<Org> ls_tosx = orgService.findChildByListType(user.getRootorgid_link(), entity.id, list);
 					response.data = ls_tosx;
 					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -236,14 +239,10 @@ public class OrgAPI {
 				} else {
 					// nếu user có 1 đơn vị con và chỉ quản lý 1 đơn vị
 					if (user.getOrg_grant_id_link() != null) {
-
-						lst_org = orgService.getOrgById(user.getOrg_grant_id_link());
-						if (lst_org.size() != 0) {
-							response.data = lst_org;
-							response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-							response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-							return new ResponseEntity<OrgResponse>(response, HttpStatus.OK);
-						}
+						response.data = orgService.getOrgById(user.getOrg_grant_id_link());;
+						response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+						response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+						return new ResponseEntity<OrgResponse>(response, HttpStatus.OK);
 
 					}
 				}
