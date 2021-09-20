@@ -87,12 +87,7 @@ public class Personnel_Service extends AbstractService<Personel> implements IPer
 		return repo.getPersonelBycode(personnel_code);
 	}
 
-	// lấy danh sách nhân viên không chưa id truyền vào,theo mã nhân viên
-	@Override
-	public List<Personel> getPersonelByCode_Id_Personel(String code, Long id) {
-		// TODO Auto-generated method stub
-		return repo.getPersonelByCode_Id_Personel(code, id);
-	}
+
 
 	@Override
 	public List<Personel> getPersonelByOrgid_link(Long org_id, Long personnel_typeid_link) {
@@ -117,6 +112,19 @@ public class Personnel_Service extends AbstractService<Personel> implements IPer
 		// TODO Auto-generated method stub
 		return repo.getPersonelByname(personnel_name);
 
+	}
+
+	@Override
+	public Personel getPersonelBycode_orgmanageid_link(String code, Long orgmanageid_link) {
+		// TODO Auto-generated method stub
+		return repo.getPersonelBycode_orgmanageid_link(code, orgmanageid_link);
+	}
+	// lấy danh sách nhân viên không chưa id truyền vào,theo mã nhân viên và theo đơn vị của nhân viên đó
+
+	@Override
+	public List<Personel> getPersonelByCode_Id_Orgmanagerid_link_Personel(String code, Long id, Long orgmanageid_link) {
+		// TODO Auto-generated method stub
+		return repo.getPersonelByCode_Id_Orgmanagerid_link_Personel(code, id, orgmanageid_link);
 	}
 
 }

@@ -50,13 +50,24 @@ public interface Personnel_repository extends JpaRepository<Personel, Long>, Jpa
 	@Query("select c from Personel c where c.code = :personnel_code")
 	public Personel getPersonelBycode(@Param("personnel_code") final String personnel_code);
 
-	// lấy nhân viên theo tên
+	
+	//lấy personel theo code và đơn vị 
+	@Query("select c from Personel c where c.code = :personnel_code and c.orgmanagerid_link = :orgmanagerid_link ")
+	public Personel getPersonelBycode_orgmanageid_link(
+			@Param("personnel_code") final String personnel_code,
+			@Param("orgmanagerid_link") final Long orgmanagerid_link);
+	//lấy nhân viên theo tên
 	@Query("select c from Personel c where c.fullname = :personnel_name")
 	public Personel getPersonelByname(@Param("personnel_name") final String personnel_name);
 
 	// lấy danh sách nhân viên theo mã nhân viên, không chứa id truyền vào
-	@Query(value = "select c from Personel c where c.code = :code " + "and c.id <> :id")
-	public List<Personel> getPersonelByCode_Id_Personel(@Param("code") final String code, @Param("id") final Long id);
+	@Query(value = "select c from Personel c where c.code = :code "
+			+ " and c.id <> :id"
+			+ " and c.orgmanagerid_link = :orgmanagerid_link")
+	public List<Personel> getPersonelByCode_Id_Orgmanagerid_link_Personel(
+			@Param("code") final String code,
+			@Param("id") final Long id,
+			@Param("orgmanagerid_link") final Long orgmanagerid_link);
 
 	// lấy danh sách nhân viên theo tổ , loại nhân viên
 	@Query(value = "select c from Personel c where c.orgid_link = :org_id and (c.personnel_typeid_link = :personnel_typeid_link or :personnel_typeid_link is null or :personnel_typeid_link = 0) ")
