@@ -28,6 +28,10 @@ public class Jitin_StockinLot implements Serializable{
 	private List<Jitin_StockinLotSpace>  stockin_lot_space  = new ArrayList<Jitin_StockinLotSpace>();
 	private String stockinLotSpace;
 	private String skucode;
+	
+	// transient
+	private String list_not_check;
+	
 	public Long getId() {
 		return id;
 	}
@@ -160,6 +164,11 @@ public class Jitin_StockinLot implements Serializable{
 	public void setGrossweight_lbs_check(Float grossweight_lbs_check) {
 		this.grossweight_lbs_check = grossweight_lbs_check;
 	}
-
+	public String getList_not_check() {
+		return list_not_check;
+	}
+	public void setList_not_check(String list_not_check) {
+		this.list_not_check = list_not_check;
+	}
 	
 }
