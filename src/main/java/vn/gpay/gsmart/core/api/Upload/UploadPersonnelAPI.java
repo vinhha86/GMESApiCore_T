@@ -239,7 +239,7 @@ public class UploadPersonnelAPI {
 								//kiểm tra xem mã loại đơn vị của phòng ban có trong DB orgtype ko?
 								//1.nếu có thì lấy
 								OrgType orgtype = orgtype_service.findOne(lst_bp.get(i).getOrgtypeid_link());
-								if(orgtype!=null && orgtype.getId()== 30) {
+								if(orgtype!=null) {
 									orgid_link = lst_bp.get(i).getId();
 									break;
 								}else {
