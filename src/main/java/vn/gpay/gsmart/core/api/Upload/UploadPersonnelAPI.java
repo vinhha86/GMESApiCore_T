@@ -41,6 +41,7 @@ import vn.gpay.gsmart.core.utils.ColumnPersonnel;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
+
 @RestController
 @RequestMapping("/api/v1/upload_personnel")
 public class UploadPersonnelAPI {
@@ -58,7 +59,8 @@ public class UploadPersonnelAPI {
 	IPersonnel_Position_Service personnel_position_service;
 	@Autowired
 	IPersonnelType_Service personneltypeService;
-
+	@Autowired
+	IOrgTypeService orgtype_service;
 	@RequestMapping(value = "/personnel", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadPersonnel(HttpServletRequest request,
 			@RequestParam("file") MultipartFile file, @RequestParam("orgmanageid_link") long orgmanageid_link) {
@@ -227,9 +229,24 @@ public class UploadPersonnelAPI {
 								}
 							}
 						}
+						//lấy mã bộ phận
 						if (lst_bp.size() != 0) {
 							// thêm
-							orgid_link = lst_bp.get(0).getId();
+						//	orgid_link = lst_bp.get(0).getId();
+							for(int i =0;i< lst_bp.size();i++) {
+								
+								//orgid_link = lst_bp.get(i).getId();
+								//kiểm tra xem mã loại đơn vị của phòng ban có trong DB orgtype ko?
+								//1.nếu có thì lấy
+								OrgType orgtype = orgtype_service.findOne(lst_bp.get(i).getOrgtypeid_link());
+								if(orgtype!=null && orgtype.getId()== 30) {
+									orgid_link = lst_bp.get(i).getId();
+									break;
+								}else {
+									continue;
+								}
+							}
+
 						} else {
 
 							// nếu chưa có thì thêm bộ phận vào DB
