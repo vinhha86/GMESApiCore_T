@@ -50,6 +50,7 @@ import vn.gpay.gsmart.core.security.IGpayUserService;
 import vn.gpay.gsmart.core.stocking_uniquecode.IStocking_UniqueCode_Service;
 import vn.gpay.gsmart.core.stocking_uniquecode.Stocking_UniqueCode;
 import vn.gpay.gsmart.core.utils.Common;
+import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -102,25 +103,38 @@ public class PersonnelAPI {
 		getperson_byorg_response response = new getperson_byorg_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			List<Long> list_org_id = new ArrayList<Long>();
+			List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),
+					OrgType.ORG_TYPE_FACTORY);
 			Long orgrootid_link = user.getRootorgid_link();
 			// loại nhân viên
 			Long personnel_typeid_link = entity.personnel_typeid_link;
 			// trạng thái
 			Integer personel_status = entity.status;
 			List<Personel> list = new ArrayList<Personel>();
+			for (GpayUserOrg userorg : list_userorg) {
+				list_org_id.add(userorg.getOrgid_link());
+			}
+			if(!list_org_id.contains(user.getOrgid_link())) {
+				list_org_id.add(user.getOrgid_link());
+			}
 			// lấy danh sách nhân viên theo tổ mà user quản lý
 			if (entity.orgid_link != orgrootid_link) {
 				// nếu user quản lý nhiều hơn 1 đơn vị
-
-				// nếu user quản lý tổ con cụ thể thì chỉ load tổ con, kể cả bấm vào đơn vị
-				// nếu user có 1 đơn vị con và chỉ quản lý 1 đơn vị
-				if (user.getOrg_grant_id_link() != null) {
-					list = personService.getPersonelByOrgid_link_PersonelType(user.getOrg_grant_id_link(),
-							personnel_typeid_link,personel_status);
-				} else {
+				if(list_org_id.size()>1) {
 					list = personService.getPersonelByOrgid_link_PersonelType(entity.orgid_link, personnel_typeid_link,personel_status);
-
+				}else {
+					// nếu user quản lý tổ con cụ thể thì chỉ load tổ con, kể cả bấm vào đơn vị
+					// nếu user có 1 đơn vị con và chỉ quản lý 1 đơn vị
+					if (user.getOrg_grant_id_link() != null) {
+						list = personService.getPersonelByOrgid_link_PersonelType(user.getOrg_grant_id_link(),
+								personnel_typeid_link,personel_status);
+					} else {
+						list = personService.getPersonelByOrgid_link_PersonelType(entity.orgid_link, personnel_typeid_link,personel_status);
+					}
 				}
+			}else {
+				list = personService.getPersonelByOrgid_link_PersonelType(entity.orgid_link, personnel_typeid_link,personel_status);
 			}
 			response.data = list;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

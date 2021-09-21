@@ -230,7 +230,7 @@ public class OrgAPI {
 			// lấy tổ cụ thể trong đơn vị - theo tổ mà tài khoản đấy quản lý (nếu có)
 			if (user.getOrgid_link() != 1) {
 				// nếu user quản lý nhiều đơn vị
-				if (list_org_id.size() > 0) {
+				if (list_org_id.size() > 1) {
 					List<Org> ls_tosx = orgService.findChildByListType(user.getRootorgid_link(), entity.id, list);
 					response.data = ls_tosx;
 					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
