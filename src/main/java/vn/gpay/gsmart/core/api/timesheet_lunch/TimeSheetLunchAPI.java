@@ -23,11 +23,14 @@ import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.personel.IPersonnel_Service;
 import vn.gpay.gsmart.core.personel.Personel;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.security.GpayUserOrg;
+import vn.gpay.gsmart.core.security.IGpayUserOrgService;
 import vn.gpay.gsmart.core.timesheet_lunch.ITimeSheetLunchService;
 import vn.gpay.gsmart.core.timesheet_lunch.TimeSheetLunch;
 import vn.gpay.gsmart.core.timesheet_lunch.TimeSheetLunchBinding;
 import vn.gpay.gsmart.core.timesheet_shift_type.ITimesheetShiftTypeService;
 import vn.gpay.gsmart.core.timesheet_shift_type.TimesheetShiftType;
+import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -42,6 +45,8 @@ public class TimeSheetLunchAPI {
 	private ITimesheetShiftTypeService timesheetshifttypeService;
 	@Autowired 
 	private IOrgService orgeService;
+	@Autowired
+	IGpayUserOrgService userOrgService;
 
 //	@RequestMapping(value = "/getForTimeSheetLunch",method = RequestMethod.POST)
 //	public ResponseEntity<TimeSheetLunch_response> getForTimeSheetLunch(HttpServletRequest request) {
@@ -74,6 +79,9 @@ public class TimeSheetLunchAPI {
 		TimeSheetLunch_response response = new TimeSheetLunch_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			List<Long> list_org_id = new ArrayList<Long>();
+			List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),
+					OrgType.ORG_TYPE_FACTORY);
 			Long orgrootid_link = user.getRootorgid_link();
 			List<Org> lst_org = new ArrayList<Org>();
 			List<Personel> listPersonnel = null ;
@@ -83,18 +91,32 @@ public class TimeSheetLunchAPI {
 //			Date twentyDaysAgo = cal.getTime();
 			Date date = entity.date;
 			Long orgid_link = entity.orgid_link;
-
-			List<TimeSheetLunchBinding> list = new ArrayList<TimeSheetLunchBinding>();
-			
-			if (user.getOrg_grant_id_link() != null) {
-				lst_org = orgeService.getOrgById(user.getOrg_grant_id_link());
-				if (lst_org.size() != 0) {
-					listPersonnel =  personnelService.getby_org(user.getOrg_grant_id_link(),orgrootid_link);
-
-				}
-			} else {
-				listPersonnel = personnelService.getby_org(orgid_link, orgrootid_link);
+			for (GpayUserOrg userorg : list_userorg) {
+				list_org_id.add(userorg.getOrgid_link());
 			}
+			if(!list_org_id.contains(user.getOrgid_link())) {
+				list_org_id.add(user.getOrgid_link());
+			}
+			List<TimeSheetLunchBinding> list = new ArrayList<TimeSheetLunchBinding>();
+			if (entity.orgid_link != orgrootid_link) {
+				//nếu quản lý nhiều tài khảon
+				if(list_org_id.size()>1) {
+					listPersonnel = personnelService.getby_org(orgid_link, orgrootid_link);
+				}else {
+					//nếu có đơn vị con cụ thể
+					if (user.getOrg_grant_id_link() != null) {
+						lst_org = orgeService.getOrgById(user.getOrg_grant_id_link());
+						if (lst_org.size() != 0) {
+							listPersonnel =  personnelService.getby_org(user.getOrg_grant_id_link(),orgrootid_link);
+						}
+					} else {
+						listPersonnel = personnelService.getby_org(orgid_link, orgrootid_link);
+					}
+				}
+			}
+			
+			
+			
 			
 		//	List<Personel> listPersonnel = personnelService.getby_org(orgid_link, orgrootid_link);
 //			System.out.println(listPersonnel.size());
