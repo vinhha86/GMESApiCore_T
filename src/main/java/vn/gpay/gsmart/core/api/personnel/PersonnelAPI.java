@@ -662,8 +662,9 @@ public class PersonnelAPI {
 		try {
 			Personel person = new Personel();
 			for (int i = 0; i < entity.data.size(); i++) {
-				person = personService.getPersonelBycode(entity.data.get(i));
-
+				//lấy nhân viên theo mã và đơn vị
+				//person = personService.getPersonelBycode_orgmanageid_link(entity.data.get(i), entity.orgmanageid_link);
+				person = entity.data.get(i);
 				person.setTimesheet_absence_type_id_link(entity.timesheet_absence_type_id_link);
 				personService.save(person);
 			}
