@@ -72,7 +72,9 @@ public class Personel implements Serializable {
 	private String place_idnumber; //nơi cấp chứng minh thư
 	private String healthinfo;// loại sức khỏe
 	private String insurance_number;//số sổ bảo hiểm
-	private Long timesheet_absence_type_id_link;
+	private Long timesheet_absence_type_id_link; 
+	private String account_number;
+	private String household_number;
 	
 	
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -437,6 +439,19 @@ public class Personel implements Serializable {
 	}
 	public void setTimesheet_absence_type_id_link(Long timesheet_absence_type_id_link) {
 		this.timesheet_absence_type_id_link = timesheet_absence_type_id_link;
+	}
+
+	public String getHousehold_number() {
+		return household_number;
+	}
+	public void setHousehold_number(String household_number) {
+		this.household_number = household_number;
+	}
+	public String getAccount_number() {
+		return account_number;
+	}
+	public void setAccount_number(String account_number) {
+		this.account_number = account_number;
 	}
 	
 	

@@ -415,6 +415,9 @@ public class UploadPersonnelAPI {
 						String Tinh = commonService.getStringValue(row.getCell(ColumnPersonnel.Tinh));
 						String DiaChi = commonService.getStringValue(row.getCell(ColumnPersonnel.DiaChi));
 						String DT = commonService.getStringValue(row.getCell(ColumnPersonnel.DienThoai));
+						
+						String SoSoHoKhau = commonService.getStringValue(row.getCell(ColumnPersonnel.SoSoHoKhau));
+						String SoTaiKhoan = commonService.getStringValue(row.getCell(ColumnPersonnel.SoTaiKhoan));
 						if (DT.equals("#N/A")) {
 							DT = "";
 						}
@@ -592,6 +595,8 @@ public class UploadPersonnelAPI {
 
 						person.setHealthinfo(SK);
 						person.setInsurance_number(SoSBH);
+						person.setAccount_number(SoTaiKhoan);
+						person.setHousehold_number(SoSoHoKhau);
 
 						// luu nhan vien
 						Personel personnel = personnel_service.save(person);

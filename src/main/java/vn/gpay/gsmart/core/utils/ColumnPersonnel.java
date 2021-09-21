@@ -26,7 +26,7 @@ public class ColumnPersonnel {
 	public static int NgayKiHDCTH  		= 22;
 	public static int NgayKiHDVTH		= 23;
 	public static int NgayDongBH		= 24;
-	public static int TGCongTac			= 25;
+	public static int SoTaiKhoan		= 25;
 	public static int Thon				= 26;
 	public static int Xa				= 27;
 	public static int Huyen				= 28;
@@ -41,4 +41,5 @@ public class ColumnPersonnel {
 	public static int NoiCapMoi			= 37;
 	public static int SucKhoe			= 38;
 	public static int SoSBH				= 39;
+	public static int SoSoHoKhau		= 40;
 }
