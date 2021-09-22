@@ -90,8 +90,13 @@ public class ScheduleOrgGrant implements Runnable {
 		int day_grant = 0;
 		Date date_end = null;
 		Date date_start = null;
+		int total_po = list_porder.size();
+		int total_po_pate = 0;
 
 		for (POrderGrant pordergrant : list_porder) {
+			if (pordergrant.getType().equals(1))
+				total_po_pate++;
+			// neu don hang bi cham
 //						total_day = commonService.getDuration(startdate, toDate, orgrootid_link, year);
 			Date start = commonService.getBeginOfDate(pordergrant.getStart_date_plan());
 			Date end = commonService.getEndOfDate(pordergrant.getFinish_date_plan());
@@ -151,17 +156,6 @@ public class ScheduleOrgGrant implements Runnable {
 			sch_porder.setProductivity_porder(pordergrant.getProductivity_porder());
 			sch_porder.setGrant_type(pordergrant.getType());
 
-//						String FolderPath = commonService.getFolderPath(pordergrant.getProductType());
-//						String filename = pordergrant.getImgProduct();
-//						if(filename != "" && filename != null) {
-//							String uploadRootPath = request.getServletContext().getRealPath("");
-//							File uploadRootDir = new File(uploadRootPath);
-//							String filePath = uploadRootDir.getParent()+"/"+FolderPath+"/"+ filename;
-//							Path path = Paths.get(filePath);
-//							byte[] data = Files.readAllBytes(path);
-//							sch_porder.setImg(data);
-//						}
-
 			int d = commonService.getDuration(start_free, end_free, orgrootid_link);
 			day_grant += d;
 
@@ -175,6 +169,10 @@ public class ScheduleOrgGrant implements Runnable {
 			String cls = (total_day - day_grant) <= 0 ? "" : "free";
 			sch_org_grant.setCls(cls);
 		}
+
+		String name = sch_org_grant.getName();
+		name += " - (" + total_po_pate + "/" + total_po + ")";
+		sch_org_grant.setName(name);
 
 		// Lay thong tin tien do thuc te cua lenh
 //					ArrayList<Thread> arrThreads = new ArrayList<Thread>();

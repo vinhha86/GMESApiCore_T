@@ -78,4 +78,8 @@ public interface IPContract_POService extends Operations<PContract_PO> {
 	Integer getTotalProductinPcontract(Long pcontractid_link, Long productid_link);
 
 	Float getTotalPriceProductInPcontract(Long pcontractid_link, Long productid_link);
+
+	int getPOConfimNotLine(Long pcontractid_link);
+
+	int getPOLineNotMaps(Long pcontractid_link);
 }

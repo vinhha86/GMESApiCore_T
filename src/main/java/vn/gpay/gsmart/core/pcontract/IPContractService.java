@@ -19,9 +19,14 @@ public interface IPContractService extends Operations<PContract> {
 
 	List<PContract> getBySearch(PContract_getbysearch_request entity);
 
-	List<PContract> getBySearch_PosList(PContract_getbysearch_request entity, List<Long> pos, List<Long> product,List<Long> vendors, List<Long> buyers);
+	List<PContract> getBySearch_PosList(PContract_getbysearch_request entity, List<Long> pos, List<Long> product,
+			List<Long> vendors, List<Long> buyers);
 
 	public List<PContract> findByContractcode(String contractcode);
-	
+
 	public List<PContract> findByExactContractcode(String contractcode);
+
+	int getProductNotBom(Long pcontractid_link);
+
+	List<PContract> getPContractByYear(int year);
 }

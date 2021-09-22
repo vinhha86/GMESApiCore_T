@@ -24,6 +24,7 @@ import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract.IPContractService;
 import vn.gpay.gsmart.core.pcontract.IPContract_AutoID_Service;
 import vn.gpay.gsmart.core.pcontract.PContract;
+import vn.gpay.gsmart.core.pcontract.PContractChart;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBOMColorService;
 import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBom2ColorService;
@@ -171,6 +172,44 @@ public class PContractAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
+		}
+	}
+
+	@RequestMapping(value = "/getpcontractchart", method = RequestMethod.POST)
+	public ResponseEntity<GetProductNotBomResponse> GetProductNotBom(@RequestBody GetProductNotBomRequest entity,
+			HttpServletRequest request) {
+		GetProductNotBomResponse response = new GetProductNotBomResponse();
+		try {
+			int year = entity.year;
+			int type = entity.type;
+
+			List<PContract> list_pcontract = pcontractService.getPContractByYear(year);
+
+			List<PContractChart> list_chart = new ArrayList<PContractChart>();
+			for (PContract pcontract : list_pcontract) {
+				long pcontractid_link = pcontract.getId();
+				PContractChart chart = new PContractChart();
+				int soluong = 0;
+				if (type == 0)
+					soluong = pcontractService.getProductNotBom(pcontractid_link);
+				else if (type == 1)
+					soluong = poService.getPOConfimNotLine(pcontractid_link);
+				else if (type == 2)
+					soluong = poService.getPOLineNotMaps(pcontractid_link);
+				chart.setMahang(pcontract.getContractcode());
+				chart.setSoluong(soluong);
+				list_chart.add(chart);
+			}
+
+			response.data = list_chart;
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<GetProductNotBomResponse>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<GetProductNotBomResponse>(response, HttpStatus.OK);
 		}
 	}
 
@@ -338,12 +377,12 @@ public class PContractAPI {
 
 		try {
 			List<Long> vendors = new ArrayList<Long>();
-			for(GpayUserOrg vendor : lsVendor) {
+			for (GpayUserOrg vendor : lsVendor) {
 				vendors.add(vendor.getOrgid_link());
 			}
-			
+
 			List<Long> buyers = new ArrayList<Long>();
-			for(GpayUserOrg buyer : lsBuyer) {
+			for (GpayUserOrg buyer : lsBuyer) {
 				buyers.add(buyer.getOrgid_link());
 			}
 
@@ -364,15 +403,15 @@ public class PContractAPI {
 			if (entity.productbuyer_code.length() > 0) {
 				List<Product> product_lst = productService.getProductByLikeBuyercode(entity.productbuyer_code);
 				for (Product theProduct : product_lst) {
-					//kiem tra xem san pham co nam trong bo ko thì lay san pham bo vao
+					// kiem tra xem san pham co nam trong bo ko thì lay san pham bo vao
 					List<ProductPairing> list_pair = pairService.getby_product(theProduct.getId());
-					for(ProductPairing pair : list_pair) {
+					for (ProductPairing pair : list_pair) {
 						products.add(pair.getProductpairid_link());
 					}
-					
+
 					products.add(theProduct.getId());
 				}
-					
+
 			}
 
 			List<Long> pos = poService.getpcontract_BySearch(entity.po_code, orgs);
@@ -381,11 +420,11 @@ public class PContractAPI {
 //			for (PContract_PO thePO : lstPO)
 //				if(!pos.contains(thePO.getPcontractid_link()))
 //					pos.add(thePO.getPcontractid_link());
-			
+
 			List<Long> product = new ArrayList<Long>();
 			// Lay danh sach PO thoa man dieu kien
 			List<Long> list_product = pcontract_product_Service.getby_product(products, entity.productbuyer_code);
-			for(Long p : list_product) {
+			for (Long p : list_product) {
 				product.add(p);
 			}
 
@@ -427,7 +466,7 @@ public class PContractAPI {
 			return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
 		}
 	}
-	
+
 	@RequestMapping(value = "/findByExactContractcode", method = RequestMethod.POST)
 	public ResponseEntity<PContract_getbypaging_response> findByExactContractcode(
 			@RequestBody PContract_findByContractcode_request entity, HttpServletRequest request) {
@@ -436,11 +475,11 @@ public class PContractAPI {
 
 		try {
 			List<PContract> result = pcontractService.findByExactContractcode(entity.contractcode);
-			if(result.size() > 0) {
+			if (result.size() > 0) {
 				response.data = result;
 				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			}else {
+			} else {
 				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 				response.setMessage("Mã đơn hàng không tồn tại");
 			}

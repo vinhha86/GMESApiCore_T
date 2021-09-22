@@ -27,9 +27,16 @@ public interface IPContractRepository extends JpaRepository<PContract, Long>, Jp
 			+ "where lower(c.contractcode) like lower(concat('%',:contractcode,'%')) ")
 	public List<PContract> findByContractcode(@Param("contractcode") final String contractcode);
 
-	@Query(value = "select c from PContract c " 
-			+ "where lower(c.contractcode) = lower(:contractcode) "
-			)
+	@Query(value = "select c from PContract c " + "where lower(c.contractcode) = lower(:contractcode) ")
 	public List<PContract> findByExactContractcode(@Param("contractcode") final String contractcode);
+
+	@Query(value = "select distinct a.productid_link from PContractProduct a " + "where a.productid_link not in ("
+			+ "select b.productid_link from PContractProductBom2 b where b.pcontractid_link = :pcontractid_link)"
+			+ " and a.pcontractid_link = :pcontractid_link ")
+	public List<Long> GetProductNotBom(@Param("pcontractid_link") final Long pcontractid_link);
+
+	@Query(value = "select c from PContract c " + "inner join ContractBuyer a on a.id = c.contractbuyerid_link "
+			+ "where contract_year = :year ")
+	public List<PContract> getPContractByYear(@Param("year") final Integer year);
 
 }

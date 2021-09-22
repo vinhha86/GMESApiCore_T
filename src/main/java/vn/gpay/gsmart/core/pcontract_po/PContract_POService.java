@@ -508,4 +508,16 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public int getPOConfimNotLine(Long pcontractid_link) {
+		// TODO Auto-generated method stub
+		return repo.getPOConfimNotLine(pcontractid_link).size();
+	}
+
+	@Override
+	public int getPOLineNotMaps(Long pcontractid_link) {
+		// TODO Auto-generated method stub
+		return repo.getPOLineNotMaps(pcontractid_link).size();
+	}
 }
