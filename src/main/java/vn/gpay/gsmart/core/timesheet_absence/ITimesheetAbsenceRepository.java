@@ -76,7 +76,7 @@ public interface ITimesheetAbsenceRepository
 			@Param("timeSheetAbsenceType") final Long timeSheetAbsenceType);
 
 	@Query(value = "select c from TimesheetAbsence c " + " inner join Personel b on c.personnelid_link = b.id "
-			+ "where :datefrom <> :dateto and  c.absencedate_to <> :datefrom "
+			+ "where c.absencedate_from <= :dateto and  c.absencedate_to >= :datefrom "
 			+ "and b.orgmanagerid_link = :orgid_link")
 	public List<TimesheetAbsence> GetByOrgAndDate(@Param("dateto") final Date dateto,
 			@Param("datefrom") final Date datefrom, @Param("orgid_link") final Long orgid_link);
