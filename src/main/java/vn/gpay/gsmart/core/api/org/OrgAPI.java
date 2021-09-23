@@ -223,10 +223,10 @@ public class OrgAPI {
 			for (GpayUserOrg userorg : list_userorg) {
 				list_org_id.add(userorg.getOrgid_link());
 			}
-			if(!list_org_id.contains(user.getOrgid_link())) {
+			if (!list_org_id.contains(user.getOrgid_link())) {
 				list_org_id.add(user.getOrgid_link());
 			}
-			
+
 			// lấy tổ cụ thể trong đơn vị - theo tổ mà tài khoản đấy quản lý (nếu có)
 			if (user.getOrgid_link() != 1) {
 				// nếu user quản lý nhiều đơn vị
@@ -239,7 +239,8 @@ public class OrgAPI {
 				} else {
 					// nếu user có 1 đơn vị con và chỉ quản lý 1 đơn vị
 					if (user.getOrg_grant_id_link() != null) {
-						response.data = orgService.getOrgById(user.getOrg_grant_id_link());;
+						response.data = orgService.getOrgById(user.getOrg_grant_id_link());
+						;
 						response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 						response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 						return new ResponseEntity<OrgResponse>(response, HttpStatus.OK);
@@ -307,6 +308,42 @@ public class OrgAPI {
 			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
 			errorBase.setMessage(e.getMessage());
 			return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@RequestMapping(value = "/getlistdonvi", method = RequestMethod.POST)
+	public ResponseEntity<GetOrgByUser_response> GetOrgByUser(HttpServletRequest request) {// @RequestParam("type")
+		GetOrgByUser_response response = new GetOrgByUser_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			List<Org> list = new ArrayList<Org>();
+
+			if (user.getOrgid_link().equals(user.getRootorgid_link())) {
+				list = orgService.findOrgByType(user.getRootorgid_link(), 0, OrgType.ORG_TYPE_FACTORY);
+			} else {
+				List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),
+						OrgType.ORG_TYPE_FACTORY);
+				List<Long> list_org = new ArrayList<Long>();
+				for (GpayUserOrg gpayUserOrg : list_userorg) {
+					list_org.add(gpayUserOrg.getOrgid_link());
+				}
+				if (!list_org.contains(user.getOrgid_link())) {
+					list_org.add(user.getOrgid_link());
+				}
+
+				for (Long id : list_org) {
+					list.add(orgService.findOne(id));
+				}
+			}
+
+			response.data = list;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<GetOrgByUser_response>(response, HttpStatus.OK);
+		} catch (RuntimeException e) {
+			response.setRespcode(ResponseMessage.KEY_RC_SERVER_ERROR);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<GetOrgByUser_response>(response, HttpStatus.OK);
 		}
 	}
 

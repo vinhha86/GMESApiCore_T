@@ -8,9 +8,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -99,56 +96,31 @@ public class TimesheetAbsenceAPI {
 			@RequestBody TimeSheetAbsence_getbypaging_request entity, HttpServletRequest request) {
 		TimeSheetAbsence_response response = new TimeSheetAbsence_response();
 		try {
-//			limit, page, 
-//			orgFactory, personnelCode, personnelName, datefrom, dateto, timeSheetAbsenceType
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			// List<TimesheetAbsence> listTimesheetAbsence;
-			// : lấy danh sách những đơn vị mà user đấy quản lý
-			List<Long> list_org_id = new ArrayList<Long>();
-			List<TimesheetAbsence> lst_timesheetab = new ArrayList<TimesheetAbsence>();
-			List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),
-					OrgType.ORG_TYPE_FACTORY);
-			// danh sách ID những đơn vị user quản lý
-			for (GpayUserOrg userorg : list_userorg) {
-				list_org_id.add(userorg.getOrgid_link());
-			}
+			List<TimesheetAbsence> lstlst_timesheetabsence = timesheetAbsenceService.getbyOrgid(entity.orgFactory,
+					entity.orgFactory, entity.datefrom, entity.dateto, entity.personnelCode, entity.personnelName,
+					entity.timeSheetAbsenceType);
 
-			// lấy danh sách báo nghỉ theo đơn vị của tài khoản quản lý
-			if (user.getOrgid_link() != 1) {
-				// nếu quản lý nhiều đơn vị
-				if (list_org_id.size() > 1) {
-					for (int i = 0; i < list_org_id.size(); i++) {
-						List<TimesheetAbsence> lstlst_timesheetabsence = timesheetAbsenceService.getbyOrgid(
-								entity.orgFactory, list_org_id.get(i), entity.datefrom, entity.dateto,
-								entity.personnelCode, entity.personnelName, entity.timeSheetAbsenceType);
-						lst_timesheetab.addAll(lstlst_timesheetabsence);
-					}
-					// response.data = lst_timesheetab;
-				} else {
-					// lấy ds báo nghỉ theo tổ của tài khoản quản lý (nếu có)
-					if (user.getOrg_grant_id_link() != null) {
-						lst_timesheetab = timesheetAbsenceService.getbyOrg_grant_id_link(user.getOrg_grant_id_link(),
-								entity.datefrom, entity.dateto, entity.personnelCode, entity.personnelName,
-								entity.timeSheetAbsenceType);
-					}
-				}
-			} else {
-				lst_timesheetab = timesheetAbsenceService.getAllbydate(entity.orgFactory, entity.datefrom,
-						entity.dateto, entity.personnelCode, entity.personnelName, entity.timeSheetAbsenceType);
-			}
+			response.data = lstlst_timesheetabsence;
 
-			// List<TimesheetAbsence> listTimesheetAbsence =
-			// timesheetAbsenceService.getbypaging(entity);
-			response.totalCount = lst_timesheetab.size();
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<TimeSheetAbsence_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<TimeSheetAbsence_response>(response, HttpStatus.OK);
+		}
+	}
 
-			PageRequest page = PageRequest.of(entity.page - 1, entity.limit);
-			int start = (int) page.getOffset();
-			int end = (start + page.getPageSize()) > lst_timesheetab.size() ? lst_timesheetab.size()
-					: (start + page.getPageSize());
-			Page<TimesheetAbsence> pageToReturn = new PageImpl<TimesheetAbsence>(lst_timesheetab.subList(start, end),
-					page, lst_timesheetab.size());
+	@RequestMapping(value = "/getbyorg_and_date", method = RequestMethod.POST)
+	public ResponseEntity<TimeSheetAbsence_response> GetByOrgAndDate(@RequestBody getByOrgAndDate_request entity,
+			HttpServletRequest request) {
+		TimeSheetAbsence_response response = new TimeSheetAbsence_response();
+		try {
+			long orgid_link = entity.orgid_link;
+			Date date = entity.date;
 
-			response.data = pageToReturn.getContent();
+			response.data = timesheetAbsenceService.getByOrgAndDate(orgid_link, date);
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

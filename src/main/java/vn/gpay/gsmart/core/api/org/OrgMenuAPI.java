@@ -83,7 +83,6 @@ public class OrgMenuAPI {
 			} else {
 				menu = orgService.findOrgByTypeForMenuOrg();
 				children = orgService.createTree(menu);
-//				System.out.println(menu.size());
 
 			}
 			response.children = children;
