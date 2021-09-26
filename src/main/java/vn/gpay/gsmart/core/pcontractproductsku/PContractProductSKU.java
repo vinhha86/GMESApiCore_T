@@ -46,7 +46,11 @@ public class PContractProductSKU implements Serializable {/**
 	
 	@Transient
 	private Integer pquantity_lenhsx = 0;//SL da tao lenh sx
-	
+	@Transient
+	private Integer pquantity_stockin = 0;//SL da nhap kho thanh pham
+	@Transient
+	private Integer pquantity_stockout = 0;//SL da xuat kho cho khach
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="skuid_link",insertable=false,updatable =false)
@@ -265,5 +269,21 @@ public class PContractProductSKU implements Serializable {/**
 		this.pquantity_lenhsx = pquantity_lenhsx;
 	}
 
+	public Integer getPquantity_stockout() {
+		return pquantity_stockout;
+	}
 
+	public void setPquantity_stockout(Integer pquantity_stockout) {
+		this.pquantity_stockout = pquantity_stockout;
+	}
+
+	public Integer getPquantity_stockin() {
+		return pquantity_stockin;
+	}
+
+	public void setPquantity_stockin(Integer pquantity_stockin) {
+		this.pquantity_stockin = pquantity_stockin;
+	}
+	
+	
 }

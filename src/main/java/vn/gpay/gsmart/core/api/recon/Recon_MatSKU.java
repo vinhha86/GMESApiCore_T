@@ -19,7 +19,7 @@ import vn.gpay.gsmart.core.api.balance.Jitin_Stockin_D_Data;
 import vn.gpay.gsmart.core.api.balance.Jitin_StockoutList_Response;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
 
-public class Recon_SKU implements Runnable{
+public class Recon_MatSKU implements Runnable{
 	private Thread t;
 	private Long pcontractid_link;
 	private Long stockid_link;
@@ -30,7 +30,7 @@ public class Recon_SKU implements Runnable{
 	String token;
 	CountDownLatch latch;
 	
-	Recon_SKU(List<Recon_MatSKU_Data> ls_skubalance, Long pcontractid_link, Long stockid_link, Long pcontract_poid_link,
+	Recon_MatSKU(Long pcontractid_link, Long stockid_link, Long pcontract_poid_link,
 			Long porderid_link, Recon_MatSKU_Data mat_sku, String token, CountDownLatch latch) {
 		this.pcontractid_link = pcontractid_link;
 		this.stockid_link = stockid_link;

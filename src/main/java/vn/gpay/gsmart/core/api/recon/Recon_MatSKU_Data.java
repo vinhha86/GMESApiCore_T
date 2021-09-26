@@ -37,7 +37,8 @@ public class Recon_MatSKU_Data implements Serializable {
 	private Float mat_sku_dif;
 	private Integer mat_sku_product;
 	private Float mat_sku_demand_dh;
-	
+	private Float mat_sku_byproduct_stockin;
+	private Float mat_sku_byproduct_stockout;
 	
 	
 	
@@ -181,4 +182,17 @@ public class Recon_MatSKU_Data implements Serializable {
 	public void setMat_sku_demand_dh(Float mat_sku_demand_dh) {
 		this.mat_sku_demand_dh = mat_sku_demand_dh;
 	}
+	public Float getMat_sku_byproduct_stockout() {
+		return mat_sku_byproduct_stockout;
+	}
+	public void setMat_sku_byproduct_stockout(Float mat_sku_byproduct_stockout) {
+		this.mat_sku_byproduct_stockout = mat_sku_byproduct_stockout;
+	}
+	public Float getMat_sku_byproduct_stockin() {
+		return mat_sku_byproduct_stockin;
+	}
+	public void setMat_sku_byproduct_stockin(Float mat_sku_byproduct_stockin) {
+		this.mat_sku_byproduct_stockin = mat_sku_byproduct_stockin;
+	}
+	
 }
