@@ -132,7 +132,7 @@ public class ProductBalanceAPI {
 				if(isAfterDeleteRec) {
 					Integer sortValue = item.getSortvalue() - 1;
 					item.setSortvalue(sortValue);
-					item.setBalance_name("Cụm công đoạn " + sortValue);
+//					item.setBalance_name("Cụm công đoạn " + sortValue);
 					productBalanceService.save(item);
 				}
 			}
@@ -182,7 +182,7 @@ public class ProductBalanceAPI {
 					if(isAfterDeleteRec) {
 						Integer sortValue = item.getSortvalue() - 1;
 						item.setSortvalue(sortValue);
-						item.setBalance_name("Cụm công đoạn " + sortValue);
+//						item.setBalance_name("Cụm công đoạn " + sortValue);
 						productBalanceService.save(item);
 					}
 				}
