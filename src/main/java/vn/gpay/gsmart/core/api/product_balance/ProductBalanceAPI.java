@@ -225,4 +225,27 @@ public class ProductBalanceAPI {
 			return new ResponseEntity<ProductBalance_response>(response, HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/product_balance_reorder",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> product_balance_reorder(@RequestBody ProductBalance_reorder_request entity,HttpServletRequest request ) {
+		ResponseBase response = new ResponseBase();
+		try {
+		
+			for (ProductBalance productBalance:entity.data){
+				ProductBalance pb = productBalanceService.findOne(productBalance.getId());
+				if (null != pb){
+					pb.setSortvalue(productBalance.getSortvalue());
+					productBalanceService.save(pb);
+				}
+				
+			}
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_EXCEPTION));
+		    return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 }
