@@ -1,5 +1,7 @@
 package vn.gpay.gsmart.core.api.fobpriceapi;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +30,28 @@ public class FOBPriceAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			FOBPrice price = entity.data;
-			if(price.getId()==null || price.getId()==0) {
+			price.setName(price.getName().trim());
+			
+			if(price.getId()==null || price.getId()==0) { //new
 				price.setOrgrootid_link(user.getRootorgid_link());
-			}else {
+				List<FOBPrice> fobprice_list = fobService.getByName(price.getName());
+				if(fobprice_list.size() > 0) {
+					response.setRespcode(ResponseMessage.KEY_RC_BAD_REQUEST);
+					response.setMessage("Tên giá đã tồn tại");
+					return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+				}
+			}else { // edit
 				FOBPrice _price =  fobService.findOne(price.getId());
 				price.setOrgrootid_link(_price.getOrgrootid_link());
+				List<FOBPrice> fobprice_list = fobService.getByName_other(price.getName(), price.getId());
+				if(fobprice_list.size() > 0) {
+					response.setRespcode(ResponseMessage.KEY_RC_BAD_REQUEST);
+					response.setMessage("Tên giá đã tồn tại");
+					return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+				}
 			}
 			fobService.save(price);
+			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);

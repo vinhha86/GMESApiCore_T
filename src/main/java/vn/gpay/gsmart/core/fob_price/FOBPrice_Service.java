@@ -31,4 +31,14 @@ public class FOBPrice_Service extends AbstractService<FOBPrice> implements IFOBS
 		return repo.getAllDefault();
 	}
 
+	@Override
+	public List<FOBPrice> getByName(String name) {
+		return repo.getByName(name);
+	}
+
+	@Override
+	public List<FOBPrice> getByName_other(String name, Long id) {
+		return repo.getByName_other(name, id);
+	}
+
 }

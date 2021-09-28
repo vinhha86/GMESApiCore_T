@@ -18,4 +18,16 @@ public interface FOBPrice_repository extends JpaRepository<FOBPrice, Long>,JpaSp
 	
 	@Query(value = "select c from FOBPrice c where c.isdefault = true and c.id != 1 order by c.id")
 	public List<FOBPrice> getAllDefault();
+	
+	@Query(value = "select c from FOBPrice c where lower(c.name) =lower(:name)")
+	public List<FOBPrice> getByName(
+			@Param ("name")final  String name);
+	
+	@Query(value = "select c from FOBPrice c where lower(c.name) =lower(:name) "
+			+ "and c.id != :id "
+			)
+	public List<FOBPrice> getByName_other(
+			@Param ("name")final  String name,
+			@Param ("id")final  Long id
+			);
 }

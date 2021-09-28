@@ -30,6 +30,10 @@ public class FOBPrice implements Serializable {
 	private Boolean issystemfix;
 	@Column(name ="isdefault")
 	private Boolean isdefault;
+	@Column(name ="lost_percent")
+	private Float lost_percent;
+	@Column(name ="price")
+	private Float price;
 	 
 	public Long getOrgrootid_link() {
 		return orgrootid_link;
@@ -60,6 +64,18 @@ public class FOBPrice implements Serializable {
 	}
 	public void setIsdefault(Boolean isdefault) {
 		this.isdefault = isdefault;
+	}
+	public Float getLost_percent() {
+		return lost_percent;
+	}
+	public void setLost_percent(Float lost_percent) {
+		this.lost_percent = lost_percent;
+	}
+	public Float getPrice() {
+		return price;
+	}
+	public void setPrice(Float price) {
+		this.price = price;
 	}
 	
 	
