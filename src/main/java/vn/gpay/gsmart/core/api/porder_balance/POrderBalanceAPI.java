@@ -137,7 +137,7 @@ public class POrderBalanceAPI {
 				if(isAfterDeleteRec) {
 					Integer sortValue = item.getSortvalue() - 1;
 					item.setSortvalue(sortValue);
-					item.setBalance_name("Cụm công đoạn " + sortValue);
+//					item.setBalance_name("Cụm công đoạn " + sortValue);
 					porderBalanceService.save(item);
 				}
 			}
@@ -187,7 +187,7 @@ public class POrderBalanceAPI {
 					if(isAfterDeleteRec) {
 						Integer sortValue = item.getSortvalue() - 1;
 						item.setSortvalue(sortValue);
-						item.setBalance_name("Cụm công đoạn " + sortValue);
+//						item.setBalance_name("Cụm công đoạn " + sortValue);
 						porderBalanceService.save(item);
 					}
 				}
@@ -273,6 +273,29 @@ public class POrderBalanceAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<POrderBalanceBinding_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/porder_balance_reorder",method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> porder_balance_reorder(@RequestBody POrderBalance_reorder_request entity,HttpServletRequest request ) {
+		ResponseBase response = new ResponseBase();
+		try {
+		
+			for (POrderBalance porderBalance:entity.data){
+				POrderBalance pb = porderBalanceService.findOne(porderBalance.getId());
+				if (null != pb){
+					pb.setSortvalue(porderBalance.getSortvalue());
+					porderBalanceService.save(pb);
+				}
+				
+			}
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_EXCEPTION));
+		    return new ResponseEntity<ResponseBase>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
 }
