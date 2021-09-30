@@ -744,11 +744,9 @@ public class POrderListAPI {
 			decimalFormat.setGroupingSize(3);
 
 			if (porder != null) {
-				float totalPO = porder.getPo_quantity() == null ? 0 : porder.getPo_quantity();
 				String ST = porder.getBuyername() == null ? "" : porder.getBuyername();
 				String PO = porder.getPo_buyer() == null ? "" : porder.getPo_vendor();
-				name += "#" + ST + "-PO: " + PO + "-" + decimalFormat.format(total) + "/"
-						+ decimalFormat.format(totalPO);
+				name += "#" + ST + "-PO: " + PO + "-" + decimalFormat.format(total);
 			}
 
 			// Common ReCalculate

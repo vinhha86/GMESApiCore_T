@@ -1,5 +1,8 @@
 package vn.gpay.gsmart.core.api.PorderPOline;
 
+import java.text.DecimalFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
@@ -28,6 +32,8 @@ import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porders_poline.IPOrder_POLine_Service;
 import vn.gpay.gsmart.core.porders_poline.POrder_POLine;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.security.IGpayUserOrgService;
+import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.POType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -48,6 +54,12 @@ public class POrderPOLineAPI {
 	IPOrderGrant_Service grantService;
 	@Autowired
 	IPOrderGrant_SKUService grantskuService;
+	@Autowired
+	IOrgService orgService;
+	@Autowired
+	IGpayUserOrgService userOrgService;
+	@Autowired
+	Common commonService;
 
 	@RequestMapping(value = "/add_porder", method = RequestMethod.POST)
 	public ResponseEntity<add_porder_response> AddPorder(@RequestBody add_porder_request entity,
@@ -138,23 +150,138 @@ public class POrderPOLineAPI {
 		}
 	}
 
+	@RequestMapping(value = "/add_pordergrant", method = RequestMethod.POST)
+	public ResponseEntity<add_grant_response> AddPorderGrant(@RequestBody add_grant_request entity,
+			HttpServletRequest request) {
+		add_grant_response response = new add_grant_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long orgrootid_link = user.getRootorgid_link();
+			Long pcontract_poid_link = entity.pcontract_poid_link;
+			Long pordergrantid_link = entity.pordergrantid_link;
+//			Long orgid_link = user.getOrgid_link();
+
+			POrderGrant grant = grantService.findOne(pordergrantid_link);
+			Long porderid_link = grant.getPorderid_link();
+
+			POrder_POLine porder_line = new POrder_POLine();
+			porder_line.setId(null);
+			porder_line.setPcontract_poid_link(pcontract_poid_link);
+			porder_line.setPordergrantid_link(pordergrantid_link);
+			porder_line.setPorderid_link(porderid_link);
+
+			porder_line_Service.save(porder_line);
+
+			// Cap nhat trang thai po sang da map voi lenh
+			PContract_PO po = poService.findOne(pcontract_poid_link);
+
+			po.setIsmap(true);
+			poService.save(po);
+
+			int total = 0;
+
+			// lay chi tiet mau co vao grant
+			List<PContractProductSKU> list_pcontract_sku = pcontractskuService.getlistsku_bypo(pcontract_poid_link);
+			for (PContractProductSKU pcontractsku : list_pcontract_sku) {
+				total += pcontractsku.getPquantity_total() == null ? 0 : pcontractsku.getPquantity_total();
+				Long skuid_link = pcontractsku.getSkuid_link();
+
+				POrderGrant_SKU grant_sku = new POrderGrant_SKU();
+				grant_sku.setId(null);
+				grant_sku.setOrgrootid_link(orgrootid_link);
+				grant_sku.setPcontract_poid_link(pcontract_poid_link);
+				grant_sku.setPordergrantid_link(pordergrantid_link);
+				grant_sku.setGrantamount(pcontractsku.getPquantity_total());
+				grant_sku.setSkuid_link(skuid_link);
+				grantskuService.save(grant_sku);
+
+				// cap nhat vao porder_sku
+				List<POrder_Product_SKU> porderskus = porderskuService.getby_porderandsku_and_po(porderid_link,
+						skuid_link, pcontract_poid_link);
+				if (porderskus.size() == 0) {
+					POrder_Product_SKU pordersku = new POrder_Product_SKU();
+					pordersku.setId(null);
+					pordersku.setOrgrootid_link(orgrootid_link);
+					pordersku.setPcontract_poid_link(pcontract_poid_link);
+					pordersku.setPorderid_link(porderid_link);
+					pordersku.setPquantity_granted(0);
+					pordersku.setPquantity_porder(pcontractsku.getPquantity_porder());
+					pordersku.setPquantity_production(pcontractsku.getPquantity_production());
+					pordersku.setPquantity_sample(pcontractsku.getPquantity_sample());
+					pordersku.setPquantity_total(pcontractsku.getPquantity_total());
+					pordersku.setProductid_link(pcontractsku.getProductid_link());
+					pordersku.setSkuid_link(pcontractsku.getSkuid_link());
+					porderskuService.save(pordersku);
+				} else {
+					POrder_Product_SKU pordersku = porderskus.get(0);
+					pordersku.setPquantity_porder(pcontractsku.getPquantity_porder() + pordersku.getPquantity_porder());
+					pordersku.setPquantity_production(
+							pcontractsku.getPquantity_production() + pordersku.getPquantity_production());
+					pordersku.setPquantity_sample(pcontractsku.getPquantity_sample() + pordersku.getPquantity_sample());
+					pordersku.setPquantity_total(pcontractsku.getPquantity_total() + pordersku.getPquantity_total());
+					porderskuService.save(pordersku);
+				}
+			}
+
+			// Cap nhat so luong cua grant
+			grant.setGrantamount(total);
+			grant.setIsmap(true);
+			grantService.save(grant);
+
+			// Cap nhat lai so luogn tong cua lenh san xuat
+			POrder porder = porderService.findOne(porderid_link);
+			porder.setTotalorder(porder.getTotalorder() + total);
+			porderService.save(porder);
+
+			String name = "";
+
+			DecimalFormat decimalFormat = new DecimalFormat("#,###");
+			decimalFormat.setGroupingSize(3);
+
+			if (porder != null) {
+				String PO = porder.getPo_buyer() == null ? "" : porder.getPo_vendor();
+				name += "PO: " + PO + "-" + decimalFormat.format(total);
+			}
+
+			// Common ReCalculate
+			Date startDate = grant.getStart_date_plan();
+			Calendar calDate = Calendar.getInstance();
+			calDate.setTime(startDate);
+			commonService.ReCalculate(grant.getId(), orgrootid_link);
+
+			response.duration = commonService.getDuration_byProductivity(total, grant.getProductivity());
+			Date endDate = grant.getFinish_date_plan();
+			response.endDate = endDate;
+			response.porderinfo = name;
+			response.amount = total;
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			return new ResponseEntity<add_grant_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<add_grant_response>(response, HttpStatus.OK);
+		}
+	}
+
 	@RequestMapping(value = "/delete_porder", method = RequestMethod.POST)
 	public ResponseEntity<delete_porder_response> DeletePorder(@RequestBody delete_porder_request entity,
 			HttpServletRequest request) {
 		delete_porder_response response = new delete_porder_response();
 		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long orgrootid_link = user.getRootorgid_link();
 			Long pcontract_poid_link = entity.pcontract_poid_link;
 			List<POrder_POLine> list_porder = porder_line_Service.get_porderline_by_po(pcontract_poid_link);
 
-			for (POrder_POLine porder_line : list_porder) {
-				// cap nhat lai trang thai cua poline thuc te
-				PContract_PO linett = poService.findOne(porder_line.getPcontract_poid_link());
+			if (list_porder.size() > 0) {
+				PContract_PO linett = poService.findOne(list_porder.get(0).getPcontract_poid_link());
 				linett.setIsmap(false);
 				poService.save(linett);
 
 				// Cap nhat lai thong tin lenh san xuat
-				POrder porder = porderService.findOne(porder_line.getPorderid_link());
-				List<POrderGrant> list_grant = grantService.getByOrderId(porder.getId());
+				POrder porder = porderService.findOne(list_porder.get(0).getPorderid_link());
+				POrderGrant grant = grantService.findOne(list_porder.get(0).getPordergrantid_link());
 				// neu lenh tu sinh thi xoa di con ko thi cap nhat lai trang thai
 				PContract_PO linekh = poService.findOne(porder.getPcontract_poid_link());
 				if (linekh.getPo_typeid_link() == POType.PO_LINE_PLAN) {
@@ -162,11 +289,35 @@ public class POrderPOLineAPI {
 					porder.setTotalorder(linekh.getPo_quantity());
 					porder.setGolivedate(linekh.getShipdate());
 					porderService.save(porder);
+
+					grant.setGrantamount(grant.getTotalamount_tt());
+					grantService.save(grant);
+
+					String name = "";
+
+					DecimalFormat decimalFormat = new DecimalFormat("#,###");
+					decimalFormat.setGroupingSize(3);
+
+					if (porder != null) {
+						String PO = porder.getPo_buyer() == null ? "" : porder.getPo_vendor();
+						name += "PO: " + PO + "-" + decimalFormat.format(grant.getTotalamount_tt());
+					}
+
+					// Common ReCalculate
+					Date startDate = grant.getStart_date_plan();
+					Calendar calDate = Calendar.getInstance();
+					calDate.setTime(startDate);
+					commonService.ReCalculate(grant.getId(), orgrootid_link);
+
+					response.duration = commonService.getDuration_byProductivity(grant.getTotalamount_tt(),
+							grant.getProductivity());
+					Date endDate = grant.getFinish_date_plan();
+					response.endDate = endDate;
+					response.porderinfo = name;
+					response.amount = grant.getTotalamount_tt();
 				} else {
 					// kiem tra xem co line tren bieu do chua thi xoa line tren bieu do
-					for (POrderGrant grant : list_grant) {
-						grantService.delete(grant);
-					}
+					grantService.delete(grant);
 					porderService.delete(porder);
 				}
 
@@ -178,16 +329,15 @@ public class POrderPOLineAPI {
 
 				// xoa het trong porder_grant_sku
 
-				for (POrderGrant grant : list_grant) {
-					List<POrderGrant_SKU> list_grant_sku = grantskuService.getPOrderGrant_SKU(grant.getId());
-					for (POrderGrant_SKU grantsku : list_grant_sku) {
-						grantskuService.delete(grantsku);
-					}
+				List<POrderGrant_SKU> list_grant_sku = grantskuService.getPOrderGrant_SKU(grant.getId());
+				for (POrderGrant_SKU grantsku : list_grant_sku) {
+					grantskuService.delete(grantsku);
 				}
 
 				// xoa trong bang porder-poline
-				porder_line_Service.delete(porder_line);
+				porder_line_Service.delete(list_porder.get(0));
 
+				response.pordergrantid_link = grant.getId();
 			}
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -205,7 +355,7 @@ public class POrderPOLineAPI {
 		getporder_by_po_response response = new getporder_by_po_response();
 		try {
 			Long pcontract_poid_link = entity.pcontract_poid_link;
-			response.data = porder_line_Service.getporder_by_po(pcontract_poid_link);
+			response.data = porder_line_Service.getbyPO(pcontract_poid_link);
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			return new ResponseEntity<getporder_by_po_response>(response, HttpStatus.OK);

@@ -1,4 +1,5 @@
 package vn.gpay.gsmart.core.porder_grant;
+
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -26,47 +27,47 @@ import org.hibernate.annotations.NotFoundAction;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.porder.POrder;
 
-@Table(name="porder_grant")
+@Table(name = "porder_grant")
 @Entity
 public class POrderGrant implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	protected Long id;
-	
-	@Column(name ="orgrootid_link")
-    private Long orgrootid_link;
-	
-	@Column(name ="porderid_link")
-    private Long porderid_link;
-	
-	@Column(name ="ordercode", length=10)
-    private String ordercode;	
 
-	@Column(name ="granttoorgid_link")
-    private Long granttoorgid_link;
-	
-	@Column(name ="grantdate")
-    private Date grantdate;
+	@Column(name = "orgrootid_link")
+	private Long orgrootid_link;
 
-	@Column(name ="grantamount")
-    private Integer grantamount;	
-	
-	@Column(name ="amountcutsum")
-    private Integer amountcutsum;	
-	
-	@Column(name ="status")
-    private Integer status;	
-	
-	@Column(name ="usercreatedid_link")
-    private Long usercreatedid_link;	
-	
-	@Column(name ="timecreated")
-    private Date timecreated;
-	
+	@Column(name = "porderid_link")
+	private Long porderid_link;
+
+	@Column(name = "ordercode", length = 10)
+	private String ordercode;
+
+	@Column(name = "granttoorgid_link")
+	private Long granttoorgid_link;
+
+	@Column(name = "grantdate")
+	private Date grantdate;
+
+	@Column(name = "grantamount")
+	private Integer grantamount;
+
+	@Column(name = "amountcutsum")
+	private Integer amountcutsum;
+
+	@Column(name = "status")
+	private Integer status;
+
+	@Column(name = "usercreatedid_link")
+	private Long usercreatedid_link;
+
+	@Column(name = "timecreated")
+	private Date timecreated;
+
 	private Date start_date_plan;
-	private Date finish_date_plan;	
+	private Date finish_date_plan;
 
 	private Integer productivity;
 	private Integer duration;
@@ -74,260 +75,289 @@ public class POrderGrant implements Serializable {
 	private String reason_change;
 	private Integer type;
 	private Boolean is_show_image;
-	
+	private Boolean ismap;
+
 	public Integer getType() {
 		return type;
 	}
+
 	public void setType(Integer type) {
 		this.type = type;
 	}
+
 	public String getReason_change() {
 		return reason_change;
 	}
+
 	public void setReason_change(String reason_change) {
 		this.reason_change = reason_change;
 	}
+
 	public Integer getProductivity() {
 		return productivity;
 	}
+
 	public void setProductivity(Integer productivity) {
 		this.productivity = productivity;
 	}
+
 	public Integer getDuration() {
 		return duration;
 	}
+
 	public void setDuration(Integer duration) {
 		this.duration = duration;
 	}
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany
-	@JoinColumn( name="pordergrantid_link",insertable=false,updatable =false)
-	private List<POrderGrant_SKU>  porder_grant_sku  = new ArrayList<>();
-	
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne
-    @JoinColumn(name="porderid_link",insertable=false,updatable =false)
-    private POrder porder;
+	@JoinColumn(name = "pordergrantid_link", insertable = false, updatable = false)
+	private List<POrderGrant_SKU> porder_grant_sku = new ArrayList<>();
 
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="granttoorgid_link",insertable=false,updatable =false)
-    private Org org;
-	
+	@JoinColumn(name = "porderid_link", insertable = false, updatable = false)
+	private POrder porder;
+
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+	@JoinColumn(name = "granttoorgid_link", insertable = false, updatable = false)
+	private Org org;
+
 	@Transient
 	public int getProductType() {
-		if(porder!=null)
+		if (porder != null)
 			return porder.getProductType();
 		return 0;
 	}
+
 	@Transient
 	public String getImgProduct() {
-		if(porder!=null)
+		if (porder != null)
 			return porder.getImageurl();
 		return "";
 	}
-	
+
 	@Transient
 	public String getPortTo() {
-		if(porder!=null) {
+		if (porder != null) {
 			return porder.getPortTo();
 		}
 		return "";
 	}
+
 	@Transient
 	public String getPackingMethod() {
-		if(porder!=null) {
+		if (porder != null) {
 			return porder.getPackingMethod();
 		}
 		return "";
 	}
+
 	@Transient
 	public String getXuongTo() {
 		return org.getName();
 	}
+
+	@Transient
+	public String getXuongSX() {
+		return org.getParentcode();
+	}
+
+	@Transient
+	public String getDonvi() {
+		return org.getParentcode();
+	}
+
 	@Transient
 	public int getProductivity_po() {
-		if(porder!=null) {
+		if (porder != null) {
 			return porder.getProductivity_po();
 		}
 		return 0;
 	}
-	
+
 	@Transient
 	public int getProductivity_porder() {
 		return 0;
 	}
-	
+
 	@Transient
 	public String getpordercode() {
-		if(porder!=null)
+		if (porder != null)
 			return porder.getOrdercode();
 		return "";
 	}
+
 	@Transient
 	public String getPo_buyer() {
-		if(porder!=null)
+		if (porder != null)
 			return porder.getPo_buyer();
 		return "";
-	}	
+	}
+
 	@Transient
 	public String getShipMode() {
-		if(porder!=null)
+		if (porder != null)
 			return porder.getShipMode();
 		return "";
 	}
+
 	@Transient
 	public String getProductcode() {
-		if(porder!=null)
+		if (porder != null)
 			return porder.getProductcode();
 		return "";
 	}
+
 	@Transient
 	public long getProductid_link() {
-		if(porder!=null)
+		if (porder != null)
 			return porder.getProductid_link();
 		return 0;
 	}
-	
+
 	@Transient
 	public long getPcontract_poid_link() {
-		if(porder!=null)
+		if (porder != null)
 			return porder.getPcontract_poid_link();
 		return 0;
 	}
+
 	@Transient
 	public long getPcontractid_link() {
-		if(porder!=null)
+		if (porder != null)
 			return porder.getPcontractid_link();
 		return 0;
 	}
+
 	@Transient
 	public int getStatusPorder() {
-		if(porder!=null)
+		if (porder != null)
 			return porder.getStatus();
 		return 0;
 	}
-	
+
 	@Transient
 	public String getBuyername() {
-		if(porder!=null) {
+		if (porder != null) {
 			return porder.getBuyername();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public String getVendorname() {
-		if(porder!=null) {
+		if (porder != null) {
 			return porder.getVendorname();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public String getMaHang() {
 		String name = "";
 		int total = grantamount == null ? 0 : grantamount;
 		String code = getProductcode();
-		
+
 		DecimalFormat decimalFormat = new DecimalFormat("#,###");
 		decimalFormat.setGroupingSize(3);
-		
-		if(porder != null) {
-			float totalPO = porder.getPo_quantity() == null ? 0 : porder.getPo_quantity();
-			name += ""+code+" / "+decimalFormat.format(total)+" / "+decimalFormat.format(totalPO);
+
+		if (porder != null) {
+			name += "" + code + "-" + decimalFormat.format(total);
 		}
-		
+
 		return name;
 	}
-	
+
 	@Transient
 	public String getMaHang(POrder porder) {
 		String name = "";
 		int total = grantamount == null ? 0 : grantamount;
 		String code = porder.getProductcode();
-		
+
 		DecimalFormat decimalFormat = new DecimalFormat("#,###");
 		decimalFormat.setGroupingSize(3);
-		
-		if(porder != null) {
-			float totalPO = porder.getPo_quantity() == null ? 0 : porder.getPo_quantity();
-			name += "#"+code+" / "+decimalFormat.format(total)+" / "+decimalFormat.format(totalPO);
+
+		if (porder != null) {
+			name += "#" + code + "-" + decimalFormat.format(total);
 		}
-		
+
 		return name;
 	}
-	
+
 	@Transient
 	public String getCls() {
-		if(porder!=null) {
+		if (porder != null) {
 			return porder.getCls();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public int getTotalpackage() {
-		if(porder != null) {
+		if (porder != null) {
 			return porder.getTotalorder();
 		}
 		return 0;
 	}
-	
+
 	@Transient
 	public Date getOrderdate() {
-		if(porder != null) {
+		if (porder != null) {
 			return porder.getOrderdate();
 		}
 		return null;
 	}
+
 	@Transient
 	public Date getProductiondate() {
-		if(porder != null) {
+		if (porder != null) {
 			return porder.getProductiondate();
 		}
 		return null;
 	}
-	
+
 	@Transient
 	public Date getProductiondate_plan() {
-		if(porder != null) {
+		if (porder != null) {
 			return porder.getProductiondate_plan();
 		}
 		return null;
 	}
-	
+
 	@Transient
 	public Date getEndDatePlan() {
-		if(porder != null) {
+		if (porder != null) {
 			return porder.getFinishdate_plan();
 		}
 		return null;
 	}
+
 	@Transient
 	public Date getGolivedate() {
-		if(porder != null) {
+		if (porder != null) {
 			return porder.getGolivedate();
 		}
 		return null;
 	}
-	
+
 	@Transient
 	public String getGranttoorgname() {
-		if(org != null) {
+		if (org != null) {
 			return org.getName();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public String getGranttoorgcode() {
-		if(org != null) {
+		if (org != null) {
 			return org.getCode();
 		}
 		return "";
 	}
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -419,35 +449,53 @@ public class POrderGrant implements Serializable {
 	public void setOrdercode(String ordercode) {
 		this.ordercode = ordercode;
 	}
+
 	public List<POrderGrant_SKU> getPorder_grant_sku() {
 		return porder_grant_sku;
 	}
+
 	public void setPorder_grant_sku(List<POrderGrant_SKU> porder_grant_sku) {
 		this.porder_grant_sku = porder_grant_sku;
 	}
+
 	public Date getStart_date_plan() {
 		return start_date_plan;
 	}
+
 	public Date getFinish_date_plan() {
 		return finish_date_plan;
 	}
+
 	public void setStart_date_plan(Date start_date_plan) {
 		this.start_date_plan = start_date_plan;
 	}
+
 	public void setFinish_date_plan(Date finish_date_plan) {
 		this.finish_date_plan = finish_date_plan;
 	}
+
 	public Integer getTotalamount_tt() {
 		return totalamount_tt;
 	}
+
 	public void setTotalamount_tt(Integer totalamount_tt) {
 		this.totalamount_tt = totalamount_tt;
 	}
+
 	public Boolean getIs_show_image() {
 		return is_show_image == null ? false : is_show_image;
 	}
+
 	public void setIs_show_image(Boolean is_show_image) {
 		this.is_show_image = is_show_image;
+	}
+
+	public Boolean getIsmap() {
+		return ismap;
+	}
+
+	public void setIsmap(Boolean ismap) {
+		this.ismap = ismap;
 	}
 
 }

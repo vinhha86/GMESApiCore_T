@@ -17,74 +17,81 @@ import vn.gpay.gsmart.core.porder_grant_timesheet.POrderGrantTimesheet;
 
 @Service
 public class POrderGrant_Service extends AbstractService<POrderGrant> implements IPOrderGrant_Service {
-	@Autowired IPOrderGrant_Repository repo;
-	@Autowired IPOrderGrantBalanceService pordergrantbalanceService;
-	@Autowired IPOrderGrantTimesheetService pordergranttimesheetService;
-	@Autowired IPOrderGrant_SKUService pordergrantskuService;
+	@Autowired
+	IPOrderGrant_Repository repo;
+	@Autowired
+	IPOrderGrantBalanceService pordergrantbalanceService;
+	@Autowired
+	IPOrderGrantTimesheetService pordergranttimesheetService;
+	@Autowired
+	IPOrderGrant_SKUService pordergrantskuService;
+
 	@Override
 	protected JpaRepository<POrderGrant, Long> getRepository() {
 		// TODO Auto-generated method stub
 		return repo;
 	}
-	
+
 	@Override
-	public List<POrderGrant>getByOrderCodeAndOrg(Long granttoorgid_link, String ordercode){
+	public List<POrderGrant> getByOrderCodeAndOrg(Long granttoorgid_link, String ordercode) {
 		return repo.getByOrderCodeAndOrg(granttoorgid_link, ordercode);
 	}
-	
+
 	@Override
-	public POrderGrant getByOrderIDAndOrg(Long granttoorgid_link, Long porderid_link){
-		List<POrderGrant> a= repo.getByOrderIDAndOrg(granttoorgid_link, porderid_link);
+	public POrderGrant getByOrderIDAndOrg(Long granttoorgid_link, Long porderid_link) {
+		List<POrderGrant> a = repo.getByOrderIDAndOrg(granttoorgid_link, porderid_link);
 		if (a.size() > 0)
 			return a.get(0);
 		else
 			return null;
 	}
-	
+
 	@Override
-	public void deleteByOrderId(Long porderid_link){
-		for(POrderGrant pordergrant: repo.getByOrderId(porderid_link)){
+	public void deleteByOrderId(Long porderid_link) {
+		for (POrderGrant pordergrant : repo.getByOrderId(porderid_link)) {
 			repo.delete(pordergrant);
 		}
 	}
-	
+
 	@Override
 	@Transactional(rollbackFor = RuntimeException.class)
-	public void deleteAll(POrderGrant pordergrant){
+	public void deleteAll(POrderGrant pordergrant) {
 		try {
-		//Xoa porder_grant_balance
-		for(POrderGrantBalance pordergrant_balance: pordergrantbalanceService.getByPorderGrant(pordergrant.getId())){
-			pordergrantbalanceService.delete(pordergrant_balance);
-		}
-		//Xoa porder_grant_timesheet
-		for(POrderGrantTimesheet pordergrant_timesheet: pordergranttimesheetService.getByPorderGrant(pordergrant.getId())){
-			pordergranttimesheetService.delete(pordergrant_timesheet);
-		}
-		//Xoa porder_grant_po
-		//Xoa porder_grant_sku
-		for(POrderGrant_SKU pordergrant_sku: pordergrant.getPorder_grant_sku()){
-			pordergrantskuService.delete(pordergrant_sku);
-		}
+			// Xoa porder_grant_balance
+			for (POrderGrantBalance pordergrant_balance : pordergrantbalanceService
+					.getByPorderGrant(pordergrant.getId())) {
+				pordergrantbalanceService.delete(pordergrant_balance);
+			}
+			// Xoa porder_grant_timesheet
+			for (POrderGrantTimesheet pordergrant_timesheet : pordergranttimesheetService
+					.getByPorderGrant(pordergrant.getId())) {
+				pordergranttimesheetService.delete(pordergrant_timesheet);
+			}
+			// Xoa porder_grant_po
+			// Xoa porder_grant_sku
+			for (POrderGrant_SKU pordergrant_sku : pordergrant.getPorder_grant_sku()) {
+				pordergrantskuService.delete(pordergrant_sku);
+			}
 
-		repo.delete(pordergrant);
-		} catch(RuntimeException e){
+			repo.delete(pordergrant);
+		} catch (RuntimeException e) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
-	//Danh sach cac lenh duoc phan cho Phan xuong va da phan chuyen
-	public List<POrderGrant> get_granted_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link, 
-			String POBuyer, String contractcode ,Long orgbuyerid_link , Long orgvendorid_link){
-		
+	// Danh sach cac lenh duoc phan cho Phan xuong va da phan chuyen
+	public List<POrderGrant> get_granted_bygolivedate(Date golivedate_from, Date golivedate_to, Long granttoorgid_link,
+			String POBuyer, String contractcode, Long orgbuyerid_link, Long orgvendorid_link) {
+
 		int status = 1;
 //		POBuyer = "%"+POBuyer+"%";
 		orgvendorid_link = orgvendorid_link == 0 ? null : orgvendorid_link;
 		orgbuyerid_link = orgbuyerid_link == 0 ? null : orgbuyerid_link;
-		
-		List<POrderGrant> a = repo.get_granted_bygolivedate(status, granttoorgid_link, golivedate_from,
-				golivedate_to, POBuyer, contractcode, orgbuyerid_link, orgvendorid_link);
+
+		List<POrderGrant> a = repo.get_granted_bygolivedate(status, granttoorgid_link, golivedate_from, golivedate_to,
+				POBuyer, contractcode, orgbuyerid_link, orgvendorid_link);
 		return a;
 	}
 
@@ -95,8 +102,8 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 //		POBuyer = "%"+POBuyer+"%";
 		orgvendorid_link = orgvendorid_link == 0 ? null : orgvendorid_link;
 		orgbuyerid_link = orgbuyerid_link == 0 ? null : orgbuyerid_link;
-		List<POrderGrant> a = repo.get_grantedTest_bygolivedate(granttoorgid_link, golivedate_from,
-				golivedate_to, POBuyer, contractcode, orgbuyerid_link, orgvendorid_link);
+		List<POrderGrant> a = repo.get_grantedTest_bygolivedate(granttoorgid_link, golivedate_from, golivedate_to,
+				POBuyer, contractcode, orgbuyerid_link, orgvendorid_link);
 		return a;
 	}
 
@@ -110,7 +117,7 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 		// TODO Auto-generated method stub
 		return repo.getByOrgId(granttoorgid_link);
 	}
-	
+
 	@Override
 	public List<POrderGrant> getProcessingByOrgId(Long granttoorgid_link) {
 		// TODO Auto-generated method stub
@@ -139,5 +146,12 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 	public Integer getProductivity_PO(Long pordergrantid_link) {
 		// TODO Auto-generated method stub
 		return repo.getProductivity_po(pordergrantid_link);
+	}
+
+	@Override
+	public List<POrderGrant> getByOfferAndOrg(Long parentpoid_link, List<Long> orgs) {
+		// TODO Auto-generated method stub
+		orgs = orgs.size() == 0 ? null : orgs;
+		return repo.getByOfferAndOrg(parentpoid_link, orgs);
 	}
 }

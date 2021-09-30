@@ -242,4 +242,9 @@ public interface IPContract_PORepository
 	@Query(value = "select distinct a.id from PContract_PO a " + "where a.pcontractid_link = :pcontractid_link "
 			+ "and po_typeid_link = 11 and (ismap = false or ismap is null) ")
 	public List<Long> getPOLineNotMaps(@Param("pcontractid_link") final Long pcontractid_link);
+
+	@Query(value = "select c from PContract_PO c " + "where c.parentpoid_link = :parentid_link "
+			+ "and c.po_typeid_link =:po_typeid_link and (ismap = false or ismap is null) " + "order by shipdate asc")
+	public List<PContract_PO> getby_parent_and_type_notmap(@Param("parentid_link") final Long parentid_link,
+			@Param("po_typeid_link") final Integer po_typeid_link);
 }

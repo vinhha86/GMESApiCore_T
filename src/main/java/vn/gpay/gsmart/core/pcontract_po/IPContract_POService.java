@@ -82,4 +82,6 @@ public interface IPContract_POService extends Operations<PContract_PO> {
 	int getPOConfimNotLine(Long pcontractid_link);
 
 	int getPOLineNotMaps(Long pcontractid_link);
+
+	List<PContract_PO> getPOConfirmNotMap(Long parentpoid_link, int type);
 }

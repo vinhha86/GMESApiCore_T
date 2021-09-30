@@ -45,6 +45,7 @@ import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
+import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
@@ -78,6 +79,8 @@ public class ScheduleAPI {
 	OrgServiceImpl orgService;
 	@Autowired
 	IPOrder_Service porderService;
+	@Autowired
+	IPOrder_Product_SKU_Service porderSkuService;
 	@Autowired
 	IPOrderGrant_Service granttService;
 	@Autowired
@@ -1584,9 +1587,10 @@ public class ScheduleAPI {
 				porder_sku.setProductid_link(po_sku.getProductid_link());
 				porder_sku.setSkuid_link(po_sku.getSkuid_link());
 
-				poskuService.save(po_sku);
+				porderSkuService.save(porder_sku);
 			}
 
+			Long pordergrantid_link = null;
 			if (entity.orggrantid_link != null) {
 				// tao porder_grant
 				POrderGrant grant = new POrderGrant();
@@ -1607,8 +1611,9 @@ public class ScheduleAPI {
 				grant.setDuration(entity.duration);
 				grant.setType(0); // 0 la chua qua ngay giao hang
 				grant.setTotalamount_tt(entity.quantity);
+				grant.setIsmap(true);
 				grant = granttService.save(grant);
-				Long pordergrantid_link = grant.getId();
+				pordergrantid_link = grant.getId();
 
 				// them grant_sku
 				for (PContractProductSKU po_sku : list_po_sku) {
@@ -1657,6 +1662,7 @@ public class ScheduleAPI {
 			porder_poline.setId(null);
 			porder_poline.setPcontract_poid_link(pcontract_poid_link);
 			porder_poline.setPorderid_link(porderid_link);
+			porder_poline.setPordergrantid_link(pordergrantid_link);
 			porderlineService.save(porder_poline);
 
 			// danh dau po da map

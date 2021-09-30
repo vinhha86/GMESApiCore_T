@@ -520,4 +520,10 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 		// TODO Auto-generated method stub
 		return repo.getPOLineNotMaps(pcontractid_link).size();
 	}
+
+	@Override
+	public List<PContract_PO> getPOConfirmNotMap(Long parentpoid_link, int type) {
+		// TODO Auto-generated method stub
+		return repo.getby_parent_and_type_notmap(parentpoid_link, type);
+	}
 }
