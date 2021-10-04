@@ -66,6 +66,7 @@ public class ScheduleOrgGrant implements Runnable {
 		try {
 			showOrgGrant();
 		} catch (Exception e) {
+			System.out.println();
 			e.printStackTrace();
 		} finally {
 			latch.countDown();
@@ -91,11 +92,11 @@ public class ScheduleOrgGrant implements Runnable {
 		Date date_end = null;
 		Date date_start = null;
 		int total_po = list_porder.size();
-		int total_po_pate = 0;
+		int total_po_late = 0;
 
 		for (POrderGrant pordergrant : list_porder) {
 			if (pordergrant.getType().equals(1))
-				total_po_pate++;
+				total_po_late++;
 			// neu don hang bi cham
 //						total_day = commonService.getDuration(startdate, toDate, orgrootid_link, year);
 			Date start = commonService.getBeginOfDate(pordergrant.getStart_date_plan());
@@ -160,33 +161,15 @@ public class ScheduleOrgGrant implements Runnable {
 			day_grant += d;
 
 			rows_grant.add(sch_porder);
-		}
 
-		// Xac dinh so ngay lam viec trong khoang thoi gian dang xem
-		if (date_end != null && date_start != null) {
-			int total_day = commonService.getDuration(date_start, date_end, orgrootid_link);
-
-			String cls = (total_day - day_grant) <= 0 ? "" : "free";
-			sch_org_grant.setCls(cls);
-		}
-
-		String name = sch_org_grant.getName();
-		name += " - (" + total_po_pate + "/" + total_po + ")";
-		sch_org_grant.setName(name);
-
-		// Lay thong tin tien do thuc te cua lenh
-//					ArrayList<Thread> arrThreads = new ArrayList<Thread>();
-		for (POrderGrant pordergrant : list_porder) {
-//						Thread thread = new Thread(){
-//						public void run(){						
-			// ngay dau va ngay cuoi cua lenh co trang thai > 3 (dang sx)
+			// Lay thong tin tien do thuc te cua lenh
 			POrderGrant theProcessing = processService.get_processing_bygolivedate(pordergrant.getPorderid_link(),
 					pordergrant.getId());
 
 			if (null != theProcessing) {
-				Date start = commonService.getBeginOfDate(theProcessing.getStart_date_plan());
-				Date end = commonService.getEndOfDate(theProcessing.getFinish_date_plan());
-				int duration = commonService.getDuration(start, end, orgrootid_link);
+//				Date start = commonService.getBeginOfDate(theProcessing.getStart_date_plan());
+//				Date end = commonService.getEndOfDate(theProcessing.getFinish_date_plan());
+				duration = commonService.getDuration(start, end, orgrootid_link);
 
 				Schedule_porder sch_porder_process = new Schedule_porder();
 				sch_porder_process.setCls(pordergrant.getCls());
@@ -240,7 +223,7 @@ public class ScheduleOrgGrant implements Runnable {
 				sch_porder_estimation.setEndDate(end_estimation);
 				sch_porder_estimation.setDuration(duration_estimation);
 				sch_porder_estimation.setTotalpackage(pordergrant.getGrantamount());
-				sch_porder_estimation.setProductivity(sch_porder_process.getProductivity());
+				sch_porder_estimation.setProductivity(po_productivity);
 
 				sch_porder_estimation.setResourceId(sch_estimation.getId());
 				sch_porder_estimation.setMahang(pordergrant.getMaHang());
@@ -248,15 +231,19 @@ public class ScheduleOrgGrant implements Runnable {
 
 				rows_grant.add(sch_porder_estimation);
 			}
-//					    }};
-//						thread.start();
-//						arrThreads.add(thread);						
 		}
 
-//		            for (int i = 0; i < arrThreads.size(); i++) 
-//		            {
-//		                arrThreads.get(i).join(); 
-//		            }
+		// Xac dinh so ngay lam viec trong khoang thoi gian dang xem
+		if (date_end != null && date_start != null) {
+			int total_day = commonService.getDuration(date_start, date_end, orgrootid_link);
+
+			String cls = (total_day - day_grant) <= 0 ? "" : "free";
+			sch_org_grant.setCls(cls);
+		}
+
+		String name = sch_org_grant.getName();
+		name += " - (" + total_po_late + "/" + total_po + ")";
+		sch_org_grant.setName(name);
 
 		// Lay cac lenh dang thu
 		List<POrderGrant> list_porder_test = granttService.get_porder_test(startdate, toDate, org_grant.getId(),
@@ -293,7 +280,10 @@ public class ScheduleOrgGrant implements Runnable {
 			sch_porder.setProductid_link(pordergrant.getProductid_link());
 			sch_porder.setPcontract_poid_link(pordergrant.getPcontract_poid_link());
 			sch_porder.setPorderid_link(pordergrant.getPorderid_link());
-			sch_porder.setProductivity_po(pordergrant.getProductivity_po());
+
+			Integer po_productivity = granttService.getProductivity_PO(pordergrant.getId());
+			sch_porder.setProductivity_po(po_productivity);
+
 			sch_porder.setProductivity_porder(pordergrant.getProductivity_porder());
 			sch_porder.setPcontractid_link(pordergrant.getPcontractid_link());
 			sch_porder.setProductbuyercode(pordergrant.getProductcode());

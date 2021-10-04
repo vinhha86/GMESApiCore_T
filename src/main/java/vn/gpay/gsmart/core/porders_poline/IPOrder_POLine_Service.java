@@ -14,4 +14,6 @@ public interface IPOrder_POLine_Service extends Operations<POrder_POLine> {
 	List<POrder_POLine> get_porderline_by_po(Long pcontract_poid_link);
 
 	List<POrderGrant> getbyPO(Long pcontract_poid_link);
+
+	List<POrder_POLine> get_porderline_by_po_and_product(Long pcontract_poid_link, Long productid_link);
 }

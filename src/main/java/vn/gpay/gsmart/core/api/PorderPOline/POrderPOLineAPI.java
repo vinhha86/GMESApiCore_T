@@ -159,6 +159,7 @@ public class POrderPOLineAPI {
 			Long orgrootid_link = user.getRootorgid_link();
 			Long pcontract_poid_link = entity.pcontract_poid_link;
 			Long pordergrantid_link = entity.pordergrantid_link;
+			Long productid_link = entity.productid_link;
 //			Long orgid_link = user.getOrgid_link();
 
 			POrderGrant grant = grantService.findOne(pordergrantid_link);
@@ -172,16 +173,26 @@ public class POrderPOLineAPI {
 
 			porder_line_Service.save(porder_line);
 
-			// Cap nhat trang thai po sang da map voi lenh
-			PContract_PO po = poService.findOne(pcontract_poid_link);
+			// Cap nhat trang thai po sang da map
+			List<PContractProductSKU> list_sku = pcontractskuService.getbypo_and_product(pcontract_poid_link,
+					productid_link);
+			for (PContractProductSKU ppsku : list_sku) {
+				ppsku.setIsmap(true);
+				pcontractskuService.save(ppsku);
+			}
+			List<PContractProductSKU> listsku_notmap = pcontractskuService.getsku_notmap(pcontract_poid_link);
+			if (listsku_notmap.size() == 0) {
+				PContract_PO po = poService.findOne(pcontract_poid_link);
 
-			po.setIsmap(true);
-			poService.save(po);
+				po.setIsmap(true);
+				poService.save(po);
+			}
 
 			int total = 0;
 
 			// lay chi tiet mau co vao grant
-			List<PContractProductSKU> list_pcontract_sku = pcontractskuService.getlistsku_bypo(pcontract_poid_link);
+			List<PContractProductSKU> list_pcontract_sku = pcontractskuService.getbypo_and_product(pcontract_poid_link,
+					productid_link);
 			for (PContractProductSKU pcontractsku : list_pcontract_sku) {
 				total += pcontractsku.getPquantity_total() == null ? 0 : pcontractsku.getPquantity_total();
 				Long skuid_link = pcontractsku.getSkuid_link();
@@ -244,13 +255,13 @@ public class POrderPOLineAPI {
 			}
 
 			// Common ReCalculate
-			Date startDate = grant.getStart_date_plan();
-			Calendar calDate = Calendar.getInstance();
-			calDate.setTime(startDate);
-			commonService.ReCalculate(grant.getId(), orgrootid_link);
+//			Date startDate = grant.getStart_date_plan();
+//			Calendar calDate = Calendar.getInstance();
+//			calDate.setTime(startDate);
+			Date endDate = commonService.ReCalculate(grant.getId(), orgrootid_link);
 
 			response.duration = commonService.getDuration_byProductivity(total, grant.getProductivity());
-			Date endDate = grant.getFinish_date_plan();
+//			 = grant.getFinish_date_plan();
 			response.endDate = endDate;
 			response.porderinfo = name;
 			response.amount = total;
@@ -272,12 +283,25 @@ public class POrderPOLineAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long orgrootid_link = user.getRootorgid_link();
 			Long pcontract_poid_link = entity.pcontract_poid_link;
-			List<POrder_POLine> list_porder = porder_line_Service.get_porderline_by_po(pcontract_poid_link);
+			Long productid_link = entity.productid_link;
+
+			List<POrder_POLine> list_porder = porder_line_Service.get_porderline_by_po_and_product(pcontract_poid_link,
+					productid_link);
 
 			if (list_porder.size() > 0) {
-				PContract_PO linett = poService.findOne(list_porder.get(0).getPcontract_poid_link());
-				linett.setIsmap(false);
-				poService.save(linett);
+				List<PContractProductSKU> list_sku = pcontractskuService.getbypo_and_product(pcontract_poid_link,
+						productid_link);
+				for (PContractProductSKU sku : list_sku) {
+					sku.setIsmap(false);
+					pcontractskuService.save(sku);
+				}
+
+				List<PContractProductSKU> list_notmap = pcontractskuService.getsku_notmap(pcontract_poid_link);
+				if (list_notmap.size() == 0) {
+					PContract_PO linett = poService.findOne(list_porder.get(0).getPcontract_poid_link());
+					linett.setIsmap(false);
+					poService.save(linett);
+				}
 
 				// Cap nhat lai thong tin lenh san xuat
 				POrder porder = porderService.findOne(list_porder.get(0).getPorderid_link());
@@ -291,6 +315,7 @@ public class POrderPOLineAPI {
 					porderService.save(porder);
 
 					grant.setGrantamount(grant.getTotalamount_tt());
+					grant.setIsmap(false);
 					grantService.save(grant);
 
 					String name = "";

@@ -45,4 +45,10 @@ public class POrder_POLine_Service extends AbstractService<POrder_POLine> implem
 		return repo.get_grant_by_line(pcontract_poid_link);
 	}
 
+	@Override
+	public List<POrder_POLine> get_porderline_by_po_and_product(Long pcontract_poid_link, Long productid_link) {
+		// TODO Auto-generated method stub
+		return repo.get_porder_by_line_and_product(pcontract_poid_link, productid_link);
+	}
+
 }

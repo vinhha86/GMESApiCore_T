@@ -1,6 +1,5 @@
 package vn.gpay.gsmart.core.pcontractproductsku;
 
-
 import java.io.Serializable;
 
 import javax.persistence.Entity;
@@ -20,153 +19,155 @@ import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.sku.SKU;
 
-@Table(name="pcontract_product_skus")
+@Table(name = "pcontract_product_skus")
 @Entity
-public class PContractProductSKU implements Serializable {/**
-	 * 
-	 */
+public class PContractProductSKU implements Serializable {
+	/**
+	* 
+	*/
 	private static final long serialVersionUID = 1L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pcontract_product_skus_generator")
-	@SequenceGenerator(name="pcontract_product_skus_generator", sequenceName = "pcontract_product_skus_id_seq", allocationSize=1)
+	@SequenceGenerator(name = "pcontract_product_skus_generator", sequenceName = "pcontract_product_skus_id_seq", allocationSize = 1)
 	private Long id;
 	private Long orgrootid_link;
 	private Long pcontractid_link;
 	private Long productid_link;
 	private Long skuid_link;
-	private Integer pquantity_sample;//SL mau
-	private Integer pquantity_porder;//SL don
-	private Integer pquantity_total;//SL tong sx
-	
-	
-	private Integer pquantity_granted;//SL da phan chuyen
-	
-	private Integer pquantity_production;//SL yeu cau sx
+	private Integer pquantity_sample;// SL mau
+	private Integer pquantity_porder;// SL don
+	private Integer pquantity_total;// SL tong sx
+
+	private Integer pquantity_granted;// SL da phan chuyen
+
+	private Integer pquantity_production;// SL yeu cau sx
 	private Long pcontract_poid_link;
-	
+	private Boolean ismap;
+
 	@Transient
-	private Integer pquantity_lenhsx = 0;//SL da tao lenh sx
+	private Integer pquantity_lenhsx = 0;// SL da tao lenh sx
 	@Transient
-	private Integer pquantity_stockin = 0;//SL da nhap kho thanh pham
+	private Integer pquantity_stockin = 0;// SL da nhap kho thanh pham
 	@Transient
-	private Integer pquantity_stockout = 0;//SL da xuat kho cho khach
+	private Integer pquantity_stockout = 0;// SL da xuat kho cho khach
 
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="skuid_link",insertable=false,updatable =false)
-    private SKU sku;
-	
+	@JoinColumn(name = "skuid_link", insertable = false, updatable = false)
+	private SKU sku;
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="productid_link",insertable=false,updatable =false)
-    private Product product;
-	
+	@JoinColumn(name = "productid_link", insertable = false, updatable = false)
+	private Product product;
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
-    private PContract_PO po;
-	
+	@JoinColumn(name = "pcontract_poid_link", insertable = false, updatable = false)
+	private PContract_PO po;
+
 	@Transient
 	public String getPo_buyer() {
-		if(po!=null)
+		if (po != null)
 			return po.getPo_buyer();
 		return "";
 	}
-	
+
 	@Transient
 	public Integer getPquantity() {
 		return pquantity_total;
 	}
+
 	@Transient
 	public String getProductcode() {
-		if(product!=null)
+		if (product != null)
 			return product.getBuyercode();
 		return "";
 	}
-	
+
 	@Transient
 	public String getProductname() {
-		if(product!=null)
+		if (product != null)
 			return product.getBuyername();
 		return "";
 	}
-	
+
 	@Transient
 	public Long getUnitid_link() {
-		if(product!=null)
+		if (product != null)
 			return product.getUnitid_link();
 		return null;
 	}
-	
+
 	@Transient
 	public String getUnitname() {
-		if(product!=null)
+		if (product != null)
 			return product.getUnitName();
 		return "";
 	}
-	
+
 	@Transient
 	public String getSkuName() {
-		if(sku!=null) {
+		if (sku != null) {
 			return sku.getName();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public int getSort_value() {
-		if(sku!=null) {
+		if (sku != null) {
 			return sku.getSort_size();
 		}
 		return 0;
 	}
-	
+
 	@Transient
 	public String getSkuCode() {
-		if(sku!=null) {
+		if (sku != null) {
 			return sku.getCode();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public String getSkuBarCode() {
-		if(sku!=null) {
+		if (sku != null) {
 			return sku.getBarcode();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public String getMauSanPham() {
-		if(sku!=null) {
+		if (sku != null) {
 			return sku.getMauSanPham();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public String getCoSanPham() {
-		if(sku!=null) {
+		if (sku != null) {
 			return sku.getCoSanPham();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public Long getSizeid_link() {
-		if(sku!=null) {
+		if (sku != null) {
 			return sku.getSize_id();
 		}
-		return (long)0;
+		return (long) 0;
 	}
-	
+
 	@Transient
 	public Long getColor_id() {
-		if(sku!=null) {
+		if (sku != null) {
 			return sku.getColor_id();
 		}
-		return (long)0;
+		return (long) 0;
 	}
 
 	public Long getId() {
@@ -284,6 +285,13 @@ public class PContractProductSKU implements Serializable {/**
 	public void setPquantity_stockin(Integer pquantity_stockin) {
 		this.pquantity_stockin = pquantity_stockin;
 	}
-	
-	
+
+	public Boolean getIsmap() {
+		return ismap;
+	}
+
+	public void setIsmap(Boolean ismap) {
+		this.ismap = ismap;
+	}
+
 }

@@ -3,54 +3,14 @@ package vn.gpay.gsmart.core.pcontract_po;
 import java.util.Date;
 
 public class PContractPO_Shipping {
-	private Long id;
+	private Long pcontract_poid_link;
 //	private Long orgrootid_link;
 	private Long pcontractid_link;
 	private String code;
 	private String po_buyer;
-//	private String po_vendor;
 	private Long productid_link;
 	private Integer po_quantity;
-//	private Long unitid_link;
 	private Date shipdate;
-//	private Date matdate;
-//	private Float actual_quantity;
-//	private Date actual_shipdate;
-//	private Float price_cmp;
-//	private Float price_fob;
-//	private Float price_sweingtarget;
-//	private Float price_sweingfact;
-//	private Float price_add;
-//	private Float price_commission;
-//	private Float salaryfund;
-//	private Long currencyid_link;
-//	private Float exchangerate;
-//	private Date productiondate;
-//	private String packingnotice;
-//	private Long qcorgid_link;
-//	private String qcorgname;
-//	private Integer etm_from;
-//	private Integer etm_to;
-//	private Integer etm_avr;
-//	private Long usercreatedid_link;
-//	private Date datecreated;
-//	private Integer status;
-//	private Integer productiondays;
-//	private Integer productiondays_ns;
-//	private Long orgmerchandiseid_link;
-//	private Long merchandiserid_link;
-//	private Long parentpoid_link;
-//	private Boolean is_tbd;
-//	private Float sewtarget_percent;
-//	private Long portfromid_link;
-//	private Long porttoid_link;
-//	private Boolean isauto_calculate;
-//	private Long shipmodeid_link;
-//	private Date date_importdata;
-//	private Integer plan_productivity;
-//	private Float plan_linerequired;
-//	private Integer po_typeid_link;
-//	private String comment;
 	private String productbuyercode;
 	private String portFrom;
 	private String packing_method;
@@ -65,6 +25,7 @@ public class PContractPO_Shipping {
 	private Integer amountgiaohang;
 	private String ordercode;
 	private Integer totalpair;
+	private String productbuyercode_parent;
 
 	public String getPacking_method() {
 		return packing_method;
@@ -88,14 +49,6 @@ public class PContractPO_Shipping {
 
 	public void setProductbuyercode(String productbuyercode) {
 		this.productbuyercode = productbuyercode;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public Long getPcontractid_link() {
@@ -232,6 +185,22 @@ public class PContractPO_Shipping {
 
 	public void setTotalpair(Integer totalpair) {
 		this.totalpair = totalpair;
+	}
+
+	public Long getPcontract_poid_link() {
+		return pcontract_poid_link;
+	}
+
+	public void setPcontract_poid_link(Long pcontract_poid_link) {
+		this.pcontract_poid_link = pcontract_poid_link;
+	}
+
+	public String getProductbuyercode_parent() {
+		return productbuyercode_parent;
+	}
+
+	public void setProductbuyercode_parent(String productbuyercode_parent) {
+		this.productbuyercode_parent = productbuyercode_parent;
 	}
 
 }

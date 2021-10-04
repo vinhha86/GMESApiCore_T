@@ -1543,6 +1543,7 @@ public class ScheduleAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
 			PContract_PO po = poService.findOne(entity.pcontract_poid_link);
+			Long productid_link = entity.productid_link;
 //			entity.orggrantid_link = entity.orggrantid_link == 0 ? null : entity.orggrantid_link;
 
 			// tao porder
@@ -1562,7 +1563,7 @@ public class ScheduleAPI {
 			porder.setPlan_duration(entity.duration);
 			porder.setPlan_linerequired(po.getPlan_linerequired());
 			porder.setPlan_productivity(entity.productivity);
-			porder.setProductid_link(po.getProductid_link());
+			porder.setProductid_link(productid_link);
 			porder.setProductiondate(entity.startdate);
 			porder.setStatus(entity.orggrantid_link != null ? POrderStatus.PORDER_STATUS_GRANTED
 					: POrderStatus.PORDER_STATUS_FREE);
@@ -1574,7 +1575,8 @@ public class ScheduleAPI {
 			Long porderid_link = porder.getId();
 			// lay sku sang porder_sku
 			Long pcontract_poid_link = po.getId();
-			List<PContractProductSKU> list_po_sku = poskuService.getlistsku_bypo(pcontract_poid_link);
+			List<PContractProductSKU> list_po_sku = poskuService.getbypo_and_product(pcontract_poid_link,
+					productid_link);
 			for (PContractProductSKU po_sku : list_po_sku) {
 				POrder_Product_SKU porder_sku = new POrder_Product_SKU();
 				porder_sku.setId(null);
@@ -1584,7 +1586,7 @@ public class ScheduleAPI {
 				porder_sku.setPquantity_production(po_sku.getPquantity_production());
 				porder_sku.setPquantity_sample(po_sku.getPquantity_sample());
 				porder_sku.setPquantity_total(po_sku.getPquantity_total());
-				porder_sku.setProductid_link(po_sku.getProductid_link());
+				porder_sku.setProductid_link(productid_link);
 				porder_sku.setSkuid_link(po_sku.getSkuid_link());
 
 				porderSkuService.save(porder_sku);
@@ -1666,8 +1668,16 @@ public class ScheduleAPI {
 			porderlineService.save(porder_poline);
 
 			// danh dau po da map
-			po.setIsmap(true);
-			poService.save(po);
+			List<PContractProductSKU> list_sku = poskuService.getbypo_and_product(pcontract_poid_link, productid_link);
+			for (PContractProductSKU sku : list_sku) {
+				sku.setIsmap(true);
+				poskuService.save(sku);
+			}
+			List<PContractProductSKU> list_sku_notmap = poskuService.getsku_notmap(pcontract_poid_link);
+			if (list_sku_notmap.size() == 0) {
+				po.setIsmap(true);
+				poService.save(po);
+			}
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

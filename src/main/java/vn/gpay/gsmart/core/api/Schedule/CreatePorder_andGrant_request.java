@@ -11,4 +11,5 @@ public class CreatePorder_andGrant_request {
 	public Long orgid_link;
 	public Long orggrantid_link;
 	public Long pcontract_poid_link;
+	public Long productid_link;
 }

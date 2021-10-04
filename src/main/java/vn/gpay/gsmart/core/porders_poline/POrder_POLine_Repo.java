@@ -29,4 +29,10 @@ public interface POrder_POLine_Repo
 
 	@Query(value = "select c " + "from POrder_POLine c " + "where c.pcontract_poid_link = :pcontract_poid_link")
 	public List<POrder_POLine> get_porderline_by_line(@Param("pcontract_poid_link") final Long pcontract_poid_link);
+
+	@Query(value = "select c " + "from POrder_POLine c " + "inner join POrder a on a.id = c.porderid_link "
+			+ "where c.pcontract_poid_link = :pcontract_poid_link and a.productid_link = :productid_link")
+	public List<POrder_POLine> get_porder_by_line_and_product(
+			@Param("pcontract_poid_link") final Long pcontract_poid_link,
+			@Param("productid_link") final Long productid_link);
 }
