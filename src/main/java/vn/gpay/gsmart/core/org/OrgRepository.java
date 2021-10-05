@@ -94,6 +94,9 @@ public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecification
 	@Query(value = "select c from Org c where c.orgtypeid_link =12 and c.id not in :buyerIds and c.status = 1 order by c.code asc")
 	public List<Org> getOrgForContractBuyerBuyerList(@Param ("buyerIds")final List<Long> buyerIds);
 	
+	@Query(value = "select c from Org c where c.id in :listid and c.status = 1 order by c.code asc")
+	public List<Org> getByListId(@Param ("listid")final List<Long> listid);
+	
 	@Query(value = "select c from Org c "
 			+ "inner join ContractBuyer a on c.id = a.vendorid_link "
 			+ "inner join ContractBuyerD b on a.id = b.contractbuyerid_link "

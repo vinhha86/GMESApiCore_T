@@ -20,6 +20,7 @@ import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.base.ResponseError;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.security.GpayAuthentication;
@@ -41,6 +42,8 @@ public class OrgAPI {
 	IGpayUserOrgService userorgService;
 	@Autowired
 	IGpayUserOrgService userOrgService;
+	@Autowired
+	IPOrderGrant_Service porderGrantService;
 
 	@GetMapping("/tosx")
 	public List<Org> getAllOrgs_Tosx() throws IOException {
@@ -300,6 +303,36 @@ public class OrgAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			response.data = orgService.findOrgByType(user.getRootorgid_link(), user.getOrgid_link(), entity.type);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<OrgResponse>(response, HttpStatus.OK);
+		} catch (RuntimeException e) {
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(e.getMessage());
+			return new ResponseEntity<>(errorBase, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@RequestMapping(value = "/getToSXByPcontractPO", method = RequestMethod.POST)
+	public ResponseEntity<?> getToSXByPcontractPO(@RequestBody get_orgreq_request entity, HttpServletRequest request) {// @RequestParam("type")
+		OrgResponse response = new OrgResponse();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			
+			Long pcontract_poid_link =  entity.pcontract_poid_link;
+			List<Long> orgId_list = porderGrantService.getToSXIdByPcontractPO(pcontract_poid_link);
+			System.out.println(orgId_list.size());
+			System.out.println(orgId_list);
+			
+			if(orgId_list.size() > 0) {
+				List<Org> org_list = orgService.getByListId(orgId_list);
+				System.out.println(org_list.size());
+				if(org_list.size() > 0) {
+					response.data = org_list;
+				}
+			}
+			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<OrgResponse>(response, HttpStatus.OK);

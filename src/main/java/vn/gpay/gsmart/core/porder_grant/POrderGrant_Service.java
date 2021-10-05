@@ -28,7 +28,6 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 
 	@Override
 	protected JpaRepository<POrderGrant, Long> getRepository() {
-		// TODO Auto-generated method stub
 		return repo;
 	}
 
@@ -114,44 +113,42 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 
 	@Override
 	public List<POrderGrant> getByOrgId(Long granttoorgid_link) {
-		// TODO Auto-generated method stub
 		return repo.getByOrgId(granttoorgid_link);
 	}
 
 	@Override
 	public List<POrderGrant> getProcessingByOrgId(Long granttoorgid_link) {
-		// TODO Auto-generated method stub
 		return repo.getProcessingByOrgId(granttoorgid_link);
 	}
 
 	@Override
 	public List<POrderGrant> getbyporder_andpo(Long porderid_link, Long pcontract_poid_link) {
-		// TODO Auto-generated method stub
 		return repo.getbyporder_andpo(porderid_link, pcontract_poid_link);
 	}
 
 	@Override
 	public List<POrderGrant> getgrant_contain_Day(Date holiday) {
-		// TODO Auto-generated method stub
 		return repo.getByDay(holiday);
 	}
 
 	@Override
 	public List<POrderGrant> get_grant_change(Long orgid_link) {
-		// TODO Auto-generated method stub
 		return repo.get_grant_change(orgid_link);
 	}
 
 	@Override
 	public Integer getProductivity_PO(Long pordergrantid_link) {
-		// TODO Auto-generated method stub
 		return repo.getProductivity_po(pordergrantid_link);
 	}
 
 	@Override
 	public List<POrderGrant> getByOfferAndOrg(Long parentpoid_link, List<Long> orgs) {
-		// TODO Auto-generated method stub
 		orgs = orgs.size() == 0 ? null : orgs;
 		return repo.getByOfferAndOrg(parentpoid_link, orgs);
+	}
+
+	@Override
+	public List<Long> getToSXIdByPcontractPO(Long pcontract_poid_link) {
+		return repo.getToSXIdByPcontractPO(pcontract_poid_link);
 	}
 }

@@ -89,5 +89,12 @@ public interface IPOrderGrant_Repository
 			+ "where c.parentpoid_link = :parentpoid_link and (b.granttoorgid_link in :orgs or :orgs is null) and (a.ismap = false or a.ismap is null)")
 	public List<POrderGrant> getByOfferAndOrg(@Param("parentpoid_link") final Long parentpoid_link,
 			@Param("orgs") final List<Long> orgs);
+	
+	@Query(value = "select distinct a.granttoorgid_link from POrderGrant a " 
+			+ "inner join POrder b on a.porderid_link = b.id "
+			+ "inner join PContract_PO c on b.pcontract_poid_link = c.id "
+			+ "where c.id = :pcontract_poid_link ")
+	public List<Long> getToSXIdByPcontractPO(
+			@Param("pcontract_poid_link") final Long pcontract_poid_link);
 
 }
