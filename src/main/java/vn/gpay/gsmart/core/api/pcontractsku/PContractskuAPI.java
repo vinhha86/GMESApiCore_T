@@ -118,6 +118,13 @@ public class PContractskuAPI {
 			long productid_link = entity.productid_link;
 
 			response.data = pskuservice.getbypo_and_product(pcontract_poid_link, productid_link);
+			// cap nhat lai so luong da phan lenh
+			for (PContractProductSKU p_sku : response.data) {
+				int pquantity_lenhsx = pordersku_Service.getPquantity_by_po_and_sku(pcontract_poid_link,
+						p_sku.getSkuid_link());
+				p_sku.setPquantity_lenhsx(pquantity_lenhsx);
+			}
+
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 		} catch (Exception e) {

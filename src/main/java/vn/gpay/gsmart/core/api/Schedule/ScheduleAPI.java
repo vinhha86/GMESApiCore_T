@@ -185,15 +185,15 @@ public class ScheduleAPI {
 			List<Org> listorg = new ArrayList<Org>();
 			if (orgroot.getOrgtypeid_link() == 1)
 				listorg = orgService.getorgChildrenbyOrg(orgid_link, list);
-			else
-				listorg.add(orgroot);
-			// Them vao danh sach cac don vi trong danh sach phan xuong duoc phan quyen cho
-			// nguoi dung
-			for (GpayUserOrg userorg : userOrgService.getall_byuser_andtype(user.getId(), OrgType.ORG_TYPE_FACTORY)) {
-				if (userorg.getOrgid_link() != user.getOrgid_link()
-						&& userorg.getOrgid_link() != user.getRootorgid_link()) {
+			else {
+				// Them vao danh sach cac don vi trong danh sach phan xuong duoc phan quyen cho
+				// nguoi dung
+				for (GpayUserOrg userorg : userOrgService.getall_byuser_andtype(user.getId(),
+						OrgType.ORG_TYPE_FACTORY)) {
 					listorg.add(orgService.findOne(userorg.getOrgid_link()));
 				}
+				if (!listorg.contains(orgroot))
+					listorg.add(orgroot);
 			}
 
 			long id = 1;
@@ -1628,6 +1628,9 @@ public class ScheduleAPI {
 					grant_sku.setPordergrantid_link(pordergrantid_link);
 
 					grantskuService.save(grant_sku);
+
+					po_sku.setPquantity_granted(po_sku.getPquantity_total());
+					poskuService.save(po_sku);
 				}
 
 				// tao Schedule_porder de tra len giao dien

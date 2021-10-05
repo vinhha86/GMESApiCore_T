@@ -232,6 +232,10 @@ public class POrderPOLineAPI {
 					pordersku.setPquantity_total(pcontractsku.getPquantity_total() + pordersku.getPquantity_total());
 					porderskuService.save(pordersku);
 				}
+
+				// Cap nhat lai mau co da phan chuyen
+				pcontractsku.setPquantity_granted(pcontractsku.getPquantity_total());
+				pcontractskuService.save(pcontractsku);
 			}
 
 			// Cap nhat so luong cua grant
@@ -285,23 +289,27 @@ public class POrderPOLineAPI {
 			Long pcontract_poid_link = entity.pcontract_poid_link;
 			Long productid_link = entity.productid_link;
 
+			List<PContractProductSKU> list_sku = pcontractskuService.getbypo_and_product(pcontract_poid_link,
+					productid_link);
+			for (PContractProductSKU sku : list_sku) {
+				sku.setIsmap(false);
+				pcontractskuService.save(sku);
+			}
+
+			List<PContractProductSKU> list_notmap = pcontractskuService.getsku_notmap(pcontract_poid_link);
+
+			PContract_PO linett = poService.findOne(pcontract_poid_link);
+			if (list_notmap.size() == 0) {
+				linett.setIsmap(true);
+			} else {
+				linett.setIsmap(false);
+			}
+			poService.save(linett);
+
 			List<POrder_POLine> list_porder = porder_line_Service.get_porderline_by_po_and_product(pcontract_poid_link,
 					productid_link);
 
 			if (list_porder.size() > 0) {
-				List<PContractProductSKU> list_sku = pcontractskuService.getbypo_and_product(pcontract_poid_link,
-						productid_link);
-				for (PContractProductSKU sku : list_sku) {
-					sku.setIsmap(false);
-					pcontractskuService.save(sku);
-				}
-
-				List<PContractProductSKU> list_notmap = pcontractskuService.getsku_notmap(pcontract_poid_link);
-				if (list_notmap.size() == 0) {
-					PContract_PO linett = poService.findOne(list_porder.get(0).getPcontract_poid_link());
-					linett.setIsmap(false);
-					poService.save(linett);
-				}
 
 				// Cap nhat lai thong tin lenh san xuat
 				POrder porder = porderService.findOne(list_porder.get(0).getPorderid_link());
