@@ -1630,6 +1630,7 @@ public class ScheduleAPI {
 					grantskuService.save(grant_sku);
 
 					po_sku.setPquantity_granted(po_sku.getPquantity_total());
+					po_sku.setPquantity_lenhsx(po_sku.getPquantity_total());
 					poskuService.save(po_sku);
 				}
 

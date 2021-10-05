@@ -235,6 +235,7 @@ public class POrderPOLineAPI {
 
 				// Cap nhat lai mau co da phan chuyen
 				pcontractsku.setPquantity_granted(pcontractsku.getPquantity_total());
+				pcontractsku.setPquantity_lenhsx(pcontractsku.getPquantity_total());
 				pcontractskuService.save(pcontractsku);
 			}
 
