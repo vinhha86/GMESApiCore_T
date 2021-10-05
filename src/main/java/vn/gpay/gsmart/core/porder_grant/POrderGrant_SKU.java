@@ -46,8 +46,6 @@ public class POrderGrant_SKU implements Serializable {
     @Transient
     public Integer amount_break;
     
-    
-    
     @NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
@@ -153,6 +151,7 @@ public class POrderGrant_SKU implements Serializable {
 		}
 		return "";
 	}
+
 	public Long getId() {
 		return id;
 	}

@@ -7,8 +7,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
 
 @Table(name="porder_grant_sku_plan")
 @Entity
@@ -23,6 +31,19 @@ public class POrderGrant_SKU_Plan implements Serializable{
 	private Long porder_grant_skuid_link;
 	private Date date;
 	private Integer amount;
+	
+	@Transient
+	public String skuCode;
+	@Transient
+	public String mauSanPham;
+	@Transient
+	public String coSanPham;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="porder_grant_skuid_link",insertable=false,updatable =false)
+	private POrderGrant_SKU porderGrant_SKU;
+	
 	public Long getId() {
 		return id;
 	}
@@ -47,5 +68,25 @@ public class POrderGrant_SKU_Plan implements Serializable{
 	public void setAmount(Integer amount) {
 		this.amount = amount;
 	}
+	public String getSkuCode() {
+		return skuCode;
+	}
+	public void setSkuCode(String skuCode) {
+		this.skuCode = skuCode;
+	}
+	public String getMauSanPham() {
+		return mauSanPham;
+	}
+	public void setMauSanPham(String mauSanPham) {
+		this.mauSanPham = mauSanPham;
+	}
+	public String getCoSanPham() {
+		return coSanPham;
+	}
+	public void setCoSanPham(String coSanPham) {
+		this.coSanPham = coSanPham;
+	}
+	
+	
 	
 }
