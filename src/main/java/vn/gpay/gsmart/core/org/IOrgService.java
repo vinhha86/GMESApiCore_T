@@ -56,6 +56,8 @@ public interface IOrgService extends Operations<Org>{
 	
 	List<Org> findOrgByTypeBanCat(Long parentid_link);
 	
+	List<Org> getByListId(List<Long> listid);
+	
 	//lay org theo name,orgtypeid_link,parentid_link
 	public Org getByNameAndTypeAndParentid_link(String name,Integer orgtypeid_link,Long parentid_link);
 	//lay ord theo code,parentid_link

@@ -36,4 +36,6 @@ public interface IPOrderGrant_Service extends Operations<POrderGrant> {
 	public Integer getProductivity_PO(Long pordergrantid_link);
 
 	public List<POrderGrant> getByOfferAndOrg(Long parentpoid_link, List<Long> orgs);
+	
+	List<Long> getToSXIdByPcontractPO(Long pcontract_poid_link);
 }
