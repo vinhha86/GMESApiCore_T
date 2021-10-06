@@ -38,6 +38,8 @@ public class POrderGrant_SKU_Plan implements Serializable{
 	public String mauSanPham;
 	@Transient
 	public String coSanPham;
+	@Transient
+	public Integer porderGrant_SKU_grantamount;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -86,7 +88,11 @@ public class POrderGrant_SKU_Plan implements Serializable{
 	public void setCoSanPham(String coSanPham) {
 		this.coSanPham = coSanPham;
 	}
-	
-	
+	public Integer getPorderGrant_SKU_grantamount() {
+		return porderGrant_SKU_grantamount;
+	}
+	public void setPorderGrant_SKU_grantamount(Integer porderGrant_SKU_grantamount) {
+		this.porderGrant_SKU_grantamount = porderGrant_SKU_grantamount;
+	}
 	
 }

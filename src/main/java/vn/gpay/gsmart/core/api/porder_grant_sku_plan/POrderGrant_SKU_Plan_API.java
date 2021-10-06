@@ -89,6 +89,7 @@ public class POrderGrant_SKU_Plan_API {
 					porderGrant_SKU_Plan.setSkuCode(porderGrant_SKU.getSku_product_code());
 					porderGrant_SKU_Plan.setMauSanPham(porderGrant_SKU.getMauSanPham());
 					porderGrant_SKU_Plan.setCoSanPham(porderGrant_SKU.getCoSanPham());
+					porderGrant_SKU_Plan.setPorderGrant_SKU_grantamount(porderGrant_SKU.getGrantamount());
 				}
 
 				result.addAll(porderGrant_SKU_Plan_list);
@@ -113,7 +114,24 @@ public class POrderGrant_SKU_Plan_API {
 		try {
 			POrderGrant_SKU_Plan porderGrant_SKU_Plan = entity.data;
 			if(porderGrant_SKU_Plan != null) {
-				porderGrant_SKU_Plan_Service.save(porderGrant_SKU_Plan);
+				Long porder_grant_skuid_link = porderGrant_SKU_Plan.getPorder_grant_skuid_link();
+				POrderGrant_SKU porderGrant_SKU = porderGrant_SKU_Service.findOne(porder_grant_skuid_link);
+				Integer grantamount = porderGrant_SKU.getGrantamount();
+				
+				List<POrderGrant_SKU_Plan> porderGrant_SKU_Plan_list = 
+						porderGrant_SKU_Plan_Service.getByPOrderGrant_SKU_NotId(porder_grant_skuid_link, porderGrant_SKU_Plan.getId());
+				Integer currentTotal = 0;
+				Integer amount = porderGrant_SKU_Plan.getAmount() == null ? 0 : porderGrant_SKU_Plan.getAmount();
+				for(POrderGrant_SKU_Plan item : porderGrant_SKU_Plan_list) {
+					currentTotal += item.getAmount() == null ? 0 : item.getAmount();
+				}
+				if(currentTotal + amount > grantamount) {
+					response.setRespcode(ResponseMessage.KEY_RC_BAD_REQUEST);
+					response.setMessage("Lỗi: Số lượng tổng vượt quá số lượng phân cho lệnh.");
+					return new ResponseEntity<POrderGrant_SKU_Plan_list_response>(response, HttpStatus.OK);
+				}else {
+					porderGrant_SKU_Plan_Service.save(porderGrant_SKU_Plan);
+				}
 			}
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

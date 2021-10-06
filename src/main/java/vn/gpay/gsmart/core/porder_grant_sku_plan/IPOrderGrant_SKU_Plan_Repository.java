@@ -51,4 +51,15 @@ public interface IPOrderGrant_SKU_Plan_Repository extends JpaRepository<POrderGr
 			@Param("porder_grant_skuid_link") final Long porder_grant_skuid_link,
 			@Param("date") final Date date
 			);
+	
+	@Query(value = "select a from POrderGrant_SKU_Plan a " 
+			+ "inner join POrderGrant_SKU b on a.porder_grant_skuid_link = b.id "
+			+ "where a.porder_grant_skuid_link = :porder_grant_skuid_link "
+			+ "and a.id != :id or :id is null "
+			+ "order by a.porder_grant_skuid_link asc, a.date asc "
+			)
+	public List<POrderGrant_SKU_Plan> getByPOrderGrant_SKU_NotId(
+			@Param("porder_grant_skuid_link") final Long porder_grant_skuid_link,
+			@Param("id") final Long id
+			);
 }

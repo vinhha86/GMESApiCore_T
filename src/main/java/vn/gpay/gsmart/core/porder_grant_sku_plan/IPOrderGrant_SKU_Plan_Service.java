@@ -9,4 +9,5 @@ public interface IPOrderGrant_SKU_Plan_Service extends Operations<POrderGrant_SK
 	List<POrderGrant_SKU_Plan> getByPOrderGrant_Date(Long porder_grantid_link, Date dateFrom, Date dateTo);
 	List<POrderGrant_SKU_Plan> getByPOrderGrant_SKU_Date(Long porder_grant_skuid_link, Date dateFrom, Date dateTo);
 	List<POrderGrant_SKU_Plan> getByPOrderGrant_SKU_Date(Long porder_grant_skuid_link, Date date);
+	List<POrderGrant_SKU_Plan> getByPOrderGrant_SKU_NotId(Long porder_grant_skuid_link, Long id);
 }
