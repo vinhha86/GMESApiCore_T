@@ -58,17 +58,8 @@ public class POrderGrant_SKU_Plan_API {
 			Date dateFrom = entity.dateFrom;
 			Date dateTo = entity.dateTo;
 			
-//			System.out.println("---------------------");
-//			System.out.println(porder_grantid_link);
-//			System.out.println(dateFrom);
-//			System.out.println(dateTo);
-			
 			dateFrom = GPAYDateFormat.atStartOfDay(dateFrom);
 			dateTo = GPAYDateFormat.atEndOfDay(dateTo);
-			
-//			System.out.println("---------------------");
-//			System.out.println(dateFrom);
-//			System.out.println(dateTo);
 			
 			LocalDate start = dateFrom.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 			LocalDate end = dateTo.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
@@ -99,25 +90,31 @@ public class POrderGrant_SKU_Plan_API {
 					porderGrant_SKU_Plan.setMauSanPham(porderGrant_SKU.getMauSanPham());
 					porderGrant_SKU_Plan.setCoSanPham(porderGrant_SKU.getCoSanPham());
 				}
-				// test
-				
-//				Date newdate = new GregorianCalendar(2021, Calendar.OCTOBER, 13).getTime();
-//				POrderGrant_SKU_Plan newPOrderGrant_SKU_Plan = new POrderGrant_SKU_Plan();
-//				newPOrderGrant_SKU_Plan.setAmount(0);
-//				newPOrderGrant_SKU_Plan.setDate(newdate);
-//				newPOrderGrant_SKU_Plan.setPorder_grant_skuid_link(porderGrant_SKU.getId());
-//				newPOrderGrant_SKU_Plan.setSkuCode(porderGrant_SKU.getSku_product_code());
-//				newPOrderGrant_SKU_Plan.setMauSanPham(porderGrant_SKU.getMauSanPham());
-//				newPOrderGrant_SKU_Plan.setCoSanPham(porderGrant_SKU.getCoSanPham());
-//				porderGrant_SKU_Plan_list.add(newPOrderGrant_SKU_Plan);
 
 				result.addAll(porderGrant_SKU_Plan_list);
 			}
 			
-//			List<POrderGrant_SKU_Plan> porderGrant_SKU_Plan_list = 
-//					porderGrant_SKU_Plan_Service.getByPOrderGrant_Date(porder_grantid_link, dateFrom, dateTo);
-			
 			response.data = result;
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<POrderGrant_SKU_Plan_list_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<POrderGrant_SKU_Plan_list_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/porder_grant_sku_plan_update", method = RequestMethod.POST)
+	public ResponseEntity<POrderGrant_SKU_Plan_list_response> porder_grant_sku_plan_update(@RequestBody POrderGrant_SKU_Plan_update_request entity,
+			HttpServletRequest request) {
+		POrderGrant_SKU_Plan_list_response response = new POrderGrant_SKU_Plan_list_response();
+		try {
+			POrderGrant_SKU_Plan porderGrant_SKU_Plan = entity.data;
+			if(porderGrant_SKU_Plan != null) {
+				porderGrant_SKU_Plan_Service.save(porderGrant_SKU_Plan);
+			}
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
