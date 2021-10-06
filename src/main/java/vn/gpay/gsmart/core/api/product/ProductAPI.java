@@ -118,6 +118,28 @@ public class ProductAPI {
 		}
 	}
 
+	@RequestMapping(value = "/getall_product_single", method = RequestMethod.POST)
+	public ResponseEntity<GetProductSingle_response> GetProductSingle(HttpServletRequest request,
+			@RequestBody GetProductSingle_request entity) {
+		GetProductSingle_response response = new GetProductSingle_response();
+		try {
+			String code = entity.buyercode;
+			Boolean is_pair = entity.is_pair;
+			int type = ProductType.SKU_TYPE_COMPLETEPRODUCT;
+			if (is_pair)
+				type = ProductType.SKU_TYPE_PRODUCT_PAIR;
+
+			response.data = productService.getByBuyerCodeAndType(code, type);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<GetProductSingle_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<GetProductSingle_response>(response, HttpStatus.OK);
+		}
+	}
+
 	@RequestMapping(value = "/delete_img", method = RequestMethod.POST)
 	public ResponseEntity<delete_image_response> DeleteImg(HttpServletRequest request,
 			@RequestBody delete_image_request entity) {

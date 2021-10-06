@@ -15,4 +15,6 @@ public interface ISizeSetService extends Operations<SizeSet> {
 	Integer getMaxSortValue();
 
 	List<SizeSet> getSizeSetByName(String name);
+
+	List<SizeSet> getbyproduct(Long productid_link, Long attributeid_link);
 }

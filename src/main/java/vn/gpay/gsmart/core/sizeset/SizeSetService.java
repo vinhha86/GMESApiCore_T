@@ -52,4 +52,10 @@ public class SizeSetService extends AbstractService<SizeSet> implements ISizeSet
 		return list;
 	}
 
+	@Override
+	public List<SizeSet> getbyproduct(Long productid_link, Long attributeid_link) {
+		// TODO Auto-generated method stub
+		return repo.getlistvalue_by_product_and_attribute(productid_link, attributeid_link);
+	}
+
 }

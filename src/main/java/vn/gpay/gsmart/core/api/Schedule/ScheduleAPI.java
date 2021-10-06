@@ -1605,7 +1605,7 @@ public class ScheduleAPI {
 				grant.setUsercreatedid_link(user.getId());
 				grant.setGrantdate(new Date());
 				grant.setGrantamount(entity.quantity);
-				grant.setStatus(1);
+				grant.setStatus(2);
 				grant.setOrgrootid_link(orgrootid_link);
 				grant.setStart_date_plan(entity.startdate);
 				grant.setFinish_date_plan(entity.enddate);

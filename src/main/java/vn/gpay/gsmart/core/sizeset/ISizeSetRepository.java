@@ -13,24 +13,26 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public interface ISizeSetRepository extends JpaRepository<SizeSet, Long>, JpaSpecificationExecutor<SizeSet> {
 	@Query(value = "select c from SizeSet c where c.orgrootid_link = :orgrootid_link order by c.sortvalue asc")
-	public List<SizeSet> getall_byorgrootid(@Param ("orgrootid_link")final  Long orgrootid_link);
-	
+	public List<SizeSet> getall_byorgrootid(@Param("orgrootid_link") final Long orgrootid_link);
+
 	@Query(value = "select c from SizeSet c where lower(c.name) = lower(:name)")
-	public List<SizeSet> getbyname(@Param ("name")final  String name);
-	
-	@Query(value = "select max(sortvalue) from SizeSet c")	
+	public List<SizeSet> getbyname(@Param("name") final String name);
+
+	@Query(value = "select max(sortvalue) from SizeSet c")
 	public int getMaxSortValue();
-	
-	@Query(value = "select c from SizeSet c "
-			+ "inner join SizeSetAttributeValue a on c.id = a.sizesetid_link "
+
+	@Query(value = "select c from SizeSet c " + "inner join SizeSetAttributeValue a on c.id = a.sizesetid_link "
 			+ "inner join SKU_Attribute_Value b on b.attributevalueid_link = a.attributevalueid_link "
-			+ "inner join PContractProductSKU d on d.skuid_link = b.skuid_link "
-			+ "where lower(c.name) = lower(:name) "
-			+ "and d.productid_link = :productid_link "
-			+ "and d.pcontractid_link = :pcontractid_link "
-			+ "group by c")
-	public List<SizeSet> getbyname_and_po(
-			@Param ("name")final  String name,
-			@Param ("pcontractid_link")final  Long pcontractid_link,
-			@Param ("productid_link")final  Long productid_link);
+			+ "inner join PContractProductSKU d on d.skuid_link = b.skuid_link " + "where lower(c.name) = lower(:name) "
+			+ "and d.productid_link = :productid_link " + "and d.pcontractid_link = :pcontractid_link " + "group by c")
+	public List<SizeSet> getbyname_and_po(@Param("name") final String name,
+			@Param("pcontractid_link") final Long pcontractid_link, @Param("productid_link") final Long productid_link);
+
+	@Query(value = "select distinct c from SizeSet c inner join SizeSetAttributeValue a on a.sizesetid_link = c.id "
+			+ "inner join Attributevalue b on b.id = a.attributevalueid_link "
+			+ "inner join ProductAttributeValue d on d.attributevalueid_link = a.attributevalueid_link "
+			+ "where a.attributeid_link= :attributeid_link "
+			+ "and (productid_link = :productid_link) and (b.isdefault = false or b.isdefault is null)")
+	public List<SizeSet> getlistvalue_by_product_and_attribute(@Param("productid_link") final Long productid_link,
+			@Param("attributeid_link") final Long attributeid_link);
 }

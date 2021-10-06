@@ -1977,6 +1977,10 @@ public class PContract_POAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgid_link = user.getOrgid_link();
+			long productid_link = entity.productid_link;
+			long orgrootid_link = user.getRootorgid_link();
+			Long colorid_link = entity.colorid_link;
+			Long sizesetid_link = entity.sizesetid_link;
 
 			List<Long> list_org = new ArrayList<Long>();
 			if (orgid_link != 0 && orgid_link != 1) {
@@ -1988,12 +1992,9 @@ public class PContract_POAPI {
 				if (!list_org.contains(orgid_link))
 					list_org.add(orgid_link);
 			}
-			Date shipdate_from = entity.shipdate_from;
-			Date shipdate_to = entity.shipdate_to;
-			Boolean ismap = entity.ismap;
 
-			response.data = pcontract_POService.get_po_shipping(list_org, POType.PO_LINE_CONFIRMED, shipdate_from,
-					shipdate_to, user.getRootorgid_link(), ismap);
+			response.data = pcontract_POService.get_po_shipping(orgrootid_link, list_org, productid_link, colorid_link,
+					sizesetid_link);
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

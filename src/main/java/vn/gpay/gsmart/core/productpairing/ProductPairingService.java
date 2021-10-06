@@ -10,27 +10,33 @@ import vn.gpay.gsmart.core.base.AbstractService;
 import vn.gpay.gsmart.core.pcontractproduct.IPContractProductRepository;
 import vn.gpay.gsmart.core.pcontractproductpairing.IPContractProductPairingRepository;
 
-
 @Service
 public class ProductPairingService extends AbstractService<ProductPairing> implements IProductPairingService {
-	@Autowired IProductPairingRepository repo;
-	@Autowired IPContractProductPairingRepository pppair_repo;
-	@Autowired IPContractProductRepository pp_repo;
+	@Autowired
+	IProductPairingRepository repo;
+	@Autowired
+	IPContractProductPairingRepository pppair_repo;
+	@Autowired
+	IPContractProductRepository pp_repo;
+
 	@Override
 	protected JpaRepository<ProductPairing, Long> getRepository() {
 		// TODO Auto-generated method stub
 		return repo;
 	}
+
 	@Override
 	public List<ProductPairing> getproduct_pairing_bycontract(long orgrootid_link, long pcontractid_link) {
 		// TODO Auto-generated method stub
 		return repo.getall_product_pair_bypcontract(pcontractid_link, orgrootid_link);
 	}
+
 	@Override
 	public List<Long> getproductid_pairing_bycontract(long orgrootid_link, long pcontractid_link) {
 		// TODO Auto-generated method stub
 		return repo.getall_productid_pair_bypcontract(pcontractid_link, orgrootid_link);
 	}
+
 	@Override
 	public List<ProductPairing> getproduct_pairing_detail_bycontract(long orgrootid_link, long pcontractid_link,
 			long productpairid_link) {
@@ -38,19 +44,27 @@ public class ProductPairingService extends AbstractService<ProductPairing> imple
 		Long pairid = productpairid_link == 0 ? null : productpairid_link;
 		return repo.getall_product_pair_detail_bypcontract(pcontractid_link, pairid, orgrootid_link);
 	}
+
 	@Override
-	public ProductPairing getproduct_pairing_bykey(long productid_link,
-			long productpairid_link) {
+	public ProductPairing getproduct_pairing_bykey(long productid_link, long productpairid_link) {
 		// TODO Auto-generated method stub
-		List<ProductPairing> a= repo.getproduct_pairing_bykey(productid_link, productpairid_link);
+		List<ProductPairing> a = repo.getproduct_pairing_bykey(productid_link, productpairid_link);
 		if (a.size() > 0)
 			return a.get(0);
-		else 
+		else
 			return null;
 	}
+
 	@Override
 	public List<ProductPairing> getby_product(Long productid_link) {
 		// TODO Auto-generated method stub
-		return repo.getproduct_pairing_bykey(productid_link, null);
+		return repo.getproduct_bypairing(productid_link);
+	}
+
+	@Override
+	public List<ProductPairing> getbypcontract_product(Long pcontractid_link, Long productid_link,
+			Long orgrootid_link) {
+		// TODO Auto-generated method stub
+		return repo.getall_pairdetail_bypcontract_product(pcontractid_link, productid_link, orgrootid_link);
 	}
 }

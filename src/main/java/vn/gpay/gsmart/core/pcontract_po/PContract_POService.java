@@ -25,6 +25,9 @@ import vn.gpay.gsmart.core.porders_poline.IPOrder_POLine_Service;
 import vn.gpay.gsmart.core.product.IProductService;
 import vn.gpay.gsmart.core.productpairing.IProductPairingService;
 import vn.gpay.gsmart.core.productpairing.ProductPairing;
+import vn.gpay.gsmart.core.sizesetattributevalue.ISizeSetAttributeRepository;
+import vn.gpay.gsmart.core.sizesetattributevalue.SizeSetAttributeValue;
+import vn.gpay.gsmart.core.sku.ISKU_AttValue_Repository;
 import vn.gpay.gsmart.core.stockin.IStockInService;
 import vn.gpay.gsmart.core.stockout.IStockOutService;
 import vn.gpay.gsmart.core.utils.ProductType;
@@ -61,6 +64,10 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	IProductPairingService pairService;
 	@Autowired
 	IPContractProductSKURepository pcontractsku_repo;
+	@Autowired
+	ISizeSetAttributeRepository sizesetatt_repo;
+	@Autowired
+	ISKU_AttValue_Repository sku_av_repo;
 
 	@Override
 	protected JpaRepository<PContract_PO, Long> getRepository() {
@@ -268,13 +275,34 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	}
 
 	@Override
-	public List<PContractPO_Shipping> get_po_shipping(List<Long> orgs, int po_type, Date shipdate_from,
-			Date shipdate_to, Long orgrootid_link, Boolean ismap) {
+	public List<PContractPO_Shipping> get_po_shipping(Long orgrootid_link, List<Long> orgs, Long productid_link,
+			Long colorid_link, Long sizesetid_link) {
 		// TODO Auto-generated method stub
 		orgs = orgs.size() == 0 ? null : orgs;
-		ismap = ismap == false ? null : true;
+		List<SizeSetAttributeValue> list_av = sizesetatt_repo.getall_bySizeSetId(sizesetid_link);
+		List<Long> listsku = new ArrayList<Long>();
 
-		List<PContract_PO> list_po = repo.getby_process_shipping(shipdate_from, shipdate_to, orgs, po_type, ismap);
+		if (sizesetid_link != null && colorid_link != null) {
+			for (SizeSetAttributeValue sizeset_av : list_av) {
+				List<Long> skuid_links = sku_av_repo.getskuid_by_valueMau_and_valueCo(colorid_link,
+						sizeset_av.getAttributevalueid_link(), productid_link);
+				if (skuid_links.size() > 0)
+					listsku.add(skuid_links.get(0));
+			}
+			if (listsku.size() == 0)
+				listsku.add((long) -1);
+		} else {
+			if (sizesetid_link == null && colorid_link != null) {
+				listsku = sku_av_repo.get_bycolorid_link(productid_link, colorid_link);
+				if (listsku.size() == 0)
+					listsku.add((long) -1);
+			} else {
+				listsku = null;
+			}
+		}
+
+		List<PContract_PO> list_po = repo.getby_product_color_sizeset(orgs, productid_link, listsku);
+
 		List<PContractPO_Shipping> list_shipping = new ArrayList<PContractPO_Shipping>();
 		for (PContract_PO po : list_po) {
 			// kiem tra xem co phai san pham bo hay ko
@@ -319,7 +347,7 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 			} else {
 				List<ProductPairing> p = pairService.getproduct_pairing_detail_bycontract(orgrootid_link,
 						po.getPcontractid_link(), po.getProductid_link());
-
+				p.removeIf(c -> !c.getProductid_link().equals(productid_link));
 				for (ProductPairing pair : p) {
 					PContractPO_Shipping ship = new PContractPO_Shipping();
 					ship.setCode(po.getCode());
