@@ -35,7 +35,9 @@ public interface IPOrderGrant_Repository
 			+ "and lower(c.po_buyer) like lower(concat('%',:POBuyer,'%')) "
 			+ "and lower(d.contractcode) like lower(concat('%',:contractcode,'%')) "
 			+ "and (:orgbuyerid_link is null or d.orgbuyerid_link = :orgbuyerid_link) "
-			+ "and (:orgvendorid_link is null or d.orgvendorid_link = :orgvendorid_link)")
+			+ "and (:orgvendorid_link is null or d.orgvendorid_link = :orgvendorid_link) "
+			+ "and a.status = (select max(grant.status) from POrderGrant grant inner join POrder porder on grant.porderid_link = porder.id "
+			+ "where porder.productid_link = b.productid_link and porder.pcontractid_link = b.pcontractid_link)")
 	public List<POrderGrant> get_granted_bygolivedate(@Param("status") final int status,
 			@Param("granttoorgid_link") final long granttoorgid_link,
 			@Param("golivedate_from") final Date golivedate_from, @Param("golivedate_to") final Date golivedate_to,
@@ -96,5 +98,12 @@ public interface IPOrderGrant_Repository
 			+ "where c.id = :pcontract_poid_link ")
 	public List<Long> getToSXIdByPcontractPO(
 			@Param("pcontract_poid_link") final Long pcontract_poid_link);
+	
+	@Query(value = "select distinct a.id from POrderGrant a " 
+			+ "inner join POrder b on a.porderid_link = b.id "
+			+ "inner join PContract_PO c on b.pcontract_poid_link = c.id "
+			+ "where b.productid_link = :productid_link and c.po_typeid_link = 10")
+	public List<Long> getPlanByProduct(
+			@Param("productid_link") final Long productid_link);
 
 }

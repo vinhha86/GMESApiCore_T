@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.api.PorderPOline;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
+import vn.gpay.gsmart.core.pcontract_po_shipping.PContract_PO_Shipping;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
@@ -380,6 +382,89 @@ public class POrderPOLineAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<delete_porder_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/delete_many_porder", method = RequestMethod.POST)
+	public ResponseEntity<delete_many_porder_response> DeleteManyPorder(@RequestBody delete_many_porder_request entity,
+			HttpServletRequest request) {
+		delete_many_porder_response response = new delete_many_porder_response();
+		try {
+			List<Long> list_id = new ArrayList<Long>();
+			
+			for(PContract_PO_Shipping po : entity.data) {
+				Long pcontract_poid_link = po.getPcontract_poid_link();
+				Long productid_link = po.getProductid_link();
+				
+				List<PContractProductSKU> list_sku = pcontractskuService.getbypo_and_product(pcontract_poid_link,
+						productid_link);
+				for (PContractProductSKU sku : list_sku) {
+					sku.setIsmap(false);
+					pcontractskuService.save(sku);
+				}
+				
+				List<PContractProductSKU> list_notmap = pcontractskuService.getsku_notmap(pcontract_poid_link);
+
+				PContract_PO linett = poService.findOne(pcontract_poid_link);
+				if (list_notmap.size() == 0) {
+					linett.setIsmap(true);
+				} else {
+					linett.setIsmap(false);
+				}
+				poService.save(linett);
+				
+				List<POrder_POLine> list_porder = porder_line_Service.get_porderline_by_po_and_product(pcontract_poid_link,
+						productid_link);
+
+				if (list_porder.size() > 0) {
+
+					// Cap nhat lai thong tin lenh san xuat
+					POrder porder = porderService.findOne(list_porder.get(0).getPorderid_link());
+					POrderGrant grant = grantService.findOne(list_porder.get(0).getPordergrantid_link());
+					// neu lenh tu sinh thi xoa di con ko thi cap nhat lai trang thai
+					PContract_PO linekh = poService.findOne(porder.getPcontract_poid_link());
+					if (linekh.getPo_typeid_link() == POType.PO_LINE_PLAN) {
+						porder.setIsMap(false);
+						porder.setTotalorder(linekh.getPo_quantity());
+						porder.setGolivedate(linekh.getShipdate());
+						porderService.save(porder);
+
+						grant.setGrantamount(grant.getTotalamount_tt());
+						grant.setIsmap(false);
+						grantService.save(grant);
+					} else {
+						// kiem tra xem co line tren bieu do chua thi xoa line tren bieu do
+						grantService.delete(grant);
+						porderService.delete(porder);
+					}
+
+					// Xoa het porder-sku
+					List<POrder_Product_SKU> list_porder_sku = porderskuService.getby_porder(porder.getId());
+					for (POrder_Product_SKU porder_sku : list_porder_sku) {
+						porderskuService.delete(porder_sku);
+					}
+
+					// xoa het trong porder_grant_sku
+
+					List<POrderGrant_SKU> list_grant_sku = grantskuService.getPOrderGrant_SKU(grant.getId());
+					for (POrderGrant_SKU grantsku : list_grant_sku) {
+						grantskuService.delete(grantsku);
+					}
+
+					// xoa trong bang porder-poline
+					porder_line_Service.delete(list_porder.get(0));
+
+					list_id.add(grant.getId());
+				}
+			}
+			response.list_grantid_link = list_id;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			return new ResponseEntity<delete_many_porder_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<delete_many_porder_response>(response, HttpStatus.OK);
 		}
 	}
 

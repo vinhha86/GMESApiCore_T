@@ -151,4 +151,10 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 	public List<Long> getToSXIdByPcontractPO(Long pcontract_poid_link) {
 		return repo.getToSXIdByPcontractPO(pcontract_poid_link);
 	}
+
+	@Override
+	public List<Long> getGrantPlanByProduct(Long productid_link) {
+		// TODO Auto-generated method stub
+		return repo.getPlanByProduct(productid_link);
+	}
 }

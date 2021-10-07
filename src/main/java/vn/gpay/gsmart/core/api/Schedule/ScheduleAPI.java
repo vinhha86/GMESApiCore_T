@@ -53,6 +53,7 @@ import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.porders_poline.IPOrder_POLine_Service;
 import vn.gpay.gsmart.core.porders_poline.POrder_POLine;
+import vn.gpay.gsmart.core.product.IProductService;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.security.GpayUserOrg;
@@ -112,6 +113,8 @@ public class ScheduleAPI {
 	IPersonnel_Service personnelService;
 	@Autowired
 	ITimesheetAbsenceService timesheet_absence_Service;
+	@Autowired
+	IProductService productService;
 
 	@RequestMapping(value = "/getplan", method = RequestMethod.POST)
 	public ResponseEntity<get_schedule_porder_response> GetAll(HttpServletRequest request, @RequestParam String listid,
@@ -1635,6 +1638,11 @@ public class ScheduleAPI {
 				}
 
 				// tao Schedule_porder de tra len giao dien
+				DecimalFormat decimalFormat = new DecimalFormat("#,###");
+				decimalFormat.setGroupingSize(3);
+				Product product = productService.findOne(productid_link);
+				String mahang = product.getBuyercode()+"-"+ decimalFormat.format(grant.getGrantamount());
+				
 				Schedule_porder sch = new Schedule_porder();
 				sch.setDuration(entity.duration);
 				sch.setProductivity(entity.productivity);
@@ -1642,11 +1650,11 @@ public class ScheduleAPI {
 				sch.setCls(porder.getCls());
 				sch.setEndDate(entity.enddate);
 				sch.setId_origin(porder.getId());
-				sch.setMahang(porder.getMaHang());
-				sch.setName(porder.getMaHang());
+				sch.setMahang(mahang);
+				sch.setName(mahang);
 				sch.setParentid_origin(entity.orgid_link);
 				sch.setPordercode(porder.getOrdercode());
-				sch.setResourceId(entity.orgid_link);
+				sch.setResourceId(entity.orggrantid_link);
 				sch.setStartDate(entity.startdate);
 				sch.setStatus(1);
 				sch.setTotalpackage(porder.getTotalorder());
@@ -1690,6 +1698,187 @@ public class ScheduleAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<CreatePorder_andGrant_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/create_many_porder_and_grant", method = RequestMethod.POST)
+	public ResponseEntity<create_many_porder_grant_response> CreateManyPorderAndGrant(HttpServletRequest request,
+			@RequestBody create_many_porder_grant_request entity) {
+		create_many_porder_grant_response response = new create_many_porder_grant_response();
+
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			Long productid_link = entity.list_pcontract_po.get(0).getProductid_link();
+			List<Schedule_porder> list_schedule = new ArrayList<Schedule_porder>();
+			
+			for(int i=0; i< entity.list_pcontract_po.size(); i++) {
+				Long pcontract_poid_link = entity.list_pcontract_po.get(i).getPcontract_poid_link();
+				PContract_PO po = poService.findOne(pcontract_poid_link);
+				int total = entity.list_pcontract_po.get(i).getPo_quantity();
+				int productivity = entity.productivity;
+				
+				// tao porder
+				Date enddate = po.getShipdate();
+				int duration = commonService.getDuration_byProductivity(total, productivity);
+				
+				Date startdate = commonService.Date_Add_with_holiday(enddate, (0-duration), orgrootid_link);
+				String po_code = null != po.getPo_vendor() && po.getPo_vendor().length() > 0 ? po.getPo_vendor()
+						: po.getPo_buyer();
+
+				POrder porder = new POrder();
+				porder.setFinishdate_plan(enddate);
+				porder.setGolivedate(enddate);
+				porder.setGranttoorgid_link(entity.orgid_link);
+				porder.setId(null);
+				porder.setIsMap(true);
+				porder.setOrderdate(new Date());
+				porder.setOrgrootid_link(orgrootid_link);
+				porder.setPcontract_poid_link(pcontract_poid_link);
+				porder.setPcontractid_link(po.getPcontractid_link());
+				porder.setPlan_duration(duration);
+				porder.setPlan_linerequired(po.getPlan_linerequired());
+				porder.setPlan_productivity(entity.productivity);
+				porder.setProductid_link(productid_link);
+				porder.setProductiondate(startdate);
+				porder.setStatus(entity.orggrantid_link != null ? POrderStatus.PORDER_STATUS_GRANTED
+						: POrderStatus.PORDER_STATUS_FREE);
+				porder.setTimecreated(new Date());
+				porder.setTotalorder(total);
+				porder.setUsercreatedid_link(user.getId());
+
+				porder = porderService.savePOrder(porder, po_code);
+				Long porderid_link = porder.getId();
+				
+				// lay sku sang porder_sku
+				List<PContractProductSKU> list_po_sku = poskuService.getbypo_and_product(pcontract_poid_link,
+						productid_link);
+				for (PContractProductSKU po_sku : list_po_sku) {
+					POrder_Product_SKU porder_sku = new POrder_Product_SKU();
+					porder_sku.setId(null);
+					porder_sku.setOrgrootid_link(orgrootid_link);
+					porder_sku.setPcontract_poid_link(pcontract_poid_link);
+					porder_sku.setPorderid_link(porderid_link);
+					porder_sku.setPquantity_production(po_sku.getPquantity_production());
+					porder_sku.setPquantity_sample(po_sku.getPquantity_sample());
+					porder_sku.setPquantity_total(po_sku.getPquantity_total());
+					porder_sku.setProductid_link(productid_link);
+					porder_sku.setSkuid_link(po_sku.getSkuid_link());
+
+					porderSkuService.save(porder_sku);
+				}
+				
+				Long pordergrantid_link = null;
+				if (entity.orggrantid_link != null) {
+					// tao porder_grant
+					POrderGrant grant = new POrderGrant();
+					grant.setGranttoorgid_link(entity.orggrantid_link);
+					grant.setId(null);
+					grant.setOrdercode(porder.getOrdercode());
+					grant.setOrgrootid_link(orgrootid_link);
+					grant.setPorderid_link(porderid_link);
+					grant.setTimecreated(new Date());
+					grant.setUsercreatedid_link(user.getId());
+					grant.setGrantdate(new Date());
+					grant.setGrantamount(total);
+					grant.setStatus(2);
+					grant.setOrgrootid_link(orgrootid_link);
+					grant.setStart_date_plan(startdate);
+					grant.setFinish_date_plan(enddate);
+					grant.setProductivity(productivity);
+					grant.setDuration(duration);
+					grant.setType(0); // 0 la chua qua ngay giao hang
+					grant.setTotalamount_tt(total);
+					grant.setIsmap(true);
+					grant = granttService.save(grant);
+					pordergrantid_link = grant.getId();
+
+					// them grant_sku
+					for (PContractProductSKU po_sku : list_po_sku) {
+						POrderGrant_SKU grant_sku = new POrderGrant_SKU();
+						grant_sku.setId(null);
+						grant_sku.setOrgrootid_link(orgrootid_link);
+						grant_sku.setPcontract_poid_link(pcontract_poid_link);
+						grant_sku.setGrantamount(po_sku.getPquantity_total());
+						grant_sku.setSkuid_link(po_sku.getSkuid_link());
+						grant_sku.setPordergrantid_link(pordergrantid_link);
+
+						grantskuService.save(grant_sku);
+
+						po_sku.setPquantity_granted(po_sku.getPquantity_total());
+						po_sku.setPquantity_lenhsx(po_sku.getPquantity_total());
+						poskuService.save(po_sku);
+					}
+					
+					// danh dau po da map
+					POrder_POLine porder_poline = new POrder_POLine();
+					porder_poline.setId(null);
+					porder_poline.setPcontract_poid_link(pcontract_poid_link);
+					porder_poline.setPorderid_link(porderid_link);
+					porder_poline.setPordergrantid_link(pordergrantid_link);
+					porderlineService.save(porder_poline);
+
+					// danh dau po da map
+					List<PContractProductSKU> list_sku = poskuService.getbypo_and_product(pcontract_poid_link, productid_link);
+					for (PContractProductSKU sku : list_sku) {
+						sku.setIsmap(true);
+						poskuService.save(sku);
+					}
+					List<PContractProductSKU> list_sku_notmap = poskuService.getsku_notmap(pcontract_poid_link);
+					if (list_sku_notmap.size() == 0) {
+						po.setIsmap(true);
+						poService.save(po);
+					}
+					
+					// tao Schedule_porder de tra len giao dien
+					DecimalFormat decimalFormat = new DecimalFormat("#,###");
+					decimalFormat.setGroupingSize(3);
+					Product product = productService.findOne(productid_link);
+					String mahang = product.getBuyercode()+"-"+ decimalFormat.format(total);
+					PContract pcontract = pcontractService.findOne(po.getPcontractid_link());
+					
+					Schedule_porder sch = new Schedule_porder();
+					sch.setDuration(duration);
+					sch.setProductivity(entity.productivity);
+					sch.setBuyername(porder.getBuyername());
+					sch.setCls(pcontract.getcls());
+					sch.setEndDate(enddate);
+					sch.setId_origin(porder.getId());
+					sch.setMahang(mahang);
+					sch.setName(mahang);
+					sch.setParentid_origin(entity.orgid_link);
+					sch.setPordercode(porder.getOrdercode());
+					sch.setResourceId(entity.orggrantid_link);
+					sch.setStartDate(startdate);
+					sch.setStatus(1);
+					sch.setTotalpackage(porder.getTotalorder());
+					sch.setVendorname(porder.getVendorname());
+					sch.setPorder_grantid_link(pordergrantid_link);
+					sch.setProductivity_po(porder.getProductivity_po());
+					sch.setProductivity_porder(0);
+					sch.setPcontract_poid_link(porder.getPcontract_poid_link());
+					sch.setPcontractid_link(porder.getPcontractid_link());
+					sch.setProductbuyercode(porder.getProductcode());
+					sch.setPorderid_link(porder.getId());
+					sch.setGrant_type(0);
+					sch.setProductid_link(productid_link);
+
+					list_schedule.add(sch);
+				}
+			}
+
+			response.data = list_schedule;
+			
+			//lay nhung grant ke hoach de remove tren bieu do
+			response.remove = granttService.getGrantPlanByProduct(productid_link);
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<create_many_porder_grant_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<create_many_porder_grant_response>(response, HttpStatus.OK);
 		}
 	}
 
