@@ -67,6 +67,7 @@ import vn.gpay.gsmart.core.task_object.Task_Object;
 import vn.gpay.gsmart.core.timesheet_absence.ITimesheetAbsenceService;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.OrgType;
+import vn.gpay.gsmart.core.utils.POType;
 import vn.gpay.gsmart.core.utils.POrderReqStatus;
 import vn.gpay.gsmart.core.utils.POrderStatus;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
@@ -1522,8 +1523,14 @@ public class ScheduleAPI {
 
 				List<POrderGrant> list_grant = granttService.getByOrderId(porderid_link);
 				if (list_grant.size() == 0) {
-					porder.setStatus(POrderStatus.PORDER_STATUS_FREE);
-					porderService.save(porder);
+					PContract_PO po = poService.findOne(porder.getPcontract_poid_link());
+					if(po.getPo_typeid_link() == POType.PO_LINE_PLAN) {
+						porder.setStatus(POrderStatus.PORDER_STATUS_FREE);
+						porderService.save(porder);
+					}
+					else {
+						porderService.delete(porder);
+					}
 				}
 			}
 
