@@ -1,10 +1,10 @@
 package vn.gpay.gsmart.core.api.Schedule;
 
 public class create_many_pordertest_request {
-	public long pcontract_poid_link;
-	public long productid_link;
-	public long parentid_origin;
-	public long resourceid;
-	public long orggrantto;
-	public long orgid_link;
+	public Long pcontract_poid_link;
+	public Long productid_link;
+	public Long parentid_origin;
+	public Long resourceid;
+	public Long orggrantto;
+	public Long orgid_link;
 }

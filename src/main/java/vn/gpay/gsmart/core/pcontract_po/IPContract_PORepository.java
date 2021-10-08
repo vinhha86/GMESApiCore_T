@@ -254,7 +254,7 @@ public interface IPContract_PORepository
 			+ "inner join PContractProductSKU a on a.pcontract_poid_link = c.id "
 			+ "where (porder.granttoorgid_link in :orgs or :orgs is null) "
 			+ "and c.po_typeid_link = 11 and plan.po_typeid_link = 10 "
-			+ "and (a.skuid_link in :listsku or :listsku is null)"
+			+ "and ((a.skuid_link in :listsku and (a.ismap = 'false' or a.ismap is null)) or :listsku is null) "
 			+ "and (c.productid_link = :productid_link or a.productid_link = :productid_link) group by c "
 			+ "order by c.shipdate ASC ")
 	public List<PContract_PO> getby_product_color_sizeset(@Param("orgs") final List<Long> orgs,

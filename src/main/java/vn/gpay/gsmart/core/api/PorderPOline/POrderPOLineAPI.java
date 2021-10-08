@@ -384,37 +384,27 @@ public class POrderPOLineAPI {
 			return new ResponseEntity<delete_porder_response>(response, HttpStatus.OK);
 		}
 	}
-	
+
 	@RequestMapping(value = "/delete_many_porder", method = RequestMethod.POST)
 	public ResponseEntity<delete_many_porder_response> DeleteManyPorder(@RequestBody delete_many_porder_request entity,
 			HttpServletRequest request) {
 		delete_many_porder_response response = new delete_many_porder_response();
 		try {
 			List<Long> list_id = new ArrayList<Long>();
-			
-			for(PContract_PO_Shipping po : entity.data) {
+
+			for (PContract_PO_Shipping po : entity.data) {
 				Long pcontract_poid_link = po.getPcontract_poid_link();
 				Long productid_link = po.getProductid_link();
-				
-				List<PContractProductSKU> list_sku = pcontractskuService.getbypo_and_product(pcontract_poid_link,
-						productid_link);
-				for (PContractProductSKU sku : list_sku) {
-					sku.setIsmap(false);
-					pcontractskuService.save(sku);
-				}
-				
-				List<PContractProductSKU> list_notmap = pcontractskuService.getsku_notmap(pcontract_poid_link);
 
-				PContract_PO linett = poService.findOne(pcontract_poid_link);
-				if (list_notmap.size() == 0) {
-					linett.setIsmap(true);
-				} else {
-					linett.setIsmap(false);
-				}
-				poService.save(linett);
-				
-				List<POrder_POLine> list_porder = porder_line_Service.get_porderline_by_po_and_product(pcontract_poid_link,
-						productid_link);
+//				List<PContractProductSKU> list_sku = pcontractskuService.getbypo_and_product(pcontract_poid_link,
+//						productid_link);
+//				for (PContractProductSKU sku : list_sku) {
+//					sku.setIsmap(false);
+//					pcontractskuService.save(sku);
+//				}
+
+				List<POrder_POLine> list_porder = porder_line_Service
+						.get_porderline_by_po_and_product(pcontract_poid_link, productid_link);
 
 				if (list_porder.size() > 0) {
 
@@ -442,7 +432,27 @@ public class POrderPOLineAPI {
 					List<POrder_Product_SKU> list_porder_sku = porderskuService.getby_porder(porder.getId());
 					for (POrder_Product_SKU porder_sku : list_porder_sku) {
 						porderskuService.delete(porder_sku);
+
+						// cap nhat lai trong pcontract_sku chua map
+						Long skuid_link = porder_sku.getSkuid_link();
+						List<PContractProductSKU> list_po_sku = pcontractskuService
+								.getlistsku_bysku_and_product_PO(skuid_link, pcontract_poid_link, productid_link);
+						if (list_po_sku.size() > 0) {
+							PContractProductSKU posku = list_po_sku.get(0);
+							posku.setIsmap(false);
+							pcontractskuService.save(posku);
+						}
 					}
+
+					List<PContractProductSKU> list_notmap = pcontractskuService.getsku_notmap(pcontract_poid_link);
+
+					PContract_PO linett = poService.findOne(pcontract_poid_link);
+					if (list_notmap.size() == 0) {
+						linett.setIsmap(true);
+					} else {
+						linett.setIsmap(false);
+					}
+					poService.save(linett);
 
 					// xoa het trong porder_grant_sku
 
@@ -458,7 +468,7 @@ public class POrderPOLineAPI {
 				}
 			}
 			response.list_grantid_link = list_id;
-			
+
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			return new ResponseEntity<delete_many_porder_response>(response, HttpStatus.OK);
 		} catch (Exception e) {

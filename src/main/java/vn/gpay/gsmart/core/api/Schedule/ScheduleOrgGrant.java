@@ -127,7 +127,8 @@ public class ScheduleOrgGrant implements Runnable {
 				sch_porder.setIcon(AtributeFixValues.folder_image + pordergrant.getImgProduct());
 			else
 				sch_porder.setIcon(null);
-			sch_porder.setCls(pordergrant.getCls());
+			String cls = pordergrant.getStatus().equals(2) ? " map" : "";
+			sch_porder.setCls(pordergrant.getCls() + cls);
 			sch_porder.setEndDate(end);
 			sch_porder.setId_origin(pordergrant.getPorderid_link());
 			sch_porder.setPorderid_link(pordergrant.getPorderid_link());
