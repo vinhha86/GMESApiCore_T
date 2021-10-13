@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import vn.gpay.gsmart.core.attribute.Attribute;
 import vn.gpay.gsmart.core.attribute.IAttributeService;
+import vn.gpay.gsmart.core.attributevalue.Attributevalue;
 import vn.gpay.gsmart.core.attributevalue.IAttributeValueService;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.category.IShipModeService;
@@ -34,6 +35,7 @@ import vn.gpay.gsmart.core.category.ShipMode;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.packingtype.IPackingTypeService;
+import vn.gpay.gsmart.core.packingtype.PackingType;
 import vn.gpay.gsmart.core.pcontract.IPContractService;
 import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
@@ -48,6 +50,8 @@ import vn.gpay.gsmart.core.pcontractproduct.IPContractProductService;
 import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproductpairing.IPContractProductPairingService;
 import vn.gpay.gsmart.core.pcontractproductpairing.PContractProductPairing;
+import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
+import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
@@ -59,11 +63,15 @@ import vn.gpay.gsmart.core.productpairing.IProductPairingService;
 import vn.gpay.gsmart.core.productpairing.ProductPairing;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sizeset.ISizeSetService;
+import vn.gpay.gsmart.core.sizeset.SizeSet;
+import vn.gpay.gsmart.core.sizesetattributevalue.ISizeSetAttributeService;
+import vn.gpay.gsmart.core.sizesetattributevalue.SizeSetAttributeValue;
 import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 import vn.gpay.gsmart.core.sku.ISKU_Service;
 import vn.gpay.gsmart.core.sku.SKU;
 import vn.gpay.gsmart.core.sku.SKU_Attribute_Value;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
+import vn.gpay.gsmart.core.utils.ColumnPO_FOB;
 import vn.gpay.gsmart.core.utils.ColumnTempNew;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.POStatus;
@@ -117,6 +125,10 @@ public class UploadAPI {
 	IPackingTypeService packingService;
 	@Autowired
 	IAttributeValueService attributevalueService;
+	@Autowired
+	IPContractProductSKUService ppskuService;
+	@Autowired
+	ISizeSetAttributeService sizeset_att_Service;
 
 	@RequestMapping(value = "/offers", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadTemplate(HttpServletRequest request,
@@ -1059,499 +1071,502 @@ public class UploadAPI {
 		return code;
 	}
 
-//	@RequestMapping(value = "/upload_po_fob", method = RequestMethod.POST)
-//	public ResponseEntity<ResponseBase> UploadPO_FOB(HttpServletRequest request,
-//			@RequestParam("file") MultipartFile file, @RequestParam("parentid_link") long parentid_link,
-//			@RequestParam("pcontractid_link") long pcontractid_link) {
-//		ResponseBase response = new ResponseBase();
-//
-//		Date current_time = new Date();
-//		String name = "";
-//		try {
-//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//			long orgrootid_link = user.getRootorgid_link();
-//			PContract_PO parent = pcontract_POService.findOne(parentid_link);
-//			String FolderPath = "upload/pcontract_po";
-//
-//			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
-//
-//			File uploadRootDir = new File(uploadRootPath);
-//			// Tạo thư mục gốc upload nếu nó không tồn tại.
-//			if (!uploadRootDir.exists()) {
-//				uploadRootDir.mkdirs();
-//			}
-//
-//			name = file.getOriginalFilename();
-//			if (name != null && name.length() > 0) {
-//				String[] str = name.split("\\.");
-//				String extend = str[str.length - 1];
-//				name = current_time.getTime() + "." + extend;
-//				File serverFile = new File(uploadRootDir.getAbsolutePath() + File.separator + name);
-//
-//				BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-//				stream.write(file.getBytes());
-//				stream.close();
-//
-//				// doc file upload
-//				XSSFWorkbook workbook = new XSSFWorkbook(serverFile);
-//				XSSFSheet sheet = workbook.getSheetAt(0);
-//
-//				// Kiem tra header
-//				int rowNum = 1;
-//				int colNum = 0;
-//				int amount_po = 0;
-//				String mes_err = "";
-//				Row row = sheet.getRow(rowNum);
-//				try {
-//					String PO = "";
-//					PO = commonService.getStringValue(row.getCell(ColumnPO_FOB.PO));
-//					while (!PO.equals("")) {
-//
-//						colNum = ColumnPO_FOB.Line;
-//						String Line = commonService.getStringValue(row.getCell(ColumnPO_FOB.Line));
-//						Line = Line.equals("0") ? "" : Line;
-//
-//						colNum = ColumnPO_FOB.shipdate;
-//						Date ShipDate = null;
-//						try {
-//							String s_shipdate = commonService.getStringValue(row.getCell(ColumnPO_FOB.shipdate));
-//							if (s_shipdate.contains("/")) {
-//								String[] s_date = s_shipdate.split("/");
-//								if (Integer.parseInt(s_date[1].toString()) < 13
-//										&& Integer.parseInt(s_date[0].toString()) < 32) {
-//									ShipDate = new SimpleDateFormat("dd/MM/yyyy").parse(s_shipdate);
-//								} else {
-//									mes_err = "Định dạng ngày không đúng dd/MM/yyyy! ";
-//								}
-//
-//							} else {
-//								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPO_FOB.shipdate))) {
-//									ShipDate = row.getCell(ColumnPO_FOB.shipdate).getDateCellValue();
-//								}
-//							}
-//
-//						} catch (Exception e) {
-//							if (DateUtil.isCellDateFormatted(row.getCell(ColumnPO_FOB.shipdate))) {
-//								ShipDate = row.getCell(ColumnPO_FOB.shipdate).getDateCellValue();
-//							}
-//						}
-//
-//						if (ShipDate == null) {
-//							throw new Exception();
-//						}
-//
-//						colNum = ColumnPO_FOB.shipmode;
-//						String Shipmode = row.getCell(ColumnPO_FOB.shipmode).getStringCellValue();
-//						Shipmode = Shipmode.equals("0") ? "" : Shipmode;
-//
-//						colNum = ColumnPO_FOB.packing_method;
-//						String PackingMethod = row.getCell(ColumnPO_FOB.packing_method).getStringCellValue();
-//						PackingMethod = PackingMethod.equals("0") ? "" : PackingMethod;
-//
-//						colNum = ColumnPO_FOB.color_name;
-//						String ColorName = commonService.getStringValue(row.getCell(ColumnPO_FOB.color_name));
-//						ColorName = ColorName.equals("0") ? "" : ColorName;
-//
-//						colNum = ColumnPO_FOB.color_code;
-//						String ColorCode = commonService.getStringValue(row.getCell(ColumnPO_FOB.color_code));
-//						ColorCode = ColorCode.equals("0") ? "" : ColorCode;
-//
-//						colNum = ColumnPO_FOB.style;
-//						String Style = commonService.getStringValue(row.getCell(ColumnPO_FOB.style));
-//						Style = Style.equals("0") ? "" : Style;
-//
-//						colNum = ColumnPO_FOB.size_set;
-//						String SizeSet = commonService.getStringValue(row.getCell(ColumnPO_FOB.size_set));
-//						SizeSet = SizeSet.equals("0") ? "" : SizeSet;
-//
-//						// Kiem tra size-set
-//						Long sizesetid_link = null;
-//
-//						if (!SizeSet.equals("")) {
-//							List<SizeSet> list_sizeset = sizesetService.getSizeSetByName(SizeSet);
-//							if (list_sizeset.size() == 0) {
-//								SizeSet sizeset = new SizeSet();
-//								sizeset.setComment("");
-//								sizeset.setId(null);
-//								sizeset.setName(SizeSet);
-//								sizeset.setOrgrootid_link(orgrootid_link);
-//								sizeset.setSortvalue(0);
-//								sizeset.setTimecreate(new Date());
-//								sizeset.setUsercreatedid_link(user.getId());
-//
-//								sizeset = sizesetService.save(sizeset);
-//								sizesetid_link = sizeset.getId();
-//							} else {
-//								sizesetid_link = list_sizeset.get(0).getId();
-//							}
-//						}
-//
-//						// Kiem tra Shipmode da ton tai hay chua
-//						Long shipmodeid_link = null;
-//						if (!Shipmode.equals("")) {
-//							List<ShipMode> shipmodes = shipmodeService.getbyname(Shipmode);
-//							if (shipmodes.size() == 0) {
-//								ShipMode shipmode_new = new ShipMode();
-//								shipmode_new.setId(null);
-//								shipmode_new.setName(Shipmode);
-//								shipmode_new = shipmodeService.save(shipmode_new);
-//
-//								shipmodeid_link = shipmode_new.getId();
-//							} else {
-//								shipmodeid_link = shipmodes.get(0).getId();
-//							}
-//						}
-//
-//						// Kiem tra PackingMethod
-//						Long packingmethodid_link = null;
-//						if (!PackingMethod.equals("")) {
-//							List<PackingType> list_packing = packingService.getbyname(PackingMethod, orgrootid_link);
-//							if (list_packing.size() == 0) {
-//								PackingType pk = new PackingType();
-//								pk.setCode(PackingMethod);
-//								pk.setId(null);
-//								pk.setName(PackingMethod);
-//								pk.setOrgrootid_link(orgrootid_link);
-//								pk = packingService.save(pk);
-//
-//								packingmethodid_link = pk.getId();
-//							} else {
-//								packingmethodid_link = list_packing.get(0).getId();
-//							}
-//						}
-//
-//						// Kiem tra PO co dung voi PO dang chon de them moi khong
-//						if (!PO.equals("TBD")) {
-//
-//							amount_po = 0;
-//							Long pcontractpoid_link = null;
-//
-//							// Kiem tra xem PO con da ton tai hay chua
-//							String s_po = Line.equals("") ? PO : PO + "-" + Line;
-//							List<PContract_PO> list_po = pcontract_POService.check_exist_po_children(s_po, ShipDate,
-//									shipmodeid_link, pcontractid_link, parentid_link);
-//
-//							if (list_po.size() == 0) {
-//
-//								PContract_PO po_new = new PContract_PO();
-//								po_new.setId(null);
-//								po_new.setPo_buyer(s_po);
-//								po_new.setShipdate(ShipDate);
-//								po_new.setShipmodeid_link(shipmodeid_link);
-//								po_new.setPcontractid_link(pcontractid_link);
-//								po_new.setParentpoid_link(parentid_link);
-//								po_new.setOrgrootid_link(orgrootid_link);
-//								po_new.setPackingnotice(packingmethodid_link + "");
-//								po_new.setProductid_link(parent.getProductid_link());
-//								po_new.setPlan_productivity(parent.getPlan_productivity());
-//								po_new.setPlan_linerequired(parent.getPlan_linerequired());
-//								po_new.setStatus(POStatus.PO_STATUS_CONFIRMED);
-//								po_new.setPo_typeid_link(POType.PO_LINE_CONFIRMED);
-//								po_new.setComment(Style);
-//
-//								po_new = pcontract_POService.save(po_new);
-//
-//								pcontractpoid_link = po_new.getId();
-//							} else {
-//								pcontractpoid_link = list_po.get(0).getId();
-//								PContract_PO po = list_po.get(0);
-//								po.setStatus(POStatus.PO_STATUS_CONFIRMED);
-//								po.setComment(Style);
-////									amount_po = po.getPo_quantity();
-//							}
-//
-//							Long colorid_link = null;
-//							List<Attributevalue> listAttributevalue = attributevalueService
-//									.getByValue(ColorName + "(" + ColorCode + ")", AtributeFixValues.ATTR_COLOR);
-//							if (listAttributevalue.size() == 0) {
-//								Attributevalue av = new Attributevalue();
-//								av.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
-//								av.setId(null);
-//								av.setIsdefault(false);
-//								av.setOrgrootid_link(orgrootid_link);
-//								av.setSortvalue(attributevalueService.getMaxSortValue(AtributeFixValues.ATTR_COLOR));
-//								av.setTimecreate(new Date());
-//								av.setUsercreateid_link(user.getId());
-//								av.setValue(ColorName + "(" + ColorCode + ")");
-//
-//								av = attributevalueService.save(av);
-//								colorid_link = av.getId();
-//							} else {
-//								colorid_link = listAttributevalue.get(0).getId();
-//							}
-//
-//							// lấy từng cỡ trong dải cỡ
-//							colNum = ColumnPO_FOB.size;
-//							String list_size = commonService.getStringValue(row.getCell(ColumnPO_FOB.size));
-//							list_size = list_size.equals("0") ? "" : list_size;
-//							String[] str_size = list_size.split("-");
-//
-//							for (String size_name : str_size) {
-//								Long sizeid_link = null;
-//								List<Attributevalue> listsize = attributevalueService.getByValue(size_name,
-//										AtributeFixValues.ATTR_SIZE);
-//								if (listsize.size() == 0) {
-//									Attributevalue av = new Attributevalue();
-//									av.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
-//									av.setId(null);
-//									av.setIsdefault(false);
-//									av.setOrgrootid_link(orgrootid_link);
-//									av.setSortvalue(attributevalueService.getMaxSortValue(AtributeFixValues.ATTR_SIZE));
-//									av.setTimecreate(new Date());
-//									av.setUsercreateid_link(user.getId());
-//									av.setValue(size_name);
-//
-//									av = attributevalueService.save(av);
-//									sizeid_link = av.getId();
-//								} else {
-//									sizeid_link = list_size.get(0).getId();
-//								}
-//							}
-//
-//							int columnsize = ColumnPO.Colorcode + 1;
-//							String s_sizename = commonService.getStringValue(rowheader.getCell(columnsize));
-//							s_sizename = s_sizename.equals("0") ? "" : s_sizename;
-//							while (!s_sizename.equals("")) {
-//								colNum = columnsize;
-//								// han che viec de qua nhieu cot co thi khong xu ly nua
-//								if (colNum == 50)
-//									break;
-//
-//								String sizename = commonService.getStringValue(rowheader.getCell(columnsize));
-//
-//								String s_amount = commonService.getStringValue(row.getCell(columnsize)).equals("") ? "0"
-//										: commonService.getStringValue(row.getCell(columnsize));
-//								s_amount = s_amount.replace(",", "");
-//								Double amount = Double.parseDouble(s_amount);
-//								if (amount > 0) {
-//									amount_po += amount;
-//
-//									Product product = productService.findOne(parent.getProductid_link());
-//									if (product.getProducttypeid_link() != 5) {
-//										Long skuid_link = skuattService.getsku_byproduct_and_valuemau_valueco(
-//												parent.getProductid_link(), colorid_link, sizeid_link);
-//
-//										if (skuid_link == 0) {
-//
-//											SKU sku = new SKU();
-//											sku.setCode(genCodeSKU(product));
-//											sku.setId(null);
-//											sku.setUnitid_link(product.getUnitid_link());
-//											sku.setName(genCodeSKU(product));
-//											sku.setOrgrootid_link(orgrootid_link);
-//											sku.setProductid_link(parent.getProductid_link());
-//											sku.setSkutypeid_link(10);
-//											sku = skuService.save(sku);
-//
-//											skuid_link = sku.getId();
-//
-//											// Them vao bang sku_attribute_value
-//											SKU_Attribute_Value savMau = new SKU_Attribute_Value();
-//											savMau.setId((long) 0);
-//											savMau.setAttributevalueid_link(colorid_link);
-//											savMau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
-//											savMau.setOrgrootid_link(orgrootid_link);
-//											savMau.setSkuid_link(skuid_link);
-//											savMau.setUsercreateid_link(user.getId());
-//											savMau.setTimecreate(new Date());
-//
-//											skuattService.save(savMau);
-//
-//											SKU_Attribute_Value savCo = new SKU_Attribute_Value();
-//											savCo.setId((long) 0);
-//											savCo.setAttributevalueid_link(sizeid_link);
-//											savCo.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
-//											savCo.setOrgrootid_link(orgrootid_link);
-//											savCo.setSkuid_link(skuid_link);
-//											savCo.setUsercreateid_link(user.getId());
-//											savCo.setTimecreate(new Date());
-//
-//											skuattService.save(savCo);
-//
-//											// Them vao trong product_attribute_value
-//											ProductAttributeValue pav_mau = new ProductAttributeValue();
-//											pav_mau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
-//											pav_mau.setAttributevalueid_link(colorid_link);
-//											pav_mau.setId(null);
-//											pav_mau.setIsDefault(false);
-//											pav_mau.setOrgrootid_link(orgrootid_link);
-//											pav_mau.setProductid_link(parent.getProductid_link());
-//											pavService.save(pav_mau);
-//
-//											ProductAttributeValue pav_co = new ProductAttributeValue();
-//											pav_co.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
-//											pav_co.setAttributevalueid_link(sizeid_link);
-//											pav_co.setId(null);
-//											pav_co.setIsDefault(false);
-//											pav_co.setOrgrootid_link(orgrootid_link);
-//											pav_co.setProductid_link(parent.getProductid_link());
-//											pavService.save(pav_co);
-//										}
-//										int amount_plus = commonService
-//												.Calculate_pquantity_production(amount.intValue());
-//										List<PContractProductSKU> ppskus = ppskuService.getlistsku_bysku_and_product_PO(
-//												skuid_link, pcontractpoid_link, parent.getProductid_link());
-//										if (ppskus.size() == 0) {
-//											PContractProductSKU ppsku = new PContractProductSKU();
-//											ppsku.setId(null);
-//											ppsku.setOrgrootid_link(orgrootid_link);
-//											ppsku.setPcontract_poid_link(pcontractpoid_link);
-//											ppsku.setPcontractid_link(pcontractid_link);
-//											ppsku.setPquantity_porder(amount.intValue());
-//											ppsku.setPquantity_production(amount_plus);
-//											ppsku.setPquantity_total(amount_plus);
-//											ppsku.setProductid_link(parent.getProductid_link());
-//											ppsku.setSkuid_link(skuid_link);
-//											ppskuService.save(ppsku);
-//										} else {
-//											PContractProductSKU ppsku = ppskus.get(0);
-//											ppsku.setPquantity_porder(amount.intValue());
-//											ppsku.setPquantity_production(amount_plus);
-//											ppsku.setPquantity_total(amount_plus);
-//											ppskuService.save(ppsku);
-//										}
-//									} else {
-//										List<ProductPairing> list_pair = productpairService
-//												.getproduct_pairing_detail_bycontract(orgrootid_link, pcontractid_link,
-//														product.getId());
-//										for (ProductPairing productPairing : list_pair) {
-//											Product product_children = productService
-//													.findOne(productPairing.getProductid_link());
-//
-//											Long skuid_link = skuattService.getsku_byproduct_and_valuemau_valueco(
-//													productPairing.getProductid_link(), colorid_link, sizeid_link);
-//
-//											if (skuid_link == 0 || skuid_link == null) {
-//
-//												SKU sku = new SKU();
-//												sku.setCode(genCodeSKU(product_children));
-//												sku.setId(null);
-//												sku.setUnitid_link(product.getUnitid_link());
-//												sku.setName(genCodeSKU(product_children));
-//												sku.setOrgrootid_link(orgrootid_link);
-//												sku.setProductid_link(productPairing.getProductid_link());
-//												sku.setSkutypeid_link(10);
-//												sku = skuService.save(sku);
-//
-//												skuid_link = sku.getId();
-//
-//												// Them vao bang sku_attribute_value
-//												SKU_Attribute_Value savMau = new SKU_Attribute_Value();
-//												savMau.setId((long) 0);
-//												savMau.setAttributevalueid_link(colorid_link);
-//												savMau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
-//												savMau.setOrgrootid_link(orgrootid_link);
-//												savMau.setSkuid_link(skuid_link);
-//												savMau.setUsercreateid_link(user.getId());
-//												savMau.setTimecreate(new Date());
-//
-//												skuattService.save(savMau);
-//
-//												SKU_Attribute_Value savCo = new SKU_Attribute_Value();
-//												savCo.setId((long) 0);
-//												savCo.setAttributevalueid_link(sizeid_link);
-//												savCo.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
-//												savCo.setOrgrootid_link(orgrootid_link);
-//												savCo.setSkuid_link(skuid_link);
-//												savCo.setUsercreateid_link(user.getId());
-//												savCo.setTimecreate(new Date());
-//
-//												skuattService.save(savCo);
-//
-//												// Them vao trong product_attribute_value
-//												ProductAttributeValue pav_mau = new ProductAttributeValue();
-//												pav_mau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
-//												pav_mau.setAttributevalueid_link(colorid_link);
-//												pav_mau.setId(null);
-//												pav_mau.setIsDefault(false);
-//												pav_mau.setOrgrootid_link(orgrootid_link);
-//												pav_mau.setProductid_link(productPairing.getProductid_link());
-//												pavService.save(pav_mau);
-//
-//												ProductAttributeValue pav_co = new ProductAttributeValue();
-//												pav_co.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
-//												pav_co.setAttributevalueid_link(sizeid_link);
-//												pav_co.setId(null);
-//												pav_co.setIsDefault(false);
-//												pav_co.setOrgrootid_link(orgrootid_link);
-//												pav_co.setProductid_link(productPairing.getProductid_link());
-//												pavService.save(pav_co);
-//											}
-//
-//											int amount_plus = commonService.Calculate_pquantity_production(
-//													amount.intValue() * productPairing.getAmount());
-//											List<PContractProductSKU> ppskus = ppskuService
-//													.getlistsku_bysku_and_product_PO(skuid_link, pcontractpoid_link,
-//															productPairing.getProductid_link());
-//											if (ppskus.size() == 0) {
-//												PContractProductSKU ppsku = new PContractProductSKU();
-//												ppsku.setId(null);
-//												ppsku.setOrgrootid_link(orgrootid_link);
-//												ppsku.setPcontract_poid_link(pcontractpoid_link);
-//												ppsku.setPcontractid_link(pcontractid_link);
-//												ppsku.setPquantity_porder(
-//														amount.intValue() * productPairing.getAmount());
-//												ppsku.setPquantity_production(amount_plus);
-//												ppsku.setPquantity_total(amount_plus);
-//												ppsku.setProductid_link(productPairing.getProductid_link());
-//												ppsku.setSkuid_link(skuid_link);
-//												ppskuService.save(ppsku);
-//											} else {
-//												PContractProductSKU ppsku = ppskus.get(0);
-//												ppsku.setPquantity_porder(
-//														amount.intValue() * productPairing.getAmount());
-//												ppsku.setPquantity_production(amount_plus);
-//												ppsku.setPquantity_total(amount_plus);
-//												ppskuService.save(ppsku);
-//											}
-//										}
-//									}
-//								}
-//
-//								columnsize++;
-//
-//								s_sizename = commonService.getStringValue(rowheader.getCell(columnsize));
-//								s_sizename = s_sizename.equals("0") ? "" : s_sizename;
-//							}
-//							System.out.println("amount_po: " + amount_po);
-//							// Cap nhat lai so tong cua po
-//							PContract_PO po = pcontract_POService.findOne(pcontractpoid_link);
-//							po.setPo_quantity(amount_po);
-//							po = pcontract_POService.save(po);
-//
-//							// Cap nhat lai so luong trong pcontract_productivity
-//						}
-//						rowNum++;
-//						row = sheet.getRow(rowNum);
-//						if (row == null)
-//							break;
-//
-//						STT = commonService.getStringValue(row.getCell(ColumnTemplate.STT));
-//						STT = STT.equals("0") ? "" : STT;
-//					}
-//				} catch (Exception e) {
-//					mes_err += "Có lỗi ở dòng " + (rowNum + 1) + " và cột " + (colNum + 1);
-//				} finally {
-//					workbook.close();
-//					serverFile.delete();
-//				}
-//
-//				if (mes_err == "") {
-//					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-//					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-//				} else {
-//					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-//					response.setMessage(mes_err);
-//				}
-//			} else {
-//				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-//				response.setMessage("Có lỗi trong quá trình upload! Bạn hãy thử lại");
-//			}
-//		} catch (Exception e) {
-//			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-//			response.setMessage(e.getMessage());
-//		}
-//		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
-//	}
+	@RequestMapping(value = "/upload_po_fob", method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> UploadPO_FOB(HttpServletRequest request,
+			@RequestParam("file") MultipartFile file, @RequestParam("parentid_link") long parentid_link,
+			@RequestParam("pcontractid_link") long pcontractid_link) {
+		ResponseBase response = new ResponseBase();
+
+		Date current_time = new Date();
+		String name = "";
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+			PContract_PO parent = pcontract_POService.findOne(parentid_link);
+			String FolderPath = "upload/pcontract_po";
+
+			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+
+			File uploadRootDir = new File(uploadRootPath);
+			// Tạo thư mục gốc upload nếu nó không tồn tại.
+			if (!uploadRootDir.exists()) {
+				uploadRootDir.mkdirs();
+			}
+
+			name = file.getOriginalFilename();
+			if (name != null && name.length() > 0) {
+				String[] str = name.split("\\.");
+				String extend = str[str.length - 1];
+				name = current_time.getTime() + "." + extend;
+				File serverFile = new File(uploadRootDir.getAbsolutePath() + File.separator + name);
+
+				BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+				stream.write(file.getBytes());
+				stream.close();
+
+				// doc file upload
+				XSSFWorkbook workbook = new XSSFWorkbook(serverFile);
+				XSSFSheet sheet = workbook.getSheetAt(0);
+
+				// Kiem tra header
+				int rowNum = 1;
+				int colNum = 0;
+				String mes_err = "";
+				Row row = sheet.getRow(rowNum);
+				try {
+					String PO = "";
+					PO = commonService.getStringValue(row.getCell(ColumnPO_FOB.PO));
+					while (!PO.equals("")) {
+
+						colNum = ColumnPO_FOB.Line;
+						String Line = commonService.getStringValue(row.getCell(ColumnPO_FOB.Line));
+						Line = Line.equals("0") ? "" : Line;
+
+						colNum = ColumnPO_FOB.shipdate;
+						Date ShipDate = null;
+						try {
+							String s_shipdate = commonService.getStringValue(row.getCell(ColumnPO_FOB.shipdate));
+							if (s_shipdate.contains("/")) {
+								String[] s_date = s_shipdate.split("/");
+								if (Integer.parseInt(s_date[1].toString()) < 13
+										&& Integer.parseInt(s_date[0].toString()) < 32) {
+									ShipDate = new SimpleDateFormat("dd/MM/yyyy").parse(s_shipdate);
+								} else {
+									mes_err = "Định dạng ngày không đúng dd/MM/yyyy! ";
+								}
+
+							} else {
+								if (DateUtil.isCellDateFormatted(row.getCell(ColumnPO_FOB.shipdate))) {
+									ShipDate = row.getCell(ColumnPO_FOB.shipdate).getDateCellValue();
+								}
+							}
+
+						} catch (Exception e) {
+							if (DateUtil.isCellDateFormatted(row.getCell(ColumnPO_FOB.shipdate))) {
+								ShipDate = row.getCell(ColumnPO_FOB.shipdate).getDateCellValue();
+							}
+						}
+
+						if (ShipDate == null) {
+							throw new Exception();
+						}
+
+						colNum = ColumnPO_FOB.shipmode;
+						String Shipmode = row.getCell(ColumnPO_FOB.shipmode).getStringCellValue();
+						Shipmode = Shipmode.equals("0") ? "" : Shipmode;
+
+						colNum = ColumnPO_FOB.packing_method;
+						String PackingMethod = row.getCell(ColumnPO_FOB.packing_method).getStringCellValue();
+						PackingMethod = PackingMethod.equals("0") ? "" : PackingMethod;
+
+						colNum = ColumnPO_FOB.color_name;
+						String ColorName = commonService.getStringValue(row.getCell(ColumnPO_FOB.color_name));
+						ColorName = ColorName.equals("0") ? "" : ColorName;
+
+						colNum = ColumnPO_FOB.color_code;
+						String ColorCode = commonService.getStringValue(row.getCell(ColumnPO_FOB.color_code));
+						ColorCode = ColorCode.equals("0") ? "" : ColorCode;
+
+						colNum = ColumnPO_FOB.style;
+						String Style = commonService.getStringValue(row.getCell(ColumnPO_FOB.style));
+						Style = Style.equals("0") ? "" : Style;
+
+						colNum = ColumnPO_FOB.size_set;
+						String SizeSet = commonService.getStringValue(row.getCell(ColumnPO_FOB.size_set));
+						SizeSet = SizeSet.equals("0") ? "" : SizeSet;
+						
+						colNum = ColumnPO_FOB.ratio;
+						String Ratio = commonService.getStringValue(row.getCell(ColumnPO_FOB.ratio));
+						Ratio = Ratio.equals("0") ? "" : Ratio;
+						
+						colNum = ColumnPO_FOB.po_quantity;
+						String s_PO_quantity = commonService.getStringValue(row.getCell(ColumnPO_FOB.po_quantity));
+						s_PO_quantity = s_PO_quantity.equals("0") ? "" : s_PO_quantity;
+						s_PO_quantity = s_PO_quantity.replace(",", "");
+						Integer PO_quantity = Integer.parseInt(s_PO_quantity);
+
+
+						// Kiem tra size-set
+						Long sizesetid_link = null;
+
+						if (!SizeSet.equals("")) {
+							List<SizeSet> list_sizeset = sizesetService.getSizeSetByName(SizeSet);
+							if (list_sizeset.size() == 0) {
+								SizeSet sizeset = new SizeSet();
+								sizeset.setComment("");
+								sizeset.setId(null);
+								sizeset.setName(SizeSet);
+								sizeset.setOrgrootid_link(orgrootid_link);
+								sizeset.setSortvalue(0);
+								sizeset.setTimecreate(new Date());
+								sizeset.setUsercreatedid_link(user.getId());
+
+								sizeset = sizesetService.save(sizeset);
+								sizesetid_link = sizeset.getId();
+							} else {
+								sizesetid_link = list_sizeset.get(0).getId();
+							}
+						}
+
+						// Kiem tra Shipmode da ton tai hay chua
+						Long shipmodeid_link = null;
+						if (!Shipmode.equals("")) {
+							List<ShipMode> shipmodes = shipmodeService.getbyname(Shipmode);
+							if (shipmodes.size() == 0) {
+								ShipMode shipmode_new = new ShipMode();
+								shipmode_new.setId(null);
+								shipmode_new.setName(Shipmode);
+								shipmode_new = shipmodeService.save(shipmode_new);
+
+								shipmodeid_link = shipmode_new.getId();
+							} else {
+								shipmodeid_link = shipmodes.get(0).getId();
+							}
+						}
+
+						// Kiem tra PackingMethod
+						Long packingmethodid_link = null;
+						if (!PackingMethod.equals("")) {
+							List<PackingType> list_packing = packingService.getbyname(PackingMethod, orgrootid_link);
+							if (list_packing.size() == 0) {
+								PackingType pk = new PackingType();
+								pk.setCode(PackingMethod);
+								pk.setId(null);
+								pk.setName(PackingMethod);
+								pk.setOrgrootid_link(orgrootid_link);
+								pk = packingService.save(pk);
+
+								packingmethodid_link = pk.getId();
+							} else {
+								packingmethodid_link = list_packing.get(0).getId();
+							}
+						}
+
+						// Kiem tra PO co dung voi PO dang chon de them moi khong
+						if (!PO.equals("TBD")) {
+
+							Long pcontractpoid_link = null;
+
+							// Kiem tra xem PO con da ton tai hay chua
+							String s_po = Line.equals("") ? PO : PO + "-" + Line;
+							List<PContract_PO> list_po = pcontract_POService.check_exist_po_children(s_po, ShipDate,
+									shipmodeid_link, pcontractid_link, parentid_link);
+
+							if (list_po.size() == 0) {
+
+								PContract_PO po_new = new PContract_PO();
+								po_new.setId(null);
+								po_new.setPo_buyer(s_po);
+								po_new.setShipdate(ShipDate);
+								po_new.setShipmodeid_link(shipmodeid_link);
+								po_new.setPcontractid_link(pcontractid_link);
+								po_new.setParentpoid_link(parentid_link);
+								po_new.setOrgrootid_link(orgrootid_link);
+								po_new.setPackingnotice(packingmethodid_link + "");
+								po_new.setProductid_link(parent.getProductid_link());
+								po_new.setPlan_productivity(parent.getPlan_productivity());
+								po_new.setPlan_linerequired(parent.getPlan_linerequired());
+								po_new.setStatus(POStatus.PO_STATUS_CONFIRMED);
+								po_new.setPo_typeid_link(POType.PO_LINE_CONFIRMED);
+								po_new.setComment(Style);
+
+								po_new = pcontract_POService.save(po_new);
+
+								pcontractpoid_link = po_new.getId();
+							} else {
+								pcontractpoid_link = list_po.get(0).getId();
+								PContract_PO po = list_po.get(0);
+								po.setStatus(POStatus.PO_STATUS_CONFIRMED);
+								po.setComment(Style);
+								po = pcontract_POService.save(po);
+								
+								pcontractpoid_link = po.getId();
+							}
+
+							Long colorid_link = null;
+							List<Attributevalue> listAttributevalue = attributevalueService
+									.getByValue(ColorName + "(" + ColorCode + ")", AtributeFixValues.ATTR_COLOR);
+							if (listAttributevalue.size() == 0) {
+								Attributevalue av = new Attributevalue();
+								av.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
+								av.setId(null);
+								av.setIsdefault(false);
+								av.setOrgrootid_link(orgrootid_link);
+								av.setSortvalue(attributevalueService.getMaxSortValue(AtributeFixValues.ATTR_COLOR));
+								av.setTimecreate(new Date());
+								av.setUsercreateid_link(user.getId());
+								av.setValue(ColorName + "(" + ColorCode + ")");
+
+								av = attributevalueService.save(av);
+								colorid_link = av.getId();
+							} else {
+								colorid_link = listAttributevalue.get(0).getId();
+							}
+
+							// lấy từng cỡ trong dải cỡ
+							colNum = ColumnPO_FOB.size;
+							String list_size = commonService.getStringValue(row.getCell(ColumnPO_FOB.size));
+							list_size = list_size.equals("0") ? "" : list_size;
+							String[] str_size = list_size.split("-");
+							
+							colNum = ColumnPO_FOB.ratio;
+							String[] list_ratio = Ratio.split("-");
+							
+							int total_size_ratio = 0;
+							for(String ratio: list_ratio) {
+								int i_ratio = Integer.parseInt(ratio);
+								total_size_ratio += i_ratio;
+							}
+
+							for (int i=0; i<str_size.length; i++) {
+								String size_name = str_size[i];
+								Long sizeid_link = null;
+								List<Attributevalue> listsize = attributevalueService.getByValue(size_name,
+										AtributeFixValues.ATTR_SIZE);
+								if (listsize.size() == 0) {
+									Attributevalue av = new Attributevalue();
+									av.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
+									av.setId(null);
+									av.setIsdefault(false);
+									av.setOrgrootid_link(orgrootid_link);
+									av.setSortvalue(attributevalueService.getMaxSortValue(AtributeFixValues.ATTR_SIZE));
+									av.setTimecreate(new Date());
+									av.setUsercreateid_link(user.getId());
+									av.setValue(size_name);
+
+									av = attributevalueService.save(av);
+									sizeid_link = av.getId();
+								} else {
+									sizeid_link = listsize.get(0).getId();
+								}
+								
+								//kiem tra co da co trong dai co chua thi them vao
+								List<SizeSetAttributeValue> list_sizeset_att = sizeset_att_Service.getOne_bysizeset_and_value(sizesetid_link, AtributeFixValues.ATTR_SIZE, sizeid_link);
+								if(list_sizeset_att.size() == 0) {
+									SizeSetAttributeValue sizeset_att = new SizeSetAttributeValue();
+									sizeset_att.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
+									sizeset_att.setAttributevalueid_link(sizeid_link);
+									sizeset_att.setId(null);
+									sizeset_att.setOrgrootid_link(orgrootid_link);
+									sizeset_att.setSizesetid_link(sizesetid_link);
+									sizeset_att_Service.save(sizeset_att);
+								}
+								
+								int size_ratio = Integer.parseInt(list_ratio[i]);
+								int quantity_size = (int)Math.ceil(PO_quantity*size_ratio/total_size_ratio);
+								int quantity_size_plus = commonService
+										.Calculate_pquantity_production(quantity_size);
+								
+								Product product = productService.findOne(parent.getProductid_link());
+								if (product.getProducttypeid_link() != 5) {
+									Long skuid_link = skuattService.getsku_byproduct_and_valuemau_valueco(
+											parent.getProductid_link(), colorid_link, sizeid_link);
+									
+									if (skuid_link == 0) {
+										SKU sku = new SKU();
+										sku.setCode(genCodeSKU(product));
+										sku.setId(null);
+										sku.setUnitid_link(product.getUnitid_link());
+										sku.setName(genCodeSKU(product));
+										sku.setOrgrootid_link(orgrootid_link);
+										sku.setProductid_link(parent.getProductid_link());
+										sku.setSkutypeid_link(10);
+										sku = skuService.save(sku);
+
+										skuid_link = sku.getId();
+
+										// Them vao bang sku_attribute_value
+										SKU_Attribute_Value savMau = new SKU_Attribute_Value();
+										savMau.setId(null);
+										savMau.setAttributevalueid_link(colorid_link);
+										savMau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
+										savMau.setOrgrootid_link(orgrootid_link);
+										savMau.setSkuid_link(skuid_link);
+										savMau.setUsercreateid_link(user.getId());
+										savMau.setTimecreate(new Date());
+
+										skuattService.save(savMau);
+
+										SKU_Attribute_Value savCo = new SKU_Attribute_Value();
+										savCo.setId(null);
+										savCo.setAttributevalueid_link(sizeid_link);
+										savCo.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
+										savCo.setOrgrootid_link(orgrootid_link);
+										savCo.setSkuid_link(skuid_link);
+										savCo.setUsercreateid_link(user.getId());
+										savCo.setTimecreate(new Date());
+
+										skuattService.save(savCo);
+										
+										// Them vao trong product_attribute_value
+										ProductAttributeValue pav_mau = new ProductAttributeValue();
+										pav_mau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
+										pav_mau.setAttributevalueid_link(colorid_link);
+										pav_mau.setId(null);
+										pav_mau.setIsDefault(false);
+										pav_mau.setOrgrootid_link(orgrootid_link);
+										pav_mau.setProductid_link(parent.getProductid_link());
+										pavService.save(pav_mau);
+
+										ProductAttributeValue pav_co = new ProductAttributeValue();
+										pav_co.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
+										pav_co.setAttributevalueid_link(sizeid_link);
+										pav_co.setId(null);
+										pav_co.setIsDefault(false);
+										pav_co.setOrgrootid_link(orgrootid_link);
+										pav_co.setProductid_link(parent.getProductid_link());
+										pavService.save(pav_co);
+									}
+									
+									List<PContractProductSKU> ppskus = ppskuService.getlistsku_bysku_and_product_PO(
+											skuid_link, pcontractpoid_link, parent.getProductid_link());
+									
+									if (ppskus.size() == 0) {
+										PContractProductSKU ppsku = new PContractProductSKU();
+										ppsku.setId(null);
+										ppsku.setOrgrootid_link(orgrootid_link);
+										ppsku.setPcontract_poid_link(pcontractpoid_link);
+										ppsku.setPcontractid_link(pcontractid_link);
+										ppsku.setPquantity_porder(quantity_size);
+										ppsku.setPquantity_production(quantity_size_plus);
+										ppsku.setPquantity_total(quantity_size_plus);
+										ppsku.setProductid_link(parent.getProductid_link());
+										ppsku.setSkuid_link(skuid_link);
+										ppskuService.save(ppsku);
+									} else {
+										PContractProductSKU ppsku = ppskus.get(0);
+										ppsku.setPquantity_porder(quantity_size);
+										ppsku.setPquantity_production(quantity_size_plus);
+										ppsku.setPquantity_total(quantity_size_plus);
+										ppskuService.save(ppsku);
+									}
+								}
+								else {
+									List<ProductPairing> list_pair = productpairService
+											.getproduct_pairing_detail_bycontract(orgrootid_link, pcontractid_link,
+													product.getId());
+									for (ProductPairing productPairing : list_pair) {
+										Product product_children = productService
+												.findOne(productPairing.getProductid_link());
+										
+										Long skuid_link = skuattService.getsku_byproduct_and_valuemau_valueco(
+												productPairing.getProductid_link(), colorid_link, sizeid_link);
+										
+										if (skuid_link == 0 || skuid_link == null) {
+											SKU sku = new SKU();
+											sku.setCode(genCodeSKU(product_children));
+											sku.setId(null);
+											sku.setUnitid_link(product.getUnitid_link());
+											sku.setName(genCodeSKU(product_children));
+											sku.setOrgrootid_link(orgrootid_link);
+											sku.setProductid_link(productPairing.getProductid_link());
+											sku.setSkutypeid_link(10);
+											sku = skuService.save(sku);
+
+											skuid_link = sku.getId();
+
+											// Them vao bang sku_attribute_value
+											SKU_Attribute_Value savMau = new SKU_Attribute_Value();
+											savMau.setId((long) 0);
+											savMau.setAttributevalueid_link(colorid_link);
+											savMau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
+											savMau.setOrgrootid_link(orgrootid_link);
+											savMau.setSkuid_link(skuid_link);
+											savMau.setUsercreateid_link(user.getId());
+											savMau.setTimecreate(new Date());
+
+											skuattService.save(savMau);
+
+											SKU_Attribute_Value savCo = new SKU_Attribute_Value();
+											savCo.setId((long) 0);
+											savCo.setAttributevalueid_link(sizeid_link);
+											savCo.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
+											savCo.setOrgrootid_link(orgrootid_link);
+											savCo.setSkuid_link(skuid_link);
+											savCo.setUsercreateid_link(user.getId());
+											savCo.setTimecreate(new Date());
+
+											skuattService.save(savCo);
+
+											// Them vao trong product_attribute_value
+											ProductAttributeValue pav_mau = new ProductAttributeValue();
+											pav_mau.setAttributeid_link(AtributeFixValues.ATTR_COLOR);
+											pav_mau.setAttributevalueid_link(colorid_link);
+											pav_mau.setId(null);
+											pav_mau.setIsDefault(false);
+											pav_mau.setOrgrootid_link(orgrootid_link);
+											pav_mau.setProductid_link(productPairing.getProductid_link());
+											pavService.save(pav_mau);
+
+											ProductAttributeValue pav_co = new ProductAttributeValue();
+											pav_co.setAttributeid_link(AtributeFixValues.ATTR_SIZE);
+											pav_co.setAttributevalueid_link(sizeid_link);
+											pav_co.setId(null);
+											pav_co.setIsDefault(false);
+											pav_co.setOrgrootid_link(orgrootid_link);
+											pav_co.setProductid_link(productPairing.getProductid_link());
+											pavService.save(pav_co);
+										}
+										
+										List<PContractProductSKU> ppskus = ppskuService
+												.getlistsku_bysku_and_product_PO(skuid_link, pcontractpoid_link,
+														productPairing.getProductid_link());
+										if (ppskus.size() == 0) {
+											PContractProductSKU ppsku = new PContractProductSKU();
+											ppsku.setId(null);
+											ppsku.setOrgrootid_link(orgrootid_link);
+											ppsku.setPcontract_poid_link(pcontractpoid_link);
+											ppsku.setPcontractid_link(pcontractid_link);
+											ppsku.setPquantity_porder(
+													quantity_size * productPairing.getAmount());
+											ppsku.setPquantity_production(quantity_size_plus * productPairing.getAmount());
+											ppsku.setPquantity_total(quantity_size_plus * productPairing.getAmount());
+											ppsku.setProductid_link(productPairing.getProductid_link());
+											ppsku.setSkuid_link(skuid_link);
+											ppskuService.save(ppsku);
+										} else {
+											PContractProductSKU ppsku = ppskus.get(0);
+											ppsku.setPquantity_porder(
+													quantity_size * productPairing.getAmount());
+											ppsku.setPquantity_production(quantity_size_plus * productPairing.getAmount());
+											ppsku.setPquantity_total(quantity_size_plus * productPairing.getAmount());
+											ppskuService.save(ppsku);
+										}
+									}
+								}
+							}
+						}
+						rowNum++;
+						row = sheet.getRow(rowNum);
+						if (row == null)
+							break;
+
+						PO = commonService.getStringValue(row.getCell(ColumnPO_FOB.PO));
+						PO = PO.equals("0") ? "" : PO;
+					}
+				} catch (Exception e) {
+					mes_err += "Có lỗi ở dòng " + (rowNum + 1) + " và cột " + (colNum + 1);
+				} finally {
+					workbook.close();
+					serverFile.delete();
+				}
+
+				if (mes_err == "") {
+					response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+					response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				} else {
+					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+					response.setMessage(mes_err);
+				}
+			} else {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage("Có lỗi trong quá trình upload! Bạn hãy thử lại");
+			}
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+	}
 
 }
