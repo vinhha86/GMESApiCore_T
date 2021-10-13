@@ -419,53 +419,62 @@ public class POrderPOLineAPI {
 						porder.setGolivedate(linekh.getShipdate());
 						porderService.save(porder);
 
-						grant.setGrantamount(grant.getTotalamount_tt());
-						grant.setIsmap(false);
-						grantService.save(grant);
+						if (grant != null) {
+							grant.setGrantamount(grant.getTotalamount_tt());
+							grant.setIsmap(false);
+							grantService.save(grant);
+						}
 					} else {
 						// kiem tra xem co line tren bieu do chua thi xoa line tren bieu do
-						grantService.delete(grant);
-						porderService.delete(porder);
+						if (grant != null) {
+							grantService.delete(grant);
+						}
+						if (porder != null)
+							porderService.delete(porder);
 					}
 
 					// Xoa het porder-sku
-					List<POrder_Product_SKU> list_porder_sku = porderskuService.getby_porder(porder.getId());
-					for (POrder_Product_SKU porder_sku : list_porder_sku) {
-						porderskuService.delete(porder_sku);
+					if (porder != null) {
+						List<POrder_Product_SKU> list_porder_sku = porderskuService.getby_porder(porder.getId());
+						for (POrder_Product_SKU porder_sku : list_porder_sku) {
+							porderskuService.delete(porder_sku);
 
-						// cap nhat lai trong pcontract_sku chua map
-						Long skuid_link = porder_sku.getSkuid_link();
-						List<PContractProductSKU> list_po_sku = pcontractskuService
-								.getlistsku_bysku_and_product_PO(skuid_link, pcontract_poid_link, productid_link);
-						if (list_po_sku.size() > 0) {
-							PContractProductSKU posku = list_po_sku.get(0);
-							posku.setIsmap(false);
-							pcontractskuService.save(posku);
+							// cap nhat lai trong pcontract_sku chua map
+							Long skuid_link = porder_sku.getSkuid_link();
+							List<PContractProductSKU> list_po_sku = pcontractskuService
+									.getlistsku_bysku_and_product_PO(skuid_link, pcontract_poid_link, productid_link);
+							if (list_po_sku.size() > 0) {
+								PContractProductSKU posku = list_po_sku.get(0);
+								posku.setIsmap(false);
+								pcontractskuService.save(posku);
+							}
 						}
 					}
 
-					List<PContractProductSKU> list_notmap = pcontractskuService.getsku_notmap(pcontract_poid_link);
-
-					PContract_PO linett = poService.findOne(pcontract_poid_link);
-					if (list_notmap.size() == 0) {
-						linett.setIsmap(true);
-					} else {
-						linett.setIsmap(false);
-					}
-					poService.save(linett);
-
 					// xoa het trong porder_grant_sku
+					if (grant != null) {
+						List<POrderGrant_SKU> list_grant_sku = grantskuService.getPOrderGrant_SKU(grant.getId());
+						for (POrderGrant_SKU grantsku : list_grant_sku) {
+							grantskuService.delete(grantsku);
+						}
 
-					List<POrderGrant_SKU> list_grant_sku = grantskuService.getPOrderGrant_SKU(grant.getId());
-					for (POrderGrant_SKU grantsku : list_grant_sku) {
-						grantskuService.delete(grantsku);
+						list_id.add(grant.getId());
 					}
 
 					// xoa trong bang porder-poline
 					porder_line_Service.delete(list_porder.get(0));
 
-					list_id.add(grant.getId());
 				}
+
+				List<PContractProductSKU> list_notmap = pcontractskuService.getsku_notmap(pcontract_poid_link);
+
+				PContract_PO linett = poService.findOne(pcontract_poid_link);
+				if (list_notmap.size() == 0) {
+					linett.setIsmap(true);
+				} else {
+					linett.setIsmap(false);
+				}
+				poService.save(linett);
 			}
 			response.list_grantid_link = list_id;
 

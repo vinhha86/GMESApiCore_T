@@ -1740,6 +1740,8 @@ public class ScheduleAPI {
 				int duration = commonService.getDuration_byProductivity(total, productivity);
 
 				Date startdate = commonService.Date_Add_with_holiday(enddate, (0 - duration), orgrootid_link);
+				startdate = commonService.getBeginOfDate(startdate);
+
 				String po_code = null != po.getPo_vendor() && po.getPo_vendor().length() > 0 ? po.getPo_vendor()
 						: po.getPo_buyer();
 
