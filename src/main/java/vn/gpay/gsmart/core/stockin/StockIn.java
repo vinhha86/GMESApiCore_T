@@ -138,6 +138,7 @@ public class StockIn implements Serializable {
 	private Long porder_grantid_link;
 	private Long pcontract_poid_link;
 	private Long pcontractid_link;
+	private Date expected_date;
 
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
@@ -516,6 +517,14 @@ public class StockIn implements Serializable {
 
 	public void setPcontractid_link(Long pcontractid_link) {
 		this.pcontractid_link = pcontractid_link;
+	}
+
+	public Date getExpected_date() {
+		return expected_date;
+	}
+
+	public void setExpected_date(Date expected_date) {
+		this.expected_date = expected_date;
 	}
 	
 }
