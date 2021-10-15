@@ -332,13 +332,14 @@ public class POrder implements Serializable {
 	@Transient
 	public String getMaHang() {
 		String name = "";
-		int total = totalorder == null ? 0 : totalorder;
-		float totalPO = pcontract_po == null ? 0 : pcontract_po.getPo_quantity();
-		
-		DecimalFormat decimalFormat = new DecimalFormat("#,###");
-		decimalFormat.setGroupingSize(3);
 		
 		if(product != null && pcontract_po!=null) {
+			int total = totalorder == null ? 0 : totalorder;
+			float totalPO = pcontract_po == null ? 0 : pcontract_po.getPo_quantity();
+			
+			DecimalFormat decimalFormat = new DecimalFormat("#,###");
+			decimalFormat.setGroupingSize(3);
+			
 			String buyer = product.getBuyercode() == null ? "" : product.getBuyercode();
 			name += buyer+" / "+decimalFormat.format(total)+" / "+decimalFormat.format(totalPO);
 		}
@@ -729,7 +730,7 @@ public class POrder implements Serializable {
 		this.stockout_date = stockout_date;
 	}
 	public Long getPcontract_poid_link() {
-		return pcontract_poid_link;
+		return pcontract_poid_link == null ? 0: pcontract_poid_link;
 	}
 	public void setPcontract_poid_link(Long pcontract_poid_link) {
 		this.pcontract_poid_link = pcontract_poid_link;

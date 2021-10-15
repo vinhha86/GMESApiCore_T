@@ -76,6 +76,9 @@ public class POrderGrant implements Serializable {
 	private Integer type;
 	private Boolean is_show_image;
 	private Boolean ismap;
+	public String lineinfo;
+	
+	
 
 	public Integer getType() {
 		return type;
@@ -257,13 +260,14 @@ public class POrderGrant implements Serializable {
 	@Transient
 	public String getMaHang() {
 		String name = "";
-		int total = grantamount == null ? 0 : grantamount;
-		String code = getProductcode();
-
-		DecimalFormat decimalFormat = new DecimalFormat("#,###");
-		decimalFormat.setGroupingSize(3);
+		
 
 		if (porder != null) {
+			int total = grantamount == null ? 0 : grantamount;
+			String code = getProductcode();
+
+			DecimalFormat decimalFormat = new DecimalFormat("#,###");
+			decimalFormat.setGroupingSize(3);
 			name += "" + code + "-" + decimalFormat.format(total);
 		}
 
@@ -273,13 +277,13 @@ public class POrderGrant implements Serializable {
 	@Transient
 	public String getMaHang(POrder porder) {
 		String name = "";
-		int total = grantamount == null ? 0 : grantamount;
-		String code = porder.getProductcode();
-
-		DecimalFormat decimalFormat = new DecimalFormat("#,###");
-		decimalFormat.setGroupingSize(3);
 
 		if (porder != null) {
+			int total = grantamount == null ? 0 : grantamount;
+			String code = porder.getProductcode();
+
+			DecimalFormat decimalFormat = new DecimalFormat("#,###");
+			decimalFormat.setGroupingSize(3);
 			name += "#" + code + "-" + decimalFormat.format(total);
 		}
 
@@ -496,6 +500,14 @@ public class POrderGrant implements Serializable {
 
 	public void setIsmap(Boolean ismap) {
 		this.ismap = ismap;
+	}
+
+	public String getLineinfo() {
+		return lineinfo;
+	}
+
+	public void setLineinfo(String lineinfo) {
+		this.lineinfo = lineinfo;
 	}
 
 }

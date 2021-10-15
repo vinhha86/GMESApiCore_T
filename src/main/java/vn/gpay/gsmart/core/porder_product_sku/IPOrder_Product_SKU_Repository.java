@@ -82,4 +82,9 @@ public interface IPOrder_Product_SKU_Repository extends JpaRepository<POrder_Pro
 	public Integer get_qty_by_po_and_sku(
 			@Param ("pcontract_poid_link")final  long pcontract_poid_link, 
 			@Param ("skuid_link")final long skuid_link);
+	
+	@Query(value = "select distinct pcontract_poid_link from POrderGrant_SKU a "
+			+ "where a.pordergrantid_link= :pordergrantid_link")
+	public List<Long> GetListPOByGrant(
+			@Param ("pordergrantid_link")final  long pordergrantid_link);
 }

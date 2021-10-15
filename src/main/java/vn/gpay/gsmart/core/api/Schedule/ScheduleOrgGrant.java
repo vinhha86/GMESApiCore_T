@@ -84,7 +84,6 @@ public class ScheduleOrgGrant implements Runnable {
 	// Tinh SL da yeu cau xuat
 	private void showOrgGrant() {
 		// Lấy các lệnh của các tổ
-
 		List<POrderGrant> list_porder = granttService.get_granted_bygolivedate(startdate, toDate, org_grant.getId(),
 				PO_code, contractcode, orgbuyerid_link, orgvendorid_link);
 
@@ -150,6 +149,7 @@ public class ScheduleOrgGrant implements Runnable {
 			sch_porder.setPcontractid_link(pordergrant.getPcontractid_link());
 			sch_porder.setProductbuyercode(pordergrant.getProductcode());
 			sch_porder.setIs_show_image(pordergrant.getIs_show_image());
+			sch_porder.setLineinfo(pordergrant.getLineinfo());
 
 			Integer po_productivity = granttService.getProductivity_PO(pordergrant.getId());
 			sch_porder.setProductivity_po(po_productivity);

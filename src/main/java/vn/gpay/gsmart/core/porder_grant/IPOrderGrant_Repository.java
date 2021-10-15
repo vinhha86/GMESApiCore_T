@@ -27,13 +27,13 @@ public interface IPOrderGrant_Repository
 	public List<POrderGrant> getByOrderId(@Param("porderid_link") final Long porderid_link);
 
 	@Query(value = "select a from POrderGrant a " + "inner join POrder b on a.porderid_link = b.id "
-			+ "inner join PContract_PO c on b.pcontract_poid_link = c.id "
-			+ "inner join PContract d on b.pcontractid_link = d.id " + "where a.granttoorgid_link = :granttoorgid_link "
+			+ "left join PContract_PO c on b.pcontract_poid_link = c.id "
+			+ "left join PContract d on b.pcontractid_link = d.id " + "where a.granttoorgid_link = :granttoorgid_link "
 			+ "and b.status >= :status " + "and a.finish_date_plan >= :golivedate_from "
 			+ "and a.finish_date_plan <= :golivedate_to "
 //			+ "and c.po_buyer like :POBuyer "
-			+ "and lower(c.po_buyer) like lower(concat('%',:POBuyer,'%')) "
-			+ "and lower(d.contractcode) like lower(concat('%',:contractcode,'%')) "
+			+ "and (lower(c.po_buyer) like lower(concat('%',:POBuyer,'%')) or c.po_buyer is null) "
+			+ "and (lower(d.contractcode) like lower(concat('%',:contractcode,'%')) or d.contractcode is null) "
 			+ "and (:orgbuyerid_link is null or d.orgbuyerid_link = :orgbuyerid_link) "
 			+ "and (:orgvendorid_link is null or d.orgvendorid_link = :orgvendorid_link) "
 			+ "and a.status = (select max(grant.status) from POrderGrant grant inner join POrder porder on grant.porderid_link = porder.id "

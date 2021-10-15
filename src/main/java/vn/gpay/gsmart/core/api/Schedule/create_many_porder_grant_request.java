@@ -11,4 +11,5 @@ public class create_many_porder_grant_request {
 	public List<PContractPO_Shipping> list_pcontract_po;
 	public Long colorid_link;
 	public Long sizesetid_link;
+	public Boolean isMerger;
 }

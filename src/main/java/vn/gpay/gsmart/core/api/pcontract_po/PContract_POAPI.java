@@ -1977,7 +1977,7 @@ public class PContract_POAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgid_link = user.getOrgid_link();
-			long productid_link = entity.productid_link;
+			Long productid_link = entity.productid_link;
 			long orgrootid_link = user.getRootorgid_link();
 			Long colorid_link = entity.colorid_link;
 			Long sizesetid_link = entity.sizesetid_link;

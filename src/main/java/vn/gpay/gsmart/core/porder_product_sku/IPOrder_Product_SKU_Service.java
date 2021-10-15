@@ -22,4 +22,5 @@ public interface IPOrder_Product_SKU_Service extends Operations<POrder_Product_S
 	List<POrder_Product_SKU> getsumsku_byporder(long porderid_link);
 	List<Long> getvalue_by_attribute(Long porderid_link, Long attributeid_link);
 	int getPquantity_by_po_and_sku(Long pcontract_poid_link, Long skuid_link);
+	List<Long> getListPOByGrant(Long pordergrantid_link);
 }

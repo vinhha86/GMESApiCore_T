@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.api.Schedule;
 
+import java.text.DateFormat;
 //import java.io.File;
 //import java.nio.file.Files;
 //import java.nio.file.Path;
@@ -35,6 +36,7 @@ import vn.gpay.gsmart.core.org.OrgServiceImpl;
 import vn.gpay.gsmart.core.pcontract.IPContractService;
 import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
+import vn.gpay.gsmart.core.pcontract_po.PContractPO_Shipping;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
@@ -1726,24 +1728,210 @@ public class ScheduleAPI {
 
 			Long sizesetid_link = entity.sizesetid_link == 0 ? null : entity.sizesetid_link;
 			Long colorid_link = entity.colorid_link == 0 ? null : entity.colorid_link;
+			int productivity = entity.productivity;
+			Boolean isMerger = entity.isMerger;
 
 			List<Schedule_porder> list_schedule = new ArrayList<Schedule_porder>();
 
-			for (int i = 0; i < entity.list_pcontract_po.size(); i++) {
-				Long pcontract_poid_link = entity.list_pcontract_po.get(i).getPcontract_poid_link();
-				PContract_PO po = poService.findOne(pcontract_poid_link);
-				int total = entity.list_pcontract_po.get(i).getPo_quantity();
-				int productivity = entity.productivity;
+			if (!isMerger) {
+				for (int i = 0; i < entity.list_pcontract_po.size(); i++) {
+					Long pcontract_poid_link = entity.list_pcontract_po.get(i).getPcontract_poid_link();
+					PContract_PO po = poService.findOne(pcontract_poid_link);
+					int total = entity.list_pcontract_po.get(i).getPo_quantity();
 
+					// tao porder
+					Date enddate = commonService.getEndOfDate(po.getShipdate());
+					int duration = commonService.getDuration_byProductivity(total, productivity);
+
+					Date startdate = commonService.Date_Add_with_holiday(enddate, (0 - duration), orgrootid_link);
+					startdate = commonService.getBeginOfDate(startdate);
+
+					String po_code = null != po.getPo_vendor() && po.getPo_vendor().length() > 0 ? po.getPo_vendor()
+							: po.getPo_buyer();
+
+					POrder porder = new POrder();
+					porder.setFinishdate_plan(enddate);
+					porder.setGolivedate(enddate);
+					porder.setGranttoorgid_link(entity.orgid_link);
+					porder.setId(null);
+					porder.setIsMap(true);
+					porder.setOrderdate(new Date());
+					porder.setOrgrootid_link(orgrootid_link);
+					porder.setPcontract_poid_link(pcontract_poid_link);
+					porder.setPcontractid_link(po.getPcontractid_link());
+					porder.setPlan_duration(duration);
+					porder.setPlan_linerequired(po.getPlan_linerequired());
+					porder.setPlan_productivity(entity.productivity);
+					porder.setProductid_link(productid_link);
+					porder.setProductiondate(startdate);
+					porder.setStatus(entity.orggrantid_link != null ? POrderStatus.PORDER_STATUS_GRANTED
+							: POrderStatus.PORDER_STATUS_FREE);
+					porder.setTimecreated(new Date());
+					porder.setTotalorder(total);
+					porder.setUsercreatedid_link(user.getId());
+
+					porder = porderService.savePOrder(porder, po_code);
+					Long porderid_link = porder.getId();
+
+					// lay sku sang porder_sku
+					List<PContractProductSKU> list_po_sku = poskuService.getsku_notmap_by_product(pcontract_poid_link,
+							productid_link);
+
+					List<SizeSetAttributeValue> list_av = sizesetatt_repo.getall_bySizeSetId(sizesetid_link);
+					List<Long> listsku = new ArrayList<Long>();
+					if (sizesetid_link != null && colorid_link != null) {
+						for (SizeSetAttributeValue sizeset_av : list_av) {
+							List<Long> skuid_links = sku_av_repo.getskuid_by_valueMau_and_valueCo(colorid_link,
+									sizeset_av.getAttributevalueid_link(), productid_link);
+							if (skuid_links.size() > 0)
+								listsku.add(skuid_links.get(0));
+						}
+						if (listsku.size() == 0)
+							listsku.add((long) -1);
+					} else {
+						if (sizesetid_link == null && colorid_link != null) {
+							listsku = sku_av_repo.get_bycolorid_link(productid_link, colorid_link);
+							if (listsku.size() == 0)
+								listsku.add((long) -1);
+						} else {
+							listsku = null;
+						}
+					}
+
+					Long pordergrantid_link = null;
+					if (entity.orggrantid_link != null) {
+						// tao porder_grant
+						POrderGrant grant = new POrderGrant();
+						grant.setGranttoorgid_link(entity.orggrantid_link);
+						grant.setId(null);
+						grant.setOrdercode(porder.getOrdercode());
+						grant.setOrgrootid_link(orgrootid_link);
+						grant.setPorderid_link(porderid_link);
+						grant.setTimecreated(new Date());
+						grant.setUsercreatedid_link(user.getId());
+						grant.setGrantdate(new Date());
+						grant.setGrantamount(total);
+						grant.setStatus(2);
+						grant.setOrgrootid_link(orgrootid_link);
+						grant.setStart_date_plan(startdate);
+						grant.setFinish_date_plan(enddate);
+						grant.setProductivity(productivity);
+						grant.setDuration(duration);
+						grant.setType(0); // 0 la chua qua ngay giao hang
+						grant.setTotalamount_tt(total);
+						grant.setIsmap(true);
+						grant = granttService.save(grant);
+						pordergrantid_link = grant.getId();
+
+						// danh dau po da map
+						POrder_POLine porder_poline = new POrder_POLine();
+						porder_poline.setId(null);
+						porder_poline.setPcontract_poid_link(pcontract_poid_link);
+						porder_poline.setPorderid_link(porderid_link);
+						porder_poline.setPordergrantid_link(pordergrantid_link);
+						porderlineService.save(porder_poline);
+
+						// tao Schedule_porder de tra len giao dien
+						DecimalFormat decimalFormat = new DecimalFormat("#,###");
+						decimalFormat.setGroupingSize(3);
+						Product product = productService.findOne(productid_link);
+						String mahang = product.getBuyercode() + "-" + decimalFormat.format(total);
+						PContract pcontract = pcontractService.findOne(po.getPcontractid_link());
+
+						Schedule_porder sch = new Schedule_porder();
+						sch.setDuration(duration);
+						sch.setProductivity(entity.productivity);
+						sch.setBuyername(porder.getBuyername());
+						sch.setCls(pcontract.getcls() + " match");
+						sch.setEndDate(enddate);
+						sch.setId_origin(porder.getId());
+						sch.setMahang(mahang);
+						sch.setName(mahang);
+						sch.setParentid_origin(entity.orgid_link);
+						sch.setPordercode(porder.getOrdercode());
+						sch.setResourceId(entity.orggrantid_link);
+						sch.setStartDate(startdate);
+						sch.setStatus(2);
+						sch.setTotalpackage(porder.getTotalorder());
+						sch.setVendorname(porder.getVendorname());
+						sch.setPorder_grantid_link(pordergrantid_link);
+						sch.setProductivity_po(porder.getProductivity_po());
+						sch.setProductivity_porder(0);
+						sch.setPcontract_poid_link(pcontract_poid_link);
+						sch.setPcontractid_link(po.getPcontractid_link());
+						sch.setProductbuyercode(product.getBuyercode());
+						sch.setPorderid_link(porder.getId());
+						sch.setGrant_type(0);
+						sch.setProductid_link(productid_link);
+
+						list_schedule.add(sch);
+					}
+
+					for (PContractProductSKU po_sku : list_po_sku) {
+						if (listsku == null || listsku.contains(po_sku.getSkuid_link())) {
+							POrder_Product_SKU porder_sku = new POrder_Product_SKU();
+							porder_sku.setId(null);
+							porder_sku.setOrgrootid_link(orgrootid_link);
+							porder_sku.setPcontract_poid_link(pcontract_poid_link);
+							porder_sku.setPorderid_link(porderid_link);
+							porder_sku.setPquantity_production(po_sku.getPquantity_production());
+							porder_sku.setPquantity_sample(po_sku.getPquantity_sample());
+							porder_sku.setPquantity_total(po_sku.getPquantity_total());
+							porder_sku.setProductid_link(productid_link);
+							porder_sku.setSkuid_link(po_sku.getSkuid_link());
+
+							porderSkuService.save(porder_sku);
+
+							// them grant_sku
+							POrderGrant_SKU grant_sku = new POrderGrant_SKU();
+							grant_sku.setId(null);
+							grant_sku.setOrgrootid_link(orgrootid_link);
+							grant_sku.setPcontract_poid_link(pcontract_poid_link);
+							grant_sku.setGrantamount(po_sku.getPquantity_total());
+							grant_sku.setSkuid_link(po_sku.getSkuid_link());
+							grant_sku.setPordergrantid_link(pordergrantid_link);
+
+							grantskuService.save(grant_sku);
+
+							// Cap nhat pcontracct_sku da map
+
+							po_sku.setPquantity_granted(po_sku.getPquantity_total());
+							po_sku.setPquantity_lenhsx(po_sku.getPquantity_total());
+							po_sku.setIsmap(true);
+							poskuService.save(po_sku);
+						}
+
+					}
+
+					// danh dau po da map
+
+					List<PContractProductSKU> list_sku_notmap = poskuService.getsku_notmap(pcontract_poid_link);
+					if (list_sku_notmap.size() == 0) {
+						po.setIsmap(true);
+						poService.save(po);
+					}
+				}
+			} else {
 				// tao porder
-				Date enddate = commonService.getEndOfDate(po.getShipdate());
+				// lay po co ngay giao gan nhat
+				PContract_PO po_min = poService.findOne(entity.list_pcontract_po.get(0).getPcontract_poid_link());
+				Date datemin = entity.list_pcontract_po.get(0).getShipdate();
+				int total = 0;
+				for (PContractPO_Shipping shipping : entity.list_pcontract_po) {
+					total += shipping.getPo_quantity();
+					if (datemin.after(shipping.getShipdate())) {
+						datemin = shipping.getShipdate();
+						po_min = poService.findOne(shipping.getPcontract_poid_link());
+					}
+				}
+
+				Date startdate = commonService.getBeginOfDate(po_min.getProductiondate());
 				int duration = commonService.getDuration_byProductivity(total, productivity);
-
-				Date startdate = commonService.Date_Add_with_holiday(enddate, (0 - duration), orgrootid_link);
-				startdate = commonService.getBeginOfDate(startdate);
-
-				String po_code = null != po.getPo_vendor() && po.getPo_vendor().length() > 0 ? po.getPo_vendor()
-						: po.getPo_buyer();
+				Date enddate = commonService
+						.getEndOfDate(commonService.Date_Add_with_holiday(startdate, duration, orgrootid_link));
+				String po_code = null != po_min.getPo_vendor() && po_min.getPo_vendor().length() > 0
+						? po_min.getPo_vendor()
+						: po_min.getPo_buyer();
 
 				POrder porder = new POrder();
 				porder.setFinishdate_plan(enddate);
@@ -1753,10 +1941,10 @@ public class ScheduleAPI {
 				porder.setIsMap(true);
 				porder.setOrderdate(new Date());
 				porder.setOrgrootid_link(orgrootid_link);
-				porder.setPcontract_poid_link(pcontract_poid_link);
-				porder.setPcontractid_link(po.getPcontractid_link());
+				porder.setPcontract_poid_link(null);
+				porder.setPcontractid_link(po_min.getPcontractid_link());
 				porder.setPlan_duration(duration);
-				porder.setPlan_linerequired(po.getPlan_linerequired());
+				porder.setPlan_linerequired(po_min.getPlan_linerequired());
 				porder.setPlan_productivity(entity.productivity);
 				porder.setProductid_link(productid_link);
 				porder.setProductiondate(startdate);
@@ -1769,34 +1957,9 @@ public class ScheduleAPI {
 				porder = porderService.savePOrder(porder, po_code);
 				Long porderid_link = porder.getId();
 
-				// lay sku sang porder_sku
-				List<PContractProductSKU> list_po_sku = poskuService.getsku_notmap_by_product(pcontract_poid_link,
-						productid_link);
-
-				List<SizeSetAttributeValue> list_av = sizesetatt_repo.getall_bySizeSetId(sizesetid_link);
-				List<Long> listsku = new ArrayList<Long>();
-				if (sizesetid_link != null && colorid_link != null) {
-					for (SizeSetAttributeValue sizeset_av : list_av) {
-						List<Long> skuid_links = sku_av_repo.getskuid_by_valueMau_and_valueCo(colorid_link,
-								sizeset_av.getAttributevalueid_link(), productid_link);
-						if (skuid_links.size() > 0)
-							listsku.add(skuid_links.get(0));
-					}
-					if (listsku.size() == 0)
-						listsku.add((long) -1);
-				} else {
-					if (sizesetid_link == null && colorid_link != null) {
-						listsku = sku_av_repo.get_bycolorid_link(productid_link, colorid_link);
-						if (listsku.size() == 0)
-							listsku.add((long) -1);
-					} else {
-						listsku = null;
-					}
-				}
-
+				// tao grant
 				Long pordergrantid_link = null;
 				if (entity.orggrantid_link != null) {
-					// tao porder_grant
 					POrderGrant grant = new POrderGrant();
 					grant.setGranttoorgid_link(entity.orggrantid_link);
 					grant.setId(null);
@@ -1819,93 +1982,128 @@ public class ScheduleAPI {
 					grant = granttService.save(grant);
 					pordergrantid_link = grant.getId();
 
-					// danh dau po da map
-					POrder_POLine porder_poline = new POrder_POLine();
-					porder_poline.setId(null);
-					porder_poline.setPcontract_poid_link(pcontract_poid_link);
-					porder_poline.setPorderid_link(porderid_link);
-					porder_poline.setPordergrantid_link(pordergrantid_link);
-					porderlineService.save(porder_poline);
-
-					// tao Schedule_porder de tra len giao dien
-					DecimalFormat decimalFormat = new DecimalFormat("#,###");
-					decimalFormat.setGroupingSize(3);
-					Product product = productService.findOne(productid_link);
-					String mahang = product.getBuyercode() + "-" + decimalFormat.format(total);
-					PContract pcontract = pcontractService.findOne(po.getPcontractid_link());
-
-					Schedule_porder sch = new Schedule_porder();
-					sch.setDuration(duration);
-					sch.setProductivity(entity.productivity);
-					sch.setBuyername(porder.getBuyername());
-					sch.setCls(pcontract.getcls() + " match");
-					sch.setEndDate(enddate);
-					sch.setId_origin(porder.getId());
-					sch.setMahang(mahang);
-					sch.setName(mahang);
-					sch.setParentid_origin(entity.orgid_link);
-					sch.setPordercode(porder.getOrdercode());
-					sch.setResourceId(entity.orggrantid_link);
-					sch.setStartDate(startdate);
-					sch.setStatus(2);
-					sch.setTotalpackage(porder.getTotalorder());
-					sch.setVendorname(porder.getVendorname());
-					sch.setPorder_grantid_link(pordergrantid_link);
-					sch.setProductivity_po(porder.getProductivity_po());
-					sch.setProductivity_porder(0);
-					sch.setPcontract_poid_link(pcontract_poid_link);
-					sch.setPcontractid_link(po.getPcontractid_link());
-					sch.setProductbuyercode(product.getBuyercode());
-					sch.setPorderid_link(porder.getId());
-					sch.setGrant_type(0);
-					sch.setProductid_link(productid_link);
-
-					list_schedule.add(sch);
+					
 				}
 
-				for (PContractProductSKU po_sku : list_po_sku) {
-					if (listsku == null || listsku.contains(po_sku.getSkuid_link())) {
-						POrder_Product_SKU porder_sku = new POrder_Product_SKU();
-						porder_sku.setId(null);
-						porder_sku.setOrgrootid_link(orgrootid_link);
-						porder_sku.setPcontract_poid_link(pcontract_poid_link);
-						porder_sku.setPorderid_link(porderid_link);
-						porder_sku.setPquantity_production(po_sku.getPquantity_production());
-						porder_sku.setPquantity_sample(po_sku.getPquantity_sample());
-						porder_sku.setPquantity_total(po_sku.getPquantity_total());
-						porder_sku.setProductid_link(productid_link);
-						porder_sku.setSkuid_link(po_sku.getSkuid_link());
+				String lineinfo = "";
+				DateFormat df = new SimpleDateFormat("dd/MM/YYYY");
+				// lay sku sang porder_sku
+				for (PContractPO_Shipping shipping : entity.list_pcontract_po) {
+					if(lineinfo == "") {
+						lineinfo += shipping.getPo_buyer() +"-"+shipping.getPo_quantity()+"-"+df.format(shipping.getShipdate());
+					}
+					else {
+						lineinfo += "; "+ shipping.getPo_buyer() +"-"+shipping.getPo_quantity()+"-"+df.format(shipping.getShipdate());
+					}
+					Long pcontract_poid_link = shipping.getPcontract_poid_link();
+					PContract_PO po = poService.findOne(pcontract_poid_link);
+					List<PContractProductSKU> list_po_sku = poskuService.getsku_notmap_by_product(pcontract_poid_link,
+							productid_link);
 
-						porderSkuService.save(porder_sku);
-
-						// them grant_sku
-						POrderGrant_SKU grant_sku = new POrderGrant_SKU();
-						grant_sku.setId(null);
-						grant_sku.setOrgrootid_link(orgrootid_link);
-						grant_sku.setPcontract_poid_link(pcontract_poid_link);
-						grant_sku.setGrantamount(po_sku.getPquantity_total());
-						grant_sku.setSkuid_link(po_sku.getSkuid_link());
-						grant_sku.setPordergrantid_link(pordergrantid_link);
-
-						grantskuService.save(grant_sku);
-
-						// Cap nhat pcontracct_sku da map
-
-						po_sku.setPquantity_granted(po_sku.getPquantity_total());
-						po_sku.setPquantity_lenhsx(po_sku.getPquantity_total());
-						po_sku.setIsmap(true);
-						poskuService.save(po_sku);
+					List<SizeSetAttributeValue> list_av = sizesetatt_repo.getall_bySizeSetId(sizesetid_link);
+					List<Long> listsku = new ArrayList<Long>();
+					if (sizesetid_link != null && colorid_link != null) {
+						for (SizeSetAttributeValue sizeset_av : list_av) {
+							List<Long> skuid_links = sku_av_repo.getskuid_by_valueMau_and_valueCo(colorid_link,
+									sizeset_av.getAttributevalueid_link(), productid_link);
+							if (skuid_links.size() > 0)
+								listsku.add(skuid_links.get(0));
+						}
+						if (listsku.size() == 0)
+							listsku.add((long) -1);
+					} else {
+						if (sizesetid_link == null && colorid_link != null) {
+							listsku = sku_av_repo.get_bycolorid_link(productid_link, colorid_link);
+							if (listsku.size() == 0)
+								listsku.add((long) -1);
+						} else {
+							listsku = null;
+						}
 					}
 
-				}
+					for (PContractProductSKU po_sku : list_po_sku) {
+						if (listsku == null || listsku.contains(po_sku.getSkuid_link())) {
+							POrder_Product_SKU porder_sku = new POrder_Product_SKU();
+							porder_sku.setId(null);
+							porder_sku.setOrgrootid_link(orgrootid_link);
+							porder_sku.setPcontract_poid_link(pcontract_poid_link);
+							porder_sku.setPorderid_link(porderid_link);
+							porder_sku.setPquantity_production(po_sku.getPquantity_production());
+							porder_sku.setPquantity_sample(po_sku.getPquantity_sample());
+							porder_sku.setPquantity_total(po_sku.getPquantity_total());
+							porder_sku.setProductid_link(productid_link);
+							porder_sku.setSkuid_link(po_sku.getSkuid_link());
 
-				// danh dau po da map
+							porderSkuService.save(porder_sku);
 
-				List<PContractProductSKU> list_sku_notmap = poskuService.getsku_notmap(pcontract_poid_link);
-				if (list_sku_notmap.size() == 0) {
-					po.setIsmap(true);
-					poService.save(po);
+							// them grant_sku
+							POrderGrant_SKU grant_sku = new POrderGrant_SKU();
+							grant_sku.setId(null);
+							grant_sku.setOrgrootid_link(orgrootid_link);
+							grant_sku.setPcontract_poid_link(pcontract_poid_link);
+							grant_sku.setGrantamount(po_sku.getPquantity_total());
+							grant_sku.setSkuid_link(po_sku.getSkuid_link());
+							grant_sku.setPordergrantid_link(pordergrantid_link);
+
+							grantskuService.save(grant_sku);
+
+							// Cap nhat pcontracct_sku da map
+
+							po_sku.setPquantity_granted(po_sku.getPquantity_total());
+							po_sku.setPquantity_lenhsx(po_sku.getPquantity_total());
+							po_sku.setIsmap(true);
+							poskuService.save(po_sku);
+						}
+					}
+					// danh dau po da map
+
+					List<PContractProductSKU> list_sku_notmap = poskuService.getsku_notmap(pcontract_poid_link);
+					if (list_sku_notmap.size() == 0) {
+						po.setIsmap(true);
+						poService.save(po);
+					}
 				}
+				
+				//Cap nhat lai thong tin grant
+				POrderGrant grant = granttService.findOne(pordergrantid_link);
+				grant.setLineinfo(lineinfo);
+				granttService.save(grant);
+
+				// tao Schedule_porder de tra len giao dien
+				DecimalFormat decimalFormat = new DecimalFormat("#,###");
+				decimalFormat.setGroupingSize(3);
+				Product product = productService.findOne(productid_link);
+				String mahang = product.getBuyercode() + "-" + decimalFormat.format(total);
+				PContract pcontract = pcontractService.findOne(po_min.getPcontractid_link());
+
+				Schedule_porder sch = new Schedule_porder();
+				sch.setDuration(duration);
+				sch.setProductivity(entity.productivity);
+				sch.setBuyername(porder.getBuyername());
+				sch.setCls(pcontract.getcls() + " match");
+				sch.setEndDate(enddate);
+				sch.setId_origin(porder.getId());
+				sch.setMahang(mahang);
+				sch.setName(mahang);
+				sch.setParentid_origin(entity.orgid_link);
+				sch.setPordercode(porder.getOrdercode());
+				sch.setResourceId(entity.orggrantid_link);
+				sch.setStartDate(startdate);
+				sch.setStatus(2);
+				sch.setTotalpackage(porder.getTotalorder());
+				sch.setVendorname(porder.getVendorname());
+				sch.setPorder_grantid_link(pordergrantid_link);
+				sch.setProductivity_po(porder.getProductivity_po());
+				sch.setProductivity_porder(0);
+				sch.setPcontract_poid_link(0);
+				sch.setPcontractid_link(po_min.getPcontractid_link());
+				sch.setProductbuyercode(product.getBuyercode());
+				sch.setPorderid_link(porder.getId());
+				sch.setGrant_type(0);
+				sch.setProductid_link(productid_link);
+				sch.setLineinfo(lineinfo);
+
+				list_schedule.add(sch);
 			}
 
 			response.data = list_schedule;

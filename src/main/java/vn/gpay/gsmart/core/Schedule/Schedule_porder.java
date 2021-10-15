@@ -44,6 +44,7 @@ public class Schedule_porder {
 	private Integer productivity_po;// NS cua PO
 	private Integer productivity_porder;// NS Target (Khi tao lenh sx, lay tu NS Target tai chao gia vao)
 	private Integer productivity_line;// NS tổ (tính trung bình tiến độ ra chuyền)
+	private String lineinfo;
 	@JsonProperty("icon")
 	private String icon;
 
@@ -269,6 +270,14 @@ public class Schedule_porder {
 
 	public void setIs_show_image(Boolean is_show_image) {
 		this.is_show_image = is_show_image;
+	}
+
+	public String getLineinfo() {
+		return lineinfo;
+	}
+
+	public void setLineinfo(String lineinfo) {
+		this.lineinfo = lineinfo;
 	}
 
 }
