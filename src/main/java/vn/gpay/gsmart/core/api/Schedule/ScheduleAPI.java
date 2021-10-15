@@ -1491,7 +1491,7 @@ public class ScheduleAPI {
 					grantsku.setPordergrantid_link(entity.pordergrantid_link_des);
 					grantsku.setSkuid_link(pOrderGrant_SKU.getSkuid_link());
 					grantsku.setPcontract_poid_link(pOrderGrant_SKU.getPcontract_poid_link());
-					grantskuService.save(pOrderGrant_SKU);
+					grantskuService.save(grantsku);
 				} else {
 					sku.setGrantamount(sku.getGrantamount() + pOrderGrant_SKU.getGrantamount());
 					grantskuService.save(sku);
