@@ -68,7 +68,7 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 			}
 			// Xoa porder_grant_po
 			// Xoa porder_grant_sku
-			for (POrderGrant_SKU pordergrant_sku : pordergrant.getPorder_grant_sku()) {
+			for (POrderGrant_SKU pordergrant_sku : pordergrantskuService.getPOrderGrant_SKU(pordergrant.getId())) {
 				pordergrantskuService.delete(pordergrant_sku);
 			}
 
