@@ -39,5 +39,5 @@ public interface IPOrderGrant_Service extends Operations<POrderGrant> {
 	
 	List<Long> getToSXIdByPcontractPO(Long pcontract_poid_link);
 	
-	List<Long> getGrantPlanByProduct(Long productid_link);
+	List<Long> getGrantIdPlanByProduct(Long productid_link);
 }

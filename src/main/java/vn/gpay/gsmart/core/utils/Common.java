@@ -173,6 +173,11 @@ public class Common  {
 		return task.getId();
 	}
 	
+	public String DateToString(Date date, String format) {
+		DateFormat df = new SimpleDateFormat(format);
+		return df.format(date);
+	}
+	
 	public String getDescriptoin_bytype(Long tasktypeid_link, List<Task_Object> list_object) {
 		String name = "";
 		int typeid = tasktypeid_link.intValue();

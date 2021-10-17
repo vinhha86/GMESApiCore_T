@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 @Repository
 @Transactional
 public interface IPOrder_Product_SKU_Repository extends JpaRepository<POrder_Product_SKU, Long>, JpaSpecificationExecutor<POrder_Product_SKU> {
@@ -85,6 +87,12 @@ public interface IPOrder_Product_SKU_Repository extends JpaRepository<POrder_Pro
 	
 	@Query(value = "select distinct pcontract_poid_link from POrderGrant_SKU a "
 			+ "where a.pordergrantid_link= :pordergrantid_link")
-	public List<Long> GetListPOByGrant(
+	public List<Long> GetListPO_id_ByGrant(
+			@Param ("pordergrantid_link")final  long pordergrantid_link);
+	
+	@Query(value = "select distinct b from POrderGrant_SKU a "
+			+ "inner join PContract_PO b on a.pcontract_poid_link = b.id "
+			+ "where a.pordergrantid_link= :pordergrantid_link")
+	public List<PContract_PO> GetListPO_ByGrant(
 			@Param ("pordergrantid_link")final  long pordergrantid_link);
 }

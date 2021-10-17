@@ -1477,6 +1477,19 @@ public class ScheduleAPI {
 			sch.setMahang(grant_des.getMaHang());
 			sch.setTotalpackage(total);
 			sch.setGrant_type(type);
+			
+			String lineinfo = "";
+			DateFormat df = new SimpleDateFormat("dd/MM/YYYY");
+			List<PContract_PO> list_po = porderSkuService.getListPO_ByGrant(sch.getPorder_grantid_link());
+			for(PContract_PO po : list_po) {
+				if(lineinfo == "") {
+					lineinfo = po.getPo_buyer()+"-"+po.getPo_quantity()+"-"+df.format(po.getShipdate());
+				}
+				else {
+					lineinfo = ";"+po.getPo_buyer()+"-"+po.getPo_quantity()+"-"+df.format(po.getShipdate());
+				}
+			}
+			sch.setLineinfo(lineinfo);;
 
 			// chuyen sku cua grant_src sang grant_des
 			List<POrderGrant_SKU> list_sku_src = grantskuService.getPOrderGrant_SKU(entity.pordergrantid_link_src);
@@ -1631,7 +1644,6 @@ public class ScheduleAPI {
 				grant.setDuration(entity.duration);
 				grant.setType(0); // 0 la chua qua ngay giao hang
 				grant.setTotalamount_tt(entity.quantity);
-				grant.setIsmap(true);
 				grant = granttService.save(grant);
 				pordergrantid_link = grant.getId();
 
@@ -1819,7 +1831,6 @@ public class ScheduleAPI {
 						grant.setDuration(duration);
 						grant.setType(0); // 0 la chua qua ngay giao hang
 						grant.setTotalamount_tt(total);
-						grant.setIsmap(true);
 						grant = granttService.save(grant);
 						pordergrantid_link = grant.getId();
 
@@ -1837,6 +1848,8 @@ public class ScheduleAPI {
 						Product product = productService.findOne(productid_link);
 						String mahang = product.getBuyercode() + "-" + decimalFormat.format(total);
 						PContract pcontract = pcontractService.findOne(po.getPcontractid_link());
+						 
+						String lineinfo = po.getPo_buyer()+"-"+po.getPo_quantity()+commonService.DateToString(po.getShipdate(), "dd/MM/YYYY");
 
 						Schedule_porder sch = new Schedule_porder();
 						sch.setDuration(duration);
@@ -1863,6 +1876,7 @@ public class ScheduleAPI {
 						sch.setPorderid_link(porder.getId());
 						sch.setGrant_type(0);
 						sch.setProductid_link(productid_link);
+						sch.setLineinfo(lineinfo);
 
 						list_schedule.add(sch);
 					}
@@ -1924,8 +1938,9 @@ public class ScheduleAPI {
 						po_min = poService.findOne(shipping.getPcontract_poid_link());
 					}
 				}
+				int duration_min = commonService.getDuration_byProductivity(po_min.getPo_quantity(), productivity);
 
-				Date startdate = commonService.getBeginOfDate(po_min.getProductiondate());
+				Date startdate = commonService.getBeginOfDate(commonService.Date_Add_with_holiday(po_min.getShipdate(), (0-duration_min), orgrootid_link));
 				int duration = commonService.getDuration_byProductivity(total, productivity);
 				Date enddate = commonService
 						.getEndOfDate(commonService.Date_Add_with_holiday(startdate, duration, orgrootid_link));
@@ -1978,7 +1993,6 @@ public class ScheduleAPI {
 					grant.setDuration(duration);
 					grant.setType(0); // 0 la chua qua ngay giao hang
 					grant.setTotalamount_tt(total);
-					grant.setIsmap(true);
 					grant = granttService.save(grant);
 					pordergrantid_link = grant.getId();
 
@@ -2109,7 +2123,13 @@ public class ScheduleAPI {
 			response.data = list_schedule;
 
 			// lay nhung grant ke hoach de remove tren bieu do
-			response.remove = granttService.getGrantPlanByProduct(productid_link);
+			response.remove = granttService.getGrantIdPlanByProduct(productid_link);
+			//cap nhat line ke hoach sang trang thai da map
+			for(Long grantid : response.remove) {
+				POrderGrant grant = granttService.findOne(grantid);
+				grant.setIsmap(true);
+				granttService.save(grant);
+			}
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

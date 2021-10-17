@@ -242,7 +242,7 @@ public class POrderPOLineAPI {
 
 			// Cap nhat so luong cua grant
 			grant.setGrantamount(total);
-			grant.setIsmap(true);
+//			grant.setIsmap(true);
 			grantService.save(grant);
 
 			// Cap nhat lai so luogn tong cua lenh san xuat
@@ -325,7 +325,7 @@ public class POrderPOLineAPI {
 					porderService.save(porder);
 
 					grant.setGrantamount(grant.getTotalamount_tt());
-					grant.setIsmap(false);
+//					grant.setIsmap(false);
 					grantService.save(grant);
 
 					String name = "";
@@ -394,6 +394,7 @@ public class POrderPOLineAPI {
 			for (Long pordergrantid_link : entity.data) {
 				POrderGrant grant = grantService.findOne(pordergrantid_link);
 				POrder porder = porderService.findOne(grant.getPorderid_link());
+				Long productid_link = porder.getProductid_link();
 				
 				if (porder != null) {
 					porderService.delete(porder);
@@ -403,10 +404,9 @@ public class POrderPOLineAPI {
 					grantService.delete(grant);
 				}
 				
-				List<Long> list_pcontractpo = porderskuService.getListPOByGrant(pordergrantid_link);
+				List<Long> list_pcontractpo = porderskuService.getListPO_Id_ByGrant(pordergrantid_link);
 				for (Long pcontract_poid_link : list_pcontractpo) {
 					PContract_PO po = poService.findOne(pcontract_poid_link);
-					Long productid_link = po.getProductid_link();
 
 					// Cap nhat lai thong tin lenh san xuat
 					
@@ -421,15 +421,7 @@ public class POrderPOLineAPI {
 						for (POrder_Product_SKU porder_sku : list_porder_sku) {
 							porderskuService.delete(porder_sku);
 
-							// cap nhat lai trong pcontract_sku chua map
-							Long skuid_link = porder_sku.getSkuid_link();
-							List<PContractProductSKU> list_po_sku = pcontractskuService
-									.getlistsku_bysku_and_product_PO(skuid_link, pcontract_poid_link, productid_link);
-							if (list_po_sku.size() > 0) {
-								PContractProductSKU posku = list_po_sku.get(0);
-								posku.setIsmap(false);
-								pcontractskuService.save(posku);
-							}
+							
 						}
 					}
 
@@ -439,6 +431,16 @@ public class POrderPOLineAPI {
 						List<POrderGrant_SKU> list_grant_sku = grantskuService.getGrantSKUByGrantAndPO(grant.getId(), pcontract_poid_link);
 						for (POrderGrant_SKU grantsku : list_grant_sku) {
 							grantskuService.delete(grantsku);
+							
+							// cap nhat lai trong pcontract_sku chua map
+							Long skuid_link = grantsku.getSkuid_link();
+							List<PContractProductSKU> list_po_sku = pcontractskuService
+									.getlistsku_bysku_and_product_PO(skuid_link, pcontract_poid_link, productid_link);
+							if (list_po_sku.size() > 0) {
+								PContractProductSKU posku = list_po_sku.get(0);
+								posku.setIsmap(false);
+								pcontractskuService.save(posku);
+							}
 						}
 
 						list_id.add(grant.getId());

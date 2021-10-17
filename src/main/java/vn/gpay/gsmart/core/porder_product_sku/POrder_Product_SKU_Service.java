@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import vn.gpay.gsmart.core.base.AbstractService;
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 
 @Service
 public class POrder_Product_SKU_Service extends AbstractService<POrder_Product_SKU> implements IPOrder_Product_SKU_Service{
@@ -84,8 +85,13 @@ public class POrder_Product_SKU_Service extends AbstractService<POrder_Product_S
 		return repo.getby_porder_and_po(porderid_link, pcontract_poid_link);
 	}
 	@Override
-	public List<Long> getListPOByGrant(Long pordergrantid_link) {
+	public List<Long> getListPO_Id_ByGrant(Long pordergrantid_link) {
 		// TODO Auto-generated method stub
-		return repo.GetListPOByGrant(pordergrantid_link);
+		return repo.GetListPO_id_ByGrant(pordergrantid_link);
+	}
+	@Override
+	public List<PContract_PO> getListPO_ByGrant(Long pordergrantid_link) {
+		// TODO Auto-generated method stub
+		return repo.GetListPO_ByGrant(pordergrantid_link);
 	}
 }

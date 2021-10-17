@@ -3,6 +3,7 @@ package vn.gpay.gsmart.core.porder_product_sku;
 import java.util.List;
 
 import vn.gpay.gsmart.core.base.Operations;
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 
 public interface IPOrder_Product_SKU_Service extends Operations<POrder_Product_SKU> {
 	public List<POrder_Product_SKU> getby_productid_link(Long productid_link);
@@ -22,5 +23,6 @@ public interface IPOrder_Product_SKU_Service extends Operations<POrder_Product_S
 	List<POrder_Product_SKU> getsumsku_byporder(long porderid_link);
 	List<Long> getvalue_by_attribute(Long porderid_link, Long attributeid_link);
 	int getPquantity_by_po_and_sku(Long pcontract_poid_link, Long skuid_link);
-	List<Long> getListPOByGrant(Long pordergrantid_link);
+	List<Long> getListPO_Id_ByGrant(Long pordergrantid_link);
+	List<PContract_PO> getListPO_ByGrant(Long pordergrantid_link);
 }

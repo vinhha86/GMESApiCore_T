@@ -89,8 +89,7 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 		orgvendorid_link = orgvendorid_link == 0 ? null : orgvendorid_link;
 		orgbuyerid_link = orgbuyerid_link == 0 ? null : orgbuyerid_link;
 
-		List<POrderGrant> a = repo.get_granted_bygolivedate(status, granttoorgid_link, golivedate_from, golivedate_to,
-				POBuyer, contractcode, orgbuyerid_link, orgvendorid_link);
+		List<POrderGrant> a = repo.get_granted_bygolivedate(status, granttoorgid_link, golivedate_from, golivedate_to);
 		return a;
 	}
 
@@ -153,7 +152,7 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 	}
 
 	@Override
-	public List<Long> getGrantPlanByProduct(Long productid_link) {
+	public List<Long> getGrantIdPlanByProduct(Long productid_link) {
 		// TODO Auto-generated method stub
 		return repo.getPlanByProduct(productid_link);
 	}
