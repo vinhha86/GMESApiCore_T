@@ -492,6 +492,48 @@ public class PContractProductAPI {
 			return new ResponseEntity<PContractProduct_getall_response>(response, HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/getby_pcontract_product", method = RequestMethod.POST)
+	public ResponseEntity<PContractProduct_getall_response> GetByPContract(HttpServletRequest request,
+			@RequestBody PContractProduct_getbycontract_product_request entity) {
+		PContractProduct_getall_response response = new PContractProduct_getall_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long orgrootid_link = user.getRootorgid_link();
+			Long pcontractid_link = entity.pcontractid_link;
+			Long productid_link =  entity.productid_link;
+
+			List<PContractProduct> lst = pcpservice.get_by_product_and_pcontract(orgrootid_link, productid_link, pcontractid_link);
+			List<PContractProductBinding> data = new ArrayList<PContractProductBinding>();
+			for (PContractProduct pContractProduct : lst) {
+				PContractProductBinding binding = new PContractProductBinding();
+				binding.setId(pContractProduct.getId());
+				binding.setOrgrootid_link(orgrootid_link);
+				binding.setPcontractid_link(pContractProduct.getPcontractid_link());
+				binding.setProductid_link(pContractProduct.getProductid_link());
+				binding.setProductCode(pContractProduct.getProductCode());
+				binding.setProductName(pContractProduct.getProductName());
+				binding.setPquantity(pContractProduct.getPquantity());
+				binding.setProduction_date(pContractProduct.getProduction_date());
+				binding.setDelivery_date(pContractProduct.getDelivery_date());
+				binding.setUnitprice(pContractProduct.getUnitprice());
+				binding.setProductVendorCode(pContractProduct.getProductVendorCode());
+				binding.setProductBuyerCode(pContractProduct.getProductBuyerCode());
+				binding.setProductinfo(pContractProduct.getProductinfo());
+				data.add(binding);
+			}
+			
+			response.data = data;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<PContractProduct_getall_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<PContractProduct_getall_response>(response, HttpStatus.OK);
+		}
+	}
 
 	@RequestMapping(value = "/gettreeproduct", method = RequestMethod.POST)
 	public ResponseEntity<PContractProduct_gettreeproduct_response> GetTreeProductByPContract(

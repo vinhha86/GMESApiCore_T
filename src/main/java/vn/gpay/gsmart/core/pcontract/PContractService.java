@@ -218,4 +218,9 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 		// TODO Auto-generated method stub
 		return repo.getPContractByYear(year);
 	}
+
+	@Override
+	public List<PContract> getByProduct(Long productid_link) {
+		return repo.getByProduct(productid_link);
+	}
 }

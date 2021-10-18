@@ -491,5 +491,26 @@ public class PContractAPI {
 			return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/getByProduct", method = RequestMethod.POST)
+	public ResponseEntity<PContract_getbypaging_response> getByProduct(
+			@RequestBody PContract_findByContractcode_request entity, HttpServletRequest request) {
+		PContract_getbypaging_response response = new PContract_getbypaging_response();
+//		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+		try {
+			Long productid_link = entity.productid_link;
+			response.data = pcontractService.getByProduct(productid_link);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
+		}
+	}
 
 }

@@ -38,5 +38,13 @@ public interface IPContractRepository extends JpaRepository<PContract, Long>, Jp
 	@Query(value = "select c from PContract c " + "inner join ContractBuyer a on a.id = c.contractbuyerid_link "
 			+ "where contract_year = :year ")
 	public List<PContract> getPContractByYear(@Param("year") final Integer year);
+	
+	@Query(value = "select a from PContract a " 
+			+ "inner join PContractProduct b on b.pcontractid_link = a.id "
+			+ "where b.productid_link = :productid_link "
+			)
+	public List<PContract> getByProduct(
+			@Param("productid_link") final Long productid_link
+			);
 
 }

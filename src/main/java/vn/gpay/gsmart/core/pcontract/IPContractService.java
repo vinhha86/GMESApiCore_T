@@ -29,4 +29,6 @@ public interface IPContractService extends Operations<PContract> {
 	int getProductNotBom(Long pcontractid_link);
 
 	List<PContract> getPContractByYear(int year);
+	
+	List<PContract> getByProduct(Long productid_link);
 }
