@@ -2251,7 +2251,11 @@ public class PContract_POAPI {
 			HttpServletRequest request) {
 		delete_listpo_line_response response = new delete_listpo_line_response();
 		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
 			for (PContract_PO thePO : entity.listid) {
+				Long pcontractid_link = thePO.getPcontractid_link();
+
 				List<POrder> list_porder = porderService.getByContractAndPO(thePO.getPcontractid_link(), thePO.getId());
 				// chi lay nhung lenh da keo vao bieu do
 				List<POrder> list_porder_grant = list_porder.stream()
@@ -2292,10 +2296,23 @@ public class PContract_POAPI {
 				}
 
 				// Delete sku
-				List<PContractProductSKU> listsku = ppskuService.getbypo_and_product(thePO.getId(),
-						thePO.getProductid_link());
-				for (PContractProductSKU pContractProductSKU : listsku) {
-					ppskuService.delete(pContractProductSKU);
+				Product product = productService.findOne(thePO.getProductid_link());
+				if (product.getProducttypeid_link() == ProductType.SKU_TYPE_COMPLETEPRODUCT) {
+					List<PContractProductSKU> listsku = ppskuService.getbypo_and_product(thePO.getId(),
+							thePO.getProductid_link());
+					for (PContractProductSKU pContractProductSKU : listsku) {
+						ppskuService.delete(pContractProductSKU);
+					}
+				} else {
+					List<ProductPairing> list_pair = pairService.getproduct_pairing_detail_bycontract(orgrootid_link,
+							pcontractid_link, thePO.getProductid_link());
+					for (ProductPairing pair : list_pair) {
+						List<PContractProductSKU> listsku = ppskuService.getbypo_and_product(thePO.getId(),
+								pair.getProductid_link());
+						for (PContractProductSKU pContractProductSKU : listsku) {
+							ppskuService.delete(pContractProductSKU);
+						}
+					}
 				}
 
 				// Delete PO Prices
