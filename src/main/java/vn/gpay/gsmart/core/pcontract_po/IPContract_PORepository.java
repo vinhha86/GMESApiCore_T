@@ -250,13 +250,10 @@ public interface IPContract_PORepository
 
 	@Query(value = "select c from PContract_PO c " + "inner join PContract_PO parent on c.parentpoid_link = parent.id "
 			+ "inner join PContract_PO plan on plan.parentpoid_link = parent.id "
-			+ "inner join POrder porder on porder.pcontract_poid_link = plan.id "
 			+ "inner join PContractProductSKU a on a.pcontract_poid_link = c.id "
-			+ "where (porder.granttoorgid_link in :orgs or :orgs is null) "
-			+ "and c.po_typeid_link = 11 and plan.po_typeid_link = 10 "
+			+ "where c.po_typeid_link = 11 and plan.po_typeid_link = 10 "
 			+ "and ((a.skuid_link in :listsku and (a.ismap = 'false' or a.ismap is null)) or :listsku is null) "
 			+ "and (c.productid_link = :productid_link or a.productid_link = :productid_link) group by c "
 			+ "order by c.shipdate ASC ")
-	public List<PContract_PO> getby_product_color_sizeset(@Param("orgs") final List<Long> orgs,
-			@Param("productid_link") final Long productid_link, @Param("listsku") final List<Long> listsku);
+	public List<PContract_PO> getby_product_color_sizeset(@Param("productid_link") final Long productid_link, @Param("listsku") final List<Long> listsku);
 }

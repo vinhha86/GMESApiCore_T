@@ -301,7 +301,7 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 			}
 		}
 
-		List<PContract_PO> list_po = repo.getby_product_color_sizeset(orgs, productid_link, listsku);
+		List<PContract_PO> list_po = repo.getby_product_color_sizeset( productid_link, listsku);
 
 		List<PContractPO_Shipping> list_shipping = new ArrayList<PContractPO_Shipping>();
 		for (PContract_PO po : list_po) {
