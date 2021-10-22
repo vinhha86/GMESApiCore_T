@@ -1179,7 +1179,6 @@ public class OrgAPI {
 			
 			if(orgid_link.equals((long)1)) {
 				response.data = orgService.findAllorgByTypeId(17, 1);
-				System.out.println("here1");
 			}else {
 				List<Org> result = new ArrayList<Org>();
 				List<Org> list_org = new ArrayList<Org>();

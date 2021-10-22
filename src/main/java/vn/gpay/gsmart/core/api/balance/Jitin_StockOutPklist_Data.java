@@ -54,6 +54,7 @@ public class Jitin_StockOutPklist_Data implements Serializable {
 	private String invoice;
 	private Date ngayNhapKho;
 	private String spaceString;
+	private String stockinProductString;
 	
 	
 	private Float met_remain;
@@ -366,6 +367,12 @@ public class Jitin_StockOutPklist_Data implements Serializable {
 	}
 	public void setSpaceString(String spaceString) {
 		this.spaceString = spaceString;
+	}
+	public String getStockinProductString() {
+		return stockinProductString;
+	}
+	public void setStockinProductString(String stockinProductString) {
+		this.stockinProductString = stockinProductString;
 	}
 
 }
