@@ -188,6 +188,8 @@ public class PContract implements Serializable {/**
 	
 	@Transient
 	public int getPayer() {
+		if(orgpayerid_link==null) return 2;
+		
 		if(orgpayerid_link.equals(orgvendorid_link) )
 			return 1;
 		else
@@ -196,6 +198,8 @@ public class PContract implements Serializable {/**
 	
 	@Transient
 	public int getOrgshow() {
+		if(orgpayerid_link==null) return 2;
+		
 		if(orgpayerid_link == orgvendorid_link )
 			return 1;
 		else

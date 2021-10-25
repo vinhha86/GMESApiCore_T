@@ -80,7 +80,11 @@ public class POrderGrant_SKUService extends AbstractService<POrderGrant_SKU> imp
 		for(Long orgid:orglines){
 			//Lay thong tin Org
 			Org theOrg = orgService.findOne(orgid);
-			orgLines += theOrg.getName() + ";";
+			if(theOrg!=null) {
+				String name  = theOrg.getName() == null ? "" : theOrg.getName();
+				orgLines += name + ";";
+			}
+			
 		}
 		return orgLines;
 	}
