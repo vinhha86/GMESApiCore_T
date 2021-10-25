@@ -318,7 +318,7 @@ public class OrgAPI {
 	public ResponseEntity<?> getToSXByPcontractPO(@RequestBody get_orgreq_request entity, HttpServletRequest request) {// @RequestParam("type")
 		OrgResponse response = new OrgResponse();
 		try {
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			
 			Long pcontract_poid_link =  entity.pcontract_poid_link;
 			List<Long> orgId_list = porderGrantService.getToSXIdByPcontractPO(pcontract_poid_link);
@@ -1201,8 +1201,6 @@ public class OrgAPI {
 					result.addAll(listToCat);
 				}
 				response.data = result;
-				
-				System.out.println("here2");
 			}
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
