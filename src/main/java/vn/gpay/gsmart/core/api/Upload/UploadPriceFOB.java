@@ -224,7 +224,16 @@ public class UploadPriceFOB {
 						}
 
 						// kiem tra don vi tinh
+						Long unitid_link = null;
 						List<Unit> list_unit = unitService.getbyName(s_donvitinh);
+						if(list_unit.size() == 0) {
+							Unit unit = new Unit();
+							unit.setCode(s_donvitinh);
+							unit.setId(null);
+							unit.setName(s_donvitinh);
+							unit.setOrgrootid_link(orgrootid_link);
+//							unit.setUnittype(unittype);
+						}
 
 						// Kiem tra xem price da co hay chua
 						List<PContract_Price_D> list_price_d = priceDService

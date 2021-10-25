@@ -11,6 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 public interface UnitRepository extends JpaRepository<Unit, Long> {
-	@Query(value = "select c from Unit c where lower(c.name) =lower(:name)")
+	@Query(value = "select c from Unit c where lower(c.code) =lower(:name)")
 	public List<Unit> getByName(@Param("name") final String name);
 }
