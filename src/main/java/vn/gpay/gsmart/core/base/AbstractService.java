@@ -10,61 +10,65 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
-public abstract class AbstractService<T extends Serializable> implements Operations<T>{
+public abstract class AbstractService<T extends Serializable> implements Operations<T> {
 
 	@Override
-    @Transactional(readOnly = true)
-    public T findOne(final long id) {
-		if(getRepository().findById(id).isPresent())
-			return getRepository().findById(id).get();
+	@Transactional(readOnly = true)
+	public T findOne(final long id) {
+		try {
+			if (getRepository().findById(id).isPresent())
+				return getRepository().findById(id).get();
+		} catch (Exception ex) {
+
+		}
 		return null;
-    }
+	}
 
 	// read - all
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<T> findAll() {
-        return new ArrayList<T>(getRepository().findAll());
-    }
+	@Override
+	@Transactional(readOnly = true)
+	public List<T> findAll() {
+		return new ArrayList<T>(getRepository().findAll());
+	}
 
-    @Override
-    public Page<T> findPaginated(final int page, final int size) {
-        return getRepository().findAll(PageRequest.of(page, size));
-    }
+	@Override
+	public Page<T> findPaginated(final int page, final int size) {
+		return getRepository().findAll(PageRequest.of(page, size));
+	}
 
-    // write
+	// write
 
-    @Override
-    public T create(final T entity) {
-        return getRepository().save(entity);
-    }
-    
-   // save
-    @Override
-    public T save(final T entity) {
-        return getRepository().save(entity);
-    }
-    
-    @Override
-    public T saveAndFlush(final T entity) {
-        return getRepository().saveAndFlush(entity);
-    }
-    
-    @Override
-    public T update(final T entity) {
-        return getRepository().save(entity);
-    }
+	@Override
+	public T create(final T entity) {
+		return getRepository().save(entity);
+	}
 
-    @Override
-    public void delete(final T entity) {
-    	getRepository().delete(entity);
-    }
+	// save
+	@Override
+	public T save(final T entity) {
+		return getRepository().save(entity);
+	}
 
-    @Override
-    public void deleteById(final long entityId) {
-    	getRepository().deleteById(entityId);
-    }
+	@Override
+	public T saveAndFlush(final T entity) {
+		return getRepository().saveAndFlush(entity);
+	}
 
-    protected abstract JpaRepository<T, Long> getRepository();
+	@Override
+	public T update(final T entity) {
+		return getRepository().save(entity);
+	}
+
+	@Override
+	public void delete(final T entity) {
+		getRepository().delete(entity);
+	}
+
+	@Override
+	public void deleteById(final long entityId) {
+		getRepository().deleteById(entityId);
+	}
+
+	protected abstract JpaRepository<T, Long> getRepository();
 }
