@@ -38,9 +38,12 @@ import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Service;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price_D;
 import vn.gpay.gsmart.core.product.IProductService;
+import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.sku.ISKU_Service;
 import vn.gpay.gsmart.core.utils.Column_Price_FOB;
 import vn.gpay.gsmart.core.utils.Common;
+import vn.gpay.gsmart.core.utils.ProductType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -62,6 +65,8 @@ public class UploadPriceFOB {
 	IOrgService orgService;
 	@Autowired
 	IUnitService unitService;
+	@Autowired
+	ISKU_Service skuService;
 
 	@RequestMapping(value = "/download_temp", method = RequestMethod.POST)
 	public ResponseEntity<download_temp_price_fob_response> DownloadTemp(HttpServletRequest request) {
@@ -178,6 +183,48 @@ public class UploadPriceFOB {
 						} else {
 							fobpriceid_link = list_dm_pricefob.get(0).getId();
 						}
+
+						// kiem tra NPL
+						Integer product_type = ProductType.SKU_TYPE_UNKNOWN;
+						switch (Loai.trim()) {
+						case "FABRIC":
+							product_type = ProductType.SKU_TYPE_MAINMATERIAL;
+							break;
+						case "TRIM":
+							product_type = ProductType.SKU_TYPE_SWEINGTRIM_MIN;
+							break;
+						case "PACKING":
+							product_type = ProductType.SKU_TYPE_PACKINGTRIM_MIN;
+							break;
+						case "THREAD":
+							product_type = ProductType.SKU_TYPE_SWEINGTHREAD_MIN;
+							break;
+						case "TICKET":
+							product_type = ProductType.TICKET;
+							break;
+						default:
+							break;
+						}
+						Long materialid_link = null, productid_link = null;
+						List<Product> list_npl = productService.getby_code_type_description_name(orgrootid_link, MaNPL,
+								product_type, MoTa, MaNPL);
+						if (list_npl.size() == 0) {
+							Product product = new Product();
+							product.setBuyercode(MaNPL);
+							product.setCode(MaNPL);
+							product.setDescription(MoTa);
+							product.setId(null);
+							product.setOrgrootid_link(orgrootid_link);
+							product.setTimecreate(new Date());
+							product.setProducttypeid_link(product_type);
+							product.setStatus(1);
+							product = productService.save(product);
+							productid_link = product.getId();
+						} else {
+							productid_link = list_npl.get(0).getId();
+						}
+
+//						List<SKU> list_sku = skuService.get
 
 						// Kiem tra nha cung cap
 						Long org_providerid_link = null;
