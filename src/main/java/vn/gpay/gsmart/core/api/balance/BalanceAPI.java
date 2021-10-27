@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.gpay.gsmart.core.api.pcontractproductbom.PContractProductBom2API;
 import vn.gpay.gsmart.core.api.pcontractproductbom.get_bom_by_product_request;
 import vn.gpay.gsmart.core.api.pcontractproductbom.get_bom_by_product_response;
+import vn.gpay.gsmart.core.api.porder_grant.POrder_Grant_findByOrgId_request;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract.IPContractService;
@@ -34,6 +35,10 @@ import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
 import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -61,6 +66,10 @@ public class BalanceAPI {
 	IPOrder_Service porder_Service;
 	@Autowired
 	IOrgService orgService;
+	@Autowired
+	IPOrderGrant_Service pordergrantService;
+	@Autowired
+	IPOrderGrant_SKUService pordergrantSkuService;
 
 	@Autowired
 	IPContract_bom2_npl_poline_Service bomPOLine_Service;
@@ -256,6 +265,7 @@ public class BalanceAPI {
 //			return new ResponseEntity<Balance_Response>(response, HttpStatus.BAD_REQUEST);
 //		}
 //	}	
+	
 	@RequestMapping(value = "/cal_balance_byporder", method = RequestMethod.POST)
 	public ResponseEntity<Balance_Response> cal_balance_byporder(HttpServletRequest request,
 			@RequestBody Balance_Request entity) {
@@ -268,12 +278,13 @@ public class BalanceAPI {
 //				List<POrder_Product_SKU> ls_Product_SKU = pOrder_SKU_Service.getsumsku_byporder(entity.porderid_link);
 				List<POrder_Product_SKU> ls_Product_SKU = pOrder_SKU_Service
 						.getlist_sku_in_porder(user.getRootorgid_link(), entity.porderid_link);
-
+				
 				List<Balance_Product_Data> ls_Product_Total = new ArrayList<Balance_Product_Data>();
 
 				List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
 				for (POrder_Product_SKU thePContractSKU : ls_Product_SKU) {
 //					SKU theProduct_SKU = skuService.findOne(thePContractSKU.getSkuid_link());
+					
 					cal_demand_bysku(ls_SKUBalance, thePorder.getPcontractid_link(), thePorder.getPcontract_poid_link(),
 							thePorder.getProductid_link(), thePContractSKU.getSkuid_link(),
 							thePContractSKU.getSkucode(), thePContractSKU.getMauSanPham(),
@@ -295,6 +306,76 @@ public class BalanceAPI {
 					for (SKUBalance_Data mat_sku : ls_SKUBalance) {
 						Balance_SKU theBalance = new Balance_SKU(ls_SKUBalance, thePorder.getPcontractid_link(),
 								theStock.getId(), null, thePorder.getId(), mat_sku, request.getHeader("Authorization"),
+								latch);
+						theBalance.start();
+					}
+				latch.await();
+
+				response.data = ls_SKUBalance;
+				response.product_data = ls_Product_Total;
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<Balance_Response>(response, HttpStatus.OK);
+			} else {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage("Lệnh sản xuất không tồn tại");
+				return new ResponseEntity<Balance_Response>(response, HttpStatus.BAD_REQUEST);
+			}
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<Balance_Response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/cal_balance_bypordergrant", method = RequestMethod.POST)
+	public ResponseEntity<Balance_Response> cal_balance_bypordergrant(HttpServletRequest request,
+			@RequestBody Balance_Request entity) {
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Balance_Response response = new Balance_Response();
+		try {
+//			POrder thePorder = porder_Service.findOne(entity.porderid_link);
+			POrderGrant thePorderGrant = pordergrantService.findOne(entity.pordergrantid_link);
+			
+			if (null != thePorderGrant) {
+				Long pcontractid_link = thePorderGrant.getPcontractid_link();
+				Long porderid_link = thePorderGrant.getPorderid_link();
+				POrder porder = porder_Service.findOne(porderid_link);
+				// Lay danh sách sku của porderGrant
+				List<POrderGrant_SKU> ls_POrderGrant_SKU = pordergrantSkuService.getPOrderGrant_SKU(thePorderGrant.getId());
+				
+				List<Balance_Product_Data> ls_Product_Total = new ArrayList<Balance_Product_Data>();
+
+				List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
+				for (POrderGrant_SKU thePOrderGrant_SKU : ls_POrderGrant_SKU) {
+//					SKU theProduct_SKU = skuService.findOne(thePContractSKU.getSkuid_link());
+					
+//					System.out.println("line 340: ------------------------");
+//					System.out.println("line 340: " + thePContractSKU.getSkucode());
+//					System.out.println("line 340: " + thePContractSKU.getId());
+//					System.out.println("line 340: " + thePContractSKU.getPquantity_porder());
+					
+					cal_demand_bysku(ls_SKUBalance, pcontractid_link, thePOrderGrant_SKU.getPcontract_poid_link(),
+							porder.getProductid_link(), thePOrderGrant_SKU.getSkuid_link(),
+							thePOrderGrant_SKU.getSkucode(), thePOrderGrant_SKU.getMauSanPham(),
+							thePOrderGrant_SKU.getCoSanPham(), thePOrderGrant_SKU.getGrantamount(), "", // tinh cho lenh
+																										// thi khong can
+																										// group theo
+																										// po_buyer
+							porder.getTotalorder(), entity.balance_limit);
+				}
+				
+				// 3. Tinh toan can doi cho tung nguyen phu lieu trong BOM
+				CountDownLatch latch = new CountDownLatch(ls_SKUBalance.size());
+
+				// Lấy danh sách các kho nguyên liệu của phân xưởng
+				List<Org> ls_Stock = orgService.findChildByType(user.getRootorgid_link(),
+						porder.getGranttoorgid_link(), OrgType.ORG_TYPE_STOCK_MAT);
+
+				for (Org theStock : ls_Stock)
+					for (SKUBalance_Data mat_sku : ls_SKUBalance) {
+						Balance_SKU theBalance = new Balance_SKU(ls_SKUBalance, porder.getPcontractid_link(),
+								theStock.getId(), null, porder.getId(), mat_sku, request.getHeader("Authorization"),
 								latch);
 						theBalance.start();
 					}
@@ -502,7 +583,7 @@ public class BalanceAPI {
 		try {
 			List<PContractBOM2SKU> bom_response = bom2Service.getBOM_By_PContractSKU(pcontractid_link,
 					product_skuid_link);
-
+			
 			ExecutorService executor = Executors.newFixedThreadPool(bom_response.size() + 1);
 			for (PContractBOM2SKU skubom : bom_response) {
 				if (balance_limit == 1) {// Chi tinh nguyen lieu
