@@ -12,4 +12,5 @@ public class TimesheetShiftTypeOrg_create_request extends RequestBase{
 	public boolean checkboxfrom;
 	public boolean checkboxto;
 	public Long orgid_link;
+	public Boolean is_ca_an;
 }

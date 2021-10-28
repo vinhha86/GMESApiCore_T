@@ -8,4 +8,6 @@ public interface ITimesheetShiftTypeService extends Operations<TimesheetShiftTyp
 	public List<TimesheetShiftType>getTimesheetShiftType_ByIdOrgid_link(Long id);
 	public Long getTimesheetShiftTypeID_ByName(String name);
 	public List<TimesheetShiftType>getShift_ByIdOrgid_link(Long orgid_link);
+	public List<TimesheetShiftType>getTimesheetShiftType_CaAn_ByIdOrgid_link(Long id);
+	public List<TimesheetShiftType>getShift_CaAn_ByIdOrgid_link(Long orgid_link);
 }

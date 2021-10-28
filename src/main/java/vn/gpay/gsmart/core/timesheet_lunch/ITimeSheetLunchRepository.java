@@ -38,6 +38,17 @@ public interface ITimeSheetLunchRepository extends JpaRepository<TimeSheetLunch,
 	
 	@Query("SELECT a "
 			+ "FROM TimeSheetLunch a "
+			+ "inner join Personel b on a.personnelid_link = b.id "
+			+ "where b.orgid_link = :orgid_link "
+			+ "and a.workingdate = :workingdate "
+			)
+	public List<TimeSheetLunch> getForUpdateStatusTimeSheetLunch(
+			@Param ("orgid_link")final Long orgid_link,
+			@Param ("workingdate")final Date workingdate
+			);
+	
+	@Query("SELECT a "
+			+ "FROM TimeSheetLunch a "
 			+ "where a.personnelid_link = :personnelid_link "
 			+ "and a.workingdate = :workingdate "
 			+ "and a.shifttypeid_link = :shifttypeid_link "

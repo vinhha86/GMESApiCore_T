@@ -18,7 +18,19 @@ public interface TimesheetShiftTypeOrgRepository extends JpaRepository<Timesheet
 //	
 	@Query(value = "select c from TimesheetShiftTypeOrg c where c.id = 1 ")
 	public List<TimesheetShiftTypeOrg>getShift1ForAbsence();
-	//lay cao theo don vi
-	@Query(value = "select c from TimesheetShiftTypeOrg c where c.orgid_link = :orgid_link order by c.timesheet_shift_type_id_link ")
+	
+	//lay ca lam viec theo don vi
+	@Query(value = "select c from TimesheetShiftTypeOrg c where c.orgid_link = :orgid_link " 
+//			+ " and (c.is_ca_an is null or c.is_ca_an is false ) "
+			+ " order by c.timesheet_shift_type_id_link "
+			)
 	public List<TimesheetShiftTypeOrg> getByOrgid_link(@Param ("orgid_link")final  Long orgid_link);
+	
+	//lay ca an theo don vi
+	@Query(value = "select c from TimesheetShiftTypeOrg c where c.orgid_link = :orgid_link " 
+			+ " and c.is_ca_an is true "
+			+ " order by c.timesheet_shift_type_id_link "
+			)
+	public List<TimesheetShiftTypeOrg> getByOrgid_link_CaAn(@Param ("orgid_link")final  Long orgid_link);
+	
 }

@@ -2,6 +2,7 @@ package vn.gpay.gsmart.core.timesheet_shift_type_org;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -35,6 +36,8 @@ public class TimesheetShiftTypeOrg implements Serializable {
 	private Integer lunch_minute;
 	private Long orgid_link;
 	private Long timesheet_shift_type_id_link;
+	private Boolean is_ca_an;
+	
 	public Long getId() {
 		return id;
 	}
@@ -96,6 +99,12 @@ public class TimesheetShiftTypeOrg implements Serializable {
 	public void setTimesheet_shift_type_id_link(Long timesheet_shift_type_id_link) {
 		this.timesheet_shift_type_id_link = timesheet_shift_type_id_link;
 	};
+	public Boolean getIs_ca_an() {
+		return is_ca_an;
+	}
+	public void setIs_ca_an(Boolean is_ca_an) {
+		this.is_ca_an = is_ca_an;
+	}
 
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -108,5 +117,15 @@ public class TimesheetShiftTypeOrg implements Serializable {
 			return timesheetshifttype.getName();
 		}
 		return "";
+	}
+	
+	@Transient
+	public String getTenLoaiCa() {
+		if (is_ca_an != null) {
+			if(is_ca_an) {
+				return "Ca ăn";
+			}
+		}
+		return "Ca làm việc";
 	}
 }
