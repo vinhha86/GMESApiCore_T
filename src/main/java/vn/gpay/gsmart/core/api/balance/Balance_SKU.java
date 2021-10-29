@@ -188,7 +188,7 @@ public class Balance_SKU implements Runnable {
 			ObjectNode appParNode = objectMapper.createObjectNode();
 			appParNode.put("pcontractid_link", pcontractid_link);
 			appParNode.put("pcontract_poid_link", pcontract_poid_link);
-			appParNode.put("porderid_link", porderid_link);
+//			appParNode.put("porderid_link", porderid_link);
 			appParNode.put("stockid_link", stockid_link);
 			appParNode.put("skuid_link", this.mat_sku.getMat_skuid_link());
 			String jsonReq = objectMapper.writeValueAsString(appParNode);
