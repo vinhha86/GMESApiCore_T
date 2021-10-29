@@ -26,24 +26,24 @@ import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
-import vn.gpay.gsmart.core.sku.SKU;
 
-@Table(name="pcontract_price_d")
+@Table(name = "pcontract_price_d")
 @Entity
-public class PContract_Price_D implements Serializable {/**
-	 * 
-	 */
+public class PContract_Price_D implements Serializable {
+	/**
+	* 
+	*/
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pcontract_price_d_generator")
-	@SequenceGenerator(name="pcontract_price_d_generator", sequenceName = "pcontract_price_d_id_seq", allocationSize=1)
+	@SequenceGenerator(name = "pcontract_price_d_generator", sequenceName = "pcontract_price_d_id_seq", allocationSize = 1)
 	private Long id;
 	private Long orgrootid_link;
 	private Long pcontractid_link;
 	private Long pcontract_poid_link;
 	private Long productid_link;
-	private Float price; //giá chào
+	private Float price; // giá chào
 	private Float cost; // giá vốn
 	private Boolean isfob;
 	private Long currencyid_link;
@@ -60,12 +60,12 @@ public class PContract_Price_D implements Serializable {/**
 	private Float lost_ratio; // tỉ lệ hao hụt
 	private Long materialid_link;
 	private Long providerid_link;
-	
+
 	@NotFound(action = NotFoundAction.IGNORE)
-	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
-	@JoinColumn( name="pcontractprice_d_id_link", referencedColumnName="id")
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "pcontractprice_d_id_link", referencedColumnName = "id")
 	private List<PContract_Price_D_SKU> pcontract_price_d_sku = new ArrayList<PContract_Price_D_SKU>();
-	
+
 	public List<PContract_Price_D_SKU> getPcontract_price_d_sku() {
 		return pcontract_price_d_sku;
 	}
@@ -76,34 +76,34 @@ public class PContract_Price_D implements Serializable {/**
 
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="materialid_link",insertable=false,updatable =false)
-	private SKU material;
-	
+	@JoinColumn(name = "materialid_link", insertable = false, updatable = false)
+	private Product material;
+
 	@Transient
 	public String getMaterialCode() {
-		if(material != null) {
-			if(material.getCode() != null) {
+		if (material != null) {
+			if (material.getCode() != null) {
 				return material.getCode();
 			}
 		}
 		return "";
 	}
-	
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="providerid_link",insertable=false,updatable =false)
+	@JoinColumn(name = "providerid_link", insertable = false, updatable = false)
 	private Org provider;
-	
+
 	@Transient
 	public String getProviderCode() {
-		if(provider != null) {
-			if(provider.getCode() != null) {
+		if (provider != null) {
+			if (provider.getCode() != null) {
 				return provider.getCode();
 			}
 		}
 		return "";
 	}
-	
+
 	public Long getFobpriceid_link() {
 		return fobpriceid_link;
 	}
@@ -111,68 +111,68 @@ public class PContract_Price_D implements Serializable {/**
 	public void setFobpriceid_link(Long fobpriceid_link) {
 		this.fobpriceid_link = fobpriceid_link;
 	}
-	
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="pcontractpriceid_link",insertable=false,updatable =false)
-    private PContract_Price pcontractPrice;
-	
+	@JoinColumn(name = "pcontractpriceid_link", insertable = false, updatable = false)
+	private PContract_Price pcontractPrice;
+
 	@Transient
 	public String getSizesetname() {
-		if(pcontractPrice != null) {
+		if (pcontractPrice != null) {
 			return pcontractPrice.getSizesetname();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public Integer getSizesetSortValue() {
-		if(pcontractPrice != null) {
+		if (pcontractPrice != null) {
 			return pcontractPrice.getSortvalue();
 		}
 		return 0;
 	}
-	
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
-    private PContract_PO pContractPO;
-	
+	@JoinColumn(name = "pcontract_poid_link", insertable = false, updatable = false)
+	private PContract_PO pContractPO;
+
 	@Transient
 	public String getCurrencyName() {
-		if(pContractPO != null) {
-			if(pContractPO.getCurrencyid_link() == null || pContractPO.getCurrencyid_link().equals(0L)) {
+		if (pContractPO != null) {
+			if (pContractPO.getCurrencyid_link() == null || pContractPO.getCurrencyid_link().equals(0L)) {
 				return "US Dollar";
 			}
 			return pContractPO.getCurrencyName();
 		}
 		return "US Dollar";
 	}
-	
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="productid_link",insertable=false,updatable =false)
-    private Product product;
-	
+	@JoinColumn(name = "productid_link", insertable = false, updatable = false)
+	private Product product;
+
 	@Transient
 	public String getProductCode() {
-		if(product != null) {
+		if (product != null) {
 			return product.getCode();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public String getProductBuyerCode() {
-		if(product != null) {
+		if (product != null) {
 			return product.getBuyercode();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public Integer getProductType() {
-		if(product != null) {
+		if (product != null) {
 			return product.getProducttypeid_link();
 		}
 		return 0;
@@ -180,38 +180,38 @@ public class PContract_Price_D implements Serializable {/**
 
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="usercreatedid_link",insertable=false,updatable =false)
-    private GpayUser usercreated;
-	
+	@JoinColumn(name = "usercreatedid_link", insertable = false, updatable = false)
+	private GpayUser usercreated;
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="fobpriceid_link",insertable=false,updatable =false)
-    private FOBPrice fobprice;
-	
+	@JoinColumn(name = "fobpriceid_link", insertable = false, updatable = false)
+	private FOBPrice fobprice;
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-    @JoinColumn(name="unitid_link",insertable=false,updatable =false)
-    private Unit unit;
-	
+	@JoinColumn(name = "unitid_link", insertable = false, updatable = false)
+	private Unit unit;
+
 	@Transient
 	public String getFobprice_name() {
-		if(fobprice != null) {
+		if (fobprice != null) {
 			return fobprice.getName();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public String getUsercreatedName() {
-		if(usercreated != null) {
+		if (usercreated != null) {
 			return usercreated.getFullName();
 		}
 		return "";
 	}
-	
+
 	@Transient
 	public String getUnitcode() {
-		if(unit != null) {
+		if (unit != null) {
 			return unit.getCode();
 		}
 		return "";
@@ -256,7 +256,6 @@ public class PContract_Price_D implements Serializable {/**
 	public void setProductid_link(Long productid_link) {
 		this.productid_link = productid_link;
 	}
-
 
 	public Long getCurrencyid_link() {
 		return currencyid_link;

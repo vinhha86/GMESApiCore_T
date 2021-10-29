@@ -2288,10 +2288,10 @@ public class PContract_POAPI {
 				}
 
 				// Delete porder
-				List<POrder> list_porder_free = list_porder.stream()
-						.filter(item -> null != item.getStatus() && item.getStatus() == POrderStatus.PORDER_STATUS_FREE)
-						.collect(Collectors.toList());
-				for (POrder porder : list_porder_free) {
+//				List<POrder> list_porder_free = list_porder.stream()
+//						.filter(item -> null != item.getStatus() && item.getStatus() > POrderStatus.PORDER_STATUS_FREE)
+//						.collect(Collectors.toList());
+				for (POrder porder : list_porder) {
 					porderService.delete(porder);
 				}
 
