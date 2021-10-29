@@ -36,4 +36,14 @@ public class TimesheetShiftTypeService extends AbstractService<TimesheetShiftTyp
 		// TODO Auto-generated method stub
 		return repo.getShift_ByIdOrgid_link(orgid_link);
 	}
+
+	@Override
+	public List<TimesheetShiftType> getTimesheetShiftType_CaAn_ByIdOrgid_link(Long id) {
+		return repo.getTimesheetShiftType_CaAn_ByIdOrgid_link(id);
+	}
+
+	@Override
+	public List<TimesheetShiftType> getShift_CaAn_ByIdOrgid_link(Long orgid_link) {
+		return repo.getShift_CaAn_ByIdOrgid_link(orgid_link);
+	}
 }

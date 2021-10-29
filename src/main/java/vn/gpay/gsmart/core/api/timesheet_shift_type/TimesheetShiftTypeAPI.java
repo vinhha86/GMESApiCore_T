@@ -45,6 +45,14 @@ public class TimesheetShiftTypeAPI {
 			@RequestBody Timesheetshift_load_byIdOrg entity) {
 		TimesheetShiftType_load_response response = new TimesheetShiftType_load_response();
 		try {
+//			if(entity.is_ca_an == null) entity.is_ca_an = false;
+//			if(entity.is_ca_an) {
+////				System.out.println("is_ca_an");
+//				response.data = timesheetShiftTypeService.getTimesheetShiftType_CaAn_ByIdOrgid_link(entity.id);
+//			}else {
+////				System.out.println("not is_ca_an");
+//				response.data = timesheetShiftTypeService.getTimesheetShiftType_ByIdOrgid_link(entity.id);
+//			}
 			response.data = timesheetShiftTypeService.getTimesheetShiftType_ByIdOrgid_link(entity.id);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -98,7 +106,7 @@ public class TimesheetShiftTypeAPI {
 		try {
 			//nếu id là tổ thì kiểm tra tổ đấy thuộc đơn vị vào lấy id đơn vị lên
 			long id = entity.id;
-			Long id_org = orgService.getById(entity.id);
+			Long id_org = orgService.getParentIdById(entity.id);
 			//nếu có id và id khác 1.( 1 là id của công ty)
 			if(id_org != null && id_org != 1) {
 				id= id_org;

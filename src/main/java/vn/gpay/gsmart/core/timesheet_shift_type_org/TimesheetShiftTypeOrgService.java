@@ -14,7 +14,6 @@ public class TimesheetShiftTypeOrgService extends AbstractService<TimesheetShift
 	@Autowired TimesheetShiftTypeOrgRepository repo;
 	@Override
 	protected JpaRepository<TimesheetShiftTypeOrg, Long> getRepository() {
-		// TODO Auto-generated method stub
 		return repo;
 	}
 //	@Override
@@ -24,13 +23,15 @@ public class TimesheetShiftTypeOrgService extends AbstractService<TimesheetShift
 //	}
 	@Override
 	public List<TimesheetShiftTypeOrg> getShift1ForAbsence() {
-		// TODO Auto-generated method stub
 		return repo.getShift1ForAbsence();
 	}
 	@Override
 	public List<TimesheetShiftTypeOrg> getByOrgid_link(Long orgid_link) {
-		// TODO Auto-generated method stub
 		return repo.getByOrgid_link(orgid_link);
+	}
+	@Override
+	public List<TimesheetShiftTypeOrg> getByOrgid_link_CaAn(Long orgid_link) {
+		return repo.getByOrgid_link_CaAn(orgid_link);
 	}
 
 }

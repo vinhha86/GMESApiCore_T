@@ -8,4 +8,5 @@ public interface ITimesheetShiftTypeOrgService extends Operations<TimesheetShift
 	//public List<TimesheetShiftTypeOrg> getByName(String name);
 	public List<TimesheetShiftTypeOrg>getShift1ForAbsence();
 	public List<TimesheetShiftTypeOrg>getByOrgid_link(Long orgid_link);
+	public List<TimesheetShiftTypeOrg>getByOrgid_link_CaAn(Long orgid_link);
 }

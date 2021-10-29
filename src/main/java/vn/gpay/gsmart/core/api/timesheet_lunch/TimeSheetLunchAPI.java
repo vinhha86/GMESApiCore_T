@@ -122,7 +122,7 @@ public class TimeSheetLunchAPI {
 //			System.out.println(listPersonnel.size());
 			
 			//kieerm tra phong ban day thuoc don vi nao - lay id cua don vi do; 
-			Long id_org =orgeService.getById(orgid_link);
+			Long id_org =orgeService.getParentIdById(orgid_link);
 			if(id_org != null && id_org != 1) {
 				orgid_link= id_org;
 			}
@@ -153,7 +153,7 @@ public class TimeSheetLunchAPI {
 				temp.setRegister_code(personnel.getRegister_code());
 				mapTmp.put(personnel.getId(), temp);
 			}
-
+			
 			// lấy id ca làm việc
 			List<TimesheetShiftType> lst_timesheetshifttype = timesheetshifttypeService.findAll();
 			for (TimeSheetLunch timeSheetLunch : listTimeSheetLunch) {
@@ -162,22 +162,22 @@ public class TimeSheetLunchAPI {
 
 					for (int i = 0; i < lst_timesheetshifttype.size(); i++) {
 						long id =lst_timesheetshifttype.get(i).getId();
-						if(timeSheetLunch.getShifttypeid_link() == id && lst_timesheetshifttype.get(i).getName().equals("Ca 1")) {
+						if(timeSheetLunch.getShifttypeid_link() == id && lst_timesheetshifttype.get(i).getName().equals("Ca ăn 1")) {
 							temp.setWorkingShift1(timeSheetLunch.isIsworking());
 							temp.setLunchShift1(timeSheetLunch.isIslunch());
 							break;
 						}
-						if(timeSheetLunch.getShifttypeid_link() == id && lst_timesheetshifttype.get(i).getName().equals("Ca 2")) {
+						if(timeSheetLunch.getShifttypeid_link() == id && lst_timesheetshifttype.get(i).getName().equals("Ca ăn 2")) {
 							temp.setWorkingShift2(timeSheetLunch.isIsworking());
 							temp.setLunchShift2(timeSheetLunch.isIslunch());
 							break;
 						}
-						if(timeSheetLunch.getShifttypeid_link() == id && lst_timesheetshifttype.get(i).getName().equals("Ca 3")) {
+						if(timeSheetLunch.getShifttypeid_link() == id && lst_timesheetshifttype.get(i).getName().equals("Ca ăn 3")) {
 							temp.setWorkingShift3(timeSheetLunch.isIsworking());
 							temp.setLunchShift3(timeSheetLunch.isIslunch());
 							break;
 						}
-						if(timeSheetLunch.getShifttypeid_link() == id && lst_timesheetshifttype.get(i).getName().equals("Ca 4")) {
+						if(timeSheetLunch.getShifttypeid_link() == id && lst_timesheetshifttype.get(i).getName().equals("Ca ăn 4")) {
 							temp.setWorkingShift4(timeSheetLunch.isIsworking());
 							temp.setLunchShift4(timeSheetLunch.isIslunch());
 							break;
@@ -229,7 +229,7 @@ public class TimeSheetLunchAPI {
 
 			for (TimeSheetLunchBinding temp : listTimeSheetLunchBinding) {
 				// TimeSheetLunchBinding temp = entity.data;
-				String dataIndex = temp.getDataIndex();
+//				String dataIndex = temp.getDataIndex();
 
 				Long personnelid_link = temp.getPersonnelid_link();
 				Date workingdate = temp.getWorkingdate();
@@ -238,10 +238,11 @@ public class TimeSheetLunchAPI {
 				boolean isWorkingShift = false;
 				boolean isLunchShift = false;
 				List<TimeSheetLunch> list = new ArrayList<TimeSheetLunch>();
-				String name = "Ca " + temp.getDataIndex();
+				String name = "Ca ăn " + temp.getDataIndex();
 
 				// lay id ca theo cột đang check
 				long id_tiemsheetshift = timesheetshifttypeService.getTimesheetShiftTypeID_ByName(name);
+//				System.out.println(name);
 
 				shifttypeid_link = (int) id_tiemsheetshift;
 				isWorkingShift = temp.isWorkingShift();
@@ -306,8 +307,22 @@ public class TimeSheetLunchAPI {
 			Long orgid_link = entity.orgid_link;
 			Date workingdate = entity.workingdate;
 			Integer status = entity.status;
-			List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService.getForTimeSheetLunch(orgid_link,
-					workingdate);
+			
+			Org org = orgeService.findOne(orgid_link);
+			List<TimeSheetLunch> listTimeSheetLunch = new ArrayList<TimeSheetLunch>();
+			if(org.getOrgtypeid_link().equals(OrgType.ORG_TYPE_XUONGSX)) {
+				listTimeSheetLunch = timeSheetLunchService.getForTimeSheetLunch(orgid_link,
+						workingdate);
+			}else {
+				listTimeSheetLunch = timeSheetLunchService.getForUpdateStatusTimeSheetLunch(orgid_link,
+						workingdate);
+			}
+			
+			// getForUpdateStatusTimeSheetLunch
+			
+//			System.out.println(orgid_link);
+//			System.out.println(workingdate);
+//			System.out.println(listTimeSheetLunch.size());
 
 			for (TimeSheetLunch timeSheetLunch : listTimeSheetLunch) {
 				timeSheetLunch.setStatus(status);
@@ -331,9 +346,19 @@ public class TimeSheetLunchAPI {
 		try {
 			Long orgid_link = entity.orgid_link;
 			Date date = entity.date;
+			
+			Org org = orgeService.findOne(orgid_link);
+			List<TimeSheetLunch> listTimeSheetLunch = new ArrayList<TimeSheetLunch>();
+			if(org.getOrgtypeid_link().equals(OrgType.ORG_TYPE_XUONGSX)) {
+				listTimeSheetLunch = timeSheetLunchService.getForTimeSheetLunch(orgid_link,
+						date);
+			}else {
+				listTimeSheetLunch = timeSheetLunchService.getForUpdateStatusTimeSheetLunch(orgid_link,
+						date);
+			}
 
-			List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService.getForTimeSheetLunch(orgid_link, date);
-
+//			List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService.getForTimeSheetLunch(orgid_link, date);
+			
 			if (listTimeSheetLunch.size() > 0) {
 				TimeSheetLunch temp = listTimeSheetLunch.get(0);
 				if (temp.getStatus() == 0) {

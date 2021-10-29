@@ -384,8 +384,8 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 	}
 
 	@Override
-	public Long getById(Long id) {
-		return repositoty.getById(id);
+	public Long getParentIdById(Long id) {
+		return repositoty.getParentIdById(id);
 	}
 
 	@Override

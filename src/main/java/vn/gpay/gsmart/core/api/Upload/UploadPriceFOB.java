@@ -38,7 +38,9 @@ import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Service;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price_D;
 import vn.gpay.gsmart.core.product.IProductService;
+import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.sku.ISKU_Service;
 import vn.gpay.gsmart.core.utils.Column_Price_FOB;
 import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.ProductType;
@@ -63,6 +65,8 @@ public class UploadPriceFOB {
 	IOrgService orgService;
 	@Autowired
 	IUnitService unitService;
+	@Autowired
+	ISKU_Service skuService;
 
 	@RequestMapping(value = "/download_temp", method = RequestMethod.POST)
 	public ResponseEntity<download_temp_price_fob_response> DownloadTemp(HttpServletRequest request) {
@@ -145,14 +149,6 @@ public class UploadPriceFOB {
 						String NhaCungCap = commonService.getStringValue(row.getCell(Column_Price_FOB.NhaCungCap));
 						NhaCungCap = NhaCungCap.equals("0") ? "" : NhaCungCap;
 
-						colNum = Column_Price_FOB.MauNPL;
-						String MauNPL = commonService.getStringValue(row.getCell(Column_Price_FOB.MauNPL));
-						MauNPL = MauNPL.equals("0") ? "" : MauNPL;
-
-						colNum = Column_Price_FOB.CoKho;
-						String CoKho = commonService.getStringValue(row.getCell(Column_Price_FOB.CoKho));
-						CoKho = CoKho.equals("0") ? "" : CoKho;
-
 						colNum = Column_Price_FOB.DinhMuc;
 						String s_dinhmuc = commonService.getStringValue(row.getCell(Column_Price_FOB.DinhMuc));
 						s_dinhmuc = s_dinhmuc.equals("0") ? "" : s_dinhmuc;
@@ -172,27 +168,6 @@ public class UploadPriceFOB {
 						s_gia = s_gia.equals("0") ? "" : s_gia;
 						Float Gia = Float.parseFloat(s_gia);
 
-						Integer product_type = 0;
-						switch (Loai.trim()) {
-						case "FABRIC":
-							product_type = ProductType.SKU_TYPE_MAINMATERIAL;
-							break;
-						case "SEWING":
-							product_type = ProductType.SKU_TYPE_SWEINGTRIM_MIN;
-							break;
-						case "PACKING":
-							product_type = ProductType.SKU_TYPE_PACKINGTRIM_MIN;
-							break;
-						case "THREAD":
-							product_type = ProductType.SKU_TYPE_SWEINGTHREAD_MIN;
-							break;
-						case "TICKET":
-							product_type = ProductType.TICKET;
-							break;
-						default:
-							break;
-						}
-
 						// Kiem tra xem ten gia co trong danh muc chua
 						Long fobpriceid_link = null;
 						List<FOBPrice> list_dm_pricefob = fobService.getByName(MaNPL);
@@ -208,6 +183,48 @@ public class UploadPriceFOB {
 						} else {
 							fobpriceid_link = list_dm_pricefob.get(0).getId();
 						}
+
+						// kiem tra NPL
+						Integer product_type = ProductType.SKU_TYPE_UNKNOWN;
+						switch (Loai.trim()) {
+						case "FABRIC":
+							product_type = ProductType.SKU_TYPE_MAINMATERIAL;
+							break;
+						case "TRIM":
+							product_type = ProductType.SKU_TYPE_SWEINGTRIM_MIN;
+							break;
+						case "PACKING":
+							product_type = ProductType.SKU_TYPE_PACKINGTRIM_MIN;
+							break;
+						case "THREAD":
+							product_type = ProductType.SKU_TYPE_SWEINGTHREAD_MIN;
+							break;
+						case "TICKET":
+							product_type = ProductType.TICKET;
+							break;
+						default:
+							break;
+						}
+						Long materialid_link = null, productid_link = null;
+						List<Product> list_npl = productService.getby_code_type_description_name(orgrootid_link, MaNPL,
+								product_type, MoTa, MaNPL);
+						if (list_npl.size() == 0) {
+							Product product = new Product();
+							product.setBuyercode(MaNPL);
+							product.setCode(MaNPL);
+							product.setDescription(MoTa);
+							product.setId(null);
+							product.setOrgrootid_link(orgrootid_link);
+							product.setTimecreate(new Date());
+							product.setProducttypeid_link(product_type);
+							product.setStatus(1);
+							product = productService.save(product);
+							productid_link = product.getId();
+						} else {
+							productid_link = list_npl.get(0).getId();
+						}
+
+//						List<SKU> list_sku = skuService.get
 
 						// Kiem tra nha cung cap
 						Long org_providerid_link = null;
@@ -226,19 +243,24 @@ public class UploadPriceFOB {
 						// kiem tra don vi tinh
 						Long unitid_link = null;
 						List<Unit> list_unit = unitService.getbyName(s_donvitinh);
-						if(list_unit.size() == 0) {
+						if (list_unit.size() == 0) {
 							Unit unit = new Unit();
 							unit.setCode(s_donvitinh);
 							unit.setId(null);
 							unit.setName(s_donvitinh);
 							unit.setOrgrootid_link(orgrootid_link);
 //							unit.setUnittype(unittype);
+							unit = unitService.save(unit);
+							unitid_link = unit.getId();
+						} else {
+							unitid_link = list_unit.get(0).getId();
 						}
 
 						// Kiem tra xem price da co hay chua
 						List<PContract_Price_D> list_price_d = priceDService
 								.getPrice_D_ByFobPriceNameAndPContractPrice(pcontractpriceid_link, MaNPL);
 						if (list_price_d.size() == 0) {
+							Float price = Gia * DinhMuc * (1 + TieuHao / 100);
 							PContract_Price_D price_d = new PContract_Price_D();
 							price_d.setCost(Gia);
 							price_d.setCurrencyid_link(currencyid_link);
@@ -252,12 +274,22 @@ public class UploadPriceFOB {
 							price_d.setPcontract_poid_link(pcontract_price.getPcontract_poid_link());
 							price_d.setPcontractid_link(pcontract_price.getPcontractid_link());
 							price_d.setPcontractpriceid_link(pcontractpriceid_link);
-							price_d.setPrice(Gia);
+							price_d.setPrice(price);
 							price_d.setProductid_link(pcontract_price.getProductid_link());
 							price_d.setProviderid_link(org_providerid_link);
 							price_d.setSizesetid_link(pcontract_price.getSizesetid_link());
-//							price_d.setUnitid_link(unitid_link);
+							price_d.setUnitid_link(unitid_link);
+							price_d.setUsercreatedid_link(user.getId());
+							price_d.setQuota(DinhMuc);
+							price_d.setUnitprice(Gia);
+							price_d = priceDService.save(price_d);
 						}
+						rowNum++;
+						row = sheet.getRow(rowNum);
+						if (row != null)
+							Loai = commonService.getStringValue(row.getCell(Column_Price_FOB.Loai));
+						else
+							Loai = "";
 					}
 
 				} catch (Exception e) {

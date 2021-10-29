@@ -26,7 +26,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 @RequestMapping("/api/v1/timesheetshifttypeorg")
 public class TimesheetShiftTypeOrgAPI {
 	@Autowired ITimesheetShiftTypeOrgService timesheetShiftTypeOrgService;
-	@Autowired IOrgService orgeService;
+	@Autowired IOrgService orgService;
 	@RequestMapping(value = "/getall", method = RequestMethod.POST)
 	public ResponseEntity<TimesheetShiftTypeOrg_response> timesheetshifttype_GetAll(HttpServletRequest request) {
 		TimesheetShiftTypeOrg_response response = new TimesheetShiftTypeOrg_response();
@@ -47,12 +47,46 @@ public class TimesheetShiftTypeOrgAPI {
 		try {
 			
 			long id = entity.orgid_link;
-			//kieerm tra phong ban day thuoc don vi nao - lay id cua don vi do; 
-			Long id_org =orgeService.getById(id);
+			//kiem tra phong ban day thuoc don vi nao - lay id cua don vi do; 
+			Long id_org =orgService.getParentIdById(id);
 			if(id_org != null && id_org != 1) {
 				id= id_org;
 			}
+//			if(entity.is_ca_an == null) entity.is_ca_an = false;
+//			if(entity.is_ca_an) {
+//				response.data = timesheetShiftTypeOrgService.getByOrgid_link_CaAn(id);
+//			}else {
+//				response.data = timesheetShiftTypeOrgService.getByOrgid_link(id);
+//			}
 			response.data = timesheetShiftTypeOrgService.getByOrgid_link(id);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<TimesheetShiftTypeOrg_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<TimesheetShiftTypeOrg_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/getbyorgid_link_caAn", method = RequestMethod.POST)
+	public ResponseEntity<TimesheetShiftTypeOrg_response> timesheetshifttype_GetByorgid_link_caAn(@RequestBody TimesheetShiftTypeOrg_load_byorgid_link entity,HttpServletRequest request) {
+		TimesheetShiftTypeOrg_response response = new TimesheetShiftTypeOrg_response();
+		try {
+			
+			long id = entity.orgid_link;
+			//kiem tra phong ban day thuoc don vi nao - lay id cua don vi do; 
+			Long id_org =orgService.getParentIdById(id);
+			if(id_org != null && id_org != 1) {
+				id= id_org;
+			}
+//			if(entity.is_ca_an == null) entity.is_ca_an = false;
+//			if(entity.is_ca_an) {
+//				response.data = timesheetShiftTypeOrgService.getByOrgid_link_CaAn(id);
+//			}else {
+//				response.data = timesheetShiftTypeOrgService.getByOrgid_link(id);
+//			}
+			response.data = timesheetShiftTypeOrgService.getByOrgid_link_CaAn(id);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<TimesheetShiftTypeOrg_response>(response, HttpStatus.OK);
@@ -75,6 +109,7 @@ public class TimesheetShiftTypeOrgAPI {
 			boolean checkboxfrom = entity.checkboxfrom;
 			boolean checkboxto = entity.checkboxto;
 			Long orgid_link  =entity.orgid_link;
+			Boolean is_ca_an = entity.is_ca_an;
 //			List<TimesheetShiftType> listTimesheetShiftType = timesheetShiftTypeService.getByName(name);
 //			if(listTimesheetShiftType.size() > 0) {
 //				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -104,6 +139,7 @@ public class TimesheetShiftTypeOrgAPI {
 			timesheetShiftType.setTo_minute(to_minute);
 			
 			timesheetShiftType.setOrgid_link(orgid_link);
+			timesheetShiftType.setIs_ca_an(is_ca_an);
 			timesheetShiftTypeOrgService.save(timesheetShiftType);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

@@ -160,7 +160,7 @@ public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecification
 	//laasy parentid_link theo id org
 	@Query(value = "select c.parentid_link from Org c "
 			+ "where c.id = :id " )
-	public Long getById(
+	public Long getParentIdById(
 			@Param ("id")final Long id);
 	//lấy đơn vị theo id -(lấy đơn vị mà tài khoản quản đó quản lý)
 	@Query(value = "select c from Org c "

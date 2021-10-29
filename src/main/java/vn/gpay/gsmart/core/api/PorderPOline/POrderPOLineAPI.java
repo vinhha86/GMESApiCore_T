@@ -395,43 +395,42 @@ public class POrderPOLineAPI {
 				POrderGrant grant = grantService.findOne(pordergrantid_link);
 				POrder porder = porderService.findOne(grant.getPorderid_link());
 				Long productid_link = porder.getProductid_link();
-				
+
 				if (porder != null) {
 					porderService.delete(porder);
 				}
-				
+
 				if (grant != null) {
 					grantService.delete(grant);
 				}
-				
+
 				List<Long> list_pcontractpo = porderskuService.getListPO_Id_ByGrant(pordergrantid_link);
 				for (Long pcontract_poid_link : list_pcontractpo) {
 					PContract_PO po = poService.findOne(pcontract_poid_link);
 
 					// Cap nhat lai thong tin lenh san xuat
-					
+
 					// neu lenh tu sinh thi xoa di con ko thi cap nhat lai trang thai
-					
 
 					// Xoa het porder-sku
 					if (porder != null) {
-						
-						
-						List<POrder_Product_SKU> list_porder_sku = porderskuService.getby_porder_and_po(porder.getId(), pcontract_poid_link);
+
+						List<POrder_Product_SKU> list_porder_sku = porderskuService
+								.getby_porder_and_po(pordergrantid_link, pcontract_poid_link);
 						for (POrder_Product_SKU porder_sku : list_porder_sku) {
 							porderskuService.delete(porder_sku);
 
-							
 						}
 					}
 
 					// xoa het trong porder_grant_sku
 					if (grant != null) {
-						
-						List<POrderGrant_SKU> list_grant_sku = grantskuService.getGrantSKUByGrantAndPO(grant.getId(), pcontract_poid_link);
+
+						List<POrderGrant_SKU> list_grant_sku = grantskuService
+								.getGrantSKUByGrantAndPO(pordergrantid_link, pcontract_poid_link);
 						for (POrderGrant_SKU grantsku : list_grant_sku) {
 							grantskuService.delete(grantsku);
-							
+
 							// cap nhat lai trong pcontract_sku chua map
 							Long skuid_link = grantsku.getSkuid_link();
 							List<PContractProductSKU> list_po_sku = pcontractskuService
