@@ -2258,16 +2258,16 @@ public class PContract_POAPI {
 
 				List<POrder> list_porder = porderService.getByContractAndPO(thePO.getPcontractid_link(), thePO.getId());
 				// chi lay nhung lenh da keo vao bieu do
-				List<POrder> list_porder_grant = list_porder.stream()
-						.filter(item -> null != item.getStatus() && item.getStatus() > POrderStatus.PORDER_STATUS_FREE)
-						.collect(Collectors.toList());
-				if (list_porder_grant.size() > 0) {
-					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-					response.setMessage(
-							"Hiện vẫn đang có Lệnh SX của đơn hàng đã phân chuyền! Cần hủy phân chuyền Lệnh SX trước khi xóa Line: "
-									+ thePO.getPo_buyer());
-					return new ResponseEntity<delete_listpo_line_response>(response, HttpStatus.BAD_REQUEST);
-				}
+//				List<POrder> list_porder_grant = list_porder.stream()
+//						.filter(item -> null != item.getStatus() && item.getStatus() > POrderStatus.PORDER_STATUS_FREE)
+//						.collect(Collectors.toList());
+//				if (list_porder_grant.size() > 0) {
+//					response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+//					response.setMessage(
+//							"Hiện vẫn đang có Lệnh SX của đơn hàng đã phân chuyền! Cần hủy phân chuyền Lệnh SX trước khi xóa Line: "
+//									+ thePO.getPo_buyer());
+//					return new ResponseEntity<delete_listpo_line_response>(response, HttpStatus.BAD_REQUEST);
+//				}
 
 				// Kiem tra danh sach po cua chao gia neu khong co thi cho xoa
 				List<PContract_PO> list_po = pcontract_POService.get_by_parentid(thePO.getId());
