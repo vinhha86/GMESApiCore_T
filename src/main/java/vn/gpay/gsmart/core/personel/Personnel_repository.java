@@ -21,7 +21,8 @@ public interface Personnel_repository extends JpaRepository<Personel, Long>, Jpa
 	public List<Personel> getby_registercode(@Param("register_code") final String register_code,
 			@Param("orgrootid_link") final Long orgrootid_link);
 
-	@Query("SELECT c FROM Personel c " + "where (c.orgid_link = :orgid_link or orgmanagerid_link = :orgid_link) ")
+	@Query("SELECT c FROM Personel c "
+			+ "where (c.orgid_link = :orgid_link or orgmanagerid_link = :orgid_link) and status = 0")
 	public List<Personel> getbyOrg(@Param("orgid_link") final Long orgid_link);
 
 	@Query("SELECT count(id) FROM Personel c "
