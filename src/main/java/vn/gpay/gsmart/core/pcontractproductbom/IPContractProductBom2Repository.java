@@ -22,6 +22,18 @@ public interface IPContractProductBom2Repository extends JpaRepository<PContract
 			@Param ("pcontractid_link")final  Long pcontractid_link);
 	
 	@Query(value = "select c from PContractProductBom2 c "
+			+ "inner join SKU d on c.materialid_link = d.id "
+			+ "where c.productid_link = :productid_link "
+			+ "and c.pcontractid_link = :pcontractid_link "
+			+ "and (d.skutypeid_link = :skutypeid_link or :skutypeid_link is null) "
+			)
+	public List<PContractProductBom2> get_material_in_pcontract_productBOM(
+			@Param ("productid_link")final  Long productid_link, 
+			@Param ("pcontractid_link")final  Long pcontractid_link,
+			@Param ("skutypeid_link")final  Integer skutypeid_link
+			);
+	
+	@Query(value = "select c from PContractProductBom2 c "
 			+ "where c.productid_link = :productid_link "
 			+ "and c.pcontractid_link = :pcontractid_link "
 			+ "and c.materialid_link = :materialid_link")

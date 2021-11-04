@@ -513,4 +513,49 @@ public class PContractAPI {
 		}
 	}
 
+	
+	@RequestMapping(value = "/getByMaterial_of_Product_Pcontract", method = RequestMethod.POST)
+	public ResponseEntity<PContract_getbypaging_response> getByMaterial_of_Product_Pcontract(
+			@RequestBody PContract_findByContractcode_request entity, HttpServletRequest request) {
+		PContract_getbypaging_response response = new PContract_getbypaging_response();
+//		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+		try {
+			Long productid_link = entity.productid_link;
+			Long pcontractid_link = entity.pcontractid_link;
+			
+			// mượn cây vải từ đơn hàng khác
+			
+			List<PContract> result = new ArrayList<PContract>();
+			//  lấy danh sách loại vải của sản phẩm
+			List<PContractProductBom2> listbom = pcontract_bom2_Service.get_material_in_pcontract_productBOM(productid_link, pcontractid_link, 20);
+			List<Long> skuid_list = new ArrayList<Long>();
+			for(PContractProductBom2 pcontractProductBom2 : listbom) {
+				skuid_list.add(pcontractProductBom2.getMaterialid_link());
+			}
+			
+			// tìm những đơn hàng khác có chứa sản phẩm có loại vải dùng bởi sản phẩm của đơn hàng request
+			if(skuid_list.size() > 0) {
+				List<PContract> pcontract_list = pcontractService.getByBom_Sku(skuid_list);
+				for(PContract pcontract : pcontract_list) {
+					if(pcontract.getId().equals(pcontractid_link)) {
+						continue;
+					}
+					result.add(pcontract);
+				}
+			}
+			
+			
+			response.data = result;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
+		}
+	}
 }

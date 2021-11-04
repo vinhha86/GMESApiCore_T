@@ -31,4 +31,6 @@ public interface IPContractService extends Operations<PContract> {
 	List<PContract> getPContractByYear(int year);
 	
 	List<PContract> getByProduct(Long productid_link);
+	
+	public List<PContract> getByBom_Sku(List<Long> skuid_list);
 }

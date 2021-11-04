@@ -47,4 +47,11 @@ public interface IPContractRepository extends JpaRepository<PContract, Long>, Jp
 			@Param("productid_link") final Long productid_link
 			);
 
+	@Query(value = "select distinct a from PContract a " 
+			+ "inner join PContractProductBom2 b on b.pcontractid_link = a.id "
+			+ "where b.materialid_link in :skuid_list "
+			)
+	public List<PContract> getByBom_Sku(
+			@Param("skuid_list") final List<Long> skuid_list
+			);
 }

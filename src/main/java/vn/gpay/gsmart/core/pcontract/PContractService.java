@@ -223,4 +223,9 @@ public class PContractService extends AbstractService<PContract> implements IPCo
 	public List<PContract> getByProduct(Long productid_link) {
 		return repo.getByProduct(productid_link);
 	}
+
+	@Override
+	public List<PContract> getByBom_Sku(List<Long> skuid_list) {
+		return repo.getByBom_Sku(skuid_list);
+	}
 }
