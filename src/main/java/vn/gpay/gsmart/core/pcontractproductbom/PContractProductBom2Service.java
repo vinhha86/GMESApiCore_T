@@ -35,4 +35,10 @@ public class PContractProductBom2Service extends AbstractService<PContractProduc
 		// TODO Auto-generated method stub
 		return repo.getall_bypcontract(orgrootid_link, pcontractid_link);
 	}
+
+	@Override
+	public List<PContractProductBom2> get_material_in_pcontract_productBOM(long productid_link, long pcontractid_link,
+			Integer skutypeid_link) {
+		return repo.get_material_in_pcontract_productBOM(productid_link, pcontractid_link, skutypeid_link);
+	}
 }
