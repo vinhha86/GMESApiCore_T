@@ -564,6 +564,7 @@ public class POrderAPI {
 				free.setShipdate(porder.getShipdate());
 				free.setPcontract_poid_link(porder.getPcontract_poid_link());
 				free.setGranttoorgid_link(porder.getGranttoorgid_link());
+				free.setProductid_link(productid_link);
 				long pcontractid_link = porder.getPcontractid_link();
 				List<POrder_Req> list_req = porder_reqService.getByContractAndPO_and_Org(pcontractid_link,
 						porder.getPcontract_poid_link(), porder.getGranttoorgid_link(), porder.getProductid_link());

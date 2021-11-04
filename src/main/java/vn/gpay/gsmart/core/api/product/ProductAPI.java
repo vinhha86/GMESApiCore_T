@@ -1318,40 +1318,44 @@ public class ProductAPI {
 
 				response.data.add(pb);
 			}
-			Long pcontractid_link = entity.pcontractid_link;
-			List<Product> list = new ArrayList<Product>();
-			if (pcontractid_link == null)
-				list = productService.getby_pairid(entity.product_pairid_link);
-			else
-				list = productService.getby_pairid_and_pcontract(entity.product_pairid_link, pcontractid_link);
+			
+			if(product.getProducttypeid_link() == 5) {
+				Long pcontractid_link = entity.pcontractid_link;
+				List<Product> list = new ArrayList<Product>();
+				if (pcontractid_link == null)
+					list = productService.getby_pairid(entity.product_pairid_link);
+				else
+					list = productService.getby_pairid_and_pcontract(entity.product_pairid_link, pcontractid_link);
 
-			for (Product _product : list) {
-				ProductPairing pairInfo = productPairingService.getproduct_pairing_bykey(_product.getId(),
-						entity.product_pairid_link);
+				for (Product _product : list) {
+					ProductPairing pairInfo = productPairingService.getproduct_pairing_bykey(_product.getId(),
+							entity.product_pairid_link);
 
-				ProductBinding pb = new ProductBinding();
-				pb.setId(_product.getId());
-				pb.setCode(_product.getBuyercode());
-				pb.setName(_product.getName());
-				pb.setProduct_type(_product.getProducttypeid_link());
-				pb.setProduct_typeName(_product.getProducttype_name());
-				pb.setCoKho(_product.getCoKho());
-				pb.setThanhPhanVai(_product.getThanhPhanVai());
-				pb.setTenMauNPL(_product.getTenMauNPL());
-				pb.setPairamount(pairInfo.getAmount());
-				pb.setInfo(pairInfo.getProductinfo());
-				if (entity.po_quantity != null) {
-					pb.setPquantity(pairInfo.getAmount() * entity.po_quantity);
-					pb.setCode_amount(
-							_product.getBuyercode() + " (" + commonService.FormatNumber(pb.getPquantity()) + ")");
+					ProductBinding pb = new ProductBinding();
+					pb.setId(_product.getId());
+					pb.setCode(_product.getBuyercode());
+					pb.setName(_product.getName());
+					pb.setProduct_type(_product.getProducttypeid_link());
+					pb.setProduct_typeName(_product.getProducttype_name());
+					pb.setCoKho(_product.getCoKho());
+					pb.setThanhPhanVai(_product.getThanhPhanVai());
+					pb.setTenMauNPL(_product.getTenMauNPL());
+					pb.setPairamount(pairInfo.getAmount());
+					pb.setInfo(pairInfo.getProductinfo());
+					if (entity.po_quantity != null) {
+						pb.setPquantity(pairInfo.getAmount() * entity.po_quantity);
+						pb.setCode_amount(
+								_product.getBuyercode() + " (" + commonService.FormatNumber(pb.getPquantity()) + ")");
+					}
+					String FolderPath = commonService.getFolderPath(_product.getProducttypeid_link());
+					String uploadRootPath = request.getServletContext().getRealPath("");
+					File uploadRootDir = new File(uploadRootPath);
+					pb.setUrlimage(getimg(product.getImgurl1(), uploadRootDir.getParent() + "/" + FolderPath));
+
+					response.data.add(pb);
 				}
-				String FolderPath = commonService.getFolderPath(_product.getProducttypeid_link());
-				String uploadRootPath = request.getServletContext().getRealPath("");
-				File uploadRootDir = new File(uploadRootPath);
-				pb.setUrlimage(getimg(product.getImgurl1(), uploadRootDir.getParent() + "/" + FolderPath));
-
-				response.data.add(pb);
 			}
+			
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

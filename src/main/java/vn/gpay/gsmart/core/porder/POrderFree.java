@@ -12,7 +12,7 @@ public class POrderFree {
 	private Date po_Productiondate;
 	private Long pcontract_poid_link;
 	private Long granttoorgid_link;
-	
+	private Long productid_link;
 	
 	
 	public Long getId() {
@@ -68,6 +68,12 @@ public class POrderFree {
 	}
 	public void setGranttoorgid_link(Long granttoorgid_link) {
 		this.granttoorgid_link = granttoorgid_link;
+	}
+	public Long getProductid_link() {
+		return productid_link;
+	}
+	public void setProductid_link(Long productid_link) {
+		this.productid_link = productid_link;
 	}
 	
 	
