@@ -117,4 +117,9 @@ public class SKU_Service extends AbstractService<SKU> implements ISKU_Service {
 		return repo.getbytype_and_pcontract_product_and_color(producttypeid_link_from, producttypeid_link_to,
 				pcontractid_link, productid_link, colorid_link);
 	}
+
+	@Override
+	public List<SKU> getSkuForXuatDieuChuyenNguyenLieu(List<Long> skuid_list, Long pcontractid_link) {
+		return repo.getSkuForXuatDieuChuyenNguyenLieu(skuid_list, pcontractid_link);
+	}
 }

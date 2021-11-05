@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
+import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom2;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 import vn.gpay.gsmart.core.sku.ISKU_Service;
@@ -27,6 +29,7 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 public class SKU_API {
 	@Autowired ISKU_AttributeValue_Service savService;
 	@Autowired ISKU_Service skuService;
+	@Autowired IPContractProductBom2Service pcontract_bom2_Service;
 	
 	@RequestMapping(value = "/getall_byproduct",method = RequestMethod.POST)
 	public ResponseEntity<SKU_getbyproduct_response> Product_GetAll(HttpServletRequest request, @RequestBody SKU_getbyproduct_request entity ) {
@@ -134,6 +137,39 @@ public class SKU_API {
 			if(entity.typeFrom == null) entity.typeFrom = 20;
 			if(entity.typeTo == null) entity.typeTo = 30;
 			response.data = skuService.getSkuByCodeAndType(entity.code, entity.typeFrom, entity.typeTo); //ex: typeFrom: 20, typeTo: 30
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<SKU_getbyproduct_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<SKU_getbyproduct_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/getSkuForXuatDieuChuyenNguyenLieu",method = RequestMethod.POST)
+	public ResponseEntity<SKU_getbyproduct_response> getSkuForXuatDieuChuyenNguyenLieu(HttpServletRequest request, @RequestBody SKU_GetForXuatDieuChuyenNguyenLieu_request entity ) {
+		SKU_getbyproduct_response response = new SKU_getbyproduct_response();
+		try {
+			Long pcontractid_link_current = entity.pcontractid_link_current;
+			Long pcontractid_link_loanfrom = entity.pcontractid_link_loanfrom;
+			Long productid_link = entity.productid_link;
+			
+			List<SKU> result = new ArrayList<SKU>();
+			List<PContractProductBom2> listbom = pcontract_bom2_Service.get_material_in_pcontract_productBOM(productid_link, pcontractid_link_current, 20);
+			List<Long> skuid_list = new ArrayList<Long>();
+			// lấy danh sách id sku loại vải của sản phẩm và đơn hàng hiện tại
+			for(PContractProductBom2 pcontractProductBom2 : listbom) {
+				skuid_list.add(pcontractProductBom2.getMaterialid_link());
+			}
+			
+			if(skuid_list.size() > 0) {
+				// tìm danh sách sku của đơn hàng chứa sản phẩm chứa các loại vải của đơn hàng hiện tại
+				result = skuService.getSkuForXuatDieuChuyenNguyenLieu(skuid_list, pcontractid_link_loanfrom);
+//				System.out.println(result.size());
+			}
+			
+			response.data = result;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<SKU_getbyproduct_response>(response,HttpStatus.OK);

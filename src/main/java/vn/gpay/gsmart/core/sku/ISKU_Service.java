@@ -30,4 +30,6 @@ public interface ISKU_Service extends Operations<SKU> {
 	public List<SKU> getSkuByCode(String code);
 
 	public List<SKU> getSkuByCodeAndType(String code, Integer typeFrom, Integer typeTo);
+	
+	public List<SKU> getSkuForXuatDieuChuyenNguyenLieu(List<Long> skuid_list, Long pcontractid_link);
 }

@@ -89,4 +89,14 @@ public interface ISKU_Repository extends JpaRepository<SKU, Long>, JpaSpecificat
 			+ "and (a.skutypeid_link < :typeTo or :typeTo is null) ")
 	public List<SKU> getSkuByCodeAndType(@Param("code") final String code, @Param("typeFrom") final Integer typeFrom,
 			@Param("typeTo") final Integer typeTo);
+	
+	@Query(value = "select distinct a from SKU a " 
+			+ "inner join PContractProductBom2 b on a.id = b.materialid_link "
+			+ "where a.id in :skuid_list " 
+			+ "and b.pcontractid_link = :pcontractid_link "
+			)
+	public List<SKU> getSkuForXuatDieuChuyenNguyenLieu(
+			@Param("skuid_list") final List<Long> skuid_list,
+			@Param("pcontractid_link") final Long pcontractid_link
+			);
 }
