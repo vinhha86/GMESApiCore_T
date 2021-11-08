@@ -33,6 +33,8 @@ import vn.gpay.gsmart.core.timesheet_shift_type.TimesheetShiftType;
 import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
+import vn.gpay.gsmart.core.timesheet_lunch.TongHopBaoAn;
+
 @RestController
 @RequestMapping("/api/v1/timesheetlunch")
 public class TimeSheetLunchAPI {
@@ -296,6 +298,53 @@ public class TimeSheetLunchAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<ResponseBase>(HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/tonghopbaoan", method = RequestMethod.POST)
+	public ResponseEntity<get_TongHopBaoAn_response> TongHopBaoAn(@RequestBody get_tonghopbaoan_request entity,
+			HttpServletRequest request) {
+		get_TongHopBaoAn_response response = new get_TongHopBaoAn_response();
+		try {
+			Long orgid_link = entity.orgid_link;
+			Date date = entity.date;
+			
+			
+			List<Org> list_org = orgeService.getorgChildrenbyOrg(orgid_link, new ArrayList<>());
+			List<TongHopBaoAn> list = new ArrayList<TongHopBaoAn>();
+			
+			for(Org org : list_org) {
+				List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService.getForTimeSheetLunchByGrant(org.getId(), date);
+				List<TimeSheetLunch> listca1 = new ArrayList<TimeSheetLunch>(listTimeSheetLunch);
+				listca1.removeIf(c-> !c.getShifttypeid_link().equals(4));
+				
+				List<TimeSheetLunch> listca2 = new ArrayList<TimeSheetLunch>(listTimeSheetLunch);
+				listca2.removeIf(c-> !c.getShifttypeid_link().equals(5));
+				
+				List<TimeSheetLunch> listca3 = new ArrayList<TimeSheetLunch>(listTimeSheetLunch);
+				listca3.removeIf(c-> !c.getShifttypeid_link().equals(6));
+				
+				List<TimeSheetLunch> listca4 = new ArrayList<TimeSheetLunch>(listTimeSheetLunch);
+				listca4.removeIf(c-> !c.getShifttypeid_link().equals(7));
+				
+				TongHopBaoAn tonghop = new TongHopBaoAn();
+				tonghop.setOrg_name(org.getName());
+				tonghop.setCa1(listca1.size());
+				tonghop.setCa2(listca2.size());
+				tonghop.setCa3(listca3.size());
+				tonghop.setCa4(listca4.size());
+				
+				list.add(tonghop);
+			}
+			
+			response.data = list;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<get_TongHopBaoAn_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<get_TongHopBaoAn_response>(HttpStatus.OK);
 		}
 	}
 

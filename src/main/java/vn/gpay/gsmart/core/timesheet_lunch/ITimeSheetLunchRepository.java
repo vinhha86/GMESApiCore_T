@@ -28,10 +28,21 @@ public interface ITimeSheetLunchRepository extends JpaRepository<TimeSheetLunch,
 	@Query("SELECT a "
 			+ "FROM TimeSheetLunch a "
 			+ "inner join Personel b on a.personnelid_link = b.id "
-			+ "where b.orgmanagerid_link = :orgmanagerid_link "
+			+ "where b.orgmanagerid_link = :orgmanagerid_link  "
 			+ "and a.workingdate = :workingdate "
 			)
 	public List<TimeSheetLunch> getForTimeSheetLunch(
+			@Param ("orgmanagerid_link")final Long orgmanagerid_link,
+			@Param ("workingdate")final Date workingdate
+			);
+	
+	@Query("SELECT distinct a "
+			+ "FROM TimeSheetLunch a "
+			+ "inner join Personel b on a.personnelid_link = b.id "
+			+ "where b.orgid_link = :orgmanagerid_link "
+			+ "and a.workingdate = :workingdate "
+			)
+	public List<TimeSheetLunch> getForTimeSheetLunchByGrant(
 			@Param ("orgmanagerid_link")final Long orgmanagerid_link,
 			@Param ("workingdate")final Date workingdate
 			);

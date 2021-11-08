@@ -39,6 +39,12 @@ public class TimeSheetLunchService extends AbstractService<TimeSheetLunch> imple
 	public List<TimeSheetLunch> getForUpdateStatusTimeSheetLunch(Long orgid_link, Date workingdate) {
 		return repo.getForUpdateStatusTimeSheetLunch(orgid_link, workingdate);
 	}
+
+	@Override
+	public List<TimeSheetLunch> getForTimeSheetLunchByGrant(Long orgid_link, Date workingdate) {
+		// TODO Auto-generated method stub
+		return repo.getForTimeSheetLunchByGrant(orgid_link, workingdate);
+	}
 	
 //	@Override
 //	public List<TimeSheetLunchBinding> getForTimeSheetLunch(Long orgid_link, Date workingdate) {

@@ -494,6 +494,11 @@ public class UploadPersonnelAPI {
 							String ngayCap = commonService.getStringValue(row.getCell(ColumnPersonnel.NgayCap));
 							if (ngayCap.contains("/")) {
 								String[] s_date = ngayCap.split("/");
+								if(s_date.length > 3) {
+									mes_err = " Định dạng ngày cấp không đúng dd/MM/yyyy! ở dòng " + (rowNum+1) +" cột Ngày cấp";
+									break;
+								}
+								
 								if (Integer.parseInt(s_date[1].toString()) < 13
 										&& Integer.parseInt(s_date[0].toString()) < 32) {
 									NgayCap = new SimpleDateFormat("dd/MM/yyyy").parse(ngayCap);
