@@ -12,8 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
-public interface ITimeSheetLunchRepository extends JpaRepository<TimeSheetLunch, Long>, JpaSpecificationExecutor<TimeSheetLunch>{
-	
+public interface ITimeSheetLunchRepository
+		extends JpaRepository<TimeSheetLunch, Long>, JpaSpecificationExecutor<TimeSheetLunch> {
+
 //	@Query("SELECT a.id, a.code, a.fullname, b.workingdate, b.shifttypeid_link, b.isworking, b.islunch "
 //			+ "FROM Personel a "
 //			+ "full join TimeSheetLunch b on b.personnelid_link = a.id "
@@ -24,63 +25,31 @@ public interface ITimeSheetLunchRepository extends JpaRepository<TimeSheetLunch,
 //			@Param ("orgid_link")final Long orgid_link,
 //			@Param ("workingdate")final Date workingdate
 //			);
-	
-	@Query("SELECT a "
-			+ "FROM TimeSheetLunch a "
-			+ "inner join Personel b on a.personnelid_link = b.id "
-			+ "where b.orgmanagerid_link = :orgmanagerid_link  "
-			+ "and a.workingdate = :workingdate "
-			)
-	public List<TimeSheetLunch> getForTimeSheetLunch(
-			@Param ("orgmanagerid_link")final Long orgmanagerid_link,
-			@Param ("workingdate")final Date workingdate
-			);
-	
-	@Query("SELECT distinct a "
-			+ "FROM TimeSheetLunch a "
-			+ "inner join Personel b on a.personnelid_link = b.id "
-			+ "where b.orgid_link = :orgmanagerid_link "
-			+ "and a.workingdate = :workingdate "
-			)
-	public List<TimeSheetLunch> getForTimeSheetLunchByGrant(
-			@Param ("orgmanagerid_link")final Long orgmanagerid_link,
-			@Param ("workingdate")final Date workingdate
-			);
-	
-	@Query("SELECT a "
-			+ "FROM TimeSheetLunch a "
-			+ "inner join Personel b on a.personnelid_link = b.id "
-			+ "where b.orgid_link = :orgid_link "
-			+ "and a.workingdate = :workingdate "
-			)
-	public List<TimeSheetLunch> getForUpdateStatusTimeSheetLunch(
-			@Param ("orgid_link")final Long orgid_link,
-			@Param ("workingdate")final Date workingdate
-			);
-	
-	@Query("SELECT a "
-			+ "FROM TimeSheetLunch a "
-			+ "where a.personnelid_link = :personnelid_link "
-			+ "and a.workingdate = :workingdate "
-			+ "and a.shifttypeid_link = :shifttypeid_link "
-			)
-	public List<TimeSheetLunch> getByPersonnelDateAndShift(
-			@Param ("personnelid_link")final Long personnelid_link,
-			@Param ("workingdate")final Date workingdate,
-			@Param ("shifttypeid_link")final Integer shifttypeid_link
-			);
-	
-	@Query("SELECT a "
-			+ "FROM TimeSheetLunch a "
-			+ "where a.personnelid_link = :personnelid_link "
-			+ "and a.isworking = true "
-			+ "and a.workingdate >= :workingdate_start "
-			+ "and a.workingdate <= :workingdate_end "
-			+ "order by a.workingdate, shifttypeid_link asc"
-			)
-	public List<TimeSheetLunch> getByPersonnelDate(
-			@Param ("personnelid_link")final Long personnelid_link,
-			@Param ("workingdate_start")final Date workingdate_start,
-			@Param ("workingdate_end")final Date workingdate_end
-			);
+
+	@Query("SELECT a " + "FROM TimeSheetLunch a " + "inner join Personel b on a.personnelid_link = b.id "
+			+ "where b.orgmanagerid_link = :orgmanagerid_link  " + "and a.workingdate = :workingdate and b.status = 0")
+	public List<TimeSheetLunch> getForTimeSheetLunch(@Param("orgmanagerid_link") final Long orgmanagerid_link,
+			@Param("workingdate") final Date workingdate);
+
+	@Query("SELECT distinct a " + "FROM TimeSheetLunch a " + "inner join Personel b on a.personnelid_link = b.id "
+			+ "where b.orgid_link = :orgmanagerid_link " + "and a.workingdate = :workingdate and b.status = 0")
+	public List<TimeSheetLunch> getForTimeSheetLunchByGrant(@Param("orgmanagerid_link") final Long orgmanagerid_link,
+			@Param("workingdate") final Date workingdate);
+
+	@Query("SELECT a " + "FROM TimeSheetLunch a " + "inner join Personel b on a.personnelid_link = b.id "
+			+ "where b.orgid_link = :orgid_link " + "and a.workingdate = :workingdate ")
+	public List<TimeSheetLunch> getForUpdateStatusTimeSheetLunch(@Param("orgid_link") final Long orgid_link,
+			@Param("workingdate") final Date workingdate);
+
+	@Query("SELECT a " + "FROM TimeSheetLunch a " + "where a.personnelid_link = :personnelid_link "
+			+ "and a.workingdate = :workingdate " + "and a.shifttypeid_link = :shifttypeid_link ")
+	public List<TimeSheetLunch> getByPersonnelDateAndShift(@Param("personnelid_link") final Long personnelid_link,
+			@Param("workingdate") final Date workingdate, @Param("shifttypeid_link") final Integer shifttypeid_link);
+
+	@Query("SELECT a " + "FROM TimeSheetLunch a " + "where a.personnelid_link = :personnelid_link "
+			+ "and a.isworking = true " + "and a.workingdate >= :workingdate_start "
+			+ "and a.workingdate <= :workingdate_end " + "order by a.workingdate, shifttypeid_link asc")
+	public List<TimeSheetLunch> getByPersonnelDate(@Param("personnelid_link") final Long personnelid_link,
+			@Param("workingdate_start") final Date workingdate_start,
+			@Param("workingdate_end") final Date workingdate_end);
 }

@@ -327,16 +327,16 @@ public class TimeSheetLunchAPI {
 				List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService.getForTimeSheetLunchByGrant(org.getId(),
 						date);
 				List<TimeSheetLunch> listca1 = new ArrayList<TimeSheetLunch>(listTimeSheetLunch);
-				listca1.removeIf(c -> !c.getShifttypeid_link().equals(4));
+				listca1.removeIf(c -> !c.getShifttypeid_link().equals(4) || !c.isIslunch());
 
 				List<TimeSheetLunch> listca2 = new ArrayList<TimeSheetLunch>(listTimeSheetLunch);
-				listca2.removeIf(c -> !c.getShifttypeid_link().equals(5));
+				listca2.removeIf(c -> !c.getShifttypeid_link().equals(5) || !c.isIslunch());
 
 				List<TimeSheetLunch> listca3 = new ArrayList<TimeSheetLunch>(listTimeSheetLunch);
-				listca3.removeIf(c -> !c.getShifttypeid_link().equals(6));
+				listca3.removeIf(c -> !c.getShifttypeid_link().equals(6) || !c.isIslunch());
 
 				List<TimeSheetLunch> listca4 = new ArrayList<TimeSheetLunch>(listTimeSheetLunch);
-				listca4.removeIf(c -> !c.getShifttypeid_link().equals(7));
+				listca4.removeIf(c -> !c.getShifttypeid_link().equals(7) || !c.isIslunch());
 
 				TongHopBaoAn tonghop = new TongHopBaoAn();
 				tonghop.setOrg_name(org.getName());
