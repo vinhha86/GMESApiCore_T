@@ -68,4 +68,10 @@ public class TimesheetAbsenceService extends AbstractService<TimesheetAbsence> i
 		return repo.GetByOrgAndDate(dateto, date, orgid_link);
 	}
 
+	@Override
+	public List<TimesheetAbsence> GetByOrgPhongBanAndDate(Long orgid_link, Date date) {
+		Date dateto = Common.Date_Add(date, 1);
+		return repo.GetByOrgPhongBanAndDate(dateto, date, orgid_link);
+	}
+
 }

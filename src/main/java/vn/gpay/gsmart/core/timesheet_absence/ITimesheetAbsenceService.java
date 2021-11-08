@@ -23,4 +23,5 @@ public interface ITimesheetAbsenceService extends Operations<TimesheetAbsence> {
 			String personnelName, Long timeSheetAbsenceType);
 
 	public List<TimesheetAbsence> getByOrgAndDate(Long orgid_link, Date date);
+	public List<TimesheetAbsence> GetByOrgPhongBanAndDate(Long orgid_link, Date date);
 }
