@@ -80,5 +80,11 @@ public interface ITimesheetAbsenceRepository
 			+ "and b.orgmanagerid_link = :orgid_link")
 	public List<TimesheetAbsence> GetByOrgAndDate(@Param("dateto") final Date dateto,
 			@Param("datefrom") final Date datefrom, @Param("orgid_link") final Long orgid_link);
+	
+	@Query(value = "select c from TimesheetAbsence c " + " inner join Personel b on c.personnelid_link = b.id "
+			+ "where c.absencedate_from <= :dateto and  c.absencedate_to >= :datefrom "
+			+ "and b.orgid_link = :orgid_link")
+	public List<TimesheetAbsence> GetByOrgPhongBanAndDate(@Param("dateto") final Date dateto,
+			@Param("datefrom") final Date datefrom, @Param("orgid_link") final Long orgid_link);
 
 }

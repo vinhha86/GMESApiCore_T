@@ -19,6 +19,7 @@ public class TimesheetShiftType implements Serializable{
 	private Long id;
 	private String name;
 	private String code;
+	private Boolean is_ca_an;
 	public Long getId() {
 		return id;
 	}
@@ -37,6 +38,11 @@ public class TimesheetShiftType implements Serializable{
 	public void setCode(String code) {
 		this.code = code;
 	}
-	
+	public Boolean getIs_ca_an() {
+		return is_ca_an;
+	}
+	public void setIs_ca_an(Boolean is_ca_an) {
+		this.is_ca_an = is_ca_an;
+	}
 	
 }

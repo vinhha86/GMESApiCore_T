@@ -121,10 +121,15 @@ public class TimesheetShiftTypeOrg implements Serializable {
 	
 	@Transient
 	public String getTenLoaiCa() {
-		if (is_ca_an != null) {
-			if(is_ca_an) {
-				return "Ca ăn";
+		if (timesheetshifttype != null) {
+			if(timesheetshifttype.getIs_ca_an() != null) {
+				if(timesheetshifttype.getIs_ca_an()) {
+					return "Ca ăn";
+				}else {
+					return "Ca làm việc";
+				}
 			}
+			return "Ca làm việc";
 		}
 		return "Ca làm việc";
 	}

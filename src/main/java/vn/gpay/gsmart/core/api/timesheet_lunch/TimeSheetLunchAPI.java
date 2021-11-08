@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.api.timesheet_lunch;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -25,11 +26,16 @@ import vn.gpay.gsmart.core.personel.Personel;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.security.GpayUserOrg;
 import vn.gpay.gsmart.core.security.IGpayUserOrgService;
+import vn.gpay.gsmart.core.timesheet_absence.ITimesheetAbsenceService;
+import vn.gpay.gsmart.core.timesheet_absence.TimesheetAbsence;
 import vn.gpay.gsmart.core.timesheet_lunch.ITimeSheetLunchService;
 import vn.gpay.gsmart.core.timesheet_lunch.TimeSheetLunch;
 import vn.gpay.gsmart.core.timesheet_lunch.TimeSheetLunchBinding;
+import vn.gpay.gsmart.core.timesheet_lunch.TimeSheetLunch_Binding;
 import vn.gpay.gsmart.core.timesheet_shift_type.ITimesheetShiftTypeService;
 import vn.gpay.gsmart.core.timesheet_shift_type.TimesheetShiftType;
+import vn.gpay.gsmart.core.timesheet_shift_type_org.ITimesheetShiftTypeOrgService;
+import vn.gpay.gsmart.core.timesheet_shift_type_org.TimesheetShiftTypeOrg;
 import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -43,10 +49,14 @@ public class TimeSheetLunchAPI {
 	private IPersonnel_Service personnelService;
 	@Autowired
 	private ITimesheetShiftTypeService timesheetshifttypeService;
-	@Autowired 
-	private IOrgService orgeService;
 	@Autowired
-	IGpayUserOrgService userOrgService;
+	private ITimesheetShiftTypeOrgService timesheetshifttypeOrgService;
+	@Autowired 
+	private IOrgService orgService;
+	@Autowired
+	private IGpayUserOrgService userOrgService;
+	@Autowired
+	private ITimesheetAbsenceService timesheetAbsenceService;
 
 //	@RequestMapping(value = "/getForTimeSheetLunch",method = RequestMethod.POST)
 //	public ResponseEntity<TimeSheetLunch_response> getForTimeSheetLunch(HttpServletRequest request) {
@@ -105,7 +115,7 @@ public class TimeSheetLunchAPI {
 				}else {
 					//nếu có đơn vị con cụ thể
 					if (user.getOrg_grant_id_link() != null) {
-						lst_org = orgeService.getOrgById(user.getOrg_grant_id_link());
+						lst_org = orgService.getOrgById(user.getOrg_grant_id_link());
 						if (lst_org.size() != 0) {
 							listPersonnel =  personnelService.getby_org(user.getOrg_grant_id_link(),orgrootid_link);
 						}
@@ -122,7 +132,7 @@ public class TimeSheetLunchAPI {
 //			System.out.println(listPersonnel.size());
 			
 			//kieerm tra phong ban day thuoc don vi nao - lay id cua don vi do; 
-			Long id_org =orgeService.getParentIdById(orgid_link);
+			Long id_org =orgService.getParentIdById(orgid_link);
 			if(id_org != null && id_org != 1) {
 				orgid_link= id_org;
 			}
@@ -308,7 +318,7 @@ public class TimeSheetLunchAPI {
 			Date workingdate = entity.workingdate;
 			Integer status = entity.status;
 			
-			Org org = orgeService.findOne(orgid_link);
+			Org org = orgService.findOne(orgid_link);
 			List<TimeSheetLunch> listTimeSheetLunch = new ArrayList<TimeSheetLunch>();
 			if(org.getOrgtypeid_link().equals(OrgType.ORG_TYPE_XUONGSX)) {
 				listTimeSheetLunch = timeSheetLunchService.getForTimeSheetLunch(orgid_link,
@@ -347,7 +357,7 @@ public class TimeSheetLunchAPI {
 			Long orgid_link = entity.orgid_link;
 			Date date = entity.date;
 			
-			Org org = orgeService.findOne(orgid_link);
+			Org org = orgService.findOne(orgid_link);
 			List<TimeSheetLunch> listTimeSheetLunch = new ArrayList<TimeSheetLunch>();
 			if(org.getOrgtypeid_link().equals(OrgType.ORG_TYPE_XUONGSX)) {
 				listTimeSheetLunch = timeSheetLunchService.getForTimeSheetLunch(orgid_link,
@@ -378,6 +388,116 @@ public class TimeSheetLunchAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<TimeSheetLunch_isconfirm_response>(HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/getListCheckCaAnAuto", method = RequestMethod.POST)
+	public ResponseEntity<TimeSheetLunch_Binding_response> getListCheckCaAnAuto(@RequestBody TimeSheetLunch_request entity,
+			HttpServletRequest request) {
+		TimeSheetLunch_Binding_response response = new TimeSheetLunch_Binding_response();
+		try {
+			Long orgid_link = entity.orgid_link;
+			Date date = entity.date;
+			List<TimesheetShiftTypeOrg> listCa = entity.listCa;
+			
+//			System.out.println(orgid_link);
+//			System.out.println(date);
+//			System.out.println(listCa.size());
+			
+			List<TimeSheetLunch_Binding> timeSheetLunch_Binding_list = new ArrayList<TimeSheetLunch_Binding>();
+			
+			Org org = orgService.findOne(orgid_link);
+			// lấy danh sách nghỉ trong ngày
+			List<TimesheetAbsence> timesheetAbsence_list = new ArrayList<TimesheetAbsence>();
+			if(org.getOrgtypeid_link().equals(OrgType.ORG_TYPE_XUONGSX)) {
+//				System.out.println("top");
+				timesheetAbsence_list = timesheetAbsenceService.getByOrgAndDate(orgid_link, date);
+			}else {
+//				System.out.println("bot");
+				timesheetAbsence_list = timesheetAbsenceService.GetByOrgPhongBanAndDate(orgid_link, date);
+			}
+			
+//			System.out.println(timesheetAbsence_list.size());
+//			System.out.println(listCa.size());
+			
+			for(TimesheetAbsence timesheetAbsence : timesheetAbsence_list) {
+				Date date_abs_from = timesheetAbsence.getAbsencedate_from();
+				Date date_abs_to = timesheetAbsence.getAbsencedate_to();
+				
+				for(TimesheetShiftTypeOrg timesheetShiftTypeOrg : listCa) {
+					timesheetShiftTypeOrg = timesheetshifttypeOrgService.findOne(timesheetShiftTypeOrg.getId());
+					
+					Integer fromHour = timesheetShiftTypeOrg.getFrom_hour();
+					Integer fromMinute = timesheetShiftTypeOrg.getFrom_minute();
+					Integer toHour = timesheetShiftTypeOrg.getTo_hour();
+					Integer toMinute = timesheetShiftTypeOrg.getTo_minute();
+					Boolean is_atnight = timesheetShiftTypeOrg.getIs_atnight();
+					
+					// (StartA <= EndB) and (EndA >= StartB) -> overlap
+					Calendar cal = Calendar.getInstance();
+					Date caFrom = date;
+					cal.setTime(caFrom);
+					cal.set(Calendar.HOUR_OF_DAY, fromHour);
+					cal.set(Calendar.MINUTE, fromMinute);
+					cal.set(Calendar.SECOND, 0); 
+					cal.set(Calendar.MILLISECOND, 0); 
+					caFrom = cal.getTime();
+					
+					Date caTo = date;
+					cal.setTime(caTo);
+					if(is_atnight != null) {
+						if(is_atnight) {
+							cal.add(Calendar.DATE, 1);
+						}
+					}
+					cal.set(Calendar.HOUR_OF_DAY, toHour);
+					cal.set(Calendar.MINUTE, toMinute);
+					cal.set(Calendar.SECOND, 0); 
+					cal.set(Calendar.MILLISECOND, 0); 
+					caTo = cal.getTime();
+					
+//					System.out.println("-----");
+//					System.out.println(date_abs_from);
+//					System.out.println(date_abs_to);
+//					System.out.println(caFrom);
+//					System.out.println(caTo);
+//					System.out.println(date_abs_from.before(caTo));
+//					System.out.println(caFrom.before(date_abs_to));
+					
+					if(date_abs_from.before(caTo) && caFrom.before(date_abs_to)) {
+						TimeSheetLunch_Binding newBinding = new TimeSheetLunch_Binding();
+						newBinding.setPersonnelid_link(timesheetAbsence.getPersonnelid_link());
+						newBinding.setIsCheck(true);
+						
+						String name = timesheetShiftTypeOrg.getName();
+//						System.out.println(timesheetShiftTypeOrg.getTimesheet_shift_type_id_link());
+//						System.out.println(name);
+						if(name.equals("Ca ăn 1")) {
+							newBinding.setLunchShift(1);
+						}
+						if(name.equals("Ca ăn 2")) {
+							newBinding.setLunchShift(2);
+						}
+						if(name.equals("Ca ăn 3")) {
+							newBinding.setLunchShift(3);
+						}
+						if(name.equals("Ca ăn 4")) {
+							newBinding.setLunchShift(4);
+						}
+						timeSheetLunch_Binding_list.add(newBinding);
+					}
+				}
+//				TimeSheetLunch_Binding a = new TimeSheetLunch_Binding();
+			}
+
+			response.data = timeSheetLunch_Binding_list;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<TimeSheetLunch_Binding_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<TimeSheetLunch_Binding_response>(HttpStatus.OK);
 		}
 	}
 }
