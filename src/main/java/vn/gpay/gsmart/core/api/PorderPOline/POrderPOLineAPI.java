@@ -396,12 +396,15 @@ public class POrderPOLineAPI {
 				POrder porder = porderService.findOne(grant.getPorderid_link());
 				Long productid_link = porder.getProductid_link();
 
-				if (porder != null) {
-					porderService.delete(porder);
-				}
-
 				if (grant != null) {
 					grantService.delete(grant);
+				}
+
+				if (porder != null) {
+					// kiem tra xem porder co nam trong grant nao ko thi moi dc xoa
+					List<POrderGrant> list_grant = grantService.getByOrderId(grant.getPorderid_link());
+					if (list_grant.size() == 0)
+						porderService.delete(porder);
 				}
 
 				List<Long> list_pcontractpo = porderskuService.getListPO_Id_ByGrant(pordergrantid_link);
