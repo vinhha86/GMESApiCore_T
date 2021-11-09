@@ -93,6 +93,7 @@ public interface ITimesheetAbsenceRepository
 			+ " and c.absencetypeid_link = :absencetypeid_link "
 			+ " and c.absencedate_from <= :dateEnd "
 			+ " and c.absencedate_to >= :dateBegin "
+			+ " and (b.date_endworking is null or b.date_endworking >= :dateEnd) "
 			)
 	public List<TimesheetAbsence> getNghiPhepTheoNgay(
 			@Param("orgmanagerid_link") final Long orgmanagerid_link,
