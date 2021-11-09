@@ -77,5 +77,28 @@ public interface Personnel_repository extends JpaRepository<Personel, Long>, Jpa
 			+ " and (c.status = :status or :status is null or :status = 3)")
 	public List<Personel> getPersonelByOrgid_link_PersonelType(@Param("orgmanagerid_link") final Long orgmanagerid_link,
 			@Param("personnel_typeid_link") final Long personnel_typeid_link, @Param("status") final Integer status);
+	
+	@Query(value = "select c from Personel c " 
+			+ " where (c.orgid_link = :orgmanagerid_link or orgmanagerid_link = :orgmanagerid_link ) "
+			+ " and c.date_startworking <= :dateBegin "
+			+ " and (c.date_endworking >= :dateEnd or c.date_endworking is null) "
+			)
+	public List<Personel> getTongLaoDongByDate(
+			@Param("orgmanagerid_link") final Long orgmanagerid_link,
+			@Param("dateBegin") final Date dateBegin, 
+			@Param("dateEnd") final Date dateEnd);
+	
+	@Query(value = "select distinct c from Personel c " 
+			+ " inner join TimesheetAbsence b on c.id = b.personnelid_link "
+			+ " where (c.orgid_link = :orgmanagerid_link or orgmanagerid_link = :orgmanagerid_link ) "
+			+ " and c.date_startworking <= :dateBegin "
+			+ " and (c.date_endworking >= :dateEnd or c.date_endworking is null) "
+			+ " and b.absencedate_from <= :dateEnd "
+			+ " and b.absencedate_to >= :dateBegin "
+			)
+	public List<Personel> getTongLaoDongNghiByDate(
+			@Param("orgmanagerid_link") final Long orgmanagerid_link,
+			@Param("dateBegin") final Date dateBegin, 
+			@Param("dateEnd") final Date dateEnd);
 
 }

@@ -129,4 +129,14 @@ public class Personnel_Service extends AbstractService<Personel> implements IPer
 		return repo.getPersonelByOrgid_link_PersonelType(orgmanagerid_link, personnel_typeid_link, status);
 	}
 
+	@Override
+	public List<Personel> getTongLaoDongByDate(Long orgmanagerid_link, Date dateBegin, Date dateEnd) {
+		return repo.getTongLaoDongByDate(orgmanagerid_link, dateBegin, dateEnd);
+	}
+
+	@Override
+	public List<Personel> getTongLaoDongNghiByDate(Long orgmanagerid_link, Date dateBegin, Date dateEnd) {
+		return repo.getTongLaoDongNghiByDate(orgmanagerid_link, dateBegin, dateEnd);
+	}
+
 }

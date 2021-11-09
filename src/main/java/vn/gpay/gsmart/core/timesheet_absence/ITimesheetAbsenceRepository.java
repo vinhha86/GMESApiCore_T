@@ -86,5 +86,32 @@ public interface ITimesheetAbsenceRepository
 			+ "and b.orgid_link = :orgid_link")
 	public List<TimesheetAbsence> GetByOrgPhongBanAndDate(@Param("dateto") final Date dateto,
 			@Param("datefrom") final Date datefrom, @Param("orgid_link") final Long orgid_link);
+	
+	@Query(value = "select c from TimesheetAbsence c " 
+			+ " inner join Personel b on c.personnelid_link = b.id "
+			+ " where b.orgmanagerid_link = :orgmanagerid_link "
+			+ " and c.absencetypeid_link = :absencetypeid_link "
+			+ " and c.absencedate_from <= :dateEnd "
+			+ " and c.absencedate_to >= :dateBegin "
+			)
+	public List<TimesheetAbsence> getNghiPhepTheoNgay(
+			@Param("orgmanagerid_link") final Long orgmanagerid_link,
+			@Param("dateBegin") final Date dateBegin, 
+			@Param("dateEnd") final Date dateEnd,
+			@Param("absencetypeid_link") final Long absencetypeid_link
+			);
+	
+	@Query(value = "select c from TimesheetAbsence c " 
+			+ " inner join Personel b on c.personnelid_link = b.id "
+			+ " where b.orgmanagerid_link = :orgmanagerid_link "
+			+ " and ( (c.absencedate_from >= :caFrom1 and c.absencedate_to <= :caTo1) or (c.absencedate_from >= :caFrom2 and c.absencedate_to <= :caTo2) ) "
+			)
+	public List<TimesheetAbsence> getNghi1Phan2TheoNgay(
+			@Param("orgmanagerid_link") final Long orgmanagerid_link,
+			@Param("caFrom1") final Date caFrom1,
+			@Param("caTo1") final Date caTo1,
+			@Param("caFrom2") final Date caFrom2,
+			@Param("caTo2") final Date caTo2
+			);
 
 }
