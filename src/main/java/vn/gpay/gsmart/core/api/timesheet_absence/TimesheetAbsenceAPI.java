@@ -473,7 +473,7 @@ public class TimesheetAbsenceAPI {
 				calendar.set(Calendar.HOUR_OF_DAY, 13);
 				calendar.set(Calendar.MINUTE, 30);
 				calendar.set(Calendar.SECOND, 0);
-				calendar.set(Calendar.MILLISECOND, 1);
+				calendar.set(Calendar.MILLISECOND, 0);
 				caFrom2 = calendar.getTime();
 				Date caTo2 = date;
 				calendar.setTime(caTo2);
@@ -503,18 +503,7 @@ public class TimesheetAbsenceAPI {
 				Integer soCoMat = tongLaoDong - soTongNghi + nghi1phan2;
 				newTimesheetAbsence_Binding.setSoCoMat(soCoMat);
 				
-//				if(personel_list.size() > 0) {
-//					for(Personel p : personel_list) {
-//						System.out.println(p.getFullname());
-//					}
-//					System.out.println(tongLaoDong);
-//					System.out.println(soTongNghi);
-//					System.out.println(nghi1phan2);
-//					System.out.println(dateBegin);
-//					System.out.println(dateEnd);
-//				}
-				
-				
+
 				//
 				result.add(newTimesheetAbsence_Binding);
 			}
