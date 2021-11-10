@@ -38,6 +38,7 @@ import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Service;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price_D;
 import vn.gpay.gsmart.core.product.IProductService;
+import vn.gpay.gsmart.core.product.IProductTypeService;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.productpairing.IProductPairingService;
 import vn.gpay.gsmart.core.productpairing.ProductPairing;
@@ -71,6 +72,8 @@ public class UploadPriceFOB {
 	ISKU_Service skuService;
 	@Autowired
 	IProductPairingService pairService;
+	@Autowired
+	IProductTypeService producttypeService;
 
 	@RequestMapping(value = "/download_temp", method = RequestMethod.POST)
 	public ResponseEntity<download_temp_price_fob_response> DownloadTemp(HttpServletRequest request) {
@@ -154,6 +157,10 @@ public class UploadPriceFOB {
 						String MaSPCon = commonService.getStringValue(row.getCell(Column_Price_FOB.MaSPCon));
 						MaSPCon = MaSPCon.equals("0") ? "" : MaSPCon;
 
+						colNum = Column_Price_FOB.MauNPL;
+						String MauNPL = commonService.getStringValue(row.getCell(Column_Price_FOB.MauNPL));
+						MauNPL = MauNPL.equals("0") ? "" : MauNPL;
+						
 						colNum = Column_Price_FOB.Mota;
 						String MoTa = commonService.getStringValue(row.getCell(Column_Price_FOB.Mota));
 						MoTa = MoTa.equals("0") ? "" : MoTa;
@@ -183,12 +190,12 @@ public class UploadPriceFOB {
 
 						// Kiem tra xem ten gia co trong danh muc chua
 						Long fobpriceid_link = null;
-						List<FOBPrice> list_dm_pricefob = fobService.getByName(MaNPL);
+						List<FOBPrice> list_dm_pricefob = fobService.getByName(MaNPL+"("+MauNPL+")");
 						if (list_dm_pricefob.size() == 0) {
 							FOBPrice price = new FOBPrice();
 							price.setId(null);
 							price.setIsdefault(false);
-							price.setName(MaNPL);
+							price.setName(MaNPL+"("+MauNPL+")");
 							price.setOrgrootid_link(orgrootid_link);
 							price.setPrice(Gia);
 							price = fobService.save(price);
@@ -198,38 +205,33 @@ public class UploadPriceFOB {
 						}
 
 						// kiem tra NPL
-						Integer product_type = ProductType.SKU_TYPE_UNKNOWN;
-						switch (Loai.trim()) {
-						case "FABRIC":
-							product_type = ProductType.SKU_TYPE_MAINMATERIAL;
-							break;
-						case "TRIM":
-							product_type = ProductType.SKU_TYPE_SWEINGTRIM_MIN;
-							break;
-						case "PACKING":
-							product_type = ProductType.SKU_TYPE_PACKINGTRIM_MIN;
-							break;
-						case "THREAD":
-							product_type = ProductType.SKU_TYPE_SWEINGTHREAD_MIN;
-							break;
-						case "TICKET":
-							product_type = ProductType.TICKET;
-							break;
-						default:
-							break;
+						List<vn.gpay.gsmart.core.product.ProductType> list_type = productService.getTypeByName(Loai.trim());
+						Long product_type = null;
+						if(list_type.size() > 0) {
+							product_type = list_type.get(0).getId();
 						}
+						else {
+							vn.gpay.gsmart.core.product.ProductType type = new vn.gpay.gsmart.core.product.ProductType();
+							type.setId(null);
+							type.setName(Loai.trim());
+							
+							type = producttypeService.save(type);
+							product_type = type.getId();
+						}
+						
 						Long npl_id_link = null;
 						List<Product> list_npl = productService.getby_code_type_description_name(orgrootid_link, MaNPL,
-								product_type, MoTa, MaNPL);
+								product_type.intValue(), MoTa, MaNPL);
 						if (list_npl.size() == 0) {
 							Product product = new Product();
 							product.setBuyercode(MaNPL);
 							product.setCode(MaNPL);
+							product.setBuyername(MaNPL);
 							product.setDescription(MoTa);
 							product.setId(null);
 							product.setOrgrootid_link(orgrootid_link);
 							product.setTimecreate(new Date());
-							product.setProducttypeid_link(product_type);
+							product.setProducttypeid_link(product_type.intValue());
 							product.setStatus(1);
 							product = productService.save(product);
 							npl_id_link = product.getId();
@@ -247,6 +249,7 @@ public class UploadPriceFOB {
 							org.setId(null);
 							org.setOrgrootid_link(orgrootid_link);
 							org.setName(NhaCungCap);
+							org.setOrgtypeid_link(5);
 							org = orgService.save(org);
 							org_providerid_link = org.getId();
 						} else {
@@ -271,8 +274,8 @@ public class UploadPriceFOB {
 
 						// kiem tra xem npl co dung cho ca bo hay khong
 						Long productid_link = null, productpairid_link = null;
-						String product_buyercode = MaSPBo.equals("") ? MaSPCon : MaSPBo;
-						int producttype = MaSPBo.equals("") ? ProductType.SKU_TYPE_COMPLETEPRODUCT
+						String product_buyercode = MaSPCon.equals("") ? MaSPBo : MaSPCon;
+						int producttype = !MaSPCon.equals("") ? ProductType.SKU_TYPE_COMPLETEPRODUCT
 								: ProductType.SKU_TYPE_PRODUCT_PAIR;
 						List<Product> list_product = productService.getByBuyerCodeAndType(product_buyercode,
 								producttype);
@@ -295,8 +298,9 @@ public class UploadPriceFOB {
 
 						// Kiem tra xem price da co hay chua
 						List<PContract_Price_D> list_price_d = priceDService
-								.getPrice_D_ByFobPriceNameAndPContractPrice(pcontractpriceid_link, MaNPL);
+								.getPrice_D_ByFobPriceAndPContractPrice(pcontractpriceid_link, fobpriceid_link);
 						Float price = Gia * DinhMuc * (1 + TieuHao / 100);
+						
 						if (list_price_d.size() == 0) {
 
 							PContract_Price_D price_d = new PContract_Price_D();
@@ -336,6 +340,7 @@ public class UploadPriceFOB {
 							price_current.setTotalprice(price_total_curretn + price - price_d.getPrice());
 							priceService.save(price_current);
 
+							price_d.setProviderid_link(org_providerid_link);
 							price_d.setQuota(DinhMuc);
 							price_d.setUnitprice(Gia);
 							price_d.setLost_ratio(TieuHao);

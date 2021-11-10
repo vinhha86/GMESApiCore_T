@@ -1,5 +1,7 @@
 package vn.gpay.gsmart.core.api.porder_grant;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,13 +25,17 @@ import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
+import vn.gpay.gsmart.core.porder_grant.KeHoachVaoChuyen;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
+import vn.gpay.gsmart.core.porder_grant_sku_plan.IPOrderGrant_SKU_Plan_Service;
+import vn.gpay.gsmart.core.porder_grant_sku_plan.POrderGrant_SKU_Plan;
 import vn.gpay.gsmart.core.porderprocessing.IPOrderProcessing_Service;
 import vn.gpay.gsmart.core.porderprocessing.POrderProcessing;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.security.GpayUserOrg;
 import vn.gpay.gsmart.core.security.IGpayUserOrgService;
+import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.POrderStatus;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -50,6 +56,10 @@ public class POrder_GrantAPI {
 	IPContract_POService poService;
 	@Autowired
 	IOrgService orgService;
+	@Autowired
+	Common commonService;
+	@Autowired
+	private IPOrderGrant_SKU_Plan_Service porderGrant_SKU_Plan_Service;
 //	ObjectMapper mapper = new ObjectMapper();
 
 	@RequestMapping(value = "/getone", method = RequestMethod.POST)
@@ -302,6 +312,98 @@ public class POrder_GrantAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<POrder_grant_getchange_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/get_kehoachvaochuyen", method = RequestMethod.POST)
+	public ResponseEntity<get_KeHoachVaoChuyen_response> getKeHoachVaoChuyen(HttpServletRequest request) {
+		get_KeHoachVaoChuyen_response response = new get_KeHoachVaoChuyen_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgid_link = user.getOrgid_link();
+			Date date_from = new Date();
+			Date date_to = Common.Date_Add(date_from, 6);
+			List<Long> list_orgid = new ArrayList<Long>();
+			DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+			
+			if (orgid_link != 1) {
+				list_orgid.add(orgid_link);
+				
+				List<GpayUserOrg> list_user_org = userOrgService.getall_byuser(user.getId());
+				for (GpayUserOrg userorg : list_user_org) {
+					if (!list_orgid.contains(userorg.getOrgid_link())) {
+						list_orgid.add(userorg.getOrgid_link());
+					}
+				}
+			}
+			
+			
+			List<POrderGrant> list_grant = porderGrantService.get_KehoachVaoChuyen(date_from, date_to, list_orgid);
+			Date day0 = date_from;
+			Date day1 = Common.Date_Add(date_from, 1);
+			Date day2 = Common.Date_Add(date_from, 2);
+			Date day3 = Common.Date_Add(date_from, 3);
+			Date day4 = Common.Date_Add(date_from, 4);
+			Date day5 = Common.Date_Add(date_from, 5);
+			Date day6 = Common.Date_Add(date_from, 6);
+			
+			List<KeHoachVaoChuyen> list_kehoach = new ArrayList<KeHoachVaoChuyen>();
+			for(POrderGrant grant : list_grant) {
+				KeHoachVaoChuyen kehoach = new KeHoachVaoChuyen();
+				
+				kehoach.setBuyername(grant.getBuyername());
+				kehoach.setDonvi(grant.getDonvi());
+				kehoach.setGranttoorgname(grant.getGranttoorgname());
+				kehoach.setId(grant.getId());
+				kehoach.setPo_Lines(grant.getpo_Lines());
+				kehoach.setPorderid_link(grant.getPorderid_link());
+				kehoach.setProductcode(grant.getProductcode());
+				
+				int soluong_0 = 0, soluong_1 = 0,soluong_2 = 0,soluong_3 = 0,soluong_4 = 0,soluong_5 = 0,soluong_6 = 0;
+				List<POrderGrant_SKU_Plan> list_grant_plan = porderGrant_SKU_Plan_Service.getByPOrderGrant_Date(grant.getId(), date_from, date_to);
+				for(POrderGrant_SKU_Plan plan : list_grant_plan) {
+					if(df.format(plan.getDate()).equals(df.format(day0))) {
+						soluong_0 += plan.getAmount();
+					}
+					else if(df.format(plan.getDate()).equals(df.format(day1))) {
+						soluong_1 += plan.getAmount();
+					}
+					else if(df.format(plan.getDate()).equals(df.format(day2))) {
+						soluong_2 += plan.getAmount();
+					}
+					else if(df.format(plan.getDate()).equals(df.format(day3))) {
+						soluong_3 += plan.getAmount();
+					}
+					else if(df.format(plan.getDate()).equals(df.format(day4))) {
+						soluong_4 += plan.getAmount();
+					}
+					else if(df.format(plan.getDate()).equals(df.format(day5))) {
+						soluong_5 += plan.getAmount();
+					}
+					else if(df.format(plan.getDate()).equals(df.format(day6))) {
+						soluong_6 += plan.getAmount();
+					}
+				}
+				
+				kehoach.setDay0(soluong_0);
+				kehoach.setDay1(soluong_1);
+				kehoach.setDay2(soluong_2);
+				kehoach.setDay3(soluong_3);
+				kehoach.setDay4(soluong_4);
+				kehoach.setDay5(soluong_5);
+				kehoach.setDay6(soluong_6);
+				
+				list_kehoach.add(kehoach);
+			}
+
+			response.data = list_kehoach;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<get_KeHoachVaoChuyen_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<get_KeHoachVaoChuyen_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
 }

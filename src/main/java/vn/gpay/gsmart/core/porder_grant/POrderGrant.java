@@ -289,6 +289,22 @@ public class POrderGrant implements Serializable {
 
 		return name;
 	}
+	
+	@Transient
+	public String getpo_Lines() {
+		String line = "";
+		for(POrderGrant_SKU sku : porder_grant_sku) {
+			if(line == "") {
+				line = sku.getPcontractPo_PoBuyer();
+			}
+			else {
+				if(!line.contains(sku.getPcontractPo_PoBuyer())) {
+					line += ";"+sku.getPcontractPo_PoBuyer();
+				}
+			}
+		}
+		return line;
+	}
 
 	@Transient
 	public String getCls() {

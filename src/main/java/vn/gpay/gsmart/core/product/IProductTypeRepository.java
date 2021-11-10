@@ -13,4 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 public interface IProductTypeRepository extends JpaRepository<ProductType, Long> {
 	@Query(value = "select c from ProductType c where c.id >= :producttypeid_min and c.id <= :producttypeid_max")
 	public List<ProductType> getall_ProductTypes(@Param ("producttypeid_min")final  int producttypeid_min, @Param ("producttypeid_max")final  int producttypeid_max);
+	
+	@Query(value = "select c from ProductType c where name = :name")
+	public List<ProductType> getByName(@Param ("name")final  String name);
 }

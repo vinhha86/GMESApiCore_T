@@ -62,4 +62,6 @@ public interface IProductService extends Operations<Product> {
 	List<Product> getByBuyerCodeAndTypeNotLike(String buyercode, Integer producttypeid_link);
 
 	List<Product> getAllProduct(Long orgrootid_link, String buyercode, String buyername);
+	
+	List<ProductType> getTypeByName(String name);
 }

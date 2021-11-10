@@ -97,8 +97,8 @@ public class PContract_Price_D implements Serializable {
 	@Transient
 	public String getProviderCode() {
 		if (provider != null) {
-			if (provider.getCode() != null) {
-				return provider.getCode();
+			if (provider.getName() != null) {
+				return provider.getName();
 			}
 		}
 		return "";

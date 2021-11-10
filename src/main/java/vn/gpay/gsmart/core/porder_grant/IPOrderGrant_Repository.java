@@ -95,5 +95,12 @@ public interface IPOrderGrant_Repository
 			+ "where b.productid_link = :productid_link and c.po_typeid_link = 10")
 	public List<Long> getPlanByProduct(
 			@Param("productid_link") final Long productid_link);
+	
+	@Query(value = "select a from POrderGrant a "
+			+ "where (a.granttoorgid_link in :list_orgid or :list_orgid is null) and a.start_date_plan <= :date_to and a.finish_date_plan >= :date_from and status = 2")
+	public List<POrderGrant> getKeHoachVaoChuyen(
+			@Param("list_orgid") final List<Long> list_orgid,
+			@Param("date_from") final Date date_from,
+			@Param("date_to") final Date date_to);
 
 }

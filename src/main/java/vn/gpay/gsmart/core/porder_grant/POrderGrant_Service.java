@@ -156,4 +156,11 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 		// TODO Auto-generated method stub
 		return repo.getPlanByProduct(productid_link);
 	}
+
+	@Override
+	public List<POrderGrant> get_KehoachVaoChuyen(Date date_from, Date date_to, List<Long> list_orgid) {
+		// TODO Auto-generated method stub
+		list_orgid = list_orgid.size() == 0 ? null : list_orgid;
+		return repo.getKeHoachVaoChuyen(list_orgid, date_from, date_to);
+	}
 }
