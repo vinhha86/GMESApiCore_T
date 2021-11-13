@@ -3096,4 +3096,26 @@ public class PContract_POAPI {
 			return new ResponseEntity<copy_poline_response>(response, HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/getpo_havetoship", method = RequestMethod.POST)
+	public ResponseEntity<getpo_by_product_response> getPO_HavetoShip (
+			@RequestBody getpo_havetoship_request entity, HttpServletRequest request) 
+	{
+		getpo_by_product_response response = new getpo_by_product_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+
+			List<PContract_PO> pcontract = pcontract_POService.getPO_HavetoShip(orgrootid_link, entity.shipdate_from, entity.shipdate_to);
+			response.data = pcontract;
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getpo_by_product_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<getpo_by_product_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 }

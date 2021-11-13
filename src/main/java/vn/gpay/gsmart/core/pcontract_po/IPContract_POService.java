@@ -84,4 +84,6 @@ public interface IPContract_POService extends Operations<PContract_PO> {
 	int getPOLineNotMaps(Long pcontractid_link);
 
 	List<PContract_PO> getPOConfirmNotMap(Long parentpoid_link, int type);
+
+	List<PContract_PO> getPO_HavetoShip(Long orgrootid_link, Date shipdate_from, Date shipdate_to);
 }
