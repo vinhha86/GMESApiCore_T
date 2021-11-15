@@ -16,7 +16,6 @@ import com.github.wenhao.jpa.Sorts;
 import com.github.wenhao.jpa.Specifications;
 
 import vn.gpay.gsmart.core.base.AbstractService;
-import vn.gpay.gsmart.core.org.Org;
 
 @Service
 public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
@@ -406,5 +405,10 @@ public class OrgServiceImpl extends AbstractService<Org> implements IOrgService{
 	@Override
 	public List<Org> getByListId(List<Long> listid) {
 		return repositoty.getByListId(listid);
+	}
+
+	@Override
+	public List<Org> getByParentId_for_TimeSheetLunchMobile(Long parentid_link) {
+		return repositoty.getByParentId_for_TimeSheetLunchMobile(parentid_link);
 	}
 }

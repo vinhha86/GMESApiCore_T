@@ -58,6 +58,8 @@ public interface IOrgService extends Operations<Org>{
 	
 	List<Org> getByListId(List<Long> listid);
 	
+	public List<Org> getByParentId_for_TimeSheetLunchMobile(Long parentid_link);
+	
 	//lay org theo name,orgtypeid_link,parentid_link
 	public Org getByNameAndTypeAndParentid_link(String name,Integer orgtypeid_link,Long parentid_link);
 	//lay ord theo code,parentid_link

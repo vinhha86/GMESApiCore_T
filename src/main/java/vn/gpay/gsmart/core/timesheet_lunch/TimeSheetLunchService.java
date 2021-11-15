@@ -42,8 +42,12 @@ public class TimeSheetLunchService extends AbstractService<TimeSheetLunch> imple
 
 	@Override
 	public List<TimeSheetLunch> getForTimeSheetLunchByGrant(Long orgid_link, Date workingdate) {
-		// TODO Auto-generated method stub
 		return repo.getForTimeSheetLunchByGrant(orgid_link, workingdate);
+	}
+
+	@Override
+	public List<TimeSheetLunch> getForTimeSheetLunch_byOrg_Date(Long orgid_link, Date workingdate) {
+		return repo.getForTimeSheetLunch_byOrg_Date(orgid_link, workingdate);
 	}
 	
 //	@Override

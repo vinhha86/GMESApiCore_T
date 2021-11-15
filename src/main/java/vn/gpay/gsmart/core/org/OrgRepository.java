@@ -9,8 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import vn.gpay.gsmart.core.org.Org;
-
 @Repository
 @Transactional
 public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecificationExecutor<Org>{
@@ -134,6 +132,17 @@ public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecification
 			+ "order by c.name asc "
 			)
 	public List<Org> findOrgByTypeBanCat(
+			@Param ("parentid_link")final Long parentid_link
+			);
+	
+	// lấy danh sách tổ theo px cho timesheetlunch_mobile
+	@Query(value = " select c from Org c "
+			+ " where c.orgtypeid_link in (1,3,8,9,13,14,17,19,21,28,29,30,31,32,33,34,35,36,37,38,39) " 
+			+ " and c.parentid_link = :parentid_link "
+			+ " and c.status > -1 "
+			+ " order by c.orgtypeid_link, c.code "
+			)
+	public List<Org> getByParentId_for_TimeSheetLunchMobile(
 			@Param ("parentid_link")final Long parentid_link
 			);
 	
