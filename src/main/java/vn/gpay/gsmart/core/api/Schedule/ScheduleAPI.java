@@ -565,17 +565,20 @@ public class ScheduleAPI {
 
 			if (entity.data.getStatus() == 2) {
 				List<PContract_PO> list_po = porderSkuService.getListPO_ByGrant(entity.data.getPorder_grantid_link());
-				shipdate = list_po.get(0).getShipdate();
-				for (PContract_PO po : list_po) {
-					if (po.getShipdate().after(shipdate))
-						shipdate = po.getShipdate();
+				if (list_po.size() > 0) {
+					shipdate = list_po.get(0).getShipdate();
+					for (PContract_PO po : list_po) {
+						if (po.getShipdate().after(shipdate))
+							shipdate = po.getShipdate();
+					}
 				}
+
 			} else {
 				POrder porder = porderService.findOne(entity.data.getPorderid_link());
 				shipdate = porder.getShipdate();
 			}
 
-			if (end_date.after(shipdate))
+			if (shipdate != null && end_date.after(shipdate))
 				type = 1;
 //			porder.setProductiondate_plan(entity.data.getStartDate());
 //			porder.setFinishdate_plan(commonService.getEndOfDate(entity.data.getEndDate()));
