@@ -508,8 +508,8 @@ public class TimesheetAbsenceAPI {
 				
 				// soCoMat = tongLaoDong - soTongNghi
 				// ko + nghi1phan2 (1/2 van tinh la la nghi)
-				personel_list = personnelService.getTongLaoDongNghiByDate(orgmanagerid_link, dateBegin, dateEnd);
-				Integer soTongNghi = personel_list.size();
+//				personel_list = personnelService.getTongLaoDongNghiByDate(orgmanagerid_link, dateBegin, dateEnd);
+//				Integer soTongNghi = personel_list.size();
 //				Integer soCoMat = tongLaoDong - soTongNghi + nghi1phan2;
 //				Integer soCoMat = tongLaoDong - soTongNghi;
 				Integer soCoMat = tongLaoDong - nghiConLai - nghiCachLy - nghiKhongPhep - nghiPhep;
