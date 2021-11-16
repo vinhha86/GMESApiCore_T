@@ -31,5 +31,5 @@ public class AtributeFixValues {
 //	public static String url_authen = "http://gpay.vn:8181";// GSmart
 //    public static String url_jitin = "http://localhost:8991/jitin";//JITIN
 //  public static String url_gmes = "http://localhost:8990";//GMES
-//	public static String folder_image = "http://gpay.vn:8090/gmesdha_upload/product/";
+//	public static String folder_image = "http://localhost:8990/gmesdha_upload/product/";
 }

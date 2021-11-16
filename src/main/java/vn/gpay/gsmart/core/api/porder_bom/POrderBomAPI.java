@@ -45,6 +45,7 @@ import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 import vn.gpay.gsmart.core.sku.SKU_Attribute_Value;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.POrderBomType;
+import vn.gpay.gsmart.core.utils.ProductType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -282,10 +283,10 @@ public class POrderBomAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long orgrootid_link = user.getRootorgid_link();
-			POrder porder = porderService.findOne(entity.porderid_link);
-			long pcontractid_link = porder.getPcontractid_link();
-			long productid_link = porder.getProductid_link();
-			long porderid_link = entity.porderid_link;
+//			POrder porder = porderService.findOne(entity.porderid_link);
+			long pcontractid_link = entity.pcontractid_link;
+			long productid_link = entity.productid_link;
+//			long porderid_link = entity.porderid_link;
 			response.isbomdone = false;
 			response.setMessage("Định mức đơn hàng chưa được chốt");
 
@@ -311,7 +312,7 @@ public class POrderBomAPI {
 			for (PContractProductBom2 bom_product : list_bom_product) {
 				// kiem tra npl co chua thi them vao bang pcontract_bom_product
 				List<POrderBomProduct> list_porder_bom_product = porderbomproductService
-						.getby_porder_and_material(porderid_link, bom_product.getMaterialid_link());
+						.getby_pcontract_product_and_material(pcontractid_link, productid_link, bom_product.getMaterialid_link());
 				if (list_porder_bom_product.size() == 0) {
 					POrderBomProduct porder_bom_product = new POrderBomProduct();
 					porder_bom_product.setAmount(bom_product.getAmount());
@@ -322,15 +323,18 @@ public class POrderBomAPI {
 					porder_bom_product.setMaterialid_link(bom_product.getMaterialid_link());
 					porder_bom_product.setOrgrootid_link(orgrootid_link);
 					porder_bom_product.setPcontractid_link(pcontractid_link);
-					porder_bom_product.setPorderid_link(porderid_link);
+					porder_bom_product.setPorderid_link(null);
 					porder_bom_product.setProductid_link(bom_product.getProductid_link());
 					porder_bom_product.setUnitid_link(bom_product.getUnitid_link());
 
 					porderbomproductService.save(porder_bom_product);
 				} else {
 					POrderBomProduct porder_bom_product = list_porder_bom_product.get(0);
-					porder_bom_product.setAmount(bom_product.getAmount());
-					porderbomproductService.save(porder_bom_product);
+					if(porder_bom_product.getProduct_type() != ProductType.SKU_TYPE_MATERIAL_MIN) {
+						porder_bom_product.setAmount(bom_product.getAmount());
+						porderbomproductService.save(porder_bom_product);
+					}
+					
 				}
 			}
 
@@ -349,7 +353,7 @@ public class POrderBomAPI {
 						productid_link);
 				for (PContractBom2Color bom_color : list_bom_color) {
 					List<PorderBomColor> list_porder_bom_color = porderbomcolorService
-							.getby_porder_and_material_and_color(porderid_link, bom_color.getMaterialid_link(),
+							.getby_pcontract_product_and_material_and_color(pcontractid_link, productid_link, bom_color.getMaterialid_link(),
 									bom_color.getColorid_link());
 					if (list_porder_bom_color.size() == 0) {
 						PorderBomColor porderbomcolor = new PorderBomColor();
@@ -361,13 +365,16 @@ public class POrderBomAPI {
 						porderbomcolor.setMaterialid_link(bom_color.getMaterialid_link());
 						porderbomcolor.setOrgrootid_link(orgrootid_link);
 						porderbomcolor.setPcontractid_link(pcontractid_link);
-						porderbomcolor.setPorderid_link(porderid_link);
+						porderbomcolor.setPorderid_link(null);
 						porderbomcolor.setProductid_link(productid_link);
 						porderbomcolorService.save(porderbomcolor);
 					} else {
 						PorderBomColor porderbomcolor = list_porder_bom_color.get(0);
-						porderbomcolor.setAmount(bom_color.getAmount());
-						porderbomcolorService.save(porderbomcolor);
+						if(porderbomcolor.getProduct_type() != ProductType.SKU_TYPE_MATERIAL_MIN) {
+							porderbomcolor.setAmount(bom_color.getAmount());
+							porderbomcolorService.save(porderbomcolor);
+						}
+						
 					}
 				}
 
@@ -376,7 +383,7 @@ public class POrderBomAPI {
 						.getbypcontract_and_product(pcontractid_link, productid_link);
 				for (PContractBOM2SKU bom_sku : list_p_bom_sku) {
 					List<POrderBOMSKU> list_porder_bom_sku = porderbomskuService
-							.getby_porder_and_material_and_sku_and_type(porderid_link, bom_sku.getMaterial_skuid_link(),
+							.getby_pcontract_product_and_material_and_sku_and_type(pcontractid_link, productid_link, bom_sku.getMaterial_skuid_link(),
 									bom_sku.getProduct_skuid_link(), POrderBomType.CanDoi);
 
 					if (list_porder_bom_sku.size() == 0) {
@@ -390,15 +397,18 @@ public class POrderBomAPI {
 						porderbomsku.setMaterialid_link(bom_sku.getMaterial_skuid_link());
 						porderbomsku.setOrgrootid_link(orgrootid_link);
 						porderbomsku.setPcontractid_link(pcontractid_link);
-						porderbomsku.setPorderid_link(porderid_link);
+						porderbomsku.setPorderid_link(null);
 						porderbomsku.setProductid_link(productid_link);
 						porderbomsku.setSkuid_link(bom_sku.getProduct_skuid_link());
 						porderbomsku.setType(POrderBomType.CanDoi);
 						porderbomskuService.save(porderbomsku);
 					} else {
 						POrderBOMSKU porderbomsku = list_porder_bom_sku.get(0);
-						porderbomsku.setAmount(bom_sku.getAmount());
-						porderbomskuService.save(porderbomsku);
+						if(porderbomsku.getProduct_type() != ProductType.SKU_TYPE_MATERIAL_MIN) {
+							porderbomsku.setAmount(bom_sku.getAmount());
+							porderbomskuService.save(porderbomsku);
+						}
+						
 					}
 				}
 			}

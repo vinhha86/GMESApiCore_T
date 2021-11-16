@@ -411,6 +411,11 @@ public class CutPlanAPI {
 					material_skuid_link, (long) 0, CutPlanRowType.sodocat, "");
 //			List<CutPlan_Size> list_sodo_catdu = cutplan_size_Service.getby_pcontract_product_matsku_productsku(pcontractid_link, productid_link,
 //					material_skuid_link, (long) 0, CutPlanRowType.catdu, "");
+			
+//			for (CutPlan_Size catdu : list_sodo_catdu) {
+//				sl_catdu = catdu.getAmount();
+//				
+//			}
 
 			for (CutPlan_Size yeucau : list_yeucau) {
 				List<CutPlan_Size> list_sodo_clone = new ArrayList<CutPlan_Size>(list_sodo);

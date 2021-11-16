@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -77,7 +78,14 @@ public class POrderBOMSKU implements Serializable {/**
 	public void setType(Integer type) {
 		this.type = type;
 	}
-
+	
+	@Transient
+	public int getProduct_type() {
+		if (material != null) {
+			return (int) material.getProducttypeid_link();
+		}
+		return 0;
+	}
 
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
