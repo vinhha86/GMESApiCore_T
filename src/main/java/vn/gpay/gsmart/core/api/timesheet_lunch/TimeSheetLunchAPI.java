@@ -37,6 +37,7 @@ import vn.gpay.gsmart.core.timesheet_shift_type.ITimesheetShiftTypeService;
 import vn.gpay.gsmart.core.timesheet_shift_type.TimesheetShiftType;
 import vn.gpay.gsmart.core.timesheet_shift_type_org.ITimesheetShiftTypeOrgService;
 import vn.gpay.gsmart.core.timesheet_shift_type_org.TimesheetShiftTypeOrg;
+import vn.gpay.gsmart.core.utils.GPAYDateFormat;
 import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -101,6 +102,23 @@ public class TimeSheetLunchAPI {
 //			cal.add(Calendar.DAY_OF_MONTH, -20);
 //			Date twentyDaysAgo = cal.getTime();
 			Date date = entity.date;
+			Date dateBegin = GPAYDateFormat.atStartOfDay(date);
+			Date dateEnd = GPAYDateFormat.atEndOfDay(date);
+			
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(dateBegin);
+			cal.set(Calendar.HOUR_OF_DAY, 0);
+			cal.set(Calendar.MINUTE, 0);
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MILLISECOND, 0);
+			dateBegin = cal.getTime();
+			cal.setTime(dateEnd);
+			cal.set(Calendar.HOUR_OF_DAY, 23);
+			cal.set(Calendar.MINUTE, 59);
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MILLISECOND, 0);
+			dateEnd = cal.getTime();
+			
 			Long orgid_link = entity.orgid_link;
 			for (GpayUserOrg userorg : list_userorg) {
 				list_org_id.add(userorg.getOrgid_link());
@@ -112,16 +130,19 @@ public class TimeSheetLunchAPI {
 			if (entity.orgid_link != orgrootid_link) {
 				// nếu quản lý nhiều tài khảon
 				if (list_org_id.size() > 1) {
-					listPersonnel = personnelService.getby_org(orgid_link, orgrootid_link);
+//					listPersonnel = personnelService.getby_org(orgid_link, orgrootid_link);
+					listPersonnel = personnelService.getTongLaoDongByDate(orgid_link, dateBegin, dateEnd);
 				} else {
 					// nếu có đơn vị con cụ thể
 					if (user.getOrg_grant_id_link() != null) {
 						lst_org = orgService.getOrgById(user.getOrg_grant_id_link());
 						if (lst_org.size() != 0) {
-							listPersonnel = personnelService.getby_org(user.getOrg_grant_id_link(), orgrootid_link);
+//							listPersonnel = personnelService.getby_org(user.getOrg_grant_id_link(), orgrootid_link);
+							listPersonnel = personnelService.getTongLaoDongByDate(user.getOrg_grant_id_link(), dateBegin, dateEnd);
 						}
 					} else {
-						listPersonnel = personnelService.getby_org(orgid_link, orgrootid_link);
+//						listPersonnel = personnelService.getby_org(orgid_link, orgrootid_link);
+						listPersonnel = personnelService.getTongLaoDongByDate(orgid_link, dateBegin, dateEnd);
 					}
 				}
 			}
