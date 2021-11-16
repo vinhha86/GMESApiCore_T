@@ -29,6 +29,15 @@ public interface PorderBomColor_Repository extends JpaRepository<PorderBomColor,
 			@Param ("colorid_link")final Long colorid_link,
 			@Param ("materialid_link")final Long materialid_link);
 	
+	@Query("SELECT c FROM PorderBomColor c where c.pcontractid_link = :pcontractid_link and productid_link = :productid_link "
+			+ "and c.colorid_link = :colorid_link "
+			+ "and c.materialid_link = :materialid_link")
+	public List<PorderBomColor> getby_pcontract_product_and_color_and_material(
+			@Param ("pcontractid_link")final Long pcontractid_link,
+			@Param ("productid_link")final Long productid_link,
+			@Param ("colorid_link")final Long colorid_link,
+			@Param ("materialid_link")final Long materialid_link);
+	
 	@Query("SELECT c FROM PorderBomColor c where c.porderid_link = :porderid_link and c.materialid_link = :materialid_link")
 	public List<PorderBomColor> getby_porder_and_material(
 			@Param ("porderid_link")final Long porderid_link,

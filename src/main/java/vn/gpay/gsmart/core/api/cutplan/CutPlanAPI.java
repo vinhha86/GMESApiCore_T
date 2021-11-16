@@ -27,7 +27,6 @@ import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOM2SKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
-import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 import vn.gpay.gsmart.core.sku.SKU_Attribute_Value;
@@ -58,15 +57,17 @@ public class CutPlanAPI {
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long material_skuid_link = entity.material_skuid_link;
-			Long porderid_link = entity.porderid_link;
+//			Long porderid_link = entity.porderid_link;
 			Long orgrootid_link = user.getRootorgid_link();
 			Long productid_link = entity.productid_link;
 			Long pcontractid_link = entity.pcontractid_link;
+			Long colorid_link = entity.colorid_link;
+			
 			Date current = new Date();
 
 			// Kiem tra xem npl da co so do hay chua
-			List<CutPlan_Size> list_cutplan = cutplan_size_Service.getby_sku_and_porder(material_skuid_link,
-					porderid_link, orgrootid_link);
+			List<CutPlan_Size> list_cutplan = cutplan_size_Service.getby_sku_and_pcontract_product(material_skuid_link,
+					pcontractid_link, productid_link, orgrootid_link);
 			if (list_cutplan.size() == 0) {
 				// them vao plan
 				// Lay danh sach sku cua san pham trong don hang
@@ -76,17 +77,17 @@ public class CutPlanAPI {
 				// Tao row cho cac mau truoc
 				List<Long> list_mau = new ArrayList<Long>();
 				for (PContractProductSKU pContractProductSKU : list_sku) {
-					if (list_mau.contains(pContractProductSKU.getColor_id()))
+					if (list_mau.contains(pContractProductSKU.getColor_id()) || list_mau.contains(colorid_link))
 						continue;
 
-					list_mau.add(pContractProductSKU.getColor_id());
+					list_mau.add(colorid_link);
 					CutPlan_Row row_yeucau = new CutPlan_Row();
 					row_yeucau.setCode("SL yêu cầu");
 					row_yeucau.setId(null);
 					row_yeucau.setName("SL yêu cầu");
 					row_yeucau.setType(CutPlanRowType.yeucau);
 					row_yeucau.setNgay(current);
-					row_yeucau.setPorderid_link(porderid_link);
+					row_yeucau.setPorderid_link(null);
 					row_yeucau.setMaterial_skuid_link(material_skuid_link);
 					row_yeucau.setCreateduserid_link(user.getId());
 					row_yeucau.setLa_vai(0);
@@ -105,7 +106,7 @@ public class CutPlanAPI {
 					row_catdu.setName("SL cắt dư");
 					row_catdu.setType(CutPlanRowType.catdu);
 					row_catdu.setNgay(current);
-					row_catdu.setPorderid_link(porderid_link);
+					row_catdu.setPorderid_link(null);
 					row_catdu.setMaterial_skuid_link(material_skuid_link);
 					row_catdu.setCreateduserid_link(user.getId());
 					row_catdu.setLa_vai(0);
@@ -120,9 +121,12 @@ public class CutPlanAPI {
 
 					// Tao size cho cac row
 					List<PContractProductSKU> list_sku_clone = new ArrayList<PContractProductSKU>(list_sku);
-					list_sku_clone.removeIf(c -> !c.getColor_id().equals(pContractProductSKU.getColor_id()));
-
+					list_sku_clone.removeIf(c -> !c.getColor_id().equals(colorid_link));
+					List<Long> listsku = new ArrayList<Long>();
 					for (PContractProductSKU sku : list_sku_clone) {
+						if(listsku.contains(sku.getSkuid_link())) continue;
+						
+						listsku.add(sku.getSkuid_link());
 						CutPlan_Size plan_yc = new CutPlan_Size();
 						plan_yc.setCutplanrowid_link(row_yeucau.getId());
 						plan_yc.setId(null);
@@ -384,8 +388,9 @@ public class CutPlanAPI {
 			Long colorid_link = entity.colorid_link;
 			Long sizeid_link = entity.sizeid_link;
 			Long productid_link = entity.productid_link;
-			Long porderid_link = entity.porderid_link;
+//			Long porderid_link = entity.porderid_link;
 			Long material_skuid_link = entity.material_skuid_link;
+			Long pcontractid_link = entity.pcontractid_link;
 
 			Long orgrootid_link = user.getRootorgid_link();
 
@@ -395,14 +400,17 @@ public class CutPlanAPI {
 			CutPlan_Row row = cutplanrowService.findOne(cutplanrowid_link);
 			// tinh so la vai
 
-			int la_vai = row.getLa_vai();
+			int la_vai = 0;
 			int sl_catdu = 0;
 
 			List<CutPlan_Size> list_sodo = cutplan_size_Service.getby_row(orgrootid_link, cutplanrowid_link);
-			List<CutPlan_Size> list_yeucau = cutplan_size_Service.getby_porder_matsku_productsku(porderid_link,
+			
+			List<CutPlan_Size> list_yeucau = cutplan_size_Service.getby_pcontract_product_matsku_productsku(pcontractid_link, productid_link,
 					material_skuid_link, (long) 0, CutPlanRowType.yeucau, "");
-			List<CutPlan_Size> list_sodo_all = cutplan_size_Service.getby_porder_matsku_productsku(porderid_link,
+			List<CutPlan_Size> list_sodo_all = cutplan_size_Service.getby_pcontract_product_matsku_productsku(pcontractid_link, productid_link,
 					material_skuid_link, (long) 0, CutPlanRowType.sodocat, "");
+//			List<CutPlan_Size> list_sodo_catdu = cutplan_size_Service.getby_pcontract_product_matsku_productsku(pcontractid_link, productid_link,
+//					material_skuid_link, (long) 0, CutPlanRowType.catdu, "");
 
 			for (CutPlan_Size yeucau : list_yeucau) {
 				List<CutPlan_Size> list_sodo_clone = new ArrayList<CutPlan_Size>(list_sodo);
@@ -486,8 +494,8 @@ public class CutPlanAPI {
 				List<CutPlan_Size> listsize_sodo_clone = new ArrayList<CutPlan_Size>(list_sodo);
 				listsize_sodo_clone.removeIf(c -> !c.getProduct_skuid_link().equals(size_yc.getProduct_skuid_link()));
 
-				List<CutPlan_Size> list_size_sodo_all = cutplan_size_Service.getby_porder_matsku_productsku(
-						porderid_link, material_skuid_link, size_yc.getProduct_skuid_link(), CutPlanRowType.sodocat,
+				List<CutPlan_Size> list_size_sodo_all = cutplan_size_Service.getby_pcontract_product_matsku_productsku(
+						pcontractid_link, productid_link, material_skuid_link, size_yc.getProduct_skuid_link(), CutPlanRowType.sodocat,
 						"");
 				for (CutPlan_Size sizesd : list_size_sodo_all) {
 					int amount_sd = sizesd.getAmount() == null ? 0 : sizesd.getAmount();
@@ -495,7 +503,7 @@ public class CutPlanAPI {
 					sodo += amount_sd * lavai_sd;
 				}
 
-				List<CutPlan_Size> listsize_catdu = cutplan_size_Service.getby_porder_matsku_productsku(porderid_link,
+				List<CutPlan_Size> listsize_catdu = cutplan_size_Service.getby_pcontract_product_matsku_productsku(pcontractid_link, productid_link,
 						material_skuid_link, size_yc.getProduct_skuid_link(), CutPlanRowType.catdu, "");
 				listsize_catdu.removeIf(c -> !c.getProduct_skuid_link().equals(size_yc.getProduct_skuid_link()));
 
@@ -506,8 +514,8 @@ public class CutPlanAPI {
 			}
 
 			// dong bo dinh muc
-			POrder porder = porderService.findOne(porderid_link);
-			cutplanrowService.sync_porder_bom(material_skuid_link, porder, colorid_link, user.getId(), orgrootid_link);
+//			POrder porder = porderService.findOne(porderid_link);
+			cutplanrowService.sync_porder_bom(material_skuid_link, pcontractid_link, productid_link, colorid_link, user.getId(), orgrootid_link);
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -527,13 +535,15 @@ public class CutPlanAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long cutplanrowid_link = entity.cutplanrowid_link;
 			Long orgrootid_link = user.getRootorgid_link();
-			Long porderid_link = entity.porderid_link;
+//			Long porderid_link = entity.porderid_link;
 			Long material_skuid_link = entity.material_skuid_link;
+			Long pcontractid_link  = entity.pcontractid_link;
+			Long productid_link = entity.productid_link;
 
 			// delete row
 			cutplanrowService.deleteById(cutplanrowid_link);
 
-			POrder porder = porderService.findOne(porderid_link);
+//			POrder porder = porderService.findOne(porderid_link);
 			// delete size in row
 			List<CutPlan_Size> list_size = cutplan_size_Service.getby_row(orgrootid_link, cutplanrowid_link);
 			for (CutPlan_Size cutPlan_Size : list_size) {
@@ -542,11 +552,11 @@ public class CutPlanAPI {
 				long product_skuid_link = cutPlan_Size.getProduct_skuid_link();
 
 				// Cap nhat lai so cat du
-				List<CutPlan_Size> listsize_yeucau = cutplan_size_Service.getby_porder_matsku_productsku(porderid_link,
+				List<CutPlan_Size> listsize_yeucau = cutplan_size_Service.getby_pcontract_product_matsku_productsku(pcontractid_link, productid_link,
 						material_skuid_link, product_skuid_link, CutPlanRowType.yeucau, "");
-				List<CutPlan_Size> listsize_catdu = cutplan_size_Service.getby_porder_matsku_productsku(porderid_link,
+				List<CutPlan_Size> listsize_catdu = cutplan_size_Service.getby_pcontract_product_matsku_productsku(pcontractid_link, productid_link,
 						material_skuid_link, product_skuid_link, CutPlanRowType.catdu, "");
-				List<CutPlan_Size> listsize_sodo = cutplan_size_Service.getby_porder_matsku_productsku(porderid_link,
+				List<CutPlan_Size> listsize_sodo = cutplan_size_Service.getby_pcontract_product_matsku_productsku(pcontractid_link, productid_link,
 						material_skuid_link, product_skuid_link, CutPlanRowType.sodocat, "");
 				int yeucau = listsize_yeucau.get(0).getAmount();
 				int sodo = 0;
@@ -570,7 +580,7 @@ public class CutPlanAPI {
 						colorid_link = value.getAttributevalueid_link();
 					}
 				}
-				cutplanrowService.sync_porder_bom(material_skuid_link, porder, colorid_link, user.getId(),
+				cutplanrowService.sync_porder_bom(material_skuid_link, pcontractid_link, productid_link, colorid_link, user.getId(),
 						orgrootid_link);
 			}
 
@@ -592,12 +602,14 @@ public class CutPlanAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long cutplanrowid_link = entity.data.getId();
 			Long orgrootid_link = user.getRootorgid_link();
-			Long porderid_link = entity.data.getPorderid_link();
+//			Long porderid_link = entity.data.getPorderid_link();
 			Long material_skuid_link = entity.data.getMaterial_skuid_link();
+			Long pcontractid_link = entity.data.getPcontractid_link();
+			Long productid_link = entity.data.getProductid_link();
 
 			cutplanrowService.save(entity.data);
 
-			POrder porder = porderService.findOne(porderid_link);
+//			POrder porder = porderService.findOne(porderid_link);
 
 			// Cap nhat lai cat du trong truong hop nhap lai so la
 			List<CutPlan_Size> list_size = cutplan_size_Service.getby_row(orgrootid_link, cutplanrowid_link);
@@ -606,11 +618,11 @@ public class CutPlanAPI {
 				long product_skuid_link = cutPlan_Size.getProduct_skuid_link();
 
 				// Cap nhat lai so cat du
-				List<CutPlan_Size> listsize_yeucau = cutplan_size_Service.getby_porder_matsku_productsku(porderid_link,
+				List<CutPlan_Size> listsize_yeucau = cutplan_size_Service.getby_pcontract_product_matsku_productsku(pcontractid_link, productid_link,
 						material_skuid_link, product_skuid_link, CutPlanRowType.yeucau, "");
-				List<CutPlan_Size> listsize_catdu = cutplan_size_Service.getby_porder_matsku_productsku(porderid_link,
+				List<CutPlan_Size> listsize_catdu = cutplan_size_Service.getby_pcontract_product_matsku_productsku(pcontractid_link, productid_link,
 						material_skuid_link, product_skuid_link, CutPlanRowType.catdu, "");
-				List<CutPlan_Size> listsize_sodo = cutplan_size_Service.getby_porder_matsku_productsku(porderid_link,
+				List<CutPlan_Size> listsize_sodo = cutplan_size_Service.getby_pcontract_product_matsku_productsku(pcontractid_link, productid_link,
 						material_skuid_link, product_skuid_link, CutPlanRowType.sodocat, "");
 				int yeucau = listsize_yeucau.get(0).getAmount();
 				int sodo = 0;
@@ -634,7 +646,7 @@ public class CutPlanAPI {
 						colorid_link = value.getAttributevalueid_link();
 					}
 				}
-				cutplanrowService.sync_porder_bom(material_skuid_link, porder, colorid_link, user.getId(),
+				cutplanrowService.sync_porder_bom(material_skuid_link, pcontractid_link, productid_link, colorid_link, user.getId(),
 						orgrootid_link);
 			}
 

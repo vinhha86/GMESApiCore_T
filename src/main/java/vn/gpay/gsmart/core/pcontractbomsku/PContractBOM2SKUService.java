@@ -77,4 +77,9 @@ public class PContractBOM2SKUService extends AbstractService<PContractBOM2SKU> i
 		// TODO Auto-generated method stub
 		return repo.getall_bypcontract_andproduct(productid_link, pcontractid_link);
 	}
+	@Override
+	public List<Long> getcolor_bypcontract_product(long pcontractid_link, long productid_link) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

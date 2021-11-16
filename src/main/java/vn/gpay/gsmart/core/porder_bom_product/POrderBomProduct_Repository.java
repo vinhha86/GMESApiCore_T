@@ -16,6 +16,10 @@ public interface POrderBomProduct_Repository extends JpaRepository<POrderBomProd
 	public List<POrderBomProduct> getby_porder(
 			@Param ("porderid_link")final Long porderid_link);
 	
+	@Query("SELECT c FROM POrderBomProduct c where c.pcontractid_link = :pcontractid_link and productid_link =:productid_link")
+	public List<POrderBomProduct> getby_pcontract_product(
+			@Param ("pcontractid_link")final Long pcontractid_link,@Param ("productid_link")final Long productid_link);
+	
 	@Query("SELECT c FROM POrderBomProduct c "
 			+ "inner join SKU a on c.materialid_link = a.id "
 			+ "inner join Product b on a.productid_link = b.id "
@@ -31,5 +35,12 @@ public interface POrderBomProduct_Repository extends JpaRepository<POrderBomProd
 			+ "and materialid_link = :material_skuid_link")
 	public List<POrderBomProduct> getby_porder_and_material(
 			@Param ("porderid_link")final Long porderid_link,
+			@Param ("material_skuid_link")final Long material_skuid_link);
+	
+	@Query("SELECT c FROM POrderBomProduct c "
+			+ "where c.pcontractid_link = :pcontractid_link and productid_link = :productid_link "
+			+ "and materialid_link = :material_skuid_link")
+	public List<POrderBomProduct> getby_pcontract_product_and_material(
+			@Param ("pcontractid_link")final Long pcontractid_link,@Param ("productid_link")final Long productid_link,
 			@Param ("material_skuid_link")final Long material_skuid_link);
 }

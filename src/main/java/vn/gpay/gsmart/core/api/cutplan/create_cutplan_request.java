@@ -5,4 +5,5 @@ public class create_cutplan_request {
 	public Long porderid_link;
 	public Long productid_link;
 	public Long pcontractid_link;
+	public Long colorid_link;
 }

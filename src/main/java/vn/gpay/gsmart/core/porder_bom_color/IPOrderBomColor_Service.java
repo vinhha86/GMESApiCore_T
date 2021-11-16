@@ -9,4 +9,5 @@ public interface IPOrderBomColor_Service extends Operations<PorderBomColor> {
 	public List<PorderBomColor> getby_porder_and_color(long porderid_link, long colorid_link);
 	public List<PorderBomColor> getby_porder_and_material(long porderid_link, long materialid_link);
 	public List<PorderBomColor> getby_porder_and_material_and_color(long porderid_link, long materialid_link, long colorid_link);
+	public List<PorderBomColor> getby_pcontract_product_and_material_and_color(long pcontractid_link, Long productid_link, long materialid_link, long colorid_link);
 }

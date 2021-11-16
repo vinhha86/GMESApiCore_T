@@ -37,5 +37,11 @@ public class PorderBomColor_Service extends AbstractService<PorderBomColor> impl
 		// TODO Auto-generated method stub
 		return repo.getby_porder_and_color_and_material(porderid_link, colorid_link, materialid_link);
 	}
+	@Override
+	public List<PorderBomColor> getby_pcontract_product_and_material_and_color(long pcontractid_link,
+			Long productid_link, long materialid_link, long colorid_link) {
+		// TODO Auto-generated method stub
+		return repo.getby_pcontract_product_and_color_and_material(pcontractid_link, productid_link, colorid_link, materialid_link);
+	}
 
 }

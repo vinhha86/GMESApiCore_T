@@ -7,6 +7,7 @@ public class update_size_amount_request {
 	public Long productid_link;
 	public Long colorid_link;
 	public Long sizeid_link;
+	public Long pcontractid_link;
 	public Integer amount;
 	public Integer amount_old;
 }
