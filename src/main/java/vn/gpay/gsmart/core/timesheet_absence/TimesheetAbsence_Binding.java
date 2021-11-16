@@ -10,6 +10,7 @@ public class TimesheetAbsence_Binding {
 	private Integer nghi1phan2;
 	private Integer nghiKhongPhep;
 	private Integer nghiCachLy;
+	private Integer nghiConLai;
 	public Long getOrgid_link() {
 		return orgid_link;
 	}
@@ -63,5 +64,11 @@ public class TimesheetAbsence_Binding {
 	}
 	public void setNghiCachLy(Integer nghiCachLy) {
 		this.nghiCachLy = nghiCachLy;
+	}
+	public Integer getNghiConLai() {
+		return nghiConLai;
+	}
+	public void setNghiConLai(Integer nghiConLai) {
+		this.nghiConLai = nghiConLai;
 	}
 }

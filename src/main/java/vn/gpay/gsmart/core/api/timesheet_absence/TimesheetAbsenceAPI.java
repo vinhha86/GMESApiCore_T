@@ -497,13 +497,42 @@ public class TimesheetAbsenceAPI {
 				Integer nghiCachLy = timesheetAbsence_list.size();
 				newTimesheetAbsence_Binding.setNghiCachLy(nghiCachLy);
 				
-				// soCoMat = tongLaoDong - soTongNghi + nghi1phan2
+				// nghConLai (not in 5,14,15)
+				List<Long> list_type = new ArrayList<Long>();
+				list_type.add((long) 5);
+				list_type.add((long) 14);
+				list_type.add((long) 15);
+				timesheetAbsence_list = timesheetAbsenceService.getNghiPhepTheoNgay_ConLai(orgmanagerid_link, dateBegin, dateEnd, list_type);
+				Integer nghiConLai = timesheetAbsence_list.size();
+				newTimesheetAbsence_Binding.setNghiConLai(nghiConLai);
+				
+				// soCoMat = tongLaoDong - soTongNghi
+				// ko + nghi1phan2 (1/2 van tinh la la nghi)
 				personel_list = personnelService.getTongLaoDongNghiByDate(orgmanagerid_link, dateBegin, dateEnd);
 				Integer soTongNghi = personel_list.size();
-				Integer soCoMat = tongLaoDong - soTongNghi + nghi1phan2;
+//				Integer soCoMat = tongLaoDong - soTongNghi + nghi1phan2;
+//				Integer soCoMat = tongLaoDong - soTongNghi;
+				Integer soCoMat = tongLaoDong - nghiConLai - nghiCachLy - nghiKhongPhep - nghiPhep;
+				
+//				System.out.println("--------");
+//				System.out.println(soCoMat);
+//				System.out.println(soCoMat2);
+				
 				newTimesheetAbsence_Binding.setSoCoMat(soCoMat);
 				
-
+//				if(personel_list.size() > 0 && org.getName().equals("Bắc Ninh 2")) {
+//					for(Personel p : personel_list) {
+//						System.out.println(p.getFullname());
+//					}
+//					System.out.println(tongLaoDong);
+//					System.out.println(soTongNghi);
+//					System.out.println(nghi1phan2);
+//					System.out.println(dateBegin);
+//					System.out.println(dateEnd);
+//					System.out.println(org.getId());
+//				}
+				
+				
 				//
 				result.add(newTimesheetAbsence_Binding);
 			}

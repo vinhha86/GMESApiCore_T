@@ -105,6 +105,21 @@ public interface ITimesheetAbsenceRepository
 	@Query(value = "select c from TimesheetAbsence c " 
 			+ " inner join Personel b on c.personnelid_link = b.id "
 			+ " where b.orgmanagerid_link = :orgmanagerid_link "
+			+ " and c.absencetypeid_link not in :absencetypeid_link_list "
+			+ " and c.absencedate_from <= :dateEnd "
+			+ " and c.absencedate_to >= :dateBegin "
+			+ " and (b.date_endworking is null or b.date_endworking >= :dateEnd) "
+			)
+	public List<TimesheetAbsence> getNghiPhepTheoNgay_ConLai(
+			@Param("orgmanagerid_link") final Long orgmanagerid_link,
+			@Param("dateBegin") final Date dateBegin, 
+			@Param("dateEnd") final Date dateEnd,
+			@Param("absencetypeid_link_list") final List<Long> absencetypeid_link_list
+			);
+	
+	@Query(value = "select c from TimesheetAbsence c " 
+			+ " inner join Personel b on c.personnelid_link = b.id "
+			+ " where b.orgmanagerid_link = :orgmanagerid_link "
 			+ " and ( (c.absencedate_from >= :caFrom1 and c.absencedate_to <= :caTo1) or (c.absencedate_from >= :caFrom2 and c.absencedate_to <= :caTo2) ) "
 			)
 	public List<TimesheetAbsence> getNghi1Phan2TheoNgay(

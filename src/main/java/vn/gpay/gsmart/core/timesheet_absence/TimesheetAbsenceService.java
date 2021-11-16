@@ -81,6 +81,12 @@ public class TimesheetAbsenceService extends AbstractService<TimesheetAbsence> i
 	}
 
 	@Override
+	public List<TimesheetAbsence> getNghiPhepTheoNgay_ConLai(Long orgmanagerid_link, Date dateBegin, Date dateEnd,
+			List<Long> absencetypeid_link_list) {
+		return repo.getNghiPhepTheoNgay_ConLai(orgmanagerid_link, dateBegin, dateEnd, absencetypeid_link_list);
+	}
+
+	@Override
 	public List<TimesheetAbsence> getNghi1Phan2TheoNgay(Long orgmanagerid_link, Date caFrom1, Date caTo1, Date caFrom2,
 			Date caTo2) {
 		return repo.getNghi1Phan2TheoNgay(orgmanagerid_link, caFrom1, caTo1, caFrom2, caTo2);

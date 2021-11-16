@@ -25,5 +25,6 @@ public interface ITimesheetAbsenceService extends Operations<TimesheetAbsence> {
 	public List<TimesheetAbsence> getByOrgAndDate(Long orgid_link, Date date);
 	public List<TimesheetAbsence> GetByOrgPhongBanAndDate(Long orgid_link, Date date);
 	public List<TimesheetAbsence> getNghiPhepTheoNgay(Long orgmanagerid_link, Date dateBegin, Date dateEnd, Long absencetypeid_link);
+	public List<TimesheetAbsence> getNghiPhepTheoNgay_ConLai(Long orgmanagerid_link, Date dateBegin, Date dateEnd, List<Long> absencetypeid_link_list);
 	public List<TimesheetAbsence> getNghi1Phan2TheoNgay(Long orgmanagerid_link, Date caFrom1, Date caTo1, Date caFrom2, Date caTo2);
 }
