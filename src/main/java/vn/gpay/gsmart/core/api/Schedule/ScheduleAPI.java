@@ -518,7 +518,7 @@ public class ScheduleAPI {
 
 			// log lai
 			Log4jCommon.move_pordergrant(user.getUsername(), grant.getId(), entity.orggrant_toid_link,
-					entity.orggrant_toid_link, "move_porder");
+					entity.orggrant_toid_link, "move_porder", grant.getProductcode());
 
 			// Cap nhat lai Porder_processing
 			List<POrderProcessing> lsProcessing = processService.getByOrderId_and_GrantId(porderid_link,
@@ -663,7 +663,7 @@ public class ScheduleAPI {
 
 			// log lai
 			Log4jCommon.move_pordergrant(user.getUsername(), pg.getId(), entity.orggrantto, entity.orggrantto,
-					"create_pordergrant");
+					"create_pordergrant", porder.getProductcode());
 
 			// Lay toan bo SKU tu POrder sang POrder_grant_sku
 			for (POrder_Product_SKU pSKU : porder.getPorder_product_sku()) {
@@ -809,7 +809,7 @@ public class ScheduleAPI {
 
 			// log lai
 			Log4jCommon.move_pordergrant(user.getUsername(), pg.getId(), entity.orggrantto, entity.orggrantto,
-					"create_pordergrant_test");
+					"create_pordergrant_test", porder.getProductcode());
 
 			PContract contract = req.getPcontract();
 			PContract_PO po = req.getPcontract_po();
@@ -1002,7 +1002,7 @@ public class ScheduleAPI {
 
 				// log lai
 				Log4jCommon.move_pordergrant(user.getUsername(), pg.getId(), entity.orggrantto, entity.orggrantto,
-						"create_many_pordergrant_test");
+						"create_many_pordergrant_test", porder.getProductcode());
 
 				PContract contract = req.getPcontract();
 				PContract_PO po = req.getPcontract_po();
@@ -1145,7 +1145,7 @@ public class ScheduleAPI {
 
 				// log lai
 				Log4jCommon.move_pordergrant(user.getUsername(), pg.getId(), entity.orggrantto, entity.orggrantto,
-						"create_many_pordergrant");
+						"create_many_pordergrant", porder.getProductcode());
 
 				// Lay toan bo SKU tu POrder sang POrder_grant_sku
 				for (POrder_Product_SKU pSKU : porder.getPorder_product_sku()) {
@@ -1549,7 +1549,7 @@ public class ScheduleAPI {
 
 			// log lai
 			Log4jCommon.move_pordergrant(user.getUsername(), grant_des.getId(), grant_des.getGranttoorgid_link(),
-					grant_des.getGranttoorgid_link(), "merger_porder/1551");
+					grant_des.getGranttoorgid_link(), "merger_porder/1551", grant_des.getProductcode());
 
 			Schedule_porder sch = entity.sch;
 			sch.setStartDate(start);
@@ -1720,7 +1720,7 @@ public class ScheduleAPI {
 
 				// log lai
 				Log4jCommon.move_pordergrant(user.getUsername(), grant.getId(), entity.orggrantid_link,
-						entity.orggrantid_link, "create_porder_and_grant");
+						entity.orggrantid_link, "create_porder_and_grant", porder.getProductcode());
 
 				// them grant_sku
 				for (PContractProductSKU po_sku : list_po_sku) {
@@ -1911,7 +1911,7 @@ public class ScheduleAPI {
 
 						// log lai
 						Log4jCommon.move_pordergrant(user.getUsername(), grant.getId(), entity.orggrantid_link,
-								entity.orggrantid_link, "create_many_porder_and_grant");
+								entity.orggrantid_link, "create_many_porder_and_grant", porder.getProductcode());
 
 						// danh dau po da map
 						POrder_POLine porder_poline = new POrder_POLine();
@@ -2079,7 +2079,7 @@ public class ScheduleAPI {
 
 					// log lai
 					Log4jCommon.move_pordergrant(user.getUsername(), grant.getId(), entity.orggrantid_link,
-							entity.orggrantid_link, "create_many_porder_and_grant/merger");
+							entity.orggrantid_link, "create_many_porder_and_grant/merger", porder.getProductcode());
 
 				}
 
@@ -2344,7 +2344,7 @@ public class ScheduleAPI {
 
 				// log lai
 				Log4jCommon.move_pordergrant(user.getUsername(), grant.getId(), grant_old.getGranttoorgid_link(),
-						grant_old.getGranttoorgid_link(), "break_porder");
+						grant_old.getGranttoorgid_link(), "break_porder", porder.getProductcode());
 
 				// Sinh 1 dong moi trong Processing
 				POrderProcessing process = new POrderProcessing();

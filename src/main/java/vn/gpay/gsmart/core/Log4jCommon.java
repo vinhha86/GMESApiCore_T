@@ -16,8 +16,8 @@ public class Log4jCommon {
 	}
 
 	public static void move_pordergrant(String username, Long grantid, Long orggrantto, Long orggrantfrom,
-			String function) {
+			String function, String masp) {
 		LOGGER.info(formatter.format(new Date()) + "/" + function + " - User: " + username + " - orggrantto: "
-				+ orggrantto + " - orggrantfrom: " + orggrantfrom);
+				+ orggrantto + " - orggrantfrom: " + orggrantfrom + " - masp: " + masp);
 	}
 }
