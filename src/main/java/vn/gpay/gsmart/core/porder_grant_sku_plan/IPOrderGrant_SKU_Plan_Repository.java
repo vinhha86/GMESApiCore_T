@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 public interface IPOrderGrant_SKU_Plan_Repository extends JpaRepository<POrderGrant_SKU_Plan, Long>, JpaSpecificationExecutor<POrderGrant_SKU_Plan>{
-	@Query(value = "select a from POrderGrant_SKU_Plan a " 
+	@Query(value = "select distinct a from POrderGrant_SKU_Plan a " 
 			+ "inner join POrderGrant_SKU b on a.porder_grant_skuid_link = b.id "
 			+ "inner join POrderGrant c on b.pordergrantid_link = c.id "
 			+ "where c.id = :porder_grantid_link "
@@ -61,5 +61,21 @@ public interface IPOrderGrant_SKU_Plan_Repository extends JpaRepository<POrderGr
 	public List<POrderGrant_SKU_Plan> getByPOrderGrant_SKU_NotId(
 			@Param("porder_grant_skuid_link") final Long porder_grant_skuid_link,
 			@Param("id") final Long id
+			);
+	
+	@Query(value = "select distinct a.date from POrderGrant_SKU_Plan a " 
+			+ "inner join POrderGrant_SKU b on a.porder_grant_skuid_link = b.id "
+			+ "inner join POrderGrant c on b.pordergrantid_link = c.id "
+			+ "where c.id = :porder_grantid_link "
+			+ "and (date(a.date) >= date(:dateFrom) or date(:dateFrom) is null) "
+			+ "and (date(a.date) <= date(:dateTo) or date(:dateTo) is null) "
+			+ "and (a.is_ordered is null or a.is_ordered is false ) "
+			+ "and a.amount > 0 "
+			+ "order by a.date asc "
+			)
+	public List<Date> getDate_ChuaYeuCau(
+			@Param("porder_grantid_link") final Long porder_grantid_link,
+			@Param("dateFrom") final Date dateFrom,
+			@Param("dateTo") final Date dateTo
 			);
 }

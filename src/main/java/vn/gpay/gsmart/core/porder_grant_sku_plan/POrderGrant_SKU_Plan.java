@@ -31,6 +31,7 @@ public class POrderGrant_SKU_Plan implements Serializable{
 	private Long porder_grant_skuid_link;
 	private Date date;
 	private Integer amount;
+	private Boolean is_ordered;
 	
 	@Transient
 	public String skuCode;
@@ -69,6 +70,12 @@ public class POrderGrant_SKU_Plan implements Serializable{
 	}
 	public void setAmount(Integer amount) {
 		this.amount = amount;
+	}
+	public Boolean getIs_ordered() {
+		return is_ordered;
+	}
+	public void setIs_ordered(Boolean is_ordered) {
+		this.is_ordered = is_ordered;
 	}
 	public String getSkuCode() {
 		return skuCode;

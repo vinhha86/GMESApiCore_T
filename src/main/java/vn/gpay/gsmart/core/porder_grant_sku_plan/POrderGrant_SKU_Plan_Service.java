@@ -41,4 +41,9 @@ public class POrderGrant_SKU_Plan_Service extends AbstractService<POrderGrant_SK
 		return repo.getByPOrderGrant_SKU_NotId(porder_grant_skuid_link, id);
 	}
 
+	@Override
+	public List<Date> getDate_ChuaYeuCau(Long porder_grantid_link, Date dateFrom, Date dateTo) {
+		return repo.getDate_ChuaYeuCau(porder_grantid_link, dateFrom, dateTo);
+	}
+
 }
