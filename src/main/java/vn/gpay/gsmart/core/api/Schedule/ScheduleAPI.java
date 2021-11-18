@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.gpay.gsmart.core.Log4jCommon;
 import vn.gpay.gsmart.core.Schedule.Schedule_holiday;
 import vn.gpay.gsmart.core.Schedule.Schedule_plan;
 import vn.gpay.gsmart.core.Schedule.Schedule_porder;
@@ -125,6 +126,8 @@ public class ScheduleAPI {
 	ISizeSetAttributeRepository sizesetatt_repo;
 	@Autowired
 	ISKU_AttValue_Repository sku_av_repo;
+	@Autowired
+	Log4jCommon logcommon;
 
 	@RequestMapping(value = "/getplan", method = RequestMethod.POST)
 	public ResponseEntity<get_schedule_porder_response> GetAll(HttpServletRequest request, @RequestParam String listid,
@@ -513,6 +516,10 @@ public class ScheduleAPI {
 			grant.setType(type);
 			grant = granttService.save(grant);
 
+			// log lai
+			Log4jCommon.move_pordergrant(user.getUsername(), grant.getId(), entity.orggrant_toid_link,
+					entity.orggrant_toid_link, "move_porder", grant.getProductcode());
+
 			// Cap nhat lai Porder_processing
 			List<POrderProcessing> lsProcessing = processService.getByOrderId_and_GrantId(porderid_link,
 					pordergrantid_link);
@@ -653,6 +660,10 @@ public class ScheduleAPI {
 			pg.setType(type);
 
 			pg = granttService.save(pg);
+
+			// log lai
+			Log4jCommon.move_pordergrant(user.getUsername(), pg.getId(), entity.orggrantto, entity.orggrantto,
+					"create_pordergrant", porder.getProductcode());
 
 			// Lay toan bo SKU tu POrder sang POrder_grant_sku
 			for (POrder_Product_SKU pSKU : porder.getPorder_product_sku()) {
@@ -795,6 +806,10 @@ public class ScheduleAPI {
 			pg.setTotalamount_tt(req.getTotalorder());
 			pg.setType(type);
 			pg = granttService.save(pg);
+
+			// log lai
+			Log4jCommon.move_pordergrant(user.getUsername(), pg.getId(), entity.orggrantto, entity.orggrantto,
+					"create_pordergrant_test", porder.getProductcode());
 
 			PContract contract = req.getPcontract();
 			PContract_PO po = req.getPcontract_po();
@@ -985,6 +1000,10 @@ public class ScheduleAPI {
 				pg.setType(type);
 				pg = granttService.save(pg);
 
+				// log lai
+				Log4jCommon.move_pordergrant(user.getUsername(), pg.getId(), entity.orggrantto, entity.orggrantto,
+						"create_many_pordergrant_test", porder.getProductcode());
+
 				PContract contract = req.getPcontract();
 				PContract_PO po = req.getPcontract_po();
 				Product product = req.getProduct();
@@ -1123,6 +1142,10 @@ public class ScheduleAPI {
 				pg.setType(type);
 
 				pg = granttService.save(pg);
+
+				// log lai
+				Log4jCommon.move_pordergrant(user.getUsername(), pg.getId(), entity.orggrantto, entity.orggrantto,
+						"create_many_pordergrant", porder.getProductcode());
 
 				// Lay toan bo SKU tu POrder sang POrder_grant_sku
 				for (POrder_Product_SKU pSKU : porder.getPorder_product_sku()) {
@@ -1524,6 +1547,10 @@ public class ScheduleAPI {
 			grant_des.setType(type);
 			grant_des = granttService.save(grant_des);
 
+			// log lai
+			Log4jCommon.move_pordergrant(user.getUsername(), grant_des.getId(), grant_des.getGranttoorgid_link(),
+					grant_des.getGranttoorgid_link(), "merger_porder/1551", grant_des.getProductcode());
+
 			Schedule_porder sch = entity.sch;
 			sch.setStartDate(start);
 			sch.setEndDate(end);
@@ -1690,6 +1717,10 @@ public class ScheduleAPI {
 				grant.setTotalamount_tt(entity.quantity);
 				grant = granttService.save(grant);
 				pordergrantid_link = grant.getId();
+
+				// log lai
+				Log4jCommon.move_pordergrant(user.getUsername(), grant.getId(), entity.orggrantid_link,
+						entity.orggrantid_link, "create_porder_and_grant", porder.getProductcode());
 
 				// them grant_sku
 				for (PContractProductSKU po_sku : list_po_sku) {
@@ -1878,6 +1909,10 @@ public class ScheduleAPI {
 						grant = granttService.save(grant);
 						pordergrantid_link = grant.getId();
 
+						// log lai
+						Log4jCommon.move_pordergrant(user.getUsername(), grant.getId(), entity.orggrantid_link,
+								entity.orggrantid_link, "create_many_porder_and_grant", porder.getProductcode());
+
 						// danh dau po da map
 						POrder_POLine porder_poline = new POrder_POLine();
 						porder_poline.setId(null);
@@ -2041,6 +2076,10 @@ public class ScheduleAPI {
 					grant.setTotalamount_tt(total);
 					grant = granttService.save(grant);
 					pordergrantid_link = grant.getId();
+
+					// log lai
+					Log4jCommon.move_pordergrant(user.getUsername(), grant.getId(), entity.orggrantid_link,
+							entity.orggrantid_link, "create_many_porder_and_grant/merger", porder.getProductcode());
 
 				}
 
@@ -2302,6 +2341,10 @@ public class ScheduleAPI {
 				grant.setType(type_new);
 				grant.setTotalamount_tt(entity.quantity);
 				grant = granttService.save(grant);
+
+				// log lai
+				Log4jCommon.move_pordergrant(user.getUsername(), grant.getId(), grant_old.getGranttoorgid_link(),
+						grant_old.getGranttoorgid_link(), "break_porder", porder.getProductcode());
 
 				// Sinh 1 dong moi trong Processing
 				POrderProcessing process = new POrderProcessing();

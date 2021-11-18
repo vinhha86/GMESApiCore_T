@@ -312,7 +312,8 @@ public class POrderBomAPI {
 			for (PContractProductBom2 bom_product : list_bom_product) {
 				// kiem tra npl co chua thi them vao bang pcontract_bom_product
 				List<POrderBomProduct> list_porder_bom_product = porderbomproductService
-						.getby_pcontract_product_and_material(pcontractid_link, productid_link, bom_product.getMaterialid_link());
+						.getby_pcontract_product_and_material(pcontractid_link, productid_link,
+								bom_product.getMaterialid_link());
 				if (list_porder_bom_product.size() == 0) {
 					POrderBomProduct porder_bom_product = new POrderBomProduct();
 					porder_bom_product.setAmount(bom_product.getAmount());
@@ -330,11 +331,11 @@ public class POrderBomAPI {
 					porderbomproductService.save(porder_bom_product);
 				} else {
 					POrderBomProduct porder_bom_product = list_porder_bom_product.get(0);
-					if(porder_bom_product.getProduct_type() != ProductType.SKU_TYPE_MATERIAL_MIN) {
+					if (porder_bom_product.getProduct_type() != ProductType.SKU_TYPE_MATERIAL_MIN) {
 						porder_bom_product.setAmount(bom_product.getAmount());
 						porderbomproductService.save(porder_bom_product);
 					}
-					
+
 				}
 			}
 
@@ -345,73 +346,74 @@ public class POrderBomAPI {
 //			}
 
 			// dong bo tu pcontract_bom_color
-			if (pp.get(0).getIsbom2done()) {
-				response.isbomdone = true;
-				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+//			if (pp.get(0).getIsbom2done()) {
+			response.isbomdone = true;
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 
-				List<PContractBom2Color> list_bom_color = pcontractbomcolorService.getall_byproduct(pcontractid_link,
-						productid_link);
-				for (PContractBom2Color bom_color : list_bom_color) {
-					List<PorderBomColor> list_porder_bom_color = porderbomcolorService
-							.getby_pcontract_product_and_material_and_color(pcontractid_link, productid_link, bom_color.getMaterialid_link(),
-									bom_color.getColorid_link());
-					if (list_porder_bom_color.size() == 0) {
-						PorderBomColor porderbomcolor = new PorderBomColor();
+			List<PContractBom2Color> list_bom_color = pcontractbomcolorService.getall_byproduct(pcontractid_link,
+					productid_link);
+			for (PContractBom2Color bom_color : list_bom_color) {
+				List<PorderBomColor> list_porder_bom_color = porderbomcolorService
+						.getby_pcontract_product_and_material_and_color(pcontractid_link, productid_link,
+								bom_color.getMaterialid_link(), bom_color.getColorid_link());
+				if (list_porder_bom_color.size() == 0) {
+					PorderBomColor porderbomcolor = new PorderBomColor();
+					porderbomcolor.setAmount(bom_color.getAmount());
+					porderbomcolor.setColorid_link(bom_color.getColorid_link());
+					porderbomcolor.setCreateddate(new Date());
+					porderbomcolor.setDescription(bom_color.getDescription());
+					porderbomcolor.setId(null);
+					porderbomcolor.setMaterialid_link(bom_color.getMaterialid_link());
+					porderbomcolor.setOrgrootid_link(orgrootid_link);
+					porderbomcolor.setPcontractid_link(pcontractid_link);
+					porderbomcolor.setPorderid_link(null);
+					porderbomcolor.setProductid_link(productid_link);
+					porderbomcolorService.save(porderbomcolor);
+				} else {
+					PorderBomColor porderbomcolor = list_porder_bom_color.get(0);
+					if (porderbomcolor.getProduct_type() != ProductType.SKU_TYPE_MATERIAL_MIN) {
 						porderbomcolor.setAmount(bom_color.getAmount());
-						porderbomcolor.setColorid_link(bom_color.getColorid_link());
-						porderbomcolor.setCreateddate(new Date());
-						porderbomcolor.setDescription(bom_color.getDescription());
-						porderbomcolor.setId(null);
-						porderbomcolor.setMaterialid_link(bom_color.getMaterialid_link());
-						porderbomcolor.setOrgrootid_link(orgrootid_link);
-						porderbomcolor.setPcontractid_link(pcontractid_link);
-						porderbomcolor.setPorderid_link(null);
-						porderbomcolor.setProductid_link(productid_link);
 						porderbomcolorService.save(porderbomcolor);
-					} else {
-						PorderBomColor porderbomcolor = list_porder_bom_color.get(0);
-						if(porderbomcolor.getProduct_type() != ProductType.SKU_TYPE_MATERIAL_MIN) {
-							porderbomcolor.setAmount(bom_color.getAmount());
-							porderbomcolorService.save(porderbomcolor);
-						}
-						
 					}
-				}
 
-				// dong bo tu pcontract_bom_sku
-				List<PContractBOM2SKU> list_p_bom_sku = pcontractbomskuService
-						.getbypcontract_and_product(pcontractid_link, productid_link);
-				for (PContractBOM2SKU bom_sku : list_p_bom_sku) {
-					List<POrderBOMSKU> list_porder_bom_sku = porderbomskuService
-							.getby_pcontract_product_and_material_and_sku_and_type(pcontractid_link, productid_link, bom_sku.getMaterial_skuid_link(),
-									bom_sku.getProduct_skuid_link(), POrderBomType.CanDoi);
-
-					if (list_porder_bom_sku.size() == 0) {
-						POrderBOMSKU porderbomsku = new POrderBOMSKU();
-						porderbomsku.setAmount(bom_sku.getAmount());
-						porderbomsku.setCreateddate(new Date());
-						porderbomsku.setCreateduserid_link(user.getId());
-						porderbomsku.setDescription(bom_sku.getDescription());
-						porderbomsku.setId(null);
-						porderbomsku.setLost_ratio(bom_sku.getLost_ratio());
-						porderbomsku.setMaterialid_link(bom_sku.getMaterial_skuid_link());
-						porderbomsku.setOrgrootid_link(orgrootid_link);
-						porderbomsku.setPcontractid_link(pcontractid_link);
-						porderbomsku.setPorderid_link(null);
-						porderbomsku.setProductid_link(productid_link);
-						porderbomsku.setSkuid_link(bom_sku.getProduct_skuid_link());
-						porderbomsku.setType(POrderBomType.CanDoi);
-						porderbomskuService.save(porderbomsku);
-					} else {
-						POrderBOMSKU porderbomsku = list_porder_bom_sku.get(0);
-						if(porderbomsku.getProduct_type() != ProductType.SKU_TYPE_MATERIAL_MIN) {
-							porderbomsku.setAmount(bom_sku.getAmount());
-							porderbomskuService.save(porderbomsku);
-						}
-						
-					}
 				}
 			}
+
+			// dong bo tu pcontract_bom_sku
+			List<PContractBOM2SKU> list_p_bom_sku = pcontractbomskuService.getbypcontract_and_product(pcontractid_link,
+					productid_link);
+			for (PContractBOM2SKU bom_sku : list_p_bom_sku) {
+				List<POrderBOMSKU> list_porder_bom_sku = porderbomskuService
+						.getby_pcontract_product_and_material_and_sku_and_type(pcontractid_link, productid_link,
+								bom_sku.getMaterial_skuid_link(), bom_sku.getProduct_skuid_link(),
+								POrderBomType.CanDoi);
+
+				if (list_porder_bom_sku.size() == 0) {
+					POrderBOMSKU porderbomsku = new POrderBOMSKU();
+					porderbomsku.setAmount(bom_sku.getAmount());
+					porderbomsku.setCreateddate(new Date());
+					porderbomsku.setCreateduserid_link(user.getId());
+					porderbomsku.setDescription(bom_sku.getDescription());
+					porderbomsku.setId(null);
+					porderbomsku.setLost_ratio(bom_sku.getLost_ratio());
+					porderbomsku.setMaterialid_link(bom_sku.getMaterial_skuid_link());
+					porderbomsku.setOrgrootid_link(orgrootid_link);
+					porderbomsku.setPcontractid_link(pcontractid_link);
+					porderbomsku.setPorderid_link(null);
+					porderbomsku.setProductid_link(productid_link);
+					porderbomsku.setSkuid_link(bom_sku.getProduct_skuid_link());
+					porderbomsku.setType(POrderBomType.CanDoi);
+					porderbomskuService.save(porderbomsku);
+				} else {
+					POrderBOMSKU porderbomsku = list_porder_bom_sku.get(0);
+					if (porderbomsku.getProduct_type() != ProductType.SKU_TYPE_MATERIAL_MIN) {
+						porderbomsku.setAmount(bom_sku.getAmount());
+						porderbomskuService.save(porderbomsku);
+					}
+
+				}
+			}
+//			}
 
 			// Xoa porder_bom_sku
 //			List<POrderBOMSKU> list_bom_sku = porderbomskuService.getByPOrderID(porderid_link);
@@ -549,19 +551,22 @@ public class POrderBomAPI {
 			List<Map<String, String>> listdata = new ArrayList<Map<String, String>>();
 
 //			List<Long> list_colorid = porder_sku_Service.getlist_colorid_byporder(porderid_link);
-			List<Long> list_colorid = pcontractskuServie.getlistvalue_by_product(pcontractid_link, productid_link, AtributeFixValues.ATTR_COLOR);
+			List<Long> list_colorid = pcontractskuServie.getlistvalue_by_product(pcontractid_link, productid_link,
+					AtributeFixValues.ATTR_COLOR);
 
-			List<POrderBomProduct> listbom = porderbomproductService.getby_pcontract_product(pcontractid_link, productid_link);
-			List<POrderBOMSKU> listbomsku = porderbomskuService.getByPContract_ProductID_and_type(pcontractid_link, productid_link,
-					POrderBomType.CanDoi);
-			List<POrderBOMSKU> listbomsku_kythuat = porderbomskuService.getByPContract_ProductID_and_type(pcontractid_link, productid_link,
-					POrderBomType.Kythuat);
-			List<POrderBOMSKU> listbomsku_sanxuat = porderbomskuService.getByPContract_ProductID_and_type(pcontractid_link, productid_link,
-					POrderBomType.SanXuat);
+			List<POrderBomProduct> listbom = porderbomproductService.getby_pcontract_product(pcontractid_link,
+					productid_link);
+			List<POrderBOMSKU> listbomsku = porderbomskuService.getByPContract_ProductID_and_type(pcontractid_link,
+					productid_link, POrderBomType.CanDoi);
+			List<POrderBOMSKU> listbomsku_kythuat = porderbomskuService
+					.getByPContract_ProductID_and_type(pcontractid_link, productid_link, POrderBomType.Kythuat);
+			List<POrderBOMSKU> listbomsku_sanxuat = porderbomskuService
+					.getByPContract_ProductID_and_type(pcontractid_link, productid_link, POrderBomType.SanXuat);
 
 //			List<Long> List_size = porder_sku_Service.getvalue_by_attribute(porderid_link, AtributeFixValues.ATTR_SIZE);
-			List<Long> List_size = pcontractskuServie.getlistvalue_by_product(pcontractid_link, productid_link, AtributeFixValues.ATTR_SIZE);
-			
+			List<Long> List_size = pcontractskuServie.getlistvalue_by_product(pcontractid_link, productid_link,
+					AtributeFixValues.ATTR_SIZE);
+
 			List<Attributevalue> listav = avService.getlist_byidAttribute(AtributeFixValues.ATTR_COLOR);
 			Map<Long, String> mapcolor = new HashMap<>();
 			for (Attributevalue av : listav) {
@@ -597,7 +602,7 @@ public class POrderBomAPI {
 		}
 		return new ResponseEntity<getbom2sku_by_porder_response>(response, HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/getbom_by_pcontract_product", method = RequestMethod.POST)
 	public ResponseEntity<getbom2sku_by_porder_response> GetBomByPContractProduct(HttpServletRequest request,
 			@RequestBody getbomskuKT_by_pcontract_product_request entity) {
@@ -612,18 +617,21 @@ public class POrderBomAPI {
 			List<Map<String, String>> listdata = new ArrayList<Map<String, String>>();
 
 //			List<Long> list_colorid = porder_sku_Service.getlist_colorid_byporder(porderid_link);
-			List<Long> list_colorid = pcontractskuServie.getlistvalue_by_product(pcontractid_link, productid_link, AtributeFixValues.ATTR_COLOR);
+			List<Long> list_colorid = pcontractskuServie.getlistvalue_by_product(pcontractid_link, productid_link,
+					AtributeFixValues.ATTR_COLOR);
 
-			List<POrderBomProduct> listbom = porderbomproductService.getby_pcontract_product(pcontractid_link, productid_link);
-			List<POrderBOMSKU> listbomsku = porderbomskuService.getByPContract_ProductID_and_type(pcontractid_link, productid_link,
-					POrderBomType.CanDoi);
-			List<POrderBOMSKU> listbomsku_kythuat = porderbomskuService.getByPContract_ProductID_and_type(pcontractid_link, productid_link,
-					POrderBomType.Kythuat);
-			List<POrderBOMSKU> listbomsku_sanxuat = porderbomskuService.getByPContract_ProductID_and_type(pcontractid_link, productid_link,
-					POrderBomType.SanXuat);
+			List<POrderBomProduct> listbom = porderbomproductService.getby_pcontract_product(pcontractid_link,
+					productid_link);
+			List<POrderBOMSKU> listbomsku = porderbomskuService.getByPContract_ProductID_and_type(pcontractid_link,
+					productid_link, POrderBomType.CanDoi);
+			List<POrderBOMSKU> listbomsku_kythuat = porderbomskuService
+					.getByPContract_ProductID_and_type(pcontractid_link, productid_link, POrderBomType.Kythuat);
+			List<POrderBOMSKU> listbomsku_sanxuat = porderbomskuService
+					.getByPContract_ProductID_and_type(pcontractid_link, productid_link, POrderBomType.SanXuat);
 
 //			List<Long> List_size = porder_sku_Service.getvalue_by_attribute(porderid_link, AtributeFixValues.ATTR_SIZE);
-			List<Long> List_size = pcontractskuServie.getlistvalue_by_product(pcontractid_link, productid_link, AtributeFixValues.ATTR_SIZE);
+			List<Long> List_size = pcontractskuServie.getlistvalue_by_product(pcontractid_link, productid_link,
+					AtributeFixValues.ATTR_SIZE);
 			List<Attributevalue> listav = avService.getlist_byidAttribute(AtributeFixValues.ATTR_COLOR);
 			Map<Long, String> mapcolor = new HashMap<>();
 			for (Attributevalue av : listav) {
