@@ -56,6 +56,8 @@ public class Stockout_order implements Serializable {
 	private Long unitid_link;
 	private Long pcontractid_link;
 	private Long pcontract_poid_link;
+	private Date date_to_vai_yc;
+	private Date date_xuat_yc;
 	
 	public Long getUnitid_link() {
 		return unitid_link;
@@ -261,13 +263,19 @@ public class Stockout_order implements Serializable {
 		return pcontractid_link;
 	}
 
-//	public List<Stockout_order_d> getStockout_order_d() {
-//		return stockout_order_d;
-//	}
-//
-//	public void setStockout_order_d(List<Stockout_order_d> stockout_order_d) {
-//		this.stockout_order_d = stockout_order_d;
-//	}
-	
-	
+	public Date getDate_to_vai_yc() {
+		return date_to_vai_yc;
+	}
+
+	public void setDate_to_vai_yc(Date date_to_vai_yc) {
+		this.date_to_vai_yc = date_to_vai_yc;
+	}
+
+	public Date getDate_xuat_yc() {
+		return date_xuat_yc;
+	}
+
+	public void setDate_xuat_yc(Date date_xuat_yc) {
+		this.date_xuat_yc = date_xuat_yc;
+	}
 }

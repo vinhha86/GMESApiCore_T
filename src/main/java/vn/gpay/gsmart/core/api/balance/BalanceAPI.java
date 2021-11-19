@@ -1,6 +1,7 @@
 package vn.gpay.gsmart.core.api.balance;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.gpay.gsmart.core.api.pcontractproductbom.PContractProductBom2API;
 import vn.gpay.gsmart.core.api.pcontractproductbom.get_bom_by_product_request;
 import vn.gpay.gsmart.core.api.pcontractproductbom.get_bom_by_product_response;
-import vn.gpay.gsmart.core.api.porder_grant.POrder_Grant_findByOrgId_request;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract.IPContractService;
@@ -39,6 +39,8 @@ import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
+import vn.gpay.gsmart.core.porder_grant_sku_plan.IPOrderGrant_SKU_Plan_Service;
+import vn.gpay.gsmart.core.porder_grant_sku_plan.POrderGrant_SKU_Plan;
 import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -70,6 +72,8 @@ public class BalanceAPI {
 	IPOrderGrant_Service pordergrantService;
 	@Autowired
 	IPOrderGrant_SKUService pordergrantSkuService;
+	@Autowired
+	IPOrderGrant_SKU_Plan_Service pordergrantSkuPlanService;
 
 	@Autowired
 	IPContract_bom2_npl_poline_Service bomPOLine_Service;
@@ -348,17 +352,85 @@ public class BalanceAPI {
 
 				List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
 				for (POrderGrant_SKU thePOrderGrant_SKU : ls_POrderGrant_SKU) {
-//					SKU theProduct_SKU = skuService.findOne(thePContractSKU.getSkuid_link());
-					
-//					System.out.println("line 340: ------------------------");
-//					System.out.println("line 340: " + thePContractSKU.getSkucode());
-//					System.out.println("line 340: " + thePContractSKU.getId());
-//					System.out.println("line 340: " + thePContractSKU.getPquantity_porder());
 					
 					cal_demand_bysku(ls_SKUBalance, pcontractid_link, thePOrderGrant_SKU.getPcontract_poid_link(),
 							porder.getProductid_link(), thePOrderGrant_SKU.getSkuid_link(),
 							thePOrderGrant_SKU.getSkucode(), thePOrderGrant_SKU.getMauSanPham(),
 							thePOrderGrant_SKU.getCoSanPham(), thePOrderGrant_SKU.getGrantamount(), "", // tinh cho lenh
+																										// thi khong can
+																										// group theo
+																										// po_buyer
+							porder.getTotalorder(), entity.balance_limit);
+				}
+				
+				// 3. Tinh toan can doi cho tung nguyen phu lieu trong BOM
+				CountDownLatch latch = new CountDownLatch(ls_SKUBalance.size());
+
+				// Lấy danh sách các kho nguyên liệu của phân xưởng
+				List<Org> ls_Stock = orgService.findChildByType(user.getRootorgid_link(),
+						porder.getGranttoorgid_link(), OrgType.ORG_TYPE_STOCK_MAT);
+
+				for (Org theStock : ls_Stock)
+					for (SKUBalance_Data mat_sku : ls_SKUBalance) {
+						Balance_SKU theBalance = new Balance_SKU(ls_SKUBalance, porder.getPcontractid_link(),
+								theStock.getId(), null, porder.getId(), mat_sku, request.getHeader("Authorization"),
+								latch);
+						theBalance.start();
+					}
+				latch.await();
+
+				response.data = ls_SKUBalance;
+				response.product_data = ls_Product_Total;
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<Balance_Response>(response, HttpStatus.OK);
+			} else {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage("Lệnh sản xuất không tồn tại");
+				return new ResponseEntity<Balance_Response>(response, HttpStatus.BAD_REQUEST);
+			}
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<Balance_Response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/cal_balance_bypordergrant_date", method = RequestMethod.POST)
+	public ResponseEntity<Balance_Response> cal_balance_bypordergrant_date(HttpServletRequest request,
+			@RequestBody Balance_Request entity) {
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Balance_Response response = new Balance_Response();
+		try {
+//			POrder thePorder = porder_Service.findOne(entity.porderid_link);
+			List<Date> date_list = entity.date_list;
+			POrderGrant thePorderGrant = pordergrantService.findOne(entity.pordergrantid_link);
+			
+			if (null != thePorderGrant) {
+				Long pcontractid_link = thePorderGrant.getPcontractid_link();
+				Long porderid_link = thePorderGrant.getPorderid_link();
+				POrder porder = porder_Service.findOne(porderid_link);
+				// Lay danh sách sku của porderGrant
+				List<POrderGrant_SKU> ls_POrderGrant_SKU = pordergrantSkuService.getPOrderGrant_SKU(thePorderGrant.getId());
+				
+				List<Balance_Product_Data> ls_Product_Total = new ArrayList<Balance_Product_Data>();
+
+				List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
+				for (POrderGrant_SKU thePOrderGrant_SKU : ls_POrderGrant_SKU) {
+					// Tính sl sp theo ngày (không lấy toàn bộ theo grant_sku)
+					Integer amount = 0;
+					for(Date date : date_list) {
+						List<POrderGrant_SKU_Plan> porderGrant_SKU_Plan_list = pordergrantSkuPlanService.getByPOrderGrant_SKU_inDate(thePOrderGrant_SKU.getId(), date);
+						for(POrderGrant_SKU_Plan porderGrant_SKU_Plan : porderGrant_SKU_Plan_list) {
+							Integer planAmount = porderGrant_SKU_Plan.getAmount() == null ? 0 : porderGrant_SKU_Plan.getAmount();
+							amount += planAmount;
+						}
+					}
+					
+					cal_demand_bysku(ls_SKUBalance, pcontractid_link, thePOrderGrant_SKU.getPcontract_poid_link(),
+							porder.getProductid_link(), thePOrderGrant_SKU.getSkuid_link(),
+							thePOrderGrant_SKU.getSkucode(), thePOrderGrant_SKU.getMauSanPham(),
+							thePOrderGrant_SKU.getCoSanPham(), amount, "", // tinh cho lenh
 																										// thi khong can
 																										// group theo
 																										// po_buyer

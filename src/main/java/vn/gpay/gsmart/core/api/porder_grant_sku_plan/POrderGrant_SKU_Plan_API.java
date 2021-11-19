@@ -287,9 +287,9 @@ public class POrderGrant_SKU_Plan_API {
 	}
 	
 	@RequestMapping(value = "/getDateFor_KeHoachVaoChuyen_ChuaYeuCau", method = RequestMethod.POST)
-	public ResponseEntity<POrderGrantBinding_list_response> getDateFor_KeHoachVaoChuyen_ChuaYeuCau(@RequestBody POrderGrant_SKU_Plan_list_request entity,
+	public ResponseEntity<POrderGrant_SKU_Plan_date_list_response> getDateFor_KeHoachVaoChuyen_ChuaYeuCau(@RequestBody POrderGrant_SKU_Plan_list_request entity,
 			HttpServletRequest request) {
-		POrderGrantBinding_list_response response = new POrderGrantBinding_list_response();
+		POrderGrant_SKU_Plan_date_list_response response = new POrderGrant_SKU_Plan_date_list_response();
 		try {
 			Long porder_grantid_link = entity.porder_grantid_link;
 			
@@ -310,18 +310,18 @@ public class POrderGrant_SKU_Plan_API {
 			dateEnd = cal.getTime();
 			
 			List<Date> date_list = porderGrant_SKU_Plan_Service.getDate_ChuaYeuCau(porder_grantid_link, dateBegin, dateEnd);
-			for(Date date : date_list) {
-				System.out.println(date);
-			}
+//			for(Date date : date_list) {
+//				System.out.println(date);
+//			}
 			
-//			response.data = dataResult;
+			response.data = date_list;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<POrderGrantBinding_list_response>(response, HttpStatus.OK);
+			return new ResponseEntity<POrderGrant_SKU_Plan_date_list_response>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			return new ResponseEntity<POrderGrantBinding_list_response>(response, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<POrderGrant_SKU_Plan_date_list_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
 }
