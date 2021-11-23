@@ -1,14 +1,18 @@
 package vn.gpay.gsmart.core.stockout_order;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -87,11 +91,11 @@ public class Stockout_order implements Serializable {
     @JoinColumn(name="porderid_link",insertable=false,updatable =false)
     private POrder porder;
 	
-//	@NotFound(action = NotFoundAction.IGNORE)
+	@NotFound(action = NotFoundAction.IGNORE)
 //	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
-//	//@BatchSize(size=10)
-//	@JoinColumn( name="stockoutorderid_link", referencedColumnName="id")
-//	private List<Stockout_order_d>  stockout_order_d  = new ArrayList<Stockout_order_d>();
+	@OneToMany(cascade =  CascadeType.ALL)
+	@JoinColumn( name="stockoutorderid_link", referencedColumnName="id")
+	private List<Stockout_order_d>  stockout_order_d  = new ArrayList<Stockout_order_d>();
 	
 	@Transient
 	public String getUsercreate_name() {
@@ -278,4 +282,13 @@ public class Stockout_order implements Serializable {
 	public void setDate_xuat_yc(Date date_xuat_yc) {
 		this.date_xuat_yc = date_xuat_yc;
 	}
+
+	public List<Stockout_order_d> getStockout_order_d() {
+		return stockout_order_d;
+	}
+
+	public void setStockout_order_d(List<Stockout_order_d> stockout_order_d) {
+		this.stockout_order_d = stockout_order_d;
+	}
+	
 }

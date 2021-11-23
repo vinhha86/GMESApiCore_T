@@ -67,7 +67,8 @@ public class Stockout_order_d implements Serializable {
     private Unit unit;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
-	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
+//	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
+	@OneToMany(cascade =  CascadeType.ALL)
 	@JoinColumn( name="stockoutorderdid_link", referencedColumnName="id")
 	private List<Stockout_order_pkl>  stockout_order_pkl  = new ArrayList<Stockout_order_pkl>();
 	
@@ -289,4 +290,6 @@ public class Stockout_order_d implements Serializable {
 	public void setData_spaces(String data_spaces) {
 		this.data_spaces = data_spaces;
 	}
+	
+	
 }

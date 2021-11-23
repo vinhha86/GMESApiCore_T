@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -424,5 +425,56 @@ public class Stockout_orderAPI {
 			response.setMessage(e.getMessage());
 		}
 		return new ResponseEntity<Stockout_order_response>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/create_YeuCauXuat", method = RequestMethod.POST)
+	@Transactional(rollbackFor = RuntimeException.class)
+	public ResponseEntity<create_order_response> create_YeuCauXuat(HttpServletRequest request,
+			@RequestBody create_stockout_order_request entity) {
+		create_order_response response = new create_order_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+			Long orgrootid_link = user.getRootorgid_link();
+			Date current_time = new Date();
+			List<Stockout_order> Stockout_order_list = entity.data;
+			for(Stockout_order stockout_order : Stockout_order_list) {
+				// voi moi stockout_order_d tao moi 1 stockout_order
+				String stockout_order_code = commonService.getStockout_order_code();
+				stockout_order.setId(null);
+				stockout_order.setOrgrootid_link(orgrootid_link);
+				stockout_order.setTimecreate(current_time);
+				stockout_order.setUsercreateid_link(user.getId());
+				stockout_order.setStockout_order_code(stockout_order_code);
+				stockout_order.setStatus(0);
+				
+				List<Stockout_order_d> stockout_order_d_list = stockout_order.getStockout_order_d();
+				for(Stockout_order_d stockout_order_d : stockout_order_d_list) {
+					stockout_order_d.setOrgrootid_link(orgrootid_link);
+					
+					List<Stockout_order_pkl> stockout_order_pkl_list = stockout_order_d.getStockout_order_pkl();
+					for(Stockout_order_pkl stockout_order_pkl : stockout_order_pkl_list) {
+//						stockout_order_pkl.setOrgid_link(orgrootid_link);
+					}
+				}
+						
+
+				stockout_order_Service.save(stockout_order);
+						
+					
+				Stocking_UniqueCode unique = stockingService.getby_type(3);
+				Integer max = unique.getStocking_max();
+				unique.setStocking_max(max+1);
+				stockingService.save(unique);
+			}
+			
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<create_order_response>(response, HttpStatus.OK);
 	}
 }
