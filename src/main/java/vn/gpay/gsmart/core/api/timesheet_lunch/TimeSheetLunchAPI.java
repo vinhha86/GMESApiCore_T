@@ -216,23 +216,12 @@ public class TimeSheetLunchAPI {
 							temp.setLunchShift4(timeSheetLunch.isIslunch());
 							break;
 						}
-//						switch (timeSheetLunch.getShifttypeid_link().toString()) {
-//						case "1":
-//							System.out.println("here 111");
-//							temp.setWorkingShift1(timeSheetLunch.isIsworking());
-//							temp.setLunchShift1(timeSheetLunch.isIslunch());
-//							break;
-//						case "2":
-////							System.out.println("here 222");
-//							temp.setWorkingShift2(timeSheetLunch.isIsworking());
-//							temp.setLunchShift2(timeSheetLunch.isIslunch());
-//							break;
-//						case "3":
-////							System.out.println("here 333");
-//							temp.setWorkingShift3(timeSheetLunch.isIsworking());
-//							temp.setLunchShift3(timeSheetLunch.isIslunch());
-//							break;
-//						}
+						if (timeSheetLunch.getShifttypeid_link() == id
+								&& lst_timesheetshifttype.get(i).getName().equals("Ca ăn 5")) {
+							temp.setWorkingShift5(timeSheetLunch.isIsworking());
+							temp.setLunchShift5(timeSheetLunch.isIslunch());
+							break;
+						}
 					}
 					mapTmp.put(timeSheetLunch.getPersonnelid_link(), temp);
 				}
@@ -608,6 +597,9 @@ public class TimeSheetLunchAPI {
 						if (name.equals("Ca ăn 4")) {
 							newBinding.setLunchShift(4);
 						}
+						if (name.equals("Ca ăn 5")) {
+							newBinding.setLunchShift(5);
+						}
 						timeSheetLunch_Binding_list.add(newBinding);
 					}
 				}
@@ -647,7 +639,7 @@ public class TimeSheetLunchAPI {
 				newTimeSheetLunch_Binding.setOrgName(org.getName());
 				newTimeSheetLunch_Binding.setOrgType(org.getOrgtypeid_link());
 				
-				Integer sumCa1 = 0, sumCa2 = 0, sumCa3 = 0, sumCa4 = 0;
+				Integer sumCa1 = 0, sumCa2 = 0, sumCa3 = 0, sumCa4 = 0, sumCa5 = 0;
 				List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService.getForTimeSheetLunch_byOrg_Date(org.getId(), date);
 				for(TimeSheetLunch timeSheetLunch : listTimeSheetLunch) {
 					Integer shifttypeid_link = timeSheetLunch.getShifttypeid_link();
@@ -664,6 +656,9 @@ public class TimeSheetLunchAPI {
 					}
 					if(shiftName.equals("Ca ăn 4")) {
 						sumCa4++;
+					}
+					if(shiftName.equals("Ca ăn 5")) {
+						sumCa5++;
 					}
 				}
 				

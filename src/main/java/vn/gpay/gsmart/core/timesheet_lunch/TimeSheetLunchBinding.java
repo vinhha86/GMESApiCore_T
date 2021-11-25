@@ -14,11 +14,13 @@ public class TimeSheetLunchBinding {
 	private boolean isWorkingShift2;
 	private boolean isWorkingShift3;
 	private boolean isWorkingShift4;
+	private boolean isWorkingShift5;
 	private boolean isLunchShift;
 	private boolean isLunchShift1;
 	private boolean isLunchShift2;
 	private boolean isLunchShift3;
 	private boolean isLunchShift4;
+	private boolean isLunchShift5;
 	private Integer status;
 	private String dataIndex;
 	private String register_code;
@@ -133,6 +135,22 @@ public class TimeSheetLunchBinding {
 
 	public void setLunchShift4(boolean isLunchShift4) {
 		this.isLunchShift4 = isLunchShift4;
+	}
+
+	public boolean isWorkingShift5() {
+		return isWorkingShift5;
+	}
+
+	public void setWorkingShift5(boolean isWorkingShift5) {
+		this.isWorkingShift5 = isWorkingShift5;
+	}
+
+	public boolean isLunchShift5() {
+		return isLunchShift5;
+	}
+
+	public void setLunchShift5(boolean isLunchShift5) {
+		this.isLunchShift5 = isLunchShift5;
 	}
 
 	public Integer getStatus() {
