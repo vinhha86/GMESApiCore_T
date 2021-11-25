@@ -14,4 +14,7 @@ public interface ITimeSheetLunchService  extends Operations<TimeSheetLunch>{
 	List<TimeSheetLunch> getByPersonnelDate(Long personnelid_link, Date workingdate_start, Date workingdate_end);
 	List<TimeSheetLunch> getForUpdateStatusTimeSheetLunch(Long orgid_link, Date workingdate);
 	List<TimeSheetLunch> getForTimeSheetLunch_byOrg_Date(Long orgid_link, Date workingdate);
+	List<TimeSheetLunch> getByConfirmStatus(Long timesheetShiftTypeOrg_id,Long orgid_link, Date workingdate, Integer status);
+	List<TimeSheetLunch> getBy_multiShift(Long orgid_link, Date workingdate, List<Long> listIds);
+	List<TimeSheetLunch> getBy_isworking_islunch(Boolean isworking, Boolean islunch);
 }

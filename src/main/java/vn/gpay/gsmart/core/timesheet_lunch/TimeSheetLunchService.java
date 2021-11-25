@@ -49,6 +49,21 @@ public class TimeSheetLunchService extends AbstractService<TimeSheetLunch> imple
 	public List<TimeSheetLunch> getForTimeSheetLunch_byOrg_Date(Long orgid_link, Date workingdate) {
 		return repo.getForTimeSheetLunch_byOrg_Date(orgid_link, workingdate);
 	}
+
+	@Override
+	public List<TimeSheetLunch> getByConfirmStatus(Long timesheetShiftTypeOrg_id, Long orgid_link, Date workingdate, Integer status) {
+		return repo.getByConfirmStatus(timesheetShiftTypeOrg_id, orgid_link, workingdate, status);
+	}
+
+	@Override
+	public List<TimeSheetLunch> getBy_isworking_islunch(Boolean isworking, Boolean islunch) {
+		return repo.getBy_isworking_islunch(isworking, islunch);
+	}
+
+	@Override
+	public List<TimeSheetLunch> getBy_multiShift(Long orgid_link, Date workingdate, List<Long> listIds) {
+		return repo.getBy_multiShift(orgid_link, workingdate, listIds);
+	}
 	
 //	@Override
 //	public List<TimeSheetLunchBinding> getForTimeSheetLunch(Long orgid_link, Date workingdate) {

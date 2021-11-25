@@ -57,4 +57,43 @@ public interface ITimeSheetLunchRepository
 	public List<TimeSheetLunch> getByPersonnelDate(@Param("personnelid_link") final Long personnelid_link,
 			@Param("workingdate_start") final Date workingdate_start,
 			@Param("workingdate_end") final Date workingdate_end);
+	
+	@Query("SELECT distinct a FROM TimeSheetLunch a " 
+			+ "inner join Personel b on a.personnelid_link = b.id "
+			+ "inner join TimesheetShiftType c on c.id = a.shifttypeid_link "
+			+ "inner join TimesheetShiftTypeOrg d on d.timesheet_shift_type_id_link = c.id "
+			+ "where (b.orgid_link = :orgid_link or b.orgmanagerid_link = :orgid_link ) " 
+			+ "and a.workingdate = :workingdate "
+			+ "and a.status = :status "
+			+ "and d.id = :timesheetShiftTypeOrg_id "
+			)
+	public List<TimeSheetLunch> getByConfirmStatus(
+			@Param("timesheetShiftTypeOrg_id") final Long timesheetShiftTypeOrg_id,
+			@Param("orgid_link") final Long orgid_link,
+			@Param("workingdate") final Date workingdate,
+			@Param("status") final Integer status
+			);
+	
+	@Query("SELECT distinct a FROM TimeSheetLunch a " 
+			+ "inner join Personel b on a.personnelid_link = b.id "
+			+ "inner join TimesheetShiftType c on c.id = a.shifttypeid_link "
+			+ "inner join TimesheetShiftTypeOrg d on d.timesheet_shift_type_id_link = c.id "
+			+ "where (b.orgid_link = :orgid_link or b.orgmanagerid_link = :orgid_link ) " 
+			+ "and a.workingdate = :workingdate "
+			+ "and d.id in :listIds "
+			)
+	public List<TimeSheetLunch> getBy_multiShift(
+			@Param("orgid_link") final Long orgid_link,
+			@Param("workingdate") final Date workingdate,
+			@Param("listIds") final List<Long> listIds
+			);
+	
+	@Query("SELECT distinct a FROM TimeSheetLunch a " 
+			+ "where (a.isworking = :isworking or a.isworking is null) "
+			+ "and (a.islunch = :islunch or a.islunch is null) "
+			)
+	public List<TimeSheetLunch> getBy_isworking_islunch(
+			@Param("isworking") final Boolean isworking,
+			@Param("islunch") final Boolean islunch
+			);
 }
