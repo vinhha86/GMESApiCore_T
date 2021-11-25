@@ -143,46 +143,46 @@ public class TimesheetShiftTypeOrgAPI {
 				
 				if(TimeSheetLunch_list_unconfirm.size() == 0 && TimeSheetLunch_list_confirm.size() == 0) {
 					isConfirm = false;
-					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 1")) {
-						System.out.println("11");
-					}
-					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 2")) {
-						System.out.println("12");
-					}
-					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 3")) {
-						System.out.println("13");
-					}
-					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 4")) {
-						System.out.println("14");
-					}
+//					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 1")) {
+//						System.out.println("11");
+//					}
+//					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 2")) {
+//						System.out.println("12");
+//					}
+//					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 3")) {
+//						System.out.println("13");
+//					}
+//					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 4")) {
+//						System.out.println("14");
+//					}
 				}else if(TimeSheetLunch_list_confirm.size() == 0) {
 					isConfirm = false;
-					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 1")) {
-						System.out.println("21");
-					}
-					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 2")) {
-						System.out.println("22");
-					}
-					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 3")) {
-						System.out.println("23");
-					}
-					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 4")) {
-						System.out.println("24");
-					}
+//					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 1")) {
+//						System.out.println("21");
+//					}
+//					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 2")) {
+//						System.out.println("22");
+//					}
+//					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 3")) {
+//						System.out.println("23");
+//					}
+//					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 4")) {
+//						System.out.println("24");
+//					}
 				}else if(TimeSheetLunch_list_unconfirm.size() == 0) {
 					isConfirm = true;
-					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 1")) {
-						System.out.println("31");
-					}
-					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 2")) {
-						System.out.println("32");
-					}
-					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 3")) {
-						System.out.println("33");
-					}
-					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 4")) {
-						System.out.println("34");
-					}
+//					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 1")) {
+//						System.out.println("31");
+//					}
+//					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 2")) {
+//						System.out.println("32");
+//					}
+//					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 3")) {
+//						System.out.println("33");
+//					}
+//					if(timesheetShiftTypeOrg.getName().equals("Ca ăn 4")) {
+//						System.out.println("34");
+//					}
 				}
 				System.out.println(TimeSheetLunch_list_unconfirm.size());
 				System.out.println(TimeSheetLunch_list_confirm.size());

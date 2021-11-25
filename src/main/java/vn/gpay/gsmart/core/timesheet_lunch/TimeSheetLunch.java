@@ -35,6 +35,7 @@ public class TimeSheetLunch implements Serializable {
 	private Date workingdate;
 	private boolean isworking;
 	private boolean islunch;
+	private Date time_approve;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -142,5 +143,11 @@ public class TimeSheetLunch implements Serializable {
 	}
 	public void setIslunch(boolean islunch) {
 		this.islunch = islunch;
+	}
+	public Date getTime_approve() {
+		return time_approve;
+	}
+	public void setTime_approve(Date time_approve) {
+		this.time_approve = time_approve;
 	}
 }

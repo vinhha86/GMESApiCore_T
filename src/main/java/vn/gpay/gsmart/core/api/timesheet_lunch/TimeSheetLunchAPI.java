@@ -391,6 +391,7 @@ public class TimeSheetLunchAPI {
 			HttpServletRequest request) {
 		ResponseBase response = new ResponseBase();
 		try {
+			Date date = new Date();
 			List<Long> selectIds = entity.selectIds;
 			List<Long> unselectIds = entity.unselectIds;
 			Long orgid_link = entity.orgid_link;
@@ -421,10 +422,12 @@ public class TimeSheetLunchAPI {
 
 			for (TimeSheetLunch timeSheetLunch : listTimeSheetLunch_select) {
 				timeSheetLunch.setStatus(1);
+				timeSheetLunch.setTime_approve(date);
 				timeSheetLunchService.save(timeSheetLunch);
 			}
 			for (TimeSheetLunch timeSheetLunch : listTimeSheetLunch_unselect) {
 				timeSheetLunch.setStatus(0);
+				timeSheetLunch.setTime_approve(null);
 				timeSheetLunchService.save(timeSheetLunch);
 			}
 
