@@ -184,8 +184,8 @@ public class TimesheetShiftTypeOrgAPI {
 //						System.out.println("34");
 //					}
 				}
-				System.out.println(TimeSheetLunch_list_unconfirm.size());
-				System.out.println(TimeSheetLunch_list_confirm.size());
+//				System.out.println(TimeSheetLunch_list_unconfirm.size());
+//				System.out.println(TimeSheetLunch_list_confirm.size());
 				
 				newTimesheetShiftTypeOrg_Binding.setIsConfirm(isConfirm);
 				result.add(newTimesheetShiftTypeOrg_Binding);
