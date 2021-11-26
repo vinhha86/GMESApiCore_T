@@ -6,6 +6,7 @@ public class TongHopBaoAn {
 	private Integer ca2;
 	private Integer ca3;
 	private Integer ca4;
+	private Integer ca5;
 	public String getOrg_name() {
 		return org_name;
 	}
@@ -36,6 +37,11 @@ public class TongHopBaoAn {
 	public void setCa4(Integer ca4) {
 		this.ca4 = ca4;
 	}
-	
+	public Integer getCa5() {
+		return ca5;
+	}
+	public void setCa5(Integer ca5) {
+		this.ca5 = ca5;
+	}
 	
 }

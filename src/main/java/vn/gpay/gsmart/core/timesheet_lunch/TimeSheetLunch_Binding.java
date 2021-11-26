@@ -33,6 +33,7 @@ public class TimeSheetLunch_Binding {
 	private Integer sumCa2;
 	private Integer sumCa3;
 	private Integer sumCa4;
+	private Integer sumCa5;
 	
 	public Long getOrgId() {
 		return orgId;
@@ -81,6 +82,12 @@ public class TimeSheetLunch_Binding {
 	}
 	public void setSumCa4(Integer sumCa4) {
 		this.sumCa4 = sumCa4;
+	}
+	public Integer getSumCa5() {
+		return sumCa5;
+	}
+	public void setSumCa5(Integer sumCa5) {
+		this.sumCa5 = sumCa5;
 	}
 	
 	

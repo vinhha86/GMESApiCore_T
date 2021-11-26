@@ -192,32 +192,37 @@ public class TimeSheetLunchAPI {
 
 					for (int i = 0; i < lst_timesheetshifttype.size(); i++) {
 						long id = lst_timesheetshifttype.get(i).getId();
-						if (timeSheetLunch.getShifttypeid_link() == id
-								&& lst_timesheetshifttype.get(i).getName().equals("Ca ăn 1")) {
+						if (timeSheetLunch.getShifttypeid_link() == 4
+//								&& lst_timesheetshifttype.get(i).getName().equals("Ca ăn 1")
+								) {
 							temp.setWorkingShift1(timeSheetLunch.isIsworking());
 							temp.setLunchShift1(timeSheetLunch.isIslunch());
 							break;
 						}
-						if (timeSheetLunch.getShifttypeid_link() == id
-								&& lst_timesheetshifttype.get(i).getName().equals("Ca ăn 2")) {
+						if (timeSheetLunch.getShifttypeid_link() == 5
+//								&& lst_timesheetshifttype.get(i).getName().equals("Ca ăn 2")
+								) {
 							temp.setWorkingShift2(timeSheetLunch.isIsworking());
 							temp.setLunchShift2(timeSheetLunch.isIslunch());
 							break;
 						}
-						if (timeSheetLunch.getShifttypeid_link() == id
-								&& lst_timesheetshifttype.get(i).getName().equals("Ca ăn 3")) {
+						if (timeSheetLunch.getShifttypeid_link() == 6
+//								&& lst_timesheetshifttype.get(i).getName().equals("Ca ăn 3")
+								) {
 							temp.setWorkingShift3(timeSheetLunch.isIsworking());
 							temp.setLunchShift3(timeSheetLunch.isIslunch());
 							break;
 						}
-						if (timeSheetLunch.getShifttypeid_link() == id
-								&& lst_timesheetshifttype.get(i).getName().equals("Ca ăn 4")) {
+						if (timeSheetLunch.getShifttypeid_link() == 7
+//								&& lst_timesheetshifttype.get(i).getName().equals("Ca ăn 4")
+								) {
 							temp.setWorkingShift4(timeSheetLunch.isIsworking());
 							temp.setLunchShift4(timeSheetLunch.isIslunch());
 							break;
 						}
-						if (timeSheetLunch.getShifttypeid_link() == id
-								&& lst_timesheetshifttype.get(i).getName().equals("Ca ăn 5")) {
+						if (timeSheetLunch.getShifttypeid_link() == 8
+//								&& lst_timesheetshifttype.get(i).getName().equals("Ca ăn 5")
+								) {
 							temp.setWorkingShift5(timeSheetLunch.isIsworking());
 							temp.setLunchShift5(timeSheetLunch.isIslunch());
 							break;
@@ -353,6 +358,9 @@ public class TimeSheetLunchAPI {
 
 				List<TimeSheetLunch> listca4 = new ArrayList<TimeSheetLunch>(listTimeSheetLunch);
 				listca4.removeIf(c -> !c.getShifttypeid_link().equals(7) || !c.isIslunch());
+				
+				List<TimeSheetLunch> listca5 = new ArrayList<TimeSheetLunch>(listTimeSheetLunch);
+				listca5.removeIf(c -> !c.getShifttypeid_link().equals(8) || !c.isIslunch());
 
 				TongHopBaoAn tonghop = new TongHopBaoAn();
 				tonghop.setOrg_name(org.getName());
@@ -360,6 +368,7 @@ public class TimeSheetLunchAPI {
 				tonghop.setCa2(listca2.size());
 				tonghop.setCa3(listca3.size());
 				tonghop.setCa4(listca4.size());
+				tonghop.setCa5(listca5.size());
 
 				list.add(tonghop);
 			}
@@ -582,22 +591,38 @@ public class TimeSheetLunchAPI {
 						newBinding.setPersonnelid_link(timesheetAbsence.getPersonnelid_link());
 						newBinding.setIsCheck(true);
 
-						String name = timesheetShiftTypeOrg.getName();
+//						String name = timesheetShiftTypeOrg.getName();
+						Long id = timesheetShiftTypeOrg.getTimesheet_shift_type_id_link();
 //						System.out.println(timesheetShiftTypeOrg.getTimesheet_shift_type_id_link());
 //						System.out.println(name);
-						if (name.equals("Ca ăn 1")) {
+						if (
+								id.equals((long) 4)
+//								&& name.equals("Ca ăn 1")
+								) {
 							newBinding.setLunchShift(1);
 						}
-						if (name.equals("Ca ăn 2")) {
+						if (
+								id.equals((long) 5)
+//								&& name.equals("Ca ăn 2")
+								) {
 							newBinding.setLunchShift(2);
 						}
-						if (name.equals("Ca ăn 3")) {
+						if (
+								id.equals((long) 6)
+//								&& name.equals("Ca ăn 3")
+								) {
 							newBinding.setLunchShift(3);
 						}
-						if (name.equals("Ca ăn 4")) {
+						if (
+								id.equals((long) 7)
+//								&& name.equals("Ca ăn 4")
+								) {
 							newBinding.setLunchShift(4);
 						}
-						if (name.equals("Ca ăn 5")) {
+						if (
+								id.equals((long) 8)
+//								&& name.equals("Ca ăn 5")
+								) {
 							newBinding.setLunchShift(5);
 						}
 						timeSheetLunch_Binding_list.add(newBinding);
@@ -628,7 +653,8 @@ public class TimeSheetLunchAPI {
 			List<TimeSheetLunch_Binding> result = new ArrayList<TimeSheetLunch_Binding>();
 			
 			// lay danh sach cac to cua phan xuong
-			List<Org> org_list = orgService.getByParentId_for_TimeSheetLunchMobile(orgid_link);
+//			List<Org> org_list = orgService.getByParentId_for_TimeSheetLunchMobile(orgid_link);
+			List<Org> org_list = orgService.getorgChildrenbyOrg(orgid_link, new ArrayList<>());
 			
 //			System.out.println(org_list.size());
 			
@@ -645,19 +671,35 @@ public class TimeSheetLunchAPI {
 					Integer shifttypeid_link = timeSheetLunch.getShifttypeid_link();
 					TimesheetShiftType timesheetShiftType = timesheetshifttypeService.findOne(shifttypeid_link);
 					String shiftName = timesheetShiftType.getName();
-					if(shiftName.equals("Ca ăn 1")) {
+					Long id = timesheetShiftType.getId();
+					if(
+							id.equals((long)4)
+							&& shiftName.equals("Ca ăn 1")
+							) {
 						sumCa1++;
 					}
-					if(shiftName.equals("Ca ăn 2")) {
+					if(
+							id.equals((long)5)
+//							&& shiftName.equals("Ca ăn 2")
+							) {
 						sumCa2++;
 					}
-					if(shiftName.equals("Ca ăn 3")) {
+					if(
+							id.equals((long)6)
+//							&& shiftName.equals("Ca ăn 3")
+							) {
 						sumCa3++;
 					}
-					if(shiftName.equals("Ca ăn 4")) {
+					if(
+							id.equals((long)7)
+//							&& shiftName.equals("Ca ăn 4")
+							) {
 						sumCa4++;
 					}
-					if(shiftName.equals("Ca ăn 5")) {
+					if(
+							id.equals((long)8)
+//							&& shiftName.equals("Ca ăn 5")
+							) {
 						sumCa5++;
 					}
 				}
@@ -666,6 +708,7 @@ public class TimeSheetLunchAPI {
 				newTimeSheetLunch_Binding.setSumCa2(sumCa2);
 				newTimeSheetLunch_Binding.setSumCa3(sumCa3);
 				newTimeSheetLunch_Binding.setSumCa4(sumCa4);
+				newTimeSheetLunch_Binding.setSumCa5(sumCa5);
 				result.add(newTimeSheetLunch_Binding);
 			}
 
