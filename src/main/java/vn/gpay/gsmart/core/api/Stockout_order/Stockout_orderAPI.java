@@ -518,7 +518,7 @@ public class Stockout_orderAPI {
 		try {
 			Date stockoutorderdate_from = entity.stockoutorderdate_from;
 			Date stockoutorderdate_to = entity.stockoutorderdate_to;
-			Long stockouttypeid_link = entity.stockouttypeid_link;
+			Integer stockouttypeid_link = entity.stockouttypeid_link;
 			if (entity.page == 0) entity.page = 1;
 			if (entity.limit == 0) entity.limit = 100;
 			

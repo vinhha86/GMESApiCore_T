@@ -44,7 +44,7 @@ public class Stockout_order_service extends AbstractService<Stockout_order> impl
 	}
 	
 	@Override
-	public List<Stockout_order> findBySearch_type(Date stockoutorderdate_from, Date stockoutorderdate_to, Long stockouttypeid_link) {
+	public List<Stockout_order> findBySearch_type(Date stockoutorderdate_from, Date stockoutorderdate_to, Integer stockouttypeid_link) {
 		Specification<Stockout_order> specification = Specifications.<Stockout_order>and()
 	            .ge(this.check1(stockoutorderdate_from,stockoutorderdate_to),"timecreate",GPAYDateFormat.atStartOfDay(stockoutorderdate_from))
                 .le(this.check2(stockoutorderdate_from,stockoutorderdate_to),"timecreate",GPAYDateFormat.atEndOfDay(stockoutorderdate_to))
