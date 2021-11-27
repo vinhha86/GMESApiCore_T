@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.api.Stockout_order;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -10,15 +11,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.gpay.gsmart.core.base.ResponseBase;
+import vn.gpay.gsmart.core.base.ResponseError;
+import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder_bom_color.IPOrderBomColor_Service;
 import vn.gpay.gsmart.core.porder_bom_sku.IPOrderBOMSKU_Service;
 import vn.gpay.gsmart.core.porder_bom_sku.POrderBOMSKU;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
 import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -33,8 +42,10 @@ import vn.gpay.gsmart.core.stockout_order.Stockout_order_coloramount;
 import vn.gpay.gsmart.core.stockout_order.Stockout_order_d;
 import vn.gpay.gsmart.core.stockout_order.Stockout_order_pkl;
 import vn.gpay.gsmart.core.utils.Common;
+import vn.gpay.gsmart.core.utils.POStatus;
 import vn.gpay.gsmart.core.utils.POrderBomType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
+import vn.gpay.gsmart.core.utils.StockoutTypes;
 import vn.gpay.gsmart.core.utils.commonUnit;
 import vn.gpay.gsmart.core.warehouse.IWarehouseService;
 import vn.gpay.gsmart.core.warehouse.Warehouse;
@@ -53,6 +64,9 @@ public class Stockout_orderAPI {
 	@Autowired IWarehouseService warehouseService;
 	@Autowired Common commonService;
 	@Autowired IStocking_UniqueCode_Service stockingService;
+	
+	@Autowired IPContract_POService pcontract_po_Service;
+	@Autowired IPOrderGrant_Service porder_grantService;
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ResponseEntity<create_order_response> Create(HttpServletRequest request,
@@ -150,6 +164,95 @@ public class Stockout_orderAPI {
 		}
 		return new ResponseEntity<create_order_response>(response, HttpStatus.OK);
 	}
+	
+	//Tao nhieu lenh xuat kho thanh pham 1 luc cho 1 hoac nhieu PO duoc chon
+	@RequestMapping(value = "/create_from_po",method = RequestMethod.POST)
+	@Transactional(rollbackFor = RuntimeException.class)
+	public ResponseEntity<?> Create_FromPO(@RequestBody StockoutP_Create_FromPO_Request entity, HttpServletRequest request ) {
+		ResponseBase response = new ResponseBase();
+		try {
+			GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			List<Long> ls_po = new ArrayList<Long>();
+			if (null != entity.list_po && entity.list_po.length() > 0) {
+				String[] s_poid = entity.list_po.split(";");
+				for (String sID : s_poid) {
+					Long lID = Long.valueOf(sID);
+					ls_po.add(lID);
+				}
+			}
+			
+			if(ls_po.size()>0) {
+				for (Long po_id: ls_po) {
+					//Lay thong tin PO de tao Stockout Req tuong ung
+					//Luu y: Khi tao yeu cau xuat kho, khong can quan tam den so ton kho tai thoi diem tao
+					PContract_PO thePO = pcontract_po_Service.findOne(po_id);
+					
+					//Tim danh sach cac porder_grant co chua po_id trong porder_grant_sku (co porder_grant nghia la da map)
+					List<POrderGrant> lsPOrder_Grant = porder_grantService.getbypcontract_po(po_id);
+					
+					//Lap Yeu cau xuat kho cho cac phan xuong da map PO
+					for (POrderGrant thePorder_Grant: lsPOrder_Grant) {
+						Stockout_order stockout_order = new Stockout_order();
+						String stockout_order_code = commonService.getStockout_order_code();
+						
+						stockout_order.setOrgrootid_link(user.getRootorgid_link());
+						stockout_order.setTimecreate(new Date());
+						stockout_order.setUsercreateid_link(user.getId());
+						stockout_order.setStockout_order_code(stockout_order_code);
+						stockout_order.setStockouttypeid_link(StockoutTypes.STOCKOUT_TYPE_TP_PO);
+						stockout_order.setStatus(0);
+						
+						//Chi dua vao danh sach Lenh xuat cac SKU cua po_id
+						for (POrderGrant_SKU theSKU: thePorder_Grant.getPorder_grant_sku()) {
+							if (theSKU.getPcontract_poid_link().equals(po_id)) {
+								Stockout_order_d theStockout_order_d = new Stockout_order_d();
+								
+								theStockout_order_d.setOrgrootid_link(user.getRootorgid_link());
+								theStockout_order_d.setUsercreateid_link(user.getId());
+								theStockout_order_d.setTimecreate(new Date());
+								
+								theStockout_order_d.setP_skuid_link(theSKU.getSkuid_link());
+								theStockout_order_d.setTotalpackage(theSKU.getGrantamount());
+								
+								stockout_order.getStockout_order_d().add(theStockout_order_d);
+							}
+						}
+						
+						stockout_order_Service.save(stockout_order);
+						
+						//Neu thanh cong Cap nhat bang unique code
+						Stocking_UniqueCode unique = stockingService.getby_type(3);
+						Integer max = unique.getStocking_max();
+						unique.setStocking_max(max+1);
+						stockingService.save(unique);
+					}
+					
+					//Cap nhat lai trang thai PO ve da lap lenh xuat kho
+					thePO.setStatus(POStatus.PO_STATUS_STOCKOUT);
+					pcontract_po_Service.save(thePO);
+				}
+				
+				
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);			
+			} 
+			else {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_EXCEPTION));
+				return new ResponseEntity<ResponseBase>(response,HttpStatus.BAD_REQUEST);			
+			}
+			
+		}catch (RuntimeException e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			e.printStackTrace();
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(null==e.getMessage()?"Lỗi hệ thống! Liên hệ IT để được hỗ trợ":e.getMessage());
+		    return new ResponseEntity<>(errorBase, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	
 	@RequestMapping(value = "/getby_id", method = RequestMethod.POST)
 	public ResponseEntity<getby_id_response> GetById(HttpServletRequest request,
