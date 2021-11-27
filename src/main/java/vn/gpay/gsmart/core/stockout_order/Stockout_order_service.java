@@ -2,6 +2,7 @@ package vn.gpay.gsmart.core.stockout_order;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -35,7 +36,22 @@ public class Stockout_order_service extends AbstractService<Stockout_order> impl
 	            .ge(this.check1(stockoutorderdate_from,stockoutorderdate_to),"timecreate",GPAYDateFormat.atStartOfDay(stockoutorderdate_from))
                 .le(this.check2(stockoutorderdate_from,stockoutorderdate_to),"timecreate",GPAYDateFormat.atEndOfDay(stockoutorderdate_to))
                 .between(this.check3(stockoutorderdate_from,stockoutorderdate_to),"timecreate", GPAYDateFormat.atStartOfDay(stockoutorderdate_from), GPAYDateFormat.atEndOfDay(stockoutorderdate_to))
-	            .build();
+                .build();
+		Sort sort = Sorts.builder()
+		        .desc("timecreate")
+		        .build();
+	    return repo.findAll(specification,sort);
+	}
+	
+	@Override
+	public List<Stockout_order> findBySearch_type(Date stockoutorderdate_from, Date stockoutorderdate_to, Long stockouttypeid_link) {
+		Specification<Stockout_order> specification = Specifications.<Stockout_order>and()
+	            .ge(this.check1(stockoutorderdate_from,stockoutorderdate_to),"timecreate",GPAYDateFormat.atStartOfDay(stockoutorderdate_from))
+                .le(this.check2(stockoutorderdate_from,stockoutorderdate_to),"timecreate",GPAYDateFormat.atEndOfDay(stockoutorderdate_to))
+                .between(this.check3(stockoutorderdate_from,stockoutorderdate_to),"timecreate", GPAYDateFormat.atStartOfDay(stockoutorderdate_from), GPAYDateFormat.atEndOfDay(stockoutorderdate_to))
+//                .eq("stockouttypeid_link", stockouttypeid_link)
+                .eq(Objects.nonNull(stockouttypeid_link), "stockouttypeid_link", stockouttypeid_link)
+                .build();
 		Sort sort = Sorts.builder()
 		        .desc("timecreate")
 		        .build();

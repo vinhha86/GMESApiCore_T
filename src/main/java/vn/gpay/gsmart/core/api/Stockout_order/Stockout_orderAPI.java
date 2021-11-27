@@ -518,11 +518,12 @@ public class Stockout_orderAPI {
 		try {
 			Date stockoutorderdate_from = entity.stockoutorderdate_from;
 			Date stockoutorderdate_to = entity.stockoutorderdate_to;
+			Long stockouttypeid_link = entity.stockouttypeid_link;
 			if (entity.page == 0) entity.page = 1;
 			if (entity.limit == 0) entity.limit = 100;
 			
-			List<Stockout_order> result = stockout_order_Service.findBySearch(stockoutorderdate_from, stockoutorderdate_to);
-			
+//			List<Stockout_order> result = stockout_order_Service.findBySearch(stockoutorderdate_from, stockoutorderdate_to);
+			List<Stockout_order> result = stockout_order_Service.findBySearch_type(stockoutorderdate_from, stockoutorderdate_to, stockouttypeid_link);
 			response.data = result;
 			response.totalCount = result.size();
 			
@@ -554,6 +555,7 @@ public class Stockout_orderAPI {
 				stockout_order.setTimecreate(current_time);
 				stockout_order.setUsercreateid_link(user.getId());
 				stockout_order.setStockout_order_code(stockout_order_code);
+				stockout_order.setStockouttypeid_link(StockoutTypes.STOCKOUT_TYPE_NL_CUTHOUSE);
 				stockout_order.setStatus(0);
 				
 				List<Stockout_order_d> stockout_order_d_list = stockout_order.getStockout_order_d();
