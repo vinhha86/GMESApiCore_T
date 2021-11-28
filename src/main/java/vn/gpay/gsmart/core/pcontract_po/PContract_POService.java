@@ -433,8 +433,8 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	@Override
 	public List<PContract_PO> getPO_HavetoShip(Long orgrootid_link, Date shipdate_from, Date shipdate_to) {
 		// TODO Auto-generated method stub
-		System.out.println(shipdate_from);
-		System.out.println(shipdate_to);
+//		System.out.println(shipdate_from);
+//		System.out.println(shipdate_to);
 		return repo.getPO_HavetoShip(orgrootid_link, shipdate_from, shipdate_to);
 	}
 	

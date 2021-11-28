@@ -165,4 +165,9 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 		list_orgid = list_orgid.size() == 0 ? null : list_orgid;
 		return repo.getKeHoachVaoChuyen(list_orgid, date_from, date_to);
 	}
+	
+	@Override
+	public List<POrderGrant> getbypcontract_po(long pcontract_poid_link){
+		return repo.getbypcontract_po(pcontract_poid_link);
+	}
 }
