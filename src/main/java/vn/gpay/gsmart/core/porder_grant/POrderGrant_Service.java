@@ -88,7 +88,9 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 //		POBuyer = "%"+POBuyer+"%";
 		orgvendorid_link = orgvendorid_link == 0 ? null : orgvendorid_link;
 		orgbuyerid_link = orgbuyerid_link == 0 ? null : orgbuyerid_link;
-
+		if(granttoorgid_link == 380) {
+			String a = "";
+		}
 		List<POrderGrant> a = repo.get_granted_bygolivedate(status, granttoorgid_link, golivedate_from, golivedate_to);
 		return a;
 	}
