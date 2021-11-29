@@ -96,4 +96,48 @@ public interface ITimeSheetLunchRepository
 			@Param("isworking") final Boolean isworking,
 			@Param("islunch") final Boolean islunch
 			);
+	
+	@Query("SELECT distinct a FROM TimeSheetLunch a " 
+			+ "inner join Personel b on a.personnelid_link = b.id "
+			+ "inner join TimesheetShiftType c on c.id = a.shifttypeid_link "
+			+ "inner join TimesheetShiftTypeOrg d on d.timesheet_shift_type_id_link = c.id "
+			+ "where (b.orgid_link = :orgid_link or b.orgmanagerid_link = :orgid_link ) " 
+			+ "and a.shifttypeid_link = :shifttypeid_link "
+			+ "and a.workingdate = :workingdate "
+			)
+	public List<TimeSheetLunch> getByOrg_Shift(
+			@Param("orgid_link") final Long orgid_link,
+			@Param("shifttypeid_link") final Integer shifttypeid_link,
+			@Param("workingdate") final Date workingdate
+			);
+	
+	@Query("SELECT distinct a FROM TimeSheetLunch a " 
+			+ "inner join Personel b on a.personnelid_link = b.id "
+			+ "inner join TimesheetShiftType c on c.id = a.shifttypeid_link "
+			+ "inner join TimesheetShiftTypeOrg d on d.timesheet_shift_type_id_link = c.id "
+			+ "where (b.orgid_link = :orgid_link or b.orgmanagerid_link = :orgid_link ) " 
+			+ "and a.shifttypeid_link = :shifttypeid_link "
+			+ "and a.workingdate = :workingdate "
+			+ "and a.is_bo_sung = true "
+			)
+	public List<TimeSheetLunch> getByOrg_Shift_Them(
+			@Param("orgid_link") final Long orgid_link,
+			@Param("shifttypeid_link") final Integer shifttypeid_link,
+			@Param("workingdate") final Date workingdate
+			);
+	
+	@Query("SELECT distinct a FROM TimeSheetLunch a " 
+			+ "inner join Personel b on a.personnelid_link = b.id "
+			+ "inner join TimesheetShiftType c on c.id = a.shifttypeid_link "
+			+ "inner join TimesheetShiftTypeOrg d on d.timesheet_shift_type_id_link = c.id "
+			+ "where (b.orgid_link = :orgid_link or b.orgmanagerid_link = :orgid_link ) " 
+			+ "and a.shifttypeid_link = :shifttypeid_link "
+			+ "and a.workingdate = :workingdate "
+			+ "and (a.is_bo_sung = false or a.is_bo_sung is null) "
+			)
+	public List<TimeSheetLunch> getByOrg_Shift_DangKy(
+			@Param("orgid_link") final Long orgid_link,
+			@Param("shifttypeid_link") final Integer shifttypeid_link,
+			@Param("workingdate") final Date workingdate
+			);
 }

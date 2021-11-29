@@ -4,6 +4,7 @@ public class TimeSheetLunch_Binding {
 	private Long personnelid_link;
 	private Integer lunchShift;
 	private Boolean isCheck;
+	
 	public Long getPersonnelid_link() {
 		return personnelid_link;
 	}
@@ -34,6 +35,13 @@ public class TimeSheetLunch_Binding {
 	private Integer sumCa3;
 	private Integer sumCa4;
 	private Integer sumCa5;
+	
+	//
+	
+	private String caName;
+	private Integer soDangKy;
+	private Integer soThem;
+	private Integer soTong;
 	
 	public Long getOrgId() {
 		return orgId;
@@ -89,6 +97,29 @@ public class TimeSheetLunch_Binding {
 	public void setSumCa5(Integer sumCa5) {
 		this.sumCa5 = sumCa5;
 	}
-	
-	
+	//
+	public String getCaName() {
+		return caName;
+	}
+	public void setCaName(String caName) {
+		this.caName = caName;
+	}
+	public Integer getSoDangKy() {
+		return soDangKy;
+	}
+	public void setSoDangKy(Integer soDangKy) {
+		this.soDangKy = soDangKy;
+	}
+	public Integer getSoThem() {
+		return soThem;
+	}
+	public void setSoThem(Integer soThem) {
+		this.soThem = soThem;
+	}
+	public Integer getSoTong() {
+		return soTong;
+	}
+	public void setSoTong(Integer soTong) {
+		this.soTong = soTong;
+	}
 }
