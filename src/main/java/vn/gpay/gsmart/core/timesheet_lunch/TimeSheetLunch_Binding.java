@@ -42,6 +42,8 @@ public class TimeSheetLunch_Binding {
 	private Integer soDangKy;
 	private Integer soThem;
 	private Integer soTong;
+	private Long timesheet_shift_type_id_link;
+	private Long timesheet_shift_type_org_id_link;
 	
 	public Long getOrgId() {
 		return orgId;
@@ -122,4 +124,17 @@ public class TimeSheetLunch_Binding {
 	public void setSoTong(Integer soTong) {
 		this.soTong = soTong;
 	}
+	public Long getTimesheet_shift_type_id_link() {
+		return timesheet_shift_type_id_link;
+	}
+	public void setTimesheet_shift_type_id_link(Long timesheet_shift_type_id_link) {
+		this.timesheet_shift_type_id_link = timesheet_shift_type_id_link;
+	}
+	public Long getTimesheet_shift_type_org_id_link() {
+		return timesheet_shift_type_org_id_link;
+	}
+	public void setTimesheet_shift_type_org_id_link(Long timesheet_shift_type_org_id_link) {
+		this.timesheet_shift_type_org_id_link = timesheet_shift_type_org_id_link;
+	}
+	
 }

@@ -9,5 +9,7 @@ import java.util.List;
 public class TimeSheetLunch_request extends RequestBase{
 	public Long orgid_link;
 	public Date date;
+	public Long timesheet_shift_type_id_link;
+	public Long timesheet_shift_type_org_id_link;
 	public List<TimesheetShiftTypeOrg> listCa;
 }
