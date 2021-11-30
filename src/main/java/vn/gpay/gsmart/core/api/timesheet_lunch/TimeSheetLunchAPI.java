@@ -33,6 +33,8 @@ import vn.gpay.gsmart.core.timesheet_lunch.TimeSheetLunch;
 import vn.gpay.gsmart.core.timesheet_lunch.TimeSheetLunchBinding;
 import vn.gpay.gsmart.core.timesheet_lunch.TimeSheetLunch_Binding;
 import vn.gpay.gsmart.core.timesheet_lunch.TongHopBaoAn;
+import vn.gpay.gsmart.core.timesheet_lunch_khach.ITimeSheetLunchKhachService;
+import vn.gpay.gsmart.core.timesheet_lunch_khach.TimeSheetLunchKhach;
 import vn.gpay.gsmart.core.timesheet_shift_type.ITimesheetShiftTypeService;
 import vn.gpay.gsmart.core.timesheet_shift_type.TimesheetShiftType;
 import vn.gpay.gsmart.core.timesheet_shift_type_org.ITimesheetShiftTypeOrgService;
@@ -59,6 +61,8 @@ public class TimeSheetLunchAPI {
 	private IGpayUserOrgService userOrgService;
 	@Autowired
 	private ITimesheetAbsenceService timesheetAbsenceService;
+	@Autowired
+	ITimeSheetLunchKhachService lunchkhachService;
 
 //	@RequestMapping(value = "/getForTimeSheetLunch",method = RequestMethod.POST)
 //	public ResponseEntity<TimeSheetLunch_response> getForTimeSheetLunch(HttpServletRequest request) {
@@ -345,33 +349,85 @@ public class TimeSheetLunchAPI {
 			List<Org> list_org = orgService.getorgChildrenbyOrg(orgid_link, new ArrayList<>());
 			List<TongHopBaoAn> list = new ArrayList<TongHopBaoAn>();
 
+			// Thêm đơn vị khách vào báo cáo
+			Org org_khach = new Org();
+			org_khach.setName("Khách");
+			org_khach.setOrgtypeid_link(166);
+			org_khach.setId(orgid_link);
+
+			list_org.add(org_khach);
+
+			// Thêm báo thêm của các tổ
+			Org org_them = new Org();
+			org_them.setName("Báo bổ sung");
+			org_them.setOrgtypeid_link(999);
+			org_them.setId((long) -1);
+
+			list_org.add(org_them);
+
 			for (Org org : list_org) {
-				List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService.getForTimeSheetLunchByGrant(org.getId(),
-						date);
-				List<TimeSheetLunch> listca1 = new ArrayList<TimeSheetLunch>(listTimeSheetLunch);
-				listca1.removeIf(c -> !c.getShifttypeid_link().equals(4) || !c.isIslunch());
+				if (org.getOrgtypeid_link().equals(166)) {
+					List<TimeSheetLunchKhach> listTimeSheetLunchKhach = lunchkhachService.getby_ngay_org(date,
+							orgid_link);
+					listTimeSheetLunchKhach.removeIf(c -> c.getAmount() == 0);
 
-				List<TimeSheetLunch> listca2 = new ArrayList<TimeSheetLunch>(listTimeSheetLunch);
-				listca2.removeIf(c -> !c.getShifttypeid_link().equals(5) || !c.isIslunch());
+					List<TimeSheetLunchKhach> listTimeSheetLunchKhach_ca1 = new ArrayList<>(listTimeSheetLunchKhach);
+					listTimeSheetLunchKhach_ca1.removeIf(c -> !c.getShifttypeid_link().equals((long) 4));
 
-				List<TimeSheetLunch> listca3 = new ArrayList<TimeSheetLunch>(listTimeSheetLunch);
-				listca3.removeIf(c -> !c.getShifttypeid_link().equals(6) || !c.isIslunch());
+					List<TimeSheetLunchKhach> listTimeSheetLunchKhach_ca2 = new ArrayList<>(listTimeSheetLunchKhach);
+					listTimeSheetLunchKhach_ca2.removeIf(c -> !c.getShifttypeid_link().equals((long) 5));
 
-				List<TimeSheetLunch> listca4 = new ArrayList<TimeSheetLunch>(listTimeSheetLunch);
-				listca4.removeIf(c -> !c.getShifttypeid_link().equals(7) || !c.isIslunch());
+					List<TimeSheetLunchKhach> listTimeSheetLunchKhach_ca3 = new ArrayList<>(listTimeSheetLunchKhach);
+					listTimeSheetLunchKhach_ca3.removeIf(c -> !c.getShifttypeid_link().equals((long) 6));
 
-				List<TimeSheetLunch> listca5 = new ArrayList<TimeSheetLunch>(listTimeSheetLunch);
-				listca5.removeIf(c -> !c.getShifttypeid_link().equals(8) || !c.isIslunch());
+					List<TimeSheetLunchKhach> listTimeSheetLunchKhach_ca4 = new ArrayList<>(listTimeSheetLunchKhach);
+					listTimeSheetLunchKhach_ca4.removeIf(c -> !c.getShifttypeid_link().equals((long) 7));
 
-				TongHopBaoAn tonghop = new TongHopBaoAn();
-				tonghop.setOrg_name(org.getName());
-				tonghop.setCa1(listca1.size());
-				tonghop.setCa2(listca2.size());
-				tonghop.setCa3(listca3.size());
-				tonghop.setCa4(listca4.size());
-				tonghop.setCa5(listca5.size());
+					List<TimeSheetLunchKhach> listTimeSheetLunchKhach_ca5 = new ArrayList<>(listTimeSheetLunchKhach);
+					listTimeSheetLunchKhach_ca5.removeIf(c -> !c.getShifttypeid_link().equals((long) 8));
 
-				list.add(tonghop);
+					TongHopBaoAn tonghop = new TongHopBaoAn();
+					tonghop.setOrg_name(org.getName());
+					tonghop.setCa1(listTimeSheetLunchKhach_ca1.size());
+					tonghop.setCa2(listTimeSheetLunchKhach_ca2.size());
+					tonghop.setCa3(listTimeSheetLunchKhach_ca3.size());
+					tonghop.setCa4(listTimeSheetLunchKhach_ca4.size());
+					tonghop.setCa5(listTimeSheetLunchKhach_ca5.size());
+					tonghop.setOrgtypeid_link(org.getOrgtypeid_link());
+
+					list.add(tonghop);
+
+				} else if (org.getOrgtypeid_link().equals(999)) {
+
+				} else {
+					List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService
+							.getForTimeSheetLunchByGrant(org.getId(), date);
+					List<TimeSheetLunch> listca1 = new ArrayList<TimeSheetLunch>(listTimeSheetLunch);
+					listca1.removeIf(c -> !c.getShifttypeid_link().equals(4) || !c.isIslunch());
+
+					List<TimeSheetLunch> listca2 = new ArrayList<TimeSheetLunch>(listTimeSheetLunch);
+					listca2.removeIf(c -> !c.getShifttypeid_link().equals(5) || !c.isIslunch());
+
+					List<TimeSheetLunch> listca3 = new ArrayList<TimeSheetLunch>(listTimeSheetLunch);
+					listca3.removeIf(c -> !c.getShifttypeid_link().equals(6) || !c.isIslunch());
+
+					List<TimeSheetLunch> listca4 = new ArrayList<TimeSheetLunch>(listTimeSheetLunch);
+					listca4.removeIf(c -> !c.getShifttypeid_link().equals(7) || !c.isIslunch());
+
+					List<TimeSheetLunch> listca5 = new ArrayList<TimeSheetLunch>(listTimeSheetLunch);
+					listca5.removeIf(c -> !c.getShifttypeid_link().equals(8) || !c.isIslunch());
+
+					TongHopBaoAn tonghop = new TongHopBaoAn();
+					tonghop.setOrg_name(org.getName());
+					tonghop.setCa1(listca1.size());
+					tonghop.setCa2(listca2.size());
+					tonghop.setCa3(listca3.size());
+					tonghop.setCa4(listca4.size());
+					tonghop.setCa5(listca5.size());
+					tonghop.setOrgtypeid_link(org.getOrgtypeid_link());
+
+					list.add(tonghop);
+				}
 			}
 
 			response.data = list;
@@ -641,7 +697,7 @@ public class TimeSheetLunchAPI {
 			return new ResponseEntity<TimeSheetLunch_Binding_response>(HttpStatus.OK);
 		}
 	}
-	
+
 	@RequestMapping(value = "/getForTimeSheetLunch_Mobile", method = RequestMethod.POST)
 	public ResponseEntity<TimeSheetLunch_Binding_response> getForTimeSheetLunch_Mobile(
 			@RequestBody TimeSheetLunch_request entity, HttpServletRequest request) {
@@ -654,26 +710,29 @@ public class TimeSheetLunchAPI {
 
 			// lay danh sach ca cua phan xuong
 			List<TimesheetShiftTypeOrg> shift_list = timesheetshifttypeOrgService.getByOrgid_link_CaAn(orgid_link);
-			
-			for(TimesheetShiftTypeOrg shift : shift_list) {
+
+			for (TimesheetShiftTypeOrg shift : shift_list) {
 				TimeSheetLunch_Binding newTimeSheetLunch_Binding = new TimeSheetLunch_Binding();
 				String name = shift.getName() + " ";
-				name += shift.getFrom_hour() < 10 ? "0"+shift.getFrom_hour() : shift.getFrom_hour();
+				name += shift.getFrom_hour() < 10 ? "0" + shift.getFrom_hour() : shift.getFrom_hour();
 				name += ":";
-				name += shift.getFrom_minute() < 10 ? "0"+shift.getFrom_minute() : shift.getFrom_minute();
+				name += shift.getFrom_minute() < 10 ? "0" + shift.getFrom_minute() : shift.getFrom_minute();
 				name += " - ";
-				name += shift.getTo_hour() < 10 ? "0"+shift.getTo_hour() : shift.getTo_hour();
+				name += shift.getTo_hour() < 10 ? "0" + shift.getTo_hour() : shift.getTo_hour();
 				name += ":";
-				name += shift.getTo_minute() < 10 ? "0"+shift.getTo_minute() : shift.getTo_minute();
+				name += shift.getTo_minute() < 10 ? "0" + shift.getTo_minute() : shift.getTo_minute();
 				newTimeSheetLunch_Binding.setCaName(name);
-				
+
 //				System.out.println(name);
-				
+
 				// sl
-				
-				List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService.getByOrg_Shift(orgid_link, shift.getTimesheet_shift_type_id_link().intValue(), date);
-				List<TimeSheetLunch> listTimeSheetLunch_DangKy = timeSheetLunchService.getByOrg_Shift_DangKy(orgid_link, shift.getTimesheet_shift_type_id_link().intValue(), date);
-				List<TimeSheetLunch> listTimeSheetLunch_Them = timeSheetLunchService.getByOrg_Shift_Them(orgid_link, shift.getTimesheet_shift_type_id_link().intValue(), date);
+
+				List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService.getByOrg_Shift(orgid_link,
+						shift.getTimesheet_shift_type_id_link().intValue(), date);
+				List<TimeSheetLunch> listTimeSheetLunch_DangKy = timeSheetLunchService.getByOrg_Shift_DangKy(orgid_link,
+						shift.getTimesheet_shift_type_id_link().intValue(), date);
+				List<TimeSheetLunch> listTimeSheetLunch_Them = timeSheetLunchService.getByOrg_Shift_Them(orgid_link,
+						shift.getTimesheet_shift_type_id_link().intValue(), date);
 				newTimeSheetLunch_Binding.setSoDangKy(listTimeSheetLunch_DangKy.size());
 				newTimeSheetLunch_Binding.setSoThem(listTimeSheetLunch_Them.size());
 				newTimeSheetLunch_Binding.setSoTong(listTimeSheetLunch.size());
