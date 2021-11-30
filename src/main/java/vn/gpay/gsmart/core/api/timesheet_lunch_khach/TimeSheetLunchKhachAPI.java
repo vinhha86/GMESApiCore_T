@@ -45,7 +45,7 @@ public class TimeSheetLunchKhachAPI {
 			List<TimeSheetLunchKhach> list_khach = new ArrayList<TimeSheetLunchKhach>();
 
 			for (TimesheetShiftTypeOrg shift_type_org : list_shifttype_orgs) {
-				Long shifttypeid_link = shift_type_org.getTimesheet_shift_type_id_link();
+				Long shifttypeid_link = shift_type_org.getId();
 
 				List<TimeSheetLunchKhach> list_lunchkhach = lunchkhachService.getbyCa_ngay_org(shifttypeid_link, day,
 						orgid_link);
@@ -58,7 +58,7 @@ public class TimeSheetLunchKhachAPI {
 					lunch_khach_new.setId(null);
 					lunch_khach_new.setOrgid_link(orgid_link);
 					lunch_khach_new.setOrgrootid_link(user.getRootorgid_link());
-					lunch_khach_new.setShifttypeid_link(shifttypeid_link);
+					lunch_khach_new.setShifttype_orgid_link(shifttypeid_link);
 					lunch_khach_new.setStatus(0);
 					lunch_khach_new.setUsercreatedid_link(user.getId());
 					lunch_khach_new.setTimecreated(new Date());

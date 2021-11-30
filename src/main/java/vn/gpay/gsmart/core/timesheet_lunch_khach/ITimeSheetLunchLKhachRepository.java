@@ -16,7 +16,7 @@ public interface ITimeSheetLunchLKhachRepository
 		extends JpaRepository<TimeSheetLunchKhach, Long>, JpaSpecificationExecutor<TimeSheetLunchKhach> {
 
 	@Query("SELECT a " + "FROM TimeSheetLunchKhach a " + "where a.orgid_link = :orgid_link  "
-			+ "and a.day = :day and a.shifttypeid_link = :shifttypeid_link")
+			+ "and a.day = :day and a.shifttype_orgid_link = :shifttypeid_link")
 	public List<TimeSheetLunchKhach> getByDate_Ca_Org(@Param("shifttypeid_link") final Long shifttypeid_link,
 			@Param("day") final Date day, @Param("orgid_link") final Long orgid_link);
 

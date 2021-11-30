@@ -28,7 +28,7 @@ public class TimeSheetLunchKhach implements Serializable {
 	private Long id;
 	private Long orgrootid_link;
 	private Long orgid_link;
-	private Long shifttypeid_link;
+	private Long shifttype_orgid_link;
 	private Integer status;
 	private Long usercreatedid_link;
 	private Date timecreated;
@@ -38,9 +38,16 @@ public class TimeSheetLunchKhach implements Serializable {
 
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
-	@JoinColumn(name = "shifttypeid_link", insertable = false, updatable = false)
+	@JoinColumn(name = "shifttype_orgid_link", insertable = false, updatable = false)
 	private TimesheetShiftTypeOrg shifttype;
-
+	
+	@Transient
+	public Long getShifttypeid_link() {
+		if(shifttype!=null) {
+			return shifttype.getTimesheet_shift_type_id_link();
+		}
+		return null;
+	}
 	@Transient
 	public TimesheetShiftTypeOrg shifttypeorg;
 
@@ -135,14 +142,6 @@ public class TimeSheetLunchKhach implements Serializable {
 		this.orgrootid_link = orgrootid_link;
 	}
 
-	public Long getShifttypeid_link() {
-		return shifttypeid_link;
-	}
-
-	public void setShifttypeid_link(Long shifttypeid_link) {
-		this.shifttypeid_link = shifttypeid_link;
-	}
-
 	public Integer getStatus() {
 		return status;
 	}
@@ -197,5 +196,13 @@ public class TimeSheetLunchKhach implements Serializable {
 
 	public void setAmount(Integer amount) {
 		this.amount = amount;
+	}
+
+	public Long getShifttype_orgid_link() {
+		return shifttype_orgid_link;
+	}
+
+	public void setShifttype_orgid_link(Long shifttype_orgid_link) {
+		this.shifttype_orgid_link = shifttype_orgid_link;
 	}
 }

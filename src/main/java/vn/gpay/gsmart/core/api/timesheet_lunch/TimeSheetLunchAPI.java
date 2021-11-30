@@ -388,11 +388,11 @@ public class TimeSheetLunchAPI {
 
 					TongHopBaoAn tonghop = new TongHopBaoAn();
 					tonghop.setOrg_name(org.getName());
-					tonghop.setCa1(listTimeSheetLunchKhach_ca1.size());
-					tonghop.setCa2(listTimeSheetLunchKhach_ca2.size());
-					tonghop.setCa3(listTimeSheetLunchKhach_ca3.size());
-					tonghop.setCa4(listTimeSheetLunchKhach_ca4.size());
-					tonghop.setCa5(listTimeSheetLunchKhach_ca5.size());
+					tonghop.setCa1(listTimeSheetLunchKhach_ca1.size() == 0? 0 : listTimeSheetLunchKhach_ca1.get(0).getAmount());
+					tonghop.setCa2(listTimeSheetLunchKhach_ca2.size() == 0? 0 : listTimeSheetLunchKhach_ca2.get(0).getAmount());
+					tonghop.setCa3(listTimeSheetLunchKhach_ca3.size() == 0? 0 : listTimeSheetLunchKhach_ca3.get(0).getAmount());
+					tonghop.setCa4(listTimeSheetLunchKhach_ca4.size() == 0? 0 : listTimeSheetLunchKhach_ca4.get(0).getAmount());
+					tonghop.setCa5(listTimeSheetLunchKhach_ca5.size() == 0? 0 : listTimeSheetLunchKhach_ca5.get(0).getAmount());
 					tonghop.setOrgtypeid_link(org.getOrgtypeid_link());
 
 					list.add(tonghop);
@@ -455,6 +455,7 @@ public class TimeSheetLunchAPI {
 			Org org = orgService.findOne(orgid_link);
 			List<TimeSheetLunch> listTimeSheetLunch_select = new ArrayList<TimeSheetLunch>();
 			List<TimeSheetLunch> listTimeSheetLunch_unselect = new ArrayList<TimeSheetLunch>();
+			
 			if (org.getOrgtypeid_link().equals(OrgType.ORG_TYPE_XUONGSX)) {
 //				listTimeSheetLunch = timeSheetLunchService.getForTimeSheetLunch(orgid_link, workingdate);
 				if (selectIds.size() > 0) {
@@ -484,6 +485,7 @@ public class TimeSheetLunchAPI {
 				timeSheetLunch.setTime_approve(date);
 				timeSheetLunchService.save(timeSheetLunch);
 			}
+			
 			for (TimeSheetLunch timeSheetLunch : listTimeSheetLunch_unselect) {
 				timeSheetLunch.setStatus(0);
 				timeSheetLunch.setTime_approve(null);
@@ -762,7 +764,7 @@ public class TimeSheetLunchAPI {
 			Long orgid_link = entity.orgid_link; // id phan xuong
 			Date date = entity.date; // ngay
 			Long timesheet_shift_type_id_link = entity.timesheet_shift_type_id_link;
-			Long timesheet_shift_type_org_id_link = entity.timesheet_shift_type_org_id_link;
+//			Long timesheet_shift_type_org_id_link = entity.timesheet_shift_type_org_id_link;
 
 			List<TimeSheetLunch_Binding> result = new ArrayList<TimeSheetLunch_Binding>();
 			List<Org> org_list = orgService.getorgChildrenbyOrg(orgid_link, new ArrayList<>());
