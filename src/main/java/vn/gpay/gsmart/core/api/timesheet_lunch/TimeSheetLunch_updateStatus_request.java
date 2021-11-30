@@ -10,5 +10,6 @@ public class TimeSheetLunch_updateStatus_request extends RequestBase {
 	public List<Long> unselectIds;
 	public Long orgid_link;
 	public Date workingdate;
-	public Integer status;
+	public Long shifttypeid_link;
+	public String comment;
 }
