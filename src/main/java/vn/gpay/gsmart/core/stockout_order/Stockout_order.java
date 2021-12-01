@@ -62,6 +62,7 @@ public class Stockout_order implements Serializable {
 	private Long pcontract_poid_link;
 	private Date date_to_vai_yc;
 	private Date date_xuat_yc;
+	private Long porder_grantid_link;
 	
 	public Long getUnitid_link() {
 		return unitid_link;
@@ -281,6 +282,14 @@ public class Stockout_order implements Serializable {
 
 	public void setDate_xuat_yc(Date date_xuat_yc) {
 		this.date_xuat_yc = date_xuat_yc;
+	}
+
+	public Long getPorder_grantid_link() {
+		return porder_grantid_link;
+	}
+
+	public void setPorder_grantid_link(Long porder_grantid_link) {
+		this.porder_grantid_link = porder_grantid_link;
 	}
 
 	public List<Stockout_order_d> getStockout_order_d() {

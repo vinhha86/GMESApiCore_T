@@ -19,9 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.base.ResponseError;
+import vn.gpay.gsmart.core.org.IOrgService;
+import vn.gpay.gsmart.core.org.Org;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
+import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder_bom_color.IPOrderBomColor_Service;
 import vn.gpay.gsmart.core.porder_bom_sku.IPOrderBOMSKU_Service;
 import vn.gpay.gsmart.core.porder_bom_sku.POrderBOMSKU;
@@ -42,6 +45,7 @@ import vn.gpay.gsmart.core.stockout_order.Stockout_order_coloramount;
 import vn.gpay.gsmart.core.stockout_order.Stockout_order_d;
 import vn.gpay.gsmart.core.stockout_order.Stockout_order_pkl;
 import vn.gpay.gsmart.core.utils.Common;
+import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.POStatus;
 import vn.gpay.gsmart.core.utils.POrderBomType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
@@ -67,6 +71,7 @@ public class Stockout_orderAPI {
 	
 	@Autowired IPContract_POService pcontract_po_Service;
 	@Autowired IPOrderGrant_Service porder_grantService;
+	@Autowired IOrgService orgService;;
 	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ResponseEntity<create_order_response> Create(HttpServletRequest request,
@@ -546,6 +551,24 @@ public class Stockout_orderAPI {
 					.getPrincipal();
 			Long orgrootid_link = user.getRootorgid_link();
 			Date current_time = new Date();
+			
+			Long pordergrantid_link = entity.pordergrantid_link;
+			POrderGrant porderGrant = porder_grantService.findOne(pordergrantid_link);
+			Org toChuyen = orgService.findOne(porderGrant.getGranttoorgid_link());
+			Org phanXuong = orgService.findOne(toChuyen.getParentid_link());
+			
+			// tim kho vai dau tien cua phan xuong
+			List<Org> khoVai_list = orgService.findChildByType(orgrootid_link, phanXuong.getId(), OrgType.ORG_TYPE_KHONGUYENLIEU);
+			Long orgid_from_link = null;
+			if(khoVai_list.size() > 0) {
+				orgid_from_link = khoVai_list.get(0).getId();
+			}
+			
+			//
+			Long porderid_link = porderGrant.getPorderid_link();
+			POrder porder = porderService.findOne(porderid_link);
+			Long pcontractid_link = porder.getPcontractid_link();
+			
 			List<Stockout_order> Stockout_order_list = entity.data;
 			for(Stockout_order stockout_order : Stockout_order_list) {
 				// voi moi stockout_order_d tao moi 1 stockout_order
@@ -556,6 +579,9 @@ public class Stockout_orderAPI {
 				stockout_order.setUsercreateid_link(user.getId());
 				stockout_order.setStockout_order_code(stockout_order_code);
 				stockout_order.setStockouttypeid_link(StockoutTypes.STOCKOUT_TYPE_NL_CUTHOUSE);
+				stockout_order.setOrgid_from_link(orgid_from_link);
+				stockout_order.setPcontractid_link(pcontractid_link);
+				stockout_order.setPorderid_link(porderid_link);
 				stockout_order.setStatus(0);
 				
 				List<Stockout_order_d> stockout_order_d_list = stockout_order.getStockout_order_d();
