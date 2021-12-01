@@ -64,6 +64,8 @@ public class TimeSheetLunchAPI {
 	private ITimesheetAbsenceService timesheetAbsenceService;
 	@Autowired
 	ITimeSheetLunchKhachService lunchkhachService;
+	@Autowired
+	ITimeSheetLunchKhachService timeSheetLunchKhachService;
 
 //	@RequestMapping(value = "/getForTimeSheetLunch",method = RequestMethod.POST)
 //	public ResponseEntity<TimeSheetLunch_response> getForTimeSheetLunch(HttpServletRequest request) {
@@ -769,15 +771,25 @@ public class TimeSheetLunchAPI {
 
 				// sl
 
-				List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService.getByOrg_Shift(orgid_link,
-						shift.getTimesheet_shift_type_id_link().intValue(), date);
+//				List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService.getByOrg_Shift(orgid_link,
+//						shift.getTimesheet_shift_type_id_link().intValue(), date);
 				List<TimeSheetLunch> listTimeSheetLunch_DangKy = timeSheetLunchService.getByOrg_Shift_DangKy(orgid_link,
 						shift.getTimesheet_shift_type_id_link().intValue(), date);
 				List<TimeSheetLunch> listTimeSheetLunch_Them = timeSheetLunchService.getByOrg_Shift_Them(orgid_link,
 						shift.getTimesheet_shift_type_id_link().intValue(), date);
 				newTimeSheetLunch_Binding.setSoDangKy(listTimeSheetLunch_DangKy.size());
 				newTimeSheetLunch_Binding.setSoThem(listTimeSheetLunch_Them.size());
-				newTimeSheetLunch_Binding.setSoTong(listTimeSheetLunch.size());
+				
+				// Tinh so khach - // orgid_link, shifttype_orgid_link, date
+				Long shifttype_orgid_link = shift.getId();
+				List<TimeSheetLunchKhach> TimeSheetLunchKhach_list = timeSheetLunchKhachService.getbyCa_ngay_org(shifttype_orgid_link, date, orgid_link);
+				Integer khach_amount = 0;
+				if(TimeSheetLunchKhach_list.size() > 0) {
+					khach_amount = TimeSheetLunchKhach_list.get(0).getAmount() == null ? 0 : TimeSheetLunchKhach_list.get(0).getAmount();
+				}
+				
+				newTimeSheetLunch_Binding.setSoKhach(khach_amount);
+				newTimeSheetLunch_Binding.setSoTong(listTimeSheetLunch_DangKy.size() + listTimeSheetLunch_Them.size() + khach_amount);
 
 				newTimeSheetLunch_Binding.setTimesheet_shift_type_id_link(shift.getTimesheet_shift_type_id_link());
 				newTimeSheetLunch_Binding.setTimesheet_shift_type_org_id_link(shift.getId());

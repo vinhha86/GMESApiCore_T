@@ -45,6 +45,7 @@ public class TimeSheetLunch_Binding {
 	private String caName;
 	private Integer soDangKy;
 	private Integer soThem;
+	private Integer soKhach;
 	private Integer soTong;
 	private Long timesheet_shift_type_id_link;
 	private Long timesheet_shift_type_org_id_link;
@@ -144,6 +145,14 @@ public class TimeSheetLunch_Binding {
 
 	public void setSoThem(Integer soThem) {
 		this.soThem = soThem;
+	}
+	
+	public Integer getSoKhach() {
+		return soKhach;
+	}
+
+	public void setSoKhach(Integer soKhach) {
+		this.soKhach = soKhach;
 	}
 
 	public Integer getSoTong() {
