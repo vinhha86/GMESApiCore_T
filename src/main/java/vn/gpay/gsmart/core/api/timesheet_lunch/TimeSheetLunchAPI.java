@@ -784,12 +784,18 @@ public class TimeSheetLunchAPI {
 				newTimeSheetLunch_Binding.setSoThem(listTimeSheetLunch_Them.size());
 				
 				// Tinh so khach - // orgid_link, shifttype_orgid_link, date
-				Long shifttype_orgid_link = shift.getId();
+				Long shifttype_orgid_link = shift.getTimesheet_shift_type_id_link();
 				List<TimeSheetLunchKhach> TimeSheetLunchKhach_list = timeSheetLunchKhachService.getbyCa_ngay_org(shifttype_orgid_link, date, orgid_link);
 				Integer khach_amount = 0;
 				if(TimeSheetLunchKhach_list.size() > 0) {
 					khach_amount = TimeSheetLunchKhach_list.get(0).getAmount() == null ? 0 : TimeSheetLunchKhach_list.get(0).getAmount();
 				}
+//				System.out.println("-----");
+//				System.out.println(TimeSheetLunchKhach_list.size());
+//				System.out.println(shifttype_orgid_link);
+//				System.out.println(date);
+//				System.out.println(orgid_link);
+//				System.out.println(khach_amount);
 				
 				newTimeSheetLunch_Binding.setSoKhach(khach_amount);
 				newTimeSheetLunch_Binding.setSoTong(listTimeSheetLunch_DangKy.size() + listTimeSheetLunch_Them.size() + khach_amount);
