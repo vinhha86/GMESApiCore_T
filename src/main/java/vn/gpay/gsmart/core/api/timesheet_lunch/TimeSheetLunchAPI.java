@@ -486,10 +486,13 @@ public class TimeSheetLunchAPI {
 
 			for (TimeSheetLunch timeSheetLunch : listTimeSheetLunch_select) {
 				if (timeSheetLunch.getStatus().equals(0)) {
-					if (timeSheetLunch.getShifttypeid_link().equals(shifttypeid_link.intValue())) {
-						timeSheetLunch.setComment(comment);
-						timeSheetLunch.setIs_bo_sung(true);
+					if (shifttypeid_link != null) {
+						if (timeSheetLunch.getShifttypeid_link().equals(shifttypeid_link.intValue())) {
+							timeSheetLunch.setComment(comment);
+							timeSheetLunch.setIs_bo_sung(true);
+						}
 					}
+
 					timeSheetLunch.setStatus(1);
 					timeSheetLunch.setTime_approve(date);
 					timeSheetLunchService.save(timeSheetLunch);
@@ -821,23 +824,41 @@ public class TimeSheetLunchAPI {
 			List<TimeSheetLunch_Binding> result = new ArrayList<TimeSheetLunch_Binding>();
 			List<Org> org_list = orgService.getorgChildrenbyOrg(orgid_link, new ArrayList<>());
 
+			// Thêm đơn vị khách vào báo cáo
+			Org org_khach = new Org();
+			org_khach.setName("Khách");
+			org_khach.setCode("Khách");
+			org_khach.setOrgtypeid_link(166);
+			org_khach.setId(orgid_link);
+
+			org_list.add(org_khach);
+
 			for (Org org : org_list) {
 				TimeSheetLunch_Binding newTimeSheetLunch_Binding = new TimeSheetLunch_Binding();
-				newTimeSheetLunch_Binding.setOrgId(org.getId());
 				newTimeSheetLunch_Binding.setOrgCode(org.getCode());
 				newTimeSheetLunch_Binding.setOrgName(org.getName());
 				newTimeSheetLunch_Binding.setOrgType(org.getOrgtypeid_link());
+				if (org.getOrgtypeid_link().equals(166)) {
+					List<TimeSheetLunchKhach> list_lunch_khach = lunchkhachService
+							.getbyCa_ngay_org(timesheet_shift_type_id_link, date, orgid_link);
+					if (list_lunch_khach.size() > 0) {
+						newTimeSheetLunch_Binding.setSoDangKy(list_lunch_khach.get(0).getAmount());
+						newTimeSheetLunch_Binding.setSoTong(list_lunch_khach.get(0).getAmount());
+					}
 
-				List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService.getByOrg_Shift(org.getId(),
-						timesheet_shift_type_id_link.intValue(), date);
-				List<TimeSheetLunch> listTimeSheetLunch_DangKy = timeSheetLunchService
-						.getByOrg_Shift_DangKy(org.getId(), timesheet_shift_type_id_link.intValue(), date);
-				List<TimeSheetLunch> listTimeSheetLunch_Them = timeSheetLunchService.getByOrg_Shift_Them(org.getId(),
-						timesheet_shift_type_id_link.intValue(), date);
-				newTimeSheetLunch_Binding.setSoDangKy(listTimeSheetLunch_DangKy.size());
-				newTimeSheetLunch_Binding.setSoThem(listTimeSheetLunch_Them.size());
-				newTimeSheetLunch_Binding.setSoTong(listTimeSheetLunch.size());
+				} else {
 
+					List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService.getByOrg_Shift(org.getId(),
+							timesheet_shift_type_id_link.intValue(), date);
+					List<TimeSheetLunch> listTimeSheetLunch_DangKy = timeSheetLunchService
+							.getByOrg_Shift_DangKy(org.getId(), timesheet_shift_type_id_link.intValue(), date);
+					List<TimeSheetLunch> listTimeSheetLunch_Them = timeSheetLunchService
+							.getByOrg_Shift_Them(org.getId(), timesheet_shift_type_id_link.intValue(), date);
+					newTimeSheetLunch_Binding.setSoDangKy(listTimeSheetLunch_DangKy.size());
+					newTimeSheetLunch_Binding.setSoThem(listTimeSheetLunch_Them.size());
+					newTimeSheetLunch_Binding.setSoTong(listTimeSheetLunch.size());
+
+				}
 				result.add(newTimeSheetLunch_Binding);
 			}
 
