@@ -582,6 +582,7 @@ public class Stockout_orderAPI {
 				stockout_order.setOrgid_from_link(orgid_from_link);
 				stockout_order.setPcontractid_link(pcontractid_link);
 				stockout_order.setPorderid_link(porderid_link);
+				stockout_order.setPorder_grantid_link(pordergrantid_link);
 				stockout_order.setStatus(0);
 				
 				List<Stockout_order_d> stockout_order_d_list = stockout_order.getStockout_order_d();
@@ -612,5 +613,19 @@ public class Stockout_orderAPI {
 			response.setMessage(e.getMessage());
 		}
 		return new ResponseEntity<create_order_response>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/getById", method = RequestMethod.POST)
+	public ResponseEntity<getby_id_response> getById(HttpServletRequest request,
+			@RequestBody getby_id_request entity) {
+		getby_id_response response = new getby_id_response();
+		try {
+			response.data = stockout_order_Service.findOne(entity.id);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<getby_id_response>(response, HttpStatus.OK);
 	}
 }
