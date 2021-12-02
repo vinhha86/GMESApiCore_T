@@ -50,7 +50,9 @@ public class TimeSheetLunchKhachAPI {
 				List<TimeSheetLunchKhach> list_lunchkhach = lunchkhachService.getbyCa_ngay_org(shifttypeid_link, day,
 						orgid_link);
 				if (list_lunchkhach.size() > 0) {
-					list_khach.add(list_lunchkhach.get(0));
+					TimeSheetLunchKhach lunch_khach_new = list_lunchkhach.get(0);
+					list_lunchkhach.removeIf(c -> c.getAmount() == 0);
+					list_khach.add(list_lunchkhach.size() > 0 ? list_lunchkhach.get(0) : lunch_khach_new);
 				} else {
 					TimeSheetLunchKhach lunch_khach_new = new TimeSheetLunchKhach();
 					lunch_khach_new.setAmount(0);
