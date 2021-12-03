@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import vn.gpay.gsmart.core.api.balance.Balance_Product_Data;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.base.ResponseError;
 import vn.gpay.gsmart.core.org.IOrgService;
@@ -701,6 +700,8 @@ public class Stockout_orderAPI {
 				stockout_order.setOrgrootid_link(orgrootid_link);
 				stockout_order.setTimecreate(current_time);
 				stockout_order.setUsercreateid_link(user.getId());
+				stockout_order.setLasttimeupdate(current_time);
+				stockout_order.setLastuserupdateid_link(user.getId());
 				stockout_order.setStockout_order_code(stockout_order_code);
 				stockout_order.setStockouttypeid_link(StockoutTypes.STOCKOUT_TYPE_NL_CUTHOUSE);
 				stockout_order.setOrgid_from_link(orgid_from_link);
@@ -712,16 +713,21 @@ public class Stockout_orderAPI {
 				List<Stockout_order_d> stockout_order_d_list = stockout_order.getStockout_order_d();
 				for(Stockout_order_d stockout_order_d : stockout_order_d_list) {
 					stockout_order_d.setOrgrootid_link(orgrootid_link);
+					stockout_order_d.setTimecreate(current_time);
+					stockout_order_d.setUsercreateid_link(user.getId());
+					stockout_order_d.setLasttimeupdate(current_time);
+					stockout_order_d.setLastuserupdateid_link(user.getId());
 					
 					List<Stockout_order_pkl> stockout_order_pkl_list = stockout_order_d.getStockout_order_pkl();
 					for(Stockout_order_pkl stockout_order_pkl : stockout_order_pkl_list) {
-//						stockout_order_pkl.setOrgid_link(orgrootid_link);
+						stockout_order_pkl.setTimecreate(current_time);
+						stockout_order_pkl.setUsercreateid_link(user.getId());
+						stockout_order_pkl.setLasttimeupdate(current_time);
+						stockout_order_pkl.setLastuserupdateid_link(user.getId());
 					}
 				}
-						
 
 				stockout_order_Service.save(stockout_order);
-						
 					
 				Stocking_UniqueCode unique = stockingService.getby_type(3);
 				Integer max = unique.getStocking_max();
@@ -739,17 +745,51 @@ public class Stockout_orderAPI {
 		return new ResponseEntity<create_order_response>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/getById", method = RequestMethod.POST)
-	public ResponseEntity<getby_id_response> getById(HttpServletRequest request,
-			@RequestBody getby_id_request entity) {
-		getby_id_response response = new getby_id_response();
+	@RequestMapping(value = "/save_YeuCauXuat", method = RequestMethod.POST)
+	@Transactional(rollbackFor = RuntimeException.class)
+	public ResponseEntity<create_order_response> save_YeuCauXuat(HttpServletRequest request,
+			@RequestBody create_stockout_order_request entity) {
+		create_order_response response = new create_order_response();
 		try {
-			response.data = stockout_order_Service.findOne(entity.id);
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+//			Long orgrootid_link = user.getRootorgid_link();
+			Date current_time = new Date();
+			
+			List<Stockout_order> Stockout_order_list = entity.data;
+			for(Stockout_order stockout_order : Stockout_order_list) {
+				stockout_order.setLasttimeupdate(current_time);
+				stockout_order.setLastuserupdateid_link(user.getId());
+				List<Stockout_order_d> stockout_order_d_list = stockout_order.getStockout_order_d();
+				for(Stockout_order_d stockout_order_d : stockout_order_d_list) {
+					if(stockout_order_d.getId() == null) {
+						stockout_order_d.setTimecreate(current_time);
+						stockout_order_d.setUsercreateid_link(user.getId());
+					}
+					stockout_order_d.setLasttimeupdate(current_time);
+					stockout_order_d.setLastuserupdateid_link(user.getId());
+					
+					List<Stockout_order_pkl> stockout_order_pkl_list = stockout_order_d.getStockout_order_pkl();
+					for(Stockout_order_pkl stockout_order_pkl : stockout_order_pkl_list) {
+						if(stockout_order_pkl.getId() == null) {
+							stockout_order_pkl.setTimecreate(current_time);
+							stockout_order_pkl.setUsercreateid_link(user.getId());
+						}
+						stockout_order_pkl.setLasttimeupdate(current_time);
+						stockout_order_pkl.setLastuserupdateid_link(user.getId());
+					}
+				}
+				
+				stockout_order_Service.save(stockout_order);
+			}
+			
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 		}
-		return new ResponseEntity<getby_id_response>(response, HttpStatus.OK);
+		return new ResponseEntity<create_order_response>(response, HttpStatus.OK);
 	}
 }

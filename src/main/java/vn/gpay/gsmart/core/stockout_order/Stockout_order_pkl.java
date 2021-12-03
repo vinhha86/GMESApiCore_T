@@ -56,6 +56,9 @@ public class Stockout_order_pkl implements Serializable{
 	private Float width_met_check;
 	private Float width_met;
 	
+	@Transient
+	private String spaceString;
+	
 	public Float getMet() {
 		return met;
 	}
@@ -264,6 +267,12 @@ public class Stockout_order_pkl implements Serializable{
 	public void setWidth_met(Float width_met) {
 		this.width_met = width_met;
 	}
-	
-	
+
+	public String getSpaceString() {
+		return spaceString;
+	}
+
+	public void setSpaceString(String spaceString) {
+		this.spaceString = spaceString;
+	}
 }

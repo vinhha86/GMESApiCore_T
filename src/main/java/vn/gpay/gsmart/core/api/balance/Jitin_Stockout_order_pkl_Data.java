@@ -37,6 +37,7 @@ public class Jitin_Stockout_order_pkl_Data implements Serializable{
 	private String material_product_code;
 	private String color_name;
 	private String unit_name;
+	private String spaceString;
 	public Long getId() {
 		return id;
 	}
@@ -216,6 +217,12 @@ public class Jitin_Stockout_order_pkl_Data implements Serializable{
 	}
 	public void setUnit_name(String unit_name) {
 		this.unit_name = unit_name;
+	}
+	public String getSpaceString() {
+		return spaceString;
+	}
+	public void setSpaceString(String spaceString) {
+		this.spaceString = spaceString;
 	}
 
 	
