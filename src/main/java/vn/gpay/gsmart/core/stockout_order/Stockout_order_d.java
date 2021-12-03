@@ -81,7 +81,7 @@ public class Stockout_order_d implements Serializable {
 	public Float gettotalmet_lock() {
 		float sum = 0;
 		for(Stockout_order_pkl pkl : stockout_order_pkl) {
-			sum += pkl.getMet();
+			sum += pkl.getMet() == null ? 0 : pkl.getMet();
 		}
 		return sum;
 	}

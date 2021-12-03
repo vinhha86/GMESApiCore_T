@@ -47,8 +47,14 @@ public class Stockout_order_pkl implements Serializable{
 	private Long lastuserupdateid_link;
 	private Date lasttimeupdate;
 	private String spaceepc_link;
-	private Float met;
 	private Integer status;
+	private Float met;
+	private Float metorigin;
+	private Float metcheck;
+	private Float width_yds_check;
+	private Float width_yds;
+	private Float width_met_check;
+	private Float width_met;
 	
 	public Float getMet() {
 		return met;
@@ -209,6 +215,54 @@ public class Stockout_order_pkl implements Serializable{
 
 	public void setStatus(Integer status) {
 		this.status = status;
+	}
+
+	public Float getMetorigin() {
+		return metorigin;
+	}
+
+	public void setMetorigin(Float metorigin) {
+		this.metorigin = metorigin;
+	}
+
+	public Float getMetcheck() {
+		return metcheck;
+	}
+
+	public void setMetcheck(Float metcheck) {
+		this.metcheck = metcheck;
+	}
+
+	public Float getWidth_yds_check() {
+		return width_yds_check;
+	}
+
+	public void setWidth_yds_check(Float width_yds_check) {
+		this.width_yds_check = width_yds_check;
+	}
+
+	public Float getWidth_yds() {
+		return width_yds;
+	}
+
+	public void setWidth_yds(Float width_yds) {
+		this.width_yds = width_yds;
+	}
+
+	public Float getWidth_met_check() {
+		return width_met_check;
+	}
+
+	public void setWidth_met_check(Float width_met_check) {
+		this.width_met_check = width_met_check;
+	}
+
+	public Float getWidth_met() {
+		return width_met;
+	}
+
+	public void setWidth_met(Float width_met) {
+		this.width_met = width_met;
 	}
 	
 	

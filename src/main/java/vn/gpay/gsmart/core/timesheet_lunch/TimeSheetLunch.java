@@ -36,6 +36,8 @@ public class TimeSheetLunch implements Serializable {
 	private boolean isworking;
 	private boolean islunch;
 	private Date time_approve;
+	private String comment;
+	private Boolean is_bo_sung;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -150,4 +152,17 @@ public class TimeSheetLunch implements Serializable {
 	public void setTime_approve(Date time_approve) {
 		this.time_approve = time_approve;
 	}
+	public String getComment() {
+		return comment;
+	}
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+	public Boolean getIs_bo_sung() {
+		return is_bo_sung;
+	}
+	public void setIs_bo_sung(Boolean is_bo_sung) {
+		this.is_bo_sung = is_bo_sung;
+	}
+	
 }
