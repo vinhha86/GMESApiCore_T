@@ -21,6 +21,8 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import vn.gpay.gsmart.core.org.Org;
+import vn.gpay.gsmart.core.pcontract.PContract;
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.security.GpayUser;
 
@@ -63,6 +65,11 @@ public class Stockout_order implements Serializable {
 	private Date date_to_vai_yc;
 	private Date date_xuat_yc;
 	
+	@Transient
+	private int totalpair;
+	@Transient
+	private int po_quantity_sp;
+	
 	public Long getUnitid_link() {
 		return unitid_link;
 	}
@@ -92,6 +99,16 @@ public class Stockout_order implements Serializable {
     private POrder porder;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="pcontract_poid_link",insertable=false,updatable =false)
+    private PContract_PO pcontract_po;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+    @JoinColumn(name="pcontractid_link",insertable=false,updatable =false)
+    private PContract pcontract;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
 //	@OneToMany( cascade =  CascadeType.ALL , orphanRemoval=true )
 	@OneToMany(cascade =  CascadeType.ALL)
 	@JoinColumn( name="stockoutorderid_link", referencedColumnName="id")
@@ -115,6 +132,62 @@ public class Stockout_order implements Serializable {
 	public String getOrg_to_name() {
 		if(orgTo!=null) 
 			return orgTo.getName();
+		return "";
+	}
+	
+	@Transient
+	public String getPort_from() {
+		if (pcontract_po != null) {
+			return pcontract_po.getPortFrom();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getPort_to() {
+		if (pcontract_po != null) {
+			return pcontract_po.getPortTo();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getProductbuyercode() {
+		if (pcontract_po != null) {
+			return pcontract_po.getProductbuyercode();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getPo_buyer() {
+		if (pcontract_po != null) {
+			return pcontract_po.getPo_buyer();
+		}
+		return "";
+	}
+	
+	@Transient
+	public Integer getPo_quantity() {
+		if (pcontract_po != null) {
+			return pcontract_po.getPo_quantity();
+		}
+		return null;
+	}
+	
+	@Transient
+	public String getBuyername() {
+		if (pcontract != null) {
+			return pcontract.getBuyername();
+		}
+		return "";
+	}
+
+	@Transient
+	public String getVendorname() {
+		if (pcontract != null) {
+			return pcontract.getVendorname();
+		}
 		return "";
 	}
 	
@@ -290,5 +363,20 @@ public class Stockout_order implements Serializable {
 	public void setStockout_order_d(List<Stockout_order_d> stockout_order_d) {
 		this.stockout_order_d = stockout_order_d;
 	}
+
+	public int getTotalpair() {
+		return totalpair;
+	}
+
+	public void setTotalpair(int totalpair) {
+		this.totalpair = totalpair;
+	}
 	
+	public int getPo_quantity_sp() {
+		return po_quantity_sp;
+	}
+
+	public void setPo_quantity_sp(int po_quantity_sp) {
+		this.po_quantity_sp = po_quantity_sp;
+	}
 }

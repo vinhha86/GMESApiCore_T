@@ -463,6 +463,14 @@ public class POrder implements Serializable {
 	}
 	
 	@Transient
+	public Long getOrgbuyerid_link() {
+		if(pcontract != null) {
+			return pcontract.getOrgbuyerid_link();
+		}
+		return null;
+	}
+	
+	@Transient
 	public String getVendorname() {
 		if(pcontract != null) {
 			return pcontract.getVendorname();

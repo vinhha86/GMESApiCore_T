@@ -166,6 +166,11 @@ public class POrderGrant implements Serializable {
 	public String getXuongSX() {
 		return org.getParentcode();
 	}
+	
+	@Transient
+	public Long getXuongSX_ID() {
+		return org.getParentid_link();
+	}
 
 	@Transient
 	public String getDonvi() {
@@ -247,6 +252,13 @@ public class POrderGrant implements Serializable {
 			return porder.getBuyername();
 		}
 		return "";
+	}
+	@Transient
+	public Long getOrgbuyerid_link() {
+		if(porder != null) {
+			return porder.getOrgbuyerid_link();
+		}
+		return null;
 	}
 
 	@Transient

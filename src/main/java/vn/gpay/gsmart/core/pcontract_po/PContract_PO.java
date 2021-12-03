@@ -111,10 +111,10 @@ public class PContract_PO implements Serializable {
 	@Transient
 	private String productionlines;
 
-	@NotFound(action = NotFoundAction.IGNORE)
-	@OneToMany
-	@JoinColumn(name = "pcontract_poid_link", insertable = false, updatable = false)
-	private List<PContractProductSKU> pcontractProductSKUs = new ArrayList<>();
+//	@NotFound(action = NotFoundAction.IGNORE)
+//	@OneToMany
+//	@JoinColumn(name = "pcontract_poid_link", insertable = false, updatable = false)
+//	private List<PContractProductSKU> pcontractProductSKUs = new ArrayList<>();
 
 //	@NotFound(action = NotFoundAction.IGNORE)
 //	@OneToMany
@@ -132,8 +132,8 @@ public class PContract_PO implements Serializable {
 	@Transient
 	public Integer getPcontractPoProductSkuQuantityTotal() { // sl sp sku trong po line
 		Integer sum = 0;
-		if (pcontractProductSKUs != null && pcontractProductSKUs.size() > 0) {
-			for (PContractProductSKU PContractProductSKU : pcontractProductSKUs) {
+		if (pcontract_po_sku != null && pcontract_po_sku.size() > 0) {
+			for (PContractProductSKU PContractProductSKU : pcontract_po_sku) {
 				if (PContractProductSKU.getPquantity_total() != null && PContractProductSKU.getPquantity_total() != 0) {
 					sum += PContractProductSKU.getPquantity_total();
 				}
@@ -280,6 +280,13 @@ public class PContract_PO implements Serializable {
 		if (parent != null)
 			return parent.getProductid_link();
 		return 0;
+	}
+	
+	@Transient
+	public Long getOrg_inchargeid_link() {
+		if (parent != null)
+			return parent.getOrgmerchandiseid_link();
+		return null;
 	}
 
 	@Transient
@@ -896,6 +903,10 @@ public class PContract_PO implements Serializable {
 
 	public void setTotalpair(int totalpair) {
 		this.totalpair = totalpair;
+	}
+
+	public List<PContractProductSKU> getPcontract_po_sku() {
+		return pcontract_po_sku;
 	}
 
 }

@@ -63,6 +63,11 @@ public class Stockout_order_d implements Serializable {
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
+    @JoinColumn(name="p_skuid_link",insertable=false,updatable =false)
+    private SKU p_sku;
+	
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
     @JoinColumn(name="unitid_link",insertable=false,updatable =false)
     private Unit unit;
 	
@@ -167,6 +172,44 @@ public class Stockout_order_d implements Serializable {
 	public String getCoKho() {
 		if(sku!=null)
 			return sku.getCoSanPham_product();
+		return "";
+	}
+	
+	
+	//Product
+	@Transient
+	public String getProduct_code_p() {
+		if(p_sku!=null)
+			return p_sku.getProduct_code();
+		return "";
+	}
+	@Transient
+	public String getSkucode_p() {
+		if(p_sku!=null) {
+			return p_sku.getCode();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getSkuname_p() {
+		if(p_sku!=null) {
+			return p_sku.getName();
+		}
+		return "";
+	}
+	
+	@Transient
+	public String getColor_name_p() {
+		if (p_sku != null) {
+			return p_sku.getColor_name();
+		}
+		return "";
+	}
+	@Transient
+	public String getSize_name_p() {
+		if(p_sku!=null)
+			return p_sku.getCoSanPham();
 		return "";
 	}
 	

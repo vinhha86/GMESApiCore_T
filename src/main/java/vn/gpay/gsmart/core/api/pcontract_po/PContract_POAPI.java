@@ -3107,6 +3107,19 @@ public class PContract_POAPI {
 			long orgrootid_link = user.getRootorgid_link();
 
 			List<PContract_PO> pcontract = pcontract_POService.getPO_HavetoShip(orgrootid_link, entity.shipdate_from, entity.shipdate_to);
+			for (PContract_PO po : pcontract) {
+				List<ProductPairing> p = pairService.getproduct_pairing_detail_bycontract(orgrootid_link,
+						po.getPcontractid_link(), po.getProductid_link());
+				int total = 1;
+				if (p.size() > 0) {
+					total = 0;
+					for (ProductPairing pair : p) {
+						total += pair.getAmount();
+					}
+				}
+				po.setTotalpair(total);
+				po.setPo_quantity_sp(po.getPo_quantity() * total);
+			}
 			response.data = pcontract;
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);

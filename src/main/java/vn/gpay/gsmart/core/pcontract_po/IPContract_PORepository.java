@@ -71,7 +71,7 @@ public interface IPContract_PORepository
 
 	//Lấy các PO Line đã chốt, chưa có Lệnh xuất kho và có ngày giao hàng <= ngày giới hạn
 	@Query(value = "select c from PContract_PO c " + "where c.orgrootid_link = :orgrootid_link "
-			+ "and po_typeid_link = 11 " 
+			+ "and c.po_typeid_link = 11 and c.ismap = true " 
 			+ "and (c.status is null or (c.status >= 0 and c.status < 2)) " 
 			+ "and (c.shipdate >= :shipdate_from and c.shipdate <= :shipdate_to)")
 	public List<PContract_PO> getPO_HavetoShip(

@@ -103,8 +103,8 @@ public interface IPOrderGrant_Repository
 			@Param("date_from") final Date date_from,
 			@Param("date_to") final Date date_to);
 
-	@Query(value = "select a from POrderGrant a " + "inner join POrderGrant_SKU b on a.id = b.pordergrantid_link "
-			+ "where b.pcontract_poid_link =  :pcontract_poid_link")
+	@Query(value = "select a from POrderGrant a where a.id in (select b.pordergrantid_link from POrderGrant_SKU b "
+			+ "where b.pcontract_poid_link =  :pcontract_poid_link)")
 	public List<POrderGrant> getbypcontract_po(
 			@Param("pcontract_poid_link") final Long pcontract_poid_link);	
 }
