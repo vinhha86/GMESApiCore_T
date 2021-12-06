@@ -177,201 +177,7 @@ public class Stockout_orderAPI {
 		return new ResponseEntity<create_order_response>(response, HttpStatus.OK);
 	}
 	
-	//Tao nhieu lenh xuat kho thanh pham 1 luc cho 1 hoac nhieu PO duoc chon
-	@RequestMapping(value = "/create_from_po",method = RequestMethod.POST)
-	@Transactional(rollbackFor = RuntimeException.class)
-	public ResponseEntity<?> Create_FromPO(@RequestBody StockoutP_Create_FromPO_Request entity, HttpServletRequest request ) {
-		ResponseBase response = new ResponseBase();
-		try {
-			GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			List<Long> ls_po = new ArrayList<Long>();
-			if (null != entity.list_po && entity.list_po.length() > 0) {
-				String[] s_poid = entity.list_po.split(";");
-				for (String sID : s_poid) {
-					Long lID = Long.valueOf(sID);
-					System.out.println(lID);
-					ls_po.add(lID);
-				}
-			}
-			
-			if(ls_po.size()>0) {
-				for (Long po_id: ls_po) {
-					//Lay thong tin PO de tao Stockout Req tuong ung
-					//Luu y: Khi tao yeu cau xuat kho, khong can quan tam den so ton kho tai thoi diem tao
-					PContract_PO thePO = pcontract_po_Service.findOne(po_id);
-				
-					if (null!=thePO) {
-						//Tim phan xuong chinh de tao Phieu xuat cho Vendor/Buyer tu phan xuong do theo PO chi tiet
-						Long org_incharge = thePO.getOrg_inchargeid_link();
-						
-						if (null!= org_incharge) {
-						
-							//Tim danh sach cac porder_grant co chua po_id trong porder_grant_sku (co porder_grant nghia la da map)
-							List<POrderGrant> lsPOrder_Grant = porder_grantService.getbypcontract_po(po_id);
-							
-							//Lap Yeu cau xuat kho cho cac phan xuong da map PO
-							//Neu 1 phan xuong co >1 Porder_grant cho cung 1 PO --> Don vao 1 lenh xuat kho
-							List<Stockout_order> lsStockout_orders = new ArrayList<Stockout_order>();
-							for (POrderGrant thePorder_Grant: lsPOrder_Grant) {
-								boolean isNew = true;
-								Stockout_order stockout_order = new Stockout_order();
-								
-								for (Stockout_order theStockout_order: lsStockout_orders) {
-									if (theStockout_order.getOrgid_from_link().equals(thePorder_Grant.getXuongSX_ID())){
-										isNew = false;
-										stockout_order = theStockout_order;
-									}
-								}
-								
-								//Neu la px chinh --> Tao phieu xuat toi Vendor tu PO chi tiet
-								if (thePorder_Grant.getXuongSX_ID().equals(org_incharge)) {
-									if (isNew) {
-										String stockout_order_code = commonService.getStockout_order_code();
-										
-										stockout_order.setOrderdate(new Date());
-										stockout_order.setOrdercode(stockout_order_code);
-										
-										//Noi xuat la px chinh - Noi nhan la Buyer 
-										stockout_order.setOrgid_from_link(thePorder_Grant.getXuongSX_ID());
-										stockout_order.setOrgid_to_link(thePorder_Grant.getOrgbuyerid_link());
-										
-										stockout_order.setP_skuid_link(thePO.getProductid_link());
-										stockout_order.setStockoutdate(thePO.getShipdate());
-										
-										stockout_order.setOrgrootid_link(user.getRootorgid_link());
-										stockout_order.setTimecreate(new Date());
-										stockout_order.setUsercreateid_link(user.getId());
-										stockout_order.setStockouttypeid_link(StockoutTypes.STOCKOUT_TYPE_TP_PO);
-										
-										stockout_order.setPcontractid_link(thePO.getPcontractid_link());
-										stockout_order.setPcontract_poid_link(po_id);
-										stockout_order.setStatus(0);
-										
-										//Danh sach hang la danh sach chi tiet mau co cua PO
-										//Lenh xuat tu px chinh cho Buyer chi co 1 lenh duy nhat
-//										long productid_link = thePO.getProductid_link();
-//	
-//										List<PContractProductSKU> lsPO_SKUs = pskuservice.getbypo_and_product(po_id, productid_link);
-										for (PContractProductSKU p_sku : thePO.getPcontract_po_sku()) {
-											Stockout_order_d stockout_order_d = new Stockout_order_d();
-											
-											stockout_order_d.setOrgrootid_link(user.getRootorgid_link());
-											stockout_order_d.setUsercreateid_link(user.getId());
-											stockout_order_d.setTimecreate(new Date());
-											
-											stockout_order_d.setP_skuid_link(p_sku.getSkuid_link());
-											stockout_order_d.setTotalpackage(null == p_sku.getPquantity_porder()?0:p_sku.getPquantity_porder());
-											
-											stockout_order.getStockout_order_d().add(stockout_order_d);
-										}
-										
-										
-										lsStockout_orders.add(stockout_order);
-										
-										//Neu thanh cong Cap nhat bang unique code
-										Stocking_UniqueCode unique = stockingService.getby_type(3);
-										Integer max = unique.getStocking_max();
-										unique.setStocking_max(max+1);
-										stockingService.save(unique);
-									}
-									
-								} else {
-								//Neu khong la px chinh --> Tao phieu dieu chuyen ve px chinh theo danh sach trong grant_sku
-									if (isNew) {
-										String stockout_order_code = commonService.getStockout_order_code();
-										
-										stockout_order.setOrderdate(new Date());
-										stockout_order.setOrdercode(stockout_order_code);
-										
-										//Noi xuat la px san xuat - Noi nhan la px chinh
-										stockout_order.setOrgid_from_link(thePorder_Grant.getXuongSX_ID());
-										stockout_order.setOrgid_to_link(org_incharge);
-										
-										stockout_order.setP_skuid_link(thePO.getProductid_link());
-										//Ngay chuyen ve px chinh phai truoc ngay xuat cho khach 3 ngay
-										stockout_order.setStockoutdate(DateUtils.addDays(thePO.getShipdate(), -3));
-										
-										stockout_order.setOrgrootid_link(user.getRootorgid_link());
-										stockout_order.setTimecreate(new Date());
-										stockout_order.setUsercreateid_link(user.getId());
-										stockout_order.setStockouttypeid_link(StockoutTypes.STOCKOUT_TYPE_TP_MOVE);
-										
-										stockout_order.setPcontractid_link(thePO.getPcontractid_link());
-										stockout_order.setPcontract_poid_link(po_id);
-										stockout_order.setStatus(0);
-									}
-									//Chi dua vao danh sach Lenh xuat cac SKU cua po_id
-									for (POrderGrant_SKU theSKU: thePorder_Grant.getPorder_grant_sku()) {
-										if (theSKU.getPcontract_poid_link().equals(po_id)) {
-											//Neu SKU da ton tai --> Cong them vao
-											//Neu SKU chua co --> Them moi
-											Stockout_order_d theStockout_order_d = stockout_order.getStockout_order_d().stream()
-													.filter(prod -> prod.getP_skuid_link().equals(theSKU.getSkuid_link()))
-													.findAny().orElse(null);
-											if (null != theStockout_order_d) {
-												theStockout_order_d.setTotalpackage(theStockout_order_d.getTotalpackage() + theSKU.getGrantamount());
-											} else {
-												Stockout_order_d stockout_order_d = new Stockout_order_d();
-												
-												stockout_order_d.setOrgrootid_link(user.getRootorgid_link());
-												stockout_order_d.setUsercreateid_link(user.getId());
-												stockout_order_d.setTimecreate(new Date());
-												
-												stockout_order_d.setP_skuid_link(theSKU.getSkuid_link());
-												stockout_order_d.setTotalpackage(null == theSKU.getGrantamount()?0:theSKU.getGrantamount());
-												
-												stockout_order.getStockout_order_d().add(stockout_order_d);
-											}
-										}
-									}
-								}
-								
-								lsStockout_orders.add(stockout_order);
-								
-								//Neu thanh cong Cap nhat bang unique code
-								Stocking_UniqueCode unique = stockingService.getby_type(3);
-								Integer max = unique.getStocking_max();
-								unique.setStocking_max(max+1);
-								stockingService.save(unique);
-							}
-							//Update DB
-							for (Stockout_order theStockout_order: lsStockout_orders) {
-								stockout_order_Service.save(theStockout_order);
-							}
-							
-							//Cap nhat lai trang thai PO ve da lap lenh xuat kho
-							thePO.setStatus(POStatus.PO_STATUS_STOCKOUT);
-							pcontract_po_Service.save(thePO);
-						} else {
-							//PO chua duoc thiet lap px chinh mac dinh
-							response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-							response.setMessage("Chưa thiết lập phân xưởng chính cho PO. Báo lại cho quản lý đơn hàng để điều chỉnh");
-							return new ResponseEntity<ResponseBase>(response,HttpStatus.BAD_REQUEST);		
-						}
-					}
-				}
-				
-				
-				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-				return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);			
-			} 
-			else {
-				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_EXCEPTION));
-				return new ResponseEntity<ResponseBase>(response,HttpStatus.BAD_REQUEST);			
-			}
-			
-		}catch (RuntimeException e) {
-			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-			e.printStackTrace();
-			ResponseError errorBase = new ResponseError();
-			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
-			errorBase.setMessage(null==e.getMessage()?"Lỗi hệ thống! Liên hệ IT để được hỗ trợ":e.getMessage());
-		    return new ResponseEntity<>(errorBase, HttpStatus.BAD_REQUEST);
-		}
-	}
-	
+
 	
 	@RequestMapping(value = "/getby_id", method = RequestMethod.POST)
 	public ResponseEntity<getby_id_response> GetById(HttpServletRequest request,
@@ -792,4 +598,269 @@ public class Stockout_orderAPI {
 		}
 		return new ResponseEntity<create_order_response>(response, HttpStatus.OK);
 	}
+	
+	//Tao nhieu lenh xuat kho thanh pham 1 luc cho 1 hoac nhieu PO duoc chon
+	@RequestMapping(value = "/create_from_po",method = RequestMethod.POST)
+	@Transactional(rollbackFor = RuntimeException.class)
+	public ResponseEntity<?> Create_FromPO(@RequestBody StockoutP_Create_FromPO_Request entity, HttpServletRequest request ) {
+		ResponseBase response = new ResponseBase();
+		try {
+			GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			List<Long> ls_po = new ArrayList<Long>();
+			if (null != entity.list_po && entity.list_po.length() > 0) {
+				String[] s_poid = entity.list_po.split(";");
+				for (String sID : s_poid) {
+					Long lID = Long.valueOf(sID);
+					System.out.println(lID);
+					ls_po.add(lID);
+				}
+			}
+			
+			if(ls_po.size()>0) {
+				for (Long po_id: ls_po) {
+					//Lay thong tin PO de tao Stockout Req tuong ung
+					//Luu y: Khi tao yeu cau xuat kho, khong can quan tam den so ton kho tai thoi diem tao
+					PContract_PO thePO = pcontract_po_Service.findOne(po_id);
+				
+					if (null!=thePO) {
+						//Tim phan xuong chinh de tao Phieu xuat cho Vendor/Buyer tu phan xuong do theo PO chi tiet
+						Long org_incharge = thePO.getOrg_inchargeid_link();
+						
+						if (null!= org_incharge) {
+						
+							//Tim danh sach cac porder_grant co chua po_id trong porder_grant_sku (co porder_grant nghia la da map)
+							List<POrderGrant> lsPOrder_Grant = porder_grantService.getbypcontract_po(po_id);
+							
+							//Lap Yeu cau xuat kho cho cac phan xuong da map PO
+							//Neu 1 phan xuong co >1 Porder_grant cho cung 1 PO --> Don vao 1 lenh xuat kho
+							List<Stockout_order> lsStockout_orders = new ArrayList<Stockout_order>();
+							for (POrderGrant thePorder_Grant: lsPOrder_Grant) {
+								boolean isNew = true;
+								Stockout_order stockout_order = new Stockout_order();
+								
+								for (Stockout_order theStockout_order: lsStockout_orders) {
+									if (theStockout_order.getOrgid_from_link().equals(thePorder_Grant.getXuongSX_ID())){
+										isNew = false;
+										stockout_order = theStockout_order;
+									}
+								}
+								
+								//Neu la px chinh --> Tao phieu xuat toi Vendor tu PO chi tiet
+								if (thePorder_Grant.getXuongSX_ID().equals(org_incharge)) {
+									if (isNew) {
+										String stockout_order_code = commonService.getStockout_order_code();
+										
+										stockout_order.setOrderdate(new Date());
+										stockout_order.setOrdercode(stockout_order_code);
+										
+										//Noi xuat la px chinh - Noi nhan la Buyer 
+										stockout_order.setOrgid_from_link(thePorder_Grant.getXuongSX_ID());
+										stockout_order.setOrgid_to_link(thePorder_Grant.getOrgbuyerid_link());
+										
+										stockout_order.setP_skuid_link(thePO.getProductid_link());
+										stockout_order.setStockoutdate(thePO.getShipdate());
+										
+										stockout_order.setOrgrootid_link(user.getRootorgid_link());
+										stockout_order.setTimecreate(new Date());
+										stockout_order.setUsercreateid_link(user.getId());
+										stockout_order.setStockouttypeid_link(StockoutTypes.STOCKOUT_TYPE_TP_PO);
+										
+										stockout_order.setPcontractid_link(thePO.getPcontractid_link());
+										stockout_order.setPcontract_poid_link(po_id);
+										stockout_order.setStatus(0);
+										
+										//Danh sach hang la danh sach chi tiet mau co cua PO
+										//Lenh xuat tu px chinh cho Buyer chi co 1 lenh duy nhat
+//										long productid_link = thePO.getProductid_link();
+//	
+//										List<PContractProductSKU> lsPO_SKUs = pskuservice.getbypo_and_product(po_id, productid_link);
+										for (PContractProductSKU p_sku : thePO.getPcontract_po_sku()) {
+											Stockout_order_d stockout_order_d = new Stockout_order_d();
+											
+											stockout_order_d.setOrgrootid_link(user.getRootorgid_link());
+											stockout_order_d.setUsercreateid_link(user.getId());
+											stockout_order_d.setTimecreate(new Date());
+											
+											stockout_order_d.setP_skuid_link(p_sku.getSkuid_link());
+											stockout_order_d.setTotalpackage(null == p_sku.getPquantity_porder()?0:p_sku.getPquantity_porder());
+											
+											stockout_order.getStockout_order_d().add(stockout_order_d);
+										}
+										
+										
+										lsStockout_orders.add(stockout_order);
+										
+										//Neu thanh cong Cap nhat bang unique code
+										Stocking_UniqueCode unique = stockingService.getby_type(3);
+										Integer max = unique.getStocking_max();
+										unique.setStocking_max(max+1);
+										stockingService.save(unique);
+									}
+									
+								} else {
+								//Neu khong la px chinh --> Tao phieu dieu chuyen ve px chinh theo danh sach trong grant_sku
+									if (isNew) {
+										String stockout_order_code = commonService.getStockout_order_code();
+										
+										stockout_order.setOrderdate(new Date());
+										stockout_order.setOrdercode(stockout_order_code);
+										
+										//Noi xuat la px san xuat - Noi nhan la px chinh
+										stockout_order.setOrgid_from_link(thePorder_Grant.getXuongSX_ID());
+										stockout_order.setOrgid_to_link(org_incharge);
+										
+										stockout_order.setP_skuid_link(thePO.getProductid_link());
+										//Ngay chuyen ve px chinh phai truoc ngay xuat cho khach 3 ngay
+										stockout_order.setStockoutdate(DateUtils.addDays(thePO.getShipdate(), -3));
+										
+										stockout_order.setOrgrootid_link(user.getRootorgid_link());
+										stockout_order.setTimecreate(new Date());
+										stockout_order.setUsercreateid_link(user.getId());
+										stockout_order.setStockouttypeid_link(StockoutTypes.STOCKOUT_TYPE_TP_MOVE);
+										
+										stockout_order.setPcontractid_link(thePO.getPcontractid_link());
+										stockout_order.setPcontract_poid_link(po_id);
+										stockout_order.setStatus(0);
+									}
+									//Chi dua vao danh sach Lenh xuat cac SKU cua po_id
+									for (POrderGrant_SKU theSKU: thePorder_Grant.getPorder_grant_sku()) {
+										if (theSKU.getPcontract_poid_link().equals(po_id)) {
+											//Neu SKU da ton tai --> Cong them vao
+											//Neu SKU chua co --> Them moi
+											Stockout_order_d theStockout_order_d = stockout_order.getStockout_order_d().stream()
+													.filter(prod -> prod.getP_skuid_link().equals(theSKU.getSkuid_link()))
+													.findAny().orElse(null);
+											if (null != theStockout_order_d) {
+												theStockout_order_d.setTotalpackage(theStockout_order_d.getTotalpackage() + theSKU.getGrantamount());
+											} else {
+												Stockout_order_d stockout_order_d = new Stockout_order_d();
+												
+												stockout_order_d.setOrgrootid_link(user.getRootorgid_link());
+												stockout_order_d.setUsercreateid_link(user.getId());
+												stockout_order_d.setTimecreate(new Date());
+												
+												stockout_order_d.setP_skuid_link(theSKU.getSkuid_link());
+												stockout_order_d.setTotalpackage(null == theSKU.getGrantamount()?0:theSKU.getGrantamount());
+												
+												stockout_order.getStockout_order_d().add(stockout_order_d);
+											}
+										}
+									}
+								}
+								
+								if (isNew) lsStockout_orders.add(stockout_order);
+								
+								//Neu thanh cong Cap nhat bang unique code
+								Stocking_UniqueCode unique = stockingService.getby_type(3);
+								Integer max = unique.getStocking_max();
+								unique.setStocking_max(max+1);
+								stockingService.save(unique);
+							}
+							//Update DB
+							for (Stockout_order theStockout_order: lsStockout_orders) {
+								stockout_order_Service.save(theStockout_order);
+							}
+							
+							//Cap nhat lai trang thai PO ve da lap lenh xuat kho
+							thePO.setStatus(POStatus.PO_STATUS_STOCKOUT);
+							pcontract_po_Service.save(thePO);
+						} else {
+							//PO chua duoc thiet lap px chinh mac dinh
+							response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+							response.setMessage("Chưa thiết lập phân xưởng chính cho PO. Báo lại cho quản lý đơn hàng để điều chỉnh");
+							return new ResponseEntity<ResponseBase>(response,HttpStatus.BAD_REQUEST);		
+						}
+					}
+				}
+				
+				
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<ResponseBase>(response,HttpStatus.OK);			
+			} 
+			else {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_EXCEPTION));
+				return new ResponseEntity<ResponseBase>(response,HttpStatus.BAD_REQUEST);			
+			}
+			
+		}catch (RuntimeException e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			e.printStackTrace();
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(null==e.getMessage()?"Lỗi hệ thống! Liên hệ IT để được hỗ trợ":e.getMessage());
+		    return new ResponseEntity<>(errorBase, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	//Hung Dai Bang
+	//Xem truoc danh sach cac phan xuong sx cho PO va SL tong sx cua tung px
+	@RequestMapping(value = "/preview_bypo",method = RequestMethod.POST)
+	public ResponseEntity<?> Preview_ByPO(@RequestBody StockoutP_Preview_ByPO_Request entity, HttpServletRequest request ) {
+		getby_porder_response response = new getby_porder_response();
+		try {
+			GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long po_id = entity.po_id;
+			//Lay thong tin PO de tao Stockout Req tuong ung
+			//Luu y: Khi tao yeu cau xuat kho, khong can quan tam den so ton kho tai thoi diem tao
+			PContract_PO thePO = pcontract_po_Service.findOne(po_id);
+		
+			if (null!=thePO) {
+				//Tim phan xuong chinh de tao Phieu xuat cho Vendor/Buyer tu phan xuong do theo PO chi tiet
+				Long org_incharge = thePO.getOrg_inchargeid_link();
+				
+				//Tim danh sach cac porder_grant co chua po_id trong porder_grant_sku (co porder_grant nghia la da map)
+				List<POrderGrant> lsPOrder_Grant = porder_grantService.getbypcontract_po(po_id);
+				
+				//Lap Yeu cau xuat kho cho cac phan xuong da map PO
+				//Neu 1 phan xuong co >1 Porder_grant cho cung 1 PO --> Don vao 1 lenh xuat kho
+				List<Stockout_order> lsStockout_orders = new ArrayList<Stockout_order>();
+				
+				for (POrderGrant thePorder_Grant: lsPOrder_Grant) {
+//					System.out.println(thePorder_Grant.getId());
+					boolean isNew = true;
+					Stockout_order stockout_order = new Stockout_order();
+					
+					for (Stockout_order theStockout_order: lsStockout_orders) {
+						if (theStockout_order.getOrgid_from_link().equals(thePorder_Grant.getXuongSX_ID())){
+							isNew = false;
+							stockout_order = theStockout_order;
+						}
+					}
+					
+					if (isNew) {
+						if (thePorder_Grant.getXuongSX_ID().equals(org_incharge))
+							stockout_order.setExtrainfo("Phân xưởng chính");
+						else
+							stockout_order.setExtrainfo("Phân xưởng phụ");
+						
+						stockout_order.setOrgid_from_link(thePorder_Grant.getXuongSX_ID());
+						stockout_order.setStockout_order_code(thePorder_Grant.getXuongSX());
+						lsStockout_orders.add(stockout_order);
+					}
+					//Chi dua vao danh sach Lenh xuat cac SKU cua po_id
+					for (POrderGrant_SKU theSKU: thePorder_Grant.getPorder_grant_sku()) {
+						if (theSKU.getPcontract_poid_link().equals(po_id)) {
+							stockout_order.setPo_quantity_sp(stockout_order.getPo_quantity_sp() + (null == theSKU.getGrantamount()?0:theSKU.getGrantamount()));
+						}
+					}					
+				}
+				response.data = lsStockout_orders;
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<getby_porder_response>(response,HttpStatus.OK);
+			} else {
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage("Đơn hàng (PO) không tồn tại");
+				return new ResponseEntity<getby_porder_response>(response,HttpStatus.BAD_REQUEST);
+			}
+		}catch (RuntimeException e) {
+			ResponseError errorBase = new ResponseError();
+			errorBase.setErrorcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			errorBase.setMessage(null==e.getMessage()?"Lỗi hệ thống! Liên hệ IT để được hỗ trợ":e.getMessage());
+		    return new ResponseEntity<>(errorBase, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 }
