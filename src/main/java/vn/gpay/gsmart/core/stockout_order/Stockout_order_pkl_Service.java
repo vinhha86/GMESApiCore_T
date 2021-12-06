@@ -18,8 +18,11 @@ public class Stockout_order_pkl_Service extends AbstractService<Stockout_order_p
 	}
 	@Override
 	public List<Stockout_order_pkl> getby_detail(Long stockout_orderdid_link) {
-		// TODO Auto-generated method stub
 		return repo.getby_detail(stockout_orderdid_link);
+	}
+	@Override
+	public List<Stockout_order_pkl> getByEpc_stockout_order(Long stockoutorderid_link, String epc) {
+		return repo.getByEpc_stockout_order(stockoutorderid_link, epc);
 	}
 
 }

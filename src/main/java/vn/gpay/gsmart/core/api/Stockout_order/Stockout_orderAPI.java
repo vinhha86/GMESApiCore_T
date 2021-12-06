@@ -577,6 +577,14 @@ public class Stockout_orderAPI {
 					
 					List<Stockout_order_pkl> stockout_order_pkl_list = stockout_order_d.getStockout_order_pkl();
 					for(Stockout_order_pkl stockout_order_pkl : stockout_order_pkl_list) {
+						if(stockout_order.getId() != null) {
+							// check neu pkl da co trong db thi khong tao moi
+							String epc = stockout_order_pkl.getEpc();
+							List<Stockout_order_pkl> pkl_list = stockout_pkl_Service.getByEpc_stockout_order(stockout_order.getId(), epc);
+							if(pkl_list.size() > 0) {
+								stockout_order_pkl = pkl_list.get(0);
+							}
+						}
 						if(stockout_order_pkl.getId() == null) {
 							stockout_order_pkl.setTimecreate(current_time);
 							stockout_order_pkl.setUsercreateid_link(user.getId());
@@ -800,7 +808,7 @@ public class Stockout_orderAPI {
 	public ResponseEntity<?> Preview_ByPO(@RequestBody StockoutP_Preview_ByPO_Request entity, HttpServletRequest request ) {
 		getby_porder_response response = new getby_porder_response();
 		try {
-			GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//			GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long po_id = entity.po_id;
 			//Lay thong tin PO de tao Stockout Req tuong ung
 			//Luu y: Khi tao yeu cau xuat kho, khong can quan tam den so ton kho tai thoi diem tao

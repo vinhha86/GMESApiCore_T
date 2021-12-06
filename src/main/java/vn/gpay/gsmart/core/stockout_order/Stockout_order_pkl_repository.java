@@ -14,4 +14,15 @@ public interface Stockout_order_pkl_repository extends JpaRepository<Stockout_or
 	@Query(value = "select c from Stockout_order_pkl c where stockoutorderdid_link = :stockoutorderdid_link ")
 	public List<Stockout_order_pkl> getby_detail(
 			@Param ("stockoutorderdid_link")final  long stockoutorderdid_link);
+	
+	@Query(value = "select distinct c from Stockout_order_pkl c "
+			+ "inner join Stockout_order_d d on d.id = c.stockoutorderdid_link "
+			+ "inner join Stockout_order e on e.id = d.stockoutorderid_link "
+			+ "where e.id = :stockoutorderid_link "
+			+ "and c.epc = :epc "
+			)
+	public List<Stockout_order_pkl> getByEpc_stockout_order(
+			@Param ("stockoutorderid_link")final Long stockoutorderid_link,
+			@Param ("epc")final String epc
+			);
 }
