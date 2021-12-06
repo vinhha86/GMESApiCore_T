@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import vn.gpay.gsmart.core.api.timesheet_lunch_khach.huyxacnhan_request;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
@@ -590,36 +589,6 @@ public class TimeSheetLunchAPI {
 		}
 	}
 
-	@RequestMapping(value = "/huyxacnhan", method = RequestMethod.POST)
-	public ResponseEntity<ResponseBase> HuyXacNhan(@RequestBody huyxacnhan_request entity, HttpServletRequest request) {
-		ResponseBase response = new ResponseBase();
-		try {
-			Long orgid_link = entity.orgid_link;
-			Date date = entity.date;
-			Long shifttypeid_link = entity.shifttypeid_link;
-			String comment = entity.comment;
-
-			List<TimeSheetLunch> list_baoan = timeSheetLunchService.getByOrg_Shift(orgid_link,
-					shifttypeid_link.intValue(), date);
-			for (TimeSheetLunch baoan : list_baoan) {
-				if (baoan.getStatus().equals(0)) {
-					baoan.setStatus(1);
-					baoan.setComment(comment);
-					baoan.setIs_bo_sung(true);
-					baoan.setTime_approve(new Date());
-					timeSheetLunchService.save(baoan);
-				}
-			}
-
-			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
-		} catch (Exception e) {
-			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-			response.setMessage(e.getMessage());
-			return new ResponseEntity<ResponseBase>(HttpStatus.OK);
-		}
-	}
 
 	@RequestMapping(value = "/getListCheckCaAnAuto", method = RequestMethod.POST)
 	public ResponseEntity<TimeSheetLunch_Binding_response> getListCheckCaAnAuto(
@@ -784,7 +753,7 @@ public class TimeSheetLunchAPI {
 				newTimeSheetLunch_Binding.setSoThem(listTimeSheetLunch_Them.size());
 				
 				// Tinh so khach - // orgid_link, shifttype_orgid_link, date
-				Long shifttype_orgid_link = shift.getTimesheet_shift_type_id_link();
+				Long shifttype_orgid_link = shift.getId();
 				List<TimeSheetLunchKhach> TimeSheetLunchKhach_list = timeSheetLunchKhachService.getbyCa_ngay_org(shifttype_orgid_link, date, orgid_link);
 				Integer khach_amount = 0;
 				if(TimeSheetLunchKhach_list.size() > 0) {
