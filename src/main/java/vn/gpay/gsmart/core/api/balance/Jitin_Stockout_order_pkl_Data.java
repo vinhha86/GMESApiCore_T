@@ -25,6 +25,7 @@ public class Jitin_Stockout_order_pkl_Data implements Serializable{
 	private Long lastuserupdateid_link;
 	private Date lasttimeupdate;
 	private String spaceepc_link;
+	private Integer status;
 	private Float met;
 	private Float metorigin;
 	private Float metcheck;
@@ -223,6 +224,12 @@ public class Jitin_Stockout_order_pkl_Data implements Serializable{
 	}
 	public void setSpaceString(String spaceString) {
 		this.spaceString = spaceString;
+	}
+	public Integer getStatus() {
+		return status;
+	}
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
 
 	
