@@ -6,4 +6,5 @@ public class getplan_by_color_request {
 	public Long material_skuid_link;
 	public Long productid_link;
 	public Long pcontractid_link;
+	public String loaiphoi;
 }

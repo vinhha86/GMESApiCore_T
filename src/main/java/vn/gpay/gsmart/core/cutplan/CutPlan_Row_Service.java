@@ -67,8 +67,8 @@ public class CutPlan_Row_Service extends AbstractService<CutPlan_Row> implements
 	}
 
 	@Override
-	public boolean sync_porder_bom(Long material_skuid_link, Long pcontractid_link, Long productid_link, Long colorid_link, Long userid_link,
-			Long orgrootid_link) {
+	public boolean sync_porder_bom(Long material_skuid_link, Long pcontractid_link, Long productid_link,
+			Long colorid_link, Long userid_link, Long orgrootid_link) {
 		// TODO Auto-generated method stub
 //		Long porderid_link = porder.getId();
 
@@ -76,8 +76,8 @@ public class CutPlan_Row_Service extends AbstractService<CutPlan_Row> implements
 		float sl_vai = 0;
 
 		// tinh tong so luong san pham trong tat ca cac so do
-		List<CutPlan_Size> list_sodo = cutplan_size_Service.getby_sku_and_pcontract_product_and_color(material_skuid_link,
-				pcontractid_link, productid_link, orgrootid_link, colorid_link);
+		List<CutPlan_Size> list_sodo = cutplan_size_Service.getby_sku_and_pcontract_product_and_color(
+				material_skuid_link, pcontractid_link, productid_link, orgrootid_link, colorid_link);
 		Map<Long, Float> map = new HashMap<Long, Float>();
 		for (CutPlan_Size sodo : list_sodo) {
 			CutPlan_Row cut_row = cutrow_Service.findOne(sodo.getCutplanrowid_link());
@@ -98,8 +98,9 @@ public class CutPlan_Row_Service extends AbstractService<CutPlan_Row> implements
 			int sl_zise = 0;
 
 			// tinh so luong cua tung co
-			List<CutPlan_Size> listsize_sodo = cutplan_size_Service.getby_pcontract_product_matsku_productsku(pcontractid_link, productid_link,
-					material_skuid_link, product_skuid_link, CutPlanRowType.sodocat, "");
+			List<CutPlan_Size> listsize_sodo = cutplan_size_Service.getby_pcontract_product_matsku_productsku(
+					pcontractid_link, productid_link, material_skuid_link, product_skuid_link, CutPlanRowType.sodocat,
+					"");
 			for (CutPlan_Size cut_size : listsize_sodo) {
 				CutPlan_Row cut_row = cutrow_Service.findOne(cut_size.getCutplanrowid_link());
 
@@ -142,8 +143,8 @@ public class CutPlan_Row_Service extends AbstractService<CutPlan_Row> implements
 
 		// xoa het dinh muc chung va chung mau cua nguyen lieu
 		// update lai bang bom amount = 0
-		List<POrderBomProduct> pContractProductBom = porderbomproductService.getby_pcontract_product_and_material(pcontractid_link, productid_link,
-				material_skuid_link);
+		List<POrderBomProduct> pContractProductBom = porderbomproductService
+				.getby_pcontract_product_and_material(pcontractid_link, productid_link, material_skuid_link);
 		if (pContractProductBom.size() > 0) {
 			POrderBomProduct porderbom = pContractProductBom.get(0);
 			porderbom.setAmount((float) 0);
@@ -151,8 +152,8 @@ public class CutPlan_Row_Service extends AbstractService<CutPlan_Row> implements
 		}
 
 		// update lai bang sku bom
-		List<PorderBomColor> listcolor = porderbomcolorService.getby_pcontract_product_and_material_and_color(pcontractid_link, productid_link,
-				material_skuid_link, colorid_link);
+		List<PorderBomColor> listcolor = porderbomcolorService.getby_pcontract_product_and_material_and_color(
+				pcontractid_link, productid_link, material_skuid_link, colorid_link);
 
 		for (PorderBomColor pColor : listcolor) {
 			porderbomcolorService.delete(pColor);
@@ -277,6 +278,15 @@ public class CutPlan_Row_Service extends AbstractService<CutPlan_Row> implements
 	public List<String> getAllLoaiPhoiMau(Long pcontractid_link, Long productid_link, Long material_skuid_link) {
 		// TODO Auto-generated method stub
 		return repo.GetAll_loaiphoimau(pcontractid_link, productid_link, material_skuid_link);
+	}
+
+	@Override
+	public List<CutPlan_Row> getby_loaiphoi(Long pcontractid_link, Long productid_link, Long material_skuid_link,
+			Long colorid_link, Long orgrootid_link, String loaiphoi) {
+		// TODO Auto-generated method stub
+		Long attributeid_link = AtributeFixValues.ATTR_COLOR;
+		return repo.getby_loaiphoi(pcontractid_link, productid_link, material_skuid_link, orgrootid_link, colorid_link,
+				attributeid_link, loaiphoi);
 	}
 
 }
