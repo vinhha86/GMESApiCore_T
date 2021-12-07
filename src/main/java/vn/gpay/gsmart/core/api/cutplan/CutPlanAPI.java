@@ -23,6 +23,7 @@ import vn.gpay.gsmart.core.cutplan.CutPlan_Row;
 import vn.gpay.gsmart.core.cutplan.CutPlan_Size;
 import vn.gpay.gsmart.core.cutplan.ICutPlan_Row_Service;
 import vn.gpay.gsmart.core.cutplan.ICutPlan_Size_Service;
+import vn.gpay.gsmart.core.cutplan.LoaiPhoi;
 import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOM2SKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
@@ -240,6 +241,36 @@ public class CutPlanAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<getplanby_color_response>(response, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/getall_loaiphoimau", method = RequestMethod.POST)
+	public ResponseEntity<getall_loaiphoimau_response> GetAllLoaiPhoiMau(HttpServletRequest request,
+			@RequestBody getall_loaiphoimau_request entity) {
+		getall_loaiphoimau_response response = new getall_loaiphoimau_response();
+		try {
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long pcontractid_link = entity.pcontractid_link;
+			Long productid_link = entity.productid_link;
+			Long material_skuid_link = entity.material_skuid_link;
+			
+			List<String> list_loaiPhoi = cutplanrowService.getAllLoaiPhoiMau(pcontractid_link, productid_link, material_skuid_link);
+			List<LoaiPhoi> list = new ArrayList<LoaiPhoi>();
+			for(String loaiphoi : list_loaiPhoi) {
+				LoaiPhoi new_loaiphoi = new LoaiPhoi();
+				new_loaiphoi.name = loaiphoi;
+				
+				list.add(new_loaiphoi);
+			}
+			
+			response.data = list;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getall_loaiphoimau_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<getall_loaiphoimau_response>(response, HttpStatus.OK);
 		}
 	}
 

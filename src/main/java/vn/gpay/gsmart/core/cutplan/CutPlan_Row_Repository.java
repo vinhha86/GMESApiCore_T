@@ -47,4 +47,9 @@ public interface CutPlan_Row_Repository
 
 	@Query(value = "select c from CutPlan_Row c " + " where c.porderid_link = :porderid_link " + "order by c.id")
 	public List<CutPlan_Row> findByPOrder(@Param("porderid_link") final Long porderid_link);
+	
+	@Query(value = "select distinct c.loaiphoimau from CutPlan_Row c " + " where c.pcontractid_link = :pcontractid_link and c.productid_link = :productid_link "
+			+ "and c.material_skuid_link = :material_skuid_link")
+	public List<String> GetAll_loaiphoimau(@Param("pcontractid_link") final Long pcontractid_link, @Param("productid_link") final Long productid_link,
+			@Param("material_skuid_link") final Long material_skuid_link);
 }

@@ -46,6 +46,7 @@ public class CutPlan_Row implements Serializable {
 	private Long createduserid_link;
 	private Long pcontractid_link;
 	private Long productid_link;
+	private String loaiphoimau;
 
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -230,6 +231,14 @@ public class CutPlan_Row implements Serializable {
 
 	public void setProductid_link(Long productid_link) {
 		this.productid_link = productid_link;
+	}
+
+	public String getLoaiphoimau() {
+		return loaiphoimau;
+	}
+
+	public void setLoaiphoimau(String loaiphoimau) {
+		this.loaiphoimau = loaiphoimau;
 	}
 
 }

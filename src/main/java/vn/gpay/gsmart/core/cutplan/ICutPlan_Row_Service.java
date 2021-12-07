@@ -21,4 +21,5 @@ public interface ICutPlan_Row_Service extends Operations<CutPlan_Row> {
 			Long userid_link, Long orgrootid_link);
 
 	public List<CutPlan_Row> findByPOrder(Long porderid_link);
+	public List<String> getAllLoaiPhoiMau (Long pcontractid_link, Long productid_link, Long material_skuid_link);
 }

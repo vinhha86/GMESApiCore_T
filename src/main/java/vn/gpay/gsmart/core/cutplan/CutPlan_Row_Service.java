@@ -273,4 +273,10 @@ public class CutPlan_Row_Service extends AbstractService<CutPlan_Row> implements
 				orgrootid_link, colorid_link, attributeid_link);
 	}
 
+	@Override
+	public List<String> getAllLoaiPhoiMau(Long pcontractid_link, Long productid_link, Long material_skuid_link) {
+		// TODO Auto-generated method stub
+		return repo.GetAll_loaiphoimau(pcontractid_link, productid_link, material_skuid_link);
+	}
+
 }
