@@ -526,6 +526,7 @@ public class Stockout_orderAPI {
 					
 					List<Stockout_order_pkl> stockout_order_pkl_list = stockout_order_d.getStockout_order_pkl();
 					for(Stockout_order_pkl stockout_order_pkl : stockout_order_pkl_list) {
+						stockout_order_pkl.setOrgid_link(orgrootid_link);
 						stockout_order_pkl.setTimecreate(current_time);
 						stockout_order_pkl.setUsercreateid_link(user.getId());
 						stockout_order_pkl.setLasttimeupdate(current_time);
