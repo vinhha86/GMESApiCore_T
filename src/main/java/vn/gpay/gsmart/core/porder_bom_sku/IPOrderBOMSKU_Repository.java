@@ -16,10 +16,18 @@ public interface IPOrderBOMSKU_Repository
 	@Query("SELECT c FROM POrderBOMSKU c " + "where c.porderid_link = :porderid_link " + "and type = :type")
 	public List<POrderBOMSKU> getByPOrderID(@Param("porderid_link") final Long porderid_link,
 			@Param("type") final int type);
-	
-	@Query("SELECT c FROM POrderBOMSKU c " + "where c.productid_link = :productid_link and pcontractid_link = :pcontractid_link " + "and type = :type")
-	public List<POrderBOMSKU> getByPContract_Product(@Param("pcontractid_link") final Long pcontractid_link, @Param("productid_link") final Long productid_link,
-			@Param("type") final int type);
+
+	@Query("SELECT c FROM POrderBOMSKU c "
+			+ "where c.productid_link = :productid_link and pcontractid_link = :pcontractid_link " + "and type = :type")
+	public List<POrderBOMSKU> getByPContract_Product(@Param("pcontractid_link") final Long pcontractid_link,
+			@Param("productid_link") final Long productid_link, @Param("type") final int type);
+
+	@Query("SELECT c FROM POrderBOMSKU c "
+			+ "where c.productid_link = :productid_link and pcontractid_link = :pcontractid_link "
+			+ "and type = :type and materialid_link = :material_skuid_link")
+	public List<POrderBOMSKU> getByPContract_Product_Material(@Param("pcontractid_link") final Long pcontractid_link,
+			@Param("productid_link") final Long productid_link, @Param("type") final int type,
+			@Param("material_skuid_link") final Long material_skuid_link);
 
 	@Query("SELECT c FROM POrderBOMSKU c " + "inner join SKU_Attribute_Value d on c.skuid_link = d.skuid_link "
 			+ "where c.porderid_link = :porderid_link" + " and d.attributevalueid_link = :colorid_link")
@@ -36,12 +44,14 @@ public interface IPOrderBOMSKU_Repository
 	public List<POrderBOMSKU> getByPOrder_and_material_and_sku_and_type(
 			@Param("porderid_link") final Long porderid_link, @Param("materialid_link") final Long materialid_link,
 			@Param("skuid_link") final Long skuid_link, @Param("type") final int type);
-	
-	@Query("SELECT c FROM POrderBOMSKU c " + "where c.productid_link = :productid_link and c.pcontractid_link = :pcontractid_link "
+
+	@Query("SELECT c FROM POrderBOMSKU c "
+			+ "where c.productid_link = :productid_link and c.pcontractid_link = :pcontractid_link "
 			+ " and c.materialid_link = :materialid_link" + " and c.skuid_link = :skuid_link " + "and c.type = :type")
 	public List<POrderBOMSKU> getByPcontract_productr_and_material_and_sku_and_type(
-			@Param("pcontractid_link") final Long pcontractid_link,@Param("productid_link") final Long productid_link, @Param("materialid_link") final Long materialid_link,
-			@Param("skuid_link") final Long skuid_link, @Param("type") final int type);
+			@Param("pcontractid_link") final Long pcontractid_link, @Param("productid_link") final Long productid_link,
+			@Param("materialid_link") final Long materialid_link, @Param("skuid_link") final Long skuid_link,
+			@Param("type") final int type);
 
 	@Query("SELECT c FROM POrderBOMSKU c " + "inner join SKU_Attribute_Value d on c.skuid_link = d.skuid_link "
 			+ "where c.porderid_link = :porderid_link " + "and c.materialid_link = :materialid_link "

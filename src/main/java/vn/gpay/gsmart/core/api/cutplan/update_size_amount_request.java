@@ -10,4 +10,5 @@ public class update_size_amount_request {
 	public Long pcontractid_link;
 	public Integer amount;
 	public Integer amount_old;
+	public String loaiphoi;
 }

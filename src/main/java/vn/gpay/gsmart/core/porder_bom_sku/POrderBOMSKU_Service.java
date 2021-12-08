@@ -6,34 +6,38 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+
 import vn.gpay.gsmart.core.base.AbstractService;
 import vn.gpay.gsmart.core.sku.ISKU_AttValue_Repository;
 
 @Service
 public class POrderBOMSKU_Service extends AbstractService<POrderBOMSKU> implements IPOrderBOMSKU_Service {
-	@Autowired IPOrderBOMSKU_Repository repo;
-	@Autowired ISKU_AttValue_Repository sku_att_repo;
+	@Autowired
+	IPOrderBOMSKU_Repository repo;
+	@Autowired
+	ISKU_AttValue_Repository sku_att_repo;
+
 	@Override
 	protected JpaRepository<POrderBOMSKU, Long> getRepository() {
 		// TODO Auto-generated method stub
 		return repo;
 	}
-	
+
 	@Override
-	public List<POrderBOMSKU> getByPOrderID_and_type(Long porderid_link, int type){
+	public List<POrderBOMSKU> getByPOrderID_and_type(Long porderid_link, int type) {
 		return repo.getByPOrderID(porderid_link, type);
 	}
-	
+
 	@Override
-	public List<POrderBOMSKU> getSKUByMaterial(Long porderid_link, Long materialid_link){
+	public List<POrderBOMSKU> getSKUByMaterial(Long porderid_link, Long materialid_link) {
 		return repo.getSKUByMaterial(porderid_link, materialid_link);
 	}
-	
+
 	@Override
-	public List<POrderBOMSKU_By_Product> getByPOrderID_GroupByProduct(Long porderid_link){
+	public List<POrderBOMSKU_By_Product> getByPOrderID_GroupByProduct(Long porderid_link) {
 		List<POrderBOMSKU_By_Product> lsBOMSKU = new ArrayList<POrderBOMSKU_By_Product>();
 		List<Object[]> lsResult = repo.getByPOrderID_GroupByProduct(porderid_link);
-		for (Object[] row : lsResult){
+		for (Object[] row : lsResult) {
 			POrderBOMSKU_By_Product theBOMSKU = new POrderBOMSKU_By_Product();
 			theBOMSKU.setProductid_link(Long.parseLong(row[0].toString()));
 			theBOMSKU.setMaterialid_link(Long.parseLong(row[1].toString()));
@@ -42,12 +46,12 @@ public class POrderBOMSKU_Service extends AbstractService<POrderBOMSKU> implemen
 		}
 		return lsBOMSKU;
 	}
-	
+
 	@Override
-	public List<POrderBOMSKU_By_Color> getByPOrderID_GroupByColor(Long porderid_link){
+	public List<POrderBOMSKU_By_Color> getByPOrderID_GroupByColor(Long porderid_link) {
 		List<POrderBOMSKU_By_Color> lsBOMSKU = new ArrayList<POrderBOMSKU_By_Color>();
 		List<Object[]> lsResult = repo.getByPOrderID_GroupByColor(porderid_link);
-		for (Object[] row : lsResult){
+		for (Object[] row : lsResult) {
 			POrderBOMSKU_By_Color theBOMSKU = new POrderBOMSKU_By_Color();
 			theBOMSKU.setProductcolor_name(row[0].toString());
 			theBOMSKU.setMaterialid_link(Long.parseLong(row[1].toString()));
@@ -77,20 +81,20 @@ public class POrderBOMSKU_Service extends AbstractService<POrderBOMSKU> implemen
 	}
 
 	@Override
-	public List<POrderBOMSKU> getby_porder_and_material_and_color_and_size_and_type(Long porderid_link, Long productid_link, 
-			Long materialid_link, long colorid_link,long sizeid_link, int type) {
+	public List<POrderBOMSKU> getby_porder_and_material_and_color_and_size_and_type(Long porderid_link,
+			Long productid_link, Long materialid_link, long colorid_link, long sizeid_link, int type) {
 		// TODO Auto-generated method stub
 		List<Long> list_sku = sku_att_repo.getskuid_by_valueMau_and_valueCo(colorid_link, sizeid_link, productid_link);
 		long skuid_link = 0;
-		if(list_sku.size() > 0) {
+		if (list_sku.size() > 0) {
 			skuid_link = list_sku.get(0);
 		}
 		return repo.getByPOrder_and_material_and_sku_and_type(porderid_link, materialid_link, skuid_link, type);
 	}
 
 	@Override
-	public List<POrderBOMSKU> getby_porder_and_material_and_sku_and_type(Long porderid_link,
-			Long materialid_link, long skuid_link, int type) {
+	public List<POrderBOMSKU> getby_porder_and_material_and_sku_and_type(Long porderid_link, Long materialid_link,
+			long skuid_link, int type) {
 		// TODO Auto-generated method stub
 		return repo.getByPOrder_and_material_and_sku_and_type(porderid_link, materialid_link, skuid_link, type);
 	}
@@ -104,12 +108,20 @@ public class POrderBOMSKU_Service extends AbstractService<POrderBOMSKU> implemen
 	public List<POrderBOMSKU> getby_pcontract_product_and_material_and_sku_and_type(Long pcontractid_link,
 			Long productid_link, Long materialid_link, long skuid_link, int type) {
 		// TODO Auto-generated method stub
-		return repo.getByPcontract_productr_and_material_and_sku_and_type(pcontractid_link, productid_link, materialid_link, skuid_link, type);
+		return repo.getByPcontract_productr_and_material_and_sku_and_type(pcontractid_link, productid_link,
+				materialid_link, skuid_link, type);
 	}
 
 	@Override
 	public List<POrderBOMSKU> getByPContract_ProductID_and_type(Long pcontractid_link, Long productid_link, int type) {
 		// TODO Auto-generated method stub
 		return repo.getByPContract_Product(pcontractid_link, productid_link, type);
+	}
+
+	@Override
+	public List<POrderBOMSKU> getByPContract_ProductID_and_type_material(Long pcontractid_link, Long productid_link,
+			int type, Long matedrial_skuid_link) {
+		// TODO Auto-generated method stub
+		return repo.getByPContract_Product_Material(pcontractid_link, productid_link, type, matedrial_skuid_link);
 	}
 }

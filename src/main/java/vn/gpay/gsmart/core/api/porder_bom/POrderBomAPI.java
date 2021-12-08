@@ -603,6 +603,75 @@ public class POrderBomAPI {
 		return new ResponseEntity<getbom2sku_by_porder_response>(response, HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/getbom_by_porder_material", method = RequestMethod.POST)
+	public ResponseEntity<getbom2sku_by_porder_response> GetBomByProductMaterial(HttpServletRequest request,
+			@RequestBody getbom2sku_by_porder_request entity) {
+		getbom2sku_by_porder_response response = new getbom2sku_by_porder_response();
+		try {
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication()
+//					.getPrincipal();
+//			long orgrootid_link = user.getRootorgid_link();
+//			long porderid_link = entity.porderid_link;
+//			POrder porder = porderService.findOne(porderid_link);
+			Long productid_link = entity.productid_link;
+			Long pcontractid_link = entity.pcontractid_link;
+			Long material_skuid_link = entity.material_skuid_link;
+
+			List<Map<String, String>> listdata = new ArrayList<Map<String, String>>();
+
+//			List<Long> list_colorid = porder_sku_Service.getlist_colorid_byporder(porderid_link);
+			List<Long> list_colorid = pcontractskuServie.getlistvalue_by_product(pcontractid_link, productid_link,
+					AtributeFixValues.ATTR_COLOR);
+
+			List<POrderBomProduct> listbom = porderbomproductService.getby_pcontract_product(pcontractid_link,
+					productid_link);
+			List<POrderBOMSKU> listbomsku = porderbomskuService.getByPContract_ProductID_and_type_material(
+					pcontractid_link, productid_link, POrderBomType.CanDoi, material_skuid_link);
+			List<POrderBOMSKU> listbomsku_kythuat = porderbomskuService.getByPContract_ProductID_and_type_material(
+					pcontractid_link, productid_link, POrderBomType.Kythuat, material_skuid_link);
+			List<POrderBOMSKU> listbomsku_sanxuat = porderbomskuService.getByPContract_ProductID_and_type_material(
+					pcontractid_link, productid_link, POrderBomType.SanXuat, material_skuid_link);
+
+//			List<Long> List_size = porder_sku_Service.getvalue_by_attribute(porderid_link, AtributeFixValues.ATTR_SIZE);
+			List<Long> List_size = pcontractskuServie.getlistvalue_by_product(pcontractid_link, productid_link,
+					AtributeFixValues.ATTR_SIZE);
+
+			List<Attributevalue> listav = avService.getlist_byidAttribute(AtributeFixValues.ATTR_COLOR);
+			Map<Long, String> mapcolor = new HashMap<>();
+			for (Attributevalue av : listav) {
+				mapcolor.put(av.getId(), av.getValue());
+			}
+
+			Map<String, Long> mapsku = new HashMap<String, Long>();
+			List<SKU_Attribute_Value> list_skuav = skuavService.getlist_byproduct(productid_link);
+			for (SKU_Attribute_Value sku_av : list_skuav) {
+				mapsku.put(sku_av.getColorid() + "_" + sku_av.getSizeid(), sku_av.getSkuid_link());
+			}
+
+			CountDownLatch latch = new CountDownLatch(listbom.size());
+			for (POrderBomProduct pContractProductBom : listbom) {
+
+				// Chay de lay tung mau san pham
+				POrderBomProduct_Runnable bom2 = new POrderBomProduct_Runnable(list_colorid, pContractProductBom,
+						List_size, listbomsku, listbomsku_kythuat, listbomsku_sanxuat, listdata, latch, mapcolor,
+						mapsku, listbom);
+				bom2.start();
+			}
+			latch.await();
+
+			// lay trang thai cua dinh muc
+//			response.isbomdone = porder.getIsbomdone() == null ? false : porder.getIsbomdone();
+
+			response.data = listdata;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<getbom2sku_by_porder_response>(response, HttpStatus.OK);
+	}
+
 	@RequestMapping(value = "/getbom_by_pcontract_product", method = RequestMethod.POST)
 	public ResponseEntity<getbom2sku_by_porder_response> GetBomByPContractProduct(HttpServletRequest request,
 			@RequestBody getbomskuKT_by_pcontract_product_request entity) {

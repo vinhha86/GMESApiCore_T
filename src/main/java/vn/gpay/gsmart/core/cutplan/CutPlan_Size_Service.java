@@ -68,17 +68,50 @@ public class CutPlan_Size_Service extends AbstractService<CutPlan_Size> implemen
 	}
 
 	@Override
-	public List<CutPlan_Size> getby_pcontract_product_matsku_productsku(Long pcontractid_link, Long productid_link, Long material_skuid_link,
-			Long product_skuid_link, Integer type, String name) {
+	public List<CutPlan_Size> getby_pcontract_product_matsku_productsku(Long pcontractid_link, Long productid_link,
+			Long material_skuid_link, Long product_skuid_link, Integer type, String name) {
 		// TODO Auto-generated method stub
-		product_skuid_link = product_skuid_link == 0 ? null :product_skuid_link;
-		return repo.getby_matsku_and_pcontract_product_and_productsku(material_skuid_link, pcontractid_link, productid_link, product_skuid_link, type, name);
+		product_skuid_link = product_skuid_link == 0 ? null : product_skuid_link;
+		return repo.getby_matsku_and_pcontract_product_and_productsku(material_skuid_link, pcontractid_link,
+				productid_link, product_skuid_link, type, name);
 	}
 
 	@Override
 	public List<CutPlan_Size> getby_sku_and_pcontract_product(Long material_skuid_link, Long pcontractid_link,
 			Long productid_link, Long orgrootid_link) {
 		// TODO Auto-generated method stub
-		return repo.getby_sku_and_pcontract_product(material_skuid_link, pcontractid_link, productid_link, orgrootid_link);
+		return repo.getby_sku_and_pcontract_product(material_skuid_link, pcontractid_link, productid_link,
+				orgrootid_link);
+	}
+
+	@Override
+	public List<CutPlan_Size> getby_sku_and_pcontract_product_and_color_loaiphoi(Long material_skuid_link,
+			Long pcontractid_link, Long productid_link, Long orgrootid_link, Long colorid_link, String loaiphoi) {
+		// TODO Auto-generated method stub
+		return repo.getby_sku_and_pcontract_product_color_loaiphoi(material_skuid_link, pcontractid_link,
+				productid_link, orgrootid_link, colorid_link, loaiphoi);
+	}
+
+	@Override
+	public List<CutPlan_Size> getby_pcontract_product_matsku_productsku_loaiphoi(Long pcontractid_link,
+			Long productid_link, Long material_skuid_link, Long product_skuid_link, Integer type, String name,
+			String loaiphoi) {
+		// TODO Auto-generated method stub
+		product_skuid_link = product_skuid_link == 0 ? null : product_skuid_link;
+		return repo.getby_matsku_and_pcontract_product_and_productsku_loaiphoi(material_skuid_link, pcontractid_link,
+				productid_link, product_skuid_link, type, name, loaiphoi);
+	}
+
+	@Override
+	public List<CutPlan_Size> getby_row_loaiphoi(Long orgrootid_link, Long cutplan_rowid_link, String loaiphoi) {
+		// TODO Auto-generated method stub
+		return repo.getby_row_loaiphoi(cutplan_rowid_link, orgrootid_link, loaiphoi);
+	}
+
+	@Override
+	public List<CutPlan_Size> getby_row_and_productsku_loaiphoi(Long orgrootid_link, Long cutplanrowid_link,
+			Long product_skuid_link, String loaiphoi) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

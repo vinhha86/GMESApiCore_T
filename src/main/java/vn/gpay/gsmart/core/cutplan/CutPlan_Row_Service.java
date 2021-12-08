@@ -18,8 +18,10 @@ import vn.gpay.gsmart.core.porder_bom_color.IPOrderBomColor_Service;
 import vn.gpay.gsmart.core.porder_bom_color.PorderBomColor;
 import vn.gpay.gsmart.core.porder_bom_product.IPOrderBomProduct_Service;
 import vn.gpay.gsmart.core.porder_bom_product.POrderBomProduct;
+import vn.gpay.gsmart.core.porder_bom_sku.IPOrderBOMSKU_LoaiPhoi_Service;
 import vn.gpay.gsmart.core.porder_bom_sku.IPOrderBOMSKU_Service;
 import vn.gpay.gsmart.core.porder_bom_sku.POrderBOMSKU;
+import vn.gpay.gsmart.core.porder_bom_sku.porder_bom_sku_loaiphoi;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.CutPlanRowType;
 import vn.gpay.gsmart.core.utils.POrderBomType;
@@ -42,6 +44,8 @@ public class CutPlan_Row_Service extends AbstractService<CutPlan_Row> implements
 	IPOrderBomColor_Service porderbomcolorService;
 	@Autowired
 	ICutplanProcessingService cutplanprocessingService;
+	@Autowired
+	IPOrderBOMSKU_LoaiPhoi_Service skubom_loaiphoi_Service;
 
 	@Override
 	protected JpaRepository<CutPlan_Row, Long> getRepository() {
@@ -71,73 +75,110 @@ public class CutPlan_Row_Service extends AbstractService<CutPlan_Row> implements
 			Long colorid_link, Long userid_link, Long orgrootid_link) {
 		// TODO Auto-generated method stub
 //		Long porderid_link = porder.getId();
+		List<String> list_loaiphoi = cutrow_Service.getAllLoaiPhoiMau(pcontractid_link, productid_link,
+				material_skuid_link);
+		for (String loaiphoi : list_loaiphoi) {
+			int tongsl_sp = 0;
+			float sl_vai = 0;
 
-		int tongsl_sp = 0;
-		float sl_vai = 0;
+			// tinh tong so luong san pham trong tat ca cac so do
+			List<CutPlan_Size> list_sodo = cutplan_size_Service.getby_sku_and_pcontract_product_and_color_loaiphoi(
+					material_skuid_link, pcontractid_link, productid_link, orgrootid_link, colorid_link, loaiphoi);
+			Map<Long, Float> map = new HashMap<Long, Float>();
+			for (CutPlan_Size sodo : list_sodo) {
+				CutPlan_Row cut_row = cutrow_Service.findOne(sodo.getCutplanrowid_link());
+				if (cut_row.getType().equals(CutPlanRowType.sodocat)) {
+					tongsl_sp += (sodo.getAmount() == null ? 0 : sodo.getAmount()) * cut_row.getLa_vai();
+					if (map.get(sodo.getCutplanrowid_link()) == null) {
+						float f_slvai = cut_row.getSl_vai();
+						sl_vai += f_slvai;
+						map.put(sodo.getCutplanrowid_link(), f_slvai);
+					}
 
-		// tinh tong so luong san pham trong tat ca cac so do
-		List<CutPlan_Size> list_sodo = cutplan_size_Service.getby_sku_and_pcontract_product_and_color(
-				material_skuid_link, pcontractid_link, productid_link, orgrootid_link, colorid_link);
-		Map<Long, Float> map = new HashMap<Long, Float>();
-		for (CutPlan_Size sodo : list_sodo) {
-			CutPlan_Row cut_row = cutrow_Service.findOne(sodo.getCutplanrowid_link());
-			if (cut_row.getType().equals(CutPlanRowType.sodocat)) {
-				tongsl_sp += (sodo.getAmount() == null ? 0 : sodo.getAmount()) * cut_row.getLa_vai();
-				if (map.get(sodo.getCutplanrowid_link()) == null) {
-					float f_slvai = cut_row.getSl_vai();
-					sl_vai += f_slvai;
-					map.put(sodo.getCutplanrowid_link(), f_slvai);
+				}
+			}
+
+			List<Long> list_sku = sku_repo.getskuid_bycolorid_link(productid_link, pcontractid_link, colorid_link);
+
+			for (Long product_skuid_link : list_sku) {
+				float bom = 0;
+				int sl_zise = 0;
+
+				// tinh so luong cua tung co
+				List<CutPlan_Size> listsize_sodo = cutplan_size_Service
+						.getby_pcontract_product_matsku_productsku_loaiphoi(pcontractid_link, productid_link,
+								material_skuid_link, product_skuid_link, CutPlanRowType.sodocat, "", loaiphoi);
+				for (CutPlan_Size cut_size : listsize_sodo) {
+					CutPlan_Row cut_row = cutrow_Service.findOne(cut_size.getCutplanrowid_link());
+
+					if (cut_size.getProduct_skuid_link().equals(product_skuid_link))
+						sl_zise += (cut_size.getAmount() == null ? 0 : cut_size.getAmount()) * cut_row.getLa_vai();
+
 				}
 
-			}
-		}
+				float bom_avg = (float) (sl_vai / (float) tongsl_sp);
+				float size_percent = ((float) sl_zise / (float) tongsl_sp);
+				bom = bom_avg * size_percent;
+				bom = (float) Math.ceil((bom * 10000)) / 10000;
 
-		List<Long> list_sku = sku_repo.getskuid_bycolorid_link(productid_link, pcontractid_link, colorid_link);
-		for (Long product_skuid_link : list_sku) {
-			float bom = 0;
-			int sl_zise = 0;
+				List<porder_bom_sku_loaiphoi> list_bomsku_loaiphoi = skubom_loaiphoi_Service
+						.getbypcontract_product_material_sku_loaiphoi(pcontractid_link, productid_link,
+								material_skuid_link, product_skuid_link, loaiphoi);
 
-			// tinh so luong cua tung co
-			List<CutPlan_Size> listsize_sodo = cutplan_size_Service.getby_pcontract_product_matsku_productsku(
-					pcontractid_link, productid_link, material_skuid_link, product_skuid_link, CutPlanRowType.sodocat,
-					"");
-			for (CutPlan_Size cut_size : listsize_sodo) {
-				CutPlan_Row cut_row = cutrow_Service.findOne(cut_size.getCutplanrowid_link());
+				// neu co dinh muc roi thi cap nhat chua co thi them vao
+				if (list_bomsku_loaiphoi.size() > 0) {
+					porder_bom_sku_loaiphoi bomsku = list_bomsku_loaiphoi.get(0);
+					bomsku.setAmount(bom);
+					skubom_loaiphoi_Service.save(bomsku);
+				} else {
+					porder_bom_sku_loaiphoi bomsku = new porder_bom_sku_loaiphoi();
+					bomsku.setId(null);
+					bomsku.setAmount(bom);
+					bomsku.setMaterial_skuid_link(material_skuid_link);
+					bomsku.setPcontractid_link(pcontractid_link);
+					bomsku.setProductid_link(productid_link);
+					bomsku.setSkuid_link(product_skuid_link);
+					bomsku.setLoaiphoi(loaiphoi);
 
-				if (cut_size.getProduct_skuid_link().equals(product_skuid_link))
-					sl_zise += (cut_size.getAmount() == null ? 0 : cut_size.getAmount()) * cut_row.getLa_vai();
+					skubom_loaiphoi_Service.save(bomsku);
 
-			}
+				}
 
-			float bom_avg = (float) (sl_vai / (float) tongsl_sp);
-			float size_percent = ((float) sl_zise / (float) tongsl_sp);
-			bom = bom_avg * size_percent;
-			bom = (float) Math.ceil((bom * 10000)) / 10000;
+				List<porder_bom_sku_loaiphoi> list_bom_loaiphoi = skubom_loaiphoi_Service
+						.getbypcontract_product_material_sku(pcontractid_link, productid_link, material_skuid_link,
+								product_skuid_link);
+				float bomall = 0;
 
-			List<POrderBOMSKU> list_bomsku = porderbomskuService.getby_pcontract_product_and_material_and_sku_and_type(
-					pcontractid_link, productid_link, material_skuid_link, product_skuid_link, POrderBomType.Kythuat);
+				for (porder_bom_sku_loaiphoi bomsku_loaiphoi : list_bom_loaiphoi) {
+					bomall += bomsku_loaiphoi.getAmount();
+				}
 
-			// neu co dinh muc roi thi cap nhat chua co thi them vao
-			if (list_bomsku.size() > 0) {
-				POrderBOMSKU bomsku = list_bomsku.get(0);
-				bomsku.setAmount(bom);
-				porderbomskuService.save(bomsku);
-			} else {
-				POrderBOMSKU bomsku = new POrderBOMSKU();
-				bomsku.setId(null);
-				bomsku.setAmount(bom);
-				bomsku.setCreateddate(new Date());
-				bomsku.setCreateduserid_link(userid_link);
-				bomsku.setMaterialid_link(material_skuid_link);
-				bomsku.setOrgrootid_link(orgrootid_link);
-				bomsku.setPcontractid_link(pcontractid_link);
-				bomsku.setPorderid_link(null);
-				bomsku.setProductid_link(productid_link);
-				bomsku.setSkuid_link(product_skuid_link);
-				bomsku.setType(POrderBomType.Kythuat);
+				List<POrderBOMSKU> list_bomsku = porderbomskuService
+						.getby_pcontract_product_and_material_and_sku_and_type(pcontractid_link, productid_link,
+								material_skuid_link, product_skuid_link, POrderBomType.Kythuat);
 
-				porderbomskuService.save(bomsku);
+				// neu co dinh muc roi thi cap nhat chua co thi them vao
+				if (list_bomsku.size() > 0) {
+					POrderBOMSKU bomsku = list_bomsku.get(0);
+					bomsku.setAmount(bomall);
+					porderbomskuService.save(bomsku);
+				} else {
+					POrderBOMSKU bomsku = new POrderBOMSKU();
+					bomsku.setId(null);
+					bomsku.setAmount(bom);
+					bomsku.setCreateddate(new Date());
+					bomsku.setCreateduserid_link(userid_link);
+					bomsku.setMaterialid_link(material_skuid_link);
+					bomsku.setOrgrootid_link(orgrootid_link);
+					bomsku.setPcontractid_link(pcontractid_link);
+					bomsku.setPorderid_link(null);
+					bomsku.setProductid_link(productid_link);
+					bomsku.setSkuid_link(product_skuid_link);
+					bomsku.setType(POrderBomType.Kythuat);
 
+					porderbomskuService.save(bomsku);
+
+				}
 			}
 		}
 
