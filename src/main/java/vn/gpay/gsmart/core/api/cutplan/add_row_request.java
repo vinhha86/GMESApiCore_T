@@ -6,4 +6,5 @@ public class add_row_request {
 	public Long productid_link;
 	public Long pcontractid_link;
 	public Long colorid_link;
+	public String loaiphoi;
 }

@@ -98,6 +98,7 @@ public class CutPlanAPI {
 					row_yeucau.setSo_cay(0);
 					row_yeucau.setPcontractid_link(pcontractid_link);
 					row_yeucau.setProductid_link(productid_link);
+					row_yeucau.setLoaiphoimau("Vị trí 1");
 
 					row_yeucau = cutplanrowService.save(row_yeucau);
 
@@ -117,6 +118,7 @@ public class CutPlanAPI {
 					row_catdu.setSo_cay(0);
 					row_catdu.setPcontractid_link(pcontractid_link);
 					row_catdu.setProductid_link(productid_link);
+					row_catdu.setLoaiphoimau("Vị trí 1");
 
 					row_catdu = cutplanrowService.save(row_catdu);
 
@@ -288,6 +290,7 @@ public class CutPlanAPI {
 			Long productid_link = entity.productid_link;
 			Long pcontractid_link = entity.pcontractid_link;
 			Long colorid_link = entity.colorid_link;
+			String loaiphoi = entity.loaiphoi;
 
 			Date current = new Date();
 			DateFormat dateFormat = new SimpleDateFormat("hh_mm_ss");
@@ -315,6 +318,7 @@ public class CutPlanAPI {
 				row_yeucau.setSo_cay(0);
 				row_yeucau.setPcontractid_link(pcontractid_link);
 				row_yeucau.setProductid_link(productid_link);
+				row_yeucau.setLoaiphoimau("Vị trí 1");
 
 				row_yeucau = cutplanrowService.save(row_yeucau);
 
@@ -332,6 +336,7 @@ public class CutPlanAPI {
 				row_catdu.setSl_vai((float) 0);
 				row_catdu.setKho("");
 				row_catdu.setSo_cay(0);
+				row_catdu.setLoaiphoimau("Vị trí 1");
 
 				row_catdu = cutplanrowService.save(row_catdu);
 
@@ -387,6 +392,7 @@ public class CutPlanAPI {
 			row_new.setSo_cay(0);
 			row_new.setPcontractid_link(pcontractid_link);
 			row_new.setProductid_link(productid_link);
+			row_new.setLoaiphoimau(loaiphoi);
 
 			row_new = cutplanrowService.save(row_new);
 
