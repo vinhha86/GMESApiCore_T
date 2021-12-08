@@ -192,6 +192,13 @@ public class Stockout_order implements Serializable {
 		return "";
 	}
 	
+	@Transient
+	public Long getPorder_Product_id() {
+		if(porder!=null)
+			return porder.getId();
+		return (long) 0;
+	}
+	
 	public Long getId() {
 		return id;
 	}
