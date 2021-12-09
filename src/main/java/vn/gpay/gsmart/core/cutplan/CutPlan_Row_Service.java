@@ -117,8 +117,11 @@ public class CutPlan_Row_Service extends AbstractService<CutPlan_Row> implements
 				}
 
 				float bom_avg = (float) (sl_vai / (float) tongsl_sp);
-				float size_percent = ((float) sl_zise / (float) tongsl_sp);
-				bom = bom_avg * size_percent;
+//				float size_percent = ((float) sl_zise / (float) tongsl_sp);
+				bom = bom_avg * 1;
+//				if (bom > 0) {
+//					String av = "";
+//				}
 				bom = (float) Math.ceil((bom * 10000)) / 10000;
 
 				List<porder_bom_sku_loaiphoi> list_bomsku_loaiphoi = skubom_loaiphoi_Service
