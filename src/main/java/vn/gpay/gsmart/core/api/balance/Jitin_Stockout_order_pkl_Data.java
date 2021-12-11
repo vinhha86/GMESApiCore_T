@@ -39,6 +39,12 @@ public class Jitin_Stockout_order_pkl_Data implements Serializable{
 	private String color_name;
 	private String unit_name;
 	private String spaceString;
+	private Integer warehouseStatus;
+	private String warehouseStatusString;
+	private Float warehouse_check_met_check;
+	private Float warehouse_check_width_check;
+	private Float warehouse_check_met_err;
+	
 	public Long getId() {
 		return id;
 	}
@@ -231,6 +237,34 @@ public class Jitin_Stockout_order_pkl_Data implements Serializable{
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
-
-	
+	public Integer getWarehouseStatus() {
+		return warehouseStatus;
+	}
+	public void setWarehouseStatus(Integer warehouseStatus) {
+		this.warehouseStatus = warehouseStatus;
+	}
+	public String getWarehouseStatusString() {
+		return warehouseStatusString;
+	}
+	public void setWarehouseStatusString(String warehouseStatusString) {
+		this.warehouseStatusString = warehouseStatusString;
+	}
+	public Float getWarehouse_check_met_check() {
+		return warehouse_check_met_check;
+	}
+	public void setWarehouse_check_met_check(Float warehouse_check_met_check) {
+		this.warehouse_check_met_check = warehouse_check_met_check;
+	}
+	public Float getWarehouse_check_width_check() {
+		return warehouse_check_width_check;
+	}
+	public void setWarehouse_check_width_check(Float warehouse_check_width_check) {
+		this.warehouse_check_width_check = warehouse_check_width_check;
+	}
+	public Float getWarehouse_check_met_err() {
+		return warehouse_check_met_err;
+	}
+	public void setWarehouse_check_met_err(Float warehouse_check_met_err) {
+		this.warehouse_check_met_err = warehouse_check_met_err;
+	}
 }
