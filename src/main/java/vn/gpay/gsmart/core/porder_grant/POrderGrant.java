@@ -159,22 +159,30 @@ public class POrderGrant implements Serializable {
 
 	@Transient
 	public String getXuongTo() {
-		return org.getName();
+		if(org != null)
+			return org.getName();
+		return "";
 	}
 
 	@Transient
 	public String getXuongSX() {
-		return org.getParentcode();
+		if(org != null)
+			return org.getParentcode();
+		return "";
 	}
 	
 	@Transient
 	public Long getXuongSX_ID() {
-		return org.getParentid_link();
+		if(org != null)
+			return org.getParentid_link();
+		return null;
 	}
 
 	@Transient
 	public String getDonvi() {
-		return org.getParentcode();
+		if(org != null)
+			return org.getParentcode();
+		return "";
 	}
 
 	@Transient
