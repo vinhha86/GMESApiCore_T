@@ -79,6 +79,22 @@ public interface IPOrderGrant_SKU_Plan_Repository extends JpaRepository<POrderGr
 			@Param("dateTo") final Date dateTo
 			);
 	
+	@Query(value = "select distinct a.date from POrderGrant_SKU_Plan a " 
+			+ "inner join POrderGrant_SKU b on a.porder_grant_skuid_link = b.id "
+			+ "inner join POrderGrant c on b.pordergrantid_link = c.id "
+			+ "where c.id = :porder_grantid_link "
+			+ "and (date(a.date) >= date(:dateFrom) or date(:dateFrom) is null) "
+			+ "and (date(a.date) <= date(:dateTo) or date(:dateTo) is null) "
+//			+ "and (a.is_ordered is null or a.is_ordered is false ) "
+//			+ "and a.amount > 0 "
+			+ "order by a.date asc "
+			)
+	public List<Date> getDate(
+			@Param("porder_grantid_link") final Long porder_grantid_link,
+			@Param("dateFrom") final Date dateFrom,
+			@Param("dateTo") final Date dateTo
+			);
+	
 	@Query(value = "select a from POrderGrant_SKU_Plan a " 
 			+ "inner join POrderGrant_SKU b on a.porder_grant_skuid_link = b.id "
 			+ "inner join POrderGrant c on b.pordergrantid_link = c.id "

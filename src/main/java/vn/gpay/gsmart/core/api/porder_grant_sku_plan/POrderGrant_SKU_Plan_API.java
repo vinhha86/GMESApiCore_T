@@ -293,8 +293,10 @@ public class POrderGrant_SKU_Plan_API {
 		try {
 			Long porder_grantid_link = entity.porder_grantid_link;
 			
-			Date dateBegin = new Date();
-			Date dateEnd = new Date();
+//			Date dateBegin = new Date();
+//			Date dateEnd = new Date();
+			Date dateBegin = entity.dateFrom;
+			Date dateEnd = entity.dateTo;
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(dateBegin);
 			cal.set(Calendar.HOUR_OF_DAY, 0);
@@ -302,14 +304,17 @@ public class POrderGrant_SKU_Plan_API {
 			cal.set(Calendar.SECOND, 0);
 			cal.set(Calendar.MILLISECOND, 0);
 			dateBegin = cal.getTime();
-			cal.add(Calendar.DAY_OF_MONTH, +6);
+			
+			cal.setTime(dateEnd);
+//			cal.add(Calendar.DAY_OF_MONTH, +5);
 			cal.set(Calendar.HOUR_OF_DAY, 0);
 			cal.set(Calendar.MINUTE, 0);
 			cal.set(Calendar.SECOND, 0);
 			cal.set(Calendar.MILLISECOND, 0);
 			dateEnd = cal.getTime();
 			
-			List<Date> date_list = porderGrant_SKU_Plan_Service.getDate_ChuaYeuCau(porder_grantid_link, dateBegin, dateEnd);
+//			List<Date> date_list = porderGrant_SKU_Plan_Service.getDate_ChuaYeuCau(porder_grantid_link, dateBegin, dateEnd);
+			List<Date> date_list = porderGrant_SKU_Plan_Service.getDate(porder_grantid_link, dateBegin, dateEnd);
 //			for(Date date : date_list) {
 //				System.out.println(date);
 //			}
