@@ -17,6 +17,7 @@ public class POrderBomProduct_Runnable implements Runnable {
 	private List<POrderBOMSKU> listbomsku;
 	private List<POrderBOMSKU> listbomsku_kythuat;
 	private List<POrderBOMSKU> listbomsku_sanxuat;
+	private List<POrderBOMSKU> listbomsku_vien;
 	private List<Map<String, String>> listdata;
 	private Map<Long, String> mapcolor;
 	private Map<String, Long> map_sku;
@@ -26,7 +27,8 @@ public class POrderBomProduct_Runnable implements Runnable {
 	public POrderBomProduct_Runnable(List<Long> list_colorid, POrderBomProduct pContractProductBom,
 			List<Long> List_size, List<POrderBOMSKU> listbomsku, List<POrderBOMSKU> listbomsku_kythuat,
 			List<POrderBOMSKU> listbomsku_sanxuat, List<Map<String, String>> listdata, CountDownLatch latch,
-			Map<Long, String> mapcolor, Map<String, Long> map_sku, List<POrderBomProduct> listbom) {
+			Map<Long, String> mapcolor, Map<String, Long> map_sku, List<POrderBomProduct> listbom,
+			List<POrderBOMSKU> listbomsku_vien) {
 		// TODO Auto-generated constructor stub
 		this.list_colorid = list_colorid;
 		this.pContractProductBom = pContractProductBom;
@@ -39,6 +41,7 @@ public class POrderBomProduct_Runnable implements Runnable {
 		this.mapcolor = mapcolor;
 		this.map_sku = map_sku;
 		this.listbom = listbom;
+		this.listbomsku_vien = listbomsku_vien;
 	}
 
 	public void start() {
@@ -106,6 +109,7 @@ public class POrderBomProduct_Runnable implements Runnable {
 					List<POrderBOMSKU> listbomsku_clone = new ArrayList<POrderBOMSKU>(listbomsku);
 					List<POrderBOMSKU> listbomsku_kt_clone = new ArrayList<POrderBOMSKU>(listbomsku_kythuat);
 					List<POrderBOMSKU> listbomsku_sx_clone = new ArrayList<POrderBOMSKU>(listbomsku_sanxuat);
+					List<POrderBOMSKU> listbomsku_vien_clone = new ArrayList<POrderBOMSKU>(listbomsku_vien);
 
 					long skuid_link = map_sku.get(colorid + "_" + size);
 					listbomsku_clone.removeIf(c -> !c.getMaterialid_link().equals(materialid_link)
@@ -117,9 +121,13 @@ public class POrderBomProduct_Runnable implements Runnable {
 					listbomsku_sx_clone.removeIf(c -> !c.getMaterialid_link().equals(materialid_link)
 							|| !c.getSkuid_link().equals(skuid_link));
 
+					listbomsku_vien_clone.removeIf(c -> !c.getMaterialid_link().equals(materialid_link)
+							|| !c.getSkuid_link().equals(skuid_link));
+
 					Float amount_size_kt = (float) 0;
 					Float amount_size = (float) 0;
 					Float amount_size_sx = (float) 0;
+					float amount_size_vien = 0;
 
 					if (listbomsku_clone.size() > 0)
 						amount_size = listbomsku_clone.get(0).getAmount();
@@ -130,9 +138,14 @@ public class POrderBomProduct_Runnable implements Runnable {
 					if (listbomsku_sx_clone.size() > 0)
 						amount_size_sx = listbomsku_sx_clone.get(0).getAmount();
 
+					if (listbomsku_vien_clone.size() > 0)
+						amount_size_vien = listbomsku_vien_clone.get(0).getAmount();
+
 					map.put("" + size, amount_size + "");
 					map.put(size + "_KT", amount_size_kt + "");
 					map.put(size + "_SX", amount_size_sx + "");
+					map.put(size + "_Vien", amount_size_vien + "");
+					map.put(size + "_Tong", amount_size_kt + amount_size_vien + "");
 
 					if (amount_size > 0) {
 						check = true;
