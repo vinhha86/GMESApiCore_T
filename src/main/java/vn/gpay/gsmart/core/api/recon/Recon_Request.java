@@ -7,4 +7,5 @@ public class Recon_Request {
 	public String list_productid;
 	public String list_materialtypeid;
 	public Integer balance_limit = 0; //0-Tinh het; 1-Chi tinh nguyen lieu; 2-Chi tinh phu lieu	
+	public Integer recon_type = 0;//0-Quyet toan can doi; 1-Quyet toan Hai quan; 2-Quyet toan san xuat (noi bo)	
 }

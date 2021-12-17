@@ -47,9 +47,31 @@ public class PContractProductSKU implements Serializable {
 	@Transient
 	private Integer pquantity_lenhsx = 0;// SL da tao lenh sx
 	@Transient
-	private Integer pquantity_stockin = 0;// SL da nhap kho thanh pham
+	private Integer pquantity_onhand_begin = 0;// SL ton dau ky (cot 5 mau 15a)
 	@Transient
-	private Integer pquantity_stockout = 0;// SL da xuat kho cho khach
+	private Integer pquantity_stockin = 0;// SL da nhap kho thanh pham trong ky (cot 6 mau 15a)
+	@Transient
+	private Integer pquantity_changetarget = 0;// SL thay doi muc dich su dung (cot 7 mau 15a)
+	@Transient
+	private Integer pquantity_stockout = 0;// SL da xuat kho cho khach (cot 8 mau 15a)
+	@Transient
+	private Integer pquantity_stockout_other = 0;// SL da xuat kho muc dich khac (cot 9 mau 15a)
+	@Transient
+	private Integer pquantity_onhand_end = 0;// SL ton cuoi ky (cot 10 mau 15a)
+	
+	@Transient
+	private String product_code = "";
+	@Transient
+	private String product_name = "";
+	@Transient
+	private String sku_code = "";
+	@Transient
+	private String unit_name = "";
+	@Transient
+	private String mausanpham = "";
+	@Transient
+	private String cosanpham = "";
+
 
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -82,16 +104,25 @@ public class PContractProductSKU implements Serializable {
 	public String getProductcode() {
 		if (product != null)
 			return product.getBuyercode();
-		return "";
+		else
+			return product_code;
+	}
+	
+	public void setProduct_code(String product_code) {
+		this.product_code = product_code;
 	}
 
 	@Transient
 	public String getProductname() {
 		if (product != null)
 			return product.getBuyername();
-		return "";
+		else
+			return product_name;
 	}
-
+	public void setProduct_name(String product_name) {
+		this.product_name = product_name;
+	}
+	
 	@Transient
 	public Long getUnitid_link() {
 		if (product != null)
@@ -103,7 +134,11 @@ public class PContractProductSKU implements Serializable {
 	public String getUnitname() {
 		if (product != null)
 			return product.getUnitName();
-		return "";
+		else
+			return unit_name;
+	}
+	public void setUnit_name(String unit_name) {
+		this.unit_name = unit_name;
 	}
 
 	@Transient
@@ -129,6 +164,9 @@ public class PContractProductSKU implements Serializable {
 		}
 		return "";
 	}
+	public void setSku_code(String sku_code) {
+		this.sku_code = sku_code;
+	}
 
 	@Transient
 	public String getSkuBarCode() {
@@ -140,18 +178,24 @@ public class PContractProductSKU implements Serializable {
 
 	@Transient
 	public String getMauSanPham() {
-		if (sku != null) {
+		if (sku != null)
 			return sku.getMauSanPham();
-		}
-		return "";
+		else
+			return mausanpham;
+	}
+	public void setMausanpham(String mausanpham) {
+		this.mausanpham = mausanpham;
 	}
 
 	@Transient
 	public String getCoSanPham() {
-		if (sku != null) {
+		if (sku != null)
 			return sku.getCoSanPham();
-		}
-		return "";
+		else
+			return cosanpham;
+	}
+	public void setCosanpham(String cosanpham) {
+		this.cosanpham = cosanpham;
 	}
 
 	@Transient
@@ -294,4 +338,37 @@ public class PContractProductSKU implements Serializable {
 		this.ismap = ismap;
 	}
 
+	public Integer getPquantity_onhand_begin() {
+		return pquantity_onhand_begin;
+	}
+
+	public void setPquantity_onhand_begin(Integer pquantity_onhand_begin) {
+		this.pquantity_onhand_begin = pquantity_onhand_begin;
+	}
+
+	public Integer getPquantity_changetarget() {
+		return pquantity_changetarget;
+	}
+
+	public void setPquantity_changetarget(Integer pquantity_changetarget) {
+		this.pquantity_changetarget = pquantity_changetarget;
+	}
+
+	public Integer getPquantity_stockout_other() {
+		return pquantity_stockout_other;
+	}
+
+	public void setPquantity_stockout_other(Integer pquantity_stockout_other) {
+		this.pquantity_stockout_other = pquantity_stockout_other;
+	}
+
+	public Integer getPquantity_onhand_end() {
+		return pquantity_onhand_end;
+	}
+
+	public void setPquantity_onhand_end(Integer pquantity_onhand_end) {
+		this.pquantity_onhand_end = pquantity_onhand_end;
+	}
+
+	
 }

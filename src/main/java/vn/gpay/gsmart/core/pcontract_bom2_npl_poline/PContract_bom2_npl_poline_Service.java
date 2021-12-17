@@ -38,6 +38,11 @@ public class PContract_bom2_npl_poline_Service extends AbstractService<PContract
 	}
 
 	@Override
+	public List<PContract_bom2_npl_poline> getby_pcontract(Long pcontractid_link) {
+		return repo.getby_pcontract(pcontractid_link);
+	}
+	
+	@Override
 	public List<PContract_bom2_npl_poline> getby_product_and_npl(Long productid_link, Long pcontractid_link,
 			Long material_skuid_link) {
 		// TODO Auto-generated method stub

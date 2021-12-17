@@ -38,4 +38,8 @@ public interface IPContract_bom2_npl_poline_repo
 			+ "where c.pcontractid_link = :pcontractid_link " + "and productid_link = :productid_link")
 	public List<PContract_bom2_npl_poline> getby_product(@Param("pcontractid_link") final Long pcontractid_link,
 			@Param("productid_link") final Long productid_link);
+	
+	@Query(value = "select c from PContract_bom2_npl_poline c where pcontractid_link = :pcontractid_link")
+	public List<PContract_bom2_npl_poline> getby_pcontract(
+			@Param("pcontractid_link") final Long pcontractid_link);
 }

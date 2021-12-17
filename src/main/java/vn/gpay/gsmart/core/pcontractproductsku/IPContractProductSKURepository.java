@@ -28,8 +28,20 @@ public interface IPContractProductSKURepository extends JpaRepository<PContractP
 	public List<PContractProductSKU> getlistsku_bypcontract(@Param("orgrootid_link") final Long orgrootid_link,
 			@Param("pcontractid_link") final long pcontractid_link);
 
-	@Query(value = "select c.skuid_link as skuid_link, sum(c.pquantity_total) as pquantity_total from PContractProductSKU c "
-			+ "where pcontractid_link = :pcontractid_link " + "group by c.skuid_link")
+	//Hung Dai Bang
+	@Query(value = "select c from PContractProductSKU c "
+			+ "where c.orgrootid_link = :orgrootid_link "
+			+ "and c.pcontractid_link = :pcontractid_link")
+	public List<PContractProductSKU> getlistsku_bypcontract_nolink(@Param("orgrootid_link") final Long orgrootid_link,
+			@Param("pcontractid_link") final long pcontractid_link);
+
+	@Query(value = "select c.productid_link as productid_link, c.skuid_link as skuid_link, "
+			+ "sum(pquantity_porder) as pquantity_porder, "
+			+ "sum(pquantity_sample) as pquantity_sample, "
+			+ "sum(pquantity_granted) as pquantity_granted, "
+			+ "sum(c.pquantity_total) as pquantity_total "
+			+ "from PContractProductSKU c "
+			+ "where pcontractid_link = :pcontractid_link " + "group by c.productid_link, c.skuid_link")
 	public List<Object[]> getsumsku_bypcontract(@Param("pcontractid_link") final long pcontractid_link);
 
 	@Query(value = "select c from PContractProductSKU c " + "where c.pcontract_poid_link = :pcontract_poid_link "

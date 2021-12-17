@@ -49,4 +49,10 @@ public interface PContract_bom2_npl_poline_sku_repo extends JpaRepository<PContr
 			@Param ("material_skuid_link")final Long material_skuid_link,
 			@Param ("productid_link")final Long productid_link,
 			@Param ("product_skuid_link")final Long product_skuid_link);
+	
+	@Query(value = "select c from PContract_bom2_npl_poline_sku c "
+			+ "where c.pcontractid_link = :pcontractid_link"
+			)
+	public List<PContract_bom2_npl_poline_sku> getby_pcontract(
+			@Param ("pcontractid_link")final Long pcontractid_link);
 }

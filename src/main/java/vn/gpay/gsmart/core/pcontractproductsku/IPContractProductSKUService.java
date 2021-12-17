@@ -59,4 +59,6 @@ public interface IPContractProductSKUService extends Operations<PContractProduct
 	List<PContractProductSKU> getsku_notmap(Long pcontract_poid_link);
 
 	List<PContractProductSKU> getsku_notmap_by_product(Long pcontract_poid_link, Long productid_link);
+
+	List<PContractProductSKU> getlistsku_bypcontract_nolink(long orgrootid_link, long pcontractid_link);
 }

@@ -3,6 +3,7 @@ package vn.gpay.gsmart.core.api.recon;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -21,23 +22,21 @@ import vn.gpay.gsmart.core.utils.AtributeFixValues;
 
 public class Recon_MatSKU implements Runnable{
 	private Thread t;
-	private Long pcontractid_link;
-	private Long stockid_link;
-	private Long pcontract_poid_link;
-	private Long porderid_link;
+	private List<Jitin_Stockin_D_Data> ls_PStockin;
+	private List<Jitin_StockOutD_Data> ls_PStockout;
 	private Recon_MatSKU_Data mat_sku;
 
 	String token;
 	CountDownLatch latch;
 	
-	Recon_MatSKU(Long pcontractid_link, Long stockid_link, Long pcontract_poid_link,
-			Long porderid_link, Recon_MatSKU_Data mat_sku, String token, CountDownLatch latch) {
-		this.pcontractid_link = pcontractid_link;
-		this.stockid_link = stockid_link;
-		this.pcontract_poid_link = pcontract_poid_link;
-		this.porderid_link = porderid_link;
+	Recon_MatSKU(
+			List<Jitin_Stockin_D_Data> ls_PStockin,
+			List<Jitin_StockOutD_Data> ls_PStockout,
+			Recon_MatSKU_Data mat_sku,
+			CountDownLatch latch) {
+		this.ls_PStockin = ls_PStockin;
+		this.ls_PStockout = ls_PStockout;
 		this.mat_sku = mat_sku;
-		this.token = token;
 		this.latch = latch;
 
 		// Nếu tính cân bằng theo PO line --> Lấy danh sách SKU của PO Line
@@ -68,32 +67,13 @@ public class Recon_MatSKU implements Runnable{
 	// Tinh SL NPL da nhap kho theo đơn hàng
 	private void cal_stockin_bycontract() {
 		try {
-			RestTemplate restTemplate = new RestTemplate();
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.APPLICATION_JSON);
-			headers.set("authorization", this.token);
-			headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
-			headers.setAccessControlRequestMethod(HttpMethod.POST);
-			String urlPost = AtributeFixValues.url_jitin + "/api/v1/stockin/stockind_bypcontract_and_sku";
-
-			ObjectMapper objectMapper = new ObjectMapper();
-			ObjectNode appParNode = objectMapper.createObjectNode();
-			appParNode.put("pcontractid_link", pcontractid_link);
-			appParNode.put("stockid_link", stockid_link);
-			appParNode.put("skuid_link", this.mat_sku.getMat_skuid_link());
-			String jsonReq = objectMapper.writeValueAsString(appParNode);
-
-			HttpEntity<String> request = new HttpEntity<String>(jsonReq, headers);
-			String result = restTemplate.postForObject(urlPost, request, String.class);
-//            System.out.println(result);
-			Jitin_StockinList_Response ls_stockind = objectMapper.readValue(result, Jitin_StockinList_Response.class);
-			if (null != ls_stockind) {
+			List<Jitin_Stockin_D_Data> ls_stockind = ls_PStockin.stream().filter(sku -> sku.getSkuid_link().equals(mat_sku.getMat_skuid_link())).collect(Collectors.toList());
+			if (ls_stockind.size() > 0) {
 				Float met_stockin = (float) 0;
-				for (Jitin_Stockin_D_Data stockinD : ls_stockind.data) {
+				for (Jitin_Stockin_D_Data stockinD : ls_stockind) {
 					met_stockin += null != stockinD.getTotalmet_check() ? stockinD.getTotalmet_check() : 0;
 				}
 				mat_sku.setMat_sku_stockin(met_stockin);
-				mat_sku.setMat_sku_dif(mat_sku.getMat_sku_stockin() - mat_sku.getMat_sku_demand());
 			}
 
 		} catch (Exception e) {
@@ -104,33 +84,11 @@ public class Recon_MatSKU implements Runnable{
 	// Tinh SL NPL da xuat kho sang san xuat theo đơn hàng
 	private void cal_stockout_bycontract() {
 		try {
-			RestTemplate restTemplate = new RestTemplate();
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.APPLICATION_JSON);
-			headers.set("authorization", this.token);
-			headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
-			headers.setAccessControlRequestMethod(HttpMethod.POST);
-			String urlPost = AtributeFixValues.url_jitin + "/api/v1/stockout/stockoutd_bypcontract_and_sku";
-
-			ObjectMapper objectMapper = new ObjectMapper();
-			ObjectNode appParNode = objectMapper.createObjectNode();
-			appParNode.put("pcontractid_link", pcontractid_link);
-			appParNode.put("pcontract_poid_link", pcontract_poid_link);
-			appParNode.put("porderid_link", porderid_link);
-			appParNode.put("stockid_link", stockid_link);
-			appParNode.put("skuid_link", this.mat_sku.getMat_skuid_link());
-			String jsonReq = objectMapper.writeValueAsString(appParNode);
-
-			HttpEntity<String> request = new HttpEntity<String>(jsonReq, headers);
-			String result = restTemplate.postForObject(urlPost, request, String.class);
-//            System.out.println(result);
-			Jitin_StockoutList_Response ls_stockoutd = objectMapper.readValue(result,
-					Jitin_StockoutList_Response.class);
-
-			if (null != ls_stockoutd) {
-
-				Float met_stockout = (float) 0;
-				for (Jitin_StockOutD_Data stockoutD : ls_stockoutd.data) {
+			
+			List<Jitin_StockOutD_Data> ls_stockoutd = ls_PStockout.stream().filter(sku -> sku.getSkuid_link().equals(mat_sku.getMat_skuid_link())).collect(Collectors.toList());
+			if (ls_stockoutd.size() > 0) {
+				Float met_stockout = (float)0;
+				for (Jitin_StockOutD_Data stockoutD : ls_stockoutd) {
 //            		System.out.println(this.mat_sku.getMat_skuid_link() + "-" + stockoutD.getTotalmet_check());
 					met_stockout += null != stockoutD.getTotalmet_check() ? stockoutD.getTotalmet_check() : 0;
 				}

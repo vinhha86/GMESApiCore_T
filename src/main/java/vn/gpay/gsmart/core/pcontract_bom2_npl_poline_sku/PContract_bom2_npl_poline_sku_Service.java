@@ -34,4 +34,8 @@ public class PContract_bom2_npl_poline_sku_Service extends AbstractService<PCont
 		return repo.getone(pcontract_poid_link, orgrootid_link, material_skuid_link, productid_link, product_skuid_link);
 	}
 
+	@Override
+	public List<PContract_bom2_npl_poline_sku> getby_pcontract(Long pcontractid_link) {
+		return repo.getby_pcontract(pcontractid_link);
+	}
 }
