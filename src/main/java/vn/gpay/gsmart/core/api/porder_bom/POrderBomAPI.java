@@ -26,7 +26,6 @@ import vn.gpay.gsmart.core.pcontractbomcolor.PContractBom2Color;
 import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOM2SKUService;
 import vn.gpay.gsmart.core.pcontractbomsku.PContractBOM2SKU;
 import vn.gpay.gsmart.core.pcontractproduct.IPContractProductService;
-import vn.gpay.gsmart.core.pcontractproduct.PContractProduct;
 import vn.gpay.gsmart.core.pcontractproductbom.IPContractProductBom2Service;
 import vn.gpay.gsmart.core.pcontractproductbom.PContractProductBom2;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
@@ -291,8 +290,8 @@ public class POrderBomAPI {
 			response.setMessage("Định mức đơn hàng chưa được chốt");
 
 			// Kiem tra xem dinh muc don hang duoc duyet hay chua roi dong bo ve
-			List<PContractProduct> pp = pcontractproductService.get_by_product_and_pcontract(orgrootid_link,
-					productid_link, pcontractid_link);
+//			List<PContractProduct> pp = pcontractproductService.get_by_product_and_pcontract(orgrootid_link,
+//					productid_link, pcontractid_link);
 //			if (!pp.get(0).getIsbom2done()) {
 //				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 //				response.isbomdone = false;
@@ -563,6 +562,9 @@ public class POrderBomAPI {
 			List<POrderBOMSKU> listbomsku_sanxuat = porderbomskuService
 					.getByPContract_ProductID_and_type(pcontractid_link, productid_link, POrderBomType.SanXuat);
 
+			List<POrderBOMSKU> listbomsku_vien = porderbomskuService.getByPContract_ProductID_and_type(pcontractid_link,
+					productid_link, POrderBomType.Vien);
+
 //			List<Long> List_size = porder_sku_Service.getvalue_by_attribute(porderid_link, AtributeFixValues.ATTR_SIZE);
 			List<Long> List_size = pcontractskuServie.getlistvalue_by_product(pcontractid_link, productid_link,
 					AtributeFixValues.ATTR_SIZE);
@@ -585,7 +587,7 @@ public class POrderBomAPI {
 				// Chay de lay tung mau san pham
 				POrderBomProduct_Runnable bom2 = new POrderBomProduct_Runnable(list_colorid, pContractProductBom,
 						List_size, listbomsku, listbomsku_kythuat, listbomsku_sanxuat, listdata, latch, mapcolor,
-						mapsku, listbom);
+						mapsku, listbom, listbomsku_vien);
 				bom2.start();
 			}
 			latch.await();
@@ -631,6 +633,8 @@ public class POrderBomAPI {
 					pcontractid_link, productid_link, POrderBomType.Kythuat, material_skuid_link);
 			List<POrderBOMSKU> listbomsku_sanxuat = porderbomskuService.getByPContract_ProductID_and_type_material(
 					pcontractid_link, productid_link, POrderBomType.SanXuat, material_skuid_link);
+			List<POrderBOMSKU> listbomsku_vien = porderbomskuService.getByPContract_ProductID_and_type_material(
+					pcontractid_link, productid_link, POrderBomType.Vien, material_skuid_link);
 
 //			List<Long> List_size = porder_sku_Service.getvalue_by_attribute(porderid_link, AtributeFixValues.ATTR_SIZE);
 			List<Long> List_size = pcontractskuServie.getlistvalue_by_product(pcontractid_link, productid_link,
@@ -654,7 +658,7 @@ public class POrderBomAPI {
 				// Chay de lay tung mau san pham
 				POrderBomProduct_Runnable bom2 = new POrderBomProduct_Runnable(list_colorid, pContractProductBom,
 						List_size, listbomsku, listbomsku_kythuat, listbomsku_sanxuat, listdata, latch, mapcolor,
-						mapsku, listbom);
+						mapsku, listbom, listbomsku_vien);
 				bom2.start();
 			}
 			latch.await();
@@ -697,6 +701,8 @@ public class POrderBomAPI {
 					.getByPContract_ProductID_and_type(pcontractid_link, productid_link, POrderBomType.Kythuat);
 			List<POrderBOMSKU> listbomsku_sanxuat = porderbomskuService
 					.getByPContract_ProductID_and_type(pcontractid_link, productid_link, POrderBomType.SanXuat);
+			List<POrderBOMSKU> listbomsku_vien = porderbomskuService.getByPContract_ProductID_and_type(pcontractid_link,
+					productid_link, POrderBomType.Vien);
 
 //			List<Long> List_size = porder_sku_Service.getvalue_by_attribute(porderid_link, AtributeFixValues.ATTR_SIZE);
 			List<Long> List_size = pcontractskuServie.getlistvalue_by_product(pcontractid_link, productid_link,
@@ -719,7 +725,7 @@ public class POrderBomAPI {
 				// Chay de lay tung mau san pham
 				POrderBomProduct_Runnable bom2 = new POrderBomProduct_Runnable(list_colorid, pContractProductBom,
 						List_size, listbomsku, listbomsku_kythuat, listbomsku_sanxuat, listdata, latch, mapcolor,
-						mapsku, listbom);
+						mapsku, listbom, listbomsku_vien);
 				bom2.start();
 			}
 			latch.await();
@@ -735,5 +741,55 @@ public class POrderBomAPI {
 			response.setMessage(e.getMessage());
 		}
 		return new ResponseEntity<getbom2sku_by_porder_response>(response, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/update_dinhmucvien", method = RequestMethod.POST)
+	public ResponseEntity<update_dinhmucvien_response> UpdateDinhMucVien(HttpServletRequest request,
+			@RequestBody update_dinhmucvien_request entity) {
+		update_dinhmucvien_response response = new update_dinhmucvien_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long orgrootid_link = user.getRootorgid_link();
+//			Long porderid_link = entity.data.getPorderid_link();
+			Long material_skuid_link = entity.material_skuid_link;
+			Long pcontractid_link = entity.pcontractid_link;
+			Long productid_link = entity.productid_link;
+			Long colorid_link = entity.colorid_link;
+			Long sizeid_link = entity.sizeid_link;
+			float amount = entity.amount;
+
+			long skuid_link = skuavService.getsku_byproduct_and_valuemau_valueco(productid_link, colorid_link,
+					sizeid_link);
+
+			List<POrderBOMSKU> list_bomvien = porderbomskuService.getby_pcontract_product_and_material_and_sku_and_type(
+					pcontractid_link, productid_link, material_skuid_link, skuid_link, POrderBomType.Vien);
+			if (list_bomvien.size() == 0) {
+				POrderBOMSKU bomvien = new POrderBOMSKU();
+				bomvien.setAmount(amount);
+				bomvien.setCreateddate(new Date());
+				bomvien.setCreateduserid_link(user.getId());
+				bomvien.setId(null);
+				bomvien.setMaterialid_link(material_skuid_link);
+				bomvien.setOrgrootid_link(orgrootid_link);
+				bomvien.setPcontractid_link(pcontractid_link);
+				bomvien.setProductid_link(productid_link);
+				bomvien.setSkuid_link(skuid_link);
+				bomvien.setType(POrderBomType.Vien);
+
+				porderbomskuService.save(bomvien);
+			} else {
+				POrderBOMSKU bomvien = list_bomvien.get(0);
+				bomvien.setAmount(amount);
+				porderbomskuService.save(bomvien);
+			}
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<update_dinhmucvien_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<update_dinhmucvien_response>(response, HttpStatus.OK);
+		}
 	}
 }

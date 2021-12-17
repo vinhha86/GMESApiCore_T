@@ -28,6 +28,7 @@ import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOM2SKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
+import vn.gpay.gsmart.core.porder_bom_sku.IPOrderBOMSKU_Service;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 import vn.gpay.gsmart.core.sku.SKU_Attribute_Value;
@@ -50,6 +51,8 @@ public class CutPlanAPI {
 	IPOrder_Service porderService;
 	@Autowired
 	ISKU_AttributeValue_Service skuavService;
+	@Autowired
+	IPOrderBOMSKU_Service porderbomskuService;
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ResponseEntity<create_cutplan_response> CreateCutPlan(HttpServletRequest request,
@@ -723,4 +726,5 @@ public class CutPlanAPI {
 			return new ResponseEntity<update_row_response>(response, HttpStatus.OK);
 		}
 	}
+
 }

@@ -61,6 +61,8 @@ public class Jitin_StockOutPklist_Data implements Serializable {
 	private Float yds_remain;
 	private Float met_remain_and_check;
 	private Float yds_remain_and_check;
+	private String warehouseStatusString;
+	private Date date_check;
 	
 	public Long getId() {
 		return id;
@@ -373,6 +375,18 @@ public class Jitin_StockOutPklist_Data implements Serializable {
 	}
 	public void setStockinProductString(String stockinProductString) {
 		this.stockinProductString = stockinProductString;
+	}
+	public String getWarehouseStatusString() {
+		return warehouseStatusString;
+	}
+	public void setWarehouseStatusString(String warehouseStatusString) {
+		this.warehouseStatusString = warehouseStatusString;
+	}
+	public Date getDate_check() {
+		return date_check;
+	}
+	public void setDate_check(Date date_check) {
+		this.date_check = date_check;
 	}
 
 }

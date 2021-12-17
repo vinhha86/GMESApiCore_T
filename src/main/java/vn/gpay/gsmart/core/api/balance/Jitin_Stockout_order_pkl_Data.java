@@ -3,6 +3,8 @@ package vn.gpay.gsmart.core.api.balance;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Transient;
+
 public class Jitin_Stockout_order_pkl_Data implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private Long id;
@@ -44,6 +46,7 @@ public class Jitin_Stockout_order_pkl_Data implements Serializable{
 	private Float warehouse_check_met_check;
 	private Float warehouse_check_width_check;
 	private Float warehouse_check_met_err;
+	private Date date_check;
 	
 	public Long getId() {
 		return id;
@@ -267,4 +270,11 @@ public class Jitin_Stockout_order_pkl_Data implements Serializable{
 	public void setWarehouse_check_met_err(Float warehouse_check_met_err) {
 		this.warehouse_check_met_err = warehouse_check_met_err;
 	}
+	public Date getDate_check() {
+		return date_check;
+	}
+	public void setDate_check(Date date_check) {
+		this.date_check = date_check;
+	}
+	
 }
