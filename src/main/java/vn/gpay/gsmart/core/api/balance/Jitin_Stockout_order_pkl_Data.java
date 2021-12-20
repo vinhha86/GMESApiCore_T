@@ -47,6 +47,7 @@ public class Jitin_Stockout_order_pkl_Data implements Serializable{
 	private Float warehouse_check_width_check;
 	private Float warehouse_check_met_err;
 	private Date date_check;
+	private Boolean isInStock;
 	
 	public Long getId() {
 		return id;
@@ -275,6 +276,12 @@ public class Jitin_Stockout_order_pkl_Data implements Serializable{
 	}
 	public void setDate_check(Date date_check) {
 		this.date_check = date_check;
+	}
+	public Boolean getIsInStock() {
+		return isInStock;
+	}
+	public void setIsInStock(Boolean isInStock) {
+		this.isInStock = isInStock;
 	}
 	
 }
