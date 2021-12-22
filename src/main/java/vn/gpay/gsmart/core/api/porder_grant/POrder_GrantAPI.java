@@ -337,8 +337,18 @@ public class POrder_GrantAPI {
 				}
 			}
 			
+			// list_orgid : ds phan xuong
+			// grant lay theo to chuyen -> tao ds to chuyen
+			List<Long> list_idToChuyen = new ArrayList<Long>();
+			for(Long idpx : list_orgid) {
+				List<Org> listToChuyen = orgService.findOrgAllByParent(idpx);
+				for(Org toChuyen : listToChuyen) {
+					list_idToChuyen.add(toChuyen.getId());
+				}
+			}
 			
-			List<POrderGrant> list_grant = porderGrantService.get_KehoachVaoChuyen(date_from, date_to, list_orgid);
+//			List<POrderGrant> list_grant = porderGrantService.get_KehoachVaoChuyen(date_from, date_to, list_orgid);
+			List<POrderGrant> list_grant = porderGrantService.get_KehoachVaoChuyen(date_from, date_to, list_idToChuyen);
 			Date day0 = date_from;
 			Date day1 = Common.Date_Add(date_from, 1);
 			Date day2 = Common.Date_Add(date_from, 2);
