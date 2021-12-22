@@ -2,6 +2,7 @@ package vn.gpay.gsmart.core.api.recon;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -10,8 +11,6 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.collections4.IterableUtils;
-import org.apache.commons.collections4.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -33,9 +32,7 @@ import vn.gpay.gsmart.core.api.balance.Jitin_StockOutD_Data;
 import vn.gpay.gsmart.core.api.balance.Jitin_StockinList_Response;
 import vn.gpay.gsmart.core.api.balance.Jitin_Stockin_D_Data;
 import vn.gpay.gsmart.core.api.balance.Jitin_StockoutList_Response;
-import vn.gpay.gsmart.core.api.balance.SKUBalance_Data;
-import vn.gpay.gsmart.core.api.balance.SKUBalance_Product_D_Data;
-import vn.gpay.gsmart.core.api.balance.BalanceAPI.calDemand;
+
 import vn.gpay.gsmart.core.api.pcontractproductbom.PContractProductBom2API;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.pcontract.IPContractService;
@@ -47,7 +44,9 @@ import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOM2SKUService;
 import vn.gpay.gsmart.core.pcontractbomsku.PContractBOM2SKU;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
+import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService_NoLink;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
+import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU_NoLink;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.security.GpayUser;
@@ -61,6 +60,7 @@ public class ReconAPI {
 	@Autowired IPContractService pcontractService;
 	@Autowired IPContract_POService pcontract_POService;
 	@Autowired IPContractProductSKUService po_SKU_Service;
+	@Autowired IPContractProductSKUService_NoLink po_SKU_Service_NoLink;
 	@Autowired ISKU_Service skuService;
 	@Autowired PContractProductBom2API bom2Service;
 	@Autowired IPOrder_Product_SKU_Service pOrder_SKU_Service;
@@ -78,6 +78,7 @@ public class ReconAPI {
 	// Lay danh sach cac Ma NPL chi ap dung dac biet cho 1 so PO Line va product_sku nhat dinh
 	private static List<PContract_bom2_npl_poline_sku> ls_bom_poline_sku = new ArrayList<PContract_bom2_npl_poline_sku>();
 	
+	private static HashMap<Long, Recon_MatSKU_Data> hash_MatSKUBalance;
 
 	@RequestMapping(value = "/cal_recon_bycontract", method = RequestMethod.POST)
 	public ResponseEntity<Recon_Response> cal_recon_bycontract_new(HttpServletRequest request,
@@ -111,6 +112,7 @@ public class ReconAPI {
 			List<Jitin_Stockin_D_Data> ls_PStockin = get_Pstockin_bycontract(request.getHeader("Authorization"),entity.pcontractid_link, null);
 			List<Jitin_StockOutD_Data> ls_PStockout = get_Pstockout_bycontract(request.getHeader("Authorization"),entity.pcontractid_link, null);
 			
+			System.out.println("SL SKU San pham:" + ls_Product_SKU.size());
 			CountDownLatch p_latch = new CountDownLatch(ls_Product_SKU.size());
 			
 			for (PContractProductSKU product_sku : ls_Product_SKU) {
@@ -120,7 +122,7 @@ public class ReconAPI {
 			p_latch.await();
 			
 			// Lay danh sach chi tiet mau co cua tung sp theo tung po line (vi moi poline co the co bom dac biet rieng cho cac muc dich xuat hang rieng)
-			List<PContractProductSKU> ls_Product_SKU_Poline = po_SKU_Service.getlistsku_bypcontract_nolink(user.getRootorgid_link(), entity.pcontractid_link);		
+			List<PContractProductSKU_NoLink> ls_Product_SKU_Poline = po_SKU_Service_NoLink.getlistsku_bypcontract_nolink(user.getRootorgid_link(), entity.pcontractid_link);		
 			ls_bom_poline = bomPOLine_Service.getby_pcontract(entity.pcontractid_link);
 			ls_bom_poline_sku = bomPOLine_SKU_Service.getby_pcontract(entity.pcontractid_link);
 
@@ -129,21 +131,24 @@ public class ReconAPI {
 			// Duyệt qua từng màu, cỡ của sản phẩm (SKU) để tính nhu cầu NPL cho màu, cỡ đó
 			List<Recon_MatSKU_Data> ls_MatSKUBalance = new ArrayList<Recon_MatSKU_Data>();
 			
+		
 			// Tinh nhu cau NPL theo dinh muc va so luong thanh pham da xuat
 			System.out.println("Start BOM:" + new Date());
+			hash_MatSKUBalance.clear();
 //			CountDownLatch bomdemand_latch = new CountDownLatch(ls_Product_SKU_Poline.size());
-			for (PContractProductSKU product_sku : ls_Product_SKU_Poline) {
+			for (PContractProductSKU_NoLink product_sku : ls_Product_SKU_Poline) {
 //				Recon_BOMDemandSKU theBOM_Demand = new Recon_BOMDemandSKU(bom_contract, ls_MatSKUBalance, product_sku, bom2Service, ls_bom_poline,ls_bom_poline_sku, p_latch, entity.recon_type);
 //				theBOM_Demand.start();
-				cal_recon_bomdemand(ls_MatSKUBalance, product_sku);
+				cal_recon_bomdemand(product_sku);
 			}
 //			bomdemand_latch.await();
 			System.out.println("End BOM:" + new Date());
 			// 3. Tinh toan nguyen phu lieu thuc nhap, thuc xuat theo phieu xuat kho cua cac NPL trong danh sach
 			CountDownLatch latch = new CountDownLatch(ls_MatSKUBalance.size());
-			List<Jitin_Stockin_D_Data> ls_MStockin = get_Pstockin_bycontract(request.getHeader("Authorization"),entity.pcontractid_link, null);
-			List<Jitin_StockOutD_Data> ls_MStockout = get_Pstockout_bycontract(request.getHeader("Authorization"),entity.pcontractid_link, null);
+			List<Jitin_Stockin_D_Data> ls_MStockin = get_Mstockin_bycontract(request.getHeader("Authorization"),entity.pcontractid_link, null);
+			List<Jitin_StockOutD_Data> ls_MStockout = get_Mstockout_bycontract(request.getHeader("Authorization"),entity.pcontractid_link, null);
 			
+			System.out.println("SL SKU NPL:" + ls_MatSKUBalance.size());
 			for (Recon_MatSKU_Data mat_sku : ls_MatSKUBalance) {
 				Recon_MatSKU theReconMat = new Recon_MatSKU(ls_MStockin,ls_MStockout, mat_sku, latch);
 				theReconMat.start();
@@ -288,8 +293,7 @@ public class ReconAPI {
 	}
 	
 	private void cal_recon_bomdemand (
-			List<Recon_MatSKU_Data> ls_MatSKUBalance,
-			PContractProductSKU product_sku
+			PContractProductSKU_NoLink product_sku
 			){
 		try {
 			List<PContractBOM2SKU> bom_response = bom_contract.stream().filter(sku -> sku.getProduct_skuid_link().equals(product_sku.getSkuid_link())).collect(Collectors.toList());
@@ -297,7 +301,7 @@ public class ReconAPI {
 			ExecutorService executor = Executors.newFixedThreadPool(bom_response.size() + 1);
 			
 			for (PContractBOM2SKU mat_skubom : bom_response) {
-				Runnable demand = new calDemand_Candoi(ls_MatSKUBalance, mat_skubom, product_sku);
+				Runnable demand = new calDemand_Candoi(mat_skubom, product_sku);
 				executor.execute(demand);
 			}
 			executor.shutdown();
@@ -312,14 +316,11 @@ public class ReconAPI {
 	
 	public static class calDemand_Candoi implements Runnable {
 		private final PContractBOM2SKU mat_skubom;
-		private final PContractProductSKU product_sku;
-		private final List<Recon_MatSKU_Data> ls_MatSKUBalance;
+		private final PContractProductSKU_NoLink product_sku;
 		calDemand_Candoi(
-				List<Recon_MatSKU_Data> ls_MatSKUBalance, 
 				PContractBOM2SKU mat_skubom, 
-				PContractProductSKU product_sku
+				PContractProductSKU_NoLink product_sku
 		) {
-			this.ls_MatSKUBalance = ls_MatSKUBalance;
 			this.mat_skubom = mat_skubom;
 			this.product_sku = product_sku;
 		}
@@ -355,17 +356,10 @@ public class ReconAPI {
 					}
 				}
 				
-
-				Recon_MatSKU_Data theSKUBalance = ls_MatSKUBalance.stream()
-						.filter(sku -> sku.getMat_skuid_link().equals(mat_skubom.getMaterial_skuid_link())).findFirst()
-						.orElse(null);
+//				List<Recon_MatSKU_Data> lsSKUBalance = ls_MatSKUBalance.stream().parallel()
+//						.filter(sku -> sku.getMat_skuid_link().equals(mat_skubom.getMaterial_skuid_link())).collect(Collectors.toList());
 				
-//				Recon_MatSKU_Data theSKUBalance = IterableUtils.find(ls_MatSKUBalance,
-//						  new Predicate<Recon_MatSKU_Data>() {
-//						      public boolean evaluate(Recon_MatSKU_Data matsku) {
-//						          return matsku.getMat_skuid_link().equals(mat_skubom.getMaterial_skuid_link());
-//						      }
-//						  });
+				Recon_MatSKU_Data theSKUBalance = hash_MatSKUBalance.get(mat_skubom.getMaterial_skuid_link());
 				
 				if (null != theSKUBalance) {
 					// Tinh tong dinh muc
@@ -388,7 +382,7 @@ public class ReconAPI {
 ////					theSKUBalance.getProduct_d().add(product_d);
 	//
 				} else {
-					System.out.println(mat_skubom.getMaterialCode());
+//					System.out.println(mat_skubom.getMaterialCode());
 					Recon_MatSKU_Data newSKUBalance = new Recon_MatSKU_Data();
 					newSKUBalance.setMat_skuid_link(mat_skubom.getMaterial_skuid_link());
 					newSKUBalance.setMat_sku_product_total(p_amount);
@@ -408,7 +402,7 @@ public class ReconAPI {
 					Float f_skudemand = mat_skubom.getAmount() * p_amount * mat_skubom.getLost_ratio();
 					newSKUBalance.setMat_sku_demand(f_skudemand);
 
-					ls_MatSKUBalance.add(newSKUBalance);
+					hash_MatSKUBalance.put(mat_skubom.getMaterial_skuid_link(), newSKUBalance);
 				}
 			} catch (Exception ex) {
 				ex.printStackTrace();

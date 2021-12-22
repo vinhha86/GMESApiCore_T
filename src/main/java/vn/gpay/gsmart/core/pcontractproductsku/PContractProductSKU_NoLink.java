@@ -3,26 +3,16 @@ package vn.gpay.gsmart.core.pcontractproductsku;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
-
-import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
-import vn.gpay.gsmart.core.product.Product;
-import vn.gpay.gsmart.core.sku.SKU;
-
 @Table(name = "pcontract_product_skus")
 @Entity
-public class PContractProductSKU implements Serializable {
+public class PContractProductSKU_NoLink implements Serializable {
 	/**
 	* 
 	*/
@@ -73,147 +63,6 @@ public class PContractProductSKU implements Serializable {
 	@Transient
 	private String cosanpham = "";
 
-
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "skuid_link", insertable = false, updatable = false)
-	private SKU sku;
-
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "productid_link", insertable = false, updatable = false)
-	private Product product;
-
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "pcontract_poid_link", insertable = false, updatable = false)
-	private PContract_PO po;
-
-	@Transient
-	public String getPo_buyer() {
-		if (po != null)
-			return po.getPo_buyer();
-		return "";
-	}
-
-	@Transient
-	public Integer getPquantity() {
-		return pquantity_total;
-	}
-
-	@Transient
-	public String getProductcode() {
-		if (product != null)
-			return product.getBuyercode();
-		else
-			return product_code;
-	}
-	
-	public void setProduct_code(String product_code) {
-		this.product_code = product_code;
-	}
-
-	@Transient
-	public String getProductname() {
-		if (product != null)
-			return product.getBuyername();
-		else
-			return product_name;
-	}
-	public void setProduct_name(String product_name) {
-		this.product_name = product_name;
-	}
-	
-	@Transient
-	public Long getUnitid_link() {
-		if (product != null)
-			return product.getUnitid_link();
-		return null;
-	}
-
-	@Transient
-	public String getUnitname() {
-		if (product != null)
-			return product.getUnitName();
-		else
-			return unit_name;
-	}
-	public void setUnit_name(String unit_name) {
-		this.unit_name = unit_name;
-	}
-
-	@Transient
-	public String getSkuName() {
-		if (sku != null) {
-			return sku.getName();
-		}
-		return "";
-	}
-
-	@Transient
-	public int getSort_value() {
-		if (sku != null) {
-			return sku.getSort_size();
-		}
-		return 0;
-	}
-
-	@Transient
-	public String getSkuCode() {
-		if (sku != null) {
-			return sku.getCode();
-		}
-		return "";
-	}
-	public void setSku_code(String sku_code) {
-		this.sku_code = sku_code;
-	}
-
-	@Transient
-	public String getSkuBarCode() {
-		if (sku != null) {
-			return sku.getBarcode();
-		}
-		return "";
-	}
-
-	@Transient
-	public String getMauSanPham() {
-		if (sku != null)
-			return sku.getMauSanPham();
-		else
-			return mausanpham;
-	}
-	public void setMausanpham(String mausanpham) {
-		this.mausanpham = mausanpham;
-	}
-
-	@Transient
-	public String getCoSanPham() {
-		if (sku != null)
-			return sku.getCoSanPham();
-		else
-			return cosanpham;
-	}
-	public void setCosanpham(String cosanpham) {
-		this.cosanpham = cosanpham;
-	}
-
-	@Transient
-	public Long getSizeid_link() {
-		if (sku != null) {
-			return sku.getSize_id();
-		}
-		return (long) 0;
-	}
-
-	@Transient
-	public Long getColor_id() {
-		if (sku != null) {
-			return sku.getColor_id();
-		}
-		return (long) 0;
-	}
 
 	public Long getId() {
 		return id;
@@ -279,9 +128,53 @@ public class PContractProductSKU implements Serializable {
 		this.pquantity_total = pquantity_total;
 	}
 
-//	public SKU getSku() {
-//		return sku;
-//	}
+	public String getProduct_code() {
+		return product_code;
+	}
+
+	public void setProduct_code(String product_code) {
+		this.product_code = product_code;
+	}
+
+	public String getProduct_name() {
+		return product_name;
+	}
+
+	public void setProduct_name(String product_name) {
+		this.product_name = product_name;
+	}
+
+	public String getSku_code() {
+		return sku_code;
+	}
+
+	public void setSku_code(String sku_code) {
+		this.sku_code = sku_code;
+	}
+
+	public String getUnit_name() {
+		return unit_name;
+	}
+
+	public void setUnit_name(String unit_name) {
+		this.unit_name = unit_name;
+	}
+
+	public String getMausanpham() {
+		return mausanpham;
+	}
+
+	public void setMausanpham(String mausanpham) {
+		this.mausanpham = mausanpham;
+	}
+
+	public String getCosanpham() {
+		return cosanpham;
+	}
+
+	public void setCosanpham(String cosanpham) {
+		this.cosanpham = cosanpham;
+	}
 
 	public Integer getPquantity_granted() {
 		return pquantity_granted;
