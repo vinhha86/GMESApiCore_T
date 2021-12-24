@@ -1412,4 +1412,34 @@ public class ProductAPI {
 			return new ResponseEntity<Product_getall_response>(response, HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/get_forStockinProductSearch", method = RequestMethod.POST)
+	public ResponseEntity<Product_getall_response> Product_Filter(HttpServletRequest request,
+			@RequestBody Product_getall_request entity) {
+		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Product_getall_response response = new Product_getall_response();
+		try {
+			// tìm sản phẩm đơn theo mã sp, mã đơn hàng, mã po
+			String productSearchString = entity.productSearchString;
+			Integer producttypeid_link = 10;
+			List<Integer> list_producttypeid_link = new ArrayList<Integer>();
+			list_producttypeid_link.add(producttypeid_link);
+			// producttypeid_link = 10
+			List<Product> result = new ArrayList<Product>();
+			if(productSearchString != null) {
+				productSearchString = productSearchString.trim();
+				result = productService.getBy_Buyercode_Contract_PO(productSearchString, list_producttypeid_link);
+			}
+			
+			
+			response.data = result;
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<Product_getall_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<Product_getall_response>(response, HttpStatus.OK);
+		}
+	}
 }

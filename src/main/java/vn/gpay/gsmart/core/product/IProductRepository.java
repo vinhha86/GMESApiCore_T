@@ -111,4 +111,21 @@ public interface IProductRepository extends JpaRepository<Product, Long>, JpaSpe
 			+ "and c.producttypeid_link <= 19 " + "and c.status = 1")
 	public List<Product> getAllProduct(@Param("orgrootid_link") final Long orgrootid_link,
 			@Param("buyercode") final String buyercode, @Param("buyername") final String buyername);
+	
+	@Query(value = "select distinct c from Product c " 
+			+ "inner join PContractProduct d on c.id = d.productid_link "
+			+ "inner join PContract e on e.id = d.pcontractid_link "
+			+ "inner join PContract_PO f on c.id = f.productid_link "
+			+ "where lower(c.buyercode) like lower(concat('%',:productSearchString,'%')) "
+			+ "and lower(e.contractcode) like lower(concat('%',:productSearchString,'%')) "
+			+ "and lower(f.po_buyer) like lower(concat('%',:productSearchString,'%')) "
+			+ "and c.producttypeid_link in :list_producttypeid_link "
+			+ "and c.status = 1 "
+			+ "order by c.buyercode asc " 
+			
+			)
+	public List<Product> getBy_Buyercode_Contract_PO(
+			@Param("productSearchString") final String productSearchString,
+			@Param("list_producttypeid_link") final List<Integer> list_producttypeid_link
+			);
 }

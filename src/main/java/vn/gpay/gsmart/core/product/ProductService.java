@@ -508,4 +508,10 @@ public class ProductService extends AbstractService<Product> implements IProduct
 		// TODO Auto-generated method stub
 		return repo_productype.getByName(name);
 	}
+
+	@Override
+	public List<Product> getBy_Buyercode_Contract_PO(String productSearchString,
+			List<Integer> list_producttypeid_link) {
+		return repo.getBy_Buyercode_Contract_PO(productSearchString, list_producttypeid_link);
+	}
 }
