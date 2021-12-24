@@ -48,6 +48,7 @@ public class Jitin_Stockin_D_Data implements Serializable {
     private String color_name;
     private Long sku_product_id;
     private String sku_product_code;
+    private String sku_product_name;
     private String sku_product_desc;
     private String sku_product_color;
     private String size_name;
@@ -353,6 +354,14 @@ public class Jitin_Stockin_D_Data implements Serializable {
 
 	public void setSku_product_code(String sku_product_code) {
 		this.sku_product_code = sku_product_code;
+	}
+	
+	public String getSku_product_name() {
+		return sku_product_name;
+	}
+
+	public void setSku_product_name(String sku_product_name) {
+		this.sku_product_name = sku_product_name;
 	}
 
 	public String getSize_name() {
