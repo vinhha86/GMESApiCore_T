@@ -661,6 +661,7 @@ public class Stockout_orderAPI {
 										
 										stockout_order.setOrderdate(new Date());
 										stockout_order.setOrdercode(stockout_order_code);
+										stockout_order.setStockout_order_code(stockout_order_code);
 										
 										//Noi xuat la px chinh - Noi nhan la Buyer 
 										stockout_order.setOrgid_from_link(thePorder_Grant.getXuongSX_ID());
@@ -713,6 +714,7 @@ public class Stockout_orderAPI {
 										
 										stockout_order.setOrderdate(new Date());
 										stockout_order.setOrdercode(stockout_order_code);
+										stockout_order.setStockout_order_code(stockout_order_code);
 										
 										//Noi xuat la px san xuat - Noi nhan la px chinh
 										stockout_order.setOrgid_from_link(thePorder_Grant.getXuongSX_ID());
