@@ -113,9 +113,9 @@ public interface IProductRepository extends JpaRepository<Product, Long>, JpaSpe
 			@Param("buyercode") final String buyercode, @Param("buyername") final String buyername);
 	
 	@Query(value = "select distinct c from Product c " 
-			+ "inner join PContractProduct d on c.id = d.productid_link "
-			+ "inner join PContract e on e.id = d.pcontractid_link "
-			+ "inner join PContract_PO f on c.id = f.productid_link "
+			+ "left join PContractProduct d on c.id = d.productid_link "
+			+ "left join PContract e on e.id = d.pcontractid_link "
+			+ "left join PContract_PO f on c.id = f.productid_link "
 			+ "where ( lower(c.buyercode) like lower(concat('%',:productSearchString,'%')) "
 			+ "or lower(e.contractcode) like lower(concat('%',:productSearchString,'%')) "
 			+ "or lower(f.po_buyer) like lower(concat('%',:productSearchString,'%')) ) "
