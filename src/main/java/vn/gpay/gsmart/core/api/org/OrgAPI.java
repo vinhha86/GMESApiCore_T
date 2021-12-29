@@ -1213,6 +1213,42 @@ public class OrgAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/getOrgFromForStockoutProduct", method = RequestMethod.POST)
+	public ResponseEntity<get_orgreq_response> getOrgFromForStockoutProduct(@RequestBody get_orgreq_request entity,
+			HttpServletRequest request) {// @RequestParam("type")
+		get_orgreq_response response = new get_orgreq_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long orgid_link = user.getOrgid_link();
+			
+			if(orgid_link.equals((long)1)) {
+				response.data = orgService.findAllorgByTypeId(8, 1);
+			}else {
+				List<Org> list_org = new ArrayList<Org>();
+				List<String> list_typeid = new ArrayList<String>();
+				list_typeid.add("8");
+
+				list_org = orgService.getorgChildrenbyOrg(orgid_link, list_typeid);
+
+				// Lay nhung don vi ma user dang quan ly
+				List<GpayUserOrg> list_user_org = userorgService.getall_byuser(user.getId());
+				for (GpayUserOrg gpayUserOrg : list_user_org) {
+					list_org.add(gpayUserOrg.getOrg());
+				}
+
+				response.data = list_org;
+			}
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<get_orgreq_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_SERVER_ERROR);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<get_orgreq_response>(response, HttpStatus.OK);
+		}
+	}
+	
 	@RequestMapping(value = "/getOrgFor_BaoAn_Mobile", method = RequestMethod.POST)
 	public ResponseEntity<get_orgreq_response> getOrgFor_BaoAn_Mobile(@RequestBody get_orgreq_request entity,
 			HttpServletRequest request) {// @RequestParam("type")
