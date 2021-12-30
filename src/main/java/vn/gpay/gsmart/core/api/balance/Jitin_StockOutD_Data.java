@@ -41,6 +41,10 @@ public class Jitin_StockOutD_Data implements Serializable {
 	private Float totalmet_check;
 	private Float totalmet_processed;
 	private Float totalmet_stockout;
+	private Float netweight;
+	private Float grossweight;
+	private Float netweight_lbs;
+	private Float grossweight_lbs;
 	
 	//Transient
 	public String product_code;
@@ -441,6 +445,38 @@ public class Jitin_StockOutD_Data implements Serializable {
 
 	public void setIsPklistNotInStore(Boolean isPklistNotInStore) {
 		this.isPklistNotInStore = isPklistNotInStore;
+	}
+
+	public Float getNetweight() {
+		return netweight;
+	}
+
+	public void setNetweight(Float netweight) {
+		this.netweight = netweight;
+	}
+
+	public Float getGrossweight() {
+		return grossweight;
+	}
+
+	public void setGrossweight(Float grossweight) {
+		this.grossweight = grossweight;
+	}
+
+	public Float getNetweight_lbs() {
+		return netweight_lbs;
+	}
+
+	public void setNetweight_lbs(Float netweight_lbs) {
+		this.netweight_lbs = netweight_lbs;
+	}
+
+	public Float getGrossweight_lbs() {
+		return grossweight_lbs;
+	}
+
+	public void setGrossweight_lbs(Float grossweight_lbs) {
+		this.grossweight_lbs = grossweight_lbs;
 	}
 	
 }
