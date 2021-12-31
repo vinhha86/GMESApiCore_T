@@ -130,6 +130,8 @@ public class StockOutD implements Serializable {
 	private Float grossweight;
 	private Float netweight_lbs;
 	private Float grossweight_lbs;
+	private Float grossweight_check;
+	private Float grossweight_lbs_check;
 	
 //	@OneToMany(fetch = FetchType.EAGER, cascade =  CascadeType.ALL , orphanRemoval=true )
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -525,6 +527,22 @@ public class StockOutD implements Serializable {
 
 	public void setGrossweight_lbs(Float grossweight_lbs) {
 		this.grossweight_lbs = grossweight_lbs;
+	}
+
+	public Float getGrossweight_check() {
+		return grossweight_check;
+	}
+
+	public void setGrossweight_check(Float grossweight_check) {
+		this.grossweight_check = grossweight_check;
+	}
+
+	public Float getGrossweight_lbs_check() {
+		return grossweight_lbs_check;
+	}
+
+	public void setGrossweight_lbs_check(Float grossweight_lbs_check) {
+		this.grossweight_lbs_check = grossweight_lbs_check;
 	}
 	
 }

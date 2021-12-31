@@ -95,6 +95,15 @@ public class StockOutPklist implements Serializable {
 	@Column(name ="grossweight")
     private Float grossweight;
 	
+	@Column(name ="grossweight_lbs")
+    private Float grossweight_lbs;
+	
+	@Column(name ="grossweight_check")
+    private Float grossweight_check; 
+	
+	@Column(name ="grossweight_lbs_check")
+    private Float grossweight_lbs_check;
+	
 	@Column(name ="epc",length =50)
     private String epc;
 	
@@ -429,6 +438,24 @@ public class StockOutPklist implements Serializable {
 	}
 	public void setWidthprocessed(Float widthprocessed) {
 		this.widthprocessed = widthprocessed;
+	}
+	public Float getGrossweight_lbs() {
+		return grossweight_lbs;
+	}
+	public void setGrossweight_lbs(Float grossweight_lbs) {
+		this.grossweight_lbs = grossweight_lbs;
+	}
+	public Float getGrossweight_check() {
+		return grossweight_check;
+	}
+	public void setGrossweight_check(Float grossweight_check) {
+		this.grossweight_check = grossweight_check;
+	}
+	public Float getGrossweight_lbs_check() {
+		return grossweight_lbs_check;
+	}
+	public void setGrossweight_lbs_check(Float grossweight_lbs_check) {
+		this.grossweight_lbs_check = grossweight_lbs_check;
 	}
 	
 	

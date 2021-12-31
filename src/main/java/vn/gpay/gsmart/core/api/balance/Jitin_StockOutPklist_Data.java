@@ -27,6 +27,9 @@ public class Jitin_StockOutPklist_Data implements Serializable {
     private Float totalerrorold;	
     private Float netweight;
     private Float grossweight;
+    private Float grossweight_lbs;
+    private Float grossweight_check; 
+    private Float grossweight_lbs_check;
     private String epc;
 	private Integer rssi;		
 	private Integer status;				
@@ -387,6 +390,24 @@ public class Jitin_StockOutPklist_Data implements Serializable {
 	}
 	public void setDate_check(Date date_check) {
 		this.date_check = date_check;
+	}
+	public Float getGrossweight_lbs() {
+		return grossweight_lbs;
+	}
+	public void setGrossweight_lbs(Float grossweight_lbs) {
+		this.grossweight_lbs = grossweight_lbs;
+	}
+	public Float getGrossweight_check() {
+		return grossweight_check;
+	}
+	public void setGrossweight_check(Float grossweight_check) {
+		this.grossweight_check = grossweight_check;
+	}
+	public Float getGrossweight_lbs_check() {
+		return grossweight_lbs_check;
+	}
+	public void setGrossweight_lbs_check(Float grossweight_lbs_check) {
+		this.grossweight_lbs_check = grossweight_lbs_check;
 	}
 
 }
