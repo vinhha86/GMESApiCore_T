@@ -53,27 +53,31 @@ public class PContractProductSKUService extends AbstractService<PContractProduct
 	}
 
 	@Override
-	public List<PContractProductSKU> getsumsku_bypcontract(long pcontractid_link) {
+	public List<PContractProductSKU> getsumsku_bypcontract(long pcontractid_link, List<Long> ls_productid) {
 		List<PContractProductSKU> result = new ArrayList<PContractProductSKU>();
-		List<Object[]> rs = repo.getsumsku_bypcontract(pcontractid_link);
+		List<Object[]> rs = repo.getsumsku_bypcontract(pcontractid_link, ls_productid);
 		for (Object[] record : rs) {
-			PContractProductSKU sku = new PContractProductSKU();
-			sku.setProductid_link((Long) record[0]);
-			sku.setSkuid_link((Long) record[1]);
-			if (null != record[2]) sku.setPquantity_porder(((Long) record[2]).intValue());
-			if (null != record[3]) sku.setPquantity_sample(((Long) record[3]).intValue());
-			if (null != record[4]) sku.setPquantity_granted(((Long) record[4]).intValue());
-			if (null != record[5]) sku.setPquantity_total(((Long) record[5]).intValue());
-			
-//			SKU theOriginSKU = sku_repo.getOne(sku.getSkuid_link());
-//			sku.setProduct_code(theOriginSKU.getProduct_code());
-//			sku.setProduct_name(theOriginSKU.getProduct_name());
-//			sku.setSku_code(theOriginSKU.getCode());
-//			sku.setMausanpham(theOriginSKU.getMauSanPham());
-//			sku.setCosanpham(theOriginSKU.getCoSanPham());
-//			sku.setUnit_name(theOriginSKU.getUnit_name());
-			
-			result.add(sku);
+			Long p_id = (Long) record[0];
+			System.out.println(p_id);
+//			if (ls_productid.contains(p_id)) {
+				PContractProductSKU sku = new PContractProductSKU();
+				sku.setProductid_link(p_id);
+				sku.setSkuid_link((Long) record[1]);
+				if (null != record[2]) sku.setPquantity_porder(((Long) record[2]).intValue());
+				if (null != record[3]) sku.setPquantity_sample(((Long) record[3]).intValue());
+				if (null != record[4]) sku.setPquantity_granted(((Long) record[4]).intValue());
+				if (null != record[5]) sku.setPquantity_total(((Long) record[5]).intValue());
+				
+				SKU theOriginSKU = sku_repo.getOne(sku.getSkuid_link());
+				sku.setProduct_code(theOriginSKU.getProduct_code());
+				sku.setProduct_name(theOriginSKU.getProduct_name());
+				sku.setSku_code(theOriginSKU.getCode());
+				sku.setMausanpham(theOriginSKU.getMauSanPham());
+				sku.setCosanpham(theOriginSKU.getCoSanPham());
+				sku.setUnit_name(theOriginSKU.getUnit_name());
+				
+				result.add(sku);
+//			}
 			
 		}
 		return result;

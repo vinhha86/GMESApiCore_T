@@ -5,20 +5,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.web.client.RestTemplate;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import vn.gpay.gsmart.core.api.balance.Jitin_StockOutD_Data;
-import vn.gpay.gsmart.core.api.balance.Jitin_StockinList_Response;
 import vn.gpay.gsmart.core.api.balance.Jitin_Stockin_D_Data;
-import vn.gpay.gsmart.core.api.balance.Jitin_StockoutList_Response;
-import vn.gpay.gsmart.core.utils.AtributeFixValues;
 
 public class Recon_MatSKU implements Runnable{
 	private Thread t;
@@ -67,16 +55,17 @@ public class Recon_MatSKU implements Runnable{
 	// Tinh SL NPL da nhap kho theo đơn hàng
 	private void cal_stockin_bycontract() {
 		try {
-//			List<Jitin_Stockin_D_Data> ls_stockind = ls_MStockin.stream().parallel().filter(sku -> sku.getSkuid_link().equals(mat_sku.getMat_skuid_link())).collect(Collectors.toList());
-//			if (ls_stockind.size() > 0) {
-//				Float met_stockin = (float) 0;
-//				for (Jitin_Stockin_D_Data stockinD : ls_stockind) {
-//					met_stockin += null != stockinD.getTotalmet_check() ? stockinD.getTotalmet_check() : 0;
-//				}
-//				mat_sku.setMat_sku_stockin(met_stockin);
-//			}
-			Double met_stockin = ls_MStockin.stream().parallel().filter(sku -> sku.getSkuid_link().equals(mat_sku.getMat_skuid_link())).mapToDouble(x -> x.getTotalpackage()).sum();
-			mat_sku.setMat_sku_stockin(met_stockin.floatValue());
+			List<Jitin_Stockin_D_Data> ls_stockind = ls_MStockin.stream().parallel().filter(sku -> sku.getSkuid_link().equals(mat_sku.getMat_skuid_link())).collect(Collectors.toList());
+			if (ls_stockind.size() > 0) {
+				Float met_stockin = (float) 0;
+				for (Jitin_Stockin_D_Data stockinD : ls_stockind) {
+					met_stockin += null != stockinD.getTotalmet_check() ? stockinD.getTotalmet_check() : 0;
+				}
+				mat_sku.setMat_sku_stockin(met_stockin);
+			}
+//			Double met_stockin = ls_MStockin.stream().parallel().filter(sku -> sku.getSkuid_link().equals(mat_sku.getMat_skuid_link())).mapToDouble(x -> x.getTotalpackage()).sum();
+//			mat_sku.setMat_sku_stockin(met_stockin.floatValue());
+			System.out.println("stockin: " + mat_sku.getMat_skuid_link() + " : " + mat_sku.getMat_sku_stockin());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -86,17 +75,18 @@ public class Recon_MatSKU implements Runnable{
 	private void cal_stockout_bycontract() {
 		try {
 			
-//			List<Jitin_StockOutD_Data> ls_stockoutd = ls_MStockout.stream().parallel().filter(sku -> sku.getSkuid_link().equals(mat_sku.getMat_skuid_link())).collect(Collectors.toList());
-//			if (ls_stockoutd.size() > 0) {
-//				Float met_stockout = (float)0;
-//				for (Jitin_StockOutD_Data stockoutD : ls_stockoutd) {
-////            		System.out.println(this.mat_sku.getMat_skuid_link() + "-" + stockoutD.getTotalmet_check());
-//					met_stockout += null != stockoutD.getTotalmet_check() ? stockoutD.getTotalmet_check() : 0;
-//				}
-//				mat_sku.setMat_sku_stockout(met_stockout);
-//			}
-			Double met_stockout = ls_MStockin.stream().parallel().filter(sku -> sku.getSkuid_link().equals(mat_sku.getMat_skuid_link())).mapToDouble(x -> x.getTotalpackage()).sum();
-			mat_sku.setMat_sku_stockout(met_stockout.floatValue());
+			List<Jitin_StockOutD_Data> ls_stockoutd = ls_MStockout.stream().parallel().filter(sku -> sku.getSkuid_link().equals(mat_sku.getMat_skuid_link())).collect(Collectors.toList());
+			if (ls_stockoutd.size() > 0) {
+				Float met_stockout = (float)0;
+				for (Jitin_StockOutD_Data stockoutD : ls_stockoutd) {
+//            		System.out.println(this.mat_sku.getMat_skuid_link() + "-" + stockoutD.getTotalmet_check());
+					met_stockout += null != stockoutD.getTotalmet_check() ? stockoutD.getTotalmet_check() : 0;
+				}
+				mat_sku.setMat_sku_stockout(met_stockout);
+			}
+//			Double met_stockout = ls_MStockout.stream().parallel().filter(sku -> sku.getSkuid_link().equals(mat_sku.getMat_skuid_link())).mapToDouble(x -> x.getTotalpackage()).sum();
+//			mat_sku.setMat_sku_stockout(met_stockout.floatValue());
+			System.out.println("stockout: " + mat_sku.getMat_skuid_link() + " : " + mat_sku.getMat_sku_stockout());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
