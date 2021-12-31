@@ -87,6 +87,9 @@ public class Warehouse implements Serializable {
 	@Column(name ="grossweight")
     private Float grossweight;
 	
+	@Column(name ="grossweight_lbs")
+    private Float grossweight_lbs;
+	
 	@Column(name ="unitprice")
     private Float unitprice;
 	
@@ -438,6 +441,14 @@ public class Warehouse implements Serializable {
 
 	public void setIs_freeze(Boolean is_freeze) {
 		this.is_freeze = is_freeze;
+	}
+
+	public Float getGrossweight_lbs() {
+		return grossweight_lbs;
+	}
+
+	public void setGrossweight_lbs(Float grossweight_lbs) {
+		this.grossweight_lbs = grossweight_lbs;
 	}
 	
 	
