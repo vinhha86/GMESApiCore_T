@@ -25,6 +25,7 @@ public class ScheduleOrgGrant implements Runnable {
 	private Date startdate;
 	private Date toDate;
 	private String PO_code;
+	private String product_buyercode;
 	private String contractcode;
 	private long orgbuyerid_link;
 	private long orgvendorid_link;
@@ -38,7 +39,7 @@ public class ScheduleOrgGrant implements Runnable {
 	CountDownLatch latch;
 
 	ScheduleOrgGrant(Schedule_plan sch_org_grant, Schedule_plan sch_process, Schedule_plan sch_estimation,
-			Org org_grant, Date startdate, Date toDate, String PO_code, String contractcode, long orgbuyerid_link,
+			Org org_grant, Date startdate, Date toDate, String PO_code, String product_buyercode, String contractcode, long orgbuyerid_link,
 			long orgvendorid_link, long orgid, long orgrootid_link, List<Schedule_porder> rows_grant,
 			IPOrderGrant_Service granttService, Common commonService, IPOrderProcessing_Service processService,
 			CountDownLatch latch) {
@@ -49,6 +50,7 @@ public class ScheduleOrgGrant implements Runnable {
 		this.startdate = startdate;
 		this.toDate = toDate;
 		this.PO_code = PO_code;
+		this.product_buyercode = product_buyercode;
 		this.contractcode = contractcode;
 		this.orgbuyerid_link = orgbuyerid_link;
 		this.orgvendorid_link = orgvendorid_link;
@@ -85,7 +87,7 @@ public class ScheduleOrgGrant implements Runnable {
 	private void showOrgGrant() {
 		// Lấy các lệnh của các tổ
 		List<POrderGrant> list_porder = granttService.get_granted_bygolivedate(startdate, toDate, org_grant.getId(),
-				PO_code, contractcode, orgbuyerid_link, orgvendorid_link);
+				PO_code, product_buyercode, contractcode, orgbuyerid_link, orgvendorid_link);
 
 		int day_grant = 0;
 		Date date_end = null;

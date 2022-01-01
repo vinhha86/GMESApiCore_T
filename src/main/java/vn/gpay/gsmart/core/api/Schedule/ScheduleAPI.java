@@ -131,7 +131,7 @@ public class ScheduleAPI {
 
 	@RequestMapping(value = "/getplan", method = RequestMethod.POST)
 	public ResponseEntity<get_schedule_porder_response> GetAll(HttpServletRequest request, @RequestParam String listid,
-			@RequestParam String startDate, @RequestParam String endDate, @RequestParam String PO_code,
+			@RequestParam String startDate, @RequestParam String endDate, @RequestParam String PO_code,@RequestParam String product_buyercode,
 			@RequestParam String contractcode, @RequestParam String Buyer, @RequestParam String Vendor,
 			@RequestParam Boolean isReqPorder, @RequestParam Boolean isAllgrant) throws ParseException {
 		get_schedule_porder_response response = new get_schedule_porder_response();
@@ -285,7 +285,7 @@ public class ScheduleAPI {
 					sch_org.getChildren().add(sch_org_grant);
 
 					ScheduleOrgGrant theScheduleOrgGrant = new ScheduleOrgGrant(sch_org_grant, sch_process,
-							sch_estimation, org_grant, startdate, toDate, PO_code, contractcode, orgbuyerid_link,
+							sch_estimation, org_grant, startdate, toDate, PO_code, product_buyercode, contractcode, orgbuyerid_link,
 							orgvendorid_link, orgid, orgrootid_link, rows_grant, granttService, commonService,
 							processService, latch);
 					theScheduleOrgGrant.start();

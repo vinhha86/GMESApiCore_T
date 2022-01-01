@@ -27,13 +27,17 @@ public interface IPOrderGrant_Repository
 	public List<POrderGrant> getByOrderId(@Param("porderid_link") final Long porderid_link);
 
 	@Query(value = "select a from POrderGrant a " + "inner join POrder b on a.porderid_link = b.id "
-					+ "where a.granttoorgid_link = :granttoorgid_link "
-			+ "and b.status >= :status " + "and a.finish_date_plan >= :golivedate_from "
+			+ "where a.granttoorgid_link = :granttoorgid_link "
+			+ "and b.status >= :status " 
+			+ "and (:po_line = '' or lower(a.lineinfo) like lower(concat('%',:po_line,'%'))) "
+			+ "and a.finish_date_plan >= :golivedate_from "
 			+ "and a.start_date_plan <= :golivedate_to "
 			+ "and (a.status = 2 or (a.status = 1 and (a.ismap = 'False' or a.ismap is null))) ")
 	public List<POrderGrant> get_granted_bygolivedate(@Param("status") final int status,
 			@Param("granttoorgid_link") final long granttoorgid_link,
-			@Param("golivedate_from") final Date golivedate_from, @Param("golivedate_to") final Date golivedate_to);
+			@Param("po_line") final String po_line,
+			@Param("golivedate_from") final Date golivedate_from, 
+			@Param("golivedate_to") final Date golivedate_to);
 
 	@Query(value = "select a from POrderGrant a " + "inner join POrder b on a.porderid_link = b.id "
 			+ "inner join PContract_PO c on b.pcontract_poid_link = c.id "
