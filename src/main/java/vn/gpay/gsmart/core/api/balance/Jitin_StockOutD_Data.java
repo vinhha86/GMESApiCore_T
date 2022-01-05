@@ -62,6 +62,7 @@ public class Jitin_StockOutD_Data implements Serializable {
 	public String unit_name;
 	private String data_spaces;
 	private Boolean isPklistNotInStore;
+	private String loaiThanhPham;
 	
 	private List<Jitin_StockOutPklist_Data>  stockout_packinglist  = new ArrayList<>();
 
@@ -495,6 +496,14 @@ public class Jitin_StockOutD_Data implements Serializable {
 
 	public void setGrossweight_lbs_check(Float grossweight_lbs_check) {
 		this.grossweight_lbs_check = grossweight_lbs_check;
+	}
+
+	public String getLoaiThanhPham() {
+		return loaiThanhPham;
+	}
+
+	public void setLoaiThanhPham(String loaiThanhPham) {
+		this.loaiThanhPham = loaiThanhPham;
 	}
 	
 }
