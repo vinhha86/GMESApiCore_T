@@ -44,4 +44,5 @@ public interface IPOrderGrant_Service extends Operations<POrderGrant> {
 	List<POrderGrant> get_KehoachVaoChuyen(Date date_from, Date date_to, List<Long> list_orgid);
 
 	List<POrderGrant> getbypcontract_po(long pcontract_poid_link);
+
 }

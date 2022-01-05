@@ -18,6 +18,7 @@ public class POrderStatus {
     public static int PORDER_STATUS_MEX    			= 23; //Ép mex
     public static int PORDER_STATUS_TOLINE    		= 24; //Chuyển lên chuyền
 
+    //Ma sap xep
     public static int PORDER_SHORTVALUE_FREE       = 6; //Chưa phân chuyền
     public static int PORDER_SHORTVALUE_GRANTED    = 5; //Đã phân chuyền, chưa yêu cầu sx
     public static int PORDER_SHORTVALUE_READY      = 4; //Yêu cầu sx đề kho và cắt chuẩn bị

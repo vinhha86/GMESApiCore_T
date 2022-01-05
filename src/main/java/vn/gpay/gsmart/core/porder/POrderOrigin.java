@@ -7,14 +7,20 @@ public class POrderOrigin {
 	private String ordercode;
 	private String stylebuyer;
 	private String po_buyer;
+	private String granttoorgname;
+	private String granttolinename;
 	private String buyername;
 	private String vendorname;
 	private Date startDatePlan;
+	private Date finishDatePlan;
 	private Date golivedate;
 	private Integer totalorder;
 	private String statusName;
 	private Long pcontractid_link;
 	private Long productid_link;
+	
+	private Integer productivity;
+	private Integer duration;
 
 	public Long getId() {
 		return id;
@@ -111,5 +117,47 @@ public class POrderOrigin {
 	public void setProductid_link(Long productid_link) {
 		this.productid_link = productid_link;
 	}
+
+	public String getGranttoorgname() {
+		return granttoorgname;
+	}
+
+	public void setGranttoorgname(String granttoorgname) {
+		this.granttoorgname = granttoorgname;
+	}
+
+	public String getGranttolinename() {
+		return granttolinename;
+	}
+
+	public void setGranttolinename(String granttolinename) {
+		this.granttolinename = granttolinename;
+	}
+
+	public Integer getProductivity() {
+		return productivity;
+	}
+
+	public void setProductivity(Integer productivity) {
+		this.productivity = productivity;
+	}
+
+	public Integer getDuration() {
+		return duration;
+	}
+
+	public void setDuration(Integer duration) {
+		this.duration = duration;
+	}
+
+	public Date getFinishDatePlan() {
+		return finishDatePlan;
+	}
+
+	public void setFinishDatePlan(Date finishDatePlan) {
+		this.finishDatePlan = finishDatePlan;
+	}
+
+
 
 }

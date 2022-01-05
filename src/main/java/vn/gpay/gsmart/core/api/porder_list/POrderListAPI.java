@@ -24,15 +24,17 @@ import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder.POrder;
 import vn.gpay.gsmart.core.porder.POrderOrigin;
+import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_NoLink_Service;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_SKUService;
 import vn.gpay.gsmart.core.porder_grant.IPOrderGrant_Service;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant;
+import vn.gpay.gsmart.core.porder_grant.POrderGrant_NoLink;
 import vn.gpay.gsmart.core.porder_grant.POrderGrant_SKU;
 import vn.gpay.gsmart.core.porder_product_sku.IPOrder_Product_SKU_Service;
 import vn.gpay.gsmart.core.porder_product_sku.POrder_Product_SKU;
 import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.utils.Common;
-import vn.gpay.gsmart.core.utils.GPAYDateFormat;
+import vn.gpay.gsmart.core.utils.POrderGrantStatus;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -44,6 +46,8 @@ public class POrderListAPI {
 	private IPContractService pcontractService;
 	@Autowired
 	private IPOrderGrant_Service pordergrantService;
+	@Autowired
+	private IPOrderGrant_NoLink_Service pordergrant_NoLink_Service;
 	@Autowired
 	private IPOrderGrant_SKUService pordergrantskuService;
 	@Autowired
@@ -157,13 +161,13 @@ public class POrderListAPI {
 			@RequestBody POrderList_getlist_request entity, HttpServletRequest request) {
 		getbysearch_origin_response response = new getbysearch_origin_response();
 		try {
-			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			Long user_orgid_link = user.getOrgid_link();
-			Long granttoorgid_link = (long) 0;
-			if (user_orgid_link == (long) 1)
-				granttoorgid_link = null;
-			else
-				granttoorgid_link = user_orgid_link;
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//			Long user_orgid_link = user.getOrgid_link();
+//			Long granttoorgid_link = (long) 0;
+//			if (user_orgid_link == (long) 1)
+//				granttoorgid_link = null;
+//			else
+//				granttoorgid_link = user_orgid_link;
 
 			response.data = new ArrayList<>();
 
@@ -172,37 +176,54 @@ public class POrderListAPI {
 			String stylebuyer = entity.style;
 			Long buyerid = entity.buyerid;
 			Long vendorid = entity.vendorid;
-			Long factoryid = entity.factoryid;
-			Date golivedatefrom = entity.golivedatefrom;
-			Date golivedateto = entity.golivedateto;
-			List<Integer> statuses = entity.status;
+//			Long factoryid = entity.factoryid;
+//			Date golivedatefrom = entity.golivedatefrom;
+//			Date golivedateto = entity.golivedateto;
+//			List<Integer> statuses = entity.status;
 
 //			System.out.println(golivedatefrom);
 //			System.out.println(golivedateto);
-			List<POrder> list_porder = porderService.getPOrderBySearch(buyerid, vendorid, factoryid, pobuyer,
-					stylebuyer, contractcode, statuses, granttoorgid_link, GPAYDateFormat.atStartOfDay(golivedatefrom),
-					GPAYDateFormat.atEndOfDay(golivedateto));
+//			List<POrder> list_porder = porderService.getPOrderBySearch(buyerid, vendorid, factoryid, pobuyer,
+//					stylebuyer, contractcode, statuses, granttoorgid_link, GPAYDateFormat.atStartOfDay(golivedatefrom),
+//					GPAYDateFormat.atEndOfDay(golivedateto));
+			
+			List<POrderGrant_NoLink> list_porder = pordergrant_NoLink_Service.getPOrderGrantBySearch(stylebuyer, pobuyer, buyerid, vendorid, contractcode);
 
 			List<POrderOrigin> list = new ArrayList<POrderOrigin>();
 
-			for (POrder p : list_porder) {
+			for (POrderGrant_NoLink p : list_porder) {
 				POrderOrigin origin = new POrderOrigin();
+//				System.out.println(p.getXuongTo());
+				
+				//Lay thong tin porder
+				POrder thePOrder = porderService.findOne(p.getPorderid_link());
+				
 				origin.setId(p.getId());
-				origin.setBuyername(p.getBuyername());
-				origin.setGolivedate(p.getGolivedate());
+				origin.setGranttoorgname(p.getXuongSX());
+				origin.setGranttolinename(p.getXuongTo());
+				origin.setBuyername(thePOrder.getBuyername());
+				origin.setGolivedate(thePOrder.getGolivedate());
 				origin.setOrdercode(p.getOrdercode());
-				origin.setPo_buyer(p.getPo_buyer());
-				origin.setStartDatePlan(p.getStartDatePlan());
-				origin.setStatusName(p.getStatusName());
-				origin.setStylebuyer(p.getStylebuyer());
-				origin.setTotalorder(p.getTotalorder());
-				origin.setVendorname(p.getVendorname());
-				origin.setPcontractid_link(p.getPcontractid_link());
-				origin.setProductid_link(p.getProductid_link());
+				origin.setPo_buyer(p.getLineinfo());
+				origin.setStartDatePlan(p.getStart_date_plan());
+				origin.setFinishDatePlan(p.getFinish_date_plan());
+				if (p.getStatus() == POrderGrantStatus.PORDERGRANT_STATUS_PLAN) {
+					origin.setStatusName("Lệnh kế hoạch");
+				} else if (p.getStatus() == POrderGrantStatus.PORDERGRANT_STATUS_POLINE) {
+					origin.setStatusName("Lệnh thực tế");
+				}
+				origin.setStylebuyer(thePOrder.getStylebuyer());
+				origin.setTotalorder(p.getTotalamount_tt());
+				origin.setVendorname(thePOrder.getVendorname());
+				origin.setPcontractid_link(thePOrder.getPcontractid_link());
+				origin.setProductid_link(thePOrder.getProductid_link());
+				
+				origin.setProductivity(p.getProductivity());
+				origin.setDuration(p.getDuration());
 
 				list.add(origin);
 			}
-			System.out.println(new Date());
+//			System.out.println(new Date());
 			response.data = list;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

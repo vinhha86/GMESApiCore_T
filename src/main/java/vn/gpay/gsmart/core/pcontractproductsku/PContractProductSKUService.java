@@ -58,7 +58,7 @@ public class PContractProductSKUService extends AbstractService<PContractProduct
 		List<Object[]> rs = repo.getsumsku_bypcontract(pcontractid_link, ls_productid);
 		for (Object[] record : rs) {
 			Long p_id = (Long) record[0];
-			System.out.println(p_id);
+//			System.out.println(p_id);
 //			if (ls_productid.contains(p_id)) {
 				PContractProductSKU sku = new PContractProductSKU();
 				sku.setProductid_link(p_id);
