@@ -110,6 +110,8 @@ public class StockInD implements Serializable {
 	private Float netweight_lbs;
 	private Float grossweight_lbs;
     
+	@Transient
+	private String loaiThanhPham;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@OneToMany(cascade =  CascadeType.ALL , orphanRemoval=true )//fetch = FetchType.LAZY load tu tu
@@ -442,7 +444,12 @@ public class StockInD implements Serializable {
 	public void setGrossweight_lbs(Float grossweight_lbs) {
 		this.grossweight_lbs = grossweight_lbs;
 	}
-	
+	public String getLoaiThanhPham() {
+		return loaiThanhPham;
+	}
+	public void setLoaiThanhPham(String loaiThanhPham) {
+		this.loaiThanhPham = loaiThanhPham;
+	}
 	
 	/*
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

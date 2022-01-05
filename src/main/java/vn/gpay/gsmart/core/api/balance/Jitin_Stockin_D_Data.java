@@ -54,6 +54,7 @@ public class Jitin_Stockin_D_Data implements Serializable {
     private String size_name;
     private String stockinDLot;
     private Boolean isPklistInStore;
+    private String loaiThanhPham;
 
     private List<Jitin_Stockin_PkList_Data> stockin_packinglist = new ArrayList<>();
     @JsonIgnoreProperties
@@ -428,6 +429,14 @@ public class Jitin_Stockin_D_Data implements Serializable {
 
 	public void setIsPklistInStore(Boolean isPklistInStore) {
 		this.isPklistInStore = isPklistInStore;
+	}
+
+	public String getLoaiThanhPham() {
+		return loaiThanhPham;
+	}
+
+	public void setLoaiThanhPham(String loaiThanhPham) {
+		this.loaiThanhPham = loaiThanhPham;
 	}
     
 }
