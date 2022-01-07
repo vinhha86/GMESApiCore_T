@@ -61,6 +61,97 @@ public class POrderGrant_SKU_Plan_API {
 		}
 	}
 	
+//	@RequestMapping(value = "/getByPOrderGrant", method = RequestMethod.POST)
+//	public ResponseEntity<POrderGrant_SKU_Plan_list_response> getByPOrderGrant(@RequestBody POrderGrant_SKU_Plan_list_request entity,
+//			HttpServletRequest request) {
+//		POrderGrant_SKU_Plan_list_response response = new POrderGrant_SKU_Plan_list_response();
+//		try {
+//			Long porder_grantid_link = entity.porder_grantid_link;
+//			Date dateFrom = entity.dateFrom;
+//			Date dateTo = entity.dateTo;
+//			
+//			dateFrom = GPAYDateFormat.atStartOfDay(dateFrom);
+//			dateTo = GPAYDateFormat.atEndOfDay(dateTo);
+//			
+//			LocalDate start = dateFrom.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//			LocalDate end = dateTo.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//			
+//			List<POrderGrant_SKU> porderGrant_SKU_list = 
+//					porderGrant_SKU_Service.getPOrderGrant_SKU(porder_grantid_link);
+//			List<POrderGrant_SKU_Plan> result = new ArrayList<POrderGrant_SKU_Plan>();
+//			for(POrderGrant_SKU porderGrant_SKU : porderGrant_SKU_list) {
+//				for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
+//					Date dateObj = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+//					List<POrderGrant_SKU_Plan> porderGrant_SKU_Plan_singleDate_list =
+//							porderGrant_SKU_Plan_Service.getByPOrderGrant_SKU_Date(porderGrant_SKU.getId(), dateObj);
+//					if(porderGrant_SKU_Plan_singleDate_list.size() == 0) {
+//						POrderGrant_SKU_Plan porderGrant_SKU_Plan = new POrderGrant_SKU_Plan();
+//						porderGrant_SKU_Plan.setId(null);
+//						porderGrant_SKU_Plan.setAmount(0);
+//						porderGrant_SKU_Plan.setPorder_grant_skuid_link(porderGrant_SKU.getId());
+//						porderGrant_SKU_Plan.setDate(dateObj);
+//						porderGrant_SKU_Plan_Service.save(porderGrant_SKU_Plan);
+//					}
+//				}
+//				
+//				List<POrderGrant_SKU_Plan> porderGrant_SKU_Plan_list = 
+//						porderGrant_SKU_Plan_Service.getByPOrderGrant_SKU_Date(porderGrant_SKU.getId(), dateFrom, dateTo);
+//				
+//				for(POrderGrant_SKU_Plan porderGrant_SKU_Plan : porderGrant_SKU_Plan_list) {
+//					porderGrant_SKU_Plan.setSkuCode(porderGrant_SKU.getSku_product_code());
+//					porderGrant_SKU_Plan.setMauSanPham(porderGrant_SKU.getMauSanPham());
+//					porderGrant_SKU_Plan.setCoSanPham(porderGrant_SKU.getCoSanPham());
+//					porderGrant_SKU_Plan.setPorderGrant_SKU_grantamount(porderGrant_SKU.getGrantamount());
+//				}
+//
+//				result.addAll(porderGrant_SKU_Plan_list);
+//			}
+//			
+//			response.data = result;
+//
+//			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+//			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+//			return new ResponseEntity<POrderGrant_SKU_Plan_list_response>(response, HttpStatus.OK);
+//		} catch (Exception e) {
+//			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+//			response.setMessage(e.getMessage());
+//			return new ResponseEntity<POrderGrant_SKU_Plan_list_response>(response, HttpStatus.BAD_REQUEST);
+//		}
+//	}
+	
+	@RequestMapping(value = "/get_POrderGrant_SKU_byPorderGrant", method = RequestMethod.POST)
+	public ResponseEntity<POrderGrant_SKU_list_response> get_POrderGrant_SKU_byPorderGrant(@RequestBody POrderGrant_SKU_Plan_list_request entity,
+			HttpServletRequest request) {
+		POrderGrant_SKU_list_response response = new POrderGrant_SKU_list_response();
+		try {
+			Long porder_grantid_link = entity.porder_grantid_link;
+			List<POrderGrant_SKU> result = new ArrayList<POrderGrant_SKU>();
+			
+			result = porderGrant_SKU_Service.get_POrderGrant_SKU_byPorderGrant(porder_grantid_link);
+//			for(POrderGrant_SKU porderGrant_SKU : result) {
+//				SKU sku = skuService.findOne(porderGrant_SKU.getSkuid_link());
+//				porderGrant_SKU.setMa_SanPham(sku.getProduct_code());
+//				porderGrant_SKU.setTen_SanPham(sku.getProduct_name());
+//				porderGrant_SKU.setMa_SKU(sku.getCode());
+//				porderGrant_SKU.setMau_SanPham(sku.getMauSanPham());
+//				porderGrant_SKU.setCo_SanPham(sku.getCoSanPham());
+////				System.out.println("-----------");
+////				System.out.println(sku.getMauSanPham());
+////				System.out.println(sku.getMauSanPham_product());
+//			}
+			
+			response.data = result;
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<POrderGrant_SKU_list_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<POrderGrant_SKU_list_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@RequestMapping(value = "/getByPOrderGrant", method = RequestMethod.POST)
 	public ResponseEntity<POrderGrant_SKU_Plan_list_response> getByPOrderGrant(@RequestBody POrderGrant_SKU_Plan_list_request entity,
 			HttpServletRequest request) {

@@ -45,6 +45,16 @@ public class POrderGrant_SKU implements Serializable {
     
     @Transient
     public Integer amount_break;
+    @Transient
+    public String ma_SanPham;
+    @Transient
+    public String ten_SanPham;
+    @Transient
+    public String ma_SKU;
+    @Transient
+    public String mau_SanPham;
+    @Transient
+    public String co_SanPham;
     
     @NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -58,7 +68,10 @@ public class POrderGrant_SKU implements Serializable {
     
     @Transient
     public Long getPorderid_link() {
-    	return porder_grant.getPorderid_link();
+    	if(porder_grant != null) {
+        	return porder_grant.getPorderid_link();
+    	}
+    	return (long) 0;
     }
     @Transient
 	public String getPcontractPo_PoBuyer() {
@@ -204,7 +217,36 @@ public class POrderGrant_SKU implements Serializable {
 	}
 	public void setAmount_break(Integer amount_break) {
 		this.amount_break = amount_break;
-	}	
-
+	}
+	public String getMa_SanPham() {
+		return ma_SanPham;
+	}
+	public void setMa_SanPham(String ma_SanPham) {
+		this.ma_SanPham = ma_SanPham;
+	}
+	public String getTen_SanPham() {
+		return ten_SanPham;
+	}
+	public void setTen_SanPham(String ten_SanPham) {
+		this.ten_SanPham = ten_SanPham;
+	}
+	public String getMa_SKU() {
+		return ma_SKU;
+	}
+	public void setMa_SKU(String ma_SKU) {
+		this.ma_SKU = ma_SKU;
+	}
+	public String getMau_SanPham() {
+		return mau_SanPham;
+	}
+	public void setMau_SanPham(String mau_SanPham) {
+		this.mau_SanPham = mau_SanPham;
+	}
+	public String getCo_SanPham() {
+		return co_SanPham;
+	}
+	public void setCo_SanPham(String co_SanPham) {
+		this.co_SanPham = co_SanPham;
+	}
 	
 }
