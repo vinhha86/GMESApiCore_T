@@ -170,16 +170,16 @@ public class BalanceAPI {
 				}
 			}
 
-			System.out.println(ls_productid);
+//			System.out.println(ls_productid);
 			// Duyệt qua từng màu, cỡ của sản phẩm (SKU) để tính nhu cầu NPL cho màu, cỡ đó
 			List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
 			for (PContractProductSKU thePContractSKU : ls_Product_SKU) {
 //				SKU theProduct_SKU = skuService.findOne(thePContractSKU.getSkuid_link());
-				System.out.println(thePContractSKU.getProductid_link() + "-" + thePContractSKU.getProductcode());
+//				System.out.println(thePContractSKU.getProductid_link() + "-" + thePContractSKU.getProductcode());
 				// Chỉ tính các sku của SP trong danh sách chọn
 				if (ls_productid.contains(thePContractSKU.getProductid_link())) {
-					System.out.println(thePContractSKU.getProductcode() + "-" + thePContractSKU.getMauSanPham() + "-" + thePContractSKU.getCoSanPham()
-					+ "-" + thePContractSKU.getPcontract_poid_link() + "-" + thePContractSKU.getPquantity_total());
+//					System.out.println(thePContractSKU.getProductcode() + "-" + thePContractSKU.getMauSanPham() + "-" + thePContractSKU.getCoSanPham()
+//					+ "-" + thePContractSKU.getPcontract_poid_link() + "-" + thePContractSKU.getPquantity_total());
 					cal_demand_bysku(ls_SKUBalance, entity.pcontractid_link, thePContractSKU.getPcontract_poid_link(),
 							thePContractSKU.getProductid_link(), thePContractSKU.getSkuid_link(),
 							thePContractSKU.getSkuCode(), thePContractSKU.getMauSanPham(),
