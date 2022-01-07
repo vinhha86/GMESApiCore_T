@@ -30,6 +30,7 @@ import vn.gpay.gsmart.core.pcontract_bom2_npl_poline.PContract_bom2_npl_poline;
 import vn.gpay.gsmart.core.pcontract_bom2_npl_poline_sku.IPContract_bom2_npl_poline_sku_Service;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
+import vn.gpay.gsmart.core.pcontractbomsku.IPContractBOM2SKUService;
 import vn.gpay.gsmart.core.pcontractbomsku.PContractBOM2SKU;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
@@ -79,6 +80,8 @@ public class BalanceAPI {
 	IPContract_bom2_npl_poline_Service bomPOLine_Service;
 	@Autowired
 	IPContract_bom2_npl_poline_sku_Service bomPOLine_SKU_Service;
+	@Autowired
+	IPContractBOM2SKUService bom2SKUService;
 
 	@RequestMapping(value = "/cal_balance_bypo", method = RequestMethod.POST)
 	public ResponseEntity<Balance_Response> cal_balance_bypo(HttpServletRequest request,
@@ -107,7 +110,7 @@ public class BalanceAPI {
 					List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
 					for (Balance_Product_Data theProduct : ls_Product) {
 						cal_demand(request, ls_SKUBalance, thePO.getPcontractid_link(), theProduct.productid_link,
-								theProduct.colorid_link, theProduct.amount);
+								theProduct.colorid_link, theProduct.amount, entity.materialid_link);
 					}
 
 					// 3. Tinh toan can doi cho tung nguyen phu lieu trong BOM
@@ -160,24 +163,28 @@ public class BalanceAPI {
 			if (null != entity.list_productid && entity.list_productid.length() > 0) {
 				String[] s_productid = entity.list_productid.split(";");
 				for (String sID : s_productid) {
-					Long lID = Long.valueOf(sID);
-					ls_productid.add(lID);
+					if (sID.length()>0) {
+						Long lID = Long.valueOf(sID);
+						ls_productid.add(lID);
+					}
 				}
 			}
 
+			System.out.println(ls_productid);
 			// Duyệt qua từng màu, cỡ của sản phẩm (SKU) để tính nhu cầu NPL cho màu, cỡ đó
 			List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
 			for (PContractProductSKU thePContractSKU : ls_Product_SKU) {
 //				SKU theProduct_SKU = skuService.findOne(thePContractSKU.getSkuid_link());
+				System.out.println(thePContractSKU.getProductid_link() + "-" + thePContractSKU.getProductcode());
 				// Chỉ tính các sku của SP trong danh sách chọn
 				if (ls_productid.contains(thePContractSKU.getProductid_link())) {
-//					System.out.println(thePContractSKU.getProductcode() + "-" + thePContractSKU.getMauSanPham() + "-" + thePContractSKU.getCoSanPham()
-//					+ "-" + thePContractSKU.getPcontract_poid_link() + "-" + thePContractSKU.getPquantity_total());
+					System.out.println(thePContractSKU.getProductcode() + "-" + thePContractSKU.getMauSanPham() + "-" + thePContractSKU.getCoSanPham()
+					+ "-" + thePContractSKU.getPcontract_poid_link() + "-" + thePContractSKU.getPquantity_total());
 					cal_demand_bysku(ls_SKUBalance, entity.pcontractid_link, thePContractSKU.getPcontract_poid_link(),
 							thePContractSKU.getProductid_link(), thePContractSKU.getSkuid_link(),
 							thePContractSKU.getSkuCode(), thePContractSKU.getMauSanPham(),
 							thePContractSKU.getCoSanPham(), thePContractSKU.getPquantity_total(),
-							thePContractSKU.getPo_buyer(), thePContractSKU.getPquantity_porder(), entity.balance_limit);
+							thePContractSKU.getPo_buyer(), thePContractSKU.getPquantity_porder(), entity.balance_limit, entity.materialid_link);
 
 //					ls_SKUBalance_Total.addAll(ls_SKUBalance);
 //		            ls_Product_Total.addAll(ls_Product);
@@ -200,12 +207,44 @@ public class BalanceAPI {
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<Balance_Response>(response, HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<Balance_Response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
 
+	@RequestMapping(value = "/get_material_bycontract", method = RequestMethod.POST)
+	public ResponseEntity<Balance_MaterialContract_Response> get_material_bycontract(HttpServletRequest request,
+			@RequestBody Balance_Request entity) {
+		Balance_MaterialContract_Response response = new Balance_MaterialContract_Response();
+		try {
+			response.data = bom2SKUService.getMateriallist_ByContract(entity.pcontractid_link);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<Balance_MaterialContract_Response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<Balance_MaterialContract_Response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	@RequestMapping(value = "/get_productlist_bymaterial", method = RequestMethod.POST)
+	public ResponseEntity<Balance_MaterialContract_Response> get_productlist_bymaterial(HttpServletRequest request,
+			@RequestBody Balance_Request entity) {
+		Balance_MaterialContract_Response response = new Balance_MaterialContract_Response();
+		try {
+			System.out.println(entity.pcontractid_link + "-" + entity.materialid_link);
+			response.data = bom2SKUService.getProductlist_ByMaterial(entity.pcontractid_link, entity.materialid_link);
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<Balance_MaterialContract_Response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<Balance_MaterialContract_Response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 //	public ResponseEntity<Balance_Response> cal_balance_bycontract(HttpServletRequest request,
 //			@RequestBody Balance_Request entity) {
 ////		GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -296,7 +335,7 @@ public class BalanceAPI {
 																										// thi khong can
 																										// group theo
 																										// po_buyer
-							thePContractSKU.getPquantity_porder(), entity.balance_limit);
+							thePContractSKU.getPquantity_porder(), entity.balance_limit, entity.materialid_link);
 				}
 
 				// 3. Tinh toan can doi cho tung nguyen phu lieu trong BOM
@@ -360,7 +399,7 @@ public class BalanceAPI {
 																										// thi khong can
 																										// group theo
 																										// po_buyer
-							porder.getTotalorder(), entity.balance_limit);
+							porder.getTotalorder(), entity.balance_limit, entity.materialid_link);
 				}
 				
 				// 3. Tinh toan can doi cho tung nguyen phu lieu trong BOM
@@ -430,11 +469,11 @@ public class BalanceAPI {
 					cal_demand_bysku(ls_SKUBalance, pcontractid_link, thePOrderGrant_SKU.getPcontract_poid_link(),
 							porder.getProductid_link(), thePOrderGrant_SKU.getSkuid_link(),
 							thePOrderGrant_SKU.getSkucode(), thePOrderGrant_SKU.getMauSanPham(),
-							thePOrderGrant_SKU.getCoSanPham(), amount, "", // tinh cho lenh
+							thePOrderGrant_SKU.getCoSanPham(), amount, "",  // tinh cho lenh
 																										// thi khong can
 																										// group theo
 																										// po_buyer
-							porder.getTotalorder(), entity.balance_limit);
+							porder.getTotalorder(), entity.balance_limit, entity.materialid_link);
 				}
 				
 				// 3. Tinh toan can doi cho tung nguyen phu lieu trong BOM
@@ -500,7 +539,7 @@ public class BalanceAPI {
 					// 2. Lay tong hop BOM theo PContractid_link, Productid_link, Colorid_link
 					for (Balance_Product_Data theProduct : ls_Product_PO) {
 						cal_demand(request, ls_SKUBalance, thePO.getPcontractid_link(), theProduct.productid_link,
-								theProduct.colorid_link, theProduct.amount);
+								theProduct.colorid_link, theProduct.amount, entity.materialid_link);
 					}
 					ls_Product.addAll(ls_Product_PO);
 				}
@@ -593,11 +632,12 @@ public class BalanceAPI {
 
 	// Tinh nhu cau NPL theo định mức
 	private void cal_demand(HttpServletRequest request, List<SKUBalance_Data> ls_SKUBalance, Long pcontractid_link,
-			Long productid_link, Long colorid_link, Integer p_amount) {
+			Long productid_link, Long colorid_link, Integer p_amount, Long materialid_limit) {
 		get_bom_by_product_request entity = new get_bom_by_product_request();
 		entity.pcontractid_link = pcontractid_link;
 //		entity.colorid_link = colorid_link;
 		entity.productid_link = productid_link;
+		entity.materialid_link = materialid_limit;
 
 		ResponseEntity<get_bom_by_product_response> bom_response = bom2Service.GetBomByProduct(request, entity);
 
@@ -651,13 +691,20 @@ public class BalanceAPI {
 
 	private void cal_demand_bysku(List<SKUBalance_Data> ls_SKUBalance, Long pcontractid_link, Long pcontract_poid_link,
 			Long productid_link, Long product_skuid_link, String product_sku_code, String product_sku_color,
-			String product_sku_size, Integer p_amount, String po_buyer, Integer p_amount_dh, Integer balance_limit) {
+			String product_sku_size, Integer p_amount, String po_buyer, Integer p_amount_dh, Integer balance_limit, Long materialid_link) {
 		try {
 			List<PContractBOM2SKU> bom_response = bom2Service.getBOM_By_PContractSKU(pcontractid_link,
 					product_skuid_link);
 			
 			ExecutorService executor = Executors.newFixedThreadPool(bom_response.size() + 1);
 			for (PContractBOM2SKU skubom : bom_response) {
+				//Check xem co tinh can doi cho 1 Material cu the ko
+				if (null != materialid_link && !skubom.getMaterial_skuid_link().equals(materialid_link)) {
+//					System.out.println("out: " + skubom.getMaterial_skuid_link());
+					continue;
+				}
+				
+//				System.out.println("in:" + materialid_link);
 				if (balance_limit == 1) {// Chi tinh nguyen lieu
 					if (skubom.getProduct_type() >= 30 || skubom.getProduct_type() < 20)
 						continue;

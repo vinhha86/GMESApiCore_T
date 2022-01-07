@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.pcontractbomsku;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,5 +82,40 @@ public class PContractBOM2SKUService extends AbstractService<PContractBOM2SKU> i
 	public List<Long> getcolor_bypcontract_product(long pcontractid_link, long productid_link) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public List<PContractBOM2SKU> getMateriallist_ByContract(long pcontractid_link) {
+		// TODO Auto-generated method stub
+		List<Object[]> rs = repo.getMateriallist_ByContract(pcontractid_link);
+		List<PContractBOM2SKU> lsRet = new ArrayList<PContractBOM2SKU>();
+		PContractBOM2SKU firstSKU = new PContractBOM2SKU();
+		firstSKU.setMaterial_skuid_link(-1L);
+		firstSKU.setDescription("Nguyên phụ liệu (chọn tất)");
+		lsRet.add(firstSKU);
+		
+		for (Object[] record : rs) {
+			Long m_id = (Long) record[0];
+			String m_code = (String)record[1];
+			PContractBOM2SKU theSKU = new PContractBOM2SKU();
+			theSKU.setMaterial_skuid_link(m_id);
+			theSKU.setDescription(m_code);
+			lsRet.add(theSKU);
+		}
+		return lsRet;
+	}
+	@Override
+	public List<PContractBOM2SKU> getProductlist_ByMaterial(long pcontractid_link, long materialid_link) {
+		// TODO Auto-generated method stub
+		List<Object[]> rs = repo.getProductlist_ByMaterial(pcontractid_link, materialid_link);
+		List<PContractBOM2SKU> lsRet = new ArrayList<PContractBOM2SKU>();
+		for (Object[] record : rs) {
+			Long p_id = (Long) record[0];
+			PContractBOM2SKU theSKU = new PContractBOM2SKU();
+			System.out.println(p_id);
+			theSKU.setProductid_link(p_id);
+			lsRet.add(theSKU);
+		}
+		return lsRet;
 	}
 }

@@ -80,4 +80,18 @@ public interface IPContractBOM2SKURepository extends JpaRepository<PContractBOM2
 	public List<PContractBOM2SKU> getall_bypcontract_andproduct(
 			@Param ("productid_link")final  Long productid_link, 
 			@Param ("pcontractid_link")final  Long pcontractid_link);
+	
+	//Lay danh sach cac san pham co su dung nguyen phu lieu
+	@Query(value = "select distinct c.productid_link from PContractBOM2SKU c "
+			+ "where c.pcontractid_link = :pcontractid_link and c.material_skuid_link = :material_skuid_link")
+	public List<Object[]> getProductlist_ByMaterial(
+			@Param ("pcontractid_link")final  Long pcontractid_link,
+			@Param ("material_skuid_link")final  Long material_skuid_link);
+	
+	//Lay danh sach cac nguyen phu lieu cua 1 Contract
+	@Query(value = "select distinct a.material_skuid_link, b.code from PContractBOM2SKU a inner join SKU b on b.id = a.material_skuid_link "
+			+ "where a.pcontractid_link = :pcontractid_link "
+			+ "order by b.code")
+	public List<Object[]> getMateriallist_ByContract(
+			@Param ("pcontractid_link")final  Long pcontractid_link);
 }
