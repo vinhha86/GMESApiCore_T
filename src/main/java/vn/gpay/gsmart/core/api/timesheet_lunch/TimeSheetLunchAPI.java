@@ -39,7 +39,7 @@ import vn.gpay.gsmart.core.timesheet_shift_type.ITimesheetShiftTypeService;
 import vn.gpay.gsmart.core.timesheet_shift_type.TimesheetShiftType;
 import vn.gpay.gsmart.core.timesheet_shift_type_org.ITimesheetShiftTypeOrgService;
 import vn.gpay.gsmart.core.timesheet_shift_type_org.TimesheetShiftTypeOrg;
-import vn.gpay.gsmart.core.utils.GPAYDateFormat;
+import vn.gpay.gsmart.core.utils.Common;
 import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
@@ -65,6 +65,8 @@ public class TimeSheetLunchAPI {
 	ITimeSheetLunchKhachService lunchkhachService;
 	@Autowired
 	ITimeSheetLunchKhachService timeSheetLunchKhachService;
+	@Autowired
+	Common commonService;
 
 //	@RequestMapping(value = "/getForTimeSheetLunch",method = RequestMethod.POST)
 //	public ResponseEntity<TimeSheetLunch_response> getForTimeSheetLunch(HttpServletRequest request) {
@@ -101,146 +103,160 @@ public class TimeSheetLunchAPI {
 			List<GpayUserOrg> list_userorg = userOrgService.getall_byuser_andtype(user.getId(),
 					OrgType.ORG_TYPE_FACTORY);
 			Long orgrootid_link = user.getRootorgid_link();
-			List<Org> lst_org = new ArrayList<Org>();
-			List<Personel> listPersonnel = null;
-
-//			Calendar cal = new GregorianCalendar();
-//			cal.add(Calendar.DAY_OF_MONTH, -20);
-//			Date twentyDaysAgo = cal.getTime();
-			Date date = entity.date;
-			Date dateBegin = GPAYDateFormat.atStartOfDay(date);
-			Date dateEnd = GPAYDateFormat.atEndOfDay(date);
-
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(dateBegin);
-			cal.set(Calendar.HOUR_OF_DAY, 0);
-			cal.set(Calendar.MINUTE, 0);
-			cal.set(Calendar.SECOND, 0);
-			cal.set(Calendar.MILLISECOND, 0);
-			dateBegin = cal.getTime();
-			cal.setTime(dateEnd);
-			cal.set(Calendar.HOUR_OF_DAY, 23);
-			cal.set(Calendar.MINUTE, 59);
-			cal.set(Calendar.SECOND, 0);
-			cal.set(Calendar.MILLISECOND, 0);
-			dateEnd = cal.getTime();
-
 			Long orgid_link = entity.orgid_link;
-			for (GpayUserOrg userorg : list_userorg) {
-				list_org_id.add(userorg.getOrgid_link());
-			}
-			if (!list_org_id.contains(user.getOrgid_link())) {
-				list_org_id.add(user.getOrgid_link());
-			}
+			List<Org> lst_org = new ArrayList<Org>();
+			List<Personel> listPersonnel = null;			
+
+			Date date = entity.date;
+			Date dateBegin = commonService.getBeginOfDate(date);
+			Date dateEnd = commonService.getEndOfDate(date);
+//			Date  date_check = Common.Date_Add(dateEnd, -1);
+			
 			List<TimeSheetLunchBinding> list = new ArrayList<TimeSheetLunchBinding>();
-			if (entity.orgid_link != orgrootid_link) {
-				// nếu quản lý nhiều tài khảon
-				if (list_org_id.size() > 1) {
-//					listPersonnel = personnelService.getby_org(orgid_link, orgrootid_link);
-					listPersonnel = personnelService.getTongLaoDongByDate(orgid_link, dateBegin, dateEnd);
-				} else {
-					// nếu có đơn vị con cụ thể
-					if (user.getOrg_grant_id_link() != null) {
-						lst_org = orgService.getOrgById(user.getOrg_grant_id_link());
-						if (lst_org.size() != 0) {
-//							listPersonnel = personnelService.getby_org(user.getOrg_grant_id_link(), orgrootid_link);
-							listPersonnel = personnelService.getTongLaoDongByDate(user.getOrg_grant_id_link(),
-									dateBegin, dateEnd);
-						}
-					} else {
+
+			List<TimesheetShiftType> lst_timesheetshifttype = timesheetshifttypeService.findAll();
+
+			//neu la ngay hom truoc thi load trong bang timesheet_lunch
+			if(dateEnd.after(Common.Date_Add(new Date(), 0))) {
+				
+				for (GpayUserOrg userorg : list_userorg) {
+					list_org_id.add(userorg.getOrgid_link());
+				}
+				if (!list_org_id.contains(user.getOrgid_link())) {
+					list_org_id.add(user.getOrgid_link());
+				}
+				if (entity.orgid_link != orgrootid_link) {
+					// nếu quản lý nhiều tài khảon
+					if (list_org_id.size() > 1) {
 //						listPersonnel = personnelService.getby_org(orgid_link, orgrootid_link);
 						listPersonnel = personnelService.getTongLaoDongByDate(orgid_link, dateBegin, dateEnd);
+					} else {
+						// nếu có đơn vị con cụ thể
+						if (user.getOrg_grant_id_link() != null) {
+							lst_org = orgService.getOrgById(user.getOrg_grant_id_link());
+							if (lst_org.size() != 0) {
+//								listPersonnel = personnelService.getby_org(user.getOrg_grant_id_link(), orgrootid_link);
+								listPersonnel = personnelService.getTongLaoDongByDate(user.getOrg_grant_id_link(),
+										dateBegin, dateEnd);
+							}
+						} else {
+//							listPersonnel = personnelService.getby_org(orgid_link, orgrootid_link);
+							listPersonnel = personnelService.getTongLaoDongByDate(orgid_link, dateBegin, dateEnd);
+						}
 					}
+				}
+
+				// kieerm tra phong ban day thuoc don vi nao - lay id cua don vi do;
+				Long id_org = orgService.getParentIdById(orgid_link);
+				if (id_org != null && id_org != 1) {
+					orgid_link = id_org;
+				}
+				List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService.getForTimeSheetLunch(orgid_link, date);
+				Map<Long, TimeSheetLunchBinding> mapTmp = new HashMap<>();
+
+				for (Personel personnel : listPersonnel) { // add personnel to map
+					TimeSheetLunchBinding temp = new TimeSheetLunchBinding();
+					temp.setPersonnelid_link(personnel.getId());
+					temp.setPersonnelCode(personnel.getCode());
+					temp.setPersonnelFullname(personnel.getFullname());
+					temp.setWorkingdate(date);
+					temp.setRegister_code(personnel.getRegister_code());
+					temp.setOrgid_link(personnel.getOrgid_link());
+					temp.setOrgmanagerid_link(personnel.getOrgmanagerid_link());
+					mapTmp.put(personnel.getId(), temp);
+				}
+
+				// lấy id ca làm việc
+				for (TimeSheetLunch timeSheetLunch : listTimeSheetLunch) {
+					if (mapTmp.containsKey(timeSheetLunch.getPersonnelid_link())) {
+						TimeSheetLunchBinding temp = mapTmp.get(timeSheetLunch.getPersonnelid_link());
+
+						for (int i = 0; i < lst_timesheetshifttype.size(); i++) {
+//							long id = lst_timesheetshifttype.get(i).getId();
+							if (timeSheetLunch.getShifttypeid_link() == 4
+//									&& lst_timesheetshifttype.get(i).getName().equals("Ca ăn 1")
+							) {
+								temp.setWorkingShift1(timeSheetLunch.isIsworking());
+								temp.setLunchShift1(timeSheetLunch.isIslunch());
+								break;
+							}
+							if (timeSheetLunch.getShifttypeid_link() == 5
+//									&& lst_timesheetshifttype.get(i).getName().equals("Ca ăn 2")
+							) {
+								temp.setWorkingShift2(timeSheetLunch.isIsworking());
+								temp.setLunchShift2(timeSheetLunch.isIslunch());
+								break;
+							}
+							if (timeSheetLunch.getShifttypeid_link() == 6
+//									&& lst_timesheetshifttype.get(i).getName().equals("Ca ăn 3")
+							) {
+								temp.setWorkingShift3(timeSheetLunch.isIsworking());
+								temp.setLunchShift3(timeSheetLunch.isIslunch());
+								break;
+							}
+							if (timeSheetLunch.getShifttypeid_link() == 7
+//									&& lst_timesheetshifttype.get(i).getName().equals("Ca ăn 4")
+							) {
+								temp.setWorkingShift4(timeSheetLunch.isIsworking());
+								temp.setLunchShift4(timeSheetLunch.isIslunch());
+								break;
+							}
+							if (timeSheetLunch.getShifttypeid_link() == 8
+//									&& lst_timesheetshifttype.get(i).getName().equals("Ca ăn 5")
+							) {
+								temp.setWorkingShift5(timeSheetLunch.isIsworking());
+								temp.setLunchShift5(timeSheetLunch.isIslunch());
+								break;
+							}
+						}
+						temp.setStatus(timeSheetLunch.getStatus());
+						mapTmp.put(timeSheetLunch.getPersonnelid_link(), temp);
+					}
+				}
+				list = new ArrayList<TimeSheetLunchBinding>(mapTmp.values());
+			}
+			else {
+				list = new ArrayList<TimeSheetLunchBinding>();
+				List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService.getForTimeSheetLunchBeforeDate(orgid_link, date);
+				for(TimeSheetLunch ts_lunch : listTimeSheetLunch) {
+					Personel person = personnelService.findOne(ts_lunch.getPersonnelid_link());
+					
+					TimeSheetLunchBinding binding = new TimeSheetLunchBinding();
+					binding.setOrgid_link(ts_lunch.getOrgid_link());
+					binding.setOrgmanagerid_link(ts_lunch.getOrgmanagerid_link());
+					binding.setPersonnelCode(person.getCode());
+					binding.setPersonnelFullname(person.getFullname());
+					binding.setPersonnelid_link(ts_lunch.getPersonnelid_link());
+					binding.setRegister_code(person.getRegister_code());
+					binding.setStatus(ts_lunch.getStatus());
+					binding.setWorkingdate(ts_lunch.getWorkingdate());
+					
+					if(ts_lunch.getShifttypeid_link() == 4) {
+						binding.setLunchShift1(true);
+					}
+					
+					if(ts_lunch.getShifttypeid_link() == 5) {
+						binding.setLunchShift2(true);
+					}
+					
+					if(ts_lunch.getShifttypeid_link() == 6) {
+						binding.setLunchShift3(true);
+					}
+					
+					if(ts_lunch.getShifttypeid_link() == 7) {
+						binding.setLunchShift4(true);
+					}
+					
+					if(ts_lunch.getShifttypeid_link() == 8) {
+						binding.setLunchShift5(true);
+					}
+					
+					list.add(binding);
 				}
 			}
 
-			// List<Personel> listPersonnel = personnelService.getby_org(orgid_link,
-			// orgrootid_link);
-//			System.out.println(listPersonnel.size());
-
-			// kieerm tra phong ban day thuoc don vi nao - lay id cua don vi do;
-			Long id_org = orgService.getParentIdById(orgid_link);
-			if (id_org != null && id_org != 1) {
-				orgid_link = id_org;
-			}
-			List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService.getForTimeSheetLunch(orgid_link, date);
-//			System.out.println(today);
-//			System.out.println(listTimeSheetLunch.size());
-			Map<Long, TimeSheetLunchBinding> mapTmp = new HashMap<>();
-
-//			// set status co editable hay khong
-//			Integer status = 0;
-//			if (listTimeSheetLunch.size() > 0) {
-//				status = listTimeSheetLunch.get(0).getStatus();
-//			}
-
-			for (Personel personnel : listPersonnel) { // add personnel to map
-				TimeSheetLunchBinding temp = new TimeSheetLunchBinding();
-				temp.setPersonnelid_link(personnel.getId());
-				temp.setPersonnelCode(personnel.getCode());
-				temp.setPersonnelFullname(personnel.getFullname());
-				temp.setWorkingdate(date);
-//				temp.setLunchShift1(true);
-//				temp.setLunchShift2(true);
-//				temp.setLunchShift3(true);
-//				temp.setWorkingShift1(true);
-//				temp.setWorkingShift2(true);
-//				temp.setWorkingShift3(true);
-//				temp.setStatus(status);
-				temp.setRegister_code(personnel.getRegister_code());
-				mapTmp.put(personnel.getId(), temp);
-			}
-
-			// lấy id ca làm việc
-			List<TimesheetShiftType> lst_timesheetshifttype = timesheetshifttypeService.findAll();
-			for (TimeSheetLunch timeSheetLunch : listTimeSheetLunch) {
-				if (mapTmp.containsKey(timeSheetLunch.getPersonnelid_link())) {
-					TimeSheetLunchBinding temp = mapTmp.get(timeSheetLunch.getPersonnelid_link());
-
-					for (int i = 0; i < lst_timesheetshifttype.size(); i++) {
-//						long id = lst_timesheetshifttype.get(i).getId();
-						if (timeSheetLunch.getShifttypeid_link() == 4
-//								&& lst_timesheetshifttype.get(i).getName().equals("Ca ăn 1")
-						) {
-							temp.setWorkingShift1(timeSheetLunch.isIsworking());
-							temp.setLunchShift1(timeSheetLunch.isIslunch());
-							break;
-						}
-						if (timeSheetLunch.getShifttypeid_link() == 5
-//								&& lst_timesheetshifttype.get(i).getName().equals("Ca ăn 2")
-						) {
-							temp.setWorkingShift2(timeSheetLunch.isIsworking());
-							temp.setLunchShift2(timeSheetLunch.isIslunch());
-							break;
-						}
-						if (timeSheetLunch.getShifttypeid_link() == 6
-//								&& lst_timesheetshifttype.get(i).getName().equals("Ca ăn 3")
-						) {
-							temp.setWorkingShift3(timeSheetLunch.isIsworking());
-							temp.setLunchShift3(timeSheetLunch.isIslunch());
-							break;
-						}
-						if (timeSheetLunch.getShifttypeid_link() == 7
-//								&& lst_timesheetshifttype.get(i).getName().equals("Ca ăn 4")
-						) {
-							temp.setWorkingShift4(timeSheetLunch.isIsworking());
-							temp.setLunchShift4(timeSheetLunch.isIslunch());
-							break;
-						}
-						if (timeSheetLunch.getShifttypeid_link() == 8
-//								&& lst_timesheetshifttype.get(i).getName().equals("Ca ăn 5")
-						) {
-							temp.setWorkingShift5(timeSheetLunch.isIsworking());
-							temp.setLunchShift5(timeSheetLunch.isIslunch());
-							break;
-						}
-					}
-					temp.setStatus(timeSheetLunch.getStatus());
-					mapTmp.put(timeSheetLunch.getPersonnelid_link(), temp);
-				}
-			}
-			list = new ArrayList<TimeSheetLunchBinding>(mapTmp.values());
 			response.data = list;
+			
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -321,6 +337,8 @@ public class TimeSheetLunchAPI {
 					timeSheetLunch.setIsworking(isWorkingShift);
 					timeSheetLunch.setIslunch(isLunchShift);
 					timeSheetLunch.setStatus(0);
+					timeSheetLunch.setOrgid_link(temp.getOrgid_link());
+					timeSheetLunch.setOrgmanagerid_link(temp.getOrgmanagerid_link());
 					timeSheetLunchService.save(timeSheetLunch);
 				}
 			}
@@ -410,6 +428,7 @@ public class TimeSheetLunchAPI {
 				} else {
 					List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService
 							.getForTimeSheetLunchByGrant(org.getId(), date);
+					
 					// chi lay nhung ai da xac nhan
 					listTimeSheetLunch.removeIf(c -> !c.getStatus().equals(1));
 

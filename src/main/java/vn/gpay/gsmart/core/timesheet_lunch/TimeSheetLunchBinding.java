@@ -24,6 +24,8 @@ public class TimeSheetLunchBinding {
 	private Integer status;
 	private String dataIndex;
 	private String register_code;
+	private Long orgid_link;
+	private Long orgmanagerid_link;
 
 	public Long getPersonnelid_link() {
 		return personnelid_link;
@@ -175,5 +177,21 @@ public class TimeSheetLunchBinding {
 
 	public void setRegister_code(String register_code) {
 		this.register_code = register_code;
+	}
+
+	public Long getOrgid_link() {
+		return orgid_link;
+	}
+
+	public void setOrgid_link(Long orgid_link) {
+		this.orgid_link = orgid_link;
+	}
+
+	public Long getOrgmanagerid_link() {
+		return orgmanagerid_link;
+	}
+
+	public void setOrgmanagerid_link(Long orgmanagerid_link) {
+		this.orgmanagerid_link = orgmanagerid_link;
 	}
 }

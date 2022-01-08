@@ -79,6 +79,12 @@ public class TimeSheetLunchService extends AbstractService<TimeSheetLunch> imple
 	public List<TimeSheetLunch> getByOrg_Shift_DangKy(Long orgid_link, Integer shifttypeid_link, Date workingdate) {
 		return repo.getByOrg_Shift_DangKy(orgid_link, shifttypeid_link, workingdate);
 	}
+
+	@Override
+	public List<TimeSheetLunch> getForTimeSheetLunchBeforeDate(Long orgid_link, Date workingdate) {
+		// TODO Auto-generated method stub
+		return repo.getForTimeSheetLunchBeforeDay(orgid_link, workingdate);
+	}
 	
 //	@Override
 //	public List<TimeSheetLunchBinding> getForTimeSheetLunch(Long orgid_link, Date workingdate) {

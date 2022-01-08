@@ -16,6 +16,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import vn.gpay.gsmart.core.personel.Personel;
 import vn.gpay.gsmart.core.timesheet_shift_type_org.TimesheetShiftTypeOrg;
 
 @Table(name="timesheet_lunch")
@@ -38,11 +39,15 @@ public class TimeSheetLunch implements Serializable {
 	private Date time_approve;
 	private String comment;
 	private Boolean is_bo_sung;
+	private Long orgid_link;
+	private Long orgmanagerid_link;
+	
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
     @JoinColumn(name="shifttypeid_link",insertable=false,updatable =false)
     private TimesheetShiftTypeOrg shifttype;
+	
 	
 	@Transient
 	public Integer getShift_from_hour() {
@@ -163,6 +168,18 @@ public class TimeSheetLunch implements Serializable {
 	}
 	public void setIs_bo_sung(Boolean is_bo_sung) {
 		this.is_bo_sung = is_bo_sung;
+	}
+	public Long getOrgid_link() {
+		return orgid_link;
+	}
+	public void setOrgid_link(Long orgid_link) {
+		this.orgid_link = orgid_link;
+	}
+	public Long getOrgmanagerid_link() {
+		return orgmanagerid_link;
+	}
+	public void setOrgmanagerid_link(Long orgmanagerid_link) {
+		this.orgmanagerid_link = orgmanagerid_link;
 	}
 	
 }

@@ -670,11 +670,14 @@ public class Common  {
 	}
 	public static Date Date_Add(Date date, int amount) {
 		Calendar _date = Calendar.getInstance();
-		_date.setTime(date);
-		_date.add(Calendar.DATE, amount);
-		_date.set(Calendar.HOUR_OF_DAY, 0);
-		_date.set(Calendar.MINUTE, 0);
-		_date.set(Calendar.SECOND, 0);
+		if(amount != 0) {
+			_date.setTime(date);
+			_date.add(Calendar.DATE, amount);
+			_date.set(Calendar.HOUR_OF_DAY, 0);
+			_date.set(Calendar.MINUTE, 0);
+			_date.set(Calendar.SECOND, 0);
+		}
+		
 		return _date.getTime();
 	}
 	public static int Date_Compare(Date date1, Date date2) {

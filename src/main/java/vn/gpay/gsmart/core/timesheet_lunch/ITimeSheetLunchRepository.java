@@ -30,9 +30,14 @@ public interface ITimeSheetLunchRepository
 			+ "where b.orgmanagerid_link = :orgmanagerid_link  " + "and a.workingdate = :workingdate and b.status = 0")
 	public List<TimeSheetLunch> getForTimeSheetLunch(@Param("orgmanagerid_link") final Long orgmanagerid_link,
 			@Param("workingdate") final Date workingdate);
+	
+	@Query("SELECT a " + "FROM TimeSheetLunch a "
+			+ "where (a.orgmanagerid_link = :orgmanagerid_link or a.orgid_link = :orgmanagerid_link)  " + "and a.workingdate = :workingdate")
+	public List<TimeSheetLunch> getForTimeSheetLunchBeforeDay(@Param("orgmanagerid_link") final Long orgmanagerid_link,
+			@Param("workingdate") final Date workingdate);
 
 	@Query("SELECT distinct a " + "FROM TimeSheetLunch a " + "inner join Personel b on a.personnelid_link = b.id "
-			+ "where b.orgid_link = :orgmanagerid_link " + "and a.workingdate = :workingdate and b.status = 0")
+			+ "where ((b.orgid_link = :orgmanagerid_link and a.orgid_link is null) or a.orgid_link = :orgmanagerid_link) " + "and a.workingdate = :workingdate and b.status = 0")
 	public List<TimeSheetLunch> getForTimeSheetLunchByGrant(@Param("orgmanagerid_link") final Long orgmanagerid_link,
 			@Param("workingdate") final Date workingdate);
 	
