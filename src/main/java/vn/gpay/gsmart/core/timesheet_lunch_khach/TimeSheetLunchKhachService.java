@@ -32,4 +32,10 @@ public class TimeSheetLunchKhachService extends AbstractService<TimeSheetLunchKh
 		return repo.getByDate_Org(day, orgid_link);
 	}
 
+	@Override
+	public List<TimeSheetLunchKhach> getby_nhieungay_org(Date date_from, Date date_to, Long orgid_link) {
+		// TODO Auto-generated method stub
+		return repo.getByManyDate_Org(date_from, date_to, orgid_link);
+	}
+
 }

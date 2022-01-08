@@ -365,8 +365,11 @@ public class TimeSheetLunchAPI {
 		get_TongHopBaoAn_response response = new get_TongHopBaoAn_response();
 		try {
 			Long orgid_link = entity.orgid_link;
-			Date date = entity.date;
+			Date date_from = entity.date_from;
+			Date date_to = entity.date_to;
 
+			date_from = commonService.getBeginOfDate(date_from);
+			date_to = commonService.getEndOfDate(date_to);
 			List<Org> list_org = orgService.getorgChildrenbyOrg(orgid_link, new ArrayList<>());
 			List<TongHopBaoAn> list = new ArrayList<TongHopBaoAn>();
 
@@ -388,7 +391,7 @@ public class TimeSheetLunchAPI {
 
 			for (Org org : list_org) {
 				if (org.getOrgtypeid_link().equals(166)) {
-					List<TimeSheetLunchKhach> listTimeSheetLunchKhach = lunchkhachService.getby_ngay_org(date,
+					List<TimeSheetLunchKhach> listTimeSheetLunchKhach = lunchkhachService.getby_nhieungay_org(date_from, date_to,
 							orgid_link);
 					listTimeSheetLunchKhach.removeIf(c -> c.getAmount() == 0);
 
@@ -427,7 +430,7 @@ public class TimeSheetLunchAPI {
 
 				} else {
 					List<TimeSheetLunch> listTimeSheetLunch = timeSheetLunchService
-							.getForTimeSheetLunchByGrant(org.getId(), date);
+							.getForTimeSheetLunchByGrantManyDay(org.getId(), date_from, date_to);
 					
 					// chi lay nhung ai da xac nhan
 					listTimeSheetLunch.removeIf(c -> !c.getStatus().equals(1));

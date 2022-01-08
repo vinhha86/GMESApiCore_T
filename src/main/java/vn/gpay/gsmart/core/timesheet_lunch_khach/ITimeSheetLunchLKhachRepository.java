@@ -24,4 +24,8 @@ public interface ITimeSheetLunchLKhachRepository
 	@Query("SELECT a " + "FROM TimeSheetLunchKhach a " + "where a.orgid_link = :orgid_link  " + "and a.day = :day")
 	public List<TimeSheetLunchKhach> getByDate_Org(@Param("day") final Date day,
 			@Param("orgid_link") final Long orgid_link);
+	
+	@Query("SELECT a " + "FROM TimeSheetLunchKhach a " + "where a.orgid_link = :orgid_link  " + "and a.day >= :date_from and a.day <= :date_to")
+	public List<TimeSheetLunchKhach> getByManyDate_Org(@Param("date_from") final Date date_from, @Param("date_to") final Date date_to,
+			@Param("orgid_link") final Long orgid_link);
 }

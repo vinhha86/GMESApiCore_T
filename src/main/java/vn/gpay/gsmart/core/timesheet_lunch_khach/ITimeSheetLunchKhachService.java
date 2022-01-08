@@ -9,4 +9,6 @@ public interface ITimeSheetLunchKhachService extends Operations<TimeSheetLunchKh
 	List<TimeSheetLunchKhach> getbyCa_ngay_org(Long shifttypeid_link, Date day, Long orgid_link);
 
 	List<TimeSheetLunchKhach> getby_ngay_org(Date day, Long orgid_link);
+	
+	List<TimeSheetLunchKhach> getby_nhieungay_org(Date date_from, Date date_to, Long orgid_link);
 }
