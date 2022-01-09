@@ -37,7 +37,7 @@ public interface CutPlan_Row_Repository
 
 	@Query(value = "select c from CutPlan_Row c " + "inner join CutPlan_Size a on a.cutplanrowid_link = c.id "
 			+ "inner join SKU_Attribute_Value b on a.product_skuid_link = b.skuid_link "
-			+ " where c.material_skuid_link = :material_skuid_link " + "and c.pcontractid_link = :pcontractid_link "
+			+ "where c.material_skuid_link = :material_skuid_link " + "and c.pcontractid_link = :pcontractid_link "
 			+ "and c.productid_link = :productid_link " + "and a.orgrootid_link = :orgrootid_link "
 			+ "and b.attributeid_link = :attributeid_link "
 			+ "and b.attributevalueid_link = :colorid_link and c.loaiphoimau = :loaiphoi " + "group by c")

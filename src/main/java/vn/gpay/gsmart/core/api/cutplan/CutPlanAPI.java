@@ -79,72 +79,73 @@ public class CutPlanAPI {
 
 			if (list_row.size() == 0) {
 				// them vao plan
+				CutPlan_Row row_yeucau = new CutPlan_Row();
+				row_yeucau.setCode("SL yêu cầu");
+				row_yeucau.setId(null);
+				row_yeucau.setName("SL yêu cầu");
+				row_yeucau.setType(CutPlanRowType.yeucau);
+				row_yeucau.setNgay(current);
+				row_yeucau.setPorderid_link(null);
+				row_yeucau.setMaterial_skuid_link(material_skuid_link);
+				row_yeucau.setCreateduserid_link(user.getId());
+				row_yeucau.setLa_vai(0);
+				row_yeucau.setDai_so_do((float) 0);
+				row_yeucau.setSl_vai((float) 0);
+				row_yeucau.setKho("");
+				row_yeucau.setSo_cay(0);
+				row_yeucau.setPcontractid_link(pcontractid_link);
+				row_yeucau.setProductid_link(productid_link);
+				row_yeucau.setLoaiphoimau(loaiphoi);
+
+				row_yeucau = cutplanrowService.save(row_yeucau);
+
+				CutPlan_Row row_catdu = new CutPlan_Row();
+				row_catdu.setCode("SL cắt dư");
+				row_catdu.setId(null);
+				row_catdu.setName("SL cắt dư");
+				row_catdu.setType(CutPlanRowType.catdu);
+				row_catdu.setNgay(current);
+				row_catdu.setPorderid_link(null);
+				row_catdu.setMaterial_skuid_link(material_skuid_link);
+				row_catdu.setCreateduserid_link(user.getId());
+				row_catdu.setLa_vai(0);
+				row_catdu.setDai_so_do((float) 0);
+				row_catdu.setSl_vai((float) 0);
+				row_catdu.setKho("");
+				row_catdu.setSo_cay(0);
+				row_catdu.setPcontractid_link(pcontractid_link);
+				row_catdu.setProductid_link(productid_link);
+				row_catdu.setLoaiphoimau(loaiphoi);
+
+				row_catdu = cutplanrowService.save(row_catdu);
+				
 				// Lay danh sach sku cua san pham trong don hang
-				List<PContractProductSKU> list_sku = pskuservice.getlistsku_byproduct_and_pcontract(orgrootid_link,
-						productid_link, pcontractid_link);
+				List<Long> ls_productid = new ArrayList<Long>();
+				ls_productid.add(productid_link);
+				List<PContractProductSKU> list_sku = pskuservice.getsumsku_bypcontract(pcontractid_link, ls_productid);
 
 				// Tao row cho cac mau truoc
 				List<Long> list_mau = new ArrayList<Long>();
 				for (PContractProductSKU pContractProductSKU : list_sku) {
-					if (list_mau.contains(pContractProductSKU.getColor_id()) || list_mau.contains(colorid_link))
-						continue;
-
-					list_mau.add(colorid_link);
-					CutPlan_Row row_yeucau = new CutPlan_Row();
-					row_yeucau.setCode("SL yêu cầu");
-					row_yeucau.setId(null);
-					row_yeucau.setName("SL yêu cầu");
-					row_yeucau.setType(CutPlanRowType.yeucau);
-					row_yeucau.setNgay(current);
-					row_yeucau.setPorderid_link(null);
-					row_yeucau.setMaterial_skuid_link(material_skuid_link);
-					row_yeucau.setCreateduserid_link(user.getId());
-					row_yeucau.setLa_vai(0);
-					row_yeucau.setDai_so_do((float) 0);
-					row_yeucau.setSl_vai((float) 0);
-					row_yeucau.setKho("");
-					row_yeucau.setSo_cay(0);
-					row_yeucau.setPcontractid_link(pcontractid_link);
-					row_yeucau.setProductid_link(productid_link);
-					row_yeucau.setLoaiphoimau(loaiphoi);
-
-					row_yeucau = cutplanrowService.save(row_yeucau);
-
-					CutPlan_Row row_catdu = new CutPlan_Row();
-					row_catdu.setCode("SL cắt dư");
-					row_catdu.setId(null);
-					row_catdu.setName("SL cắt dư");
-					row_catdu.setType(CutPlanRowType.catdu);
-					row_catdu.setNgay(current);
-					row_catdu.setPorderid_link(null);
-					row_catdu.setMaterial_skuid_link(material_skuid_link);
-					row_catdu.setCreateduserid_link(user.getId());
-					row_catdu.setLa_vai(0);
-					row_catdu.setDai_so_do((float) 0);
-					row_catdu.setSl_vai((float) 0);
-					row_catdu.setKho("");
-					row_catdu.setSo_cay(0);
-					row_catdu.setPcontractid_link(pcontractid_link);
-					row_catdu.setProductid_link(productid_link);
-					row_catdu.setLoaiphoimau(loaiphoi);
-
-					row_catdu = cutplanrowService.save(row_catdu);
-
-					// Tao size cho cac row
-					List<PContractProductSKU> list_sku_clone = new ArrayList<PContractProductSKU>(list_sku);
-					list_sku_clone.removeIf(c -> !c.getColor_id().equals(colorid_link));
-					List<Long> listsku = new ArrayList<Long>();
-					for (PContractProductSKU sku : list_sku_clone) {
-						if (listsku.contains(sku.getSkuid_link()))
+					long skuid_link = pContractProductSKU.getSkuid_link();
+					List<SKU_Attribute_Value> list_sku_av = skuavService.getlist_bysku(skuid_link);
+					
+					list_sku_av.removeIf(c -> c.getAttributevalueid_link().equals(colorid_link));
+					
+					if(list_sku_av.size() == 1) {
+						if (list_mau.contains(list_sku_av.get(0).getAttributevalueid_link()))
 							continue;
 
-						listsku.add(sku.getSkuid_link());
+						list_mau.add(list_sku_av.get(0).getAttributevalueid_link());
+						
+
+						// Tao size cho cac row
 						CutPlan_Size plan_yc = new CutPlan_Size();
 						plan_yc.setCutplanrowid_link(row_yeucau.getId());
 						plan_yc.setId(null);
 						plan_yc.setOrgrootid_link(orgrootid_link);
-						plan_yc.setAmount(sku.getPquantity_total());
-						plan_yc.setProduct_skuid_link(sku.getSkuid_link());
+						plan_yc.setAmount(pContractProductSKU.getPquantity_total());
+						plan_yc.setProduct_skuid_link(skuid_link);
 
 						cutplan_size_Service.save(plan_yc);
 
@@ -152,11 +153,13 @@ public class CutPlanAPI {
 						plan_catdu.setCutplanrowid_link(row_catdu.getId());
 						plan_catdu.setId(null);
 						plan_catdu.setOrgrootid_link(orgrootid_link);
-						plan_catdu.setAmount(0 - sku.getPquantity_total());
-						plan_catdu.setProduct_skuid_link(sku.getSkuid_link());
+						plan_catdu.setAmount(0 - pContractProductSKU.getPquantity_total());
+						plan_catdu.setProduct_skuid_link(skuid_link);
 
 						cutplan_size_Service.save(plan_catdu);
 					}
+					
+					
 				}
 			}
 

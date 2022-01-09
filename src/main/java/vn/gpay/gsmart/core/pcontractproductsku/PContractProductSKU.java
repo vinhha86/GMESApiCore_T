@@ -75,7 +75,7 @@ public class PContractProductSKU implements Serializable {
 
 
 	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "skuid_link", insertable = false, updatable = false)
 	private SKU sku;
 
