@@ -13,4 +13,7 @@ public interface IPOrderGrant_SKU_Plan_Service extends Operations<POrderGrant_SK
 	List<Date> getDate_ChuaYeuCau(Long porder_grantid_link, Date dateFrom, Date dateTo);
 	List<Date> getDate(Long porder_grantid_link, Date dateFrom, Date dateTo);
 	List<POrderGrant_SKU_Plan> getByPOrderGrant_SKU_inDate(Long porder_grant_skuid_link, Date date);
+	List<POrderGrant_SKU_Plan> getByPOrderGrant_SKU_byDate(Long pordergrantid_link, Date date);
+	List<POrderGrant_SKU_Plan> getByPOrderGrant_SKU_byDate_sku(Long pordergrantid_link, Long skuid_link, Date date);
+	List<POrderGrant_SKU_Plan> getByPOrderGrant_SKU_Plan_byDate_porderGrant(Long pordergrantid_link, Date date);
 }

@@ -56,4 +56,20 @@ public class POrderGrant_SKU_Plan_Service extends AbstractService<POrderGrant_SK
 		return repo.getByPOrderGrant_SKU_inDate(porder_grant_skuid_link, date);
 	}
 
+	@Override
+	public List<POrderGrant_SKU_Plan> getByPOrderGrant_SKU_byDate(Long pordergrantid_link, Date date) {
+		return repo.getByPOrderGrant_SKU_byDate(pordergrantid_link, date);
+	}
+
+	@Override
+	public List<POrderGrant_SKU_Plan> getByPOrderGrant_SKU_byDate_sku(Long pordergrantid_link, Long skuid_link,
+			Date date) {
+		return repo.getByPOrderGrant_SKU_byDate_sku(pordergrantid_link, skuid_link, date);
+	}
+
+	@Override
+	public List<POrderGrant_SKU_Plan> getByPOrderGrant_SKU_Plan_byDate_porderGrant(Long pordergrantid_link, Date date) {
+		return repo.getByPOrderGrant_SKU_Plan_byDate_porderGrant(pordergrantid_link, date);
+	}
+
 }

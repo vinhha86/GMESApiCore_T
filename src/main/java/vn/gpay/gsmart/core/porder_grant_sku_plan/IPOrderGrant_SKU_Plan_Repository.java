@@ -108,4 +108,36 @@ public interface IPOrderGrant_SKU_Plan_Repository extends JpaRepository<POrderGr
 //			@Param("date_list") final List<Date> date_list
 			@Param("date") final Date date
 			);
+	
+	@Query(value = "select a from POrderGrant_SKU_Plan a " 
+			+ "where a.pordergrantid_link = :pordergrantid_link "
+			+ "and (date(a.date) = date(:date) or date(:date) is null) "
+			+ "order by a.date asc "
+			)
+	public List<POrderGrant_SKU_Plan> getByPOrderGrant_SKU_byDate(
+			@Param("pordergrantid_link") final Long pordergrantid_link,
+			@Param("date") final Date date
+			);
+	
+	@Query(value = "select a from POrderGrant_SKU_Plan a " 
+			+ "where a.pordergrantid_link = :pordergrantid_link "
+			+ "and a.skuid_link = :skuid_link "
+			+ "and (date(a.date) = date(:date) or date(:date) is null) "
+			+ "order by a.date asc "
+			)
+	public List<POrderGrant_SKU_Plan> getByPOrderGrant_SKU_byDate_sku(
+			@Param("pordergrantid_link") final Long pordergrantid_link,
+			@Param("skuid_link") final Long skuid_link,
+			@Param("date") final Date date
+			);
+	
+	@Query(value = "select a from POrderGrant_SKU_Plan a " 
+			+ "where a.pordergrantid_link = :pordergrantid_link "
+			+ "and (date(a.date) = date(:date) or date(:date) is null) "
+			+ "order by a.skuid_link asc, a.date asc "
+			)
+	public List<POrderGrant_SKU_Plan> getByPOrderGrant_SKU_Plan_byDate_porderGrant(
+			@Param("pordergrantid_link") final Long pordergrantid_link,
+			@Param("date") final Date date
+			);
 }

@@ -128,18 +128,6 @@ public class POrderGrant_SKU_Plan_API {
 			List<POrderGrant_SKU> result = new ArrayList<POrderGrant_SKU>();
 			
 			result = porderGrant_SKU_Service.get_POrderGrant_SKU_byPorderGrant(porder_grantid_link);
-//			for(POrderGrant_SKU porderGrant_SKU : result) {
-//				SKU sku = skuService.findOne(porderGrant_SKU.getSkuid_link());
-//				porderGrant_SKU.setMa_SanPham(sku.getProduct_code());
-//				porderGrant_SKU.setTen_SanPham(sku.getProduct_name());
-//				porderGrant_SKU.setMa_SKU(sku.getCode());
-//				porderGrant_SKU.setMau_SanPham(sku.getMauSanPham());
-//				porderGrant_SKU.setCo_SanPham(sku.getCoSanPham());
-////				System.out.println("-----------");
-////				System.out.println(sku.getMauSanPham());
-////				System.out.println(sku.getMauSanPham_product());
-//			}
-			
 			response.data = result;
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -152,8 +140,8 @@ public class POrderGrant_SKU_Plan_API {
 		}
 	}
 	
-	@RequestMapping(value = "/getByPOrderGrant", method = RequestMethod.POST)
-	public ResponseEntity<POrderGrant_SKU_Plan_list_response> getByPOrderGrant(@RequestBody POrderGrant_SKU_Plan_list_request entity,
+	@RequestMapping(value = "/getDateInfo_ByPOrderGrant", method = RequestMethod.POST)
+	public ResponseEntity<POrderGrant_SKU_Plan_list_response> getDateInfo_ByPOrderGrant(@RequestBody POrderGrant_SKU_Plan_list_request entity,
 			HttpServletRequest request) {
 		POrderGrant_SKU_Plan_list_response response = new POrderGrant_SKU_Plan_list_response();
 		try {
@@ -161,44 +149,74 @@ public class POrderGrant_SKU_Plan_API {
 			Date dateFrom = entity.dateFrom;
 			Date dateTo = entity.dateTo;
 			
+			// pordergrantid_link, skuid_link
+			
 			dateFrom = GPAYDateFormat.atStartOfDay(dateFrom);
 			dateTo = GPAYDateFormat.atEndOfDay(dateTo);
 			
 			LocalDate start = dateFrom.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 			LocalDate end = dateTo.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 			
-			List<POrderGrant_SKU> porderGrant_SKU_list = 
-					porderGrant_SKU_Service.getPOrderGrant_SKU(porder_grantid_link);
-			List<POrderGrant_SKU_Plan> result = new ArrayList<POrderGrant_SKU_Plan>();
-			for(POrderGrant_SKU porderGrant_SKU : porderGrant_SKU_list) {
-				for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
-					Date dateObj = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
-					List<POrderGrant_SKU_Plan> porderGrant_SKU_Plan_singleDate_list =
-							porderGrant_SKU_Plan_Service.getByPOrderGrant_SKU_Date(porderGrant_SKU.getId(), dateObj);
-					if(porderGrant_SKU_Plan_singleDate_list.size() == 0) {
-						POrderGrant_SKU_Plan porderGrant_SKU_Plan = new POrderGrant_SKU_Plan();
-						porderGrant_SKU_Plan.setId(null);
-						porderGrant_SKU_Plan.setAmount(0);
-						porderGrant_SKU_Plan.setPorder_grant_skuid_link(porderGrant_SKU.getId());
-						porderGrant_SKU_Plan.setDate(dateObj);
-						porderGrant_SKU_Plan_Service.save(porderGrant_SKU_Plan);
-					}
-				}
+			Map<Date, List<POrderGrant_SKU_Plan>> map = new HashMap<Date, List<POrderGrant_SKU_Plan>>();
+			
+			for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
+				Date dateObj = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+				List<POrderGrant_SKU_Plan> porderGrant_SKU_Plan_list = new ArrayList<POrderGrant_SKU_Plan>();
 				
-				List<POrderGrant_SKU_Plan> porderGrant_SKU_Plan_list = 
-						porderGrant_SKU_Plan_Service.getByPOrderGrant_SKU_Date(porderGrant_SKU.getId(), dateFrom, dateTo);
-				
-				for(POrderGrant_SKU_Plan porderGrant_SKU_Plan : porderGrant_SKU_Plan_list) {
-					porderGrant_SKU_Plan.setSkuCode(porderGrant_SKU.getSku_product_code());
-					porderGrant_SKU_Plan.setMauSanPham(porderGrant_SKU.getMauSanPham());
-					porderGrant_SKU_Plan.setCoSanPham(porderGrant_SKU.getCoSanPham());
-					porderGrant_SKU_Plan.setPorderGrant_SKU_grantamount(porderGrant_SKU.getGrantamount());
-				}
-
-				result.addAll(porderGrant_SKU_Plan_list);
+				// tìm ds POrderGrant_SKU_Plan theo thông tin pordergrantid_link, skuid_link có date = dateObj
+				porderGrant_SKU_Plan_list = porderGrant_SKU_Plan_Service.getByPOrderGrant_SKU_Plan_byDate_porderGrant(porder_grantid_link, dateObj);
+//				System.out.println(dateObj + " " + porder_grantid_link + " " +porderGrant_SKU_Plan_list.size());
+				map.put(dateObj, porderGrant_SKU_Plan_list);
 			}
 			
-			response.data = result;
+//			response.data = result;
+			response.map = map;
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<POrderGrant_SKU_Plan_list_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<POrderGrant_SKU_Plan_list_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/save_porder_grant_sku_plan", method = RequestMethod.POST)
+	public ResponseEntity<POrderGrant_SKU_Plan_list_response> save_porder_grant_sku_plan(@RequestBody POrderGrant_SKU_Plan_list_request entity,
+			HttpServletRequest request) {
+		POrderGrant_SKU_Plan_list_response response = new POrderGrant_SKU_Plan_list_response();
+		try {
+			Long skuid_link = entity.skuid_link;
+			Long porder_grantid_link = entity.porder_grantid_link;
+			Date date = entity.date;
+			Integer amount = entity.amount == null ? 0 : entity.amount;
+			
+//			System.out.println(skuid_link);
+//			System.out.println(porder_grantid_link);
+//			System.out.println(date);
+//			System.out.println(amount);
+			
+			List<POrderGrant_SKU_Plan> porderGrant_SKU_Plan_list = porderGrant_SKU_Plan_Service.getByPOrderGrant_SKU_byDate_sku(
+					porder_grantid_link, skuid_link, date);
+			
+			if(porderGrant_SKU_Plan_list.size() == 0) {
+				// chưa có, create
+				POrderGrant_SKU_Plan porderGrant_SKU_Plan = new POrderGrant_SKU_Plan();
+				porderGrant_SKU_Plan.setAmount(amount);
+				porderGrant_SKU_Plan.setIs_ordered(true);
+				porderGrant_SKU_Plan.setDate(date);
+				porderGrant_SKU_Plan.setPordergrantid_link(porder_grantid_link);
+				porderGrant_SKU_Plan.setSkuid_link(skuid_link);
+				porderGrant_SKU_Plan_Service.save(porderGrant_SKU_Plan);
+			}else {
+				// đã có, edit
+				POrderGrant_SKU_Plan porderGrant_SKU_Plan = porderGrant_SKU_Plan_list.get(0);
+				porderGrant_SKU_Plan.setAmount(amount);
+				porderGrant_SKU_Plan_Service.save(porderGrant_SKU_Plan);
+			}
+			
+			response.data = new ArrayList<POrderGrant_SKU_Plan>();
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
@@ -376,6 +394,8 @@ public class POrderGrant_SKU_Plan_API {
 			return new ResponseEntity<POrderGrantBinding_list_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	
 	
 	@RequestMapping(value = "/getDateFor_KeHoachVaoChuyen_ChuaYeuCau", method = RequestMethod.POST)
 	public ResponseEntity<POrderGrant_SKU_Plan_date_list_response> getDateFor_KeHoachVaoChuyen_ChuaYeuCau(@RequestBody POrderGrant_SKU_Plan_list_request entity,

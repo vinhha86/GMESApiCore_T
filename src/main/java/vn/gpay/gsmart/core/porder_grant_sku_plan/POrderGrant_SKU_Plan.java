@@ -32,6 +32,8 @@ public class POrderGrant_SKU_Plan implements Serializable{
 	private Date date;
 	private Integer amount;
 	private Boolean is_ordered;
+	private Long pordergrantid_link;
+	private Long skuid_link;
 	
 	@Transient
 	public String skuCode;
@@ -100,6 +102,18 @@ public class POrderGrant_SKU_Plan implements Serializable{
 	}
 	public void setPorderGrant_SKU_grantamount(Integer porderGrant_SKU_grantamount) {
 		this.porderGrant_SKU_grantamount = porderGrant_SKU_grantamount;
+	}
+	public Long getPordergrantid_link() {
+		return pordergrantid_link;
+	}
+	public void setPordergrantid_link(Long pordergrantid_link) {
+		this.pordergrantid_link = pordergrantid_link;
+	}
+	public Long getSkuid_link() {
+		return skuid_link;
+	}
+	public void setSkuid_link(Long skuid_link) {
+		this.skuid_link = skuid_link;
 	}
 	
 }
