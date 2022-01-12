@@ -127,7 +127,8 @@ public class POrderGrant_SKUService extends AbstractService<POrderGrant_SKU> imp
 			newPOrderGrant_SKU.setMau_SanPham(theOriginSKU.getMauSanPham());
 			newPOrderGrant_SKU.setCo_SanPham(theOriginSKU.getCoSanPham());
 			
-			result.add(newPOrderGrant_SKU);
+			if(rs_grantamount_int != null && rs_grantamount_int > 0) 
+				result.add(newPOrderGrant_SKU);
 		}
 		
 		return result;
