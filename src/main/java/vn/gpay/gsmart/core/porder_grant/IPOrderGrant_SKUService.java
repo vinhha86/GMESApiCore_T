@@ -25,4 +25,5 @@ public interface IPOrderGrant_SKUService extends Operations<POrderGrant_SKU>{
 	Integer porder_get_qty_grant(Long porderid_link, Long skuid_link,Long pcontract_poid_link);
 	
 	List<POrderGrant_SKU> get_POrderGrant_SKU_byPorderGrant(Long pordergrantid_link);
+	List<Long>getSkuid_list_by_porderGrantId(Long pordergrantid_link);
 }

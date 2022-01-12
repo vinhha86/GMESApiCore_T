@@ -190,7 +190,7 @@ public class POrderGrant_SKU_Plan_API {
 			Long skuid_link = entity.skuid_link;
 			Long porder_grantid_link = entity.porder_grantid_link;
 			Date date = entity.date;
-			Integer amount = entity.amount == null ? 0 : entity.amount;
+			Integer amount = entity.amount;
 			
 //			System.out.println(skuid_link);
 //			System.out.println(porder_grantid_link);
@@ -202,18 +202,25 @@ public class POrderGrant_SKU_Plan_API {
 			
 			if(porderGrant_SKU_Plan_list.size() == 0) {
 				// chưa có, create
-				POrderGrant_SKU_Plan porderGrant_SKU_Plan = new POrderGrant_SKU_Plan();
-				porderGrant_SKU_Plan.setAmount(amount);
-				porderGrant_SKU_Plan.setIs_ordered(true);
-				porderGrant_SKU_Plan.setDate(date);
-				porderGrant_SKU_Plan.setPordergrantid_link(porder_grantid_link);
-				porderGrant_SKU_Plan.setSkuid_link(skuid_link);
-				porderGrant_SKU_Plan_Service.save(porderGrant_SKU_Plan);
+				if(amount != null) {
+					POrderGrant_SKU_Plan porderGrant_SKU_Plan = new POrderGrant_SKU_Plan();
+					porderGrant_SKU_Plan.setAmount(amount);
+					porderGrant_SKU_Plan.setIs_ordered(true);
+					porderGrant_SKU_Plan.setDate(date);
+					porderGrant_SKU_Plan.setPordergrantid_link(porder_grantid_link);
+					porderGrant_SKU_Plan.setSkuid_link(skuid_link);
+					porderGrant_SKU_Plan_Service.save(porderGrant_SKU_Plan);
+				}
 			}else {
 				// đã có, edit
-				POrderGrant_SKU_Plan porderGrant_SKU_Plan = porderGrant_SKU_Plan_list.get(0);
-				porderGrant_SKU_Plan.setAmount(amount);
-				porderGrant_SKU_Plan_Service.save(porderGrant_SKU_Plan);
+				if(amount != null) {
+					POrderGrant_SKU_Plan porderGrant_SKU_Plan = porderGrant_SKU_Plan_list.get(0);
+					porderGrant_SKU_Plan.setAmount(amount);
+					porderGrant_SKU_Plan_Service.save(porderGrant_SKU_Plan);
+				}else {
+					POrderGrant_SKU_Plan porderGrant_SKU_Plan = porderGrant_SKU_Plan_list.get(0);
+					porderGrant_SKU_Plan_Service.delete(porderGrant_SKU_Plan);
+				}
 			}
 			
 			response.data = new ArrayList<POrderGrant_SKU_Plan>();
