@@ -162,9 +162,12 @@ public class Balance_SKU implements Runnable {
 			if (null != ls_stockind) {
 				Float met_stockin = (float) 0;
 				for (Jitin_Stockin_D_Data stockinD : ls_stockind.data) {
+//					System.out.println(stockinD.getStockinid_link() + "-" + stockinD.getTotalmet_check());
 					met_stockin += null != stockinD.getTotalmet_check() ? stockinD.getTotalmet_check() : 0;
+//					System.out.println(met_stockin);
 				}
 				mat_sku.setMat_sku_stockin(met_stockin);
+				
 				mat_sku.setMat_sku_dif(mat_sku.getMat_sku_stockin() - mat_sku.getMat_sku_demand());
 			}
 

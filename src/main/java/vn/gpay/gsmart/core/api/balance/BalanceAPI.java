@@ -234,7 +234,7 @@ public class BalanceAPI {
 			@RequestBody Balance_Request entity) {
 		Balance_MaterialContract_Response response = new Balance_MaterialContract_Response();
 		try {
-			System.out.println(entity.pcontractid_link + "-" + entity.materialid_link);
+//			System.out.println(entity.pcontractid_link + "-" + entity.materialid_link);
 			response.data = bom2SKUService.getProductlist_ByMaterial(entity.pcontractid_link, entity.materialid_link);
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

@@ -41,7 +41,9 @@ import vn.gpay.gsmart.core.packingtype.IPackingTypeService;
 import vn.gpay.gsmart.core.packingtype.PackingType;
 import vn.gpay.gsmart.core.pcontract_bom2_npl_poline.IPContract_bom2_npl_poline_Service;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
+import vn.gpay.gsmart.core.pcontract_po.IPContract_PO_NoLink_Service;
 import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO_NoLink;
 import vn.gpay.gsmart.core.pcontract_po_productivity.IPContract_PO_Productivity_Service;
 import vn.gpay.gsmart.core.pcontract_po_productivity.PContract_PO_Productivity;
 import vn.gpay.gsmart.core.pcontract_po_shipping.IPContract_PO_ShippingService;
@@ -101,6 +103,8 @@ public class PContract_POAPI {
 	IAttributeService attrService;
 	@Autowired
 	IPContract_POService pcontract_POService;
+	@Autowired
+	IPContract_PO_NoLink_Service pcontract_PO_NoLink_Service;
 	@Autowired
 	IProductAttributeService pavService;
 	@Autowired
@@ -3098,37 +3102,37 @@ public class PContract_POAPI {
 	}
 	
 	@RequestMapping(value = "/getpo_havetoship", method = RequestMethod.POST)
-	public ResponseEntity<getpo_by_product_response> getPO_HavetoShip (
+	public ResponseEntity<getpo_nolink_by_product_response> getPO_HavetoShip (
 			@RequestBody getpo_havetoship_request entity, HttpServletRequest request) 
 	{
-		getpo_by_product_response response = new getpo_by_product_response();
+		getpo_nolink_by_product_response response = new getpo_nolink_by_product_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
 
-			List<PContract_PO> pcontract = pcontract_POService.getPO_HavetoShip(orgrootid_link, entity.shipdate_from, entity.shipdate_to);
-			for (PContract_PO po : pcontract) {
-				List<ProductPairing> p = pairService.getproduct_pairing_detail_bycontract(orgrootid_link,
-						po.getPcontractid_link(), po.getProductid_link());
-				int total = 1;
-				if (p.size() > 0) {
-					total = 0;
-					for (ProductPairing pair : p) {
-						total += pair.getAmount();
-					}
-				}
-				po.setTotalpair(total);
-				po.setPo_quantity_sp(po.getPo_quantity() * total);
-			}
+			List<PContract_PO_NoLink> pcontract = pcontract_PO_NoLink_Service.getPO_HavetoShip(orgrootid_link, entity.shipdate_from, entity.shipdate_to);
+//			for (PContract_PO_NoLink po : pcontract) {
+//				List<ProductPairing> p = pairService.getproduct_pairing_detail_bycontract(orgrootid_link,
+//						po.getPcontractid_link(), po.getProductid_link());
+//				int total = 1;
+//				if (p.size() > 0) {
+//					total = 0;
+//					for (ProductPairing pair : p) {
+//						total += pair.getAmount();
+//					}
+//				}
+//				po.setTotalpair(total);
+//				po.setPo_quantity_sp(po.getPo_quantity() * total);
+//			}
 			response.data = pcontract;
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<getpo_by_product_response>(response, HttpStatus.OK);
+			return new ResponseEntity<getpo_nolink_by_product_response>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			return new ResponseEntity<getpo_by_product_response>(response, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<getpo_nolink_by_product_response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
 }
