@@ -456,10 +456,11 @@ public class BalanceAPI {
 
 				List<SKUBalance_Data> ls_SKUBalance = new ArrayList<SKUBalance_Data>();
 				for (POrderGrant_SKU thePOrderGrant_SKU : ls_POrderGrant_SKU) {
+//				for (Long skuid : skuid_list) {
 					// Tính sl sp theo ngày (không lấy toàn bộ theo grant_sku)
 					Integer amount = 0;
 					for(Date date : date_list) {
-						List<POrderGrant_SKU_Plan> porderGrant_SKU_Plan_list = pordergrantSkuPlanService.getByPOrderGrant_SKU_inDate(thePOrderGrant_SKU.getId(), date);
+						List<POrderGrant_SKU_Plan> porderGrant_SKU_Plan_list = pordergrantSkuPlanService.getByPOrderGrant_SKU_inDate(thePorderGrant.getId(), thePOrderGrant_SKU.getSkuid_link(), date, thePOrderGrant_SKU.getPcontract_poid_link());
 						for(POrderGrant_SKU_Plan porderGrant_SKU_Plan : porderGrant_SKU_Plan_list) {
 							Integer planAmount = porderGrant_SKU_Plan.getAmount() == null ? 0 : porderGrant_SKU_Plan.getAmount();
 							amount += planAmount;

@@ -80,9 +80,10 @@ public interface IPOrderGrant_SKU_Plan_Repository extends JpaRepository<POrderGr
 			);
 	
 	@Query(value = "select distinct a.date from POrderGrant_SKU_Plan a " 
-			+ "inner join POrderGrant_SKU b on a.porder_grant_skuid_link = b.id "
-			+ "inner join POrderGrant c on b.pordergrantid_link = c.id "
-			+ "where c.id = :porder_grantid_link "
+//			+ "inner join POrderGrant_SKU b on a.porder_grant_skuid_link = b.id "
+//			+ "inner join POrderGrant c on b.pordergrantid_link = c.id "
+			
+			+ "where a.pordergrantid_link = :pordergrantid_link "
 			+ "and (date(a.date) >= date(:dateFrom) or date(:dateFrom) is null) "
 			+ "and (date(a.date) <= date(:dateTo) or date(:dateTo) is null) "
 //			+ "and (a.is_ordered is null or a.is_ordered is false ) "
@@ -90,23 +91,26 @@ public interface IPOrderGrant_SKU_Plan_Repository extends JpaRepository<POrderGr
 			+ "order by a.date asc "
 			)
 	public List<Date> getDate(
-			@Param("porder_grantid_link") final Long porder_grantid_link,
+			@Param("pordergrantid_link") final Long pordergrantid_link,
 			@Param("dateFrom") final Date dateFrom,
 			@Param("dateTo") final Date dateTo
 			);
 	
 	@Query(value = "select a from POrderGrant_SKU_Plan a " 
-			+ "inner join POrderGrant_SKU b on a.porder_grant_skuid_link = b.id "
-			+ "inner join POrderGrant c on b.pordergrantid_link = c.id "
-			+ "where a.porder_grant_skuid_link = :porder_grant_skuid_link "
+			+ "inner join POrderGrant_SKU b on a.pordergrantid_link = b.pordergrantid_link and a.skuid_link = b.skuid_link "
+			+ "where a.pordergrantid_link = :pordergrantid_link "
+			+ "and a.skuid_link = :skuid_link "
+			+ "and b.pcontract_poid_link = :pcontract_poid_link "
 //			+ "and (date(a.date) in :date_list or :date_list is null) "
 			+ "and (date(a.date) = date(:date) or date(:date) is null) "
-			+ "order by a.porder_grant_skuid_link asc, a.date asc "
+			+ "order by a.skuid_link asc, a.date asc "
 			)
 	public List<POrderGrant_SKU_Plan> getByPOrderGrant_SKU_inDate(
-			@Param("porder_grant_skuid_link") final Long porder_grant_skuid_link,
+			@Param("pordergrantid_link") final Long pordergrantid_link,
+			@Param("skuid_link") final Long skuid_link,
 //			@Param("date_list") final List<Date> date_list
-			@Param("date") final Date date
+			@Param("date") final Date date,
+			@Param("pcontract_poid_link") final Long pcontract_poid_link
 			);
 	
 	@Query(value = "select a from POrderGrant_SKU_Plan a " 

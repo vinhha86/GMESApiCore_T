@@ -20,6 +20,12 @@ public interface IPOrderGrant_SKURepository extends JpaRepository<POrderGrant_SK
 	public List<POrderGrant_SKU>getPOrderGrant_SKU(
 			@Param ("pordergrantid_link")final Long pordergrantid_link);
 	
+	@Query(value = "select distinct a.skuid_link from POrderGrant_SKU a "
+			+ "where a.pordergrantid_link = :pordergrantid_link "
+			)
+	public List<Long>getSkuid_list_by_porderGrantId(
+			@Param ("pordergrantid_link")final Long pordergrantid_link);
+	
 	@Query(value = "select a from POrderGrant_SKU a "
 			+ "where a.pordergrantid_link = :pordergrantid_link "
 			+ "and (pcontract_poid_link = :pcontract_poid_link or :pcontract_poid_link is null)"

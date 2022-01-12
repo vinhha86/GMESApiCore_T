@@ -132,4 +132,9 @@ public class POrderGrant_SKUService extends AbstractService<POrderGrant_SKU> imp
 		
 		return result;
 	}
+
+	@Override
+	public List<Long> getSkuid_list_by_porderGrantId(Long pordergrantid_link) {
+		return repo.getSkuid_list_by_porderGrantId(pordergrantid_link);
+	}
 }
