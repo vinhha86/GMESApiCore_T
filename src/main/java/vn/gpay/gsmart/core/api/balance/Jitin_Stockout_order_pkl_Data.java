@@ -20,6 +20,7 @@ public class Jitin_Stockout_order_pkl_Data implements Serializable{
 	private Float width;
 	private Float netweight;
 	private Float grossweight;
+	private Float grossweight_lbs;
 	private String epc;
 	private Date encryptdatetime;
 	private Long usercreateid_link;
@@ -282,6 +283,12 @@ public class Jitin_Stockout_order_pkl_Data implements Serializable{
 	}
 	public void setIsInStock(Boolean isInStock) {
 		this.isInStock = isInStock;
+	}
+	public Float getGrossweight_lbs() {
+		return grossweight_lbs;
+	}
+	public void setGrossweight_lbs(Float grossweight_lbs) {
+		this.grossweight_lbs = grossweight_lbs;
 	}
 	
 }

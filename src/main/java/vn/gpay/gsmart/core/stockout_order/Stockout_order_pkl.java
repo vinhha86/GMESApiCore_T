@@ -40,6 +40,7 @@ public class Stockout_order_pkl implements Serializable{
 	private Float width;
 	private Float netweight;
 	private Float grossweight;
+	private Float grossweight_lbs;
 	private String epc;
 	private Date encryptdatetime;
 	private Long usercreateid_link;
@@ -275,4 +276,13 @@ public class Stockout_order_pkl implements Serializable{
 	public void setSpaceString(String spaceString) {
 		this.spaceString = spaceString;
 	}
+
+	public Float getGrossweight_lbs() {
+		return grossweight_lbs;
+	}
+
+	public void setGrossweight_lbs(Float grossweight_lbs) {
+		this.grossweight_lbs = grossweight_lbs;
+	}
+	
 }
