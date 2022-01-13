@@ -1858,6 +1858,9 @@ public class PContract_POAPI {
 			}
 
 			pcontract_po = pcontract_POService.save(pcontract_po);
+			
+			//Update so tong cua PO cha
+			update_quantity_parentpo(pcontract_po.getParentpoid_link());
 
 			// Cap nhat productivity
 			List<PContract_PO_Productivity> list_productivity = entity.data.getPcontract_po_productivity();
@@ -1922,6 +1925,26 @@ public class PContract_POAPI {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<PContract_pocreate_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	private void update_quantity_parentpo(Long parentpoid_link) {
+		if (null != parentpoid_link) {
+			List<PContract_PO> ls_po_child = pcontract_POService.get_by_parent_and_type(parentpoid_link, POType.PO_LINE_PLAN);
+			if (ls_po_child.size() > 0) {
+				int total_quantity = 0;
+				for(PContract_PO thePO_Child: ls_po_child) {
+					total_quantity += null == thePO_Child.getPo_quantity()?0:thePO_Child.getPo_quantity();
+				}
+				PContract_PO thePO_Parent = pcontract_POService.findOne(parentpoid_link);
+				thePO_Parent.setPo_quantity(total_quantity);
+				for(PContract_PO_Productivity theProductivity: thePO_Parent.getPcontract_po_productivity()) {
+					if (theProductivity.getProductid_link().equals(thePO_Parent.getProductid_link())) {
+						theProductivity.setAmount(total_quantity);
+					}
+				}
+				pcontract_POService.save(thePO_Parent);
+			}
 		}
 	}
 
@@ -3111,19 +3134,19 @@ public class PContract_POAPI {
 			long orgrootid_link = user.getRootorgid_link();
 
 			List<PContract_PO_NoLink> pcontract = pcontract_PO_NoLink_Service.getPO_HavetoShip(orgrootid_link, entity.shipdate_from, entity.shipdate_to);
-//			for (PContract_PO_NoLink po : pcontract) {
-//				List<ProductPairing> p = pairService.getproduct_pairing_detail_bycontract(orgrootid_link,
-//						po.getPcontractid_link(), po.getProductid_link());
-//				int total = 1;
-//				if (p.size() > 0) {
-//					total = 0;
-//					for (ProductPairing pair : p) {
-//						total += pair.getAmount();
-//					}
-//				}
-//				po.setTotalpair(total);
-//				po.setPo_quantity_sp(po.getPo_quantity() * total);
-//			}
+			for (PContract_PO_NoLink po : pcontract) {
+				List<ProductPairing> p = pairService.getproduct_pairing_detail_bycontract(orgrootid_link,
+						po.getPcontractid_link(), po.getProductid_link());
+				int total = 1;
+				if (p.size() > 0) {
+					total = 0;
+					for (ProductPairing pair : p) {
+						total += pair.getAmount();
+					}
+				}
+				po.setTotalpair(total);
+				po.setPo_quantity_sp(po.getPo_quantity() * total);
+			}
 			response.data = pcontract;
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
