@@ -21,6 +21,7 @@ public class AtributeFixValues {
 	public static String url_authen = "http://localhost:8081";// DHA
 	public static String url_jitin = "http://localhost:8080/jitindha";
 	public static String folder_image = "http://27.71.231.154:8080/gmesdha_upload/product/";// DHA
+	public static String url_timesheet = "http://localhost:6767";// DHA
 
 	// GSmart
 //	public static String url_authen = "http://localhost:8181";
