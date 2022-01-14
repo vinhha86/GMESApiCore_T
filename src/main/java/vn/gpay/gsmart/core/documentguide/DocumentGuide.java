@@ -26,6 +26,7 @@ public class DocumentGuide implements Serializable {
 	private String name;
 	private String filename;
 	private Long orgrootid_link;
+	private Integer doctype;
 	
 	
 	public Long getOrgrootid_linkl() {
@@ -51,6 +52,12 @@ public class DocumentGuide implements Serializable {
 	}
 	public void setFilename(String filename) {
 		this.filename = filename;
+	}
+	public Integer getDoctype() {
+		return doctype;
+	}
+	public void setDoctype(Integer doctype) {
+		this.doctype = doctype;
 	}
 	
 	

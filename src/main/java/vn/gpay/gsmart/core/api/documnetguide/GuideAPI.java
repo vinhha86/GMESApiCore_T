@@ -64,6 +64,52 @@ public class GuideAPI {
 			guide.setOrgrootid_linkl(user.getRootorgid_link());
 			guide.setFilename(name);
 			guide.setName(name);
+			guide.setDoctype(0);
+			
+			guideService.save(guide);
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<guide_create_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseError.ERRCODE_RUNTIME_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<guide_create_response>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@RequestMapping(value = "/create_tech",method = RequestMethod.POST)
+	public ResponseEntity<guide_create_response> Create_Tech(HttpServletRequest request,
+			@RequestParam("file") MultipartFile file) {
+		guide_create_response response = new guide_create_response();
+		try {
+			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
+			
+			String FolderPath = String.format("%s/document_guide/", AtributeFixValues.folder_upload);
+			
+			String uploadRootPath = request.getServletContext().getRealPath("");
+			File uploadRootDir = new File(uploadRootPath);
+			File folder_upload = new File(uploadRootDir.getParent()+"/"+FolderPath);
+			
+			if (!folder_upload.exists()) {
+				folder_upload.mkdirs();
+			}
+			
+			String name = file.getOriginalFilename();		
+			if (name != null && name.length() > 0) {
+				File serverFile = new File(folder_upload.getAbsolutePath() + File.separator + name);
+
+				BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+				stream.write(file.getBytes());
+				stream.close();
+			}
+			
+			DocumentGuide guide = new DocumentGuide();
+			guide.setId(null);
+			guide.setOrgrootid_linkl(user.getRootorgid_link());
+			guide.setFilename(name);
+			guide.setName(name);
+			guide.setDoctype(1);
 			
 			guideService.save(guide);
 			
@@ -78,10 +124,13 @@ public class GuideAPI {
 	}
 	
 	@RequestMapping(value = "/getall",method = RequestMethod.POST)
-	public ResponseEntity<guide_getall_response> GetAll(HttpServletRequest request) {
+	public ResponseEntity<guide_getall_response> GetAll(HttpServletRequest request, @RequestBody guide_getall_request entity) {
 		guide_getall_response response = new guide_getall_response();
 		try {
-			response.data = guideService.findAll();					
+			if (null == entity.doctype)
+				response.data = guideService.findAll();					
+			else
+				response.data = guideService.loadByType(entity.doctype);
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

@@ -1,5 +1,7 @@
 package vn.gpay.gsmart.core.documentguide;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -14,5 +16,9 @@ public class DocumentGuideService extends AbstractService<DocumentGuide> impleme
 		// TODO Auto-generated method stub
 		return repo;
 	}
-
+	@Override
+	public List<DocumentGuide> loadByType(Integer doctype) {
+		// TODO Auto-generated method stub
+		return repo.loadByType(doctype);
+	}
 }

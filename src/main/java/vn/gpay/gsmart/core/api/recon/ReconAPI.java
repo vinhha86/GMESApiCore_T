@@ -136,8 +136,8 @@ public class ReconAPI {
 				
 				// Tinh nhu cau NPL theo dinh muc va so luong thanh pham da xuat
 				hash_MatSKUBalance.clear();
-				System.out.println("Start BOM:" + new Date());
-				System.out.println(hash_MatSKUBalance.size());
+//				System.out.println("Start BOM:" + new Date());
+//				System.out.println(hash_MatSKUBalance.size());
 	
 	//			CountDownLatch bomdemand_latch = new CountDownLatch(ls_Product_SKU_Poline.size());
 				for (PContractProductSKU_NoLink product_sku : ls_Product_SKU_Poline) {
@@ -146,27 +146,27 @@ public class ReconAPI {
 					cal_recon_bomdemand(product_sku);
 				}
 	//			bomdemand_latch.await();
-				System.out.println("End BOM:" + new Date());
-				System.out.println(hash_MatSKUBalance.size());
+//				System.out.println("End BOM:" + new Date());
+//				System.out.println(hash_MatSKUBalance.size());
 				// 3. Tinh toan nguyen phu lieu thuc nhap, thuc xuat theo phieu xuat kho cua cac NPL trong danh sach
 				// Duyệt qua từng màu, cỡ của sản phẩm (SKU) để tính nhu cầu NPL cho màu, cỡ đó
 				List<Recon_MatSKU_Data> ls_MatSKUBalance = new ArrayList<Recon_MatSKU_Data>(hash_MatSKUBalance.values());
-				System.out.println("SL SKU NPL:" + ls_MatSKUBalance.size());
+//				System.out.println("SL SKU NPL:" + ls_MatSKUBalance.size());
 				
 				CountDownLatch latch = new CountDownLatch(ls_MatSKUBalance.size());
 				
-				System.out.println("Start get Stockin:" + new Date());
+//				System.out.println("Start get Stockin:" + new Date());
 				List<Jitin_Stockin_D_Data> ls_MStockin = get_Mstockin_bycontract(request.getHeader("Authorization"),entity.pcontractid_link, null);
 				System.out.println("End get Stockin:" + ls_MStockin.size() + "-" + new Date());
 				List<Jitin_StockOutD_Data> ls_MStockout = get_Mstockout_bycontract(request.getHeader("Authorization"),entity.pcontractid_link, null);
-				System.out.println("End get Stockout:" + ls_MStockout.size() + "-" + new Date());
+//				System.out.println("End get Stockout:" + ls_MStockout.size() + "-" + new Date());
 	
 				for (Recon_MatSKU_Data mat_sku : ls_MatSKUBalance) {
 					Recon_MatSKU theReconMat = new Recon_MatSKU(ls_MStockin,ls_MStockout, mat_sku, latch);
 					theReconMat.start();
 				}
 				latch.await();
-				System.out.println("End NPL:" + new Date());
+//				System.out.println("End NPL:" + new Date());
 				response.data = ls_MatSKUBalance;
 			}
 

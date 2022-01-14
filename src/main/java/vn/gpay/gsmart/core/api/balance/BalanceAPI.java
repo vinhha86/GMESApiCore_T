@@ -184,7 +184,8 @@ public class BalanceAPI {
 							thePContractSKU.getProductid_link(), thePContractSKU.getSkuid_link(),
 							thePContractSKU.getSkuCode(), thePContractSKU.getMauSanPham(),
 							thePContractSKU.getCoSanPham(), thePContractSKU.getPquantity_total(),
-							thePContractSKU.getPo_buyer(), thePContractSKU.getPquantity_porder(), entity.balance_limit, entity.materialid_link);
+							thePContractSKU.getPo_buyer(), thePContractSKU.getPquantity_porder(), 
+							entity.balance_limit, entity.materialid_link);
 
 //					ls_SKUBalance_Total.addAll(ls_SKUBalance);
 //		            ls_Product_Total.addAll(ls_Product);
@@ -395,10 +396,7 @@ public class BalanceAPI {
 					cal_demand_bysku(ls_SKUBalance, pcontractid_link, thePOrderGrant_SKU.getPcontract_poid_link(),
 							porder.getProductid_link(), thePOrderGrant_SKU.getSkuid_link(),
 							thePOrderGrant_SKU.getSkucode(), thePOrderGrant_SKU.getMauSanPham(),
-							thePOrderGrant_SKU.getCoSanPham(), thePOrderGrant_SKU.getGrantamount(), "", // tinh cho lenh
-																										// thi khong can
-																										// group theo
-																										// po_buyer
+							thePOrderGrant_SKU.getCoSanPham(), thePOrderGrant_SKU.getGrantamount(), "", // tinh cho lenh																						// po_buyer
 							porder.getTotalorder(), entity.balance_limit, entity.materialid_link);
 				}
 				
