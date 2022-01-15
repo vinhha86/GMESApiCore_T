@@ -496,17 +496,20 @@ public class ScheduleAPI {
 
 			if (grant.getStatus() == 2) {
 				List<PContract_PO> list_po = porderSkuService.getListPO_ByGrant(pordergrantid_link);
-				shipdate_max = list_po.get(0).getShipdate();
-				for (PContract_PO po : list_po) {
-					if (po.getShipdate().after(shipdate_max))
-						shipdate_max = po.getShipdate();
+				if (list_po.size() > 0) {
+					shipdate_max = list_po.get(0).getShipdate();
+					for (PContract_PO po : list_po) {
+						if (po.getShipdate().after(shipdate_max))
+							shipdate_max = po.getShipdate();
+					}
 				}
 			} else {
 				POrder porder = porderService.findOne(grant.getPorderid_link());
 				shipdate_max = porder.getShipdate();
 			}
 
-			if (end_date.after(shipdate_max))
+			//Neu ngay ket thuc nho hon ngay giao hang cuoi cung --> Giao hang muon
+			if (null!=shipdate_max && end_date.after(shipdate_max))
 				type = 1;
 
 			grant.setGranttoorgid_link(entity.orggrant_toid_link);
@@ -555,6 +558,7 @@ public class ScheduleAPI {
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<move_porder_response>(response, HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
 			return new ResponseEntity<move_porder_response>(response, HttpStatus.OK);
