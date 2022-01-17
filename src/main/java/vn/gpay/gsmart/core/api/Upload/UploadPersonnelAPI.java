@@ -77,8 +77,6 @@ public class UploadPersonnelAPI {
 			File uploadRootDir = new File(uploadRootPath);
 			name = file.getOriginalFilename();
 
-			System.out.print(name);
-
 			if (name != null && name.length() > 0) {
 				String[] str = name.split("\\.");
 				String extend = str[str.length - 1];

@@ -6,6 +6,8 @@ public class TimeSheetInOut {
     private int verify_type;
     private String time;
     private String fullname;
+    private String day;
+    
     
     
 
@@ -47,5 +49,13 @@ public class TimeSheetInOut {
 
 	public void setFullname(String fullname) {
 		this.fullname = fullname;
+	}
+
+	public String getDay() {
+		return day;
+	}
+
+	public void setDay(String day) {
+		this.day = day;
 	}
 }

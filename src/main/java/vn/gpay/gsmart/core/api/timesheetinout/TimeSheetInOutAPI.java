@@ -6,6 +6,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +39,13 @@ public class TimeSheetInOutAPI {
 	public ResponseEntity<TimeSheetInOut_load_response> timesheetinout_GetAll(@RequestBody TimeSheetInOut_load_request entity) {
 		TimeSheetInOut_load_response response = new TimeSheetInOut_load_response();
 		try {
+			String date_from = entity.fromdate;
+			String date_to = entity.todate;
+			long orgid_link = entity.orgid_link;
+			
 			String urlPush = AtributeFixValues.url_timesheet+"/timesheet/getlist";
 			URL url = new URL(urlPush);
+			
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
             conn.setDoInput(true);
@@ -49,8 +57,10 @@ public class TimeSheetInOutAPI {
             ObjectMapper objectMapper = new ObjectMapper();
             ObjectNode appParNode = objectMapper.createObjectNode();
             
-//            appParNode.put("userid", entity.user.getId());
-//            appParNode.put("enable", enabled);
+            //truyen param theo
+            appParNode.put("date_from", date_from);
+            appParNode.put("date_to", date_to);
+            appParNode.put("orgid_link", orgid_link);
             String jsonReq = objectMapper.writeValueAsString(appParNode);
             
             OutputStream os = conn.getOutputStream();
@@ -68,11 +78,23 @@ public class TimeSheetInOutAPI {
             
             conn.disconnect();
 
+            DateFormat df_gio = new SimpleDateFormat("H:m:s");
+            DateFormat df2 = new SimpleDateFormat("yyyy-MM-dd H:m:s");
+            DateFormat df_ngay = new SimpleDateFormat("dd-MM-yyyy");
 			List<TimeSheetInOut> lsttimesheetinout = objectMapper.readValue(result, new TypeReference<List<TimeSheetInOut>>() {});
 			for(TimeSheetInOut inout : lsttimesheetinout) {
 				Personel person = personService.getPersonelBycode(inout.getPersonel_code());
-				inout.setFullname(person.getFullname());
+				if(person!=null) {
+					inout.setFullname(person.getFullname());
+					inout.setPersonel_code(person.getCode());
+					String time = df_gio.format(df2.parse(inout.getTime()));
+					String ngay = df_ngay.format(df2.parse(inout.getTime()));
+					inout.setTime(time);
+					inout.setDay(ngay);
+				}
+					
 			}
+			lsttimesheetinout.removeIf(c -> c.getFullname() == null);
 			response.data =lsttimesheetinout;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
