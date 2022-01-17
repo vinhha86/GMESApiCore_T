@@ -6,10 +6,12 @@ import java.io.FileOutputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -2201,9 +2203,13 @@ public class PContract_POAPI {
 				List<ProductPairing> list_pair = productpairService.getproduct_pairing_detail_bycontract(orgrootid_link,
 						pcontractid_link, productpairid_link);
 				for (ProductPairing pair : list_pair) {
-					list_product.add(pair.getProductid_link());
+					Boolean isContain = Arrays.asList(list_product).contains(pair.getProductid_link());
+					if(!isContain)
+						list_product.add(pair.getProductid_link());
 				}
 			} else {
+				Boolean isContain = Arrays.asList(list_product).contains(product.getId());
+					if(!isContain)
 				list_product.add(product.getId());
 			}
 
