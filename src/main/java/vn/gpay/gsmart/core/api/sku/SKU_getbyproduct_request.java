@@ -5,5 +5,6 @@ import vn.gpay.gsmart.core.base.ResponseBase;
 public class SKU_getbyproduct_request extends ResponseBase {
 	public Integer producttypeid_link;
 	public Long productid_link;
+	public Long stockid_link;
 	public boolean isremove;
 }

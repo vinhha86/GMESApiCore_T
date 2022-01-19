@@ -156,4 +156,8 @@ public class WarehouseRepositoryImpl extends StringAbstractService<Warehouse> im
 	public List<Warehouse> findMaterialByEPC(String epc) {
 		return repositoty.findMaterialByEPC(epc);
 	}
+	@Override
+	public Long getSumBy_Sku_Stock(Long skuid_link, Long stockid_link) {
+		return repositoty.getSumBy_Sku_Stock(skuid_link, stockid_link);
+	}
 }

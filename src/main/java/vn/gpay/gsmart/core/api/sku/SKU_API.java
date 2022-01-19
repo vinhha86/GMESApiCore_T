@@ -22,6 +22,7 @@ import vn.gpay.gsmart.core.sku.ISKU_AttributeValue_Service;
 import vn.gpay.gsmart.core.sku.ISKU_Service;
 import vn.gpay.gsmart.core.sku.SKU;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
+import vn.gpay.gsmart.core.warehouse.IWarehouseService;
 
 
 @RestController
@@ -30,15 +31,27 @@ public class SKU_API {
 	@Autowired ISKU_AttributeValue_Service savService;
 	@Autowired ISKU_Service skuService;
 	@Autowired IPContractProductBom2Service pcontract_bom2_Service;
+	@Autowired IWarehouseService warehouseService;
 	
 	@RequestMapping(value = "/getall_byproduct",method = RequestMethod.POST)
 	public ResponseEntity<SKU_getbyproduct_response> Product_GetAll(HttpServletRequest request, @RequestBody SKU_getbyproduct_request entity ) {
 		SKU_getbyproduct_response response = new SKU_getbyproduct_response();
 		try {
-			response.data = skuService.getlist_byProduct(entity.productid_link);
+			List<SKU> result = skuService.getlist_byProduct(entity.productid_link);
 			if(entity.isremove) {
-				response.data.removeIf(c->c.getIs_default());
+				result.removeIf(c->c.getIs_default());
 			}
+			
+			// tim sl ton kho
+			if(entity.stockid_link != null) {
+				for(SKU sku : result) {
+					Long totalSLTon = warehouseService.getSumBy_Sku_Stock(sku.getId(), entity.stockid_link);
+					System.out.println(sku.getId() + " " + totalSLTon);
+					sku.setTotalSLTon(totalSLTon.intValue());
+				}
+			}
+			
+			response.data = result;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<SKU_getbyproduct_response>(response,HttpStatus.OK);

@@ -80,6 +80,9 @@ public class SKU implements Serializable {
 	private BigDecimal vatpercent;
 
 	private Long productid_link;
+	
+	@Transient
+	private Integer totalSLTon;
 
 //	@NotFound(action = NotFoundAction.IGNORE)
 //	@OneToMany
@@ -561,4 +564,14 @@ public class SKU implements Serializable {
 	public void setBarcode(String barcode) {
 		this.barcode = barcode;
 	}
+
+	public Integer getTotalSLTon() {
+		return totalSLTon;
+	}
+
+	public void setTotalSLTon(Integer totalSLTon) {
+		this.totalSLTon = totalSLTon;
+	}
+	
+	
 }

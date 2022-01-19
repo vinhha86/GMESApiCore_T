@@ -25,4 +25,5 @@ public interface IWarehouseService extends StringOperations<Warehouse>{
 	String getspaces_bysku(Long stockid_link, Long skuid_link);
 	
 	List<Warehouse> findMaterialByEPC(String epc);
+	Long getSumBy_Sku_Stock(Long skuid_link, Long stockid_link);
 }

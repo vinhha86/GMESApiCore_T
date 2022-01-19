@@ -62,4 +62,13 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, String>{
 	@Query(value = "select c from Warehouse c where epc =:epc")
 	public List<Warehouse> findMaterialByEPC(
 			@Param ("epc")final String epc);
+	
+	@Query(value = "select count(c.id) from Warehouse c "
+			+ " where c.skuid_link = :skuid_link "
+			+ " and c.stockid_link = :stockid_link "
+			) 
+	public Long getSumBy_Sku_Stock(
+			@Param ("skuid_link")final Long skuid_link,
+			@Param ("stockid_link")final Long stockid_link
+			);
 }
