@@ -46,7 +46,6 @@ public class SKU_API {
 			if(entity.stockid_link != null) {
 				for(SKU sku : result) {
 					Long totalSLTon = warehouseService.getSumBy_Sku_Stock(sku.getId(), entity.stockid_link);
-					System.out.println(sku.getId() + " " + totalSLTon);
 					sku.setTotalSLTon(totalSLTon.intValue());
 				}
 			}
