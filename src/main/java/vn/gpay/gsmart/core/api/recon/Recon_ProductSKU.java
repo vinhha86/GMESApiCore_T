@@ -7,12 +7,13 @@ import java.util.concurrent.ThreadLocalRandom;
 import vn.gpay.gsmart.core.api.balance.Jitin_StockOutD_Data;
 import vn.gpay.gsmart.core.api.balance.Jitin_Stockin_D_Data;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
+import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU_NoLink;
 
 public class Recon_ProductSKU implements Runnable{
 	private Thread t;
 	private List<Jitin_Stockin_D_Data> ls_PStockin;
 	private List<Jitin_StockOutD_Data> ls_PStockout;
-	private PContractProductSKU product_sku;
+	private PContractProductSKU_NoLink product_sku;
 
 	String token;
 	CountDownLatch latch;
@@ -20,7 +21,7 @@ public class Recon_ProductSKU implements Runnable{
 	Recon_ProductSKU(
 			List<Jitin_Stockin_D_Data> ls_PStockin,
 			List<Jitin_StockOutD_Data> ls_PStockout,
-			PContractProductSKU product_sku, 
+			PContractProductSKU_NoLink product_sku, 
 			CountDownLatch latch) {
 		this.ls_PStockin = ls_PStockin;
 		this.ls_PStockout = ls_PStockout;
@@ -32,8 +33,8 @@ public class Recon_ProductSKU implements Runnable{
 	public void run() {
 		try {
 //			System.out.println(product_sku.getProductcode());
-			cal_stockin_bycontract();
-			cal_stockout_bycontract();
+			if (null!=ls_PStockin) cal_stockin_bycontract();
+			if (null!=ls_PStockout) cal_stockout_bycontract();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

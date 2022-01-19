@@ -14,9 +14,7 @@ public class Recon_MatSKU implements Runnable{
 	private List<Jitin_StockOutD_Data> ls_MStockout;
 	private Recon_MatSKU_Data mat_sku;
 
-	String token;
 	CountDownLatch latch;
-	
 	Recon_MatSKU(
 			List<Jitin_Stockin_D_Data> ls_MStockin,
 			List<Jitin_StockOutD_Data> ls_MStockout,
@@ -35,8 +33,11 @@ public class Recon_MatSKU implements Runnable{
 	@Override
 	public void run() {
 		try {
-			cal_stockin_bycontract();
-			cal_stockout_bycontract();
+			if (null != mat_sku) {
+//				System.out.println("Stock:" + mat_sku.getMat_skuid_link());
+				cal_stockin_bycontract();
+				cal_stockout_bycontract();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -65,7 +66,7 @@ public class Recon_MatSKU implements Runnable{
 			}
 //			Double met_stockin = ls_MStockin.stream().parallel().filter(sku -> sku.getSkuid_link().equals(mat_sku.getMat_skuid_link())).mapToDouble(x -> x.getTotalpackage()).sum();
 //			mat_sku.setMat_sku_stockin(met_stockin.floatValue());
-			System.out.println("stockin: " + mat_sku.getMat_skuid_link() + " : " + mat_sku.getMat_sku_stockin());
+//			System.out.println("stockin: " + mat_sku.getMat_skuid_link() + " : " + mat_sku.getMat_sku_stockin());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -86,7 +87,7 @@ public class Recon_MatSKU implements Runnable{
 			}
 //			Double met_stockout = ls_MStockout.stream().parallel().filter(sku -> sku.getSkuid_link().equals(mat_sku.getMat_skuid_link())).mapToDouble(x -> x.getTotalpackage()).sum();
 //			mat_sku.setMat_sku_stockout(met_stockout.floatValue());
-			System.out.println("stockout: " + mat_sku.getMat_skuid_link() + " : " + mat_sku.getMat_sku_stockout());
+//			System.out.println("stockout: " + mat_sku.getMat_skuid_link() + " : " + mat_sku.getMat_sku_stockout());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

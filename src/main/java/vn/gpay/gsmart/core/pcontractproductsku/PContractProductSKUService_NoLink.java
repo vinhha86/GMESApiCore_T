@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import vn.gpay.gsmart.core.base.AbstractService;
 import vn.gpay.gsmart.core.sku.ISKU_Repository;
+import vn.gpay.gsmart.core.sku.SKU;
 
 @Service
 public class PContractProductSKUService_NoLink extends AbstractService<PContractProductSKU_NoLink>
@@ -28,9 +29,9 @@ public class PContractProductSKUService_NoLink extends AbstractService<PContract
 	}
 
 	@Override
-	public List<PContractProductSKU_NoLink> getsumsku_bypcontract(long pcontractid_link) {
+	public List<PContractProductSKU_NoLink> getsumsku_bypcontract(long pcontractid_link, List<Long> ls_productid) {
 		List<PContractProductSKU_NoLink> result = new ArrayList<PContractProductSKU_NoLink>();
-		List<Object[]> rs = repo.getsumsku_bypcontract(pcontractid_link);
+		List<Object[]> rs = repo.getsumsku_bypcontract(pcontractid_link, ls_productid);
 		for (Object[] record : rs) {
 			PContractProductSKU_NoLink sku = new PContractProductSKU_NoLink();
 			sku.setProductid_link((Long) record[0]);
@@ -40,13 +41,13 @@ public class PContractProductSKUService_NoLink extends AbstractService<PContract
 			if (null != record[4]) sku.setPquantity_granted(((Long) record[4]).intValue());
 			if (null != record[5]) sku.setPquantity_total(((Long) record[5]).intValue());
 			
-//			SKU theOriginSKU = sku_repo.getOne(sku.getSkuid_link());
-//			sku.setProduct_code(theOriginSKU.getProduct_code());
-//			sku.setProduct_name(theOriginSKU.getProduct_name());
-//			sku.setSku_code(theOriginSKU.getCode());
-//			sku.setMausanpham(theOriginSKU.getMauSanPham());
-//			sku.setCosanpham(theOriginSKU.getCoSanPham());
-//			sku.setUnit_name(theOriginSKU.getUnit_name());
+			SKU theOriginSKU = sku_repo.getOne(sku.getSkuid_link());
+			sku.setProduct_code(theOriginSKU.getProduct_code());
+			sku.setProduct_name(theOriginSKU.getProduct_name());
+			sku.setSku_code(theOriginSKU.getCode());
+			sku.setMausanpham(theOriginSKU.getMauSanPham());
+			sku.setCosanpham(theOriginSKU.getCoSanPham());
+			sku.setUnit_name(theOriginSKU.getUnit_name());
 			
 			result.add(sku);
 			

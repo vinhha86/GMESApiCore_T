@@ -24,6 +24,9 @@ public interface IPContractProductSKURepository_NoLink extends JpaRepository<PCo
 			+ "sum(pquantity_granted) as pquantity_granted, "
 			+ "sum(c.pquantity_total) as pquantity_total "
 			+ "from PContractProductSKU_NoLink c "
-			+ "where pcontractid_link = :pcontractid_link " + "group by c.productid_link, c.skuid_link")
-	public List<Object[]> getsumsku_bypcontract(@Param("pcontractid_link") final long pcontractid_link);
+			+ "where pcontractid_link = :pcontractid_link and c.productid_link in :ls_productid " + "group by c.productid_link, c.skuid_link")
+	public List<Object[]> getsumsku_bypcontract(
+			@Param("pcontractid_link") final long pcontractid_link,
+			@Param("ls_productid") List<Long> ls_productid
+			);
 }
