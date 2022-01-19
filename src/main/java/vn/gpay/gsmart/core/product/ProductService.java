@@ -514,4 +514,10 @@ public class ProductService extends AbstractService<Product> implements IProduct
 			List<Integer> list_producttypeid_link) {
 		return repo.getBy_Buyercode_Contract_PO(productSearchString, list_producttypeid_link);
 	}
+
+	@Override
+	public List<Product> getBy_Buyercode_Contract_PO_Pairing(String productSearchString,
+			List<Integer> list_producttypeid_link) {
+		return repo.getBy_Buyercode_Contract_PO_Pairing(productSearchString, list_producttypeid_link);
+	}
 }

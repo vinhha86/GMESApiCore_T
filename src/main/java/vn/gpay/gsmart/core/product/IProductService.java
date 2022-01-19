@@ -66,4 +66,6 @@ public interface IProductService extends Operations<Product> {
 	List<ProductType> getTypeByName(String name);
 	
 	List<Product> getBy_Buyercode_Contract_PO(String productSearchString, List<Integer> list_producttypeid_link);
+	
+	List<Product> getBy_Buyercode_Contract_PO_Pairing(String productSearchString, List<Integer> list_producttypeid_link);
 }

@@ -128,4 +128,22 @@ public interface IProductRepository extends JpaRepository<Product, Long>, JpaSpe
 			@Param("productSearchString") final String productSearchString,
 			@Param("list_producttypeid_link") final List<Integer> list_producttypeid_link
 			);
+	
+	@Query(value = "select distinct c from Product c " 
+			+ "left join PContractProduct d on c.id = d.productid_link "
+			+ "left join PContract e on e.id = d.pcontractid_link "
+			+ "left join ProductPairing g on g.productid_link = c.id "
+			+ "left join PContract_PO f on g.productpairid_link = f.productid_link "
+			+ "where ( lower(c.buyercode) like lower(concat('%',:productSearchString,'%')) "
+			+ "or lower(e.contractcode) like lower(concat('%',:productSearchString,'%')) "
+			+ "or lower(f.po_buyer) like lower(concat('%',:productSearchString,'%')) ) "
+			+ "and c.producttypeid_link in :list_producttypeid_link "
+			+ "and c.status = 1 "
+			+ "order by c.buyercode asc " 
+			
+			)
+	public List<Product> getBy_Buyercode_Contract_PO_Pairing(
+			@Param("productSearchString") final String productSearchString,
+			@Param("list_producttypeid_link") final List<Integer> list_producttypeid_link
+			);
 }

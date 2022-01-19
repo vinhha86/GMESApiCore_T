@@ -1428,7 +1428,22 @@ public class ProductAPI {
 			List<Product> result = new ArrayList<Product>();
 			if(productSearchString != null) {
 				productSearchString = productSearchString.trim();
+//				System.out.println(productSearchString);
 				result = productService.getBy_Buyercode_Contract_PO(productSearchString, list_producttypeid_link);
+				// sp bo -> lay sp don
+				List<Product> product_list_spdon = productService.getBy_Buyercode_Contract_PO_Pairing(productSearchString, list_producttypeid_link);
+				for(Product item : product_list_spdon) {
+					Boolean isContain = false;
+					for(Product product : result) {
+						if(item.getId().equals(product.getId())) {
+							isContain = true;
+							break;
+						}
+					}
+					if(!isContain) {
+						result.add(item);
+					}
+				}
 			}
 			
 			
