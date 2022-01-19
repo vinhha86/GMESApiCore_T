@@ -63,6 +63,7 @@ public class Jitin_StockOutD_Data implements Serializable {
 	private String data_spaces;
 	private Boolean isPklistNotInStore;
 	private String loaiThanhPham;
+	private Integer totalSLTon;
 	
 	private List<Jitin_StockOutPklist_Data>  stockout_packinglist  = new ArrayList<>();
 
@@ -504,6 +505,14 @@ public class Jitin_StockOutD_Data implements Serializable {
 
 	public void setLoaiThanhPham(String loaiThanhPham) {
 		this.loaiThanhPham = loaiThanhPham;
+	}
+
+	public Integer getTotalSLTon() {
+		return totalSLTon;
+	}
+
+	public void setTotalSLTon(Integer totalSLTon) {
+		this.totalSLTon = totalSLTon;
 	}
 	
 }
