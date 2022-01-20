@@ -378,13 +378,23 @@ public class ScheduleAPI {
 
 			int type = 0;
 			List<PContract_PO> list_po = porderSkuService.getListPO_ByGrant(entity.data.getPorder_grantid_link());
-			Date shipdate = list_po.get(0).getShipdate();
+			Date shipdate = null;
 			for (PContract_PO po : list_po) {
-				if (po.getShipdate().after(shipdate))
-					shipdate = po.getShipdate();
+				if(po.getShipdate() != null) {
+					if(shipdate == null) {
+						shipdate = po.getShipdate();
+					}
+					else {
+						if (po.getShipdate().after(shipdate))
+							shipdate = po.getShipdate();
+					}
+				}
 			}
-			if (end.after(shipdate))
-				type = 1;
+			if(shipdate != null) {
+				if (end.after(shipdate))
+					type = 1;
+			}
+			
 
 			int duration = commonService.getDuration(start, end, orgrootid_link);
 			int productivity = commonService.getProductivity(event.getTotalpackage(), duration);
@@ -452,8 +462,11 @@ public class ScheduleAPI {
 
 			POrder req = porderService.findOne(grant.getPorderid_link());
 			int type = 0;
-			if (entity.EndDate.after(req.getShipdate()))
-				type = 1;
+			if(req.getShipdate() != null) {
+				if (entity.EndDate.after(req.getShipdate()))
+					type = 1;
+			}
+			
 
 			grant.setStart_date_plan(entity.StartDate);
 			grant.setFinish_date_plan(entity.EndDate);
@@ -643,7 +656,11 @@ public class ScheduleAPI {
 
 			porder.setStatus(POrderStatus.PORDER_STATUS_GRANTED);
 			porderService.save(porder);
-			int type = endDate.after(porder.getShipdate()) ? 1 : 0;
+			int type = 0;
+			if(porder.getShipdate() != null) {
+				if(endDate.after(porder.getShipdate()))
+					type = 1;
+			}
 			// Tao POrder_grant
 			POrderGrant pg = new POrderGrant();
 			pg.setId(null);
@@ -2265,10 +2282,17 @@ public class ScheduleAPI {
 
 				// Lay ngay giao hang
 				List<PContract_PO> list_po = porderSkuService.getListPO_ByGrant(entity.pordergrant_id_link);
-				Date shipdate = list_po.get(0).getShipdate();
+				Date shipdate = null;
 				for (PContract_PO po : list_po) {
-					if (po.getShipdate().after(shipdate))
-						shipdate = po.getShipdate();
+					if(po.getShipdate() != null) {
+						if(shipdate == null)
+							shipdate = po.getShipdate();
+					}
+					else {
+						if (po.getShipdate().after(shipdate))
+							shipdate = po.getShipdate();
+					}
+					
 				}
 
 				int total = grant_old.getGrantamount();
@@ -2283,8 +2307,11 @@ public class ScheduleAPI {
 //				int productivity_old = commonService.getProductivity(totalorder_old, duration_old);
 
 				int type_old = 0, type_new = 0;
-				if (end_old.after(shipdate))
-					type_old = 1;
+				if(shipdate != null) {
+					if (end_old.after(shipdate))
+						type_old = 1;
+				}
+				
 
 				grant_old.setGrantamount(totalorder_old);
 				grant_old.setFinish_date_plan(end_old);
@@ -2322,9 +2349,12 @@ public class ScheduleAPI {
 				int duration_new = commonService.getDuration_byProductivity(total_new, producttivity);
 				Date end_new = commonService.Date_Add_with_holiday(start_new, duration_new - 1, orgrootid_link);
 				end_new = commonService.getEndOfDate(end_new);
-
-				if (end_new.after(shipdate))
-					type_new = 1;
+				
+				if(shipdate != null) {
+					if (end_new.after(shipdate))
+						type_new = 1;
+				}
+				
 
 				POrderGrant grant = new POrderGrant();
 				grant.setGranttoorgid_link(grant_old.getGranttoorgid_link());
