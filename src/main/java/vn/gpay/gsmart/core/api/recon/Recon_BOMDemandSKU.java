@@ -13,7 +13,7 @@ import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU_NoLink;
 
 public class Recon_BOMDemandSKU implements Runnable{
 	private Thread t;
-	private HashMap<Long, Recon_MatSKU_Data> hash_MatSKUBalance;
+	HashMap<Long, Recon_MatSKU_Data> hash_MatSKUBalance;
 	private PContractProductSKU_NoLink product_sku;
 
 	private CountDownLatch latch;
@@ -38,6 +38,7 @@ public class Recon_BOMDemandSKU implements Runnable{
 		this.ls_bom_poline_sku = ls_bom_poline_sku;
 		
 		this.latch = latch;
+
 	}
 	
 	@Override
@@ -100,6 +101,7 @@ public class Recon_BOMDemandSKU implements Runnable{
 //					.filter(sku -> sku.getMat_skuid_link().equals(mat_skubom.getMaterial_skuid_link())).collect(Collectors.toList());
 			
 			Recon_MatSKU_Data theSKUBalance = hash_MatSKUBalance.get(mat_skubom.getMaterial_skuid_link());
+			System.out.println("HASH: " + hash_MatSKUBalance.size());
 			
 			if (null != theSKUBalance) {
 				// Tinh tong dinh muc
@@ -113,8 +115,9 @@ public class Recon_BOMDemandSKU implements Runnable{
 				// Tinh trung binh dinh muc
 				Float f_skubomamount = ((null != theSKUBalance.getMat_sku_bom_amount()?theSKUBalance.getMat_sku_bom_amount():0) + (null != mat_skubom.getAmount()?mat_skubom.getAmount():0)) / 2;
 				theSKUBalance.setMat_sku_bom_amount(f_skubomamount);
-
+//				System.out.println("Update MatSKU: " + mat_skubom.getMaterial_skuid_link() + "-" + theSKUBalance.getMat_sku_demand() + "-" + f_skudemand + "-"+ f_skubomamount);
 				theSKUBalance.setMat_sku_demand(theSKUBalance.getMat_sku_demand() + f_skudemand);
+				
 				
 ////				// Thong tin chi tiet mau co
 ////				SKUBalance_Product_D_Data product_d = new SKUBalance_Product_D_Data();
@@ -138,8 +141,8 @@ public class Recon_BOMDemandSKU implements Runnable{
 					newSKUBalance.setMat_sku_name(mat_skubom.getMaterialCode());
 					newSKUBalance.setMat_sku_desc(mat_skubom.getDescription_product());
 					newSKUBalance.setMat_sku_unit_name(mat_skubom.getUnitName());
-	//				newSKUBalance.setMat_sku_size_name(skubom.getCoKho());
-	//				newSKUBalance.setMat_sku_color_name(skubom.getTenMauNPL());
+					newSKUBalance.setMat_sku_size_name(mat_skubom.getCoKho());
+					newSKUBalance.setMat_sku_color_name(mat_skubom.getTenMauNPL());
 					newSKUBalance.setMat_sku_product_typename(mat_skubom.getProduct_typeName());
 					newSKUBalance.setMat_sku_product_typeid_link(mat_skubom.getProduct_type());
 	
@@ -154,7 +157,7 @@ public class Recon_BOMDemandSKU implements Runnable{
 							f_skudemand = mat_skubom.getAmount() * p_amount;
 					}
 					newSKUBalance.setMat_sku_demand(f_skudemand);
-	
+//					System.out.println("New MatSKU: " + mat_skubom.getMaterial_skuid_link() + "-" + f_skudemand + "-"+ mat_skubom.getAmount());
 					hash_MatSKUBalance.put(mat_skubom.getMaterial_skuid_link(), newSKUBalance);
 				}
 			}

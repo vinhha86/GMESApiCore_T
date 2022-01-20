@@ -78,7 +78,7 @@ public class ReconAPI {
 	// Lay danh sach cac Ma NPL chi ap dung dac biet cho 1 so PO Line va product_sku nhat dinh
 	private static List<PContract_bom2_npl_poline_sku> ls_bom_poline_sku = new ArrayList<PContract_bom2_npl_poline_sku>();
 	
-	private static HashMap<Long, Recon_MatSKU_Data> hash_MatSKUBalance = new HashMap<Long, Recon_MatSKU_Data>();
+	protected static HashMap<Long, Recon_MatSKU_Data> hash_MatSKUBalance = new HashMap<Long, Recon_MatSKU_Data>();
 
 	@RequestMapping(value = "/cal_recon_bycontract", method = RequestMethod.POST)
 	public ResponseEntity<Recon_Response> cal_recon_bycontract_new(HttpServletRequest request,
@@ -140,21 +140,21 @@ public class ReconAPI {
 //				System.out.println("Start BOM:" + new Date());
 //				System.out.println("PO Line:" + ls_Product_SKU_Poline.size());
 	
-				CountDownLatch bomdemand_latch = new CountDownLatch(ls_Product_SKU.size());
+//				CountDownLatch bomdemand_latch = new CountDownLatch(ls_Product_SKU.size());
 				for (PContractProductSKU_NoLink product_sku : ls_Product_SKU) {
-					Recon_BOMDemandSKU theBOM_Demand = new Recon_BOMDemandSKU(
-							bom_contract, 
-							hash_MatSKUBalance, 
-							product_sku, 
-							ls_bom_poline,
-							ls_bom_poline_sku, 
-							bomdemand_latch, 
-							entity.recon_type
-							);
-					theBOM_Demand.start();
-//					cal_recon_bomdemand(product_sku, entity.materialid_link);
+//					Recon_BOMDemandSKU theBOM_Demand = new Recon_BOMDemandSKU(
+//							bom_contract, 
+//							hash_MatSKUBalance, 
+//							product_sku, 
+//							ls_bom_poline,
+//							ls_bom_poline_sku, 
+//							bomdemand_latch, 
+//							entity.recon_type
+//							);
+//					theBOM_Demand.start();
+					cal_recon_bomdemand(product_sku, entity.materialid_link);
 				}
-				bomdemand_latch.await();
+//				bomdemand_latch.await();
 				System.out.println("End BOM:" + new Date());
 				System.out.println(hash_MatSKUBalance.size());
 				
