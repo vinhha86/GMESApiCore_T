@@ -59,4 +59,10 @@ public class PContract_Price_Service extends AbstractService<PContract_Price> im
 		// TODO Auto-generated method stub
 		return repo.getTotalPrice(pcontractid_link, productid_link);
 	}
+	
+	@Override
+	public Float getAVGPrice(Long pcontractid_link, Long productid_link) {
+		// TODO Auto-generated method stub
+		return repo.getAVGPrice(pcontractid_link, productid_link);
+	}
 }

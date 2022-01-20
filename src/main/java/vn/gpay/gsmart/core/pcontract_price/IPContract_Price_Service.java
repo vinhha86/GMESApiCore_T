@@ -17,4 +17,6 @@ public interface IPContract_Price_Service extends Operations<PContract_Price> {
 			long sizesetid_link);
 
 	Float getTotalPrice(Long pcontractid_link, Long productid_link);
+
+	Float getAVGPrice(Long pcontractid_link, Long productid_link);
 }

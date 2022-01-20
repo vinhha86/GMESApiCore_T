@@ -567,7 +567,8 @@ public class PContractProductAPI {
 				binding.setProductinfo(pContractProduct.getProductinfo());
 				binding.setAmount(pcontract_POService.getTotalProductinPcontract(pcontractid_link,
 						pContractProduct.getProductid_link()));
-				binding.setPrice(priceService.getTotalPrice(pcontractid_link, pContractProduct.getProductid_link()));
+//				binding.setPrice(priceService.getTotalPrice(pcontractid_link, pContractProduct.getProductid_link()));
+				binding.setPrice(priceService.getAVGPrice(pcontractid_link, pContractProduct.getProductid_link()));
 				binding.setProductVendorCode(pContractProduct.getProductVendorCode());
 
 				String uploadRootPath = request.getServletContext().getRealPath("");
