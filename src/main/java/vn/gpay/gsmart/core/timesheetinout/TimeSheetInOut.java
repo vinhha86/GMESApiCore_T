@@ -7,10 +7,8 @@ public class TimeSheetInOut {
     private String time;
     private String fullname;
     private String day;
-    
-    
-    
-
+    private Long orgid_link;
+  
     public String getDevice_serial() {
         return device_serial;
     }
@@ -57,5 +55,13 @@ public class TimeSheetInOut {
 
 	public void setDay(String day) {
 		this.day = day;
+	}
+
+	public Long getOrgid_link() {
+		return orgid_link;
+	}
+
+	public void setOrgid_link(Long orgid_link) {
+		this.orgid_link = orgid_link;
 	}
 }
