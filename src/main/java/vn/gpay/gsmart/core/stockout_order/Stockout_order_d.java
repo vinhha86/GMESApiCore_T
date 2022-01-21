@@ -55,6 +55,8 @@ public class Stockout_order_d implements Serializable {
 
 	@Transient
 	private String data_spaces; //  danh sách khoang
+	@Transient
+	private Long totalSLTon; //  sl ton kho
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -332,6 +334,14 @@ public class Stockout_order_d implements Serializable {
 
 	public void setData_spaces(String data_spaces) {
 		this.data_spaces = data_spaces;
+	}
+
+	public Long getTotalSLTon() {
+		return totalSLTon;
+	}
+
+	public void setTotalSLTon(Long totalSLTon) {
+		this.totalSLTon = totalSLTon;
 	}
 	
 	

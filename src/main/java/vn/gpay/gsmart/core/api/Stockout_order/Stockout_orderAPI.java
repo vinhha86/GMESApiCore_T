@@ -445,6 +445,7 @@ public class Stockout_orderAPI {
 //			List<Stockout_order> result = stockout_order_Service.findBySearch(stockoutorderdate_from, stockoutorderdate_to);
 			List<Stockout_order> result = stockout_order_Service.findBySearch_type(stockoutorderdate_from, stockoutorderdate_to, stockouttypeid_link);
 			for (Stockout_order po : result) {
+				// sl xuat
 				List<ProductPairing> p = pairService.getproduct_pairing_detail_bycontract(po.getOrgrootid_link(),
 						po.getPcontractid_link(), po.getP_skuid_link());
 				int total = 1;
@@ -456,6 +457,26 @@ public class Stockout_orderAPI {
 				}
 				po.setTotalpair(total);
 				po.setPo_quantity_sp(po.getPo_quantity() * total);
+				
+				// sl ton kho
+				Long orgId = po.getOrgid_from_link(); // px
+				if(orgId != null) {
+					// ds kho thanh pham
+					List<Integer> listorgtype = new ArrayList<Integer>();
+					listorgtype.add(OrgType.ORG_TYPE_KHOTHANHPHAM);
+					List<Org> khoTp_list = orgService.findOrgByOrgType(listorgtype, orgId);
+					List<Stockout_order_d> stockout_order_d_list = po.getStockout_order_d();
+					for(Stockout_order_d stockout_order_d : stockout_order_d_list) {
+						Long p_skuid_link = stockout_order_d.getP_skuid_link();
+						Long totalSLTon = (long) 0;
+						for(Org khoTp : khoTp_list) {
+							Long SLTon = warehouseService.getSumBy_Sku_Stock(p_skuid_link, khoTp.getId());
+							totalSLTon += SLTon;
+						}
+						stockout_order_d.setTotalSLTon(totalSLTon);
+					}
+					
+				}
 			}
 			
 			response.data = result;
