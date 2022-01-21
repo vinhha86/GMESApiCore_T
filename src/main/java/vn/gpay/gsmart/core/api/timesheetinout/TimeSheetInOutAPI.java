@@ -8,7 +8,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +24,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import vn.gpay.gsmart.core.personel.IPersonnel_Service;
 import vn.gpay.gsmart.core.personel.Personel;
+import vn.gpay.gsmart.core.timesheetinout.TimeSheetDaily;
 import vn.gpay.gsmart.core.timesheetinout.TimeSheetInOut;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
@@ -106,6 +106,74 @@ public class TimeSheetInOutAPI {
 			System.out.println(e.getMessage());
 		}
 		return new ResponseEntity<TimeSheetInOut_load_response>(response, HttpStatus.OK);
+		
+	}
+	
+	@RequestMapping(value = "/get_daily", method = RequestMethod.POST)
+	public ResponseEntity<getDailyResponse> getDaily(@RequestBody getDailyRequest entity) {
+		getDailyResponse response = new getDailyResponse();
+		try {
+			int month = entity.month;
+			int year = entity.year;
+			long grantid_link = entity.grantid_link;
+			long orgid_link = entity.orgid_link;
+			
+			String urlPush = AtributeFixValues.url_timesheet+"/timesheet/getlist_daily";
+			URL url = new URL(urlPush);
+			
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+//            conn.setRequestProperty("authorization", token);
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setRequestMethod("POST");
+            
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode appParNode = objectMapper.createObjectNode();
+            
+            //truyen param theo
+            appParNode.put("month", month);
+            appParNode.put("year", year);
+            appParNode.put("orgid_link", orgid_link);
+            String jsonReq = objectMapper.writeValueAsString(appParNode);
+            
+            OutputStream os = conn.getOutputStream();
+            os.write(jsonReq.getBytes());
+            os.flush();
+                     
+            String result = "";
+			String line;
+			
+            BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            while ((line = rd.readLine()) != null) {
+            	result += line;
+            }
+            rd.close();
+            
+            conn.disconnect();
+            
+			List<TimeSheetDaily> lsttimesheetinout = objectMapper.readValue(result, new TypeReference<List<TimeSheetDaily>>() {});
+			for(TimeSheetDaily daily : lsttimesheetinout) {
+				Personel person = personService.getPersonelBycode(daily.getPersonnel_code());
+				if(person!=null) {
+					daily.setFullname(person.getFullname());
+					daily.setPersonnel_code(person.getCode());
+				}
+					
+			}
+			lsttimesheetinout.removeIf(c -> c.getFullname() == null);
+			response.data =lsttimesheetinout;
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			System.out.println(e.getMessage());
+		}
+		return new ResponseEntity<getDailyResponse>(response, HttpStatus.OK);
 		
 	}
 }
