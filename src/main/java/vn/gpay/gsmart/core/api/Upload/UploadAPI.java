@@ -130,6 +130,8 @@ public class UploadAPI {
 	@Autowired
 	ISizeSetAttributeService sizeset_att_Service;
 
+	
+	//chao gia
 	@RequestMapping(value = "/offers", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadTemplate(HttpServletRequest request,
 			@RequestParam("file") MultipartFile file, @RequestParam("pcontractid_link") long pcontractid_link) {
@@ -902,7 +904,6 @@ public class UploadAPI {
 									}
 									int total = 0;
 									if (list_line_gh.size() == 0) {
-										po_line.setId(null);
 										po_line.setCurrencyid_link((long) 1);
 										po_line.setDatecreated(current_time);
 										po_line.setIsauto_calculate(true);
@@ -1071,6 +1072,7 @@ public class UploadAPI {
 		return code;
 	}
 
+	//po chi tiet (FOB)
 	@RequestMapping(value = "/upload_po_fob", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadPO_FOB(HttpServletRequest request,
 			@RequestParam("file") MultipartFile file, @RequestParam("parentid_link") long parentid_link,

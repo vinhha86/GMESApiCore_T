@@ -1137,6 +1137,8 @@ public class PContract_POAPI {
 		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 	}
 
+	
+	//Chi tiet PO CMP
 	@RequestMapping(value = "/upload_po", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadPO(HttpServletRequest request, @RequestParam("file") MultipartFile file,
 			@RequestParam("parentid_link") long parentid_link,
@@ -1563,7 +1565,7 @@ public class PContract_POAPI {
 								s_sizename = commonService.getStringValue(rowheader.getCell(columnsize));
 								s_sizename = s_sizename.equals("0") ? "" : s_sizename;
 							}
-							System.out.println("amount_po: " + amount_po);
+//							System.out.println("amount_po: " + amount_po);
 							// Cap nhat lai so tong cua po
 							PContract_PO po = pcontract_POService.findOne(pcontractpoid_link);
 							po.setPo_quantity(amount_po);
