@@ -38,6 +38,9 @@ public class TimeSheetDaily {
 	private String day29;
 	private String day30;
 	private String day31;
+	private int stt;
+	
+	
 	public String getPersonnel_code() {
 		return personnel_code;
 	}
@@ -259,5 +262,11 @@ public class TimeSheetDaily {
 	}
 	public void setFullname(String fullname) {
 		this.fullname = fullname;
+	}
+	public int getSTT() {
+		return stt;
+	}
+	public void setSTT(int stt) {
+		this.stt = stt;
 	}
 }

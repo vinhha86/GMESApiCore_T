@@ -8,8 +8,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.collections4.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -154,15 +159,46 @@ public class TimeSheetInOutAPI {
             conn.disconnect();
             
 			List<TimeSheetDaily> lsttimesheetinout = objectMapper.readValue(result, new TypeReference<List<TimeSheetDaily>>() {});
+			List<TimeSheetDaily> list_remove = new ArrayList<TimeSheetDaily>();
+			
+			//Lay ds nhan vien theo orgid 
+			List<Personel> list_person = personService.getby_org(orgid_link, 1);
+			Map<Integer, Personel> map_person = new HashedMap<>();
+			for(Personel person : list_person) {
+				int i_person_code = Integer.parseInt(person.getCode());
+				map_person.put(i_person_code, person);
+			}
+						
 			for(TimeSheetDaily daily : lsttimesheetinout) {
-				Personel person = personService.getPersonelBycode(daily.getPersonnel_code());
-				if(person!=null) {
+				if(map_person.containsKey(Integer.parseInt(daily.getPersonnel_code()))) {
+					Personel person = map_person.get(Integer.parseInt(daily.getPersonnel_code()));
+					
 					daily.setFullname(person.getFullname());
 					daily.setPersonnel_code(person.getCode());
-				}
 					
+					if(grantid_link!= 0) {
+						if(!person.getOrgid_link().equals(grantid_link)) {
+							list_remove.add(daily);
+						}
+					}
+				}
+				else {
+					list_remove.add(daily);
+				}
+//				Personel person = personService.getPersonelBycode(daily.getPersonnel_code());
+//				if(person!=null) {
+//					daily.setFullname(person.getFullname());
+//					daily.setPersonnel_code(person.getCode());
+//				}
+//				if(grantid_link!= 0) {
+//					if(!person.getOrgid_link().equals(grantid_link)) {
+//						list_remove.add(daily);
+//					}
+//				}
 			}
 			lsttimesheetinout.removeIf(c -> c.getFullname() == null);
+			lsttimesheetinout.removeAll(list_remove);
+			
 			response.data =lsttimesheetinout;
 			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
