@@ -41,6 +41,17 @@ public class Jitin_Stockout_order_d_Data implements Serializable {
 	private String size_name;
 	private String unitname;
 	private List<Jitin_Stockout_order_pkl_Data>  stockout_order_pkl  = new ArrayList<Jitin_Stockout_order_pkl_Data>();
+	
+	// thanh pham
+	private String skucode_product;
+	private String sku_product_code;
+	private String skuname_product;
+	private String color_name_product;
+	private String size_name_product;
+	private String loaiThanhPham;
+	private Long totalSLTon;
+	
+	
 	public Long getId() {
 		return id;
 	}
@@ -232,6 +243,48 @@ public class Jitin_Stockout_order_d_Data implements Serializable {
 	}
 	public void setStockout_order_pkl(List<Jitin_Stockout_order_pkl_Data> stockout_order_pkl) {
 		this.stockout_order_pkl = stockout_order_pkl;
+	}
+	public String getSkucode_product() {
+		return skucode_product;
+	}
+	public void setSkucode_product(String skucode_product) {
+		this.skucode_product = skucode_product;
+	}
+	public String getSku_product_code() {
+		return sku_product_code;
+	}
+	public void setSku_product_code(String sku_product_code) {
+		this.sku_product_code = sku_product_code;
+	}
+	public String getSkuname_product() {
+		return skuname_product;
+	}
+	public void setSkuname_product(String skuname_product) {
+		this.skuname_product = skuname_product;
+	}
+	public String getColor_name_product() {
+		return color_name_product;
+	}
+	public void setColor_name_product(String color_name_product) {
+		this.color_name_product = color_name_product;
+	}
+	public String getSize_name_product() {
+		return size_name_product;
+	}
+	public void setSize_name_product(String size_name_product) {
+		this.size_name_product = size_name_product;
+	}
+	public String getLoaiThanhPham() {
+		return loaiThanhPham;
+	}
+	public void setLoaiThanhPham(String loaiThanhPham) {
+		this.loaiThanhPham = loaiThanhPham;
+	}
+	public Long getTotalSLTon() {
+		return totalSLTon;
+	}
+	public void setTotalSLTon(Long totalSLTon) {
+		this.totalSLTon = totalSLTon;
 	}
 
 	

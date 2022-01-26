@@ -57,6 +57,19 @@ public class Stockout_order_d implements Serializable {
 	private String data_spaces; //  danh sách khoang
 	@Transient
 	private Long totalSLTon; //  sl ton kho
+	// thong tin thanh pham
+	@Transient
+	private String skucode_product;
+	@Transient
+	private String sku_product_code;
+	@Transient
+	private String skuname_product;
+	@Transient
+	private String color_name_product;
+	@Transient
+	private String size_name_product;
+	@Transient
+	private String loaiThanhPham;
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne
@@ -342,6 +355,54 @@ public class Stockout_order_d implements Serializable {
 
 	public void setTotalSLTon(Long totalSLTon) {
 		this.totalSLTon = totalSLTon;
+	}
+
+	public String getSkucode_product() {
+		return skucode_product;
+	}
+
+	public void setSkucode_product(String skucode_product) {
+		this.skucode_product = skucode_product;
+	}
+
+	public String getSku_product_code() {
+		return sku_product_code;
+	}
+
+	public void setSku_product_code(String sku_product_code) {
+		this.sku_product_code = sku_product_code;
+	}
+
+	public String getSkuname_product() {
+		return skuname_product;
+	}
+
+	public void setSkuname_product(String skuname_product) {
+		this.skuname_product = skuname_product;
+	}
+
+	public String getColor_name_product() {
+		return color_name_product;
+	}
+
+	public void setColor_name_product(String color_name_product) {
+		this.color_name_product = color_name_product;
+	}
+
+	public String getSize_name_product() {
+		return size_name_product;
+	}
+
+	public void setSize_name_product(String size_name_product) {
+		this.size_name_product = size_name_product;
+	}
+
+	public String getLoaiThanhPham() {
+		return loaiThanhPham;
+	}
+
+	public void setLoaiThanhPham(String loaiThanhPham) {
+		this.loaiThanhPham = loaiThanhPham;
 	}
 	
 	
