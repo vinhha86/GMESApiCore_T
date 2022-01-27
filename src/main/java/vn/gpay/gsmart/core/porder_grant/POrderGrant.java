@@ -173,8 +173,9 @@ public class POrderGrant implements Serializable {
 	
 	@Transient
 	public Long getXuongSX_ID() {
-		if(org != null)
+		if(org != null) {
 			return org.getParentid_link();
+		}
 		return null;
 	}
 

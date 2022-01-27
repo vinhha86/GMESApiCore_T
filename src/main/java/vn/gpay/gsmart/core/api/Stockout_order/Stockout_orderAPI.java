@@ -491,6 +491,67 @@ public class Stockout_orderAPI {
 		return new ResponseEntity<Stockout_order_response>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/getStockoutorder_by_types", method = RequestMethod.POST)
+	public ResponseEntity<Stockout_order_response> getStockoutorder_by_types(HttpServletRequest request,
+			@RequestBody Stockout_order_getBySearch_request entity) {
+		Stockout_order_response response = new Stockout_order_response();
+		try {
+			Date stockoutorderdate_from = entity.stockoutorderdate_from;
+			Date stockoutorderdate_to = entity.stockoutorderdate_to;
+			Integer stockouttypeid_link_from = entity.stockouttypeid_link_from;
+			Integer stockouttypeid_link_to = entity.stockouttypeid_link_to;
+			if (entity.page == 0) entity.page = 1;
+			if (entity.limit == 0) entity.limit = 100;
+			
+//			List<Stockout_order> result = stockout_order_Service.findBySearch(stockoutorderdate_from, stockoutorderdate_to);
+			List<Stockout_order> result = stockout_order_Service.findBySearch_types(stockoutorderdate_from, stockoutorderdate_to, stockouttypeid_link_from, stockouttypeid_link_to);
+			for (Stockout_order po : result) {
+				// sl xuat
+				List<ProductPairing> p = pairService.getproduct_pairing_detail_bycontract(po.getOrgrootid_link(),
+						po.getPcontractid_link(), po.getP_skuid_link());
+				int total = 1;
+				if (p.size() > 0) {
+					total = 0;
+					for (ProductPairing pair : p) {
+						total += pair.getAmount();
+					}
+				}
+				po.setTotalpair(total);
+				po.setPo_quantity_sp(po.getPo_quantity() * total);
+				
+				// sl ton kho
+				Long orgId = po.getOrgid_from_link(); // px
+				if(orgId != null) {
+					// ds kho thanh pham
+					List<Integer> listorgtype = new ArrayList<Integer>();
+					listorgtype.add(OrgType.ORG_TYPE_KHOTHANHPHAM);
+					List<Org> khoTp_list = orgService.findOrgByOrgType(listorgtype, orgId);
+					List<Stockout_order_d> stockout_order_d_list = po.getStockout_order_d();
+					for(Stockout_order_d stockout_order_d : stockout_order_d_list) {
+						Long p_skuid_link = stockout_order_d.getP_skuid_link();
+						Long totalSLTon = (long) 0;
+						for(Org khoTp : khoTp_list) {
+							Long SLTon = warehouseService.getSumBy_Sku_Stock(p_skuid_link, khoTp.getId());
+							totalSLTon += SLTon;
+						}
+						stockout_order_d.setTotalSLTon(totalSLTon);
+					}
+					
+				}
+			}
+			
+			response.data = result;
+			response.totalCount = result.size();
+			
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<Stockout_order_response>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/create_YeuCauXuat", method = RequestMethod.POST)
 	@Transactional(rollbackFor = RuntimeException.class)
 	public ResponseEntity<create_order_response> create_YeuCauXuat(HttpServletRequest request,
@@ -636,6 +697,7 @@ public class Stockout_orderAPI {
 		ResponseBase response = new ResponseBase();
 		try {
 			GpayUser user = (GpayUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			// ds po
 			List<Long> ls_po = new ArrayList<Long>();
 			if (null != entity.list_po && entity.list_po.length() > 0) {
 				String[] s_poid = entity.list_po.split(";");
@@ -646,6 +708,7 @@ public class Stockout_orderAPI {
 				}
 			}
 			
+			//
 			if(ls_po.size()>0) {
 				for (Long po_id: ls_po) {
 					//Lay thong tin PO de tao Stockout Req tuong ung
@@ -676,7 +739,7 @@ public class Stockout_orderAPI {
 								}
 								
 								//Neu la px chinh --> Tao phieu xuat toi Vendor tu PO chi tiet
-								if (thePorder_Grant.getXuongSX_ID().equals(org_incharge)) {
+								if (null!=thePorder_Grant.getXuongSX_ID() && thePorder_Grant.getXuongSX_ID().equals(org_incharge)) {
 									if (isNew) {
 										String stockout_order_code = commonService.getStockout_order_code();
 										
@@ -862,7 +925,7 @@ public class Stockout_orderAPI {
 					}
 					
 					if (isNew) {
-						if (thePorder_Grant.getXuongSX_ID().equals(org_incharge))
+						if (null!=thePorder_Grant.getXuongSX_ID() && thePorder_Grant.getXuongSX_ID().equals(org_incharge))
 							stockout_order.setExtrainfo("Phân xưởng chính");
 						else
 							stockout_order.setExtrainfo("Phân xưởng phụ");

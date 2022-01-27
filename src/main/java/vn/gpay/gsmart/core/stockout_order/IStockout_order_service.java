@@ -11,4 +11,5 @@ public interface IStockout_order_service extends Operations<Stockout_order>{
 
 	List<Stockout_order> findBySearch(Date stockoutorderdate_from, Date stockoutorderdate_to);
 	List<Stockout_order> findBySearch_type(Date stockoutorderdate_from, Date stockoutorderdate_to, Integer stockouttypeid_link);
+	List<Stockout_order> findBySearch_types(Date stockoutorderdate_from, Date stockoutorderdate_to, Integer stockouttypeid_link_from, Integer stockouttypeid_link_to);
 }

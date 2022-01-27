@@ -10,4 +10,6 @@ public class Stockout_order_getBySearch_request extends RequestBase{
 	public Integer stockouttypeid_link;
 	public int page;
 	public int limit;
+	public Integer stockouttypeid_link_from;
+	public Integer stockouttypeid_link_to;
 }

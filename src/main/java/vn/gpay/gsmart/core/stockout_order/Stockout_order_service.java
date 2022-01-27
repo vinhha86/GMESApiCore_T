@@ -58,6 +58,22 @@ public class Stockout_order_service extends AbstractService<Stockout_order> impl
 	    return repo.findAll(specification,sort);
 	}
 	
+	@Override
+	public List<Stockout_order> findBySearch_types(Date stockoutorderdate_from, Date stockoutorderdate_to, Integer stockouttypeid_link_from, Integer stockouttypeid_link_to) {
+		Specification<Stockout_order> specification = Specifications.<Stockout_order>and()
+	            .ge(this.check1(stockoutorderdate_from,stockoutorderdate_to),"timecreate",GPAYDateFormat.atStartOfDay(stockoutorderdate_from))
+                .le(this.check2(stockoutorderdate_from,stockoutorderdate_to),"timecreate",GPAYDateFormat.atEndOfDay(stockoutorderdate_to))
+                .between(this.check3(stockoutorderdate_from,stockoutorderdate_to),"timecreate", GPAYDateFormat.atStartOfDay(stockoutorderdate_from), GPAYDateFormat.atEndOfDay(stockoutorderdate_to))
+//                .eq("stockouttypeid_link", stockouttypeid_link)
+                .ge(Objects.nonNull(stockouttypeid_link_from), "stockouttypeid_link", stockouttypeid_link_from)
+                .le(Objects.nonNull(stockouttypeid_link_to), "stockouttypeid_link", stockouttypeid_link_to)
+                .build();
+		Sort sort = Sorts.builder()
+		        .desc("timecreate")
+		        .build();
+	    return repo.findAll(specification,sort);
+	}
+	
 	private boolean check1(Date stockoutorderdate_from,Date stockoutorderdate_to) {
 		if(stockoutorderdate_from!=null && stockoutorderdate_to==null) return true;
 		return false;
