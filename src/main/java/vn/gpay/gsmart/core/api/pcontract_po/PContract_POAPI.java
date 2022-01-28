@@ -2226,7 +2226,7 @@ public class PContract_POAPI {
 			//Tinh so ton kho thanh pham
 			if (entity.isshow_available !=0) {
 				for(PContractProductSKU sku: list_sku) {
-					sku.setPquantity_onhand_end(warehouseService.getSumBy_Sku(sku.getId()));
+					sku.setPquantity_onhand_end(warehouseService.getSumBy_Sku(sku.getSkuid_link()));
 //					System.out.println(sku.getId());
 				}
 			}
