@@ -114,6 +114,7 @@ public class ReconAPI {
 //				ls_Product_SKU = ls_Product_SKU_Contract;
 //			}
 			if (ls_Product_SKU.size() > 0) {
+				System.out.println("Pcontract: " + entity.pcontractid_link);
 				//2. Tinh so luong sku da xuat kho thanh pham tra cho khach
 				List<Jitin_Stockin_D_Data> ls_PStockin = get_Pstockin_bycontract(request.getHeader("Authorization"),entity.pcontractid_link, null);
 				List<Jitin_StockOutD_Data> ls_PStockout = get_Pstockout_bycontract(request.getHeader("Authorization"),entity.pcontractid_link, null);
@@ -155,8 +156,8 @@ public class ReconAPI {
 					cal_recon_bomdemand(product_sku, entity.materialid_link);
 				}
 //				bomdemand_latch.await();
-				System.out.println("End BOM:" + new Date());
-				System.out.println(hash_MatSKUBalance.size());
+//				System.out.println("End BOM:" + new Date());
+//				System.out.println(hash_MatSKUBalance.size());
 				
 				// 3. Tinh toan nguyen phu lieu thuc nhap, thuc xuat theo phieu xuat kho cua cac NPL trong danh sach
 				// Duyệt qua từng màu, cỡ của sản phẩm (SKU) để tính nhu cầu NPL cho màu, cỡ đó

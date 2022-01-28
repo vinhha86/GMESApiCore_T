@@ -21,10 +21,10 @@ public class PContract_PO_NoLink_Service extends AbstractService<PContract_PO_No
 	}
 
 	@Override
-	public List<PContract_PO_NoLink> getPO_HavetoShip(Long orgrootid_link, Date shipdate_from, Date shipdate_to) {
+	public List<PContract_PO_NoLink> getPO_HavetoShip(Long orgrootid_link, Date shipdate_from, Date shipdate_to, Long orgbuyerid_link) {
 		// TODO Auto-generated method stub
 //		System.out.println(shipdate_from);
 //		System.out.println(shipdate_to);
-		return repo.getPO_HavetoShip(orgrootid_link, shipdate_from, shipdate_to);
+		return repo.getPO_HavetoShip(orgrootid_link, shipdate_from, shipdate_to, orgbuyerid_link);
 	}
 }

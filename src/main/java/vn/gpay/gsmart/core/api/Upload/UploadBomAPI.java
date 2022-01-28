@@ -61,36 +61,21 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 @RestController
 @RequestMapping("/api/v1/uploadbom")
 public class UploadBomAPI {
-	@Autowired
-	Common commonService;
-	@Autowired
-	IAttributeService attrService;
-	@Autowired
-	IProductService productService;
-	@Autowired
-	IProductAttributeService pavService;
-	@Autowired
-	ISKU_Service skuService;
-	@Autowired
-	ISKU_AttributeValue_Service skuattService;
-	@Autowired
-	IPContractProductBom2Service bomproductService;
-	@Autowired
-	IPContractBOM2SKUService bomskuService;
-	@Autowired
-	IAttributeValueService attributevalueService;
-	@Autowired
-	IPContractProductSKUService pcontractskuService;
-	@Autowired
-	IPContract_POService poService;
-	@Autowired
-	IPContract_bom2_npl_poline_Service po_npl_Service;
-	@Autowired
-	IPContractProductService ppService;
-	@Autowired
-	IPContract_bom2_sku_log_Service bomlogService;
-	@Autowired
-	ISizeSetService sizesetService;
+	@Autowired Common commonService;
+	@Autowired IAttributeService attrService;
+	@Autowired IProductService productService;
+	@Autowired IProductAttributeService pavService;
+	@Autowired ISKU_Service skuService;
+	@Autowired ISKU_AttributeValue_Service skuattService;
+	@Autowired IPContractProductBom2Service bomproductService;
+	@Autowired IPContractBOM2SKUService bomskuService;
+	@Autowired IAttributeValueService attributevalueService;
+	@Autowired IPContractProductSKUService pcontractskuService;
+	@Autowired IPContract_POService poService;
+	@Autowired IPContract_bom2_npl_poline_Service po_npl_Service;
+	@Autowired IPContractProductService ppService;
+	@Autowired IPContract_bom2_sku_log_Service bomlogService;
+	@Autowired ISizeSetService sizesetService;
 
 	@RequestMapping(value = "/bom_candoi", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> BomCanDoi(HttpServletRequest request, @RequestParam("file") MultipartFile file,
@@ -129,7 +114,7 @@ public class UploadBomAPI {
 				XSSFWorkbook workbook = new XSSFWorkbook(serverFile);
 				XSSFSheet sheet = workbook.getSheetAt(0);
 
-				// kiem tra xem co upload nham loai file hay khong
+				// kiem tra xem co upload nham loai file hay khong? File BOM co cell(0,0) = Size
 				Row row0 = sheet.getRow(0);
 				String file_type = commonService.getStringValue(row0.getCell(ColumnTempBom.STT));
 				if (!file_type.equals("Size")) {
@@ -146,17 +131,29 @@ public class UploadBomAPI {
 					String ColorName = "", ColorCode = "";
 					String list_po_no = "";
 					try {
+/*
+ * Doc bat dau tu dong thu 3 (dong 1 la comment, dong 2 la header)
+ * Doc tung dong cot STT cho den khi gap gia tri ""
+ * Doc het cac row, kiem tra truoc, neu khong co loi moi update DB
+ */
 						String STT = "";
 						STT = commonService.getStringValue(row.getCell(ColumnTempBom.STT));
 						STT = STT.equals("0") ? "" : STT;
 						// kiem tra ten mau xem co ton tai trong chi tiet po hay chua roi moi xu ly
 						while (!STT.equals("")) {
+							//Ten mau cua san pham
 							colNum = ColumnTempBom.TenMauSP;
 							ColorName = commonService.getStringValue(row.getCell(ColumnTempBom.TenMauSP));
 
+							//Ma mau cua san pham
 							colNum = ColumnTempBom.MaMauSP;
 							ColorCode = commonService.getStringValue(row.getCell(ColumnTempBom.MaMauSP));
 
+/*
+ * Neu ten mau san pham = All/ALL --> dinh muc ap dung cho tat ca cac loai mau cua san pham
+ * Ma mau san pham can phai duoc khai bao trong PO Chi tiet thi moi dc upload vao Dinh muc can doi
+ * list_colorid_link chua danh sach ID cua cac ma mau san pham duoc su dung cho dinh muc dang tinh toan					
+ */
 							if (!ColorName.toLowerCase().equals("All".toLowerCase())) {
 								List<Attributevalue> listAttributevalue = attributevalueService
 										.getByValue(ColorName + "(" + ColorCode + ")", AtributeFixValues.ATTR_COLOR);
@@ -176,6 +173,7 @@ public class UploadBomAPI {
 									break;
 								}
 							} else {
+								//Lay danh sach tat ca cac loai mau cua San pham
 								list_colorid_link = pcontractskuService.getlistvalue_by_product(pcontractid_link,
 										productid_link, AtributeFixValues.ATTR_COLOR);
 							}
@@ -184,7 +182,10 @@ public class UploadBomAPI {
 							colNum = ColumnTempBom.POLine;
 							list_po_no = commonService.getStringValue(row.getCell(ColumnTempBom.POLine));
 							list_po_no = list_po_no.toLowerCase();
-							// List_str_po mà trống là dùng cho tất cả các line
+/*
+ * list_po_no mà trống là dùng cho tất cả các line
+ * list_po_no co gia tri (phan cach bang dau ",") --> Kiem tra xem co dung trong danh sach PO Line chi tiet ko
+ */
 							if (!list_po_no.equals("")) {
 								String[] lst_po = list_po_no.split(",");
 								for (String po_no : lst_po) {
@@ -203,8 +204,11 @@ public class UploadBomAPI {
 									}
 								}
 							}
-
-							// Kiem tra ma san pham xem có trong đơn hàng hay không
+//End kiem tra danh sach PO Line
+							
+/*
+ * Kiem tra ma san pham xem có trong đơn hàng hay không
+ */
 							colNum = ColumnTempBom.MaSanPham;
 							String arr_masanpham = commonService.getStringValue(row.getCell(ColumnTempBom.MaSanPham));
 							if (!arr_masanpham.equals("")) {
@@ -227,15 +231,19 @@ public class UploadBomAPI {
 										break;
 									}
 								}
-							}
-
-							// Kiem tra dinh dang so cua cot tieu hao
+						}
+//End Kiem tra ma san pham	
+							
+//Kiem tra dinh dang so cua cot tieu hao, phai la so
 							if (row.getCell(ColumnTempBom.HaoHut).getCellType() != CellType.NUMERIC) {
 								mes_err = "Cột " + ColumnTempBom.HaoHut + " dòng " + (rowNum + 1)
 										+ "Không đúng định dạng số";
 							}
 
-							// kiem tra dinh dang so cac gia tri dinh muc
+/*
+ * Kiem tra dinh dang so cac gia tri dinh muc cho tung size san pham --> Neu co loi --> Thoat va thong bao
+ * Chay cho den khi gia tri header cua cot = "" --> Dung
+ */
 							int columnsize = ColumnTempBom.HaoHut + 1;
 							String s_sizename = commonService.getStringValue(rowheader.getCell(columnsize));
 							s_sizename = s_sizename.equals("0") ? "" : s_sizename;
@@ -268,8 +276,11 @@ public class UploadBomAPI {
 							STT = commonService.getStringValue(row.getCell(ColumnTemplate.STT));
 							STT = STT.equals("0") ? "" : STT;
 						}
+//End 1 Row
 
-						// Nếu không có lỗi thì mới xử lý vào trong DB
+/*
+ * Nếu không có lỗi thì mới xử lý vào trong DB
+ */
 						if (mes_err == "") {
 							rowNum = 2;
 							colNum = 1;
@@ -277,7 +288,7 @@ public class UploadBomAPI {
 
 							STT = commonService.getStringValue(row.getCell(ColumnTempBom.STT));
 							STT = STT.equals("0") ? "" : STT;
-
+//Doc lai tu Row du lieu dau tien (row thu 3 trong file upload
 							while (!STT.equals("")) {
 								list_colorid_link = new ArrayList<Long>();
 								colNum = ColumnTempBom.Type;
@@ -318,7 +329,7 @@ public class UploadBomAPI {
 								colNum = ColumnTempBom.MaSanPham;
 								String MaSanPham = commonService.getStringValue(row.getCell(ColumnTempBom.MaSanPham));
 
-								// kiem tra maunpl co trong db chua thi them vao
+//Kiem tra maunpl co trong db chua thi them vao
 								Long npl_colorid_link = AtributeFixValues.value_color_all;
 
 								String code_color_npl = TenMauNPL + "(" + MaMauNPL + ")";
@@ -343,8 +354,9 @@ public class UploadBomAPI {
 										npl_colorid_link = av_new.getId();
 									}
 								}
+//End them ma mau NPL
 
-								// Kiem tra co kho co trong db chua thi them vao bang attribute_value
+//Kiem tra co kho co trong db chua thi them vao bang attribute_value
 								long sizewidthid_link = AtributeFixValues.value_sizewidth_all;
 								if (!str_CoKho.trim().equals("")) {
 									List<Attributevalue> list_av = attributevalueService.getByValue(str_CoKho.trim(),
@@ -367,7 +379,9 @@ public class UploadBomAPI {
 										sizewidthid_link = av_new.getId();
 									}
 								}
-
+//End them co kho NPL
+								
+//Lap danh sach mau san pham tac dong boi dinh muc								
 								if (!ColorName.toLowerCase().equals("All".toLowerCase())) {
 									String code_color = ColorName + "(" + ColorCode + ")";
 									List<Attributevalue> listAttributevalue = attributevalueService
@@ -377,9 +391,13 @@ public class UploadBomAPI {
 									list_colorid_link = pcontractskuService.getlistvalue_by_product(pcontractid_link,
 											productid_link, AtributeFixValues.ATTR_COLOR);
 								}
-
-								// kiem tra npl co chua thi sinh moi va them vao san pham
-								// Chay tung mau san pham de sinh nguyen lieu va day vao trong db
+//End lap danh sach mau san pham
+								
+/*
+ * Kiem tra npl co chua thi sinh moi va them vao san pham
+ * Chay tung mau san pham de sinh nguyen lieu va day vao trong db
+ * Cac bang lien quan:
+ */
 								for (Long colorid_link : list_colorid_link) {
 									Long npl_id = null;
 //									String color_code_npl = attributevalueService.findOne(colorid_link).getValue();
@@ -390,7 +408,11 @@ public class UploadBomAPI {
 									String ma_npl_code = MaMauNPL.equals("") ? ma_npl : ma_npl + "(" + MaMauNPL + ")";
 									List<Product> list_npl = productService.getby_code_type_description_name(
 											orgrootid_link, ma_npl_code, type_npl, description, name_npl);
-
+/*
+ * Start Them moi NPL vao bang Product
+ * gia tri Producttype se dua vao du lieu o cot Type (cot thu 2) trong file Excel
+ * Cac bang lien quan NPL: product, ProductAttributeValue, sku, SKU_Attribute_Value
+ */
 									if (list_npl.size() == 0) {
 										Product new_npl = new Product();
 										new_npl.setBuyercode(ma_npl_code);
@@ -540,8 +562,9 @@ public class UploadBomAPI {
 
 											skuattService.save(savCo);
 										}
-
+//End them moi NPL
 									} else {
+//Start NPL da co trong DB
 										npl_id = list_npl.get(0).getId();
 										Product npl = list_npl.get(0);
 
@@ -613,25 +636,29 @@ public class UploadBomAPI {
 											skuattService.save(savCo);
 										}
 									}
-
+//End khai bao thong tin NPL + SKU cua NPL theo mau va Co kho vao DB
+									
 									// them npl vao trong bang pcontract_product_bom2
 									// Kiem tra npl dung cho 1 hay nhieu san pham roi moi them vao cac san pham
-									// neu khong dien ma san pham thi mac dinh lay theo san pham dang chon tren giao
-									// dien
+									// neu khong dien ma san pham thi mac dinh lay theo san pham dang chon tren giao dien
 									List<Long> list_productid_link = new ArrayList<Long>();
 									if (!MaSanPham.equals("")) {
 										String[] arr_masp = MaSanPham.split(",");
 										for (String masp : arr_masp) {
 											List<Product> lst_product = productService.getByBuyerCodeAndTypeNotLike(
-													masp,
-													vn.gpay.gsmart.core.utils.ProductType.SKU_TYPE_COMPLETEPRODUCT);
+													masp,vn.gpay.gsmart.core.utils.ProductType.SKU_TYPE_COMPLETEPRODUCT);
 											list_productid_link.add(lst_product.get(0).getId());
 										}
 									} else {
 										list_productid_link.add(productid_link);
 									}
-
+/*
+ * Duyet qua tung SP trong danh sach --> Them NPL vao bang dinh muc can doi PContractProductBom2
+ * Cac bang lien quan: PContractProductBom2; PContract_bom2_npl_poline; PContractBOM2SKU; PContract_bom2_sku_log
+ */
 									for (Long productid : list_productid_link) {
+										
+//Start Update bang PContractProductBom2									
 										productid_link = productid;
 										List<PContractProductBom2> list_bom = bomproductService
 												.getby_pcontract_product_material(productid_link, pcontractid_link,
@@ -654,8 +681,9 @@ public class UploadBomAPI {
 											bom.setLost_ratio((float) lost_ratio);
 											bomproductService.save(bom);
 										}
-
-										// kiem tra va them vao bang pcontractpo_npl
+//End Update bang PContractProductBom2
+									
+//Start kiem tra va them vao bang PContract_bom2_npl_poline
 										colNum = ColumnTempBom.POLine;
 //										String list_po_no = commonService.getStringValue(row.getCell(ColumnTempBom.POLine));
 										if (!list_po_no.equals("")) {
@@ -693,8 +721,9 @@ public class UploadBomAPI {
 												}
 											}
 										}
-
-										// them vao trong bang pcontract-bom2_sku
+//End Update bang PContract_bom2_npl_poline
+										
+//Start update bang pcontract-bom2_sku
 										int columnsize = ColumnTempBom.HaoHut + 1;
 										String s_sizename = commonService.getStringValue(rowheader.getCell(columnsize));
 										s_sizename = s_sizename.equals("0") ? "" : s_sizename;
@@ -709,7 +738,7 @@ public class UploadBomAPI {
 												amount = 0;
 											}
 											if (amount != 0) {
-												// kiem tra co co trong db chua chua co thi sinh moi
+//Start kiem tra Size co trong db chua? --> sinh moi
 												Long sizeid_link = null;
 												String sizename = commonService
 														.getStringValue(rowheader.getCell(columnsize));
@@ -733,7 +762,9 @@ public class UploadBomAPI {
 												} else {
 													sizeid_link = list_size.get(0).getId();
 												}
-
+//End Kiem tra Size
+												
+//Start kiem tra xem Product SKU (theo Mau, SIze) da co chua? --> Them moi
 												Float amount_old = (float) -1;
 												long product_skuid_link = skuattService
 														.getsku_byproduct_and_valuemau_valueco(productid_link,
@@ -776,7 +807,7 @@ public class UploadBomAPI {
 
 													skuattService.save(savCo);
 												}
-
+//End kiem tra Product SKU
 												List<PContractBOM2SKU> list_bom_sku = bomskuService
 														.getall_material_in_productBOMSKU(pcontractid_link,
 																productid_link, sizeid_link, colorid_link,
@@ -837,7 +868,9 @@ public class UploadBomAPI {
 											s_sizename = commonService.getStringValue(rowheader.getCell(columnsize));
 											s_sizename = s_sizename.equals("0") ? "" : s_sizename;
 										}
+//En update bang PContractBOM2SKU
 									}
+//End Them NPL vao bang dinh muc
 								}
 
 								// Chuyen sang row tiep theo neu con du lieu thi xu ly tiep khong thi dung lai

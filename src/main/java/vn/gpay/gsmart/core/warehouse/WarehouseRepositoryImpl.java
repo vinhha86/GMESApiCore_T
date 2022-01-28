@@ -160,4 +160,8 @@ public class WarehouseRepositoryImpl extends StringAbstractService<Warehouse> im
 	public Long getSumBy_Sku_Stock(Long skuid_link, Long stockid_link) {
 		return repositoty.getSumBy_Sku_Stock(skuid_link, stockid_link);
 	}
+	@Override
+	public Integer getSumBy_Sku(Long skuid_link) {
+		return repositoty.getSumBy_Sku(skuid_link);
+	}
 }

@@ -97,10 +97,12 @@ import vn.gpay.gsmart.core.utils.POrderReqStatus;
 import vn.gpay.gsmart.core.utils.POrderStatus;
 import vn.gpay.gsmart.core.utils.ProductType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
+import vn.gpay.gsmart.core.warehouse.IWarehouseService;
 
 @RestController
 @RequestMapping("/api/v1/pcontract_po")
 public class PContract_POAPI {
+	@Autowired IWarehouseService warehouseService;
 	@Autowired
 	IAttributeService attrService;
 	@Autowired
@@ -1137,8 +1139,6 @@ public class PContract_POAPI {
 		return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
 	}
 
-	
-	//Chi tiet PO CMP
 	@RequestMapping(value = "/upload_po", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadPO(HttpServletRequest request, @RequestParam("file") MultipartFile file,
 			@RequestParam("parentid_link") long parentid_link,
@@ -1565,7 +1565,7 @@ public class PContract_POAPI {
 								s_sizename = commonService.getStringValue(rowheader.getCell(columnsize));
 								s_sizename = s_sizename.equals("0") ? "" : s_sizename;
 							}
-//							System.out.println("amount_po: " + amount_po);
+							System.out.println("amount_po: " + amount_po);
 							// Cap nhat lai so tong cua po
 							PContract_PO po = pcontract_POService.findOne(pcontractpoid_link);
 							po.setPo_quantity(amount_po);
@@ -2082,6 +2082,9 @@ public class PContract_POAPI {
 				}
 				po.setTotalpair(total);
 				po.setPo_quantity_sp(po.getPo_quantity() * total);
+				
+				//Lay danh sach NPL FOB (Nha may tu cung cap bao gom ca In/Theu/Giat)
+				
 			}
 			response.data = pcontract;
 
@@ -2220,6 +2223,13 @@ public class PContract_POAPI {
 				list_sku.addAll(ppskuService.getbypo_and_product(po_line.getId(), productid_link));
 			}
 
+			//Tinh so ton kho thanh pham
+			if (entity.isshow_available !=0) {
+				for(PContractProductSKU sku: list_sku) {
+					sku.setPquantity_onhand_end(warehouseService.getSumBy_Sku(sku.getId()));
+//					System.out.println(sku.getId());
+				}
+			}
 			response.data = list_sku;
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
@@ -3141,7 +3151,8 @@ public class PContract_POAPI {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			long orgrootid_link = user.getRootorgid_link();
 
-			List<PContract_PO_NoLink> pcontract = pcontract_PO_NoLink_Service.getPO_HavetoShip(orgrootid_link, entity.shipdate_from, entity.shipdate_to);
+			List<PContract_PO_NoLink> pcontract = pcontract_PO_NoLink_Service.getPO_HavetoShip(orgrootid_link, 
+					entity.shipdate_from, entity.shipdate_to, entity.orgbuyerid_link);
 			for (PContract_PO_NoLink po : pcontract) {
 				List<ProductPairing> p = pairService.getproduct_pairing_detail_bycontract(orgrootid_link,
 						po.getPcontractid_link(), po.getProductid_link());

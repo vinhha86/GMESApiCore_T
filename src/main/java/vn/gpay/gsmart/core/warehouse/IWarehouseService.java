@@ -26,4 +26,5 @@ public interface IWarehouseService extends StringOperations<Warehouse>{
 	
 	List<Warehouse> findMaterialByEPC(String epc);
 	Long getSumBy_Sku_Stock(Long skuid_link, Long stockid_link);
+	Integer getSumBy_Sku(Long skuid_link);
 }

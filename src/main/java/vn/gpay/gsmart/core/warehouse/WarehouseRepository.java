@@ -71,4 +71,10 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, String>{
 			@Param ("skuid_link")final Long skuid_link,
 			@Param ("stockid_link")final Long stockid_link
 			);
+	@Query(value = "select count(c.id) from Warehouse c "
+			+ " where c.skuid_link = :skuid_link "
+			) 
+	public Integer getSumBy_Sku(
+			@Param ("skuid_link")final Long skuid_link
+			);
 }

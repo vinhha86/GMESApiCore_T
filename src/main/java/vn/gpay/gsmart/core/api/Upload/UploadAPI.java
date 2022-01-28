@@ -83,55 +83,32 @@ import vn.gpay.gsmart.core.utils.ResponseMessage;
 @RestController
 @RequestMapping("/api/v1/upload")
 public class UploadAPI {
-	@Autowired
-	Common commonService;
-	@Autowired
-	IProductService productService;
-	@Autowired
-	IAttributeService attrService;
-	@Autowired
-	IProductAttributeService pavService;
-	@Autowired
-	ISKU_Service skuService;
-	@Autowired
-	ISKU_AttributeValue_Service skuattService;
-	@Autowired
-	IProductPairingService productpairService;
-	@Autowired
-	IPContract_Price_DService pricedetailService;
-	@Autowired
-	IPContractProductService pcontractproductService;
-	@Autowired
-	IPContractProductPairingService pcontractpairService;
-	@Autowired
-	IShipModeService shipmodeService;
-	@Autowired
-	IOrgService orgService;
-	@Autowired
-	IPContract_POService pcontract_POService;
-	@Autowired
-	IPContract_Price_Service priceService;
-	@Autowired
-	IPContract_PO_Productivity_Service productivityService;
-	@Autowired
-	ISizeSetService sizesetService;
-	@Autowired
-	IPOrder_Req_Service reqService;
-	@Autowired
-	IPOrder_Service porderService;
-	@Autowired
-	IPContractService pcontractService;
-	@Autowired
-	IPackingTypeService packingService;
-	@Autowired
-	IAttributeValueService attributevalueService;
-	@Autowired
-	IPContractProductSKUService ppskuService;
-	@Autowired
-	ISizeSetAttributeService sizeset_att_Service;
+	@Autowired Common commonService;
+	@Autowired IProductService productService;
+	@Autowired IAttributeService attrService;
+	@Autowired IProductAttributeService pavService;
+	@Autowired ISKU_Service skuService;
+	@Autowired ISKU_AttributeValue_Service skuattService;
+	@Autowired IProductPairingService productpairService;
+	@Autowired IPContract_Price_DService pricedetailService;
+	@Autowired IPContractProductService pcontractproductService;
+	@Autowired IPContractProductPairingService pcontractpairService;
+	@Autowired IShipModeService shipmodeService;
+	@Autowired IOrgService orgService;
+	@Autowired IPContract_POService pcontract_POService;
+	@Autowired IPContract_Price_Service priceService;
+	@Autowired IPContract_PO_Productivity_Service productivityService;
+	@Autowired ISizeSetService sizesetService;
+	@Autowired IPOrder_Req_Service reqService;
+	@Autowired IPOrder_Service porderService;
+	@Autowired IPContractService pcontractService;
+	@Autowired IPackingTypeService packingService;
+	@Autowired IAttributeValueService attributevalueService;
+	@Autowired IPContractProductSKUService ppskuService;
+	@Autowired ISizeSetAttributeService sizeset_att_Service;
 
 	
-	//chao gia
+	//upload chao gia
 	@RequestMapping(value = "/offers", method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> UploadTemplate(HttpServletRequest request,
 			@RequestParam("file") MultipartFile file, @RequestParam("pcontractid_link") long pcontractid_link) {
@@ -175,6 +152,10 @@ public class UploadAPI {
 					XSSFSheet sheet = workbook.getSheetAt(0);
 
 					// Kiem tra header
+					/*
+					 * File excel mau co 2 row dau la danh cho Header
+					 * Du lieu bat dau tu row thu 3 --> default rowNum = 2
+					 */
 					int rowNum = 2;
 					int colNum = 1, col_phancach1 = ColumnTempNew.vendor_target + 1, col_phancach2 = 0;
 
@@ -182,10 +163,15 @@ public class UploadAPI {
 					Row rowheader = sheet.getRow(0);
 
 					try {
+						/*
+						 * Cot STT chua thong tin cac dong thong tin can xu ly
+						 * Cot STT co gia tri tu 1; gia tri 0 --> ko xu ly
+						 * Doc cho den khi nao gap gia tri STT ="" thi moi thoi
+						 */
 						String STT = "";
 						STT = commonService.getStringValue(row.getCell(ColumnTempNew.STT));
 						STT = STT.equals("0") ? "" : STT;
-
+						
 						while (!STT.equals("")) {
 							// Lay thong tin PO kiem tra xem PO da ton tai trong he thong hay chua
 							// Neu la san pham don chiec thi kiem tra masp, ngay giao, vendor target
@@ -209,6 +195,9 @@ public class UploadAPI {
 								break;
 							}
 
+							/*
+							 * Tim san pham (product) voi MaSP Buyer duoc cung cap. Neu chua co --> Tao moi san pham
+							 */
 							List<Product> products = productService.getone_by_code(orgrootid_link, product_code,
 									(long) 0, ProductType.SKU_TYPE_COMPLETEPRODUCT);
 							if (products.size() == 0) {
@@ -233,11 +222,11 @@ public class UploadAPI {
 									long value = 0;
 
 									if (attribute.getId() == AtributeFixValues.ATTR_COLOR) {
-										value = AtributeFixValues.value_color_all;
+										value = AtributeFixValues.value_color_all; //Mau
 									} else if (attribute.getId() == AtributeFixValues.ATTR_SIZE) {
-										value = AtributeFixValues.value_size_all;
+										value = AtributeFixValues.value_size_all; //Co
 									} else if (attribute.getId() == AtributeFixValues.ATTR_SIZEWIDTH) {
-										value = AtributeFixValues.value_sizewidth_all;
+										value = AtributeFixValues.value_sizewidth_all; //Co kho
 									}
 
 									pav.setId((long) 0);
@@ -285,30 +274,38 @@ public class UploadAPI {
 
 								skuattService.save(savCo);
 
-							} else {
+							} 
+							else {
+								//San pham da duoc khai bao trong he thong
 								productid_link = products.get(0).getId();
 							}
 
 							// Kiem tra xem PO co phai la hang bo hay khong
+							/*
+							 * Neu cot 3 - Style set co thong tin thi day la hang bo
+							 */
 							long product_set_id_link = 0;
 
+							//Ma hang bo
 							colNum = ColumnTempNew.Style_Set + 1;
-							String product_set_code = commonService
-									.getStringValue(row.getCell(ColumnTempNew.Style_Set));
+							String product_set_code = commonService.getStringValue(row.getCell(ColumnTempNew.Style_Set));
 							product_set_code = product_set_code.equals("0") ? "" : product_set_code;
 
+							//Ma vendor cua hang bo
 							colNum = ColumnTempNew.Style_Set_Vendor + 1;
-							String product_set_code_vendor = commonService
-									.getStringValue(row.getCell(ColumnTempNew.Style_Set_Vendor));
-							product_set_code_vendor = product_set_code_vendor.equals("0") ? ""
-									: product_set_code_vendor;
+							String product_set_code_vendor = commonService.getStringValue(row.getCell(ColumnTempNew.Style_Set_Vendor));
+							product_set_code_vendor = product_set_code_vendor.equals("0") ? "": product_set_code_vendor;
 
+							//So luong san pham trong bo
 							colNum = ColumnTempNew.amount_style + 1;
 							String s_amount = commonService.getStringValue(row.getCell(ColumnTempNew.amount_style));
 							s_amount = s_amount.replace(",", "");
 							int amount = (int) row.getCell(ColumnTempNew.amount_style).getNumericCellValue() == 0 ? 1
 									: (int) row.getCell(ColumnTempNew.amount_style).getNumericCellValue();
 
+							/*
+							 * Neu la san pham bo --> Kiem tra neu chua co thi them Bo vao bang Product
+							 */
 							if (!product_set_code.equals(null) && !product_set_code.equals("")) {
 								List<Product> product_set = productService.getone_by_code(orgrootid_link,
 										product_set_code, (long) 0, ProductType.SKU_TYPE_PRODUCT_PAIR);
@@ -332,7 +329,7 @@ public class UploadAPI {
 								}
 							}
 
-							// kiem tra trong bang productpair co chua thi them bo vao
+							// kiem tra trong bang pcontract_product_pairing co thong tin cua bo chua. Neu chua co --> Them vao
 							if (product_set_id_link > 0) {
 								ProductPairing pair = productpairService.getproduct_pairing_bykey(productid_link,
 										product_set_id_link);
@@ -383,6 +380,7 @@ public class UploadAPI {
 								}
 							}
 
+							//Phuong thuc van chuyen (tim theo ten)
 							long shipmodeid_link = 0;
 							colNum = ColumnTempNew.shipmode + 1;
 							String shipmode_name = commonService.getStringValue(row.getCell(ColumnTempNew.shipmode));
@@ -391,8 +389,10 @@ public class UploadAPI {
 								shipmodeid_link = shipmode.get(0).getId();
 							}
 
-							// Lay ngay giao hang lon nhat
-
+							/*
+							 * Lay ngay giao hang dau tien trong danh sach dot giao hang
+							 * Ngay giao hang phai theo dinh dang dd/MM/yyyy
+							 */
 							List<Date> list_ngaygiao = new ArrayList<Date>();
 							List<Integer> list_soluong = new ArrayList<Integer>();
 
@@ -426,12 +426,14 @@ public class UploadAPI {
 								list_ngaygiao.add(ShipDate);
 							}
 
+							//Ngay giao hang tiep theo
 							colNum = col_phancach1 + 3;
 
 							String s_po_quantity = commonService
 									.getStringValue(row.getCell(ColumnTempNew.ns_target + 3));
 							s_po_quantity = s_po_quantity.replace(",", "");
 							Float f_po_quantity = s_po_quantity.equals("") ? 0 : Float.parseFloat(s_po_quantity);
+//po_quantity luu so luong tong cua ca don hang							
 							int po_quantity = f_po_quantity.intValue();
 							if (po_quantity > 0)
 								list_soluong.add(po_quantity);
@@ -439,6 +441,13 @@ public class UploadAPI {
 							col_phancach2 = ColumnTempNew.ns_target + 4;
 							colNum = col_phancach2;
 							String s_header_phancach2 = commonService.getStringValue(rowheader.getCell(col_phancach2));
+
+/*
+ * Duyet cac dot giao hang de tao PO Line ke hoach
+ * Chay den khi gap cot xxx thi dung
+ * Phan nay chi de cong vao, tinh ra so luong tong cua PO
+ * list_ngaygiao chua danh sach cac dot giao hang (PO Line ke hoach)
+ */
 							while (!s_header_phancach2.equals("xxx")) {
 
 								Date shipdate2 = null;
@@ -470,8 +479,7 @@ public class UploadAPI {
 									// Lay so luong
 									String s_sub_quantity = commonService.getStringValue(row.getCell(colNum + 1));
 									s_sub_quantity = s_sub_quantity.replace(",", "");
-									Float f_sub_quantity = s_sub_quantity.equals("") ? 0
-											: Float.parseFloat(s_sub_quantity);
+									Float f_sub_quantity = s_sub_quantity.equals("") ?0:Float.parseFloat(s_sub_quantity);
 									po_quantity += f_sub_quantity.intValue();
 
 									list_soluong.add(f_sub_quantity.intValue() * amount);
@@ -487,7 +495,7 @@ public class UploadAPI {
 
 								col_phancach2 += 2;
 								s_header_phancach2 = commonService.getStringValue(rowheader.getCell(col_phancach2));
-
+//End duyet PO Line
 							}
 
 							// Kiem tra chao gia da ton tai hay chua
@@ -505,17 +513,19 @@ public class UploadAPI {
 //							s_amount_style = s_amount_style.replace(",", "");
 //							Float amount_style = s_amount_style == "" ? 0 : Float.parseFloat(s_amount_style);
 
+							//Gia muc tieu cua khach
 							colNum = ColumnTempNew.vendor_target + 1;
-							String s_vendor_target = commonService
-									.getStringValue(row.getCell(ColumnTempNew.vendor_target));
+							String s_vendor_target = commonService.getStringValue(row.getCell(ColumnTempNew.vendor_target));
 							s_vendor_target = s_vendor_target.replace(",", "");
 							float vendor_target = s_vendor_target == "" ? 0 : Float.parseFloat(s_vendor_target);
-
+							
+							//Nang suat muc tieu
 							colNum = ColumnTempNew.ns_target + 1;
 							String s_ns_target = commonService.getStringValue(row.getCell(ColumnTempNew.ns_target));
 							s_ns_target = s_ns_target.replace(",", "");
 							Float ns_target = s_ns_target == "" ? 0 : Float.parseFloat(s_ns_target);
 
+							//Phan xuong chinh
 							colNum = ColumnTempNew.org + 1;
 							String s_org_code = commonService.getStringValue(row.getCell(ColumnTempNew.org));
 							s_org_code = s_org_code.replace(",", "");
@@ -525,8 +535,10 @@ public class UploadAPI {
 								orgid_link = list_org.get(0).getId();
 							}
 
+							//So ngay san xuat = So tong / Nang suat
 							int productiondays_ns = ns_target == 0 ? 0 : po_quantity / (ns_target.intValue());
 
+							//Ngay NPL ve
 							colNum = ColumnTempNew.matdate + 1;
 							Date matdate = null;
 
@@ -552,6 +564,12 @@ public class UploadAPI {
 									matdate = row.getCell(ColumnTempNew.matdate).getDateCellValue();
 								}
 							}
+							
+							/*
+							 * Ngay vao chuyen (production_date) = Ngay NPL ve + 7
+							 * So ngay sx (production_day) = Ngay giao hang - Ngay vao chuyen - Ngay nghi theo lich
+							 * So chuyen yeu cau (plan_linerequired) =  Nang suat ngay / So ngay sx
+							 */
 							Date production_date = null;
 							int production_day = 0;
 							float plan_linerequired = 0;
@@ -567,12 +585,14 @@ public class UploadAPI {
 								plan_linerequired = Float.parseFloat(formatted);
 							}
 
+							//So PO
 							colNum = ColumnTempNew.PO + 1;
 							String PO_No = commonService.getStringValue(row.getCell(ColumnTempNew.PO));
 							if (PO_No == "" || PO_No.equals("0")) {
 								PO_No = "TBD";
 							}
-
+							
+							//Trang thai PO (Da duyet(0) / Chua duyet(-1))
 							colNum = ColumnTempNew.status + 1;
 							String s_status = commonService.getStringValue(row.getCell(ColumnTempNew.status));
 							Integer status = POStatus.PO_STATUS_UNCONFIRM;
@@ -580,8 +600,12 @@ public class UploadAPI {
 								status = POStatus.PO_STATUS_CONFIRMED;
 							}
 
-							// Neu khong cot ngay giao hang nao co gia tri thi ko xu ly nua chuyen den dong
-							// tiep theo
+/*
+ * Row du lieu phai co it nhat 1 thong tin giao hang trong danh sach cac dot giao hang
+ * Neu khong cot ngay giao hang --> Chuyen
+ * Neu co --> Them Chao gia (PO chinh) va PO Line ke hoach
+ * Ket thuc o dong 10055
+ */
 							if (ShipDate != null) {
 								List<PContract_PO> listpo = new ArrayList<PContract_PO>();
 								if (product_set_id_link == 0) {
@@ -591,6 +615,7 @@ public class UploadAPI {
 									listpo = pcontract_POService.check_exist_po(ShipDate, po_productid_link,
 											shipmodeid_link, pcontractid_link, "");
 								}
+//Start add/update PO tong								
 								if (listpo.size() == 0) {
 									po_tong.setId(null);
 									po_tong.setCurrencyid_link((long) 1);
@@ -629,8 +654,9 @@ public class UploadAPI {
 
 								po_tong = pcontract_POService.save(po_tong);
 								pcontractpo_id_link = po_tong.getId();
-
-								// Kiem tra ns cua san pham
+//End Update PO tong
+								
+//Start tinh nang suat, ngay sx, so chuyen y/c cua san pham con --> Ghi vao bang pcontract_po_productivity
 								List<PContract_PO_Productivity> list_productivity = productivityService
 										.getbypo_and_product(pcontractpo_id_link, productid_link);
 								PContract_PO_Productivity po_productivity = new PContract_PO_Productivity();
@@ -648,8 +674,12 @@ public class UploadAPI {
 								po_productivity.setPlan_productivity(ns_target.intValue());
 								po_productivity.setProductiondays_ns(productiondays_ns);
 								productivityService.save(po_productivity);
-
-								// Xoa cac dai co di roi insert lai vao san pham con hoac san pham don
+//End tinh nang suat, ngay sx, so chuyen y/c cua san pham con
+								
+/*
+ * Xoa cac dai co di roi insert lai vao san pham con hoac san pham don
+ * Khi upload file --> Xoa dai co di tinh toan lai chu khong update
+ */
 								List<PContract_Price> list_price = priceService.getPrice_by_product(pcontractpo_id_link,
 										productid_link);
 								for (PContract_Price price : list_price) {
@@ -660,9 +690,13 @@ public class UploadAPI {
 									}
 									priceService.delete(price);
 								}
-
-								// Sinh cac dai co vao trong san pham con
-
+//End Xoa dai co
+								
+/*
+ * Sinh cac dai co va gia CMP cho tung dai co vao trong san pham con
+ * Chot hien tai Max chi co 6 giai co (Infant, Monthly, Toddle, Normal, Big, Plus)
+ * Bang: pcontract_price va pcontract_price_d
+ */
 								// Sinh cac dai co khac all
 								float total_price_amount = 0;
 								float total_amount = 0;
@@ -673,15 +707,16 @@ public class UploadAPI {
 									colNum = i + 1;
 									Row row2 = sheet.getRow(1);
 									String sizesetname = commonService.getStringValue(row2.getCell(i));
+									
+									//Gia cua dai co
 									String s_price_sizeset = commonService.getStringValue(row.getCell(i));
 									s_price_sizeset = s_price_sizeset.replace(",", "");
-									Float price_sizeset = s_price_sizeset.equals("") ? 0
-											: Float.parseFloat(s_price_sizeset);
+									Float price_sizeset = s_price_sizeset.equals("") ? 0: Float.parseFloat(s_price_sizeset);
 
+									//So luong cua dai co
 									String s_amount_sizeset = commonService.getStringValue(row.getCell(i + 7));
 									s_amount_sizeset = s_amount_sizeset.replace(",", "");
-									Float amount_sizeset = s_amount_sizeset.equals("") ? 0
-											: Float.parseFloat(s_amount_sizeset);
+									Float amount_sizeset = s_amount_sizeset.equals("") ? 0: Float.parseFloat(s_amount_sizeset);
 
 									if (price_sizeset > 0 || amount_sizeset > 0) {
 										count++;
@@ -721,6 +756,7 @@ public class UploadAPI {
 
 									}
 								}
+//End Sinh dai co
 								float price_cmp = 0;
 
 								if (total_amount == 0) {
@@ -733,7 +769,7 @@ public class UploadAPI {
 								String formatted = df.format(price_cmp);
 								price_cmp = Float.parseFloat(formatted);
 
-								// Sinh dai co all vao san pham con
+// Sinh dai co all vao san pham con (san pham nao cung se co 1 dai co ALL de luu so luong va gia tong hop cua cac dai co con)
 								PContract_Price price_all = new PContract_Price();
 								price_all.setId(null);
 								price_all.setIs_fix(true);
@@ -764,8 +800,9 @@ public class UploadAPI {
 								price_detail_all.setProductid_link(productid_link);
 								pricedetailService.save(price_detail_all);
 
-								// kiem tra xem co phai san pham bo khong thi cap nhat cac dai co vao trong sản
-								// phẩm bộ
+/*
+ * kiem tra xem co phai san pham bo khong thi cap nhat cac dai co vao trong sản phẩm bộ
+ */
 								if (product_set_id_link > 0) {
 									// Kiem tra ns cua san pham bo
 									List<PContract_PO_Productivity> list_productivity_set = productivityService
@@ -858,8 +895,11 @@ public class UploadAPI {
 										}
 									}
 								}
-
-								// Kiem tra line giao hang va sinh line giao hang
+//End Cap nhat dai co va gia cho san pham bo
+								
+/*
+ * Sinh cac PO Line giao hang ke hoach (PO Line con)
+ */
 								for (int i = 0; i < list_ngaygiao.size(); i++) {
 									Date ngaygiao = list_ngaygiao.get(i);
 									int soluong = list_soluong.get(i);
@@ -942,7 +982,10 @@ public class UploadAPI {
 
 									Long pcontract_po_line_id = po_line.getId();
 
-									// kiem tra porder_req ton tai chua thi them vao
+/*
+ * Kiem tra porder_req ton tai chua thi them vao
+ * Hien o Lenh chua phan chuyen hoac yeu cau xep ke hoach
+ */
 									if (orgid_link != null) {
 										List<POrder_Req> list_req = reqService.getByOrg_PO_Product(pcontract_po_line_id,
 												productid_link, orgid_link);
@@ -971,8 +1014,9 @@ public class UploadAPI {
 											porder_req.setTotalorder(total);
 											reqService.save(porder_req);
 										}
-
 									}
+//End Kiem tra porder_req ton tai chua thi them vao
+									
 //									if (product_set_code.equals("")) {
 //										po_line.setPo_quantity(total);
 //										pcontract_POService.save(po_line);
@@ -1017,8 +1061,9 @@ public class UploadAPI {
 										po_productivity_line_set.setProductiondays_ns(productiondays_ns_line);
 										productivityService.save(po_productivity_line_set);
 									}
-
+//End sinh PO Line ke hoach										
 								}
+//End 1 Row								
 							}
 
 							// Chuyen sang row tiep theo neu con du lieu thi xu ly tiep khong thi dung lai
@@ -1034,7 +1079,7 @@ public class UploadAPI {
 						mes_err = "Có lỗi ở dòng " + (rowNum + 1) + " và cột " + colNum + ": " + mes_err;
 					} finally {
 						workbook.close();
-						serverFile.delete();
+						serverFile.delete(); //Xoa file luon sau khi xu ly xong
 					}
 
 					if (mes_err == "") {
