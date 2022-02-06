@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import vn.gpay.gsmart.core.api.recon.Recon_MatSKU_Data;
 import vn.gpay.gsmart.core.attribute.Attribute;
 import vn.gpay.gsmart.core.attribute.IAttributeService;
 import vn.gpay.gsmart.core.attributevalue.Attributevalue;
@@ -54,6 +56,7 @@ import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_DService;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_D_SKUService;
 import vn.gpay.gsmart.core.pcontract_price.IPContract_Price_Service;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price;
+import vn.gpay.gsmart.core.pcontract_price.PContract_PriceFOB_Data;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price_D;
 import vn.gpay.gsmart.core.pcontract_price.PContract_Price_D_SKU;
 import vn.gpay.gsmart.core.pcontractproduct.IPContractProductService;
@@ -2070,6 +2073,7 @@ public class PContract_POAPI {
 			}
 
 			List<PContract_PO> pcontract = pcontract_POService.getby_pcontract_and_type(pcontractid_link, type);
+			HashMap<Long, String> hash_FOBWorklist = new HashMap<Long, String>();
 			for (PContract_PO po : pcontract) {
 				List<ProductPairing> p = pairService.getproduct_pairing_detail_bycontract(orgrootid_link,
 						po.getPcontractid_link(), po.getProductid_link());
@@ -2084,7 +2088,19 @@ public class PContract_POAPI {
 				po.setPo_quantity_sp(po.getPo_quantity() * total);
 				
 				//Lay danh sach NPL FOB (Nha may tu cung cap bao gom ca In/Theu/Giat)
-				
+				String myfob_work = hash_FOBWorklist.get(po.getParentpoid_link());
+				if (null != myfob_work) {
+					po.setFob_worklist(myfob_work);
+				} else {
+					List<PContract_PriceFOB_Data> fob_worklist = pcontractpriceDService.getPrice_FOB(pcontractid_link, po.getParentpoid_link());
+					String sfob_work = "";
+					for(PContract_PriceFOB_Data fobwork: fob_worklist) {
+						if (sfob_work.length()>0) sfob_work += "; ";
+						sfob_work += fobwork.getFob_price() + "(" + fobwork.getProvider_name() + ")";
+					}
+					po.setFob_worklist(sfob_work);
+					hash_FOBWorklist.put(po.getParentpoid_link(), sfob_work);
+				}
 			}
 			response.data = pcontract;
 

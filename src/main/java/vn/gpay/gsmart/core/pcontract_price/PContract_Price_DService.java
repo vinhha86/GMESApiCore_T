@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.pcontract_price;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,4 +52,20 @@ public class PContract_Price_DService extends AbstractService<PContract_Price_D>
 		return repo.getPrice_D_ByFobPriceNameAndPContractPrice(pcontractpriceid_link, fobprice_name);
 	}
 
+	@Override
+	public List<PContract_PriceFOB_Data> getPrice_FOB(Long pcontractid_link, Long pcontract_poid_link) {
+//		System.out.println(pcontractid_link + ":" + pcontract_poid_link);
+		List<PContract_PriceFOB_Data> data = new ArrayList<PContract_PriceFOB_Data>();
+		List<Object[]> objects = repo.getPrice_FOB(pcontractid_link, pcontract_poid_link);
+
+		for (Object[] row : objects) {
+			String fob_price = (String) row[0] == null ? "" : (String) row[0];
+			String provider_name = (String) row[1] == null ? "" : (String) row[1];
+			PContract_PriceFOB_Data temp = new PContract_PriceFOB_Data();
+			temp.setFob_price(fob_price);
+			temp.setProvider_name(provider_name);
+			data.add(temp);
+		}
+		return data;
+	}
 }

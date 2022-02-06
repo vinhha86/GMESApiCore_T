@@ -99,6 +99,8 @@ public class PContract_PO implements Serializable {
 	private int po_quantity_sp;
 	@Transient
 	private int totalpair;
+	@Transient
+	private String fob_worklist;//Danh sach dau muc fob (nha may tu chi tra)
 
 	public Integer getPo_typeid_link() {
 		return po_typeid_link;
@@ -908,5 +910,15 @@ public class PContract_PO implements Serializable {
 	public List<PContractProductSKU> getPcontract_po_sku() {
 		return pcontract_po_sku;
 	}
+
+	public String getFob_worklist() {
+		return fob_worklist;
+	}
+
+	public void setFob_worklist(String fob_worklist) {
+		this.fob_worklist = fob_worklist;
+	}
+	
+	
 
 }

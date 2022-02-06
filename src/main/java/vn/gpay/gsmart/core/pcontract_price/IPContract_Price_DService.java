@@ -16,4 +16,6 @@ public interface IPContract_Price_DService extends Operations<PContract_Price_D>
 
 	public List<PContract_Price_D> getPrice_D_ByFobPriceNameAndPContractPrice(Long pcontractpriceid_link,
 			String fobprice_name);
+
+	List<PContract_PriceFOB_Data> getPrice_FOB(Long pcontractid_link, Long pcontract_poid_link);
 }

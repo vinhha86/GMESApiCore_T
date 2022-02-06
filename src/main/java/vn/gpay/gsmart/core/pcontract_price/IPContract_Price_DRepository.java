@@ -36,4 +36,12 @@ public interface IPContract_Price_DRepository
 	@Query(value = "select c from PContract_Price_D c " + "where pcontractpriceid_link = :pcontractpriceid_link ")
 	public List<PContract_Price_D> getPrice_D_ByPContractPrice(
 			@Param("pcontractpriceid_link") final Long pcontractpriceid_link);
+	
+	@Query(value = "select distinct b.name,c.code from PContract_Price_D a "
+			+ "inner join FOBPrice b on a.fobpriceid_link = b.id "
+			+ "left join Org c on a.providerid_link = c.id "
+			+ "where a.pcontractid_link = :pcontractid_link and a.pcontract_poid_link = :pcontract_poid_link and a.isfob=true")
+	public List<Object[]> getPrice_FOB(
+			@Param("pcontractid_link") final Long pcontractid_link,
+			@Param("pcontract_poid_link") final Long pcontract_poid_link);
 }
