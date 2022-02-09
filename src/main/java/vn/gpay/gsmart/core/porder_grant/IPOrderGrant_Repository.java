@@ -75,6 +75,10 @@ public interface IPOrderGrant_Repository
 			+ " and b.pcontract_poid_link =  :pcontract_poid_link " + "group by a")
 	public List<POrderGrant> getbyporder_andpo(@Param("porderid_link") final Long porderid_link,
 			@Param("pcontract_poid_link") final Long pcontract_poid_link);
+	
+	@Query(value = "select a from POrderGrant a "
+			+ "where (a.porderid_link = :porderid_link or :porderid_link is null) ")
+	public List<POrderGrant> getbyporder(@Param("porderid_link") final Long porderid_link);
 
 	@Query(value = "select c.plan_productivity from POrderGrant a " + "inner join POrder b on a.porderid_link = b.id "
 			+ "inner join PContract_PO c on b.pcontract_poid_link = c.id " + "where a.id = :pordergrantid_link")

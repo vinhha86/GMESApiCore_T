@@ -79,6 +79,40 @@ public class POrder_GrantAPI {
 			return new ResponseEntity<POrder_Grant_GetOne_Response>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	@RequestMapping(value = "/getByPcontractPo", method = RequestMethod.POST)
+	public ResponseEntity<POrder_Grant_GetOne_Response> getByPcontractPo(@RequestBody POrder_Grant_GetOne_Request entity,
+			HttpServletRequest request) {
+		POrder_Grant_GetOne_Response response = new POrder_Grant_GetOne_Response();
+		try {
+
+			response.data = porderGrantService.getByOrderIDAndOrg(entity.granttoorgid_link, entity.porderid_link);
+			//
+			POrderGrant porderGrant = new POrderGrant();
+			// tim porder theo pcontract_poid_link
+			Long pcontract_poid_link = entity.pcontract_poid_link;
+			List<POrder> porder_list = porderService.getByPcontractPO(pcontract_poid_link);
+			// tim grant theo porderid_link
+			if(porder_list.size() > 0) {
+				POrder porder = porder_list.get(0);
+				Long porderid_link = porder.getId();
+				List<POrderGrant> porderGrant_list = porderGrantService.getbyporder(porderid_link);
+				if(porderGrant_list.size() > 0) {
+					porderGrant = porderGrant_list.get(0);
+				}
+			}
+			
+			response.data = porderGrant;
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<POrder_Grant_GetOne_Response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<POrder_Grant_GetOne_Response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
 
 	@RequestMapping(value = "/findone", method = RequestMethod.POST)
 	public ResponseEntity<POrder_Grant_GetOne_Response> POrderFindOne(@RequestBody POrder_Grant_findOne_request entity,

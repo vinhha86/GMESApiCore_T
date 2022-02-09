@@ -172,4 +172,9 @@ public class POrderGrant_Service extends AbstractService<POrderGrant> implements
 	public List<POrderGrant> getbypcontract_po(long pcontract_poid_link){
 		return repo.getbypcontract_po(pcontract_poid_link);
 	}
+
+	@Override
+	public List<POrderGrant> getbyporder(Long porderid_link) {
+		return repo.getbyporder(porderid_link);
+	}
 }
