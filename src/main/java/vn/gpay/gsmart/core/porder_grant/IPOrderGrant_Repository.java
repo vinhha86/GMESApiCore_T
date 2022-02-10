@@ -115,4 +115,11 @@ public interface IPOrderGrant_Repository
 			+ "where b.pcontract_poid_link =  :pcontract_poid_link)")
 	public List<POrderGrant> getbypcontract_po(
 			@Param("pcontract_poid_link") final Long pcontract_poid_link);	
+	
+	@Query(value = "select distinct a from POrderGrant a "
+			+ " inner join POrderGrant_SKU b on b.pordergrantid_link = a.id "
+			+ " where b.pcontract_poid_link = :pcontract_poid_link "
+			)
+	public List<POrderGrant> getby_pcontract_po_id(
+			@Param("pcontract_poid_link") final Long pcontract_poid_link);	
 }

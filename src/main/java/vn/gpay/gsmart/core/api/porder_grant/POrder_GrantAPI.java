@@ -91,15 +91,16 @@ public class POrder_GrantAPI {
 			POrderGrant porderGrant = new POrderGrant();
 			// tim porder theo pcontract_poid_link
 			Long pcontract_poid_link = entity.pcontract_poid_link;
-			List<POrder> porder_list = porderService.getByPcontractPO(pcontract_poid_link);
-			// tim grant theo porderid_link
-			if(porder_list.size() > 0) {
-				POrder porder = porder_list.get(0);
-				Long porderid_link = porder.getId();
-				List<POrderGrant> porderGrant_list = porderGrantService.getbyporder(porderid_link);
-				if(porderGrant_list.size() > 0) {
-					porderGrant = porderGrant_list.get(0);
-				}
+//			List<POrder> porder_list = porderService.getByPcontractPO(pcontract_poid_link);
+			// tim grant theo pcontract_poid_link
+			
+			// sua tim theo pcontract_poid_link
+			List<POrderGrant> porderGrant_list = porderGrantService.getby_pcontract_po_id(pcontract_poid_link);
+			
+			System.out.println(porderGrant_list.size());
+			
+			if(porderGrant_list.size() > 0) {
+				porderGrant = porderGrant_list.get(0);
 			}
 			
 			response.data = porderGrant;
