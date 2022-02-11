@@ -166,7 +166,7 @@ public interface OrgRepository extends JpaRepository<Org, Long>,JpaSpecification
 			@Param ("code")final String code,
 			@Param ("parentid_link")final Long parentid_link
 			);
-	//laasy parentid_link theo id org
+	//lay parentid_link theo id org
 	@Query(value = "select c.parentid_link from Org c "
 			+ "where c.id = :id " )
 	public Long getParentIdById(

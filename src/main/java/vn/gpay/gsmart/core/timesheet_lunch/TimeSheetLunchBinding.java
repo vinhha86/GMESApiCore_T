@@ -26,6 +26,8 @@ public class TimeSheetLunchBinding {
 	private String register_code;
 	private Long orgid_link;
 	private Long orgmanagerid_link;
+	private Boolean is_nolunch;
+	private Long nolunch_shift_idlink;
 
 	public Long getPersonnelid_link() {
 		return personnelid_link;
@@ -194,4 +196,21 @@ public class TimeSheetLunchBinding {
 	public void setOrgmanagerid_link(Long orgmanagerid_link) {
 		this.orgmanagerid_link = orgmanagerid_link;
 	}
+
+	public Boolean getIs_nolunch() {
+		return is_nolunch;
+	}
+
+	public void setIs_nolunch(Boolean is_nolunch) {
+		this.is_nolunch = is_nolunch;
+	}
+
+	public Long getNolunch_shift_idlink() {
+		return nolunch_shift_idlink;
+	}
+
+	public void setNolunch_shift_idlink(Long nolunch_shift_idlink) {
+		this.nolunch_shift_idlink = nolunch_shift_idlink;
+	}
+	
 }

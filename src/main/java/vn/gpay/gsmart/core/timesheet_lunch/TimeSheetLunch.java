@@ -41,6 +41,7 @@ public class TimeSheetLunch implements Serializable {
 	private Boolean is_bo_sung;
 	private Long orgid_link;
 	private Long orgmanagerid_link;
+	private Boolean is_nolunch;
 	
 	
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -181,5 +182,12 @@ public class TimeSheetLunch implements Serializable {
 	public void setOrgmanagerid_link(Long orgmanagerid_link) {
 		this.orgmanagerid_link = orgmanagerid_link;
 	}
+	public Boolean getIs_nolunch() {
+		return is_nolunch;
+	}
+	public void setIs_nolunch(Boolean is_nolunch) {
+		this.is_nolunch = is_nolunch;
+	}
+	
 	
 }
