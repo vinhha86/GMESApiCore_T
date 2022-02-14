@@ -1034,9 +1034,9 @@ public class ProductAPI {
 	}
 
 	@RequestMapping(value = "/updateimg", method = RequestMethod.POST)
-	public ResponseEntity<ResponseBase> Product_updteImg(HttpServletRequest request,
+	public ResponseEntity<Product_updateimg_response> Product_updteImg(HttpServletRequest request,
 			@RequestParam("file") MultipartFile file, @RequestParam("id") int id, @RequestParam("img") int img) {
-		ResponseBase response = new ResponseBase();
+		Product_updateimg_response response = new Product_updateimg_response();
 
 		try {
 			Product product = productService.findOne(id);
@@ -1083,13 +1083,15 @@ public class ProductAPI {
 				break;
 			}
 			productService.save(product);
+			response.imgname = name;
+			response.imgnumber = img;
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+			return new ResponseEntity<Product_updateimg_response>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+			return new ResponseEntity<Product_updateimg_response>(response, HttpStatus.OK);
 		}
 	}
 

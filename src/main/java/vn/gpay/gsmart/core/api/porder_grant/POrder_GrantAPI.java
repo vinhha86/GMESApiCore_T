@@ -97,8 +97,6 @@ public class POrder_GrantAPI {
 			// sua tim theo pcontract_poid_link
 			List<POrderGrant> porderGrant_list = porderGrantService.getby_pcontract_po_id(pcontract_poid_link);
 			
-			System.out.println(porderGrant_list.size());
-			
 			if(porderGrant_list.size() > 0) {
 				porderGrant = porderGrant_list.get(0);
 			}
