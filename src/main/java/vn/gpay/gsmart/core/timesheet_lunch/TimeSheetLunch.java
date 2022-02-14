@@ -183,7 +183,7 @@ public class TimeSheetLunch implements Serializable {
 		this.orgmanagerid_link = orgmanagerid_link;
 	}
 	public Boolean getIs_nolunch() {
-		return is_nolunch;
+		return is_nolunch == null ? false : is_nolunch;
 	}
 	public void setIs_nolunch(Boolean is_nolunch) {
 		this.is_nolunch = is_nolunch;
