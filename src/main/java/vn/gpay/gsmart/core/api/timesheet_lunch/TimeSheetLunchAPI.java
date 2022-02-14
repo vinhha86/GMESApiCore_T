@@ -118,7 +118,6 @@ public class TimeSheetLunchAPI {
 
 			//neu la ngay hom truoc thi load trong bang timesheet_lunch
 			if(dateEnd.after(Common.Date_Add(new Date(), 0))) {
-				
 				for (GpayUserOrg userorg : list_userorg) {
 					list_org_id.add(userorg.getOrgid_link());
 				}
@@ -126,7 +125,7 @@ public class TimeSheetLunchAPI {
 					list_org_id.add(user.getOrgid_link());
 				}
 				if (entity.orgid_link != orgrootid_link) {
-					// nếu quản lý nhiều tài khảon
+					// nếu quản lý nhiều tài khoan
 					if (list_org_id.size() > 1) {
 //						listPersonnel = personnelService.getby_org(orgid_link, orgrootid_link);
 						listPersonnel = personnelService.getTongLaoDongByDate(orgid_link, dateBegin, dateEnd);
@@ -146,7 +145,7 @@ public class TimeSheetLunchAPI {
 					}
 				}
 
-				// kieerm tra phong ban day thuoc don vi nao - lay id cua don vi do;
+				// kiem tra phong ban day thuoc don vi nao - lay id cua don vi do;
 				Long id_org = orgService.getParentIdById(orgid_link);
 				if (id_org != null && id_org != 1) {
 					orgid_link = id_org;
@@ -209,6 +208,19 @@ public class TimeSheetLunchAPI {
 								break;
 							}
 						}
+						
+						// lay gia tri id cua ca khong an trua, set cho binding
+						if(timeSheetLunch.getIs_nolunch()) {
+//							System.out.println("here 1");
+							Long shifttypeid_link = timeSheetLunch.getShifttypeid_link().longValue();
+							List<TimesheetShiftTypeOrg> timesheetShiftTypeOrg_list = timesheetshifttypeOrgService.getByOrgid_link_and_shifttypeId(
+									orgid_link, shifttypeid_link);
+							if(timesheetShiftTypeOrg_list.size() > 0) {
+								TimesheetShiftTypeOrg timesheetShiftTypeOrg = timesheetShiftTypeOrg_list.get(0);
+								temp.setNolunch_shift_idlink(timesheetShiftTypeOrg.getId());
+							}
+						}
+						
 						temp.setStatus(timeSheetLunch.getStatus());
 						mapTmp.put(timeSheetLunch.getPersonnelid_link(), temp);
 					}
@@ -251,6 +263,18 @@ public class TimeSheetLunchAPI {
 						binding.setLunchShift5(true);
 					}
 					
+					// lay gia tri id cua ca khong an trua, set cho binding
+					if(ts_lunch.getIs_nolunch()) {
+//						System.out.println("here 1");
+						Long shifttypeid_link = ts_lunch.getShifttypeid_link().longValue();
+						List<TimesheetShiftTypeOrg> timesheetShiftTypeOrg_list = timesheetshifttypeOrgService.getByOrgid_link_and_shifttypeId(
+								orgid_link, shifttypeid_link);
+						if(timesheetShiftTypeOrg_list.size() > 0) {
+							TimesheetShiftTypeOrg timesheetShiftTypeOrg = timesheetShiftTypeOrg_list.get(0);
+							binding.setNolunch_shift_idlink(timesheetShiftTypeOrg.getId());
+						}
+					}
+					
 					list.add(binding);
 				}
 			}
@@ -283,6 +307,7 @@ public class TimeSheetLunchAPI {
 				// TimeSheetLunchBinding temp = entity.data;
 //				String dataIndex = temp.getDataIndex();
 
+				Long nolunch_shift_idlink = temp.getNolunch_shift_idlink();
 				Long personnelid_link = temp.getPersonnelid_link();
 				Date workingdate = temp.getWorkingdate();
 
@@ -293,29 +318,15 @@ public class TimeSheetLunchAPI {
 				String name = "Ca ăn " + temp.getDataIndex();
 
 				// lay id ca theo cột đang check
-				long id_tiemsheetshift = timesheetshifttypeService.getTimesheetShiftTypeID_ByName(name);
+				long id_timesheetshift = timesheetshifttypeService.getTimesheetShiftTypeID_ByName(name);
 //				System.out.println(name);
 
-				shifttypeid_link = (int) id_tiemsheetshift;
+				shifttypeid_link = (int) id_timesheetshift;
 				isWorkingShift = temp.isWorkingShift();
 				isLunchShift = temp.isLunchShift();
 				list = timeSheetLunchService.getByPersonnelDateAndShift(personnelid_link, workingdate,
 						shifttypeid_link);
 
-//				if (dataIndex.equals("workingShift2") || dataIndex.equals("lunchShift2")) {
-//					shifttypeid_link = 2;
-//					isWorkingShift = temp.isWorkingShift2();
-//					isLunchShift = temp.isLunchShift2();
-//					list = timeSheetLunchService.getByPersonnelDateAndShift(personnelid_link, workingdate,
-//							shifttypeid_link);
-//				}
-//				if (dataIndex.equals("workingShift3") || dataIndex.equals("lunchShift3")) {
-//					shifttypeid_link = 3;
-//					isWorkingShift = temp.isWorkingShift3();
-//					isLunchShift = temp.isLunchShift3();
-//					list = timeSheetLunchService.getByPersonnelDateAndShift(personnelid_link, workingdate,
-//							shifttypeid_link);
-//				}
 				// save
 				if (shifttypeid_link == 0) {
 					continue;
@@ -324,6 +335,22 @@ public class TimeSheetLunchAPI {
 					TimeSheetLunch timeSheetLunch = list.get(0);
 					timeSheetLunch.setIsworking(isWorkingShift);
 					timeSheetLunch.setIslunch(isLunchShift);
+					
+					// lưu is_nolunch  
+					// nolunch_shift_idlink gửi lên  lấy theo id bảng timesheet_shift_type_org
+					// TimeSheetLunch shifttypeid_link lấy theo id bảng timesheet_shift_type
+					TimesheetShiftTypeOrg timesheetShiftTypeOrg = timesheetshifttypeOrgService.findOne(nolunch_shift_idlink);
+					if(timesheetShiftTypeOrg != null) {
+						Long timesheet_shift_type_id_link = timesheetShiftTypeOrg.getTimesheet_shift_type_id_link();
+						if(timesheet_shift_type_id_link != null) {
+							if(timeSheetLunch.getShifttypeid_link().equals(timesheet_shift_type_id_link.intValue())) {
+								timeSheetLunch.setIs_nolunch(true);
+							}else {
+								timeSheetLunch.setIs_nolunch(false);
+							}
+						}
+					}
+					//
 					timeSheetLunchService.save(timeSheetLunch);
 				} else {
 					TimeSheetLunch timeSheetLunch = new TimeSheetLunch();
@@ -339,6 +366,22 @@ public class TimeSheetLunchAPI {
 					timeSheetLunch.setStatus(0);
 					timeSheetLunch.setOrgid_link(temp.getOrgid_link());
 					timeSheetLunch.setOrgmanagerid_link(temp.getOrgmanagerid_link());
+					
+					// lưu is_nolunch  
+					// nolunch_shift_idlink gửi lên  lấy theo id bảng timesheet_shift_type_org
+					// TimeSheetLunch shifttypeid_link lấy theo id bảng timesheet_shift_type
+					TimesheetShiftTypeOrg timesheetShiftTypeOrg = timesheetshifttypeOrgService.findOne(nolunch_shift_idlink);
+					if(timesheetShiftTypeOrg != null) {
+						Long timesheet_shift_type_id_link = timesheetShiftTypeOrg.getTimesheet_shift_type_id_link();
+						if(timesheet_shift_type_id_link != null) {
+							if(timeSheetLunch.getShifttypeid_link().equals(timesheet_shift_type_id_link.intValue())) {
+								timeSheetLunch.setIs_nolunch(true);
+							}else {
+								timeSheetLunch.setIs_nolunch(false);
+							}
+						}
+					}
+					//
 					timeSheetLunchService.save(timeSheetLunch);
 				}
 			}

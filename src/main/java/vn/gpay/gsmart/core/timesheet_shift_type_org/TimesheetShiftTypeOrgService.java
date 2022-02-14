@@ -33,5 +33,10 @@ public class TimesheetShiftTypeOrgService extends AbstractService<TimesheetShift
 	public List<TimesheetShiftTypeOrg> getByOrgid_link_CaAn(Long orgid_link) {
 		return repo.getByOrgid_link_CaAn(orgid_link);
 	}
+	@Override
+	public List<TimesheetShiftTypeOrg> getByOrgid_link_and_shifttypeId(Long orgid_link,
+			Long timesheet_shift_type_id_link) {
+		return repo.getByOrgid_link_and_shifttypeId(orgid_link, timesheet_shift_type_id_link);
+	}
 
 }
