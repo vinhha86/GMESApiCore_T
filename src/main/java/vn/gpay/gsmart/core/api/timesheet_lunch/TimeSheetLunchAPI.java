@@ -554,12 +554,12 @@ public class TimeSheetLunchAPI {
 
 			for (TimeSheetLunch timeSheetLunch : listTimeSheetLunch_select) {
 				if (timeSheetLunch.getStatus().equals(0)) {
-					if (shifttypeid_link != null) {
-						if (timeSheetLunch.getShifttypeid_link().equals(shifttypeid_link.intValue())) {
-							timeSheetLunch.setComment(comment);
-							timeSheetLunch.setIs_bo_sung(true);
-						}
-					}
+//					if (shifttypeid_link != null) {
+//						if (timeSheetLunch.getShifttypeid_link().equals(shifttypeid_link.intValue())) {
+//							timeSheetLunch.setComment(comment);
+//							timeSheetLunch.setIs_bo_sung(true);
+//						}
+//					}
 
 					timeSheetLunch.setStatus(1);
 					timeSheetLunch.setTime_approve(date);
@@ -583,40 +583,52 @@ public class TimeSheetLunchAPI {
 			return new ResponseEntity<ResponseBase>(HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/cancel_approve", method = RequestMethod.POST)
+	public ResponseEntity<ResponseBase> cancel_approve(@RequestBody TimeSheetLunch_updateStatus_request entity,
+			HttpServletRequest request) {
+		ResponseBase response = new ResponseBase();
+		try {
+			String comment = entity.comment;
+			Date workingdate = entity.workingdate; // ngay
+			Integer shifttypeid_link = entity.shifttypeid_link.intValue(); // bang timesheet_shift_type
+			Long orgid_link = entity.orgid_link; // p/xuong, to chuyen
+			
+			// tim danh sach cac timesheet lunch da xac nhan theo orgid_link, shifttypeid_link, workingdate
+			// update comment va status -> 0
+			
+			Org org = orgService.findOne(orgid_link);
+			List<TimeSheetLunch> timeSheetLunch_list = new ArrayList<TimeSheetLunch>();
+			if(org.getId().equals((long) 1)) {
+				// dha
+			}else if(org.getOrgtypeid_link().equals(OrgType.ORG_TYPE_XUONGSX)) {
+				// phan xuong
+				timeSheetLunch_list = timeSheetLunchService.getByOrg_Shift_DangKy(
+						orgid_link, shifttypeid_link, workingdate);
+				System.out.println("1");
+			}else {
+				// to chuyen ...
+				timeSheetLunch_list = timeSheetLunchService.getByOrg_Shift_DangKy(
+						orgid_link, shifttypeid_link, workingdate);
+				System.out.println("2");
+			}
+			
+			System.out.println(timeSheetLunch_list.size());
+			for(TimeSheetLunch timeSheetLunch : timeSheetLunch_list) {
+				timeSheetLunch.setComment(comment);
+				timeSheetLunch.setStatus(0);
+				timeSheetLunchService.save(timeSheetLunch);
+			}
 
-//	@RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
-//	public ResponseEntity<ResponseBase> updateStatus(@RequestBody TimeSheetLunch_updateStatus_request entity,
-//			HttpServletRequest request) {
-//		ResponseBase response = new ResponseBase();
-//		try {
-//			Long orgid_link = entity.orgid_link;
-//			Date workingdate = entity.workingdate;
-//			Integer status = entity.status;
-//
-//			Org org = orgService.findOne(orgid_link);
-//			List<TimeSheetLunch> listTimeSheetLunch = new ArrayList<TimeSheetLunch>();
-//			if (org.getOrgtypeid_link().equals(OrgType.ORG_TYPE_XUONGSX)) {
-//				listTimeSheetLunch = timeSheetLunchService.getForTimeSheetLunch(orgid_link, workingdate);
-//			} else {
-//				listTimeSheetLunch = timeSheetLunchService.getForUpdateStatusTimeSheetLunch(orgid_link, workingdate);
-//			}
-//
-//			// getForUpdateStatusTimeSheetLunch
-//
-//			for (TimeSheetLunch timeSheetLunch : listTimeSheetLunch) {
-//				timeSheetLunch.setStatus(status);
-//				timeSheetLunchService.save(timeSheetLunch);
-//			}
-//
-//			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
-//			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-//			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
-//		} catch (Exception e) {
-//			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
-//			response.setMessage(e.getMessage());
-//			return new ResponseEntity<ResponseBase>(HttpStatus.OK);
-//		}
-//	}
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<ResponseBase>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(HttpStatus.OK);
+		}
+	}
 
 	@RequestMapping(value = "/isconfirm", method = RequestMethod.POST)
 	public ResponseEntity<TimeSheetLunch_isconfirm_response> isconfirm(@RequestBody TimeSheetLunch_request entity,
