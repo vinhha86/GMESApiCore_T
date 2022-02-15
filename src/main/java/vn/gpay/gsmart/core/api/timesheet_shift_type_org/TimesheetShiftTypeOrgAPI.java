@@ -91,7 +91,19 @@ public class TimesheetShiftTypeOrgAPI {
 //			}else {
 //				response.data = timesheetShiftTypeOrgService.getByOrgid_link(id);
 //			}
-			response.data = timesheetShiftTypeOrgService.getByOrgid_link_CaAn(id);
+			
+			response.data = new ArrayList<TimesheetShiftTypeOrg>();
+//			Boolean isHavingNullValue = entity.isHavingNullValue == null ? false : entity.isHavingNullValue;
+//			if(isHavingNullValue) {
+//				TimesheetShiftTypeOrg timesheetShiftTypeOrg_NullValue = new TimesheetShiftTypeOrg();
+//				timesheetShiftTypeOrg_NullValue.setTimesheet_shift_type_id_link((long)0);
+//				timesheetShiftTypeOrg_NullValue.setId((long)0);
+//				response.data.add(timesheetShiftTypeOrg_NullValue);
+//			}
+			
+			List<TimesheetShiftTypeOrg> result = timesheetShiftTypeOrgService.getByOrgid_link_CaAn(id);
+			response.data.addAll(result);
+			
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
 			return new ResponseEntity<TimesheetShiftTypeOrg_response>(response, HttpStatus.OK);
