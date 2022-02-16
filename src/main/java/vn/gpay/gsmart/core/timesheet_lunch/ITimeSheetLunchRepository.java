@@ -130,6 +130,7 @@ public interface ITimeSheetLunchRepository
 			+ "and a.shifttypeid_link = :shifttypeid_link "
 			+ "and a.workingdate = :workingdate "
 			+ "and a.is_bo_sung = true "
+			+ "and a.status = 1 "
 			)
 	public List<TimeSheetLunch> getByOrg_Shift_Them(
 			@Param("orgid_link") final Long orgid_link,
@@ -145,6 +146,7 @@ public interface ITimeSheetLunchRepository
 			+ "and a.shifttypeid_link = :shifttypeid_link "
 			+ "and a.workingdate = :workingdate "
 			+ "and (a.is_bo_sung = false or a.is_bo_sung is null) "
+			+ "and a.status = 1 "
 			)
 	public List<TimeSheetLunch> getByOrg_Shift_DangKy(
 			@Param("orgid_link") final Long orgid_link,

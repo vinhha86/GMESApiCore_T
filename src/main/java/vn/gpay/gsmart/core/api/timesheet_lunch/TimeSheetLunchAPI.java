@@ -435,9 +435,9 @@ public class TimeSheetLunchAPI {
 			org_them.setId((long) -1);
 
 			list_org.add(org_them);
-
+			
 			for (Org org : list_org) {
-				if (org.getOrgtypeid_link().equals(166)) {
+				if (org.getOrgtypeid_link().equals(OrgType.ORG_TYPE_DONVIKHACH)) {
 					List<TimeSheetLunchKhach> listTimeSheetLunchKhach = lunchkhachService.getby_nhieungay_org(date_from, date_to,
 							orgid_link);
 					listTimeSheetLunchKhach.removeIf(c -> c.getAmount() == 0);

@@ -47,6 +47,8 @@ public class OrgType {
 	public static int ORG_TYPE_KCS 				= 37;
 	public static int ORG_TYPE_LAIXE 			= 38;
 	public static int ORG_TYPE_BANCAT 			= 39;
+	
+	public static int ORG_TYPE_DONVIKHACH 			= 166;
 
     public static int ORG_TYPE_UNKNOWN   		= -1; //Không xác định
 }
