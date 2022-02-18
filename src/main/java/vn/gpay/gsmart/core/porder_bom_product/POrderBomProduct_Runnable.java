@@ -1,5 +1,6 @@
 package vn.gpay.gsmart.core.porder_bom_product;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -146,6 +147,26 @@ public class POrderBomProduct_Runnable implements Runnable {
 					map.put(size + "_SX", amount_size_sx + "");
 					map.put(size + "_Vien", amount_size_vien + "");
 					map.put(size + "_Tong", amount_size_kt + amount_size_vien + "");
+					if(amount_size != null && amount_size_kt != null) {
+						DecimalFormat df = new DecimalFormat("0.00");
+						Float chechLech = amount_size - amount_size_kt;
+						Float phanTramChechLech = (float) 0;
+						String phanTramChechLechString = "";
+						if(chechLech > 0) {
+							phanTramChechLech = chechLech / amount_size * 100;
+							phanTramChechLechString = df.format(phanTramChechLech);
+							phanTramChechLechString = "-" + phanTramChechLechString + "%";
+						}else if(chechLech < 0) {
+							chechLech = amount_size_kt - amount_size;
+							phanTramChechLech = chechLech / amount_size * 100;
+							phanTramChechLechString = df.format(phanTramChechLech);
+							phanTramChechLechString = "+" + phanTramChechLechString + "%";
+						}else {
+							phanTramChechLech = (float) 0;
+							phanTramChechLechString = phanTramChechLech + "";
+						}
+						map.put(size + "_PhanTramChenhLech", phanTramChechLechString);
+					}
 
 					if (amount_size > 0) {
 						check = true;

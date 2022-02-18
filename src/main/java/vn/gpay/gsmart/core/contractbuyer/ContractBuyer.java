@@ -48,6 +48,11 @@ public class ContractBuyer implements Serializable {
 	@JoinColumn(name = "contractbuyerid_link", insertable = false, updatable = false)
 	private List<ContractBuyerD> contractBuyerDs = new ArrayList<ContractBuyerD>();
 
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne
+	@JoinColumn(name = "buyerid_link", insertable = false, updatable = false)
+	private Org buyer;
+	
 	@Transient
 	public String getBuyerCodes() {
 		String result = "";
@@ -60,11 +65,19 @@ public class ContractBuyer implements Serializable {
 		}
 		return result;
 	}
-
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne
-	@JoinColumn(name = "buyerid_link", insertable = false, updatable = false)
-	private Org buyer;
+	
+	@Transient
+	public String getBuyerNames() {
+		String result = "";
+		for (ContractBuyerD cbd : contractBuyerDs) {
+			if (result.equals("")) {
+				result += cbd.getBuyerName();
+			} else {
+				result += "; " + cbd.getBuyerName();
+			}
+		}
+		return result;
+	}
 
 	@Transient
 	public String getBuyerName() {
