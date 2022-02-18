@@ -168,6 +168,7 @@ public class TimeSheetInOutAPI {
 			}
 						
 			for(TimeSheetDaily daily : lsttimesheetinout) {
+				//Neu nhan su co trong danh sach nhan su cua don vi thi moi tinh, neu khong loai khoi danh sach
 				if(map_person.containsKey(Integer.parseInt(daily.getPersonnel_code()))) {
 					Personel person = map_person.get(Integer.parseInt(daily.getPersonnel_code()));
 					

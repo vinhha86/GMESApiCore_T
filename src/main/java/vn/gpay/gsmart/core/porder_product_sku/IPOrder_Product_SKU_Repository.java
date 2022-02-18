@@ -90,9 +90,15 @@ public interface IPOrder_Product_SKU_Repository extends JpaRepository<POrder_Pro
 	public List<Long> GetListPO_id_ByGrant(
 			@Param ("pordergrantid_link")final  long pordergrantid_link);
 	
-	@Query(value = "select distinct b from POrderGrant_SKU a "
-			+ "inner join PContract_PO b on a.pcontract_poid_link = b.id "
-			+ "where a.pordergrantid_link= :pordergrantid_link")
+//	@Query(value = "select distinct b from POrderGrant_SKU a "
+//			+ "inner join PContract_PO b on a.pcontract_poid_link = b.id "
+//			+ "where a.pordergrantid_link= :pordergrantid_link")
+//	public List<PContract_PO> GetListPO_ByGrant(
+//			@Param ("pordergrantid_link")final  long pordergrantid_link);
+	
+	@Query(value = "select distinct a from PContract_PO a "
+			+ "where a.id in (select b.pcontract_poid_link from POrder b "
+			+ "where b.id in (select c.porderid_link from POrderGrant c where c.id = :pordergrantid_link))")
 	public List<PContract_PO> GetListPO_ByGrant(
 			@Param ("pordergrantid_link")final  long pordergrantid_link);
 }
