@@ -30,6 +30,7 @@ import vn.gpay.gsmart.core.personel.Personel;
 import vn.gpay.gsmart.core.timesheetinout.TimeSheetDaily;
 import vn.gpay.gsmart.core.timesheetinout.TimeSheetInOut;
 import vn.gpay.gsmart.core.utils.AtributeFixValues;
+import vn.gpay.gsmart.core.utils.HttpPost;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -211,4 +212,37 @@ public class TimeSheetInOutAPI {
 		return new ResponseEntity<getDailyResponse>(response, HttpStatus.OK);
 		
 	}
+	
+	@RequestMapping(value = "/calculate_daily", method = RequestMethod.POST)
+	public ResponseEntity<getDailyResponse> calculateDaily(@RequestBody getDailyRequest entity) {
+		getDailyResponse response = new getDailyResponse();
+		try {
+			long orgid_link = entity.orgid_link;
+			
+			String urlPost = AtributeFixValues.url_timesheet+"/timesheet/calculate_daily";
+			
+            
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode appParNode = objectMapper.createObjectNode();
+            
+            //truyen param theo
+            appParNode.put("orgid_link", orgid_link);
+            String jsonReq = objectMapper.writeValueAsString(appParNode);
+            
+            HttpPost http = new HttpPost();
+            String result = http.getDataFromHttpPost(jsonReq, urlPost);
+            if("\"OK\"".equals(result))			
+            	response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+            else 
+            	response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		}
+		return new ResponseEntity<getDailyResponse>(response, HttpStatus.OK);
+		
+	}
+	
 }
