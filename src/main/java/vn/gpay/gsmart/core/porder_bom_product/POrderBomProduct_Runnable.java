@@ -111,8 +111,13 @@ public class POrderBomProduct_Runnable implements Runnable {
 					List<POrderBOMSKU> listbomsku_kt_clone = new ArrayList<POrderBOMSKU>(listbomsku_kythuat);
 					List<POrderBOMSKU> listbomsku_sx_clone = new ArrayList<POrderBOMSKU>(listbomsku_sanxuat);
 					List<POrderBOMSKU> listbomsku_vien_clone = new ArrayList<POrderBOMSKU>(listbomsku_vien);
+					
 
-					long skuid_link = map_sku.get(colorid + "_" + size);
+					Long skuid_link = map_sku.get(colorid + "_" + size);
+//					if (null == skuid_link) {
+//						System.out.println(materialid_link);
+//					}					
+					
 					listbomsku_clone.removeIf(c -> !c.getMaterialid_link().equals(materialid_link)
 							|| !c.getSkuid_link().equals(skuid_link));
 
@@ -184,6 +189,7 @@ public class POrderBomProduct_Runnable implements Runnable {
 				listbom.remove(pContractProductBom);
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
 			latch.countDown();
 		}
