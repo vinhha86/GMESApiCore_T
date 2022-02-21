@@ -19,6 +19,8 @@ public class PContractProductSKUBinding {
 	private String coSanPham;
 	private Long sizeId;
 	private Long colorId;
+	private String tenSanPham;
+	private String maSanPham;
 	
 	public Long getId() {
 		return id;
@@ -128,4 +130,17 @@ public class PContractProductSKUBinding {
 	public void setPcontract_poid_link(Long pcontract_poid_link) {
 		this.pcontract_poid_link = pcontract_poid_link;
 	}
+	public String getTenSanPham() {
+		return tenSanPham;
+	}
+	public void setTenSanPham(String tenSanPham) {
+		this.tenSanPham = tenSanPham;
+	}
+	public String getMaSanPham() {
+		return maSanPham;
+	}
+	public void setMaSanPham(String maSanPham) {
+		this.maSanPham = maSanPham;
+	}
+	
 }
