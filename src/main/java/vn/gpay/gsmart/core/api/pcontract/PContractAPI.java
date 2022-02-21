@@ -26,6 +26,7 @@ import vn.gpay.gsmart.core.pcontract.IPContract_AutoID_Service;
 import vn.gpay.gsmart.core.pcontract.PContract;
 import vn.gpay.gsmart.core.pcontract.PContractChart;
 import vn.gpay.gsmart.core.pcontract_po.IPContract_POService;
+import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBOMColorService;
 import vn.gpay.gsmart.core.pcontractbomcolor.IPContractBom2ColorService;
 import vn.gpay.gsmart.core.pcontractbomcolor.PContractBOMColor;
@@ -46,6 +47,7 @@ import vn.gpay.gsmart.core.pcontractproductpairing.IPContractProductPairingServi
 import vn.gpay.gsmart.core.pcontractproductpairing.PContractProductPairing;
 import vn.gpay.gsmart.core.pcontractproductsku.IPContractProductSKUService;
 import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
+import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKUBinding;
 import vn.gpay.gsmart.core.porder.IPOrder_Service;
 import vn.gpay.gsmart.core.porder_req.IPOrder_Req_Service;
 import vn.gpay.gsmart.core.product.IProductService;
@@ -99,6 +101,8 @@ public class PContractAPI {
 	IProductService productService;
 	@Autowired
 	IProductPairingService pairService;
+	@Autowired
+	IPContract_POService pcontract_POService;
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ResponseEntity<PContract_create_response> PContractCreate(@RequestBody PContract_create_request entity,
@@ -564,11 +568,45 @@ public class PContractAPI {
 			HttpServletRequest request) {
 		PContract_getone_response response = new PContract_getone_response();
 		try {
-
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			Long orgid_link = user.getOrgid_link();
+			//
+			String orgcode = user.getOrgcode();
+			List<String> orgs = new ArrayList<String>();
+			List<Long> list_org = new ArrayList<Long>();
+			if (orgid_link != 0 && orgid_link != 1) {
+				for (GpayUserOrg userorg : userOrgService.getall_byuser_andtype(user.getId(),
+						OrgType.ORG_TYPE_FACTORY)) {
+					orgs.add(userorg.getOrgcode());
+					list_org.add(userorg.getOrgid_link());
+				}
+				// Them chinh don vi cua user
+				orgs.add(orgcode);
+				if (!list_org.contains(orgid_link))
+					list_org.add(orgid_link);
+			}
+			//
+//			Boolean isDHATong = true;
+//			Org phanXuong = new Org();
+//			if(orgid_link.equals((long) 1)) {
+//				isDHATong = true;
+//			}else{
+//				isDHATong = false;
+//			}
+//			if(isDHATong == false) {
+//				phanXuong = orgService.findOne(orgid_link);
+//			}
+			// 
+			List<Integer> type = new ArrayList<Integer>();
+			type.add(10);
 			Long pcontract_id = entity.id;
 			PContract pcontract = pcontractService.findOne(entity.id);
 			
 			// danh sach obj de chuan bi them vao file
+			List<PContractProductSKUBinding> pcontractProductSKUBinding_list = new ArrayList<PContractProductSKUBinding>();
+			
+			List<PContract_PO> pcontract_PO_list = pcontract_POService.getPO_Offer_Accept_ByPContract_AndOrg(
+					pcontract_id, (long)0, list_org);
 			
 			
 			// them vao file excel
