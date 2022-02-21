@@ -558,4 +558,30 @@ public class PContractAPI {
 			return new ResponseEntity<PContract_getbypaging_response>(response, HttpStatus.OK);
 		}
 	}
+	
+	@RequestMapping(value = "/get_TongHopBaoCaoKHSX", method = RequestMethod.POST)
+	public ResponseEntity<PContract_getone_response> get_TongHopBaoCaoKHSX(@RequestBody PContract_getone_request entity,
+			HttpServletRequest request) {
+		PContract_getone_response response = new PContract_getone_response();
+		try {
+
+			Long pcontract_id = entity.id;
+			PContract pcontract = pcontractService.findOne(entity.id);
+			
+			// danh sach obj de chuan bi them vao file
+			
+			
+			// them vao file excel
+			
+			response.data = pcontract;
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<PContract_getone_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<PContract_getone_response>(response, HttpStatus.OK);
+		}
+	}
 }
