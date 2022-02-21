@@ -2431,7 +2431,22 @@ public class PContract_POAPI {
 //			System.out.println(new Date());
 			List<PContract_PO> pcontract = pcontract_POService.getPO_Offer_Accept_ByPContract_AndOrg(
 					entity.pcontractid_link, entity.productid_link == null ? 0 : entity.productid_link, list_org);
-
+			
+			// so sanh po_quantity voi po_line thuc te
+			for(PContract_PO pcontract_PO : pcontract) {
+				Long pcontract_poid_link = pcontract_PO.getId();
+				List<PContract_PO> listPContractPO = pcontract_POService
+						.get_by_parent_and_type_and_MauSP(pcontract_poid_link, POType.PO_LINE_CONFIRMED, null);
+				Integer po_quantity_total = 0;
+				for(PContract_PO pcontract_PO_child : listPContractPO) {
+					Integer po_quantity_child = pcontract_PO_child.getPo_quantity() == null ? 0 : pcontract_PO_child.getPo_quantity();
+					po_quantity_total += po_quantity_child;
+				}
+				pcontract_PO.setPo_quantity_total(po_quantity_total);
+				Integer po_quantity = pcontract_PO.getPo_quantity() == null ? 0 : pcontract_PO.getPo_quantity();
+				pcontract_PO.setPo_quantity_difference((po_quantity_total - po_quantity));
+			}
+			
 //			if(orgs.size() > 0 ) {
 //				for(PContract_PO parent: pcontract) {
 ////				      new Thread("" + parent.getId()){
@@ -2901,6 +2916,8 @@ public class PContract_POAPI {
 
 			List<PContract_PO> listPContractPO = pcontract_POService
 					.get_by_parent_and_type_and_MauSP(pcontract_poid_link, POType.PO_LINE_CONFIRMED, mausanphamid_link);
+			
+//			System.out.println(listPContractPO.size());
 
 			// Update danh sach to chuyen duoc giao sx cho PO Line
 			for (PContract_PO thePoline : listPContractPO) {

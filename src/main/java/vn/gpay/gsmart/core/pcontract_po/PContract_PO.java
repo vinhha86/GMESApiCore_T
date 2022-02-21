@@ -96,6 +96,10 @@ public class PContract_PO implements Serializable {
 	private String dc;
 
 	@Transient
+	private Integer po_quantity_total; // sum po_quantity po con thuc te
+	@Transient
+	private Integer po_quantity_difference; // hieu so po_quantity_total - po_quantity
+	@Transient
 	private int po_quantity_sp;
 	@Transient
 	private int totalpair;
@@ -918,7 +922,21 @@ public class PContract_PO implements Serializable {
 	public void setFob_worklist(String fob_worklist) {
 		this.fob_worklist = fob_worklist;
 	}
-	
-	
 
+	public Integer getPo_quantity_total() {
+		return po_quantity_total;
+	}
+
+	public void setPo_quantity_total(Integer po_quantity_total) {
+		this.po_quantity_total = po_quantity_total;
+	}
+
+	public Integer getPo_quantity_difference() {
+		return po_quantity_difference;
+	}
+
+	public void setPo_quantity_difference(Integer po_quantity_difference) {
+		this.po_quantity_difference = po_quantity_difference;
+	}
+	
 }

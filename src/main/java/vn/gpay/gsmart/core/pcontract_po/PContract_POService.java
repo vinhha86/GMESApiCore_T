@@ -71,7 +71,6 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 
 	@Override
 	protected JpaRepository<PContract_PO, Long> getRepository() {
-		// TODO Auto-generated method stub
 		return repo;
 	}
 
@@ -130,7 +129,6 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 
 	@Override
 	public List<PContract_PO> getPO_Offer_Accept_ByPContract(Long pcontractid_link, Long productid_link) {
-		// TODO Auto-generated method stub
 		try {
 			return repo.getPO_Offer_Accept_ByPContract(pcontractid_link, productid_link == 0 ? null : productid_link);
 		} catch (Exception ex) {
@@ -164,14 +162,12 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 
 	@Override
 	public List<PContract_PO> get_by_parentid(Long pcontractpo_parentid_link) {
-		// TODO Auto-generated method stub
 		return repo.getby_parentid_link(pcontractpo_parentid_link);
 	}
 
 	@Override
 	public List<PContract_PO> check_exist_po_children(String PO_No, Date Shipdate, Long shipmodeid_link,
 			Long pcontractid_link, Long parentid_link) {
-		// TODO Auto-generated method stub
 		return repo.getone_po_upload(PO_No, shipmodeid_link, Shipdate, pcontractid_link, parentid_link);
 	}
 
@@ -219,7 +215,6 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	@Override
 	public List<PContract_PO> getPO_Offer_Accept_ByPContract_AndOrg(Long pcontractid_link, Long productid_link,
 			List<Long> list_orgid_link) {
-		// TODO Auto-generated method stub
 		productid_link = productid_link == 0 ? null : productid_link;
 		if (list_orgid_link.size() == 0)
 			return repo.getPO_Offer_Accept_ByPContract(pcontractid_link, productid_link);
@@ -229,32 +224,27 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 
 	@Override
 	public List<PContract_PO> getby_porder(Long porderid_link) {
-		// TODO Auto-generated method stub
 		return repo.getby_porder(porderid_link);
 	}
 
 	@Override
 	public List<PContract_PO> check_exist_line(Date ShipDate, long productid_link, long pcontractid_link,
 			long parentid_link) {
-		// TODO Auto-generated method stub
 		return repo.getone_line_giaohang(productid_link, ShipDate, pcontractid_link, parentid_link);
 	}
 
 	@Override
 	public List<PContract_PO> get_by_parent_and_type(Long pcontractpo_parentid_link, int po_typeid_link) {
-		// TODO Auto-generated method stub
 		return repo.getby_parent_and_type(pcontractpo_parentid_link, po_typeid_link);
 	}
 
 	@Override
 	public List<PContract_PO> getall_offers_by_org(List<Long> orgid_link) {
-		// TODO Auto-generated method stub
 		return repo.getOffers_byOrg(orgid_link);
 	}
 
 	@Override
 	public List<Long> getpcontract_BySearch(String po_code, List<Long> orgs) {
-		// TODO Auto-generated method stub
 		po_code = po_code == null ? "" : po_code;
 		orgs = orgs.size() == 0 ? null : orgs;
 
@@ -263,21 +253,18 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 
 	@Override
 	public List<PContract_PO> getBySearch_andType(String po_code, List<Long> orgs, int po_type) {
-		// TODO Auto-generated method stub
 		orgs = orgs.size() == 0 ? null : orgs;
 		return repo.getBySearch_OrgAndType(po_code, orgs, po_type);
 	}
 
 	@Override
 	public List<PContract_PO> getby_pcontract_and_type(Long pcontractid_link, List<Integer> type) {
-		// TODO Auto-generated method stub
 		return repo.getby_pcontract_and_type(type, pcontractid_link);
 	}
 
 	@Override
 	public List<PContractPO_Shipping> get_po_shipping(Long orgrootid_link, List<Long> orgs, Long productid_link,
 			Long colorid_link, Long sizesetid_link) {
-		// TODO Auto-generated method stub
 		orgs = orgs.size() == 0 ? null : orgs;
 		List<SizeSetAttributeValue> list_av = sizesetatt_repo.getall_bySizeSetId(sizesetid_link);
 		List<Long> listsku = new ArrayList<Long>();
@@ -400,53 +387,49 @@ public class PContract_POService extends AbstractService<PContract_PO> implement
 	@Override
 	public List<PContract_PO> getbycode_and_type_and_product(String po_no, int type, Long pcontractid_link,
 			Long productid_link) {
-		// TODO Auto-generated method stub
 		return repo.getbycode_and_type_and_product(pcontractid_link, po_no, type, productid_link);
 	}
 
 	@Override
 	public List<PContract_PO> getpo_notin_list(List<String> list_po, int type, Long pcontractid_link) {
-		// TODO Auto-generated method stub
 		return repo.getnotin_list_pono(pcontractid_link, list_po, type);
 	}
 
 	@Override
 	public List<PContract_PO> getby_pcontract_and_type_andproduct(Long pcontractid_link, List<Integer> type,
 			Long productid_link) {
-		// TODO Auto-generated method stub
 		return repo.getby_pcontract_and_type_and_product(type, pcontractid_link, productid_link);
 	}
 
 	@Override
 	public List<PContract_PO> getpo_byid(Long pcontractpoid_link) {
-		// TODO Auto-generated method stub
 		return repo.getbyId(pcontractpoid_link);
 	}
 
 	@Override
 	public List<PContract_PO> get_by_parent_and_type_and_MauSP(Long pcontractpo_parentid_link, int po_typeid_link,
 			Long mausanphamid_link) {
-		// TODO Auto-generated method stub
 		return repo.getby_parent_and_type_and_mausp(pcontractpo_parentid_link, mausanphamid_link, po_typeid_link);
+	}
+	
+	@Override
+	public Integer getSumPoQuantity_by_parent_and_type_and_mausp(Long pcontractpo_parentid_link, int po_typeid_link,
+			Long mausanphamid_link) {
+		return repo.getSumPoQuantity_by_parent_and_type_and_mausp(pcontractpo_parentid_link, mausanphamid_link, po_typeid_link);
 	}
 
 	@Override
 	public List<PContract_PO> getPO_HavetoShip(Long orgrootid_link, Date shipdate_from, Date shipdate_to) {
-		// TODO Auto-generated method stub
-//		System.out.println(shipdate_from);
-//		System.out.println(shipdate_to);
 		return repo.getPO_HavetoShip(orgrootid_link, shipdate_from, shipdate_to);
 	}
 	
 	@Override
 	public Integer getTotalProductinPcontract(Long pcontractid_link, Long productid_link) {
-		// TODO Auto-generated method stub
 		return repo.getTotalProductinPcontract(pcontractid_link, productid_link);
 	}
 
 	@Override
 	public Float getTotalPriceProductInPcontract(Long pcontractid_link, Long productid_link) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
