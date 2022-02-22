@@ -1935,6 +1935,31 @@ public class PContract_POAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/update_merchandiser", method = RequestMethod.POST)
+	public ResponseEntity<PContract_pocreate_response> update_merchandiser(@RequestBody PContract_pocreate_request entity,
+			HttpServletRequest request) {
+		PContract_pocreate_response response = new PContract_pocreate_response();
+		try {
+//			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+			PContract_PO pcontract_po_req = entity.data;
+			PContract_PO pcontract_po = pcontract_POService.findOne(pcontract_po_req.getId());
+			pcontract_po.setMerchandiserid_link(pcontract_po_req.getMerchandiserid_link());
+			pcontract_POService.save(pcontract_po);
+
+			// Response to Client
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+
+			return new ResponseEntity<PContract_pocreate_response>(response, HttpStatus.OK);
+
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<PContract_pocreate_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	private void update_quantity_parentpo(Long parentpoid_link) {
 		if (null != parentpoid_link) {
 			List<PContract_PO> ls_po_child = pcontract_POService.get_by_parent_and_type(parentpoid_link, POType.PO_LINE_PLAN);
@@ -2103,6 +2128,43 @@ public class PContract_POAPI {
 				}
 			}
 			response.data = pcontract;
+
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getby_pcontract_and_type_response>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+			return new ResponseEntity<getby_pcontract_and_type_response>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/getDsPhanXuongSX_byPcontractId", method = RequestMethod.POST)
+	public ResponseEntity<getby_pcontract_and_type_response> getDsPhanXuongSX_byPcontractId(
+			@RequestBody getby_pcontract_and_type_request entity, HttpServletRequest request) {
+		getby_pcontract_and_type_response response = new getby_pcontract_and_type_response();
+		try {
+			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			long orgrootid_link = user.getRootorgid_link();
+
+			List<Integer> type = new ArrayList<Integer>();
+			Long pcontractid_link = entity.pcontractid_link;
+			String[] list_type = entity.potype.split(",");
+			for (String id : list_type) {
+				type.add(Integer.parseInt(id));
+			}
+
+			List<PContract_PO> pcontract = pcontract_POService.getby_pcontract_and_type(pcontractid_link, type);
+			List<Long> phanXuongIds = new ArrayList<Long>();
+			for (PContract_PO po : pcontract) {
+				List<Long> factories_Id = po.getFactories_Id();
+				for(Long id : factories_Id) {
+					if(!phanXuongIds.contains(id)) {
+						phanXuongIds.add(id);
+					}
+				}
+			}
+			response.phanXuongIds = phanXuongIds;
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));

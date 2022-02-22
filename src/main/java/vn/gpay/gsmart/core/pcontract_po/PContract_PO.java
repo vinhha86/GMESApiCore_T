@@ -31,6 +31,7 @@ import vn.gpay.gsmart.core.pcontractproductsku.PContractProductSKU;
 import vn.gpay.gsmart.core.porder_req.POrder_Req;
 import vn.gpay.gsmart.core.product.Product;
 import vn.gpay.gsmart.core.security.GpayUser;
+import vn.gpay.gsmart.core.utils.OrgType;
 import vn.gpay.gsmart.core.utils.POType;
 
 @Table(name = "pcontract_po")
@@ -413,6 +414,20 @@ public class PContract_PO implements Serializable {
 				name += ", " + req.getGranttoorgcode();
 		}
 		return name;
+	}
+	
+	@Transient
+	public List<Long> getFactories_Id() {
+		List<Long> orgIds = new ArrayList<Long>();
+		for (POrder_Req req : porder_req) {
+			if(req.getGranttoorgid_link() != null) {
+				if (orgIds.contains(req.getGranttoorgid_link()))
+					continue;
+				if(req.getGranttoorgtype().equals(OrgType.ORG_TYPE_XUONGSX))
+					orgIds.add(req.getGranttoorgid_link());
+			}
+		}
+		return orgIds;
 	}
 
 	public List<PContract_Price> getPcontract_price() {

@@ -257,6 +257,37 @@ public class UserAPI {
 		}
 	}
 	
+	@RequestMapping(value = "/getby_org_buyer_multi",method = RequestMethod.POST)
+	public ResponseEntity<getby_org_pcontract_response> getby_org_buyer_multi( @RequestBody getby_org_pcontract_request entity,HttpServletRequest request ) {
+		getby_org_pcontract_response response = new getby_org_pcontract_response();
+		try {
+//			GpayAuthentication user = (GpayAuthentication)SecurityContextHolder.getContext().getAuthentication();
+//			long orgrootid_link = user.getRootorgid_link();
+//			long orgid_link = entity.orgid_link;
+//			long orgbuyerid_link = entity.orgbuyerid_link;
+			List<Long> orgid_link_arr = entity.orgid_link_arr;
+			response.data = new ArrayList<GpayUser>();
+			for(Long orgid_link : orgid_link_arr) {
+				List<GpayUser> user_list = userDetailsService.getUserList(orgid_link,"", 1);
+				response.data.addAll(0, user_list);
+			}
+			
+//			response.data=userDetailsService.getUserList(orgid_link,"", 1);
+			
+//			for(GpayUser _user : response.data) {
+//				long merchandiserid_link = _user.getId();
+//				_user.index = pcontractService.getby_buyer_merchandiser(orgrootid_link, orgbuyerid_link, merchandiserid_link);
+//			}
+			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+			return new ResponseEntity<getby_org_pcontract_response>(response,HttpStatus.OK);
+		}catch (Exception e) {
+			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+			response.setMessage(e.getMessage());
+		    return new ResponseEntity<getby_org_pcontract_response>(response,HttpStatus.OK);
+		}
+	}
+	
 	@RequestMapping(value = "/user_delete",method = RequestMethod.POST)
 	public ResponseEntity<ResponseBase> Delete( @RequestBody UserByIdRequest entity,HttpServletRequest request ) {
 		ResponseBase response = new ResponseBase();

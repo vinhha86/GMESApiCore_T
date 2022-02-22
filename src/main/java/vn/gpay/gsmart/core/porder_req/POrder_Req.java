@@ -133,6 +133,14 @@ public class POrder_Req implements Serializable {
 	}
 	
 	@Transient
+	public Integer getGranttoorgtype() {
+		if(org != null) {
+			return org.getOrgtypeid_link() == null ? 0 : org.getOrgtypeid_link();
+		}
+		return 0;
+	}
+	
+	@Transient
 	public String getProduct_code() {
 		if(product != null) {
 			return product.getBuyercode();

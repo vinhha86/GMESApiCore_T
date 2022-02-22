@@ -7,4 +7,5 @@ import vn.gpay.gsmart.core.pcontract_po.PContract_PO;
 
 public class getby_pcontract_and_type_response extends ResponseBase {
 	public List<PContract_PO> data;
+	public List<Long> phanXuongIds;
 }
