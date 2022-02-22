@@ -13,11 +13,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -76,6 +76,7 @@ public class TimeSheetReportAPI {
 		XSSFWorkbook workbook = new XSSFWorkbook(is_filecopy);
 		XSSFSheet sheet = workbook.getSheetAt(0);
 
+
 		// tao font de cho vao style
 
 		XSSFFont font_Calibri = workbook.createFont();
@@ -99,17 +100,47 @@ public class TimeSheetReportAPI {
 		cellStyle_row0.setFont(font_Calibri_bold);
 		cellStyle_row0.setFillForegroundColor(IndexedColors.RED.index);
 		cellStyle_row0.setFillBackgroundColor(IndexedColors.RED.index);
+		cellStyle_row0.setBorderTop(BorderStyle.THIN);
+		cellStyle_row0.setBorderBottom(BorderStyle.THIN);
+		cellStyle_row0.setBorderLeft(BorderStyle.THIN);
+		cellStyle_row0.setBorderRight(BorderStyle.THIN);
+		
+		XSSFCellStyle cellStyle_row0_borderless = workbook.createCellStyle();
+		cellStyle_row0_borderless.setAlignment(HorizontalAlignment.CENTER);
+		cellStyle_row0_borderless.setVerticalAlignment(VerticalAlignment.CENTER);
+		cellStyle_row0_borderless.setFont(font_Calibri_bold);
+		cellStyle_row0_borderless.setFillForegroundColor(IndexedColors.RED.index);
+		cellStyle_row0_borderless.setFillBackgroundColor(IndexedColors.RED.index);
+
 		
 		XSSFCellStyle cellStyle_row_inout = workbook.createCellStyle();
 		cellStyle_row_inout.setAlignment(HorizontalAlignment.CENTER);
 		cellStyle_row_inout.setVerticalAlignment(VerticalAlignment.CENTER);
 		cellStyle_row_inout.setFont(font_Calibri);
+		cellStyle_row_inout.setBorderTop(BorderStyle.THIN);
+		cellStyle_row_inout.setBorderBottom(BorderStyle.THIN);
+		cellStyle_row_inout.setBorderLeft(BorderStyle.THIN);
+		cellStyle_row_inout.setBorderRight(BorderStyle.THIN);
+		
+		XSSFCellStyle cellStyle_row_inout_borderless = workbook.createCellStyle();
+		cellStyle_row_inout_borderless.setAlignment(HorizontalAlignment.CENTER);
+		cellStyle_row_inout_borderless.setVerticalAlignment(VerticalAlignment.CENTER);
+		cellStyle_row_inout_borderless.setFont(font_Calibri);
+
 		
 		XSSFCellStyle cellStyle_row_lunch = workbook.createCellStyle();
 		cellStyle_row_lunch.setAlignment(HorizontalAlignment.CENTER);
 		cellStyle_row_lunch.setVerticalAlignment(VerticalAlignment.CENTER);
 		cellStyle_row_lunch.setFont(font_Calibri_Italic);
+		cellStyle_row_lunch.setBorderTop(BorderStyle.THIN);
+		cellStyle_row_lunch.setBorderBottom(BorderStyle.THIN);
+		cellStyle_row_lunch.setBorderLeft(BorderStyle.THIN);
+		cellStyle_row_lunch.setBorderRight(BorderStyle.THIN);
 
+		XSSFCellStyle cellStyle_row_lunch_borderless = workbook.createCellStyle();
+		cellStyle_row_lunch_borderless.setAlignment(HorizontalAlignment.CENTER);
+		cellStyle_row_lunch_borderless.setVerticalAlignment(VerticalAlignment.CENTER);
+		cellStyle_row_lunch_borderless.setFont(font_Calibri_Italic);
 
 		try {
 			getDailyRequest timesheet_req = new getDailyRequest();
@@ -144,6 +175,7 @@ public class TimeSheetReportAPI {
 			if (null != timesheet_daily) {
 				int iRowID = 4;
 				Integer iSTT = 0;
+				Integer iRow = 1;
 				List<TimeSheetDaily> timesheet_data = timesheet_daily.getBody().data;
 //				System.out.println("rows:" + timesheet_data.size());
 				for (TimeSheetDaily oneTSRow:  timesheet_data) {
@@ -166,12 +198,28 @@ public class TimeSheetReportAPI {
 						Cell cell_TenNV = tsRow.createCell(ColumnExcel.C);
 						cell_TenNV.setCellValue(oneTSRow.getFullname());
 						cell_TenNV.setCellStyle(theCellStyle);
+						
+						//Ngat trang
+						if (iSTT % 12 == 0) {
+							System.out.println(iSTT);
+							sheet.setRowBreak(iRowID-2);
+						}
 					}  else {
 						if (oneTSRow.getSortvalue() > 1 && oneTSRow.getSortvalue() <=3)
 							theCellStyle = cellStyle_row_lunch;
 						else
 							theCellStyle = cellStyle_row_inout;
-							
+						
+						//3 cot dau de trong
+						Cell cell_A = tsRow.createCell(ColumnExcel.A);
+						cell_A.setCellValue("");
+						cell_A.setCellStyle(theCellStyle);
+						Cell cell_B = tsRow.createCell(ColumnExcel.B);
+						cell_B.setCellValue("");
+						cell_B.setCellStyle(theCellStyle);
+						Cell cell_C = tsRow.createCell(ColumnExcel.C);
+						cell_C.setCellValue("");
+						cell_C.setCellStyle(theCellStyle);
 					}
 					int iStartCol = ColumnExcel.D;
 					for (int i =1; i<=31;i++) {
@@ -275,8 +323,75 @@ public class TimeSheetReportAPI {
 
 						iStartCol++;
 					}
+					
+					//Set Style cho phan ky ten
+					Cell cell_Sign = tsRow.createCell(iStartCol);
+					cell_Sign.setCellStyle(theCellStyle);
+					
+					//Merge cells
+					if (iRow > 5 && iRow % 5 == 1) {
+						int row_start = iRowID - 6;
+						int row_end = iRowID - 2;
+						sheet.addMergedRegion(new CellRangeAddress(row_start, row_end, ColumnExcel.A, ColumnExcel.A));
+						sheet.addMergedRegion(new CellRangeAddress(row_start, row_end, ColumnExcel.B, ColumnExcel.B));
+						sheet.addMergedRegion(new CellRangeAddress(row_start, row_end, ColumnExcel.C, ColumnExcel.C));
+						sheet.addMergedRegion(new CellRangeAddress(row_start, row_end, ColumnExcel.AI, ColumnExcel.AI));
+					}
+					iRow++;
 				}
+				//Merge cells nguoi cuoi cung
+				int row_start = iRowID - 5;
+				int row_end = iRowID - 1;
+				sheet.addMergedRegion(new CellRangeAddress(row_start, row_end, ColumnExcel.A, ColumnExcel.A));
+				sheet.addMergedRegion(new CellRangeAddress(row_start, row_end, ColumnExcel.B, ColumnExcel.B));
+				sheet.addMergedRegion(new CellRangeAddress(row_start, row_end, ColumnExcel.C, ColumnExcel.C));
+				sheet.addMergedRegion(new CellRangeAddress(row_start, row_end, ColumnExcel.AI, ColumnExcel.AI));
+				
+				//Dong footer
+				iRowID = iRowID+1;
+				Row tsRow_f1 = sheet.createRow(iRowID++);
+				Cell cell_f_B1 = tsRow_f1.createCell(ColumnExcel.B);
+				cell_f_B1.setCellValue("Ghi chú:");
+				cell_f_B1.setCellStyle(cellStyle_row0_borderless);
+				Cell cell_f_C1 = tsRow_f1.createCell(ColumnExcel.C);
+				cell_f_C1.setCellValue("Ô: Nghỉ ốm");
+				Cell cell_f_F1 = tsRow_f1.createCell(ColumnExcel.F);
+				cell_f_F1.setCellValue("L: Nghỉ lẻ");
+				Cell cell_f_I1 = tsRow_f1.createCell(ColumnExcel.I);
+				cell_f_I1.setCellValue("H: Học tập, Hội họp");
+				Cell cell_f_M1 = tsRow_f1.createCell(ColumnExcel.M);
+				cell_f_M1.setCellValue("Ro: Nghỉ không hưởng lương");
+				Cell cell_f_AD1 = tsRow_f1.createCell(ColumnExcel.AD);
+				cell_f_AD1.setCellValue("00:00 : Tổng thời gian");
+				cell_f_AD1.setCellStyle(cellStyle_row0_borderless);
+				
+				Row tsRow_f2 = sheet.createRow(iRowID++);
+				Cell cell_f_C2 = tsRow_f2.createCell(ColumnExcel.C);
+				cell_f_C2.setCellValue("CO: Nghỉ con ốm");
+				Cell cell_f_F2 = tsRow_f2.createCell(ColumnExcel.F);
+				cell_f_F2.setCellValue("CT: Công tác");
+				Cell cell_f_I2 = tsRow_f2.createCell(ColumnExcel.I);
+				cell_f_I2.setCellValue("R: Nghỉ, Hiếu, Hỉ");
+				Cell cell_f_M2 = tsRow_f2.createCell(ColumnExcel.M);
+				cell_f_M2.setCellValue("DC: Đình chỉ");
+				Cell cell_f_AD2 = tsRow_f2.createCell(ColumnExcel.AD);
+				cell_f_AD2.setCellValue("00:00 : Thời gian ăn ca");
+				cell_f_AD2.setCellStyle(cellStyle_row_lunch_borderless);
+				
+				Row tsRow_f3 = sheet.createRow(iRowID++);
+				Cell cell_f_C3 = tsRow_f3.createCell(ColumnExcel.C);
+				cell_f_C3.setCellValue("CO: Nghỉ con ốm");
+				Cell cell_f_F3 = tsRow_f3.createCell(ColumnExcel.F);
+				cell_f_F3.setCellValue("CT: Công tác");
+				Cell cell_f_I3 = tsRow_f3.createCell(ColumnExcel.I);
+				cell_f_I3.setCellValue("R: Nghỉ, Hiếu, Hỉ");
+				Cell cell_f_M3 = tsRow_f3.createCell(ColumnExcel.M);
+				cell_f_M3.setCellValue("DC: Đình chỉ");
+				Cell cell_f_AD3 = tsRow_f3.createCell(ColumnExcel.AD);
+				cell_f_AD3.setCellValue("00:00 : Thời gian vào ra");
+				cell_f_AD3.setCellStyle(cellStyle_row_inout_borderless);
 			}
+
 
 			// tra file ve dang byte[]
 			OutputStream outputstream = new FileOutputStream(file);
