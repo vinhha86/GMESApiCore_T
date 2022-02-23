@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import vn.gpay.gsmart.core.api.pcontract_po.getpo_by_product_response;
 import vn.gpay.gsmart.core.base.ResponseBase;
 import vn.gpay.gsmart.core.org.IOrgService;
 import vn.gpay.gsmart.core.org.Org;
@@ -58,6 +59,7 @@ import vn.gpay.gsmart.core.security.GpayUser;
 import vn.gpay.gsmart.core.security.GpayUserOrg;
 import vn.gpay.gsmart.core.security.IGpayUserOrgService;
 import vn.gpay.gsmart.core.utils.OrgType;
+import vn.gpay.gsmart.core.utils.POType;
 import vn.gpay.gsmart.core.utils.ResponseMessage;
 
 @RestController
@@ -564,9 +566,9 @@ public class PContractAPI {
 	}
 	
 	@RequestMapping(value = "/get_TongHopBaoCaoKHSX", method = RequestMethod.POST)
-	public ResponseEntity<PContract_getone_response> get_TongHopBaoCaoKHSX(@RequestBody PContract_getone_request entity,
+	public ResponseEntity<getpo_by_product_response> get_TongHopBaoCaoKHSX(@RequestBody PContract_getone_request entity,
 			HttpServletRequest request) {
-		PContract_getone_response response = new PContract_getone_response();
+		getpo_by_product_response response = new getpo_by_product_response();
 		try {
 			GpayUser user = (GpayUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			Long orgid_link = user.getOrgid_link();
@@ -586,40 +588,45 @@ public class PContractAPI {
 					list_org.add(orgid_link);
 			}
 			//
-//			Boolean isDHATong = true;
-//			Org phanXuong = new Org();
-//			if(orgid_link.equals((long) 1)) {
-//				isDHATong = true;
-//			}else{
-//				isDHATong = false;
-//			}
-//			if(isDHATong == false) {
-//				phanXuong = orgService.findOne(orgid_link);
-//			}
-			// 
 			List<Integer> type = new ArrayList<Integer>();
 			type.add(10);
 			Long pcontract_id = entity.id;
-			PContract pcontract = pcontractService.findOne(entity.id);
+			PContract pcontract = pcontractService.findOne(pcontract_id);
 			
 			// danh sach obj de chuan bi them vao file
 			List<PContractProductSKUBinding> pcontractProductSKUBinding_list = new ArrayList<PContractProductSKUBinding>();
 			
+			// list po ke hoach
 			List<PContract_PO> pcontract_PO_list = pcontract_POService.getPO_Offer_Accept_ByPContract_AndOrg(
-					pcontract_id, (long)0, list_org);
+					pcontract.getId(), (long)0, list_org);
+			
+			// list po thuc te
+			List<PContract_PO> PContract_PO_thucte_list = new ArrayList<PContract_PO>();
+			for(PContract_PO pcontract_po : pcontract_PO_list) {
+				List<PContract_PO> listPContractPO = pcontract_POService
+						.get_by_parent_and_type_and_MauSP(pcontract_po.getId(), POType.PO_LINE_CONFIRMED, null);
+				PContract_PO_thucte_list.addAll(listPContractPO);
+			}
+			for(PContract_PO pcontract_po : PContract_PO_thucte_list) {
+				// ds mau co -> sl -> set vao binding
+				// pskuservice.getbypo_and_product(pcontract_poid_link, productid_link);
+			}
 			
 			
 			// them vao file excel
 			
-			response.data = pcontract;
+			
+			
+			// response
+			response.data = result;
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
-			return new ResponseEntity<PContract_getone_response>(response, HttpStatus.OK);
+			return new ResponseEntity<getpo_by_product_response>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
 			response.setMessage(e.getMessage());
-			return new ResponseEntity<PContract_getone_response>(response, HttpStatus.OK);
+			return new ResponseEntity<getpo_by_product_response>(response, HttpStatus.OK);
 		}
 	}
 }

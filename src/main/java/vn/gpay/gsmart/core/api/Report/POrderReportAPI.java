@@ -95,7 +95,7 @@ public class POrderReportAPI {
 																											// de chinh
 																											// sua tren
 																											// do
-		File file = new File(uploadRoot + "/LenhSanXuat_" + current_time.getTime() + ".xlsx"); // file de export
+		File file = new File(uploadRoot + "/LenhSanXuat_" + current_time.getTime() + ".xlsx"); //  file de export
 		// tao file copy cua template
 		Files.copy(FileExport, FileCopy);
 		FileInputStream is_filecopy = new FileInputStream(FileCopy);
