@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
+Built-By: Admin
+Build-Jdk: 17.0.2
 Implementation-Title: GSMART_API_CORE
 Implementation-Version: 0.0.1-SNAPSHOT
-Built-By: Phong
 Implementation-Vendor-Id: vn.gpay.gsmart
-Build-Jdk: 1.8.0_261
-Implementation-URL: https://projects.spring.io/spring-boot/#/spring-bo
- ot-starter-parent/GSMART_API_CORE
+Implementation-URL: https://projects.spring.io/spring-boot/#/spring-boot
+ -starter-parent/GSMART_API_CORE
 Created-By: Maven Integration for Eclipse
 
