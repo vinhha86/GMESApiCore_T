@@ -618,7 +618,8 @@ public class PContractAPI {
 			
 			
 			// response
-			response.data = result;
+//			response.data = result;
+			response.data = new ArrayList<PContract_PO>();
 
 			response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
 			response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
