@@ -157,23 +157,17 @@ public class TimeSheetReportAPI {
 			String name_phanxuong = org_Tochuyen.getParentname();
 			String name_thangtinhcong = entity.month + "/" + entity.year;
 			
-			//Ghi ten phan xuong
+			//Ghi ten phan xuong/to chuyen
 			Row row_1 = sheet.getRow(0);
-			Cell cell_A1 = row_1.getCell(ColumnExcel.A);
-			cell_A1.setCellValue(name_phanxuong);
-			
-			
-			//Ghi ten to chuyen
-			Row row_3 = sheet.getRow(2);
-			Cell cell_C3 = row_3.getCell(ColumnExcel.C);
-			cell_C3.setCellValue(name_tochuyen);
+			Cell cell_A1 = row_1.getCell(ColumnExcel.C);
+			cell_A1.setCellValue(name_phanxuong + " / " + name_tochuyen);
 			
 			//Ghi thang cong
-			Cell cell_AG3 = row_3.getCell(ColumnExcel.AG);
+			Cell cell_AG3 = row_1.getCell(ColumnExcel.AG);
 			cell_AG3.setCellValue(name_thangtinhcong);
 			
 			if (null != timesheet_daily) {
-				int iRowID = 4;
+				int iRowID = 2;
 				Integer iSTT = 0;
 				Integer iRow = 1;
 				List<TimeSheetDaily> timesheet_data = timesheet_daily.getBody().data;
@@ -200,7 +194,7 @@ public class TimeSheetReportAPI {
 						cell_TenNV.setCellStyle(theCellStyle);
 						
 						//Ngat trang
-						if (iSTT % 12 == 0) {
+						if (iSTT % 13 == 0) {
 							System.out.println(iSTT);
 							sheet.setRowBreak(iRowID-2);
 						}
@@ -380,16 +374,20 @@ public class TimeSheetReportAPI {
 				
 				Row tsRow_f3 = sheet.createRow(iRowID++);
 				Cell cell_f_C3 = tsRow_f3.createCell(ColumnExcel.C);
-				cell_f_C3.setCellValue("CO: Nghỉ con ốm");
+				cell_f_C3.setCellValue("F: Nghỉ phép");
 				Cell cell_f_F3 = tsRow_f3.createCell(ColumnExcel.F);
-				cell_f_F3.setCellValue("CT: Công tác");
+				cell_f_F3.setCellValue("CD: Nghỉ chế độ");
 				Cell cell_f_I3 = tsRow_f3.createCell(ColumnExcel.I);
-				cell_f_I3.setCellValue("R: Nghỉ, Hiếu, Hỉ");
+				cell_f_I3.setCellValue("TS: Nghỉ Thai sản");
 				Cell cell_f_M3 = tsRow_f3.createCell(ColumnExcel.M);
-				cell_f_M3.setCellValue("DC: Đình chỉ");
+				cell_f_M3.setCellValue("o: Nghỉ không lý do");
 				Cell cell_f_AD3 = tsRow_f3.createCell(ColumnExcel.AD);
 				cell_f_AD3.setCellValue("00:00 : Thời gian vào ra");
 				cell_f_AD3.setCellStyle(cellStyle_row_inout_borderless);
+				
+				Row tsRow_f4 = sheet.createRow(iRowID++);
+				Cell cell_f_C4 = tsRow_f4.createCell(ColumnExcel.C);
+				cell_f_C4.setCellValue("DS: Dưỡng sức");
 			}
 
 
