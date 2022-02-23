@@ -101,7 +101,7 @@ public class TimeSheetReportAPI {
 		cellStyle_row0.setFillForegroundColor(IndexedColors.RED.index);
 		cellStyle_row0.setFillBackgroundColor(IndexedColors.RED.index);
 		cellStyle_row0.setBorderTop(BorderStyle.THIN);
-		cellStyle_row0.setBorderBottom(BorderStyle.THIN);
+//		cellStyle_row0.setBorderBottom(BorderStyle.THIN);
 		cellStyle_row0.setBorderLeft(BorderStyle.THIN);
 		cellStyle_row0.setBorderRight(BorderStyle.THIN);
 		
@@ -117,8 +117,8 @@ public class TimeSheetReportAPI {
 		cellStyle_row_inout.setAlignment(HorizontalAlignment.CENTER);
 		cellStyle_row_inout.setVerticalAlignment(VerticalAlignment.CENTER);
 		cellStyle_row_inout.setFont(font_Calibri);
-		cellStyle_row_inout.setBorderTop(BorderStyle.THIN);
-		cellStyle_row_inout.setBorderBottom(BorderStyle.THIN);
+//		cellStyle_row_inout.setBorderTop(BorderStyle.THIN);
+//		cellStyle_row_inout.setBorderBottom(BorderStyle.THIN);
 		cellStyle_row_inout.setBorderLeft(BorderStyle.THIN);
 		cellStyle_row_inout.setBorderRight(BorderStyle.THIN);
 		
@@ -132,8 +132,8 @@ public class TimeSheetReportAPI {
 		cellStyle_row_lunch.setAlignment(HorizontalAlignment.CENTER);
 		cellStyle_row_lunch.setVerticalAlignment(VerticalAlignment.CENTER);
 		cellStyle_row_lunch.setFont(font_Calibri_Italic);
-		cellStyle_row_lunch.setBorderTop(BorderStyle.THIN);
-		cellStyle_row_lunch.setBorderBottom(BorderStyle.THIN);
+//		cellStyle_row_lunch.setBorderTop(BorderStyle.THIN);
+//		cellStyle_row_lunch.setBorderBottom(BorderStyle.THIN);
 		cellStyle_row_lunch.setBorderLeft(BorderStyle.THIN);
 		cellStyle_row_lunch.setBorderRight(BorderStyle.THIN);
 
