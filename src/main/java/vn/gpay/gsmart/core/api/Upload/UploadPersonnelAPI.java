@@ -75,6 +75,10 @@ public class UploadPersonnelAPI {
 			String FolderPath = "upload/personnel";
 			String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
 			File uploadRootDir = new File(uploadRootPath);
+			
+			if (!uploadRootDir.exists())
+				uploadRootDir.mkdirs();
+			
 			name = file.getOriginalFilename();
 
 			if (name != null && name.length() > 0) {

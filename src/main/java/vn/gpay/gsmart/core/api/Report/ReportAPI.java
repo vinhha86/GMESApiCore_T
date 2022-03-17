@@ -600,6 +600,34 @@ public class ReportAPI {
 			return new ResponseEntity<download_template_personnel_response>(response, HttpStatus.OK);
 		}
 	}
+	// download file test
+		@RequestMapping(value = "/download_temp_test", method = RequestMethod.POST)
+		public ResponseEntity<download_temp_test_response> downloadTempTest(HttpServletRequest request) {
+
+			download_temp_test_response response = new download_temp_test_response();
+			try {
+				String FolderPath = "TemplateUpload";
+
+				// Thư mục gốc upload file.
+				String uploadRootPath = request.getServletContext().getRealPath(FolderPath);
+
+				String filePath = uploadRootPath + "/" + "Danhsach_Test.xlsx";
+				Path path = Paths.get(filePath);
+				
+				byte[] data = Files.readAllBytes(path);
+				
+				response.setData(data);
+				response.setRespcode(ResponseMessage.KEY_RC_SUCCESS);
+				response.setMessage(ResponseMessage.getMessage(ResponseMessage.KEY_RC_SUCCESS));
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			} catch (IOException e) {
+//				logger.warn(e.getMessage());
+				response.setData(null);
+				response.setRespcode(ResponseMessage.KEY_RC_EXCEPTION);
+				response.setMessage(e.getMessage());
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			}
+		}
 
 	@RequestMapping(value = "/download_temp_bom_candoi", method = RequestMethod.POST)
 	public ResponseEntity<down_temp_bom_response> DownloadBomCanDoi(HttpServletRequest request,

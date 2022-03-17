@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Built-By: Admin
+Built-By: LEGION
 Build-Jdk: 17.0.2
 Implementation-Title: GSMART_API_CORE
 Implementation-Version: 0.0.1-SNAPSHOT
